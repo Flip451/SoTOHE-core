@@ -273,7 +273,7 @@ mod tests {
 
     #[rstest]
     #[case::document_with_section("PRD §3.2", Some(SignalBasis::Document))]
-    #[case::document_plain("track/tech-stack.md", Some(SignalBasis::Document))]
+    #[case::document_plain("knowledge/adr/README.md", Some(SignalBasis::Document))]
     #[case::document_with_section_jp(
         "tmp/TODO-PLAN-2026-03-22.md §Phase 2",
         Some(SignalBasis::Document)

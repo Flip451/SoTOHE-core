@@ -10,14 +10,14 @@
             {
               "message": "`ClaudeReviewer` is spawned with `--bare` only; there is no permission gate or tool whitelist (`--permission-mode dontAsk` / equivalent), so this subprocess is not structurally prevented from invoking write-capable tools and mutating the workspace. That breaks the read-only/no-write contract for CN-05.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "file": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
               "line": 304,
               "category": "security"
             },
             {
               "message": "The new public Claude review APIs are added without failure-path test coverage in this module. In particular, there is no test for `fast_review()` or for the fail-closed branches in `run_claude_review_str` (invalid track/scope, subprocess failure, or write-verdict failure), so regressions in the new Claude path can ship unnoticed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/cli_composition.rs",
+              "file": "libs/infrastructure/src/review_v2/cli_composition.rs",
               "line": 598,
               "category": "tests"
             }
@@ -32,7 +32,7 @@
             {
               "message": "The new `run_claude_review_str` tests never exercise the intended branches: all three cases pass `../evil` as `track_id_str`, so `TrackId::try_new` fails before scope/round-type validation or any successful auto-record path runs. That leaves the new public Claude helpers without a happy-path test and does not actually verify the fail-closed write-first behavior they are meant to guarantee.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/cli_composition.rs",
+              "file": "libs/infrastructure/src/review_v2/cli_composition.rs",
               "line": 1245,
               "category": "testing"
             }
@@ -47,7 +47,7 @@
             {
               "message": "The stdout collector is always joined after the child exits, including the timeout path. If `claude` (or a descendant) keeps the stdout pipe open, `run_claude_child` blocks forever instead of returning `ReviewerError::Timeout`, so the review command can hang despite the timeout.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "file": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
               "line": 389,
               "category": "correctness"
             }
@@ -127,14 +127,14 @@
             {
               "message": "`ClaudeReviewer` now creates `tmp/reviewer-runtime/claude-session-*.log` with `File::create` before every subprocess spawn. That is a workspace write on the review path, so the adapter is no longer strictly read-only/output-only as CN-05 requires, and it can fail outright in a read-only workspace before producing a verdict.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/claude_reviewer.rs",
+              "file": "libs/infrastructure/src/review_v2/claude_reviewer.rs",
               "line": 301,
               "category": "architecture"
             },
             {
               "message": "The new Claude review entrypoints are only exercised on success and basic argument-validation paths. There is still no coverage for the fail-closed branches that matter here: subprocess spawn/timeout/invalid-envelope handling in `ClaudeReviewer::review`/`fast_review`, or review-store write failure in `run_claude_review_str`. That leaves the new provider path regressions undetected.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/cli_composition.rs",
+              "file": "libs/infrastructure/src/review_v2/cli_composition.rs",
               "line": 598,
               "category": "testing"
             }
@@ -593,7 +593,7 @@
             {
               "message": "`sotp review local` now resolves `agent-profiles.json` from the process current directory instead of the repository root. If the command is invoked from a subdirectory or via a wrapper that changes cwd, profile loading fails and the new provider-selection path cannot run, even though the repo is discoverable. Use repo-root discovery here like the PR workflow does.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/local.rs",
+              "file": "apps/cli/src/commands/review/local.rs",
               "line": 70,
               "category": "correctness"
             }

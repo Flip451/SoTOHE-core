@@ -60,7 +60,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "echo '{\"hookSpecificOutput\": {\"additionalContext\": \"Context compaction triggered. Key context: Check CLAUDE.md for project rules and workflow. Check track/tech-stack.md for Rust stack. Check track/items/ for current feature specs and plans. Check .claude/rules/ for Rust coding standards. Check knowledge/conventions/README.md for project-specific implementation rules. Run cargo make ci to verify quality before commits.\"}}'"
+            "command": "echo '{\"hookSpecificOutput\": {\"additionalContext\": \"Context compaction triggered. Key context: Check CLAUDE.md for project rules and workflow. Check knowledge/adr/README.md for tech stack decisions. Check track/items/ for current feature specs and plans. Check .claude/rules/ for Rust coding standards. Check knowledge/conventions/README.md for project-specific implementation rules. Run cargo make ci to verify quality before commits.\"}}'"
           }
         ]
       }
@@ -71,7 +71,7 @@
         "hooks": [
           {
             "type": "prompt",
-            "prompt": "A Bash command requires user permission: $ARGUMENTS\n\nAnalyze the command and decide (check in order, return at first match):\n\n0. **PRIORITY: Chain operators (&&, ;)**\n   If the command contains `&&` or `;` joining multiple commands, ALWAYS deny.\n   Each subcommand is likely individually allowed — split into separate Bash calls.\n   Respond: {\"hookSpecificOutput\":{\"hookEventName\":\"PermissionRequest\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Split chained commands into separate Bash calls\",\"additionalContext\":\"This command chains multiple commands with && or ;. Split into separate Bash calls — each individual command is likely already in permissions.allow.\"}}\n\n1. Can this be done with a dedicated Claude Code tool instead?\n   - File reading (cat, head, tail, less, more) → Use the Read tool\n   - File searching (grep, rg, ag) → Use the Grep tool\n   - File finding (find, ls, tree) → Use the Glob tool\n   - File writing (cat >, echo >) → Use the Write or Edit tool\n\n2. Is this a direct `bin/sotp` call that has a `cargo make` wrapper?\n   - `bin/sotp make ...` → Use `cargo make ...` (the wrapper calls sotp make internally)\n   - `bin/sotp review check-approved`, `bin/sotp review results`, and `bin/sotp plan codex-local` intentionally have no cargo make wrapper in this workflow; do not suggest `track-check-approved`, `track-review-results`, or `track-local-plan`.\n   - If a `cargo make` wrapper exists, deny and suggest it.\n\n3. If a dedicated tool or cargo make wrapper CAN replace this command, respond with JSON:\n   {\"hookSpecificOutput\":{\"hookEventName\":\"PermissionRequest\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Use cargo make wrapper or dedicated tool instead\",\"additionalContext\":\"This command can be replaced by [ALTERNATIVE]. Use [SPECIFIC_COMMAND] instead.\"}}\n\n4. If the command genuinely needs Bash (no dedicated tool, no cargo make wrapper, no chain), respond with JSON:\n   {\"hookSpecificOutput\":{\"hookEventName\":\"PermissionRequest\",\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"No dedicated tool or wrapper alternative\"}}",
+            "prompt": "A Bash command requires user permission: $ARGUMENTS\n\nAnalyze the command and decide (check in order, return at first match):\n\n0. **PRIORITY: Chain operators (&&, ;)**\n   If the command contains `&&` or `;` joining multiple commands, ALWAYS deny.\n   Each subcommand is likely individually allowed — split into separate Bash calls.\n   Respond: {\"hookSpecificOutput\":{\"hookEventName\":\"PermissionRequest\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Split chained commands into separate Bash calls\",\"additionalContext\":\"This command chains multiple commands with && or ;. Split into separate Bash calls — each individual command is likely already in permissions.allow.\"}}\n\n1. Can this be done with a dedicated Claude Code tool instead?\n   - File reading (cat, head, tail, less, more) → Use the Read tool\n   - File searching (grep, rg, ag) → Use the Grep tool\n   - File finding (find, ls, tree) → Use the Glob tool\n   - File writing (cat >, echo >) → Use the Write or Edit tool\n\n2. Is this a direct `bin/sotp` call that has a `cargo make` wrapper?\n   - `bin/sotp make ...` → Use `cargo make ...` (the wrapper calls sotp make internally)\n   - `bin/sotp review check-approved`, `bin/sotp review results`, and `bin/sotp capability exec` intentionally have no cargo make wrapper in this workflow; do not suggest `track-check-approved`, `track-review-results`, or a capability-exec wrapper.\n   - If a `cargo make` wrapper exists, deny and suggest it.\n\n3. If a dedicated tool or cargo make wrapper CAN replace this command, respond with JSON:\n   {\"hookSpecificOutput\":{\"hookEventName\":\"PermissionRequest\",\"permissionDecision\":\"deny\",\"permissionDecisionReason\":\"Use cargo make wrapper or dedicated tool instead\",\"additionalContext\":\"This command can be replaced by [ALTERNATIVE]. Use [SPECIFIC_COMMAND] instead.\"}}\n\n4. If the command genuinely needs Bash (no dedicated tool, no cargo make wrapper, no chain), respond with JSON:\n   {\"hookSpecificOutput\":{\"hookEventName\":\"PermissionRequest\",\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"No dedicated tool or wrapper alternative\"}}",
             "timeout": 15,
             "statusMessage": "Evaluating if dedicated tool can replace Bash command..."
           }
@@ -83,8 +83,6 @@
     "allow": [
       "Read(./**)",
       "Edit(./**)",
-      "Write(./**)",
-      "Glob(./**)",
       "Grep(./**)",
       "Task(*)",
       "Skill(*)",
@@ -98,43 +96,19 @@
       "Bash(git ls-files:*)",
       "Bash(git notes show:*)",
       "Bash(git notes list:*)",
-      "Bash(cargo make help)",
       "Bash(cargo make bootstrap)",
-      "Bash(cargo make build-tools)",
-      "Bash(cargo make build-dev)",
-      "Bash(cargo make up)",
-      "Bash(cargo make down)",
-      "Bash(cargo make logs)",
-      "Bash(cargo make ps)",
-      "Bash(cargo make shell)",
-      "Bash(cargo make fmt)",
       "Bash(cargo make fmt-check)",
       "Bash(cargo make clippy)",
       "Bash(cargo make test)",
       "Bash(cargo make test-doc)",
-      "Bash(cargo make test-nocapture)",
-      "Bash(cargo make bacon)",
-      "Bash(cargo make bacon-test)",
-      "Bash(cargo make check)",
       "Bash(cargo make deny)",
-      "Bash(cargo make machete)",
-      "Bash(cargo make clippy-tests)",
-      "Bash(cargo make llvm-cov)",
       "Bash(cargo make check-layers)",
       "Bash(cargo make verify-arch-docs)",
-      "Bash(cargo make verify-plan-progress)",
       "Bash(cargo make verify-track-metadata)",
-      "Bash(cargo make verify-tech-stack)",
       "Bash(cargo make verify-latest-track)",
-      "Bash(cargo make verify-track-registry)",
       "Bash(cargo make ci-rust)",
       "Bash(cargo make ci)",
-      "Bash(cargo make add-all)",
-      "Bash(cargo make track-add-paths)",
       "Bash(cargo make track-commit-message)",
-      "Bash(cargo make track-note)",
-      "Bash(cargo make track-branch-create:*)",
-      "Bash(cargo make track-branch-switch:*)",
       "Bash(gemini:*)",
       "Bash(codex:*)",
       "Bash(tree:*)",
@@ -145,18 +119,15 @@
       "Bash(bin/sotp signal:*)",
       "Bash(bin/sotp track:*)",
       "Bash(bin/sotp dry:*)",
-      "Bash(bin/sotp plan:*)",
+      "Bash(bin/sotp capability:*)",
+      "Bash(bin/sotp git add-all)",
+      "Bash(bin/sotp git add-from-file:*)",
+      "Bash(bin/sotp git sync)",
+      "Bash(bin/sotp git note-from-file:*)",
       "Bash(bin/sotp pr:*)",
+      "Bash(gh pr view:*)",
+      "Bash(cargo make pr-audit-comment:*)",
       "Bash(cargo make verify-plan-artifact-refs)",
-      "Bash(cargo make build-sotp)",
-      "Bash(cargo make export-schema:*)",
-      "Bash(cargo make track-pr)",
-      "Bash(cargo make track-pr:*)",
-      "Bash(cargo make track-pr-push)",
-      "Bash(cargo make track-pr-review)",
-      "Bash(cargo make track-set-commit-hash)",
-      "Bash(cargo make track-set-commit-hash:*)",
-      "Bash(cargo make track-switch-base)",
       "Bash(cargo make track-local-review)",
       "Bash(cargo make track-local-review:*)",
       "Bash(cargo make track-local-review-fix:*)",
@@ -180,7 +151,6 @@
     "deny": [
       "Read(./track/archive/**)",
       "Grep(./track/archive/**)",
-      "Glob(./track/archive/**)",
       "Read(./.env)",
       "Read(./.env.*)",
       "Read(./.cache/cargo/**)",
@@ -212,7 +182,6 @@
     ]
   },
   "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
-    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-sonnet-5"
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   }
 }

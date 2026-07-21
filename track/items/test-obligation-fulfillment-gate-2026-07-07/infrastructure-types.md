@@ -1,0 +1,70 @@
+<!-- Generated from infrastructure-types.json — DO NOT EDIT DIRECTLY -->
+
+## Enums
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| ContractRoleKey | enum | add | SecondaryPort, SpecificationPort, Repository, ApplicationService | 🔵 | 🔵 |
+| DataRoleKey | enum | add | ValueObject, Entity, AggregateRoot, DomainService, UseCase, EventPolicy, DomainEvent, Specification, Factory, Interactor, Command, Query, Dto, ErrorType, SecondaryAdapter, CompositionRoot, PrimaryAdapter | 🔵 | 🔵 |
+| FulfillmentFailCategoryDto | enum | add | Contradiction, Substitution, CentralUnverified | 🔵 | 🔵 |
+| FunctionRoleKey | enum | add | UseCaseFunction, FreeFunction | 🔵 | 🔵 |
+| ObligationFulfillmentVerdictDto | enum | add | Fulfilled, Fail, Pending | 🔵 | 🔵 |
+| PatternKey | enum | add | Typestate | 🔵 | 🔵 |
+| TestBindingRecordDto | enum | add | Fulfillment, Waiver, VoluntaryBinding | 🔵 | 🔵 |
+| TestObligationKindDto | enum | add | Boundary, InvariantPreservation, EventEmission, LogicResult, PredicateBothBranches, ConstructionResult, Result, Reaction, Transition, Contract, ContractConformance, Logic | 🔵 | 🔵 |
+| TestObligationPerAxisDto | enum | add | Invariant, Method, Handles, ReactsTo, Transition, TraitMethod, Entry, Emits, TraitImpl | 🔵 | 🔵 |
+| WaiverVerdictDto | enum | add | Waived, Fail, Pending | 🔵 | 🔵 |
+
+## Error Types
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| ObligationsCodecError | error_type | add | — | 🔵 | 🔵 |
+| TestBindingsCodecError | error_type | add | — | 🔵 | 🔵 |
+
+## DTOs
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| CatalogueEntryRefDto | dto | add | — | 🔵 | 🔵 |
+| ObligationFulfillmentCacheDocumentDto | dto | add | — | 🔵 | 🔵 |
+| ObligationFulfillmentCacheEntryDto | dto | add | — | 🔵 | 🔵 |
+| ObligationsDocumentDto | dto | add | — | 🔵 | 🔵 |
+| RoleObligationRulesDto | dto | add | — | 🔵 | 🔵 |
+| TestBindingsDocumentDto | dto | add | — | 🔵 | 🔵 |
+| TestLocationDto | dto | add | — | 🔵 | 🔵 |
+| TestObligationAnchorIdDto | dto | add | — | 🔵 | 🔵 |
+| TestObligationDto | dto | add | — | 🔵 | 🔵 |
+| TestObligationEdgeIdDto | dto | add | — | 🔵 | 🔵 |
+| TestObligationIdDto | dto | add | — | 🔵 | 🔵 |
+| TestObligationRuleDto | dto | add | — | 🔵 | 🔵 |
+| TestObligationRulesDocumentDto | dto | add | — | 🔵 | 🔵 |
+| WaiverCacheDocumentDto | dto | add | — | 🔵 | 🔵 |
+| WaiverCacheEntryDto | dto | add | — | 🔵 | 🔵 |
+
+## Secondary Adapters
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| FailingObligationFulfillmentVerifier | secondary_adapter | add | impl ObligationFulfillmentVerifierPort, impl Debug, impl Clone | 🔵 | 🔵 |
+| FailingWaiverVerifier | secondary_adapter | add | impl WaiverVerifierPort, impl Debug, impl Clone | 🔵 | 🔵 |
+| FsSpecDocumentLoader | secondary_adapter | add | impl SpecDocumentLoaderPort, impl Debug, impl Clone | 🔵 | 🔵 |
+| JsonObligationFulfillmentCacheCodec | secondary_adapter | add | impl ObligationFulfillmentCachePort, impl Debug, impl Clone | 🔵 | 🔵 |
+| JsonObligationsCodec | secondary_adapter | add | impl ObligationsArtifactPort, impl Debug, impl Clone | 🔵 | 🔵 |
+| JsonTestBindingsCodec | secondary_adapter | add | impl TestBindingsArtifactPort, impl Debug, impl Clone | 🔵 | 🔵 |
+| JsonTestObligationRulesLoader | secondary_adapter | add | impl TestObligationRulesLoaderPort, impl Debug, impl Clone | 🔵 | 🔵 |
+| JsonWaiverCacheCodec | secondary_adapter | add | impl WaiverCachePort, impl Debug, impl Clone | 🔵 | 🔵 |
+| ObligationFulfillmentEscalationDriver | secondary_adapter | add | impl Debug, impl Clone, impl SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::ObligationFulfillmentPair, domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey, domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> | 🔵 | 🔵 |
+| ObligationFulfillmentVerifierAdapter | secondary_adapter | add | impl ObligationFulfillmentVerifierPort | 🔵 | 🔵 |
+| Sha256ContentHasher | secondary_adapter | add | impl Debug, impl Clone, impl Default, impl ContentHasherPort | 🔵 | 🔵 |
+| SynTestSourceScanner | secondary_adapter | add | impl TestSourceScannerPort | 🔵 | 🔵 |
+| WaiverEscalationDriver | secondary_adapter | add | impl Debug, impl Clone, impl SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::WaiverPair, domain::tddd::test_obligation::verdict::WaiverCacheKey, domain::tddd::test_obligation::verdict::WaiverVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> | 🔵 | 🔵 |
+| WaiverVerifierAdapter | secondary_adapter | add | impl WaiverVerifierPort | 🔵 | 🔵 |
+
+## Free Functions
+
+| Name | Kind | Action | Details | Signal | Cat-Spec |
+|------|------|--------|---------|--------|----------|
+| infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint | free_function | add | fn() -> domain::tddd::test_obligation::hashes::VerifierPromptFingerprint | 🔵 | 🔵 |
+| infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint | free_function | add | fn() -> domain::tddd::test_obligation::hashes::VerifierPromptFingerprint | 🔵 | 🔵 |
+

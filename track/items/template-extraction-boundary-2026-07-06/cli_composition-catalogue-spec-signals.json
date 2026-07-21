@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "a2d9e4243a0b26ae135e475f1f67c3c934d1d0773f9d88d98133b88fef95b602",
+  "signals": [
+    {
+      "type_name": "TemplateCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "1e54d7001c2a24a956f4169ab01187e98d88969d423eb885251a880480a01e1c"
+    }
+  ]
+}

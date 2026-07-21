@@ -1,0 +1,270 @@
+{
+  "schema_version": 1,
+  "track_id": "test-obligation-fulfillment-gate-2026-07-07",
+  "entries": {
+    "T001": [
+      { "layer": "usecase", "entry_key": "SemanticEscalationDriverPort" },
+      { "layer": "usecase", "entry_key": "SemanticEscalationVerdictBridge" },
+      { "layer": "usecase", "entry_key": "SemanticCalibrationProbeConfig" },
+      { "layer": "usecase", "entry_key": "SemanticEscalationFuture" }
+    ],
+    "T002": [
+      { "layer": "usecase", "entry_key": "RefVerifyConfig" },
+      { "layer": "usecase", "entry_key": "RefVerifyCacheKey" },
+      { "layer": "usecase", "entry_key": "RefVerifyPercent" }
+    ],
+    "T003": [
+      { "layer": "domain", "entry_key": "RoleObligationRules" },
+      { "layer": "domain", "entry_key": "TestObligationRule" },
+      { "layer": "domain", "entry_key": "TestObligationRulesDocument" },
+      { "layer": "domain", "entry_key": "TestObligationBriefTemplate" },
+      { "layer": "domain", "entry_key": "TestObligationMinimum" },
+      { "layer": "domain", "entry_key": "TestObligationKind" },
+      { "layer": "domain", "entry_key": "TestObligationPerAxis" },
+      { "layer": "domain", "entry_key": "TestObligationPatternKind" },
+      { "layer": "domain", "entry_key": "TestObligationRulesLoadError" },
+      { "layer": "domain", "entry_key": "TestObligationRulesLoaderPort" },
+      { "layer": "domain", "entry_key": "ValidationError" }
+    ],
+    "T004": [
+      { "layer": "infrastructure", "entry_key": "DataRoleKey" },
+      { "layer": "infrastructure", "entry_key": "ContractRoleKey" },
+      { "layer": "infrastructure", "entry_key": "FunctionRoleKey" },
+      { "layer": "infrastructure", "entry_key": "PatternKey" },
+      { "layer": "infrastructure", "entry_key": "TestObligationPerAxisDto" },
+      { "layer": "infrastructure", "entry_key": "TestObligationRuleDto" },
+      { "layer": "infrastructure", "entry_key": "RoleObligationRulesDto" },
+      { "layer": "infrastructure", "entry_key": "TestObligationRulesDocumentDto" },
+      { "layer": "infrastructure", "entry_key": "JsonTestObligationRulesLoader" }
+    ],
+    "T005": [],
+    "T006": [
+      { "layer": "domain", "entry_key": "AnchorTextHash" },
+      { "layer": "domain", "entry_key": "DeclarationHash" },
+      { "layer": "domain", "entry_key": "BoundTestsSetHash" },
+      { "layer": "domain", "entry_key": "WaivedReasonHash" },
+      { "layer": "domain", "entry_key": "TestBodySpanHash" },
+      { "layer": "domain", "entry_key": "TestObligationId" },
+      { "layer": "domain", "entry_key": "TestObligationAnchorId" },
+      { "layer": "domain", "entry_key": "TestObligationEdgeId" },
+      { "layer": "domain", "entry_key": "TestObligationItemIdentifier" },
+      { "layer": "domain", "entry_key": "TestObligationBrief" },
+      { "layer": "domain", "entry_key": "TestModulePath" },
+      { "layer": "domain", "entry_key": "TestFunctionName" },
+      { "layer": "domain", "entry_key": "WaivedReason" },
+      { "layer": "domain", "entry_key": "RoleName" },
+      { "layer": "domain", "entry_key": "DiagnosticMessage" }
+    ],
+    "T007": [
+      { "layer": "domain", "entry_key": "TestObligation" },
+      { "layer": "domain", "entry_key": "TestLocation" },
+      { "layer": "domain", "entry_key": "TestBindingRecord" },
+      { "layer": "domain", "entry_key": "TestBindingsDocument" },
+      { "layer": "domain", "entry_key": "UncitedSpecElementFinding" },
+      { "layer": "domain", "entry_key": "NonEmptyTestLocations" }
+    ],
+    "T008": [
+      { "layer": "domain", "entry_key": "ObligationFulfillmentVerdict" },
+      { "layer": "domain", "entry_key": "WaiverVerdict" },
+      { "layer": "domain", "entry_key": "ObligationFulfillmentCacheKey" },
+      { "layer": "domain", "entry_key": "ObligationFulfillmentCacheDocument" },
+      { "layer": "domain", "entry_key": "WaiverCacheKey" },
+      { "layer": "domain", "entry_key": "WaiverCacheDocument" },
+      { "layer": "domain", "entry_key": "TestObligationDriftKind" },
+      { "layer": "domain", "entry_key": "TestObligationDrift" },
+      { "layer": "domain", "entry_key": "EdgeResolutionOutcome" }
+    ],
+    "T009": [
+      { "layer": "domain", "entry_key": "ObligationDeriveError" },
+      { "layer": "domain", "entry_key": "ObligationEvaluateError" },
+      { "layer": "domain", "entry_key": "ObligationResultsError" },
+      { "layer": "domain", "entry_key": "FulfillmentFailCategory" },
+      { "layer": "domain", "entry_key": "SemanticVerifierError" },
+      { "layer": "domain", "entry_key": "ArtifactCodecError" },
+      { "layer": "domain", "entry_key": "TestSourceScanError" },
+      { "layer": "domain", "entry_key": "VerifyCacheError" },
+      { "layer": "domain", "entry_key": "ObligationsArtifactPort" },
+      { "layer": "domain", "entry_key": "TestBindingsArtifactPort" },
+      { "layer": "domain", "entry_key": "ObligationFulfillmentCachePort" },
+      { "layer": "domain", "entry_key": "WaiverCachePort" },
+      { "layer": "domain", "entry_key": "ObligationFulfillmentVerifierPort" },
+      { "layer": "domain", "entry_key": "WaiverVerifierPort" },
+      { "layer": "domain", "entry_key": "TestSourceScannerPort" }
+    ],
+    "T010": [
+      { "layer": "infrastructure", "entry_key": "CatalogueEntryRefDto" },
+      { "layer": "infrastructure", "entry_key": "ObligationsDocumentDto" },
+      { "layer": "infrastructure", "entry_key": "TestObligationDto" },
+      { "layer": "infrastructure", "entry_key": "TestObligationIdDto" },
+      { "layer": "infrastructure", "entry_key": "TestObligationAnchorIdDto" },
+      { "layer": "infrastructure", "entry_key": "TestObligationKindDto" },
+      { "layer": "infrastructure", "entry_key": "ObligationsCodecError" },
+      { "layer": "infrastructure", "entry_key": "JsonObligationsCodec" }
+    ],
+    "T011": [
+      { "layer": "infrastructure", "entry_key": "TestBindingsDocumentDto" },
+      { "layer": "infrastructure", "entry_key": "TestBindingRecordDto" },
+      { "layer": "infrastructure", "entry_key": "TestLocationDto" },
+      { "layer": "infrastructure", "entry_key": "TestObligationEdgeIdDto" },
+      { "layer": "infrastructure", "entry_key": "TestBindingsCodecError" },
+      { "layer": "infrastructure", "entry_key": "JsonTestBindingsCodec" }
+    ],
+    "T012": [
+      { "layer": "infrastructure", "entry_key": "ObligationFulfillmentCacheDocumentDto" },
+      { "layer": "infrastructure", "entry_key": "ObligationFulfillmentCacheEntryDto" },
+      { "layer": "infrastructure", "entry_key": "ObligationFulfillmentVerdictDto" },
+      { "layer": "infrastructure", "entry_key": "FulfillmentFailCategoryDto" },
+      { "layer": "infrastructure", "entry_key": "JsonObligationFulfillmentCacheCodec" },
+      { "layer": "infrastructure", "entry_key": "WaiverCacheDocumentDto" },
+      { "layer": "infrastructure", "entry_key": "WaiverCacheEntryDto" },
+      { "layer": "infrastructure", "entry_key": "WaiverVerdictDto" },
+      { "layer": "infrastructure", "entry_key": "JsonWaiverCacheCodec" }
+    ],
+    "T013": [
+      { "layer": "infrastructure", "entry_key": "SynTestSourceScanner" }
+    ],
+    "T014": [],
+    "T015": [],
+    "T016": [
+      { "layer": "usecase", "entry_key": "TestObligationCatalogueCommandInput" },
+      { "layer": "usecase", "entry_key": "DeriveTestObligationsCommand" },
+      { "layer": "usecase", "entry_key": "DeriveTestObligationsApplicationService" },
+      { "layer": "usecase", "entry_key": "DeriveTestObligationsInteractor" },
+      { "layer": "usecase", "entry_key": "ContentHasherPort" },
+      { "layer": "domain", "entry_key": "SpecDocumentLoaderPort" },
+      { "layer": "domain", "entry_key": "SpecDocumentLoadError" },
+      { "layer": "domain", "entry_key": "TraitImplDeclV2" },
+      { "layer": "domain", "entry_key": "TraitRefScope" },
+      { "layer": "domain", "entry_key": "TraitName" },
+      { "layer": "domain", "entry_key": "CrateName" },
+      { "layer": "domain", "entry_key": "RoleObligationItemsProjector" },
+      { "layer": "domain", "entry_key": "CatalogueDocumentLoaderPort" },
+      { "layer": "domain", "entry_key": "CatalogueDocumentLoaderError" }
+    ],
+    "T017": [
+      { "layer": "usecase", "entry_key": "TestObligationCatalogueCommandInput" },
+      { "layer": "usecase", "entry_key": "CheckTestObligationsCommand" },
+      { "layer": "usecase", "entry_key": "CheckTestObligationsOutcome" },
+      { "layer": "usecase", "entry_key": "CheckTestObligationsApplicationService" },
+      { "layer": "domain", "entry_key": "NonEmptyDrifts" }
+    ],
+    "T018": [
+      { "layer": "usecase", "entry_key": "EvaluateTestObligationsCommand" },
+      { "layer": "usecase", "entry_key": "EvaluateTestObligationsOutcome" },
+      { "layer": "usecase", "entry_key": "TestObligationEvaluateConfig" },
+      { "layer": "usecase", "entry_key": "EvaluateTestObligationsApplicationService" },
+      { "layer": "usecase", "entry_key": "EvaluateTestObligationsFuture" },
+      { "layer": "usecase", "entry_key": "TestObligationEvaluateConfigError" },
+      { "layer": "domain", "entry_key": "NonEmptyEdgeIds" },
+      { "layer": "domain", "entry_key": "NonEmptyEdgeVerdictRecords" },
+      { "layer": "domain", "entry_key": "ObligationEvaluateError" },
+      { "layer": "domain", "entry_key": "ObligationFulfillmentPair" },
+      { "layer": "domain", "entry_key": "WaiverPair" },
+      { "layer": "domain", "entry_key": "TestsSource" },
+      { "layer": "domain", "entry_key": "EntryDeclaration" },
+      { "layer": "domain", "entry_key": "AnchorText" },
+      { "layer": "domain", "entry_key": "DetectionRatePercent" }
+    ],
+    "T019": [
+      { "layer": "usecase", "entry_key": "TestObligationResultsCommand" },
+      { "layer": "usecase", "entry_key": "TestObligationResultsOutput" },
+      { "layer": "usecase", "entry_key": "TestObligationLaneSummary" },
+      { "layer": "usecase", "entry_key": "TestObligationChainLabel" },
+      { "layer": "usecase", "entry_key": "TestObligationResultsApplicationService" },
+      { "layer": "usecase", "entry_key": "TestObligationResultsInteractor" }
+    ],
+    "T020": [
+      { "layer": "cli_driver", "entry_key": "TestObligationDeriveHandler" },
+      { "layer": "cli_driver", "entry_key": "TestObligationCheckHandler" },
+      { "layer": "cli_driver", "entry_key": "TestObligationEvaluateHandler" },
+      { "layer": "cli_driver", "entry_key": "TestObligationResultsHandler" },
+      { "layer": "cli_driver", "entry_key": "TestObligationDeriveInput" },
+      { "layer": "cli_driver", "entry_key": "TestObligationCheckInput" },
+      { "layer": "cli_driver", "entry_key": "TestObligationEvaluateInput" },
+      { "layer": "cli_driver", "entry_key": "TestObligationResultsInput" }
+    ],
+    "T021": [
+      { "layer": "cli_composition", "entry_key": "TestObligationCompositionRoot" },
+      { "layer": "infrastructure", "entry_key": "FsSpecDocumentLoader" },
+      { "layer": "infrastructure", "entry_key": "FailingObligationFulfillmentVerifier" },
+      { "layer": "infrastructure", "entry_key": "FailingWaiverVerifier" }
+    ],
+    "T022": [
+      { "layer": "cli", "entry_key": "CliCommand" },
+      { "layer": "cli", "entry_key": "TestObligationSubcommand" },
+      { "layer": "cli", "entry_key": "TestObligationArgs" },
+      { "layer": "cli", "entry_key": "TestObligationDeriveArgs" },
+      { "layer": "cli", "entry_key": "TestObligationCheckArgs" },
+      { "layer": "cli", "entry_key": "TestObligationEvaluateArgs" },
+      { "layer": "cli", "entry_key": "TestObligationResultsArgs" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_derive" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_check" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_evaluate" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_results" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::command_context" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::failure" }
+    ],
+    "T023": [],
+    "T024": [
+      { "layer": "infrastructure", "entry_key": "ObligationFulfillmentEscalationDriver" }
+    ],
+    "T025": [
+      { "layer": "infrastructure", "entry_key": "WaiverEscalationDriver" }
+    ],
+    "T026": [
+      { "layer": "infrastructure", "entry_key": "Sha256ContentHasher" }
+    ],
+    "T027": [
+      { "layer": "usecase", "entry_key": "TestBindingsSkeletonCommand" },
+      { "layer": "usecase", "entry_key": "TestBindingsSkeletonRecord" },
+      { "layer": "usecase", "entry_key": "TestBindingsSkeletonOutcome" },
+      { "layer": "usecase", "entry_key": "TestBindingsSkeletonError" },
+      { "layer": "usecase", "entry_key": "TestBindingsSkeletonApplicationService" },
+      { "layer": "usecase", "entry_key": "TestBindingsSkeletonInteractor" },
+      { "layer": "cli_driver", "entry_key": "TestBindingsSkeletonInput" },
+      { "layer": "cli_driver", "entry_key": "TestBindingsSkeletonHandler" },
+      { "layer": "cli_composition", "entry_key": "TestObligationCompositionRoot" },
+      { "layer": "cli", "entry_key": "TestBindingsSkeletonArgs" },
+      { "layer": "cli", "entry_key": "TestObligationSubcommand" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_bindings_skeleton" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::read_only_command_context" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::command_root" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::current_branch" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::read_command_branch" }
+    ],
+    "T028": [
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::command_context_with" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::dispatch_test_obligation" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_bindings_skeleton_with" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_check_with" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_derive_with" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_evaluate_with" },
+      { "layer": "cli", "entry_key": "cli::commands::test_obligation::execute_results_with" }
+    ],
+    "T029": [
+      { "layer": "domain", "entry_key": "VerifierPromptFingerprint" },
+      { "layer": "domain", "entry_key": "ObligationFulfillmentCacheEntry" },
+      { "layer": "domain", "entry_key": "WaiverCacheEntry" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint" },
+      { "layer": "usecase", "entry_key": "CheckTestObligationsInteractor" },
+      { "layer": "usecase", "entry_key": "EvaluateTestObligationsInteractor" }
+    ],
+    "T030": [
+      { "layer": "domain", "entry_key": "EdgeVerdictRecord" }
+    ],
+    "T031": [
+      { "layer": "domain", "entry_key": "ObligationsDocument" }
+    ],
+    "T032": [
+      { "layer": "infrastructure", "entry_key": "ObligationFulfillmentVerifierAdapter" },
+      { "layer": "infrastructure", "entry_key": "WaiverVerifierAdapter" }
+    ],
+    "T033": [
+      { "layer": "domain", "entry_key": "ObligationCheckError" },
+      { "layer": "domain", "entry_key": "TargetEntryRoleKind" },
+      { "layer": "usecase", "entry_key": "CheckTestObligationsInteractor" }
+    ]
+  }
+}

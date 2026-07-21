@@ -6,12 +6,14 @@ use std::time::Instant;
 use domain::review_v2::{CommitHashReader, ReviewScopeConfig};
 use domain::{CommitHash, TrackId};
 
-use infrastructure::git_cli::{GitRepository, SystemGitRepo};
+use infrastructure::git_cli::SystemGitRepo;
 use infrastructure::review_v2::{
     ClaudeReviewer, CodexReviewer, FsCommitHashStore, FsReviewStore, GitDiffGetter,
     SystemReviewHasher, load_v2_scope_config,
 };
 use thiserror::Error;
+use usecase::capability_exec::ReasoningEffort;
+use usecase::dry_write_driver::CapabilityName;
 use usecase::review_v2::{ReviewCycle, ScopeQueryInteractor};
 
 use super::null_reviewer::NullReviewer;
@@ -257,7 +259,15 @@ fn discover_repo_from_items_dir(items_dir: &Path) -> Result<SystemGitRepo, Revie
 }
 
 pub(super) fn repo_root_from_items_dir(items_dir: &Path) -> Result<PathBuf, ReviewSharedError> {
-    Ok(discover_repo_from_items_dir(items_dir)?.root().to_path_buf())
+    // `items_dir` is an explicit composition input. Derive the repository root
+    // from it rather than falling back to ambient process CWD, which is shared
+    // by concurrent callers and can select an unrelated repository.
+    let project_root = crate::track::resolve_project_root(items_dir)
+        .map_err(|error| ReviewSharedError::Path(error.to_string()))?;
+    Ok(SystemGitRepo::discover_from(&project_root)
+        .map_err(|error| ReviewSharedError::Git(format!("git discover: {error}")))?
+        .root()
+        .to_path_buf())
 }
 
 struct RepoCwdGuard {
@@ -315,9 +325,14 @@ pub(super) fn with_repo_cwd<T>(
 /// Resolves the diff base commit hash.
 pub(super) fn resolve_diff_base(
     store: &FsCommitHashStore,
-    git: &SystemGitRepo,
+    _git: &SystemGitRepo,
     base_branch: &str,
 ) -> Result<CommitHash, ReviewSharedError> {
+    use std::sync::Arc;
+
+    use infrastructure::FsGitWorkflowAdapter;
+    use usecase::git_workflow::{GitPrimitivePort, ReviewGitInteractor};
+
     match store.read() {
         Ok(Some(hash)) => return Ok(hash),
         Ok(None) => {}
@@ -326,15 +341,18 @@ pub(super) fn resolve_diff_base(
         }
     }
 
-    let output = git
-        .output(&["rev-parse", base_branch])
-        .map_err(|e| ReviewSharedError::Git(format!("git rev-parse {base_branch}: {e}")))?;
-    if !output.status.success() {
-        return Err(ReviewSharedError::Git(format!("git rev-parse {base_branch} failed")));
+    // Route the base-branch resolution through the usecase ReviewGitInteractor
+    // (T007). `resolve_diff_base` returns `Ok(None)` when the rev cannot be
+    // resolved — surface that as a `Git` error for the caller.
+    let port: Arc<dyn GitPrimitivePort> = Arc::new(FsGitWorkflowAdapter::new());
+    let interactor = ReviewGitInteractor::new(port);
+    match interactor
+        .resolve_diff_base(base_branch)
+        .map_err(|e| ReviewSharedError::Git(format!("git rev-parse {base_branch}: {e}")))?
+    {
+        Some(hash) => Ok(hash),
+        None => Err(ReviewSharedError::Git(format!("git rev-parse {base_branch} failed"))),
     }
-    let sha = String::from_utf8_lossy(&output.stdout).trim().to_owned();
-    CommitHash::try_new(&sha)
-        .map_err(|e| ReviewSharedError::InvalidInput(format!("invalid {base_branch} SHA: {e}")))
 }
 
 /// Builds the v2 review composition with a real `CodexReviewer`.
@@ -528,7 +546,7 @@ pub(crate) fn load_agent_profiles_from_repo(
         })?
     };
     let profiles_path = repo.root().join(infrastructure::agent_profiles::AGENT_PROFILES_PATH);
-    infrastructure::agent_profiles::AgentProfiles::load(&profiles_path).map_err(|e| {
+    infrastructure::agent_profiles::AgentProfiles::load(repo.root(), &profiles_path).map_err(|e| {
         ReviewSharedError::Config(format!("[ERROR] failed to load agent-profiles.json: {e}"))
     })
 }
@@ -536,6 +554,7 @@ pub(crate) fn load_agent_profiles_from_repo(
 pub(crate) struct ResolvedAgentExecution {
     pub(crate) provider: String,
     pub(crate) model: String,
+    pub(crate) effort: ReasoningEffort,
 }
 
 /// Resolves an agent capability execution from `agent-profiles.json`, applying
@@ -551,19 +570,20 @@ pub(crate) fn resolve_agent_execution(
     model_override: Option<&str>,
 ) -> Result<ResolvedAgentExecution, ReviewSharedError> {
     let profiles = load_agent_profiles_from_repo(items_dir)?;
-    let resolved = profiles.resolve_execution(capability, round_type).ok_or_else(|| {
-        ReviewSharedError::Config(format!(
-            "[ERROR] {capability} capability not defined in agent-profiles.json"
-        ))
-    })?;
-    let model =
-        model_override.map(str::to_owned).or_else(|| resolved.model.clone()).ok_or_else(|| {
-            ReviewSharedError::Config(format!(
-                "[ERROR] no model specified: pass --model or set model in agent-profiles.json \
-                 {capability} capability"
-            ))
-        })?;
-    Ok(ResolvedAgentExecution { provider: resolved.provider.clone(), model })
+    let capability_name = CapabilityName::try_new(capability)
+        .map_err(|error| ReviewSharedError::InvalidInput(error.to_string()))?;
+    let resolved = profiles
+        .resolve_execution(&capability_name, round_type)
+        .map_err(|error| ReviewSharedError::Config(error.to_string()))?;
+    let infrastructure::agent_profiles::ResolvedExecution::ProviderCli { provider, model, effort } =
+        resolved
+    else {
+        return Err(ReviewSharedError::Config(format!(
+            "[ERROR] {capability} must resolve to a provider CLI execution"
+        )));
+    };
+    let model = model_override.map(str::to_owned).unwrap_or_else(|| model.as_str().to_owned());
+    Ok(ResolvedAgentExecution { provider: provider.as_str().to_owned(), model, effort })
 }
 
 /// Parses a `round_type` string (`"fast"` or `"final"`) into the infra

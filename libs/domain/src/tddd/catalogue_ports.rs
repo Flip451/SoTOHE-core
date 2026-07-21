@@ -4,7 +4,7 @@
 //! and returns them together with a topologically-sorted layer order.
 //! `ContractMapWriter` persists a rendered [`ContractMapContent`] to a
 //! track directory. Both ports are defined in the domain layer per the
-//! hexagonal convention `knowledge/conventions/hexagonal-architecture.md`
+//! `knowledge/conventions/type-designer-kind-selection.md` R1
 //! (persistence-related ports live in domain) and are implemented in
 //! `libs/infrastructure/src/tddd/contract_map_adapter.rs` (T004).
 //!

@@ -1,0 +1,252 @@
+{
+  "crate_name": "domain",
+  "functions": {},
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "ObligationCheckError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TaskStatusKind",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TaskStatusKind",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TaskStatusKind",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "action": "reference",
+      "for_type": "TaskStatusKind",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TaskStatusKind",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TaskStatusKind",
+      "trait_ref": "core::fmt::Display"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "ObligationCheckError": {
+      "action": "modify",
+      "docs": "ObligationCheckError variant surface updated for task-attribution failures; see IN-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RulesLoad",
+            "payload": {
+              "fields": [
+                "TestObligationRulesLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ObligationsAbsent",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BindingsAbsent",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "StaleObligationsArtifact",
+            "payload": {
+              "fields": [
+                {
+                  "name": "detail",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DriftsDetected",
+            "payload": {
+              "fields": [
+                {
+                  "name": "drifts",
+                  "ty": "NonEmptyDrifts"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnresolvedEdges",
+            "payload": {
+              "fields": [
+                {
+                  "name": "edges",
+                  "ty": "NonEmptyEdgeIds"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "StaleVerdicts",
+            "payload": {
+              "fields": [
+                {
+                  "name": "edges",
+                  "ty": "NonEmptyEdgeIds"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CatalogueLoad",
+            "payload": {
+              "fields": [
+                "CatalogueDocumentLoaderError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SpecLoad",
+            "payload": {
+              "fields": [
+                "SpecDocumentLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidCatalogueState",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ArtifactCodec",
+            "payload": {
+              "fields": [
+                "ArtifactCodecError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SourceScan",
+            "payload": {
+              "fields": [
+                "TestSourceScanError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CacheIo",
+            "payload": {
+              "fields": [
+                "VerifyCacheError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TaskAttribution",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::errors",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "TaskStatusKind": {
+      "action": "reference",
+      "docs": "Finite task-status discriminant referenced unchanged for strictest-wins lane attribution.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Todo",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InProgress",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Done",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Skipped",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "track",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        }
+      ]
+    }
+  }
+}

@@ -210,7 +210,7 @@ The guard policy runs inside Claude Code's pre-tool-call hook. Its adversary mod
 
 - Claude itself, proposing shell commands in generated code that could trigger git operations the user has not authorized.
 - Commands are passed as strings to `Bash(command=...)` calls, then checked synchronously by the policy before execution.
-- **Shell variables are NOT expanded by the policy checker.** The raw string `echo $HOME` is checked, not `echo /home/user`.
+- **Shell variables are NOT expanded by the policy checker.** The raw string `echo $HOME` is checked; the checker never obtains the resulting home-directory value (denoted abstractly as `/home/<user>`).
 
 This means the policy operates on the *literal* form of the command, not its post-expansion form. This is a fundamental constraint that shapes the security analysis below.
 

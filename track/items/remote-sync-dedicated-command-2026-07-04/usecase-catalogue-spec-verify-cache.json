@@ -1,0 +1,1422 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "8e89c0572cfb61e4cdf42af26ae11f55096671eaed935438f95fdb815cb70c30",
+      "evidence_hash": "410f29d17f2e6db0a726027907816e2f6ab2710054d903d4aca27caaa0357558",
+      "verdict": {
+        "kind": "pass",
+        "citation": "3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DiagnosticText"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」infrastructure adapter primitive（ADR 例示 `SystemGitRepo::sync_current_branch(&self) -> Result<(), SyncError>`）を新設する。git process I/O・git コマンド文字列（`pull --ff-only`）・ff-only 意味論・失敗分類をこの下位 primitive に閉じ込め、generic passthrough には委ねない。3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。この primitive は git process I/O と失敗分類を所有する下位層であり、command-facing の公開契約ではない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8e89c0572cfb61e4cdf42af26ae11f55096671eaed935438f95fdb815cb70c30",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sync` の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DiagnosticText"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8e89c0572cfb61e4cdf42af26ae11f55096671eaed935438f95fdb815cb70c30",
+      "evidence_hash": "de8d2a866e90275939b5b7c6ef19db6a6676caba4292fc797474a18ab3e8dc03",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sync path の failure modes は infrastructure boundary（`SystemGitRepo::sync_current_branch`）で typed error（例 `SyncError`）の variant として分類する。上位層は自層の error 型への薄い変換のみを担い、失敗種別の再判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "DiagnosticText"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "sync path の failure modes は infrastructure boundary（`SystemGitRepo::sync_current_branch`）で typed error（例 `SyncError`）の variant として分類する。上位層は自層の error 型への薄い変換のみを担い、失敗種別の再判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "068678f8ed48234d5b2939a3f0e912bff06cc0971e7e1c4d34e30ab46290888d",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
+      "verdict": {
+        "kind": "pass",
+        "citation": "両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ExplicitTrackBranch"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1894653e9c5de3d4ca9eb225366a26400a5ec113a9ffb4c504bee86cd8e405e3",
+      "evidence_hash": "410f29d17f2e6db0a726027907816e2f6ab2710054d903d4aca27caaa0357558",
+      "verdict": {
+        "kind": "pass",
+        "citation": "3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "GitWorkflowError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」infrastructure adapter primitive（ADR 例示 `SystemGitRepo::sync_current_branch(&self) -> Result<(), SyncError>`）を新設する。git process I/O・git コマンド文字列（`pull --ff-only`）・ff-only 意味論・失敗分類をこの下位 primitive に閉じ込め、generic passthrough には委ねない。3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。この primitive は git process I/O と失敗分類を所有する下位層であり、command-facing の公開契約ではない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1894653e9c5de3d4ca9eb225366a26400a5ec113a9ffb4c504bee86cd8e405e3",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`sync` の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き ... `switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "GitWorkflowError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1894653e9c5de3d4ca9eb225366a26400a5ec113a9ffb4c504bee86cd8e405e3",
+      "evidence_hash": "328d76731e25df874eba80ce74446dd41231ace238ffef454a780e8dcb1c04ec",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。」"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "GitWorkflowError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "git 関与フローの orchestration（意味論 method / service を呼ぶ側の手順）を usecase 層の interactor へ移管する。本 track census で特定した git 関与フロー — track branch ops の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フロー、および archived-track telemetry の emit フロー（`TelemetryAggregateServiceImpl::emit_archived`（`apps/cli-composition/src/telemetry.rs`）は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 構造へ移設して composition から外す）— を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は git 関与フローに限定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1894653e9c5de3d4ca9eb225366a26400a5ec113a9ffb4c504bee86cd8e405e3",
+      "evidence_hash": "de8d2a866e90275939b5b7c6ef19db6a6676caba4292fc797474a18ab3e8dc03",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sync path の failure modes は infrastructure boundary（`SystemGitRepo::sync_current_branch`）で typed error（例 `SyncError`）の variant として分類する。上位層は自層の error 型への薄い変換のみを担い、失敗種別の再判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "GitWorkflowError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "sync path の failure modes は infrastructure boundary（`SystemGitRepo::sync_current_branch`）で typed error（例 `SyncError`）の variant として分類する。上位層は自層の error 型への薄い変換のみを担い、失敗種別の再判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1894653e9c5de3d4ca9eb225366a26400a5ec113a9ffb4c504bee86cd8e405e3",
+      "evidence_hash": "5030593340a9f3e7ff568e811bff0eee80645c6442cf73415d3198da94e19207",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track switch-base` および削除対象を除く既存 git subcommand の CLI 面（受け取る引数、stdout/stderr の内容と順序、exit code、fail-closed 挙動）を本 track で変更しない。内部 refactor / chain 統合が行われても、外部から観測可能な挙動を bit-equivalent に保つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "GitWorkflowError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "`track switch-base` および削除対象を除く既存 git subcommand の CLI 面（受け取る引数、stdout/stderr の内容と順序、exit code、fail-closed 挙動）を本 track で変更しない。内部 refactor / chain 統合が行われても、外部から観測可能な挙動を bit-equivalent に保つ。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1894653e9c5de3d4ca9eb225366a26400a5ec113a9ffb4c504bee86cd8e405e3",
+      "evidence_hash": "bc034cba8d68f862fa032cc3320bb3d8287998b1f6f2cef866b2983a8a469f38",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp track switch-base` が本 track 前と同じ input / output / exit code を維持することを、既存の switch-base 挙動テスト（`apps/cli-composition/src/track/branch_strategy.rs` 周辺）が bit-equivalent に pass することで確認できる。track ブランチから base branch に戻り upstream から pull する end-to-end 挙動を、fresh temp git repo の統合テストで確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "GitWorkflowError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`bin/sotp track switch-base` が本 track 前と同じ input / output / exit code を維持することを、既存の switch-base 挙動テスト（`apps/cli-composition/src/track/branch_strategy.rs` 周辺）が bit-equivalent に pass することで確認できる。track ブランチから base branch に戻り upstream から pull する end-to-end 挙動を、fresh temp git repo の統合テストで確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1894653e9c5de3d4ca9eb225366a26400a5ec113a9ffb4c504bee86cd8e405e3",
+      "evidence_hash": "37cb0ffeb129c8ad5e7f77769aa96efdd8edd37939001394542ba4a3db83b306",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/git_cli/` に current-branch sync 用の infrastructure adapter primitive（例 `SystemGitRepo::sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "GitWorkflowError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "`libs/infrastructure/src/git_cli/` に current-branch sync 用の infrastructure adapter primitive（例 `SystemGitRepo::sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。infrastructure layer が対応 variant を返し pattern match で識別可能であること、および上位層が `SyncError` を自層 error 型へ写像する薄い変換のみで失敗種別を再判定していないことをユニットテストで確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c90811ac9a82ddc949c9578755e4ef0fd926674cb8f065b378e190e139a5c56e",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
+      "verdict": {
+        "kind": "pass",
+        "citation": "port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。... 両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "GitWorkflowInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c90811ac9a82ddc949c9578755e4ef0fd926674cb8f065b378e190e139a5c56e",
+      "evidence_hash": "b16fad6584e647e98cd34264b82e897b4d9f2cf35478bb46b15d69f3ee06f659",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`GitCompositionRoot` に inline git 実装（git コマンド文字列を直接叩く method 群）が存在せず、wiring（adapter 構築 + 注入）に限定される。`apps/cli` の git subcommand dispatch が配線済み `GitDriver` を実 dispatch し、`GitWorkflowService` → `FsGitWorkflowAdapter` → `GitDriver` chain が唯一の live chain になる。commit の fail-closed track-branch guard が単一箇所に集約され、逐語重複が解消されていることをテストで確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "GitWorkflowInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`GitCompositionRoot` に inline git 実装（git コマンド文字列を直接叩く method 群）が存在せず、wiring（adapter 構築 + 注入）に限定される。`apps/cli` の git subcommand dispatch が配線済み `GitDriver` を実 dispatch し、`GitWorkflowService` → `FsGitWorkflowAdapter` → `GitDriver` chain が唯一の live chain になる。commit の fail-closed track-branch guard が単一箇所に集約され、逐語重複が解消されていることをテストで確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a4100881c13f7f509df37fbb0d4cb4362e62de1094ab56cc0756a1326ab591ba",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrGitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a4100881c13f7f509df37fbb0d4cb4362e62de1094ab56cc0756a1326ab591ba",
+      "evidence_hash": "328d76731e25df874eba80ce74446dd41231ace238ffef454a780e8dcb1c04ec",
+      "verdict": {
+        "kind": "pass",
+        "citation": "pr 系の fetch → 解決 → 参照フロー ... を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は git 関与フローに限定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrGitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "git 関与フローの orchestration（意味論 method / service を呼ぶ側の手順）を usecase 層の interactor へ移管する。本 track census で特定した git 関与フロー — track branch ops の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フロー、および archived-track telemetry の emit フロー（`TelemetryAggregateServiceImpl::emit_archived`（`apps/cli-composition/src/telemetry.rs`）は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 構造へ移設して composition から外す）— を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は git 関与フローに限定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a4100881c13f7f509df37fbb0d4cb4362e62de1094ab56cc0756a1326ab591ba",
+      "evidence_hash": "60e90498a7a6e413e1c0cc3508694d1e8e5ae1d7d448971d07a7df31afafb19b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrGitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "git 関与フローについて composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a4100881c13f7f509df37fbb0d4cb4362e62de1094ab56cc0756a1326ab591ba",
+      "evidence_hash": "fd04cb65809c583f462f7af6bd2fd3906994f5bdb6562eaa72a938bb835a722c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrGitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "79a9a2082d8bd94bfa2e5585702e9f2912c6d10d856851cda1a5bbf9e836484e",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track switch-base は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewGitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "79a9a2082d8bd94bfa2e5585702e9f2912c6d10d856851cda1a5bbf9e836484e",
+      "evidence_hash": "328d76731e25df874eba80ce74446dd41231ace238ffef454a780e8dcb1c04ec",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review_v2 の hash 解決フロー ... を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewGitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "git 関与フローの orchestration（意味論 method / service を呼ぶ側の手順）を usecase 層の interactor へ移管する。本 track census で特定した git 関与フロー — track branch ops の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フロー、および archived-track telemetry の emit フロー（`TelemetryAggregateServiceImpl::emit_archived`（`apps/cli-composition/src/telemetry.rs`）は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 構造へ移設して composition から外す）— を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は git 関与フローに限定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "79a9a2082d8bd94bfa2e5585702e9f2912c6d10d856851cda1a5bbf9e836484e",
+      "evidence_hash": "60e90498a7a6e413e1c0cc3508694d1e8e5ae1d7d448971d07a7df31afafb19b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "git 関与フローについて composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewGitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "git 関与フローについて composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+        }
+      }
+    },
+    {
+      "claim_hash": "79a9a2082d8bd94bfa2e5585702e9f2912c6d10d856851cda1a5bbf9e836484e",
+      "evidence_hash": "fd04cb65809c583f462f7af6bd2fd3906994f5bdb6562eaa72a938bb835a722c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ReviewGitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "93a8ef7ef33362bd172acc2fb1757fff0ba176d4e47b503d9a8bb791ef375357",
+      "evidence_hash": "328d76731e25df874eba80ce74446dd41231ace238ffef454a780e8dcb1c04ec",
+      "verdict": {
+        "kind": "pass",
+        "citation": "archived-track telemetry の emit フロー（`TelemetryAggregateServiceImpl::emit_archived`（`apps/cli-composition/src/telemetry.rs`）は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 構造へ移設して composition から外す）— を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryAggregateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "git 関与フローの orchestration（意味論 method / service を呼ぶ側の手順）を usecase 層の interactor へ移管する。本 track census で特定した git 関与フロー — track branch ops の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フロー、および archived-track telemetry の emit フロー（`TelemetryAggregateServiceImpl::emit_archived`（`apps/cli-composition/src/telemetry.rs`）は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 構造へ移設して composition から外す）— を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は git 関与フローに限定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "93a8ef7ef33362bd172acc2fb1757fff0ba176d4e47b503d9a8bb791ef375357",
+      "evidence_hash": "60e90498a7a6e413e1c0cc3508694d1e8e5ae1d7d448971d07a7df31afafb19b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "git 関与フローについて composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryAggregateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "git 関与フローについて composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+        }
+      }
+    },
+    {
+      "claim_hash": "93a8ef7ef33362bd172acc2fb1757fff0ba176d4e47b503d9a8bb791ef375357",
+      "evidence_hash": "fd04cb65809c583f462f7af6bd2fd3906994f5bdb6562eaa72a938bb835a722c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryAggregateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "69acec59346cc4604160e611a547dc4cb35472ba9cc938ab93fa36362218a944",
+      "evidence_hash": "328d76731e25df874eba80ce74446dd41231ace238ffef454a780e8dcb1c04ec",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「archived-track telemetry の emit フロー ... を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く」"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryEmitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "git 関与フローの orchestration（意味論 method / service を呼ぶ側の手順）を usecase 層の interactor へ移管する。本 track census で特定した git 関与フロー — track branch ops の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フロー、および archived-track telemetry の emit フロー（`TelemetryAggregateServiceImpl::emit_archived`（`apps/cli-composition/src/telemetry.rs`）は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 構造へ移設して composition から外す）— を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は git 関与フローに限定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "69acec59346cc4604160e611a547dc4cb35472ba9cc938ab93fa36362218a944",
+      "evidence_hash": "60e90498a7a6e413e1c0cc3508694d1e8e5ae1d7d448971d07a7df31afafb19b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論 method を呼ぶ手順は usecase interactor に置く。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryEmitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "git 関与フローについて composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+        }
+      }
+    },
+    {
+      "claim_hash": "69acec59346cc4604160e611a547dc4cb35472ba9cc938ab93fa36362218a944",
+      "evidence_hash": "fd04cb65809c583f462f7af6bd2fd3906994f5bdb6562eaa72a938bb835a722c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryEmitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "14de549999fb4d272d976e950a651368861825dd2693b47a430fad8e5f510822",
+      "evidence_hash": "328d76731e25df874eba80ce74446dd41231ace238ffef454a780e8dcb1c04ec",
+      "verdict": {
+        "kind": "pass",
+        "citation": "archived-track telemetry の emit フロー（`TelemetryAggregateServiceImpl::emit_archived`（`apps/cli-composition/src/telemetry.rs`）は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 構造へ移設して composition から外す）— を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryReportInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "git 関与フローの orchestration（意味論 method / service を呼ぶ側の手順）を usecase 層の interactor へ移管する。本 track census で特定した git 関与フロー — track branch ops の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フロー、および archived-track telemetry の emit フロー（`TelemetryAggregateServiceImpl::emit_archived`（`apps/cli-composition/src/telemetry.rs`）は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 構造へ移設して composition から外す）— を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は git 関与フローに限定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "14de549999fb4d272d976e950a651368861825dd2693b47a430fad8e5f510822",
+      "evidence_hash": "60e90498a7a6e413e1c0cc3508694d1e8e5ae1d7d448971d07a7df31afafb19b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意味論 method を呼ぶ手順は usecase interactor に置く。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryReportInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "git 関与フローについて composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+        }
+      }
+    },
+    {
+      "claim_hash": "14de549999fb4d272d976e950a651368861825dd2693b47a430fad8e5f510822",
+      "evidence_hash": "fd04cb65809c583f462f7af6bd2fd3906994f5bdb6562eaa72a938bb835a722c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TelemetryReportInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f3e9bc73585b6b464b0341256703d2868d1a00b7218e3f0115bc2a3de1a6f1e8",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
+      "verdict": {
+        "kind": "pass",
+        "citation": "両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TrackBranchClaim"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "78ce61d8b36c1b0875da821d8c9ab6108288a217d7db69ac856b25b34d81bed5",
+      "evidence_hash": "afeaf6330026e65f2bc14ddec66dff224707ce7819a5a002bf2dbad117230137",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track switch-base` を存続させ、内部実装を branch switch + sync の合成に refactor する。base branch は active track の `branch_strategy_snapshot` から解決する既存ロジック（`apps/cli-composition/src/track/branch_strategy.rs::track_switch_base`、snapshot 優先）を保持し、sync step は `git sync` と同じ infrastructure 側の意味論 method を経由する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TrackGitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`bin/sotp track switch-base` を存続させ、内部実装を branch switch + sync の合成に refactor する。base branch は active track の `branch_strategy_snapshot` から解決する既存ロジック（`apps/cli-composition/src/track/branch_strategy.rs::track_switch_base`、snapshot 優先）を保持し、sync step は `git sync` と同じ infrastructure 側の意味論 method を経由する。cli_composition 側に git コマンド文字列や ff-only 意味論を残さない。外部挙動（引数・stdout/stderr・exit code・非 track ブランチでの fail-closed）は不変とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "78ce61d8b36c1b0875da821d8c9ab6108288a217d7db69ac856b25b34d81bed5",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track switch-base は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TrackGitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "78ce61d8b36c1b0875da821d8c9ab6108288a217d7db69ac856b25b34d81bed5",
+      "evidence_hash": "328d76731e25df874eba80ce74446dd41231ace238ffef454a780e8dcb1c04ec",
+      "verdict": {
+        "kind": "pass",
+        "citation": "git 関与フローの orchestration（意味論 method / service を呼ぶ側の手順）を usecase 層の interactor へ移管する。... を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は git 関与フローに限定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TrackGitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "git 関与フローの orchestration（意味論 method / service を呼ぶ側の手順）を usecase 層の interactor へ移管する。本 track census で特定した git 関与フロー — track branch ops の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フロー、および archived-track telemetry の emit フロー（`TelemetryAggregateServiceImpl::emit_archived`（`apps/cli-composition/src/telemetry.rs`）は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 構造へ移設して composition から外す）— を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は git 関与フローに限定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "78ce61d8b36c1b0875da821d8c9ab6108288a217d7db69ac856b25b34d81bed5",
+      "evidence_hash": "60e90498a7a6e413e1c0cc3508694d1e8e5ae1d7d448971d07a7df31afafb19b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "git 関与フローについて composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TrackGitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "git 関与フローについて composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+        }
+      }
+    },
+    {
+      "claim_hash": "78ce61d8b36c1b0875da821d8c9ab6108288a217d7db69ac856b25b34d81bed5",
+      "evidence_hash": "5030593340a9f3e7ff568e811bff0eee80645c6442cf73415d3198da94e19207",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track switch-base` および削除対象を除く既存 git subcommand の CLI 面（受け取る引数、stdout/stderr の内容と順序、exit code、fail-closed 挙動）を本 track で変更しない。内部 refactor / chain 統合が行われても、外部から観測可能な挙動を bit-equivalent に保つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TrackGitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "`track switch-base` および削除対象を除く既存 git subcommand の CLI 面（受け取る引数、stdout/stderr の内容と順序、exit code、fail-closed 挙動）を本 track で変更しない。内部 refactor / chain 統合が行われても、外部から観測可能な挙動を bit-equivalent に保つ。"
+        }
+      }
+    },
+    {
+      "claim_hash": "78ce61d8b36c1b0875da821d8c9ab6108288a217d7db69ac856b25b34d81bed5",
+      "evidence_hash": "bc034cba8d68f862fa032cc3320bb3d8287998b1f6f2cef866b2983a8a469f38",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp track switch-base` が本 track 前と同じ input / output / exit code を維持することを、既存の switch-base 挙動テスト（`apps/cli-composition/src/track/branch_strategy.rs` 周辺）が bit-equivalent に pass することで確認できる。track ブランチから base branch に戻り upstream から pull する end-to-end 挙動を、fresh temp git repo の統合テストで確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TrackGitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`bin/sotp track switch-base` が本 track 前と同じ input / output / exit code を維持することを、既存の switch-base 挙動テスト（`apps/cli-composition/src/track/branch_strategy.rs` 周辺）が bit-equivalent に pass することで確認できる。track ブランチから base branch に戻り upstream から pull する end-to-end 挙動を、fresh temp git repo の統合テストで確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "78ce61d8b36c1b0875da821d8c9ab6108288a217d7db69ac856b25b34d81bed5",
+      "evidence_hash": "fd04cb65809c583f462f7af6bd2fd3906994f5bdb6562eaa72a938bb835a722c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TrackGitInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fce3288631211ebe50e08765d5162b488d4642edda5e0ab4addb945411e79dd8",
+      "evidence_hash": "328d76731e25df874eba80ce74446dd41231ace238ffef454a780e8dcb1c04ec",
+      "verdict": {
+        "kind": "pass",
+        "citation": "archived-track telemetry の emit フロー（`TelemetryAggregateServiceImpl::emit_archived`（`apps/cli-composition/src/telemetry.rs`）は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 構造へ移設して composition から外す）"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ArchivedTelemetryFactoryPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "git 関与フローの orchestration（意味論 method / service を呼ぶ側の手順）を usecase 層の interactor へ移管する。本 track census で特定した git 関与フロー — track branch ops の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フロー、および archived-track telemetry の emit フロー（`TelemetryAggregateServiceImpl::emit_archived`（`apps/cli-composition/src/telemetry.rs`）は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 構造へ移設して composition から外す）— を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は git 関与フローに限定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fce3288631211ebe50e08765d5162b488d4642edda5e0ab4addb945411e79dd8",
+      "evidence_hash": "60e90498a7a6e413e1c0cc3508694d1e8e5ae1d7d448971d07a7df31afafb19b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ArchivedTelemetryFactoryPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "git 関与フローについて composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fce3288631211ebe50e08765d5162b488d4642edda5e0ab4addb945411e79dd8",
+      "evidence_hash": "fd04cb65809c583f462f7af6bd2fd3906994f5bdb6562eaa72a938bb835a722c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ArchivedTelemetryFactoryPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7aadec5c3bfb0e862003974403f1c1f7c7eade3c48bbb617b05826b41bf20732",
+      "evidence_hash": "410f29d17f2e6db0a726027907816e2f6ab2710054d903d4aca27caaa0357558",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」infrastructure adapter primitive（ADR 例示 `SystemGitRepo::sync_current_branch(&self) -> Result<(), SyncError>`）を新設する。git process I/O・git コマンド文字列（`pull --ff-only`）・ff-only 意味論・失敗分類をこの下位 primitive に閉じ込め、generic passthrough には委ねない。この primitive は git process I/O と失敗分類を所有する下位層であり、command-facing の公開契約ではない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "GitPrimitivePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」infrastructure adapter primitive（ADR 例示 `SystemGitRepo::sync_current_branch(&self) -> Result<(), SyncError>`）を新設する。git process I/O・git コマンド文字列（`pull --ff-only`）・ff-only 意味論・失敗分類をこの下位 primitive に閉じ込め、generic passthrough には委ねない。3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。この primitive は git process I/O と失敗分類を所有する下位層であり、command-facing の公開契約ではない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7aadec5c3bfb0e862003974403f1c1f7c7eade3c48bbb617b05826b41bf20732",
+      "evidence_hash": "a439f4f58c3b373f04182f0f3cde5a4bad1373eeed77820c221934383321a573",
+      "verdict": {
+        "kind": "pass",
+        "citation": "write 系（stage / commit / note / branch create / branch switch / mv / fetch）と read 系（rev-parse 系 / show / fetch）"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "GitPrimitivePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "cli 系レイヤー（cli / cli_composition / cli_driver）に埋め込まれた git コマンド文字列と判定ロジックを、infrastructure の意味論 method 群へ全面移管する。write 系（stage / commit / note / branch create / branch switch / mv / fetch）と read 系（rev-parse 系 / show / fetch）の両方を対象とする。sync path 限定ではなく、census で特定した cli_composition の git / track / pr / review_v2 系と delivery 層の直埋めを対象範囲に含める。上位層は自層 error 型への変換のみを行い、失敗判別ロジックを持たない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7aadec5c3bfb0e862003974403f1c1f7c7eade3c48bbb617b05826b41bf20732",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "GitPrimitivePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7aadec5c3bfb0e862003974403f1c1f7c7eade3c48bbb617b05826b41bf20732",
+      "evidence_hash": "1ea479924b3b92e82aea556b75bc513038e27d1e000ac150f2ea2a12e76d131d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`既存の意味論 method（`current_branch` / `push_branch` / `index_tree_hash` / `stage_all_excluding` + 新設 `sync_current_branch` 等）は `SystemGitRepo` の `pub` inherent method として残す。 ... read 系の直埋め call site（rev-parse 系 / show / fetch。cli_composition の pr / review_v2 / track 系、および delivery 層 `apps/cli/src/commands/track/branch_ops.rs`）を意味論 method（branch 存在確認 / HEAD 解決 / ref 上のファイル読み出し等）へ置き換える。`"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "GitPrimitivePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "`GitRepository` trait（`status` / `output` の generic passthrough を公開している infrastructure trait）を削除し、`status` / `output` を `SystemGitRepo` の `pub(crate)` inherent method へ移す（`pub trait` の method は言語仕様上 method 単位で可視性を落とせないため、trait 経由の公開を撤去して達成する）。既存の意味論 method（`current_branch` / `push_branch` / `index_tree_hash` / `stage_all_excluding` + 新設 `sync_current_branch` 等）は `SystemGitRepo` の `pub` inherent method として残す。任意 git コマンド文字列を注入する generic passthrough は crate 内側だけの実装用ハッチとして上位層へ露出させない（再発を compile-time で防止）。read 系の直埋め call site（rev-parse 系 / show / fetch。cli_composition の pr / review_v2 / track 系、および delivery 層 `apps/cli/src/commands/track/branch_ops.rs`）を意味論 method（branch 存在確認 / HEAD 解決 / ref 上のファイル読み出し等）へ置き換える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7aadec5c3bfb0e862003974403f1c1f7c7eade3c48bbb617b05826b41bf20732",
+      "evidence_hash": "de8d2a866e90275939b5b7c6ef19db6a6676caba4292fc797474a18ab3e8dc03",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sync path の failure modes は infrastructure boundary（`SystemGitRepo::sync_current_branch`）で typed error（例 `SyncError`）の variant として分類する。上位層は自層の error 型への薄い変換のみを担い、失敗種別の再判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "GitPrimitivePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "sync path の failure modes は infrastructure boundary（`SystemGitRepo::sync_current_branch`）で typed error（例 `SyncError`）の variant として分類する。上位層は自層の error 型への薄い変換のみを担い、失敗種別の再判別・message 組み立て・string 化を持たない。error 判別ロジックを infrastructure 側に一元化する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7aadec5c3bfb0e862003974403f1c1f7c7eade3c48bbb617b05826b41bf20732",
+      "evidence_hash": "0def82479a48064537f35a169e6331164e1cec4a319d5abab3c8fe01219ee2c9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "cli 系レイヤーは git を意味論 method / service 経由でのみ操作する。generic passthrough（`status` / `output`）は `SystemGitRepo` の `pub(crate)` inherent method として infrastructure crate 内側に閉じ込め（`GitRepository` trait は削除する）、crate 外から任意の git コマンド文字列を注入できない。新しい git 操作は意味論 method / port として追加する（generic passthrough の再公開は ADR supersede を要する）。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "GitPrimitivePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "cli 系レイヤーは git を意味論 method / service 経由でのみ操作する。generic passthrough（`status` / `output`）は `SystemGitRepo` の `pub(crate)` inherent method として infrastructure crate 内側に閉じ込め（`GitRepository` trait は削除する）、crate 外から任意の git コマンド文字列を注入できない。新しい git 操作は意味論 method / port として追加する（generic passthrough の再公開は ADR supersede を要する）。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7aadec5c3bfb0e862003974403f1c1f7c7eade3c48bbb617b05826b41bf20732",
+      "evidence_hash": "37cb0ffeb129c8ad5e7f77769aa96efdd8edd37939001394542ba4a3db83b306",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/git_cli/` に current-branch sync 用の infrastructure adapter primitive（例 `SystemGitRepo::sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。infrastructure layer が対応 variant を返し pattern match で識別可能であること、および上位層が `SyncError` を自層 error 型へ写像する薄い変換のみで失敗種別を再判定していないことをユニットテストで確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "GitPrimitivePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "`libs/infrastructure/src/git_cli/` に current-branch sync 用の infrastructure adapter primitive（例 `SystemGitRepo::sync_current_branch`）と typed error（例 `SyncError`）が declare され、3 fail-closed modes（upstream 未設定 / non-fast-forward / worktree unresolved）が distinguishable な variant として区別できる。infrastructure layer が対応 variant を返し pattern match で識別可能であること、および上位層が `SyncError` を自層 error 型へ写像する薄い変換のみで失敗種別を再判定していないことをユニットテストで確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f66f0c08cf82856b6b16e196e02141c6e9bd0f38b7ae04ed90d7e025b92a19f5",
+      "evidence_hash": "0300bc9074068710b9c70164c31e56ac6e025371ced452feabb9f533c1688418",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現在ブランチを upstream から pull するだけの native subcommand `bin/sotp git sync` を新設する。switch は行わず branch 引数も取らない。sync 対象は常に「現在の git ブランチ」に固定し、`.harness/config/branch-strategy.json` や `metadata.json#branch_strategy_snapshot` を読まない。branch 解決も config 読み取りも不要なプリミティブとする"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "GitWorkflowService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "現在ブランチを upstream から pull するだけの native subcommand `bin/sotp git sync` を新設する。switch は行わず branch 引数も取らない。sync 対象は常に「現在の git ブランチ」に固定し、`.harness/config/branch-strategy.json` や `metadata.json#branch_strategy_snapshot` を読まない。branch 解決も config 読み取りも不要なプリミティブとすることで、snapshot 優先・global config 再読禁止の原則と構造的に衝突しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f66f0c08cf82856b6b16e196e02141c6e9bd0f38b7ae04ed90d7e025b92a19f5",
+      "evidence_hash": "2901e6ccf173e2a5a7a37c5f296251b0ce6dba55c77df66b8b4c35feaabe8627",
+      "verdict": {
+        "kind": "pass",
+        "citation": "generic な switch+pull 合成 subcommand `bin/sotp git switch-and-pull` を廃止する。... 呼び出し元は `track switch-base`（track 文脈）または `git sync`（現在ブランチ同期）へ置き換える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "GitWorkflowService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "generic な switch+pull 合成 subcommand `bin/sotp git switch-and-pull` を廃止する。`apps/cli/src/commands/git.rs` の `SwitchAndPull` variant / `SwitchAndPullArgs` 型と、`apps/cli-composition/src/git.rs` の `git_switch_and_pull` / `git_switch_and_pull_in` / `git_switch_and_pull_impl` を削除する。deprecation shim / alias は残さず、呼び出し元は `track switch-base`（track 文脈）または `git sync`（現在ブランチ同期）へ置き換える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f66f0c08cf82856b6b16e196e02141c6e9bd0f38b7ae04ed90d7e025b92a19f5",
+      "evidence_hash": "410f29d17f2e6db0a726027907816e2f6ab2710054d903d4aca27caaa0357558",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」infrastructure adapter primitive（ADR 例示 `SystemGitRepo::sync_current_branch(&self) -> Result<(), SyncError>`）を新設する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "GitWorkflowService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "sync path を D5 の旗艦事例として、`libs/infrastructure/src/git_cli/` に「現在ブランチを upstream から fast-forward only で pull する」infrastructure adapter primitive（ADR 例示 `SystemGitRepo::sync_current_branch(&self) -> Result<(), SyncError>`）を新設する。git process I/O・git コマンド文字列（`pull --ff-only`）・ff-only 意味論・失敗分類をこの下位 primitive に閉じ込め、generic passthrough には委ねない。3 種 fail-closed failure modes（upstream 未設定 / non-fast-forward / worktree unresolved）を typed error（ADR 例示 `SyncError`）の variant として infrastructure boundary で分類する。この primitive は git process I/O と失敗分類を所有する下位層であり、command-facing の公開契約ではない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f66f0c08cf82856b6b16e196e02141c6e9bd0f38b7ae04ed90d7e025b92a19f5",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし… port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "GitWorkflowService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f66f0c08cf82856b6b16e196e02141c6e9bd0f38b7ae04ed90d7e025b92a19f5",
+      "evidence_hash": "6dcb05ab98039e40275f2df635b0b5fd902259b633015952e37c66e2ba35e147",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`git sync` の pull は fast-forward only 固定とし、`--ff` / `--rebase` / `--no-ff` 等のフラグを追加しない。upstream 未設定 / divergence / worktree 未解決 のいずれも fail-closed とし、graceful skip / warning-only 継続を許容しない。`switch-and-pull` が採っていた「pull 失敗を WARN で通過させ exit 0」挙動（`apps/cli-composition/src/git.rs::git_switch_and_pull_impl` の警告フォールバック）を新経路に持ち込まない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "GitWorkflowService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "`git sync` の pull は fast-forward only 固定とし、`--ff` / `--rebase` / `--no-ff` 等のフラグを追加しない。upstream 未設定 / divergence / worktree 未解決 のいずれも fail-closed とし、graceful skip / warning-only 継続を許容しない。`switch-and-pull` が採っていた「pull 失敗を WARN で通過させ exit 0」挙動（`apps/cli-composition/src/git.rs::git_switch_and_pull_impl` の警告フォールバック）を新経路に持ち込まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f66f0c08cf82856b6b16e196e02141c6e9bd0f38b7ae04ed90d7e025b92a19f5",
+      "evidence_hash": "509fd1473af0dbd46648aabb43bb3c81f6c72665e0006d082c426a130c8af930",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp git sync` subcommand が存在し、引数なしで呼ぶと現在ブランチを upstream から fast-forward pull する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "GitWorkflowService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`bin/sotp git sync` subcommand が存在し、引数なしで呼ぶと現在ブランチを upstream から fast-forward pull する。happy path（upstream 設定済み + ff-clean）のユニット / 統合テストが `cargo make test` で pass する。CLI `--help` の `git` サブコマンド一覧に `sync` が表示され、branch 引数を取らないことがヘルプに明示される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f66f0c08cf82856b6b16e196e02141c6e9bd0f38b7ae04ed90d7e025b92a19f5",
+      "evidence_hash": "b16fad6584e647e98cd34264b82e897b4d9f2cf35478bb46b15d69f3ee06f659",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`GitWorkflowService` → `FsGitWorkflowAdapter` → `GitDriver` chain が唯一の live chain になる。commit の fail-closed track-branch guard が単一箇所に集約され、逐語重複が解消されていることをテストで確認できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "GitWorkflowService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`GitCompositionRoot` に inline git 実装（git コマンド文字列を直接叩く method 群）が存在せず、wiring（adapter 構築 + 注入）に限定される。`apps/cli` の git subcommand dispatch が配線済み `GitDriver` を実 dispatch し、`GitWorkflowService` → `FsGitWorkflowAdapter` → `GitDriver` chain が唯一の live chain になる。commit の fail-closed track-branch guard が単一箇所に集約され、逐語重複が解消されていることをテストで確認できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "48956d7615760d827e6433255ce751aa23103472993c400a5e0880352acf06b0",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし`"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TrackArchiveFsPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "48956d7615760d827e6433255ce751aa23103472993c400a5e0880352acf06b0",
+      "evidence_hash": "328d76731e25df874eba80ce74446dd41231ace238ffef454a780e8dcb1c04ec",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track archive の git mv + logs 移動の合成 … を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TrackArchiveFsPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "git 関与フローの orchestration（意味論 method / service を呼ぶ側の手順）を usecase 層の interactor へ移管する。本 track census で特定した git 関与フロー — track branch ops の fail-closed 検証シーケンス、track archive の git mv + logs 移動の合成、pr 系の fetch → 解決 → 参照フロー、review_v2 の hash 解決フロー、および archived-track telemetry の emit フロー（`TelemetryAggregateServiceImpl::emit_archived`（`apps/cli-composition/src/telemetry.rs`）は git worktree 解決を伴う git 関与フローであり、application service 実装ごと usecase interactor + port 構造へ移設して composition から外す）— を、既存 `GitWorkflowInteractor` と同型の port + interactor 構造として usecase に置く。composition root は adapter の構築と注入（wiring / DI）だけを行う。適用範囲は git 関与フローに限定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "48956d7615760d827e6433255ce751aa23103472993c400a5e0880352acf06b0",
+      "evidence_hash": "60e90498a7a6e413e1c0cc3508694d1e8e5ae1d7d448971d07a7df31afafb19b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "git 関与フローについて composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TrackArchiveFsPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "git 関与フローについて composition root は adapter の構築と注入（wiring / DI）だけを行い、orchestration（呼ぶ側の手順・判定シーケンス）を持たない。意味論 method を呼ぶ手順は usecase interactor に置く。"
+        }
+      }
+    },
+    {
+      "claim_hash": "48956d7615760d827e6433255ce751aa23103472993c400a5e0880352acf06b0",
+      "evidence_hash": "fd04cb65809c583f462f7af6bd2fd3906994f5bdb6562eaa72a938bb835a722c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TrackArchiveFsPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "本 track census で特定した git 関与フロー（archived-track telemetry emit を含む）の orchestration が usecase 層の interactor に存在し、対応する composition root 側が wiring（adapter 構築 + 注入）のみになっていることを確認できる。移管された各手順が mock port を用いた usecase 単体テストで検証可能である。"
+        }
+      }
+    }
+  ]
+}

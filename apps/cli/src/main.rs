@@ -20,12 +20,20 @@ struct Cli {
     command: Option<CliCommand>,
 }
 
+// Subcommand payloads intentionally stay unboxed so clap can derive the command
+// surface from the same DTO shapes documented in the catalogue contract.
+#[allow(clippy::large_enum_variant)]
 #[derive(Subcommand)]
 enum CliCommand {
     /// Architecture rules analysis tools.
     Arch {
         #[command(subcommand)]
         cmd: commands::arch::ArchCommand,
+    },
+    /// ADR baseline snapshot, restore, and freeze-check operations.
+    AdrBaseline {
+        #[command(subcommand)]
+        cmd: commands::adr_baseline::AdrBaselineCommand,
     },
     /// Convention document management tools.
     Conventions {
@@ -62,10 +70,10 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::pr::PrCommand,
     },
-    /// Local planner workflow wrappers.
-    Plan {
+    /// Generic profile-driven capability dispatch.
+    Capability {
         #[command(subcommand)]
-        cmd: commands::plan::PlanCommand,
+        cmd: commands::capability::CapabilityCommand,
     },
     /// Local review workflow wrappers.
     Review {
@@ -106,6 +114,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::ref_verify::RefVerifyCommand,
     },
+    /// Test-obligation gate and binding authoring helpers.
+    TestObligation {
+        #[command(subcommand)]
+        cmd: commands::test_obligation::TestObligationSubcommand,
+    },
     /// Signal evaluation commands: calc-*/check-* for all 4 SoT Chain chains.
     Signal {
         #[command(subcommand)]
@@ -116,12 +129,28 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::task_contract::TaskContractCommand,
     },
+    /// Catalogue generation + annotation: init, add, import, cite, check.
+    Catalog {
+        #[command(subcommand)]
+        cmd: commands::catalog::CatalogCommand,
+    },
     /// Catalogue lint: primitive-obsession guard across TDDD layer catalogues.
     CatalogueLint {
         #[command(subcommand)]
         cmd: commands::catalogue_lint::CatalogueLintCommand,
     },
+    /// Template export: build a generic template tree from the boundary manifest.
+    Template {
+        #[command(subcommand)]
+        cmd: commands::template::TemplateCommand,
+    },
+    /// Resolve, verify, and provision the repository-local Codex runtime link.
+    CodexRuntime {
+        #[command(subcommand)]
+        cmd: commands::codex_runtime::CodexRuntimeCommand,
+    },
     /// Run the example track state machine demo.
+    #[cfg(not(doc))]
     Demo,
 }
 
@@ -144,6 +173,7 @@ fn run_cli_with(
 ) -> ExitCode {
     match cli.command {
         Some(CliCommand::Arch { cmd }) => commands::arch::execute(cmd),
+        Some(CliCommand::AdrBaseline { cmd }) => commands::adr_baseline::execute(cmd),
         Some(CliCommand::Conventions { cmd }) => commands::conventions::execute(cmd),
         Some(CliCommand::Domain { cmd }) => commands::domain::execute(cmd),
         Some(CliCommand::Guard { cmd }) => commands::guard::execute(cmd),
@@ -151,7 +181,7 @@ fn run_cli_with(
         Some(CliCommand::Track { cmd }) => execute_track_with_telemetry(cmd),
         Some(CliCommand::Git { cmd }) => commands::git::execute(cmd),
         Some(CliCommand::Pr { cmd }) => commands::pr::execute(cmd),
-        Some(CliCommand::Plan { cmd }) => commands::plan::execute(cmd),
+        Some(CliCommand::Capability { cmd }) => commands::capability::execute(cmd),
         Some(CliCommand::Review { cmd }) => commands::review::execute(cmd),
         Some(CliCommand::File { cmd }) => commands::file::execute(cmd),
         Some(CliCommand::Verify { cmd }) => execute_verify_with_telemetry(cmd),
@@ -161,10 +191,28 @@ fn run_cli_with(
         Some(CliCommand::Telemetry { cmd }) => commands::telemetry::execute(cmd),
         Some(CliCommand::Dry { cmd }) => dry_execute(cmd),
         Some(CliCommand::RefVerify { cmd }) => ref_verify_execute(cmd),
+        Some(CliCommand::TestObligation { cmd }) => commands::test_obligation::execute(
+            commands::test_obligation::TestObligationArgs::new(cmd),
+        ),
         Some(CliCommand::Signal { cmd }) => commands::signal::execute(cmd),
         Some(CliCommand::TaskContract { cmd }) => commands::task_contract::execute(cmd),
+        Some(CliCommand::Catalog { cmd }) => commands::catalog::execute(cmd),
         Some(CliCommand::CatalogueLint { cmd }) => commands::catalogue_lint::execute(cmd),
+        Some(CliCommand::Template { cmd }) => commands::template::execute(cmd),
+        Some(CliCommand::CodexRuntime { cmd }) => commands::codex_runtime::execute(cmd),
+        #[cfg(not(doc))]
         Some(CliCommand::Demo) | None => {
+            let outcome = DemoCompositionRoot::new().demo_driver().handle(DemoInput::Run);
+            if let Some(msg) = outcome.stdout {
+                println!("{msg}");
+            }
+            if let Some(msg) = outcome.stderr {
+                eprintln!("{msg}");
+            }
+            ExitCode::from(outcome.exit_code)
+        }
+        #[cfg(doc)]
+        None => {
             let outcome = DemoCompositionRoot::new().demo_driver().handle(DemoInput::Run);
             if let Some(msg) = outcome.stdout {
                 println!("{msg}");
@@ -427,8 +475,11 @@ fn execute_verify_with_telemetry(cmd: commands::verify::VerifyCommand) -> ExitCo
 fn verify_command_gate_name(cmd: &commands::verify::VerifyCommand) -> &'static str {
     use commands::verify::VerifyCommand;
     match cmd {
-        VerifyCommand::TechStack(_) => "verify-tech-stack",
         VerifyCommand::LatestTrack(_) => "verify-latest-track",
+        VerifyCommand::RetentionGate(_) => "verify-retention-gate",
+        VerifyCommand::SotpVersionTag(_) => "verify-sotp-version-tag",
+        VerifyCommand::MachinePaths(_) => "verify-machine-paths",
+        VerifyCommand::TemplateRefs(_) => "verify-template-refs",
         VerifyCommand::ArchDocs(_) => "verify-arch-docs",
         VerifyCommand::Layers(_) => "verify-layers",
         VerifyCommand::HooksPath(_) => "verify-hooks-path",
@@ -554,6 +605,48 @@ mod tests {
         assert_eq!(outcome.exit_code, 0, "demo failed: {:?}", outcome.stderr);
         let msg = outcome.stdout.unwrap_or_default();
         assert!(msg.contains("planned"), "expected 'planned' in output: {msg}");
+    }
+
+    #[test]
+    fn test_cli_command_capability_exec_parses_to_capability_variant() {
+        let cli = Cli::try_parse_from([
+            "sotp",
+            "capability",
+            "exec",
+            "implementer",
+            "--host",
+            "codex",
+            "--briefing-file",
+            "tmp/briefing.md",
+        ])
+        .expect("capability exec must parse at the top-level command boundary");
+
+        assert!(
+            matches!(cli.command, Some(CliCommand::Capability { .. })),
+            "capability exec must select the Capability variant"
+        );
+    }
+
+    #[test]
+    fn test_cli_command_codex_runtime_provision_parses_to_runtime_variant() {
+        let cli = Cli::try_parse_from([
+            "sotp",
+            "codex-runtime",
+            "provision",
+            "--project-root",
+            "/workspace/project",
+        ])
+        .expect("codex-runtime provision must parse at the top-level command boundary");
+
+        assert!(matches!(cli.command, Some(CliCommand::CodexRuntime { .. })));
+    }
+
+    #[test]
+    fn test_cli_command_retired_plan_codex_local_is_rejected() {
+        assert!(
+            Cli::try_parse_from(["sotp", "plan", "codex-local"]).is_err(),
+            "the retired plan codex-local command must not parse"
+        );
     }
 
     // ── CliCommand::Dry entrypoint dispatch routing ───────────────────────────
@@ -887,6 +980,47 @@ mod tests {
         assert_eq!(exit, ExitCode::SUCCESS);
     }
 
+    // ── CliCommand::Template entrypoint dispatch routing ─────────────────────
+
+    /// `sotp template export …` must parse into
+    /// `CliCommand::Template { cmd: TemplateCommand::Export }` with every path
+    /// argument mapped through the public CLI entrypoint.
+    #[test]
+    fn test_template_export_parses_to_template_export_variant() {
+        use crate::commands::template::{TemplateCommand, TemplateExportArgs};
+
+        let cli = Cli::try_parse_from([
+            "sotp",
+            "template",
+            "export",
+            "--workspace-root",
+            "/ws",
+            "--manifest-path",
+            "/ws/boundary.json",
+            "--overlay-dir",
+            "/ws/overlay",
+            "--output-dir",
+            "/out",
+        ])
+        .unwrap();
+
+        match cli.command {
+            Some(CliCommand::Template {
+                cmd: TemplateCommand::Export(TemplateExportArgs { output_dir, .. }),
+            }) => {
+                assert_eq!(output_dir, std::path::PathBuf::from("/out"));
+            }
+            _ => panic!("expected Template {{ Export }}, got a different variant"),
+        }
+    }
+
+    /// An unrecognized `sotp template` subcommand must be rejected by clap.
+    #[test]
+    fn test_template_unknown_subcommand_is_rejected() {
+        let result = Cli::try_parse_from(["sotp", "template", "unknown-subcmd"]);
+        assert!(result.is_err(), "unrecognized template subcommand must be rejected by clap");
+    }
+
     // ── Hook telemetry wrapper paths ─────────────────────────────────────────
 
     /// `sotp hook dispatch skill-compliance` routes through `execute_hook_with_telemetry`.
@@ -900,21 +1034,6 @@ mod tests {
     }
 
     // ── Verify telemetry wrapper paths ───────────────────────────────────────
-
-    /// `sotp verify tech-stack` routes through `execute_verify_with_telemetry`.
-    /// With a CWD that has no tech-stack.md the command exits non-zero (findings),
-    /// but the wrapper itself must not panic and must forward the exit code.
-    #[test]
-    fn test_verify_tech_stack_dispatch_via_run_cli_does_not_panic() {
-        let dir = TempDir::new().unwrap();
-        let project_root = dir.path().to_str().unwrap();
-        let cli =
-            Cli::try_parse_from(["sotp", "verify", "tech-stack", "--project-root", project_root])
-                .unwrap();
-        // Non-zero exit is expected (no tech-stack.md). The wrapper must not panic.
-        let exit = run_cli(cli, |_cmd| ExitCode::FAILURE);
-        assert_ne!(exit, ExitCode::from(2u8), "exit 2 reserved for hook blocks");
-    }
 
     /// `sotp verify layers` routes through `execute_verify_with_telemetry`.
     /// With a temp dir (no Cargo.toml) cargo-metadata fails → non-zero exit, but
@@ -934,26 +1053,23 @@ mod tests {
 
     // ── verify_command_gate_name coverage ────────────────────────────────────
 
-    /// Each `VerifyCommand` variant parsed from CLI args must map to a stable
-    /// gate name starting with "verify-".
+    /// Each sampled `VerifyCommand` variant parsed from CLI args must map to its
+    /// stable gate name.
     #[test]
-    fn test_verify_command_gate_name_uses_verify_prefix() {
+    fn test_verify_command_gate_name_uses_expected_labels() {
         use super::verify_command_gate_name;
 
         let subcommands = [
-            ["sotp", "verify", "tech-stack"],
-            ["sotp", "verify", "latest-track"],
-            ["sotp", "verify", "arch-docs"],
-            ["sotp", "verify", "layers"],
+            (["sotp", "verify", "latest-track"], "verify-latest-track"),
+            (["sotp", "verify", "retention-gate"], "verify-retention-gate"),
+            (["sotp", "verify", "arch-docs"], "verify-arch-docs"),
+            (["sotp", "verify", "layers"], "verify-layers"),
         ];
-        for args in &subcommands {
-            let cli = Cli::try_parse_from(*args).unwrap();
+        for (args, expected_gate_name) in &subcommands {
+            let cli = Cli::try_parse_from(args).unwrap();
             if let Some(CliCommand::Verify { cmd }) = cli.command {
                 let name = verify_command_gate_name(&cmd);
-                assert!(
-                    name.starts_with("verify-"),
-                    "gate name '{name}' does not start with 'verify-'"
-                );
+                assert_eq!(name, *expected_gate_name);
             }
         }
     }

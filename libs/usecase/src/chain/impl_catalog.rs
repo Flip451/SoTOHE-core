@@ -179,10 +179,10 @@ impl LoadablePersistedChain for ImplCatalogChain {
     ) -> Result<(), Self::StaleError> {
         let stored = persisted.declaration_hash();
         let current = input.current_catalogue_hash.to_hex();
-        if stored == current {
+        if stored.as_digest().as_str() == current {
             Ok(())
         } else {
-            Err(ImplCatalogStaleError { stored: stored.to_owned(), current })
+            Err(ImplCatalogStaleError { stored: stored.as_digest().as_str().to_owned(), current })
         }
     }
 }
@@ -248,7 +248,13 @@ mod tests {
     }
 
     fn make_doc(declaration_hash: &str, signals: Vec<TypeSignal>) -> TypeSignalsDocument {
-        TypeSignalsDocument::new(ts(), declaration_hash, signals)
+        let digest = domain::Sha256Digest::try_new(declaration_hash.to_owned()).unwrap();
+        TypeSignalsDocument::new(
+            ts(),
+            domain::CatalogueDeclarationHash::new(digest.clone()),
+            domain::ImplementationInputHash::new(digest),
+            signals,
+        )
     }
 
     // ── check_freshness ───────────────────────────────────────────────────────

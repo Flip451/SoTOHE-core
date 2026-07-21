@@ -11,21 +11,21 @@ decisions: []
 - **フォーマット**: Nygard 式 + Rejected Alternatives + Reassess When
 - **言語**: 日本語
 - **採番**: `YYYY-MM-DD-HHMM-slug.md`（例: `2026-03-11-1430-track-status-derived.md`）
-- **Status**: `Proposed` / `Accepted` / `Superseded` / `Deprecated`
-  - `Proposed`: ADR is authored and under review / pending activation of the associated track
-  - `Accepted`: Decision is accepted and implementation may proceed
-  - `Superseded`: Replaced by a newer ADR (reference the superseding ADR)
-  - `Deprecated`: Decision is withdrawn without replacement
-- **Superseded の場合**: 新 ADR を作成し、旧 ADR の Status を `Superseded by YYYY-MM-DD-HHMM-slug.md` に変更
+- **front-matter**: MD body の前に `adr_id` と `decisions[]` を必須で置く。各 decision は根拠 ref と decision 単位の `status` を持つ。
+- **decision status**: `proposed` / `accepted` / `implemented` / `superseded` / `deprecated`。`implemented` には `implemented_in`、`superseded` には `superseded_by` が必須。
+- **根拠**: 新規 decision には `user_decision_ref` または `review_finding_ref` を入れる。file-level の `## Status` は使用しない。
 
 ## ADR テンプレート
 
 ```markdown
+---
+adr_id: "<YYYY-MM-DD-HHMM>-<slug>"
+decisions:
+  - id: D1
+    user_decision_ref: "chat_segment:<session>:<date>"
+    status: proposed
+---
 # {タイトル}
-
-## Status
-
-Proposed / Accepted / Superseded / Deprecated
 
 ## Context
 
@@ -69,6 +69,12 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 |-----|--------|------|
 | [Phase 1.5 を good enough 宣言](2026-03-23-2100-phase-1.5-good-enough.md) | Accepted | 2026-03-23 |
 | [sotp CLI 外部ツール化は Moat 後に再評価](2026-03-23-2110-sotp-extraction-deferred.md) | Accepted | 2026-03-23 |
+| [sotp 開発領域と汎用テンプレートの分離境界・切り出し方式](2026-07-06-1717-template-extraction-boundary.md) | Proposed | 2026-07-06 |
+| [export は自バイナリを移植する](2026-07-08-0541-template-export-sotp-binary-transplant.md) | Proposed | 2026-07-08 |
+| [TODO マーカー状態管理の廃止](2026-07-08-1020-retire-todo-marker-state-and-track-docs.md) | Proposed | 2026-07-08 |
+| [技術スタック・製品ガイドラインの grandfathered baseline](2026-07-08-1405-grandfathered-tech-and-product-baseline.md) | Proposed | 2026-07-08 |
+| [retention gate の verify サブコマンド化](2026-07-08-2306-retention-gate-verify-subcommand.md) | Proposed | 2026-07-08 |
+| [公開テンプレート配布前の阻害要因解消](2026-07-13-0818-public-template-blocker-cleanup.md) | Proposed | 2026-07-13 |
 | [scripts/ Python ヘルパーの段階的 Rust 移行ロードマップ](2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md) | Proposed | 2026-04-13 |
 | [external_guides 撤去 — Python migration roadmap Phase 3 supersede](2026-04-28-1258-remove-external-guides.md) | — | 2026-04-28 |
 | [Python 固有ロジックの Rust 完全移行と Python ランタイム依存の撤去](2026-06-03-1327-python-runtime-full-removal.md) | Proposed | 2026-06-03 |
@@ -117,6 +123,10 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [TDDD GAT trait サポート: パーサ QualifiedPath + 比較フォーマッター正規化 + カタログ関連アイテムスキーマ](2026-06-18-0822-typeref-parser-qualified-path-support.md) | Proposed | 2026-06-18 |
 | [cli 系 3 層への TDDD 適用と既存 linter によるロール配置制約の設定](2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md) | Proposed | 2026-06-21 |
 | [TDDD chain ③ の `cargo rustdoc` 呼び出しに `--document-hidden-items` を追加する](2026-06-27-0440-tddd-rustdoc-document-hidden-items.md) | Proposed | 2026-06-27 |
+| [型カタログ作成の「生成 + 注釈」への移行 — 意図入力スキャフォールディング API](2026-07-02-1345-catalogue-generation-annotation.md) | — | 2026-07-02 |
+| [テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成](2026-07-02-0359-test-obligation-and-fulfillment-gate.md) | Proposed | 2026-07-02 |
+| [テスト義務ゲートにおける skipped task status レーン](2026-07-11-0802-test-obligation-skipped-status-lane.md) | Proposed | 2026-07-11 |
+| [contract-map renderer: `dyn Trait` return/param edge の解決](2026-07-13-0308-contract-map-dyn-trait-return-edge.md) | Proposed | 2026-07-13 |
 
 ### トラック・ワークフロー
 
@@ -138,6 +148,8 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [feature バッチ消化への既定反転 — per-layer 並列レビューを始動させる](2026-06-22-1327-feature-batch-default-inversion.md) | Accepted | 2026-06-22 |
 | [impl 段階の構造的不整合検出時のフェーズ遷移診断スキル](2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md) | Proposed | 2026-06-26 |
 | [タスク単位の契約履行 pre-review ゲート — Phase 3 attribution artifact と impl_catalog 信号の binary 再利用](2026-06-27-0852-pre-review-task-contract-conformance-gate.md) | Accepted | 2026-06-27 |
+| [remote sync 専用コマンドの新設と git 操作の hexagonal 是正 — switch と pull の分離、意味論 port への全面移管](2026-07-04-0155-git-sync-dedicated-command.md) | Proposed | 2026-07-04 |
+| [/track:adr2pr の呼び出し型を引数指定から文脈自動解決に戻す](2026-07-20-1508-adr2pr-argless-context-resolution.md) | Proposed | 2026-07-20 |
 
 ### ADR 運用
 
@@ -146,6 +158,10 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [ADR 自動導出: SSoT → ADR 候補検出の設計](2026-03-24-0930-adr-auto-derivation-design.md) | Accepted (設計のみ) | 2026-03-24 |
 | [ADR decision の根拠 trace 信号機評価 + 個別 lifecycle 管理](2026-04-27-1234-adr-decision-traceability-lifecycle.md) | — (D1 superseded by 2026-06-16-0042) | 2026-04-27 |
 | [ADR decision 根拠信号機: review grounding を一件でも持てば 🟡 とする優先規則修正](2026-06-16-0042-adr-signal-review-grounding-precedence.md) | — | 2026-06-16 |
+| [ADR baseline の累積刻印とバイト照合 binary check による無断改変検出](2026-07-16-2001-adr-decision-freeze.md) | Proposed | 2026-07-16 |
+| [ADR-baseline の review 入口検査を init 刻印の存在確認のみに縮小する](2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md) | Proposed | 2026-07-17 |
+| [adr2pr 終端に ADR baseline diff の PR コメント投稿フェーズを追加](2026-07-18-0340-adr2pr-baseline-diff-comment.md) | Proposed | 2026-07-18 |
+| [入力決定と pipeline 産決定の二箱分離](2026-07-19-0616-two-box-decision-separation.md) | Proposed | 2026-07-19 |
 
 ### ドキュメント運用
 
@@ -154,6 +170,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [運用ドキュメント断捨離方針 — SoT 一本化と narrative 重複の解消](2026-04-27-0554-doc-reorganization.md) | — | 2026-04-27 |
 | [運用ドキュメント再編（統合版）— ルート文書一本化・track/workflow.md 分散・工学規約の conventions 移管](2026-06-15-0025-operational-docs-restructure-unified.md) | — | 2026-06-15 |
 | [knowledge/strategy ディレクトリの整理方針](2026-06-17-1321-knowledge-strategy-cleanup.md) | — | 2026-06-17 |
+| [同梱運用ドキュメントのアーキテクチャ記述 SSoT 再編](2026-07-17-0247-docs-architecture-ssot-realignment.md) | Proposed | 2026-07-17 |
 
 ### ドメインモデル・型設計 (DESIGN.md 由来)
 
@@ -198,6 +215,10 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [Codex review-fix-lead の hexagonal Rust 化 + 入れ子 reviewer session 失敗の解消 + 自己 dogfooding](2026-05-31-0542-review-fix-codex-hexagonal-nested-session.md) | Proposed | 2026-05-31 |
 | [Codex を Claude と同等の SoTOHE オーケストレーターにする設定追加](2026-06-13-0002-codex-orchestrator-settings-addition.md) | Proposed | 2026-06-13 |
 | [Claude/Codex 運用文書の .harness SSoT 化](2026-06-30-0425-harness-workflow-ssot-adapters.md) | Proposed | 2026-06-30 |
+| [capability exec: profile 駆動の汎用 capability dispatch コマンド](2026-07-12-0510-capability-exec-unified-dispatch.md) | Proposed | 2026-07-12 |
+| [外部 provider 実行基盤の修復](2026-07-13-0410-capability-exec-infra-repair.md) | Proposed | 2026-07-13 |
+| [外部 agent 呼び出しのコスト削減](2026-07-13-2217-agent-dispatch-cost-reduction.md) | Proposed | 2026-07-13 |
+| [codex reviewer runtime の bootstrap 解決リンク（resolve & link）配備](2026-07-18-1359-codex-resolve-and-link-provisioning.md) | Proposed | 2026-07-18 |
 
 ### テスト・CI ツーリング
 
@@ -217,6 +238,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | ADR | Status | Date |
 |-----|--------|------|
 | [既存 DRY 違反の一掃 — 横断・既存重複を正典へ集約する](2026-06-19-0924-existing-dry-violation-cleanup.md) | Proposed | 2026-06-19 |
+| [catalogue_v2 エントリ型の catalogue linter 適合 refactor](2026-07-04-0525-catalogue-v2-entry-lint-conformance.md) | Proposed | 2026-07-04 |
 
 ### Review コマンド / API
 
@@ -228,3 +250,4 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [review fixer がスコープ境界を自己解決する — `--scope-files` 廃止](2026-06-01-2300-review-fixer-self-resolve-scope-files.md) | — | 2026-06-01 |
 | [レイヤー別 reviewer briefing prompt の導入と review-prompts ディレクトリの再配置](2026-06-18-1406-review-prompts-relocation-per-layer-briefings.md) | — | 2026-06-18 |
 | [内容レビューの SoT 別スコープ化](2026-06-30-1549-per-sot-review-scope.md) | — | 2026-06-30 |
+| [レビュー負荷軽減 — findings 全件報告と下流 artifact の再記述禁止](2026-07-02-1600-review-load-batch-findings-no-restatement.md) | — | 2026-07-02 |

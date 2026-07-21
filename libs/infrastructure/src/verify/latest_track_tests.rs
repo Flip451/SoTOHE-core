@@ -187,7 +187,7 @@ fn test_placeholder_in_fenced_block_ignored() {
     write_file(
         tmp.path(),
         &format!("{TRACK_ITEMS_DIR}/feat-c/spec.md"),
-        "# Spec\n\nReal content here.\n\n```\nTODO: this is inside a code block\n```\n",
+        "# Spec\n\nReal content here.\n\n```\nTODO: sample text inside a fence\n```\n",
     );
     write_file(
         tmp.path(),

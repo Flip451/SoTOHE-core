@@ -1,0 +1,496 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::run_review_fix::RunReviewFixService>"
+            },
+            {
+              "name": "command",
+              "ty": "usecase::review_v2::run_review_fix::RunReviewFixCommand"
+            },
+            {
+              "name": "provider",
+              "ty": "String"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "type_name": "ReviewFixDriver"
+    }
+  ],
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecDriverInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TargetArtifactPathArg",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TargetArtifactPathArg",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TargetArtifactPathArg",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TargetArtifactPathArg",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TargetArtifactPathArg",
+      "trait_ref": "core::str::FromStr"
+    },
+    {
+      "for_type": "CapabilityResumeArg",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityResumeArg",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapabilityResumeArg",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapabilityResumeArg",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CapabilityDriver": {
+      "action": "reference",
+      "docs": "Validates CLI resume input and invokes the generic capability dispatch use case.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::capability_exec::CapabilityExecService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "CapabilityExecDriverInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "capability",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CapabilityExecDriverInput": {
+      "action": "modify",
+      "docs": "Typed CLI-driver input for fresh or explicitly resumed capability execution.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "CapabilityNameArg"
+            },
+            {
+              "name": "host",
+              "ty": "ProviderNameArg"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "CapabilityFilePathArg"
+            },
+            {
+              "name": "timeout_seconds",
+              "ty": "Option<TimeoutSecondsArg>"
+            },
+            {
+              "name": "resume",
+              "ty": "CapabilityResumeArg"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CapabilityResumeArg": {
+      "action": "add",
+      "docs": "CLI-boundary representation of fresh, targetless, or target-bound capability resume intent.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fresh",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ResumeWithoutTarget",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Resume",
+            "payload": {
+              "fields": [
+                "Vec<TargetArtifactPathArg>"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ReviewFixDriver": {
+      "action": "add",
+      "docs": "Primary adapter that owns one fully wired review-fix invocation and renders its status, sentinel, diagnostics, and exit code; provider is an already-resolved presentation label used only for logging.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::review_v2::run_review_fix::RunReviewFixService>"
+            },
+            {
+              "name": "command",
+              "ty": "usecase::review_v2::run_review_fix::RunReviewFixCommand"
+            },
+            {
+              "name": "provider",
+              "ty": "String"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "review",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-01",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "ReviewInput": {
+      "action": "modify",
+      "docs": "CLI-driver command-family DTO after removal of the obsolete RunFixLocal variant; its primitive payloads are the pre-existing presentation-boundary representation and this track changes only fix-lane ownership.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RunCodex",
+            "payload": {
+              "fields": [
+                { "name": "model", "ty": "String" },
+                { "name": "timeout_seconds", "ty": "u64" },
+                { "name": "briefing_file", "ty": "Option<std::path::PathBuf>" },
+                { "name": "prompt", "ty": "Option<String>" },
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "round_type", "ty": "String" },
+                { "name": "group", "ty": "String" },
+                { "name": "items_dir", "ty": "std::path::PathBuf" }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "RunClaude",
+            "payload": {
+              "fields": [
+                { "name": "model", "ty": "String" },
+                { "name": "timeout_seconds", "ty": "u64" },
+                { "name": "briefing_file", "ty": "Option<std::path::PathBuf>" },
+                { "name": "prompt", "ty": "Option<String>" },
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "round_type", "ty": "String" },
+                { "name": "group", "ty": "String" },
+                { "name": "items_dir", "ty": "std::path::PathBuf" }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "RunLocal",
+            "payload": {
+              "fields": [
+                { "name": "model", "ty": "Option<String>" },
+                { "name": "timeout_seconds", "ty": "u64" },
+                { "name": "briefing_file", "ty": "Option<std::path::PathBuf>" },
+                { "name": "prompt", "ty": "Option<String>" },
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "round_type", "ty": "String" },
+                { "name": "group", "ty": "String" },
+                { "name": "items_dir", "ty": "std::path::PathBuf" }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CheckApproved",
+            "payload": {
+              "fields": [
+                { "name": "track_id", "ty": "String" },
+                { "name": "items_dir", "ty": "std::path::PathBuf" }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Results",
+            "payload": {
+              "fields": [
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "items_dir", "ty": "std::path::PathBuf" },
+                { "name": "scope", "ty": "Option<String>" },
+                { "name": "all", "ty": "bool" },
+                { "name": "limit", "ty": "u32" },
+                { "name": "round_type", "ty": "String" },
+                { "name": "no_hint", "ty": "bool" }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Classify",
+            "payload": {
+              "fields": [
+                { "name": "paths", "ty": "Vec<String>" },
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "items_dir", "ty": "std::path::PathBuf" }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Files",
+            "payload": {
+              "fields": [
+                { "name": "scope", "ty": "String" },
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "items_dir", "ty": "std::path::PathBuf" }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ValidateScope",
+            "payload": {
+              "fields": [
+                { "name": "scope", "ty": "String" },
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "items_dir", "ty": "std::path::PathBuf" }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "GetBriefing",
+            "payload": {
+              "fields": [
+                { "name": "scope", "ty": "String" },
+                { "name": "track_id", "ty": "Option<String>" },
+                { "name": "items_dir", "ty": "std::path::PathBuf" }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "PersistCommitHash",
+            "payload": {
+              "fields": [
+                { "name": "track_id", "ty": "String" },
+                { "name": "workspace_root", "ty": "std::path::PathBuf" }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "review",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-04",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "TargetArtifactPathArg": {
+      "action": "add",
+      "docs": "CLI parser wrapper that validates a normalized repository-relative target artifact path.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/agent-dispatch-cost-reduction-2026-07-13/spec.json"
+        }
+      ]
+    }
+  }
+}

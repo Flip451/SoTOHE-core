@@ -4,6 +4,7 @@
 //! It replaces the `tasks` / `plan` fields that were previously embedded in
 //! `TrackMetadata`. Introduced by ADR 2026-04-19-1242 §D1.4.
 
+use crate::tddd::test_obligation::ids::DiagnosticMessage;
 use crate::track::validate_plan_invariants;
 use crate::{
     DomainError, NonEmptyString, PlanSection, PlanView, TaskId, TaskStatus, TaskStatusKind,
@@ -205,11 +206,12 @@ impl ImplPlanDocument {
             .filter_map(|t| t.id().as_ref().strip_prefix('T').and_then(|n| n.parse::<u64>().ok()))
             .max()
             .unwrap_or(0);
-        let next_num = max_suffix.checked_add(1).ok_or_else(|| {
-            ValidationError::InvalidTaskId(
+        let Some(next_num) = max_suffix.checked_add(1) else {
+            return Err(ValidationError::InvalidTaskId(DiagnosticMessage::try_new(
                 "task id counter overflow: cannot allocate a new task id".to_owned(),
-            )
-        })?;
+            )?)
+            .into());
+        };
         let new_id = TaskId::try_new(format!("T{next_num:03}"))?;
 
         // Validate target section existence before mutating self.
@@ -217,10 +219,15 @@ impl ImplPlanDocument {
         let mut all_sections = self.plan.sections().to_vec();
 
         let target_idx = match section_id {
-            Some(sid) => all_sections
-                .iter()
-                .position(|s| s.id() == sid)
-                .ok_or_else(|| ValidationError::SectionNotFound(sid.to_owned()))?,
+            Some(sid) => {
+                let Some(pos) = all_sections.iter().position(|s| s.id() == sid) else {
+                    return Err(ValidationError::SectionNotFound(DiagnosticMessage::try_new(
+                        sid.to_owned(),
+                    )?)
+                    .into());
+                };
+                pos
+            }
             None => {
                 if all_sections.is_empty() {
                     return Err(ValidationError::NoSectionsAvailable.into());
@@ -288,25 +295,27 @@ fn resolve_transition(
             // Backfill: only valid when a commit hash is provided.
             match commit_hash {
                 Some(hash) => Ok(TaskTransition::BackfillHash { commit_hash: hash }),
-                None => Err(ValidationError::UnsupportedTargetStatus(
+                None => Err(ValidationError::UnsupportedTargetStatus(DiagnosticMessage::try_new(
                     "task is done pending; provide --commit-hash to backfill".to_string(),
-                )
+                )?)
                 .into()),
             }
         }
         (TaskStatus::DoneTraced { .. }, "done") => {
             // Task already has a commit hash; backfill is not possible.
-            Err(ValidationError::UnsupportedTargetStatus(
+            Err(ValidationError::UnsupportedTargetStatus(DiagnosticMessage::try_new(
                 "task already has a recorded commit hash; use 'in_progress' to reopen".to_string(),
-            )
+            )?)
             .into())
         }
         (TaskStatus::Skipped, "todo") => Ok(TaskTransition::ResetToTodo),
-        (current, target) => Err(ValidationError::UnsupportedTargetStatus(format!(
-            "cannot transition from '{}' to '{target}'",
-            current.kind()
-        ))
-        .into()),
+        (current, target) => {
+            Err(ValidationError::UnsupportedTargetStatus(DiagnosticMessage::try_new(format!(
+                "cannot transition from '{}' to '{target}'",
+                current.kind()
+            ))?)
+            .into())
+        }
     }
 }
 
@@ -369,7 +378,8 @@ mod tests {
         assert!(
             matches!(
                 err,
-                DomainError::Validation(ValidationError::DuplicateTaskId(ref id)) if id == "T001"
+                DomainError::Validation(ValidationError::DuplicateTaskId(ref id))
+                    if id.as_str() == "T001"
             ),
             "unexpected error: {err:?}"
         );
@@ -385,7 +395,8 @@ mod tests {
         assert!(
             matches!(
                 err,
-                DomainError::Validation(ValidationError::UnreferencedTask(ref id)) if id == "T002"
+                DomainError::Validation(ValidationError::UnreferencedTask(ref id))
+                    if id.as_str() == "T002"
             ),
             "unexpected error: {err:?}"
         );
@@ -412,7 +423,8 @@ mod tests {
         assert!(
             matches!(
                 err,
-                DomainError::Validation(ValidationError::UnknownTaskReference(ref id)) if id == "T999"
+                DomainError::Validation(ValidationError::UnknownTaskReference(ref id))
+                    if id.as_str() == "T999"
             ),
             "unexpected error: {err:?}"
         );
@@ -436,7 +448,8 @@ mod tests {
         assert!(
             matches!(
                 err,
-                DomainError::Validation(ValidationError::DuplicateTaskReference(ref id)) if id == "T001"
+                DomainError::Validation(ValidationError::DuplicateTaskReference(ref id))
+                    if id.as_str() == "T001"
             ),
             "unexpected error: {err:?}"
         );
@@ -454,7 +467,8 @@ mod tests {
         assert!(
             matches!(
                 err,
-                DomainError::Validation(ValidationError::DuplicatePlanSectionId(ref id)) if id == "S1"
+                DomainError::Validation(ValidationError::DuplicatePlanSectionId(ref id))
+                    if id.as_str() == "S1"
             ),
             "unexpected error: {err:?}"
         );

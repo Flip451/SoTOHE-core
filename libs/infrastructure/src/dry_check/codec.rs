@@ -30,6 +30,7 @@
 /// - `NotAViolation` / `Accepted` serialize as bare string tags.
 /// - `Violation` serializes as `{ "violation": { "refactor_proposal": "..." } }`.
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(super) enum DryCheckVerdictDto {
     #[serde(rename = "not-a-violation")]
     NotAViolation,
@@ -52,6 +53,7 @@ pub(super) enum DryCheckVerdictDto {
 /// valid 64-char hex) are mapped to the sentinel in `dto_to_domain` so that one
 /// corrupted historical row does not abort the entire `read_records()` call.
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(super) struct DryCheckRecordDto {
     pub low_path: String,
     pub low_hash: String,
@@ -90,6 +92,7 @@ fn fail_closed_fingerprint_string() -> String {
 /// The type alias `DryCheckJsonV1` is kept to avoid cascading renames across the
 /// store module; it now always writes and reads `schema_version: 2` records.
 #[derive(Debug, serde::Serialize, serde::Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(super) struct DryCheckJsonV1 {
     pub schema_version: u32,
     pub records: Vec<DryCheckRecordDto>,

@@ -1,0 +1,414 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6321455f702e2e3aeadc87243f3a3e8c3fb53265adf375dc274666184737dcd3",
+          "at": "2026-07-06T13:48:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6321455f702e2e3aeadc87243f3a3e8c3fb53265adf375dc274666184737dcd3",
+          "at": "2026-07-06T13:53:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0617cba0ebb9a0f2ab9e5120e67bd229001f228ee65d53a728a9d11e77810015",
+          "at": "2026-07-06T14:24:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Pattern 7 still documents the old delete-entry shape, saying the deleted entry must carry the baseline `kind`/shape and the example includes `role`, `kind`, `methods`, and `docs`. The generate+annotate workflow and implementation now make `catalog import --action delete` write an identity-only tombstone with just `action`, optional `module_path`, `spec_refs`, and `informal_grounds`; `.harness/capabilities/type-designer.md` says the same. Leaving this stale cookbook rule in the relocated schema reference will make reviewers/designers treat correct generated delete tombstones as incomplete and may lead them to hand-add fields the CLI intentionally omits.",
+              "severity": "P1",
+              "file": "knowledge/conventions/catalogue-schema-reference.md",
+              "line": 686,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "The reference-entry cookbook says an empty `methods: []` is acceptable when no rendering fidelity is required. That contradicts the binding kind-selection convention's R7/reference semantics, which requires baseline ports declared as `action: \"reference\"` to enumerate the baseline methods, and it also conflicts with the capability's 12c baseline-identical attestation for every reference entry. This weakens the policy exactly where type-designer will look after the relocation and can cause under-specified reference entries to pass author review despite violating the project convention.",
+              "severity": "P1",
+              "file": "knowledge/conventions/catalogue-schema-reference.md",
+              "line": 706,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0617cba0ebb9a0f2ab9e5120e67bd229001f228ee65d53a728a9d11e77810015",
+          "at": "2026-07-06T14:29:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sotp catalog init` is documented as producing only “5 header keys”, but the implementation builds six top-level keys: `schema_version`, `crate_name`, `layer`, `types`, `traits`, and `functions`. The same incorrect count is repeated in `knowledge/conventions/catalogue-schema-reference.md`, so the capability/checklist can make a valid generated skeleton look non-conforming. Update the documented count to six while keeping the note that empty impl arrays are omitted.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 121,
+              "category": "harness-policy"
+            }
+          ],
+          "hash": "rvw1:sha256:c85e940418d6cc97e4e254616461bff0f2fef81193a06aa2ef35641a63f57a30",
+          "at": "2026-07-06T14:34:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b60298efe68a4202615bd278a514631e15ef8bf810af4fcf55ebe0d41cfd3cf0",
+          "at": "2026-07-06T14:39:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c79e91ce4be57d399fb3846a5702f732bfb5a78aa231dd5f802abfcaca32a9e",
+          "at": "2026-07-06T15:03:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c79e91ce4be57d399fb3846a5702f732bfb5a78aa231dd5f802abfcaca32a9e",
+          "at": "2026-07-06T15:06:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca1cd481913c148e1fb491d6fd858a631c3569a901dbe9098c663a0259d8a85f",
+          "at": "2026-07-06T15:17:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new fallback route covers trait/function `delete` together with `reference`/`modify`, but the described edit is not enough to produce a valid deletion. `catalog add --kind trait|function` creates a live entry with fields such as `role`, `methods`/`params`, `returns`, and `docs`; simply changing `action` to `delete` leaves those live-entry fields in place. The catalogue decoder routes `action: delete` through the tombstone DTO, which rejects live-entry fields, so `catalog check` will fail for users following this workflow. Split the delete case out and instruct authors to create an identity-only tombstone with only the allowed grounding fields, including the required spec anchor.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 130,
+              "category": "workflow-gap"
+            }
+          ],
+          "hash": "rvw1:sha256:ca1cd481913c148e1fb491d6fd858a631c3569a901dbe9098c663a0259d8a85f",
+          "at": "2026-07-06T15:21:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e505b171ddf61adc9f28275e8aa0ee5ed3a480795b79711b016ae9b4c6b6aec",
+          "at": "2026-07-06T15:25:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e70e5166fe21d6f736d4afe4ef4397a1e39c13c357eb042a4e0deb80a762591d",
+          "at": "2026-07-06T15:46:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Pattern 8 now tells authors to declare a referenced repository port as `role: { \"Repository\": { ... } }`, but `knowledge/conventions/type-designer-kind-selection.md` R7 still requires every port referenced by a `SecondaryAdapter` trait_impl to be present as a `role: SecondaryPort` trait entry, and says only `SecondaryPort` entries satisfy the port-index/exposure rule. This leaves repository ports impossible to classify consistently: following this cookbook example violates R7, while following R7 contradicts the schema-reference cookbook. Update the R7 convention alongside this example, or keep the cookbook on the role R7 currently recognizes.",
+              "severity": "P1",
+              "file": "knowledge/conventions/catalogue-schema-reference.md",
+              "line": 709,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e70e5166fe21d6f736d4afe4ef4397a1e39c13c357eb042a4e0deb80a762591d",
+          "at": "2026-07-06T15:48:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b952af465214c9863a4ec630b7c101b843bd1e38485e26723a81fb449b96f80f",
+          "at": "2026-07-06T15:55:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new schema reference still documents `where_predicates` with the legacy `{ \"type\", \"bounds\" }` shape in the FunctionEntry schema, MethodDeclaration schema, and Pattern 5 example. The codec's DTO documents the current wire format as `lhs` / `rhs` / `operator` and treats `type` / `bounds` only as backwards-compat aliases, while the encoder emits `lhs`, `rhs`, and `operator`. Because this file is now the normative v5 catalogue reference used for hand-adjustments, leaving the legacy alias as the documented shape contradicts the implementation SSoT and will teach authors to write non-canonical v5 entries.",
+              "severity": "P1",
+              "file": "knowledge/conventions/catalogue-schema-reference.md",
+              "line": 177,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b952af465214c9863a4ec630b7c101b843bd1e38485e26723a81fb449b96f80f",
+          "at": "2026-07-06T15:58:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ec13cb73f2fbc67be648a1d5dddfa380ebf928e2f206248bce230e18685d196",
+          "at": "2026-07-06T16:03:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ec13cb73f2fbc67be648a1d5dddfa380ebf928e2f206248bce230e18685d196",
+          "at": "2026-07-06T16:05:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d6ef593d6da1f67f37df3c1737fe0b62b554621eb7d8b83f65d7e14601daa22",
+          "at": "2026-07-06T16:53:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`/adr:add` is now documented as the canonical pre-track ADR authoring entrypoint while also saying YAML `decisions[]` front matter is mandatory. The referenced command still generates a markdown-only ADR skeleton (`.claude/commands/adr/add.md` template starts at `# <title>` and has no `---/adr_id/decisions` block), but `knowledge/conventions/adr.md` says ADRs without front matter fail `signal check-adr-user`/`verify-adr-signals` fail-closed. Following the documented pipeline can therefore create a new ADR that immediately breaks CI. Update the `/adr:add` surface to emit grounded front matter, or do not present it here as the canonical path until that wiring is fixed.",
+              "severity": "P1",
+              "file": "CLAUDE.md",
+              "line": 31,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4d6ef593d6da1f67f37df3c1737fe0b62b554621eb7d8b83f65d7e14601daa22",
+          "at": "2026-07-06T16:57:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CLAUDE.md` now states that `.claude/commands/track/*.md` are thin adapters whose workflow logic lives under `.harness/workflows/track/*.md`, but that glob also covers commands such as `.claude/commands/track/status.md`, `catchup.md`, and `setup.md` that have no workflow SSoT pointer and contain their own execution/resolution logic. That contradicts the harness-policy adapter-SSoT rule and gives maintainers a false responsibility boundary. Narrow this claim to the workflow-backed adapters, or add workflow SSoTs for the remaining commands and reduce their adapters accordingly.",
+              "severity": "P1",
+              "file": "CLAUDE.md",
+              "line": 37,
+              "category": "adapter-SSoT sync"
+            }
+          ],
+          "hash": "rvw1:sha256:cfc86711af88e48712d91244331d24b0cc80ecd899741f5a20f6022323cd8b90",
+          "at": "2026-07-06T17:02:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d3c275402c04945573e701af37ba7121350bde12b92aff774e81866b153b3c3",
+          "at": "2026-07-06T17:06:23Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be73c391a9eadecf34a0af620a008c5dddc46e90b5d6488a4ce3f139b5113e13",
+          "at": "2026-07-06T13:50:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-01 says the `.harness/capabilities/type-designer.md` rewrite is limited to IN-01..IN-03 plus IN-07's 12a receipt text, but IN-04/IN-05 and AC-03/AC-06 require removing schema/cookbook sections from that same doc and adding a reference to the new manual. Downstream implementers cannot satisfy both the constraint and the in-scope/AC requirements deterministically.",
+              "severity": "P1",
+              "file": "track/items/type-designer-generate-annotate-doc-2026-07-06/spec.json",
+              "line": 178,
+              "category": "scope / acceptance_criteria contradiction"
+            },
+            {
+              "message": "GO-02 makes the separate reference document a goal, but its only adr_ref is D2. D2 moves schema knowledge out of the type-designer workflow; the decision to keep that knowledge in an independent `knowledge/conventions/` manual is D9, so this goal is not anchored to the decision that authorizes the reference-document outcome.",
+              "severity": "P1",
+              "file": "track/items/type-designer-generate-annotate-doc-2026-07-06/spec.json",
+              "line": 22,
+              "category": "goal not anchored to a decision"
+            }
+          ],
+          "hash": "rvw1:sha256:be73c391a9eadecf34a0af620a008c5dddc46e90b5d6488a4ce3f139b5113e13",
+          "at": "2026-07-06T13:55:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e12f1e57fb44dd13d04c164f7308e950531e3084986a4052cd38c7a0b46965e2",
+          "at": "2026-07-06T14:00:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2205fb1777095a9fd542e81427ee160f91d9c4ef19f1140becb30eafdd67791f",
+          "at": "2026-07-06T16:34:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-09 now requires accepting the R7 `SecondaryPort`/`Repository` and `build_trait_index` corrections in `type-designer-kind-selection.md`, but the declared in-scope item for that file, IN-08, is still limited to the three `kind` wire-format reference rewrites and says R1-R10 themselves are unchanged. That makes the AC require behavior outside the declared in_scope set, so downstream phases cannot deterministically tell whether the R7 edits are authorized by this spec contract.",
+              "severity": "P1",
+              "file": "track/items/type-designer-generate-annotate-doc-2026-07-06/spec.json",
+              "line": 366,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:2205fb1777095a9fd542e81427ee160f91d9c4ef19f1140becb30eafdd67791f",
+          "at": "2026-07-06T16:37:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:684315d730cbde2726c9131fbc2fab07b147837d51b3ad7ee3d1e1a06783d357",
+          "at": "2026-07-06T16:45:14Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd283ec3c01f224abef775a0aef2242740a75815a836e72ad272c5036d9cee4d",
+          "at": "2026-07-06T12:27:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd283ec3c01f224abef775a0aef2242740a75815a836e72ad272c5036d9cee4d",
+          "at": "2026-07-06T12:29:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db1503d498182653a41a9d089d526c1f06e46e3ddc9f5d2da6eec54c8d20d407",
+          "at": "2026-07-06T13:49:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is ordered before T002 but includes adding references to `knowledge/conventions/catalogue-schema-reference.md` `(T002)`. T002 is the task that creates and registers that manual, so executing T001 first leaves an individually committed task with references to a missing artifact and can break reference verification. Move T002 before T001, or split the T001 reference update into a task that runs after T002.",
+              "severity": "P1",
+              "file": "track/items/type-designer-generate-annotate-doc-2026-07-06/impl-plan.json",
+              "line": 6,
+              "category": "dependency cycle or wrong ordering"
+            }
+          ],
+          "hash": "rvw1:sha256:db1503d498182653a41a9d089d526c1f06e46e3ddc9f5d2da6eec54c8d20d407",
+          "at": "2026-07-06T13:53:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "P1 upstream restatement: `T002`, `T001`, `T003`, and sections `S1`-`S3` go beyond target + operation + anchor cite by restating upstream spec behavior in prose, e.g. the exact authority-note semantics, generated-output workflow, receipt criteria, boundary-section rule, and stale-pointer rationale. `knowledge/conventions/no-upstream-restatement.md` and the impl-plan severity policy require these downstream plan texts to reference `IN-*`/`CN-*`/`AC-*` anchors instead of re-explaining the behavior contract, otherwise the plan can drift from `spec.json`. Trim the descriptions to file/symbol targets, concrete operations, and the existing anchor cites.",
+              "severity": "P1",
+              "file": "track/items/type-designer-generate-annotate-doc-2026-07-06/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:62192f136ba5b292cb70ad01a72f08fcc48f0ceb872faf43cc6cbd4c317c4814",
+          "at": "2026-07-06T13:59:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3c6d9facd4efbd16bc8899ab16549fdd60681d5a4ed4491d4da8cf0640b8dad",
+          "at": "2026-07-06T14:03:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2123f31297c2c88b9e6d9201da05c7b16790d478c59ccdefbfca559fb7977f79",
+          "at": "2026-07-06T14:22:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2123f31297c2c88b9e6d9201da05c7b16790d478c59ccdefbfca559fb7977f79",
+          "at": "2026-07-06T14:24:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b20ea9e97772c24fd57370126deb981bd4c87ed5a072b84132e712e47a36f89b",
+          "at": "2026-07-06T14:44:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b20ea9e97772c24fd57370126deb981bd4c87ed5a072b84132e712e47a36f89b",
+          "at": "2026-07-06T14:47:10Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5adafd00e42a10a28e734f09d8a32aeadf3fb2efbe03535b9809620a9d642ce1",
+          "at": "2026-07-06T13:48:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5adafd00e42a10a28e734f09d8a32aeadf3fb2efbe03535b9809620a9d642ce1",
+          "at": "2026-07-06T13:52:46Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65b0c82004e1723eb17ac89f75e372fd15cf00cc15b3307c2579a0ae282dc803",
+          "at": "2026-07-06T13:47:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65b0c82004e1723eb17ac89f75e372fd15cf00cc15b3307c2579a0ae282dc803",
+          "at": "2026-07-06T13:50:55Z"
+        }
+      ]
+    }
+  }
+}

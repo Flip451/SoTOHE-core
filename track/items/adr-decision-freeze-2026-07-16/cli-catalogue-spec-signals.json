@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "e098a881a49a9cea1d77ede31165e7cb7bc24da733f2b0b9049bb4fd6bd888b8",
+  "signals": [
+    {
+      "type_name": "AdrBaselineCheckCommitArgs",
+      "signal": "blue",
+      "entry_hash": "2c060da06ad69bc1b0ee4280b06dba222523e3388773e8195028b3dd690b361e"
+    },
+    {
+      "type_name": "AdrBaselineCheckReviewArgs",
+      "signal": "blue",
+      "entry_hash": "bbc2ca31e9fdc27a38fdec1c5d5f654eb30776aee680ba9942a0e0190bf89545"
+    },
+    {
+      "type_name": "AdrBaselineCommand",
+      "signal": "blue",
+      "entry_hash": "11e0b5b070ace6dd9b87b33beea69f516962080a941ca5954615c901e003bd1a"
+    },
+    {
+      "type_name": "AdrBaselineRestoreArgs",
+      "signal": "blue",
+      "entry_hash": "3ea4a06f04ed207945d3499cb65d34963ca8a892250a3c12a7e4b137b4176a08"
+    },
+    {
+      "type_name": "AdrBaselineSnapshotArgs",
+      "signal": "blue",
+      "entry_hash": "cfc53c372d6b75fb599942b3b99369523019bea5d83ade452a0dc2c11950989c"
+    },
+    {
+      "type_name": "CliCommand",
+      "signal": "blue",
+      "entry_hash": "14818e23d747fde53f8a48003d9a308afb79c3f0280bdcfe28f7ed350d7bc6f9"
+    },
+    {
+      "type_name": "cli::commands::adr_baseline::dispatch",
+      "signal": "blue",
+      "entry_hash": "64b5acddd5d120b83437f3e2f1115e60a155ed157bad59164abce2cff7897090"
+    },
+    {
+      "type_name": "cli::commands::adr_baseline::execute",
+      "signal": "blue",
+      "entry_hash": "b248bbae84bfbb8a83f9d55a42d14748ca3d70f2156dfa9e7dd16bf8f21759cb"
+    },
+    {
+      "type_name": "cli::commands::adr_baseline::execute_with_error_chain",
+      "signal": "blue",
+      "entry_hash": "ef46b4680cb453ab80768508e68c320a70cbe2f3760a39dc0a778960f2c092c0"
+    }
+  ]
+}

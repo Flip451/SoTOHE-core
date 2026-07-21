@@ -1,0 +1,1035 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 includes upstream behavior/rationale prose beginning “Preserve the existing task-status vocabulary…”; retain only target, operation, and anchor citation.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 restates the behavior contract (“retain status-independent detection”, “strictest-wins”, fail-closed errors, and todo-only warnings); reduce the description to target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates the results behavior (“aggregate unresolved findings by…”, informational independence, and freshness/read-error semantics); reduce the description to target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 restates rendering and exit-code behavior, including strict-lane blocking and strictest-wins cases; reduce the description to target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 restates the output breakdown and exit-code contract (“preserve exit 0…”); reduce the description to target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 includes upstream workflow/behavior constraints about signal-gate preservation, incremental bindings, and avoiding an empty obligations artifact; reduce the description to target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 restates the fail-closed domain rationale (“required by the later usecase interpretation”); keep only concise section purpose if needed.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 48,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 restates status-independent detection and final interpretation behavior; remove the behavior-contract prose from the section description.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 58,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 restates the distinct exit-code contract; remove this upstream behavior prose from the section description.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 68,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:b97735b8bfd9377191b00630816668839d689533115d4c8b5c04eb01c0a17a32",
+          "at": "2026-07-11T08:39:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 restates the upstream fail-closed behavior in “so status-independent task-attribution and artifact-structure failures remain explicit...” after already naming the target, operation, and anchors. Keep only target + operation + anchors, per no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 embeds the upstream detection, strictest-wins, fail-closed, and warning contracts in prose. These are restatements beyond target + operation + anchors and should be removed per no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates the results lane semantics, pass/fail independence, read-error behavior, and freshness handling instead of limiting the description to target + operation + anchors.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 restates the todo warning, strict-lane blocking, status-independent failure, and exit behavior in prose. Replace the behavioral contract with target + operation + anchors only.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 restates the lane breakdown and exit-0 contract in prose beyond the permitted target + operation + anchors form.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 restates out-of-scope behavior (“without introducing an attribution artifact or changing signal-gate or merge workflows”) and adds obligation-artifact workflow semantics in prose. Keep the executable target/operation and anchors without duplicating the upstream contract.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 36,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 restates the fail-closed domain behavior and its dependency rationale (“required by the later usecase interpretation”) without an anchor. Plan section descriptions must use target + operation + anchor rather than upstream rationale/contract prose.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 48,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 restates status-independent detection and final gate interpretation behavior instead of citing the upstream anchors only.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 58,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 restates the distinct exit-code behavior contract in prose. Replace it with target + operation + anchor wording per no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 69,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:b97735b8bfd9377191b00630816668839d689533115d4c8b5c04eb01c0a17a32",
+          "at": "2026-07-11T08:40:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `plan.summary` field is empty (`\"summary\": []`), so GO-NN goal-to-task traceability is absent from the impl-plan SSoT. Add the goals and their carrying task IDs.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 42,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:61a5aff11e654fe06ca2b6c86b97c393d8a2f29f6c4f1277defba03b28ca030c",
+          "at": "2026-07-11T08:45:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 targets `libs/domain/src/tddd/test_obligation/{errors.rs,vocab.rs}` but claims to update `TaskStatusKind`; that type is in `libs/domain/src/track.rs` and is catalogued as `action: reference`, so the task scope cannot execute the stated change.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "`usecase-types.json` declares the `TestObligationDetectionDependencies` catalogue entry (`action: add`, IN-03/IN-05), but `task-contract.json` contains no corresponding usecase attribution. The claimed 15-entry coverage is therefore incomplete and the shared dependency carrier has no owning task.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/task-contract.json",
+              "line": 4,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:31d7b39b78db55bda329ed108cb6e3ae1f31c92bd1e8f1b0855949f2c828e77b",
+          "at": "2026-07-11T08:51:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 の「update implementation-batch test-obligation bindings」は対象ファイルまたはシンボルを示しておらず、実装者が変更境界を推測する必要がある。`test-bindings.json` など具体的な対象を記載すべき。",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/impl-plan.json",
+              "line": 36,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:228d5fc6650b84d3b80090437dcdb489aa270f239bb6fc96197e2008eced1ae6",
+          "at": "2026-07-11T08:56:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31b6b3142534fb968f174e1e811e9b17fd51e3d53f7bb7acaec4cfe112042ef7",
+          "at": "2026-07-11T08:59:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31b6b3142534fb968f174e1e811e9b17fd51e3d53f7bb7acaec4cfe112042ef7",
+          "at": "2026-07-11T09:04:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31b6b3142534fb968f174e1e811e9b17fd51e3d53f7bb7acaec4cfe112042ef7",
+          "at": "2026-07-11T09:04:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e800a7e94191818d9cdb6ebd0802b7486feaf5533e26bd1fdde34a7ab13ba052",
+          "at": "2026-07-11T10:00:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0e60c1ad1fc79340263cf8150b6774692412f8f7a6ddf4ad50ebaec0eb2458c",
+          "at": "2026-07-11T11:59:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa840200cb78f2a05abcaf358729769da87f5b707641dd6bffaaa68a1cb3b404",
+          "at": "2026-07-11T12:43:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa840200cb78f2a05abcaf358729769da87f5b707641dd6bffaaa68a1cb3b404",
+          "at": "2026-07-11T12:44:51Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4534d0c6d3530f7c0ed38e8a84ca9db8143e40dd5bb3b8a3be045ba8002df046",
+          "at": "2026-07-11T11:47:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4534d0c6d3530f7c0ed38e8a84ca9db8143e40dd5bb3b8a3be045ba8002df046",
+          "at": "2026-07-11T11:50:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa6df7ebd3628a85584f23de2affa16a15fe69a774c9f9b369d8d6201946d34b",
+          "at": "2026-07-11T13:02:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f792284d11d2acfa9770c8ec0a3bf864c6c5d6e6fa3217f7a145367d1b64eacc",
+          "at": "2026-07-11T15:36:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e080fc787d43bf37950a406722d61770b14f470174e1d20c5e052b40a3bacc4",
+          "at": "2026-07-11T15:54:14Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "All 36 records are `voluntary_binding`, but the two derived obligations require canonical `fulfillment` records. The 12 records covering their spec edges are therefore misclassified; fulfillment lookup ignores voluntary bindings, leaving both obligations unbound despite the cache entries. Replace them with two fulfillment records and retain voluntary bindings only for non-derived edges.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/test-bindings.json",
+              "line": 4,
+              "category": "artifact-schema"
+            }
+          ],
+          "hash": "rvw1:sha256:8ae4a69e76dfa5b280289deb5cbcce7e7ba6dc37e4c20f4647771ac295dae7af",
+          "at": "2026-07-11T11:48:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The two derived obligations in obligations.json have no fulfillment records; all 36 bindings are voluntary_binding records. This contradicts the briefing's required two fulfillment records and misuses voluntary_binding for edges that do carry derived obligations, weakening stable obligation-level coverage.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/test-bindings.json",
+              "line": 4,
+              "category": "artifact-integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:8ae4a69e76dfa5b280289deb5cbcce7e7ba6dc37e4c20f4647771ac295dae7af",
+          "at": "2026-07-11T11:48:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1579a9bd7cef96dd7aa7508f8c95996277fbf17496cb424b3e972cc73fd4d9b",
+          "at": "2026-07-11T12:34:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1579a9bd7cef96dd7aa7508f8c95996277fbf17496cb424b3e972cc73fd4d9b",
+          "at": "2026-07-11T12:38:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:88472094b2619fd4b8b98b49af0bf2f3ec98f91932ec8ab605eccce773a38585",
+          "at": "2026-07-11T13:03:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0a3131018c4fa72d023209105d81630f06c08c14cbbf27d56581acb2b3e784bb",
+          "at": "2026-07-11T13:24:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e306cd54d4718945da8efb3e4e16de2e6b378e6dc342130af26287e8d539ce4",
+          "at": "2026-07-11T13:51:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0012fd7cbf6b9a9a5ef004ad23b95b3c6ae0f6b31a49652fa99b50fb730b81f9",
+          "at": "2026-07-11T14:12:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ca6408c3d32fafe57dcb1b8b2548135fa49a4d4e1bb67ae4336bd6f50761607",
+          "at": "2026-07-11T15:37:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The IN-05 composition-root binding does not cover the behavior it claims. `test_composition_root_results_wires_informational_status_lanes` now asserts that no status lanes are rendered for an empty workspace, while `test_composition_root_wires_status_artifacts_for_check_and_results` converts every done task to skipped and checks only a nonzero skipped missing count. Neither test exercises IN-05's todo/in_progress/done lane breakdowns or missing/stale/verdict-absent aggregation, so this edge lacks meaningful test coverage despite its cached fulfilled verdict.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/test-bindings.json",
+              "line": 183,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:8399be8f3abaf0a2065bb05355065d38fce54a13ce8cd81b8af95dbc0177c7eb",
+          "at": "2026-07-11T15:46:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The IN-05 composition-root binding now retains only `test_composition_root_results_wires_informational_status_lanes`, which asserts todo/in_progress/done output but never exercises the skipped lane. Removing `test_composition_root_wires_status_artifacts_for_check_and_results` drops the only bound composition test that asserts skipped-lane output, so the claimed four-lane coverage is no longer represented by this edge's test set.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/test-bindings.json",
+              "line": 182,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:9e5db627ee7b34415aea495cc6aad9745d5d4c7adf28a5a282a01ab34b5c0b70",
+          "at": "2026-07-11T15:55:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e44a781be43fa51e757a842ebbe2900d40cbd9fde7ab02b3ad949943d68eccf",
+          "at": "2026-07-11T16:01:27Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The test now uses the canonical repository root instead of a temporary workspace, so it reads live/generated/stale track artifacts and is not hermetic or minimal. Keep a temp workspace and copy the required lane-input files explicitly.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/test_obligation.rs",
+              "line": 740,
+              "category": "test_hermeticity"
+            }
+          ],
+          "hash": "rvw1:sha256:bc08ebc8ddeaf02e0ba1f79dec7beeb2cf50aa6afbb88feb66935045b8e028cc",
+          "at": "2026-07-11T14:31:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc08ebc8ddeaf02e0ba1f79dec7beeb2cf50aa6afbb88feb66935045b8e028cc",
+          "at": "2026-07-11T14:32:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f9d954a7080d73944f6d9b3cee0f666cd915b8e4c6f3ec11237203f289d6d3a",
+          "at": "2026-07-11T14:40:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa4ed92198be6b60793ac965d9c4c9347d5e3e23e3ce0f635476b0b34f1f250c",
+          "at": "2026-07-11T16:13:52Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bf46ec81737b716093cddb7403af473cb2795f134003232d0a6a8089df7c72f",
+          "at": "2026-07-11T08:38:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bf46ec81737b716093cddb7403af473cb2795f134003232d0a6a8089df7c72f",
+          "at": "2026-07-11T08:38:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bf46ec81737b716093cddb7403af473cb2795f134003232d0a6a8089df7c72f",
+          "at": "2026-07-11T08:43:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 requires deterministic task attribution through the existing artifact chain, but no acceptance criterion verifies the `obligations.json` target entry → `task-contract.json` task assignment → `impl-plan.json` status composition. AC-01 starts from an already-established lane, so an implementation can satisfy every AC without proving the goal’s attribution mechanism.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+              "line": 8,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "GO-02 promises preservation of the fail-closed guarantee, but orphaned bindings have no acceptance criterion for their final gate outcome. AC-03 only checks that orphaned detection is status-independent, while AC-01/AC-02 enumerate blocking behavior only for missing, stale, verdict absence, and structural failures; therefore the stated fail-closed goal is not deterministically proven for orphaned findings.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json",
+              "line": 18,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:6bf46ec81737b716093cddb7403af473cb2795f134003232d0a6a8089df7c72f",
+          "at": "2026-07-11T08:43:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9fb160df686e97dd05a27e64da8a822b741f5c0d004934f237ea20319b5338a",
+          "at": "2026-07-11T08:48:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e3625eb65c708c3ff5aa710194e585923e5c911b192df4918a7f5de8de5d11b0",
+          "at": "2026-07-11T09:02:02Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:517625f0501d8479573d729cb7666a5337ec2d7dd4614604441e50bbf66265ea",
+          "at": "2026-07-11T11:53:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:517625f0501d8479573d729cb7666a5337ec2d7dd4614604441e50bbf66265ea",
+          "at": "2026-07-11T11:57:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aff3954520f0f9fb7794405fd91645db3b3cb5089d1e026dcd51657d70344e94",
+          "at": "2026-07-11T12:32:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:286cda3d91d19adf5a4cf788c04fd496d46461b8118124120942d87b22136a1f",
+          "at": "2026-07-11T13:24:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:61ded61d33c5b0d1553171fb9d041538868b382445dba968aa39f42d678c1f44",
+          "at": "2026-07-11T13:51:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`collect_status_lane_summaries(...)?` now propagates task-attribution/read failures from this informational results command. The briefing explicitly requires results to remain successful even on read errors (IN-05/AC-05); this changes the CLI from exit 0 to an error. Preserve the successful output with empty status-lane summaries on attribution failure. The modified test currently blesses the regression instead of enforcing the contract.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/results.rs",
+              "line": 316,
+              "category": "orchestration correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:f16da273653e30d2cf7ed3667d76b8c61a19bb9a41b54f9fabe33ca5c3a15c32",
+          "at": "2026-07-11T14:11:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f16da273653e30d2cf7ed3667d76b8c61a19bb9a41b54f9fabe33ca5c3a15c32",
+          "at": "2026-07-11T14:13:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0930ce6937765398b2b4a791b9982b55fa65620d07bdba7961957e7a64fd10b",
+          "at": "2026-07-11T14:31:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:131e3ecf8d7b99cd98328000ca70581139e7378a25f99a392c65cf825523db1d",
+          "at": "2026-07-11T15:37:50Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2f3cd1fb4b97b2c24a6a3698d524ef7dddfbf2de89aa7c7d6fa8376b2acdef3",
+          "at": "2026-07-11T11:47:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2f3cd1fb4b97b2c24a6a3698d524ef7dddfbf2de89aa7c7d6fa8376b2acdef3",
+          "at": "2026-07-11T11:48:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2f3cd1fb4b97b2c24a6a3698d524ef7dddfbf2de89aa7c7d6fa8376b2acdef3",
+          "at": "2026-07-11T11:50:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2f3cd1fb4b97b2c24a6a3698d524ef7dddfbf2de89aa7c7d6fa8376b2acdef3",
+          "at": "2026-07-11T11:50:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f2f3cd1fb4b97b2c24a6a3698d524ef7dddfbf2de89aa7c7d6fa8376b2acdef3",
+          "at": "2026-07-11T11:52:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52310cec0958746ca3734b89baf836e557ab3f129c0f89fddf99367c435c048f",
+          "at": "2026-07-11T14:10:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a693f4d3f52dce193a71c54243b5f22a0478e341acd098b7a0f195bfe72c3760",
+          "at": "2026-07-11T15:36:07Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:259fdd4c8f7fb5ef96e43c95e0729e1cd4e5968ef80f9cc845c08f56cc4cd018",
+          "at": "2026-07-11T08:37:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:259fdd4c8f7fb5ef96e43c95e0729e1cd4e5968ef80f9cc845c08f56cc4cd018",
+          "at": "2026-07-11T08:40:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:259fdd4c8f7fb5ef96e43c95e0729e1cd4e5968ef80f9cc845c08f56cc4cd018",
+          "at": "2026-07-11T08:41:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:681e8be13e8a5c58e54290abcbb6ad9c00721ed250a04d30cf86b8b0c5e1bd1f",
+          "at": "2026-07-11T14:15:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42c1a09525230640c2a8e9e21390009dd78b8c170d64ff86243d1e30fc5a3279",
+          "at": "2026-07-11T16:38:16Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3ed1ce4d9c857c9a0019403a9c1d0090f567f9a2462f03c71d94ea6bbd94398",
+          "at": "2026-07-11T11:45:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3ed1ce4d9c857c9a0019403a9c1d0090f567f9a2462f03c71d94ea6bbd94398",
+          "at": "2026-07-11T11:48:09Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::ObligationCheckError` declares existing named payloads (`detail`, `drifts`, `edges`) as tuple payloads, diverging from the baseline/post-modification shape.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/domain-types.json",
+              "line": 74,
+              "category": "action incoherent with the diff"
+            },
+            {
+              "message": "`usecase::PreReviewGateError` is marked `reference` but its three existing named payloads are declared as tuples instead of the baseline struct fields (`message`, `layer`).",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 425,
+              "category": "action incoherent with the diff"
+            },
+            {
+              "message": "`domain::ObligationCheckError.docs` restates the IN-04 status-independent/fail-closed behavior instead of referring to the upstream anchor only.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/domain-types.json",
+              "line": 47,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::CheckTestObligationsInteractor.docs` restates the IN-03 detection-versus-final-gate boundary in prose; replace the behavioral contract with anchor-based intent.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 245,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::CheckTestObligationsOutcome` both restates the todo-warning behavior in `docs` and omits IN-07/AC-07 although `status_lane_summaries` carries skipped-lane results.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 346,
+              "category": "upstream restatement; spec_refs missing or off-topic"
+            },
+            {
+              "message": "`usecase::PreReviewGateError.docs` contains design-rationale prose about opaque String diagnostics rather than an anchor-only reference.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 427,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::TestObligationResultsInteractor.docs` restates the IN-05 informational aggregation/pass-fail separation contract instead of referring to anchors only.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 523,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::TestObligationResultsOutput` exposes skipped-capable `status_lane_summaries` but cites only IN-05; add the IN-07/AC-07 skipped-lane grounding.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 680,
+              "category": "spec_refs missing or off-topic"
+            },
+            {
+              "message": "`usecase::TestObligationStatusLaneSummary` restates the count/usize design rationale and does not cite IN-07/AC-07 even though its TaskStatusKind lane includes Skipped.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 689,
+              "category": "upstream restatement; spec_refs missing or off-topic"
+            },
+            {
+              "message": "`domain::TaskStatusKind` explicitly includes `Skipped` and documents strictest-wins attribution, but its only spec reference is IN-01; add the skipped-lane grounding IN-07/AC-07.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/domain-types.json",
+              "line": 224,
+              "category": "spec_refs missing or off-topic"
+            },
+            {
+              "message": "`cli_driver::TestObligationCheckHandler.docs` restates the AC-01/AC-02 gate-warning and blocking contract in prose; use anchor-based intent instead.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/cli_driver-types.json",
+              "line": 10,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`cli_driver::TestObligationResultsHandler.docs` restates the informational/exit-0 contract and lists only three lanes, omitting the independent skipped lane required by AC-07.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/cli_driver-types.json",
+              "line": 81,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`cli_composition::TestObligationCompositionRoot` wires the status-lane attribution path but cites only IN-01/IN-05; add the IN-07/AC-07 skipped-lane grounding.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/cli_composition-types.json",
+              "line": 91,
+              "category": "spec_refs missing or off-topic"
+            }
+          ],
+          "hash": "rvw1:sha256:6c086d154df87ce51592a2683dd809a371e5fdfd188aad8341cafbc8283eb230",
+          "at": "2026-07-11T08:42:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`TestObligationResultsHandler` documents only todo/in-progress/done lanes, but AC-07/IN-07 require skipped as an independent informational lane. The adapter contract must include skipped.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/cli_driver-types.json",
+              "line": 81,
+              "category": "cross-layer contract"
+            },
+            {
+              "message": "`CheckTestObligationsInteractor::new` and `TestObligationResultsInteractor::new` declare the same 12-parameter dependency signature. This duplicates the detection dependency contract across sibling interactors and should be factored into a shared dependency bundle.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 259,
+              "category": "duplicated method signature across sibling types"
+            },
+            {
+              "message": "`ObligationCheckError` docs restate the IN-04 behavior (“status-independent ... always block”) instead of describing the changed symbol and citing the upstream contract. This violates `no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/domain-types.json",
+              "line": 47,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`TestObligationCheckHandler` docs restate the todo-warning and strict-lane gate behavior from the spec. Replace the behavioral prose with the changed surface plus anchor citations per `no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/cli_driver-types.json",
+              "line": 10,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`TestObligationResultsHandler` docs restate informational aggregation and always-success read-error behavior from IN-05/AC-05. Use an anchor-only change description instead.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/cli_driver-types.json",
+              "line": 81,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CheckTestObligationsInteractor` docs restate the status-independence/final-gate boundary from IN-03. The catalogue docs must not reproduce the upstream behavior contract.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 245,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CheckTestObligationsOutcome` docs restate the passing/todo-warning behavior from IN-02 rather than limiting the entry to the changed DTO and anchor citations.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 346,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`TestObligationResultsInteractor` docs restate the informational-only/no-gate-decision behavior from IN-05. Replace the prose contract with a concise symbol/change description and citations.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 523,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:6c086d154df87ce51592a2683dd809a371e5fdfd188aad8341cafbc8283eb230",
+          "at": "2026-07-11T08:42:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::ObligationCheckError` declares the existing named payload variants `StaleObligationsArtifact`, `DriftsDetected`, `UnresolvedEdges`, and `StaleVerdicts` as tuple payloads, but the baseline uses named struct fields (`detail`/`drifts`/`edges`). This misstates the post-modification public enum shape.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/domain-types.json",
+              "line": 74,
+              "category": "action incoherent with the diff"
+            },
+            {
+              "message": "`domain::TaskStatusKind` includes `Skipped` and is documented for strictest-wins attribution, but its only grounding is IN-01, which does not specify the skipped lane. Add IN-07/AC-07 grounding.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/domain-types.json",
+              "line": 224,
+              "category": "spec_refs missing or off-topic"
+            },
+            {
+              "message": "`usecase::CheckTestObligationsOutcome` carries `status_lane_summaries`, including the skipped lane, but cites only IN-02. Add IN-07 grounding for the skipped-lane contract.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 439,
+              "category": "spec_refs missing or off-topic"
+            },
+            {
+              "message": "`usecase::TestObligationResultsOutput` exposes skipped-capable status-lane summaries but cites only IN-05. Add IN-07 grounding for the independent skipped results lane.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 697,
+              "category": "spec_refs missing or off-topic"
+            },
+            {
+              "message": "`usecase::TestObligationStatusLaneSummary` models `TaskStatusKind` lanes, including `Skipped`, but cites only IN-02/IN-05. Add IN-07 grounding for the skipped lane.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 721,
+              "category": "spec_refs missing or off-topic"
+            },
+            {
+              "message": "The `TestObligationStatusLaneSummary` docs restate the non-negative-count/`usize` design rationale instead of limiting the catalogue description to the changed type and upstream anchors.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 706,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`cli_composition::TestObligationCompositionRoot` wires the task-status attribution path used by the skipped lane but cites only IN-01/IN-05. Add IN-07/AC-07 grounding.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/cli_composition-types.json",
+              "line": 91,
+              "category": "spec_refs missing or off-topic"
+            }
+          ],
+          "hash": "rvw1:sha256:ef7ad759eea0ef65107874290342bf2763d2fd9bd691a150c7ac8d30caf0ceae",
+          "at": "2026-07-11T09:14:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::TestObligationDetectionDependencies` is a dependency/data carrier, not a use-case behavior type, but declares `role: UseCase`; this misclassifies the type under the role/layer matrix.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 532,
+              "category": "role_kind_mismatch"
+            },
+            {
+              "message": "`usecase::TestObligationDetectionDependencies` bundles check-only dependencies (rules/source/spec/catalogue/fingerprints) with results dependencies, and `TestObligationResultsInteractor::new` therefore accepts unrelated ports. This violates single responsibility and couples the results interactor to dependencies it does not use.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 519,
+              "category": "single_responsibility"
+            },
+            {
+              "message": "`usecase::TestObligationStatusLaneSummary` docs restate the upstream design rationale that its `usize` fields represent collection lengths rather than domain values. Catalogue docs should identify the type and cite anchors without reproducing upstream rationale.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 714,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "`usecase::CheckTestObligationsInteractor` carries skipped-lane interpretation via IN-07, but its `spec_refs` omit the required AC-07 grounding for skipped-lane behavior.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 360,
+              "category": "spec_refs"
+            },
+            {
+              "message": "`usecase::CheckTestObligationsOutcome` exposes status-lane summaries including the skipped lane, but its `spec_refs` cite IN-07 without the required AC-07 grounding.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 445,
+              "category": "spec_refs"
+            },
+            {
+              "message": "`usecase::TestObligationResultsInteractor` is the results aggregation surface but cites only IN-05/IN-07; it is missing the required AC-05 results grounding and AC-07 skipped-lane grounding.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 616,
+              "category": "spec_refs"
+            },
+            {
+              "message": "`usecase::TestObligationResultsOutput` carries the results and skipped status lanes but cites only IN-05/IN-07; it is missing the required AC-05 and AC-07 citations.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 701,
+              "category": "spec_refs"
+            },
+            {
+              "message": "`usecase::TestObligationStatusLaneSummary` is shared by the check/results lane surfaces and includes skipped status, but its `spec_refs` omit the required AC-05 results citation and AC-07 skipped-lane citation.",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 729,
+              "category": "spec_refs"
+            }
+          ],
+          "hash": "rvw1:sha256:0655ccff3f7bdf6e1b4386cbe06b8e6a92267de11e8dccc3eb955e9e014f87ab",
+          "at": "2026-07-11T09:33:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d11adc59510ca68f18ab1a222135b3068450ede3e40148ee1c008397159e253e",
+          "at": "2026-07-11T09:52:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d11adc59510ca68f18ab1a222135b3068450ede3e40148ee1c008397159e253e",
+          "at": "2026-07-11T09:54:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::TestObligationResultsInteractor` の `docs` が、status-lane failure の格納方法、既存結果の保持、outer `Result` の責務という挙動契約を散文で再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、変更対象・操作と IN-05/IN-07/AC-05/AC-07 の anchor cite のみにしてください。",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 547,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "`usecase::TestObligationResultsOutput` の `docs` が、inner `Result` の意味、部分結果の保持、zero-count lane を生成しない理由まで挙動と設計理由を再記述しています。型 shape 自体と IN-05/AC-05/AC-07 の参照で表現し、`docs` は変更対象・操作・anchor cite に限定してください。",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/usecase-types.json",
+              "line": 640,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "`cli_driver::TestObligationResultsHandler` の `docs` が、skipped lane の表示、degraded rendering、既存結果の保持、exit 0 を維持する挙動を AC-05/AC-07 から散文で再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、handler の変更対象・操作と anchor cite のみにしてください。",
+              "severity": "P1",
+              "file": "track/items/d15-task-status-check-gate-2026-07-11/cli_driver-types.json",
+              "line": 81,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:727e18914fcdb1111f6e173d647e92a17fa05e063869f930f58ac1b2be709a62",
+          "at": "2026-07-11T15:36:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb2701431fa3276a70fe8e8e1de14728f11185308c3b598ab1173fd69ff58d5b",
+          "at": "2026-07-11T15:41:04Z"
+        }
+      ]
+    }
+  }
+}

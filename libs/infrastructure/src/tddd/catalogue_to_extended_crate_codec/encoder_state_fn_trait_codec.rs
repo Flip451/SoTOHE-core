@@ -23,8 +23,8 @@ impl EncoderState {
         trait_name: &TraitName,
         entry: &TraitEntry,
     ) -> Result<(), CatalogueToExtendedCrateCodecError> {
-        let module_path = entry.module_path.clone();
-        let docs = entry.docs.clone();
+        let module_path = entry.module_path().clone();
+        let docs = entry.docs().map(|d| d.as_str().to_owned());
 
         // Encode trait-level generics (IN-07, ADR `2026-05-18-1223` D2).
         // `TraitEntry.generics` is a Vec<MethodGenericParam> (reused type); the generic
@@ -35,10 +35,10 @@ impl EncoderState {
         // rustdoc-style `Generics` representation that the signal evaluator fingerprints
         // correctly. (ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D1)
         let trait_generic_names: Vec<&str> =
-            entry.generics.iter().map(|g| g.name.as_str()).collect();
+            entry.generics().iter().map(|g| g.name.as_str()).collect();
         let trait_generics = self.build_where_form_generics(
-            &entry.generics,
-            &entry.where_predicates,
+            entry.generics(),
+            entry.where_predicates(),
             &trait_generic_names,
         )?;
 
@@ -46,7 +46,7 @@ impl EncoderState {
         // Trait-level generic names are passed as outer context so that method signatures
         // that reference trait parameters (e.g. `fn get(&self) -> T` in `trait Foo<T>`)
         // encode `T` as `Type::Generic` rather than an unresolved-marker path.
-        let methods: Vec<MethodDeclaration> = entry.methods.clone();
+        let methods: Vec<MethodDeclaration> = entry.methods().to_vec();
         let mut all_items = self.encode_method_items(
             &methods,
             false,
@@ -60,7 +60,7 @@ impl EncoderState {
         // count matches the C-side (rustdoc) count. The signal evaluator's
         // `build_trait_method_map` reads these items and fingerprints them as
         // `assoc_type[{generic_fp}]:{bounds_str}={default_str}`.
-        for assoc_type in &entry.assoc_types {
+        for assoc_type in entry.assoc_types() {
             let id = self.alloc_id();
             let item = self.encode_assoc_type_item(id, assoc_type, &trait_generic_names)?;
             self.index.insert(id, item);
@@ -82,7 +82,7 @@ impl EncoderState {
         // Each AssocConst contributes its Id to `Trait.items` so that the A-side item
         // count matches the C-side (rustdoc) count. The signal evaluator fingerprints
         // these as `assoc_const:{ty_str}={val_str}`.
-        for assoc_const in &entry.assoc_consts {
+        for assoc_const in entry.assoc_consts() {
             let id = self.alloc_id();
             let item = self.encode_assoc_const_item(id, assoc_const, &trait_generic_names)?;
             self.index.insert(id, item);
@@ -106,8 +106,8 @@ impl EncoderState {
         //   - generic args land in `Path.args` (not embedded in `Path.path`)
         //   - trait-level generics in bound args (e.g. `T` in `Into<T>`) are
         //     rewritten to `Type::Generic` rather than an unresolved-marker path.
-        let mut bounds: Vec<GenericBound> = Vec::with_capacity(entry.supertrait_bounds.len());
-        for b in &entry.supertrait_bounds {
+        let mut bounds: Vec<GenericBound> = Vec::with_capacity(entry.supertrait_bounds().len());
+        for b in entry.supertrait_bounds() {
             bounds.push(self.encode_and_validate_bound(b.as_str(), &trait_generic_names)?);
         }
 
@@ -138,21 +138,21 @@ impl EncoderState {
         entry: &FunctionEntry,
     ) -> Result<(), CatalogueToExtendedCrateCodecError> {
         let module_path = fn_path.module_path.clone();
-        let docs = entry.docs.clone();
-        let is_async = entry.is_async;
+        let docs = entry.docs().map(|d| d.as_str().to_owned());
+        let is_async = entry.is_async();
 
         // Collect function-level generic parameter names so that occurrences of
         // those names in param/return type strings are encoded as `Type::Generic`
         // rather than as unresolved path markers. Mirrors `encode_method_items`.
         // (ADR `2026-05-08-0248` D14)
-        let generic_names: Vec<&str> = entry.generics.iter().map(|g| g.name.as_str()).collect();
+        let generic_names: Vec<&str> = entry.generics().iter().map(|g| g.name.as_str()).collect();
 
         let params: Vec<_> = entry
-            .params
+            .params()
             .iter()
             .map(|p| (p.name.as_str().to_string(), p.ty.as_str().to_string()))
             .collect();
-        let returns_str = entry.returns.as_str().to_string();
+        let returns_str = entry.returns().as_str().to_string();
 
         let mut inputs: Vec<(String, Type)> = vec![];
         for (pname, pty_str) in params {
@@ -188,8 +188,8 @@ impl EncoderState {
         // C-side inline bounds the same way so both sides fingerprint to the same
         // canonical form. (ADR `2026-05-13-1153-tddd-where-form-generics-normalization` D1)
         let fn_generics = self.build_where_form_generics(
-            &entry.generics,
-            &entry.where_predicates,
+            entry.generics(),
+            entry.where_predicates(),
             &generic_names,
         )?;
 

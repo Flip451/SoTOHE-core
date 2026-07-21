@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "layer": "cli_composition",
+  "entries": [
+    {
+      "claim_hash": "f64d2083ea2a658f0164c7efd6c882c7d401e7b7d5d64005a45347148bf37627",
+      "evidence_hash": "237468cb2ff4a151d02d8b4a445f0e33bb28a11011c12070a21e62a759b396fc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "呼び出し可能な capability、provider、model、実行経路は profile と provider-native adapter 定義から解決し、capability 名ごとの専用 runner を増設しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "`bin/sotp capability exec <capability-name> --host <provider> --briefing-file <path>` を、自由形式の成果物を orchestrator が消費する capability の単一かつ profile 駆動の dispatch 入口として提供する。呼び出し可能な capability、provider、model、実行経路は profile と provider-native adapter 定義から解決し、capability 名ごとの専用 runner を増設しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f64d2083ea2a658f0164c7efd6c882c7d401e7b7d5d64005a45347148bf37627",
+      "evidence_hash": "998f089ed95c490d4391f3884992b04c9f54678ff0821068bea77e35f13a1b9f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "provider ごとの adapter 定義を、capability 定義への適合と実行権限の権威として扱う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "provider ごとの adapter 定義を、capability 定義への適合と実行権限の権威として扱う。codex は skill の sandbox 宣言を subprocess の sandbox 制約へ反映し、未宣言時は read-only とする。claude は agent 定義の `tools:` と profile と一致する `model:` の存在を preflight し、欠如または不一致を reject する。CLI と profile に権限を緩和または重複宣言する経路を設けない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4c9f90f062a02b02bc8c5506abb1078eac7f6dd229482c88351daddd37a905ab",
+      "evidence_hash": "759353985a2bffd1570e4cbb85415534dbaedd660c5a2d0b824468bea9e8d51e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp plan codex-local` の CLI、driver、usecase、infrastructure adapter と、それを正規経路として示す規約・command・設定・skill の参照を撤去し、writer capability への案内を `capability exec` の経路へ差し替える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "PlanCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "`sotp plan codex-local` の CLI、driver、usecase、infrastructure adapter と、それを正規経路として示す規約・command・設定・skill の参照を撤去し、writer capability への案内を `capability exec` の経路へ差し替える。"
+        }
+      }
+    }
+  ]
+}

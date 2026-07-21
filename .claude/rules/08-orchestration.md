@@ -27,7 +27,7 @@ Terms:
 
 Read these first before planning or implementation:
 
-- `track/tech-stack.md`
+- `knowledge/adr/README.md` (pre-track ADR index — tech stack / product-policy decisions)
 - `knowledge/conventions/branch-strategy.md`
 - `knowledge/conventions/track-lifecycle.md`
 - `knowledge/conventions/git-notes.md`
@@ -57,7 +57,28 @@ Always invoke `/track:plan` before implementation, regardless of task difficulty
 
 ## Delegation Rules
 
-Use the minimum capable capability first, then resolve it via `.harness/config/agent-profiles.json`.
+Use the minimum capable capability first, then dispatch it through the CLI or wrapper that
+resolves its profile internally.
+
+### Capability session resume (caller-side decision)
+
+The continuation/fresh decision belongs to the dispatching orchestrator, BEFORE dispatch.
+Session reuse applies only when the dispatcher invokes a provider subprocess:
+
+- Pass `--resume` to `bin/sotp capability exec` when the dispatch continues the SAME
+  assignment for the same track and capability (a follow-up round on the same briefing, a
+  retry after an incomplete round, resuming interrupted work). Outside a track add
+  `--target-artifact <repo-relative-path>` for each target; a track-external dispatch with
+  no determined target must stay fresh.
+- A Claude-root dispatch that also resolves to the Claude provider returns a
+  `delegate-in-host` instruction before the session cache is consulted. Its native Claude Agent
+  invocation always starts fresh; do not pass `--resume` expecting it to reuse a session.
+- Do NOT pass `--resume` on a first dispatch or when the assignment's concern changes
+  (new task, new briefing subject) — those run as new sessions.
+- Resume never needs manual cache management: provider/model mismatch, resume failure, or
+  expiry falls back to a fresh session without aborting the dispatch, and all execution
+  flags are explicitly re-specified either way. Reviewer rounds resume automatically inside
+  `bin/sotp review local`; no caller flag exists there.
 
 - Claude Code or Codex (`orchestrator` host):
   - normal edits
@@ -73,7 +94,8 @@ Use the minimum capable capability first, then resolve it via `.harness/config/a
   - `implementer`: difficult Rust implementation, refactoring, performance-oriented edits
   - `reviewer`: code review, correctness analysis, idiomatic Rust checks
   - `researcher`: crate research, codebase-wide analysis, external research
-- provider resolution (from `.harness/config/agent-profiles.json`):
+- provider-routing SSoT (`.harness/config/agent-profiles.json`; resolved internally by the
+  relevant CLI or dispatcher):
   - `orchestrator` → `capabilities.orchestrator.provider`
   - `spec-designer` / `type-designer` / `impl-planner` / `adr-editor` / `implementer` → their own capability provider entries
   - `reviewer` / `review-fix-lead` / `dry-checker` / `dry-fix-lead` → their own capability provider entries

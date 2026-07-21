@@ -113,7 +113,7 @@
             {
               "message": "`schema_version` is public here, so callers can construct or mutate a `CatalogueSpecSignalsDocument` to any version and bypass the invariant that this document is pinned to `CATALOGUE_SPEC_SIGNALS_SCHEMA_VERSION` (= 1). That leaves the type able to represent invalid on-disk state and defeats the version gate the new API is meant to enforce.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue_spec_signal.rs",
+              "file": "libs/domain/src/tddd/catalogue_spec_signal.rs",
               "line": 147,
               "category": "correctness"
             }
@@ -410,7 +410,7 @@
             {
               "message": "`Cat-Spec` lookup is name-only and does not consume matches, so legal delete+add catalogues with duplicated entry names will render the first signal on both rows and hide the second signal. The existing catalogue codec allows duplicate names for delete+add pairs, and the new helper in this file needs to preserve per-entry order the same way `signal_for_entry` does.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/type_catalogue_render.rs",
+              "file": "libs/infrastructure/src/type_catalogue_render.rs",
               "line": 163,
               "category": "correctness"
             }
@@ -664,7 +664,7 @@
             {
               "message": "This active-track preflight is missing the `check_impl_plan_presence` guard that `type-signals`/`type-graph`/`contract-map` use. Because `FsTrackStore::load_impl_plan` returns `None` on an absent file and `derive_track_status(None, ...)` becomes `Planned`, a branch-bearing track with a missing `impl-plan.json` will be treated as active enough and the command will regenerate catalogue-spec signals instead of failing closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
               "line": 57,
               "category": "architecture"
             }
@@ -679,7 +679,7 @@
             {
               "message": "The refresh reads the layer catalogue with `std::fs::read` but never applies the symlink guard used elsewhere for local catalogue inputs. A malicious workspace can replace `track/items/<track_id>/<layer>-types.json` with a symlink to an arbitrary file outside the track tree, and this command will still read/hash it. Reject symlinked catalogue paths before decoding, or the pre-commit refresh can be pointed at attacker-controlled files.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
               "line": 127,
               "category": "security"
             }
@@ -694,7 +694,7 @@
             {
               "message": "The new command path has no test covering the frozen-track guard (`Done`/`Archived`), so the custom rejection in `ensure_active_track_catalogue` can regress without being caught. Add a focused integration test that builds a completed/archived track and asserts `execute_catalogue_spec_signals` fails before any write occurs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
               "line": 45,
               "category": "testing"
             }
@@ -724,7 +724,7 @@
             {
               "message": "`execute_catalogue_spec_signals` reads tracks from `items_dir` but constructs `FsCatalogueSpecSignalsStore` from `workspace_root`. If a caller passes a non-default `--items-dir`, the command will silently write `<layer>-catalogue-spec-signals.json` under `workspace_root/track/items/...` instead of the requested items tree, so a successful run can update the wrong files.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
+              "file": "apps/cli/src/commands/track/tddd/catalogue_spec_signals.rs",
               "line": 105,
               "category": "correctness"
             }
@@ -894,14 +894,14 @@
             {
               "message": "`read_spec_element_hashes` silently drops any `SpecElementId` that fails validation instead of failing closed. If `spec.json` contains an invalid or duplicated element id, the CLI can build an incomplete hash map and report false dangling/hash results instead of surfacing a validation error.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
               "line": 90,
               "category": "correctness"
             },
             {
               "message": "The layer gate treats `catalogue_path.exists()` as the only presence check and then reads the file directly, with no symlink guard. A dangling symlink is therefore treated as \"absent\" and skipped, and a symlinked catalogue can be followed outside the workspace, which lets the verifier fail open on a manipulated worktree.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
               "line": 119,
               "category": "security"
             }
@@ -982,7 +982,7 @@
             {
               "message": "Guard `items_dir/<track_id>` before the active-track preflight. As written, `read_track_metadata` and `load_impl_plan` run before any symlink check on `track_dir`, so a symlinked track directory can be followed and off-workspace `metadata.json` / `impl-plan.json` can be read before the later file guards fire.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
               "line": 74,
               "category": "security"
             }
@@ -1151,7 +1151,7 @@
             {
               "message": "The new `exists()` preflight is not atomic with `resolve_layers()`: if `architecture-rules.json` is deleted between the check and the call, `resolve_layers()` can fall back to the synthetic `domain` binding and the verifier may silently skip non-domain layers, returning a false success.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify_catalogue_spec_refs.rs",
+              "file": "apps/cli/src/commands/verify_catalogue_spec_refs.rs",
               "line": 168,
               "category": "security"
             }
@@ -1357,14 +1357,14 @@
             {
               "message": "Converting `SystemGitRepo::root()` to `String` with `to_string_lossy()` and rebuilding `items_dir` from that string will mangle non-UTF-8 repo paths. On Unix repos with arbitrary bytes in the path, the child `sotp` invocations can point at the wrong tree or fail even though the discovered `PathBuf` was valid.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "file": "apps/cli/src/commands/make.rs",
               "line": 525,
               "category": "correctness"
             },
             {
               "message": "The staging step silently ignores `read_dir` failures and per-entry errors (`if let Ok(...)` plus `flatten()`), so a filesystem hiccup can leave the refreshed `*-catalogue-spec-signals.json` files unstaged while the function still continues to CI/commit. That lets the new pre-commit step fail open with stale index content.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "file": "apps/cli/src/commands/make.rs",
               "line": 629,
               "category": "error-handling"
             }
@@ -1379,14 +1379,14 @@
             {
               "message": "`sotp track catalogue-spec-signals` takes `track_id` as a positional argument, not `--track-id`. This invocation will fail clap parsing before the refresh runs, so every active track branch will be blocked at the new pre-commit step.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "file": "apps/cli/src/commands/make.rs",
               "line": 607,
               "category": "correctness"
             },
             {
               "message": "`read_dir` failures and per-entry errors are ignored here (`if let Ok(...)` plus `flatten()`), so a missing or unreadable refreshed signals file is silently skipped. Because staging is what makes the regenerated `*-catalogue-spec-signals.json` land in the commit, this can let the commit record stale index content even though the refresh step reported success.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "file": "apps/cli/src/commands/make.rs",
               "line": 630,
               "category": "error-handling"
             }
@@ -1438,7 +1438,7 @@
             {
               "message": "The new staging pass walks the entire track directory and `git add`s every file matching `*-catalogue-spec-signals.json`, so a stale or unrelated file left in `track/items/<track-id>/` can get committed even though step 3 never regenerated it. This broadens the commit set beyond the current enabled bindings and can record unintended content.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "file": "apps/cli/src/commands/make.rs",
               "line": 630,
               "category": "logic"
             }
@@ -1453,7 +1453,7 @@
             {
               "message": "The new verify/refresh/stage block re-reads `architecture-rules.json` instead of reusing a single binding snapshot, so a concurrent edit between the `verify catalogue-spec-refs` and `track catalogue-spec-signals` calls can make the staged `*-catalogue-spec-signals.json` set diverge from what was verified. That can commit a mixed or stale signal set even though the binary gate passed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "file": "apps/cli/src/commands/make.rs",
               "line": 636,
               "category": "correctness"
             }
@@ -1542,14 +1542,14 @@
             {
               "message": "This refresh loop calls the strict user-facing `execute_catalogue_spec_signals` for every enabled layer, so any branch that still has a TDDD-enabled layer without an initialized `<layer>-types.json`/baseline will now be blocked here even though the existing pre-commit type-signal path explicitly skips uninitialized layers. That turns a previously valid commit path into a hard failure.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "file": "apps/cli/src/commands/make.rs",
               "line": 629,
               "category": "correctness"
             },
             {
               "message": "The code captures `type_signal_bindings`, but the actual refresh work re-enters `execute_catalogue_spec_signals`, which reparses `architecture-rules.json` internally on each iteration. If that file changes between the verify step and this refresh/stage step, the commit can stage a different layer set than the one that was verified, reintroducing the TOCTOU window this patch was meant to close.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "file": "apps/cli/src/commands/make.rs",
               "line": 629,
               "category": "correctness"
             }
@@ -1660,7 +1660,7 @@
             {
               "message": "Skipping `binding.targets().len() > 1` here means the new refresh step never updates `*-catalogue-spec-signals.json` for multi-target layers, even though `sotp track catalogue-spec-signals` supports them. On any track with a multi-target layer, pre-commit leaves those signals stale and the later CI/verify pass will block a valid commit.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "file": "apps/cli/src/commands/make.rs",
               "line": 594,
               "category": "correctness"
             }
@@ -1675,14 +1675,14 @@
             {
               "message": "Skipping every binding with `targets().len() > 1` means the new refresh step never runs for multi-target layers. `sotp track catalogue-spec-signals` is still capable of regenerating those layers, so on any track that uses one this leaves `*-catalogue-spec-signals.json` stale/absent and the later verify/CI path will reject an otherwise valid commit.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "file": "apps/cli/src/commands/make.rs",
               "line": 599,
               "category": "logic"
             },
             {
               "message": "`catalogue_path.is_file()` conflates a genuinely missing catalogue with a symlink, directory, or other non-regular file. The earlier type-signals step fail-closes on those cases, but here they are silently treated as \"inactive\" and skipped, which reopens a TOCTOU gap where a path swap can bypass the refresh instead of blocking the commit.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "file": "apps/cli/src/commands/make.rs",
               "line": 603,
               "category": "security"
             }
@@ -2131,7 +2131,7 @@
             {
               "message": "The new facts-only briefing rule conflicts with the adr-editor invocation below it: this briefing still requires the imperative `edit the working tree only; do not commit inside the loop`. Because the same file tells harness-policy reviewers to flag briefing violations, legitimate Phase 1 back-and-forth invocations will now trip the new rule by construction.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/plan.md",
+              "file": ".claude/commands/track/plan.md",
               "line": 222,
               "category": "logic"
             }
@@ -2359,7 +2359,7 @@
             {
               "message": "This guard only covers the source command file, but `/track:plan` actually emits the prompts sent to sub-agents into runtime files like `tmp/spec-designer-briefing.md` and `tmp/impl-planner-briefing.md`. Those generated briefings are outside the harness-policy review scope, so a later change can still inject prescriptive text into the delivered prompt without any finding. The new enforcement path therefore misses the artifact it is meant to constrain.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/plan.md",
+              "file": ".claude/commands/track/plan.md",
               "line": 165,
               "category": "mechanism_gap"
             }
@@ -2856,7 +2856,7 @@
             {
               "message": "`layer_id` is still a raw `String`, and `execute` never validates it with the existing `LayerId` domain type before handing it to the reader/writer ports. That lets malformed layer ids cross the usecase boundary and reach filesystem-backed adapters, which violates the repo's validated-input rule and can turn bad CLI input into adapter failures or path-safety issues.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_signals.rs",
+              "file": "libs/usecase/src/catalogue_spec_signals.rs",
               "line": 35,
               "category": "correctness"
             }
@@ -2871,7 +2871,7 @@
             {
               "message": "The new public `FetchError`/`WriteFailed` path forwards upstream error text verbatim into user-facing output. If the reader or writer adapter includes raw git stderr, filesystem paths, or other internal diagnostics in those messages, this use case will leak implementation details to CLI users instead of returning a sanitized failure.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_signals.rs",
+              "file": "libs/usecase/src/catalogue_spec_signals.rs",
               "line": 70,
               "category": "security"
             }
@@ -2915,7 +2915,7 @@
             {
               "message": "The new usecase exposes several public failure branches, but this module only tests the happy path, the two branch guards, invalid catalogue hash parsing, and the three integrity findings. There are no tests for `CatalogueNotFound`/`CatalogueFetchError` from `read_catalogue_for_spec_ref_check` or `SpecNotFound`/`SpecFetchError` from `read_spec_element_hashes` and signals fetch failures, so regressions in the adapter/error mapping can ship unnoticed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/catalogue_spec_refs.rs",
+              "file": "libs/usecase/src/catalogue_spec_refs.rs",
               "line": 159,
               "category": "testing"
             }
@@ -3263,7 +3263,7 @@
             {
               "message": "The new fail-closed `BlobFetchResult::NotFound` arm for missing `<layer>-types.json` is not directly exercised by a regression test in this module. `test_u31_chain2_signals_not_found_blocks_for_opted_in_layer` only covers the signals-file path, so a future refactor could reintroduce the catalogue-deletion bypass without breaking the current suite.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/merge_gate.rs",
+              "file": "libs/usecase/src/merge_gate.rs",
               "line": 458,
               "category": "testing"
             }
@@ -3340,14 +3340,14 @@
             {
               "message": "D1.4 says hash drift is handled through the existing `sotp verify plan-artifact-refs` path, but D1.2 immediately above says that command is not reused and a new `sotp verify catalogue-spec-refs` gate is introduced. The binary-gate boundary is therefore self-contradictory.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
               "line": 198,
               "category": "contradiction"
             },
             {
               "message": "D3.3 marks CI as skipping signal verification, but D4.1 later defines the CI/pre-commit interim path to run `check_catalogue_spec_signals(strict=false)`. The same CI path is both required and omitted in different sections.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
               "line": 462,
               "category": "contradiction"
             }
@@ -3377,7 +3377,7 @@
             {
               "message": "`D3.1` defines `sotp track catalogue-spec-signals` as operating on every `tddd.enabled` layer, but `D5.2` later says layers with `catalogue_spec_signal.enabled: false` must be skipped on all paths. As written, the writer CLI would still regenerate signals for opted-out layers, which conflicts with the layer-level opt-in model.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
               "line": 407,
               "category": "contradiction"
             }
@@ -3721,7 +3721,7 @@
             {
               "message": "Rendered contract is stale: `read_catalogue_for_spec_ref_check` is shown here as `BlobFetchResult<TypeCatalogueDocument>`, but the track spec and `usecase-types.json` require `BlobFetchResult<(TypeCatalogueDocument, String)>` so the raw-hash side channel is available for stale detection. Implementers reading the generated markdown would miss the hash-bearing half of the port.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalogue-spec-signal-activation-2026-04-23/usecase-types.md",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/usecase-types.md",
               "line": 7,
               "category": "contradiction"
             }
@@ -3773,7 +3773,7 @@
             {
               "message": "`check_catalogue_spec_ref_integrity` is defined here as `check_catalogue_spec_ref_integrity(catalogue, spec, signals_opt)`, but the track plan threads an extra `current_catalogue_hash` through T004/T009/T017 so stale detection can compare the persisted `catalogue_declaration_hash` against the current `types.json` hash. As written, the contract and the implementation plan disagree on the function inputs, so the stale-check path is under-specified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
+              "file": "knowledge/adr/2026-04-23-0344-catalogue-spec-signal-activation.md",
               "line": 218,
               "category": "contradiction"
             }
@@ -3810,7 +3810,7 @@
             {
               "message": "`T017` treats the raw `String` from `read_catalogue_for_spec_ref_check` as if it could be passed directly into `check_catalogue_spec_ref_integrity` via `Some(&hash)`, but the domain contract in `D1.5`/`T004` is `Option<&ContentHash>`. As written, this merge-gate step is type-inconsistent and omits the required `String` → `ContentHash` conversion, so the orchestration cannot be implemented literally.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalogue-spec-signal-activation-2026-04-23/impl-plan.json",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/impl-plan.json",
               "line": 102,
               "category": "factual error (semantic)"
             }
@@ -3876,14 +3876,14 @@
             {
               "message": "This note points to `knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md` §D1.4 as the place where the `check_impl_plan_presence` invariant was reverted, but that section is about metadata/Phase 3 responsibility split; the revert note is in the later 2026-04-23 correction/follow-up block. The section reference is wrong.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
               "line": 5,
               "category": "broken reference"
             },
             {
               "message": "`verification.md` says T025 (`check_impl_plan_presence` / `ImplPlanPresenceError` removal) was already completed and therefore should not be listed in `impl-plan.json`, but the scaffold still lists `T025` as a todo task and still carries `ImplPlanPresenceError` in the domain catalogue. That leaves the plan artifacts in two incompatible states.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/verification.md",
               "line": 57,
               "category": "contradiction"
             }
@@ -3986,7 +3986,7 @@
             {
               "message": "D2.3 still says this ADR decides `SpecRef.anchor` / `SpecRef.hash` resolution logic, but the amended scope below excludes catalogue `spec_refs[]` from `sotp verify plan-artifact-refs` and assigns them to the later `sotp verify catalogue-spec-refs` gate. That leaves the ADR internally inconsistent about which document owns catalogue spec-ref drift checking.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
+              "file": "knowledge/adr/2026-04-19-1242-plan-artifact-workflow-restructure.md",
               "line": 480,
               "category": "contradiction"
             }
@@ -4286,7 +4286,7 @@
             {
               "message": "`TrackBlobReader` assigns two incompatible meanings to the `String` in the `(TypeCatalogueDocument, String)` tuple. This file says `read_type_catalogue` returns the resolved catalogue filename for diagnostics, but the new gate/adapter docs treat the same tuple shape as a raw-bytes SHA-256 for stale detection. That makes `read_catalogue_for_spec_ref_check` ambiguous and leaves the port contract internally inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalogue-spec-signal-activation-2026-04-23/usecase-types.json",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/usecase-types.json",
               "line": 30,
               "category": "contradiction"
             }
@@ -4823,7 +4823,7 @@
             {
               "message": "T009 updates the verify flow to consume precomputed `SpecElementHashReader` hashes and call `check_catalogue_spec_ref_integrity(layer, catalogue, &spec_element_hashes, ...)`, but the later T017 merge-gate task still describes the old `read_spec_document -> SpecDocument` path and passes `spec` into the same checker. The plan currently contains two incompatible contracts for the same verification gate, so T017 needs to be brought onto the new hash-map-based signature.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalogue-spec-signal-activation-2026-04-23/plan.md",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/plan.md",
               "line": 66,
               "category": "contradiction"
             }
@@ -5658,7 +5658,7 @@
             {
               "message": "The progress summary says `25/25 resolved`, but the same file still marks `T022` as skipped (`[-]`) later in the task list, so the summary is inconsistent with the actual task state. It should read `24/25 resolved` with 1 skipped.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/catalogue-spec-signal-activation-2026-04-23/plan.md",
+              "file": "track/items/catalogue-spec-signal-activation-2026-04-23/plan.md",
               "line": 4,
               "category": "contradiction"
             }

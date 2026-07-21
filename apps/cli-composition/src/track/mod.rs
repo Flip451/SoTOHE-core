@@ -10,7 +10,6 @@ mod tddd;
 use crate::CommandOutcome;
 use crate::error::CompositionError;
 use crate::track::composition_root::TrackCompositionRoot;
-use infrastructure::git_cli::GitRepository;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 /// Validates a track ID string by delegating to the canonical domain rule.
@@ -136,85 +135,12 @@ fn sync_views_to_stdout(project_root: &Path, track_id: &str) -> Vec<String> {
         }
     }
 }
-fn repo_relative_arg(repo_root: &Path, path: &Path) -> String {
-    path.strip_prefix(repo_root).unwrap_or(path).to_string_lossy().into_owned()
-}
-fn run_git_mv(
-    repo: &impl GitRepository,
-    repo_root: &Path,
-    src: &Path,
-    dst: &Path,
-) -> Result<(), CompositionError> {
-    let src_arg = repo_relative_arg(repo_root, src);
-    let dst_arg = repo_relative_arg(repo_root, dst);
-    let output = repo
-        .output(&["mv", &src_arg, &dst_arg])
-        .map_err(|e| CompositionError::Infrastructure(format!("failed to run git mv: {e}")))?;
-    if output.status.success() {
-        return Ok(());
-    }
-    let stderr = String::from_utf8_lossy(&output.stderr).trim().to_owned();
-    let code = output.status.code().unwrap_or(-1);
-    Err(CompositionError::Infrastructure(format!("git mv failed (exit {code}): {stderr}")))
-}
-fn rollback_archive_contents_after_logs_error(
-    repo: &impl GitRepository,
-    repo_root: &Path,
-    src_dir: &Path,
-    dst_dir: &Path,
-) -> Result<(), CompositionError> {
-    if !dst_dir.exists() {
-        return Ok(());
-    }
-    std::fs::create_dir_all(src_dir).map_err(|e| {
-        CompositionError::Infrastructure(format!(
-            "failed to recreate source directory {}: {e}",
-            src_dir.display()
-        ))
-    })?;
-    let entries = std::fs::read_dir(dst_dir)
-        .map_err(|e| {
-            CompositionError::Infrastructure(format!(
-                "failed to read archive directory {}: {e}",
-                dst_dir.display()
-            ))
-        })?
-        .map(|entry| entry.map(|entry| (entry.path(), entry.file_name())))
-        .collect::<Result<Vec<_>, _>>()
-        .map_err(|e| {
-            CompositionError::Infrastructure(format!(
-                "failed to read archive directory {}: {e}",
-                dst_dir.display()
-            ))
-        })?;
-    for (dst_child, file_name) in entries {
-        let src_child = src_dir.join(file_name);
-        run_git_mv(repo, repo_root, &dst_child, &src_child).map_err(|e| {
-            CompositionError::Infrastructure(format!(
-                "failed to roll back archive move from {} to {}: {e}",
-                dst_child.display(),
-                src_child.display()
-            ))
-        })?;
-    }
-    if dst_dir.exists() {
-        std::fs::remove_dir(dst_dir).map_err(|e| {
-            CompositionError::Infrastructure(format!(
-                "failed to remove empty archive directory {}: {e}",
-                dst_dir.display()
-            ))
-        })?;
-    }
-    Ok(())
-}
-fn describe_archive_rollback(result: Result<(), CompositionError>) -> String {
-    match result {
-        Ok(()) => "archive move was rolled back".to_owned(),
-        Err(rollback_err) => {
-            format!("additionally failed to roll back archive move: {rollback_err}")
-        }
-    }
-}
+// The archive rollback helpers (`repo_relative_arg` / `run_git_mv` /
+// `rollback_archive_contents_after_logs_error` / `describe_archive_rollback`)
+// were removed as part of the T006 cutover — the archive orchestration is now
+// entirely inside `usecase::git_workflow::TrackGitInteractor::archive_track`,
+// which composes `GitPrimitivePort::move_path` and `TrackArchiveFsPort` fs
+// primitives without needing composition-root-side rollback plumbing.
 impl TrackCompositionRoot {
     /// Initialize a new track by writing `metadata.json`.
     ///
@@ -299,29 +225,14 @@ impl TrackCompositionRoot {
         items_dir: PathBuf,
         track_id: String,
     ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::git_cli::GitRepository;
         validate_track_id_str(&track_id)?;
-        let branch_name = format!("track/{track_id}");
-        resolve_project_root(&items_dir)?;
-        let repo = infrastructure::git_cli::SystemGitRepo::discover().map_err(|e| {
-            CompositionError::AdapterInit(format!("failed to discover git repository: {e}"))
-        })?;
-        let exists_output = repo
-            .output(&["rev-parse", "--verify", "--quiet", &branch_name])
-            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
-        if !exists_output.status.success() {
-            return Err(CompositionError::WiringFailed(format!(
-                "branch '{branch_name}' does not exist"
-            )));
-        }
-        let code = repo
-            .status(&["switch", &branch_name])
-            .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
-        if code == 0 {
-            Ok(CommandOutcome::success(Some(format!("[OK] Switched to branch: {branch_name}"))))
-        } else {
-            Err(CompositionError::Infrastructure(format!("git switch {branch_name} failed")))
-        }
+        let project_root = resolve_project_root(&items_dir)?;
+        let id = domain::TrackId::try_new(&track_id)
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
+        branch_strategy::track_git_interactor()
+            .switch_to_track_branch(&project_root, &id)
+            .map(|msg| CommandOutcome::success(Some(msg)))
+            .map_err(|e| CompositionError::Infrastructure(e.to_string()))
     }
     /// Resolve the current track phase, next command, and blocker.
     /// # Errors
@@ -585,78 +496,32 @@ impl TrackCompositionRoot {
         track_id: String,
     ) -> Result<CommandOutcome, CompositionError> {
         validate_track_id_str(&track_id)?;
-        let project_root = resolve_project_root(&items_dir)?;
-        let repo =
-            infrastructure::git_cli::SystemGitRepo::discover_from(&project_root).map_err(|e| {
+        // Anchor discovery to `items_dir` (not the process CWD) so that
+        // absolute `--items-dir <path>` invocations from tests or from a
+        // nested working directory resolve the correct repo root. When
+        // `items_dir` is relative (the CLI default `track/items`),
+        // `resolve_project_root` returns `.`, which then `discover_from`
+        // rehydrates from the current worktree.
+        let project_root_hint = resolve_project_root(&items_dir)?;
+        let repo = infrastructure::git_cli::SystemGitRepo::discover_from(&project_root_hint)
+            .map_err(|e| {
                 CompositionError::AdapterInit(format!("failed to discover git repository: {e}"))
             })?;
-        let repo_root = repo.root().to_path_buf();
-        let src_dir = repo.resolve_path(&items_dir).join(&track_id);
-        if !src_dir.is_dir() {
-            return Err(CompositionError::WiringFailed(format!(
-                "track directory not found: {}",
-                src_dir.display()
-            )));
-        }
-        let archive_root = repo_root.join("track").join("archive");
-        let dst_dir = archive_root.join(&track_id);
-        if dst_dir.exists() {
-            return Err(CompositionError::WiringFailed(format!(
-                "archive destination already exists: {}",
-                dst_dir.display()
-            )));
-        }
-        std::fs::create_dir_all(&archive_root).map_err(|e| {
-            CompositionError::Infrastructure(format!(
-                "failed to create archive directory {}: {e}",
-                archive_root.display()
-            ))
-        })?;
-        let src_logs = src_dir.join("logs");
-        let logs_was_dir = src_logs.is_dir();
-        run_git_mv(&repo, &repo_root, &src_dir, &dst_dir)?;
-        let dst_logs = dst_dir.join("logs");
-        if logs_was_dir && !dst_logs.is_dir() {
-            if !src_logs.is_dir() {
-                let rollback_message =
-                    describe_archive_rollback(rollback_archive_contents_after_logs_error(
-                        &repo, &repo_root, &src_dir, &dst_dir,
-                    ));
-                return Err(CompositionError::Infrastructure(format!(
-                    "logs/ was present before archive but was not found at {} or {} after git mv; {rollback_message}",
-                    src_logs.display(),
-                    dst_logs.display()
-                )));
-            }
-            if let Err(rename_err) = std::fs::rename(&src_logs, &dst_logs) {
-                let rollback_message =
-                    describe_archive_rollback(rollback_archive_contents_after_logs_error(
-                        &repo, &repo_root, &src_dir, &dst_dir,
-                    ));
-                return Err(CompositionError::Infrastructure(format!(
-                    "failed to move logs/ from {} to {}: {rename_err}; {rollback_message}",
-                    src_logs.display(),
-                    dst_logs.display()
-                )));
-            }
-        }
-        Ok(CommandOutcome::success(Some(format!(
-            "[OK] Archived track '{track_id}': {} → {}",
-            src_dir.display(),
-            dst_dir.display()
-        ))))
+        let project_root = repo.root().to_path_buf();
+        let id = domain::TrackId::try_new(&track_id)
+            .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
+        branch_strategy::track_git_interactor()
+            .archive_track(&project_root, &id)
+            .map(|msg| CommandOutcome::success(Some(msg)))
+            .map_err(|e| CompositionError::Infrastructure(e.to_string()))
     }
 }
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
     use std::path::{Path, PathBuf};
-    use std::process::Command;
 
-    use super::{
-        resolve_project_root, resolve_track_id_for_write,
-        rollback_archive_contents_after_logs_error,
-    };
+    use super::{resolve_project_root, resolve_track_id_for_write};
     use crate::review_v2::process_guards::{CwdGuard, GitRunner};
 
     fn change_to(path: &Path) -> CwdGuard {
@@ -727,6 +592,40 @@ mod tests {
                 || msg.contains("No such file or directory")
                 || msg.contains("rev-parse"),
             "expected error message to mention git failure, got: {msg:?}"
+        );
+    }
+
+    #[test]
+    fn test_track_init_missing_items_root_creates_metadata() {
+        let root = tempfile::tempdir().unwrap();
+        let items_dir = root.path().join("track").join("items");
+        let config_dir = root.path().join(".harness").join("config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        std::fs::write(
+            config_dir.join("branch-strategy.json"),
+            r#"{
+  "base_branch": "main",
+  "merge_target": "main",
+  "merge_method": "merge"
+}"#,
+        )
+        .unwrap();
+        std::fs::write(
+            root.path().join("architecture-rules.json"),
+            include_str!("../../../../architecture-rules.json"),
+        )
+        .unwrap();
+
+        assert!(!items_dir.exists(), "fixture must start without track/items");
+
+        let outcome = crate::track::TrackCompositionRoot::new()
+            .track_init(items_dir.clone(), "new-track".to_owned(), "New Track".to_owned())
+            .unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(
+            items_dir.join("new-track").join("metadata.json").is_file(),
+            "track init must bootstrap track/items and write metadata"
         );
     }
 
@@ -839,46 +738,10 @@ mod tests {
         assert!(track_dir.join("untracked.txt").is_file());
     }
 
-    #[test]
-    fn test_rollback_archive_contents_after_logs_error_restores_source_tree() {
-        let _guard = crate::test_support::process_env_lock().lock().unwrap();
-        let tmp = tempfile::tempdir().unwrap();
-        let root = tmp.path();
-        let track_id = "rollback-track-2026";
-        let src_dir = root.join("track").join("items").join(track_id);
-        let dst_dir = root.join("track").join("archive").join(track_id);
-        std::fs::create_dir_all(&src_dir).unwrap();
-        std::fs::write(root.join(".gitignore"), "track/items/*/logs/\n").unwrap();
-        std::fs::write(src_dir.join("tracked.txt"), "archive fixture\n").unwrap();
-
-        init_git_repo(root);
-        GitRunner::at(root).assert_success(&[
-            "add",
-            ".gitignore",
-            "track/items/rollback-track-2026/tracked.txt",
-        ]);
-        GitRunner::at(root).assert_success(&["commit", "-m", "add track", "--no-gpg-sign"]);
-        std::fs::create_dir_all(root.join("track").join("archive")).unwrap();
-        GitRunner::at(root).assert_success(&[
-            "mv",
-            "track/items/rollback-track-2026",
-            "track/archive/rollback-track-2026",
-        ]);
-
-        let logs_dir = src_dir.join("logs");
-        std::fs::create_dir_all(&logs_dir).unwrap();
-        std::fs::write(logs_dir.join("telemetry.jsonl"), "{}\n").unwrap();
-
-        let repo = infrastructure::git_cli::SystemGitRepo::discover_from(root).unwrap();
-        rollback_archive_contents_after_logs_error(&repo, root, &src_dir, &dst_dir).unwrap();
-
-        assert!(src_dir.join("tracked.txt").is_file());
-        assert!(src_dir.join("logs").join("telemetry.jsonl").is_file());
-        assert!(!dst_dir.exists());
-
-        let status =
-            Command::new("git").args(["status", "--short"]).current_dir(root).output().unwrap();
-        assert!(status.status.success());
-        assert_eq!(String::from_utf8_lossy(&status.stdout), "");
-    }
+    // The former `test_rollback_archive_contents_after_logs_error_restores_source_tree`
+    // test targeted the private `rollback_archive_contents_after_logs_error`
+    // helper, which was deleted as part of the T006 cutover.
+    // `TrackGitInteractor::archive_track` now performs the fs-side rename
+    // directly through the port; its unit coverage lives in
+    // `libs/usecase/src/git_workflow.rs::tests` (T003 mock-port tests).
 }

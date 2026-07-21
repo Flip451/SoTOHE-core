@@ -60,7 +60,7 @@ impl usecase::signal::SignalLayerReader for BindingSignalLayerReader {
 /// the orchestrator, not locally.
 #[allow(clippy::too_many_arguments, clippy::type_complexity)]
 pub(crate) fn signal_check_layer_chain(
-    strict_override: bool,
+    strict_override: Option<domain::Strictness>,
     gate: Option<SignalGateName>,
     workspace_root: Option<PathBuf>,
     chain_id: domain::ChainId,
@@ -110,7 +110,7 @@ pub(crate) fn signal_check_layer_chain_with_strict(
         Box<dyn Fn(domain::tddd::LayerId, &str, &str) -> infrastructure::verify::VerifyOutcome>,
     ) -> infrastructure::verify::VerifyOutcome,
 ) -> Result<CommandOutcome, CompositionError> {
-    use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+    use infrastructure::git_cli::SystemGitRepo;
     use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
     use infrastructure::verify::tddd_layers::{
         LoadTdddLayersError, find_binding, load_tddd_layers_from_workspace,

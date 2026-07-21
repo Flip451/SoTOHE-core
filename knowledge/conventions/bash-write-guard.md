@@ -1,12 +1,12 @@
-# Bash File-Write Guard (CON-07)
+# Bash File-Write Guard
 
 ## Overview
 
 Bash tool file writes used to be guarded because they bypassed the file-lock hooks
 (`file-lock-acquire`/`file-lock-release`), which only triggered on `Read|Edit|Write` tool
 calls. Those file-lock hooks have since been removed, so the original protection target for the
-AST-level file-write guard no longer exists. ADR
-`2026-06-10-1630-git-hooks-process-level-enforcement` D4 supersedes the retired Layer-2 blocks.
+AST-level file-write guard no longer exists. The retired Layer-2 blocks therefore do not protect a
+current enforcement boundary.
 
 This convention now documents the remaining Bash write guardrails and the accepted residual risks.
 
@@ -46,19 +46,19 @@ The following file-write vectors are accepted after Layer-2 retirement:
 
 | Vector | Reason not blocked |
 |--------|-------------------|
-| General Bash writes via redirects, `tee`, or `sed -i` | Allowed by ADR D4. The file-lock hooks they originally protected were removed, so CON-07 no longer attempts to sandbox arbitrary file writes from Bash |
-| Shell re-entry (`bash -c`, `sh -c`, heredocs, scripts) | Also allowed by ADR D4. Git writes are enforced at process level by git hooks, while non-git file writes are handled by normal review and CI |
+| General Bash writes via redirects, `tee`, or `sed -i` | The file-lock hooks they originally protected were removed, so this guard does not attempt to sandbox arbitrary file writes from Bash |
+| Shell re-entry (`bash -c`, `sh -c`, heredocs, scripts) | Git writes are enforced at process level by git hooks, while non-git file writes are handled by normal review and CI |
 | Named pipes (`mkfifo`) | Rarely used in Claude Code Bash calls; `mkfifo` is not in `permissions.allow` |
 | `/proc/self/fd/N` writes | Exotic; not practical to detect without filesystem-level sandboxing |
 | `dd of=file` | Not in `permissions.allow`; rare in template workflows |
-| `cargo make` internal writes | Intentionally allowed — cargo make tasks run in Docker containers with their own isolation |
+| `cargo make` internal writes | Intentionally allowed — task execution is reviewed and gated rather than treated as a shell sandbox |
 
 ## Design Decision
 
-CON-07 no longer treats Bash file writes as the primary enforcement surface. The old
+This guard no longer treats Bash file writes as the primary enforcement surface. The old
 command-string scan era tried to infer dangerous behavior from shell syntax and accumulated
-blanket blocks for redirects, `tee`, and `sed -i`. After ADR D4, direct git-write enforcement lives
-at the git process boundary through `.githooks/reference-transaction` and `.githooks/pre-push`.
+blanket blocks for redirects, `tee`, and `sed -i`. Direct git-write enforcement lives at the git
+process boundary through `.githooks/reference-transaction` and `.githooks/pre-push`.
 
 The remaining Bash-side controls are intentionally narrow: `permissions.deny` blocks a small set of
 high-risk file commands, `FORBIDDEN_ALLOW` prevents those commands from entering

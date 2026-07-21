@@ -15,6 +15,7 @@
 mod baseline;
 pub mod baseline_document;
 pub mod baseline_graph_ports;
+pub mod catalog_gen;
 pub mod catalogue;
 pub mod catalogue_linter;
 pub mod catalogue_ports;
@@ -31,6 +32,7 @@ pub mod new_typegraph_codec_error;
 pub mod primitive_occurrence_scanner;
 pub mod semantic_verify;
 pub mod signal_evaluator;
+pub mod test_obligation;
 pub mod type_signals_doc;
 
 pub use baseline_document::BaselineDocument;

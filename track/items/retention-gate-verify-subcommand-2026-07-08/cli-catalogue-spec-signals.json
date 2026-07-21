@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "715f8fe91cc01f88a171380b15e6af85f0bb8dcd7f5d76b5c19ffac84c5226ef",
+  "signals": [
+    {
+      "type_name": "CatalogueSpecRefsArgs",
+      "signal": "blue",
+      "entry_hash": "345ba32c0b88199c22df89bc7530c57adf8873886282e599714fca37c9f39de1"
+    },
+    {
+      "type_name": "PlanArtifactRefsArgs",
+      "signal": "blue",
+      "entry_hash": "be41bc795cde5a2b986b214ab809b5b2f5b78c7b466baa0da5a254f4e4bb3dc4"
+    },
+    {
+      "type_name": "SpecVerifyArgs",
+      "signal": "blue",
+      "entry_hash": "91fc70db9006bf93a3b604b55427d96b04ea52a71a2ee2c45c7e523c32efc8cc"
+    },
+    {
+      "type_name": "VerifyArgs",
+      "signal": "blue",
+      "entry_hash": "31fd32344750663cd886132e15c852a365eb23e3da0db0bc094f771621aee27a"
+    },
+    {
+      "type_name": "VerifyCommand",
+      "signal": "blue",
+      "entry_hash": "46f039a1ca35381caa46561b627c09800251c53354729c44f11765e8d974c7b1"
+    }
+  ]
+}

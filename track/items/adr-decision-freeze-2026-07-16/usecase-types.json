@@ -1,0 +1,1205 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "store",
+              "ty": "std::sync::Arc<dyn AdrBaselineStorePort>"
+            },
+            {
+              "name": "source",
+              "ty": "std::sync::Arc<dyn AdrBaselineSourcePort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "AdrBaselineInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "store",
+              "ty": "std::sync::Arc<dyn AdrBaselineStoreReadPort>"
+            },
+            {
+              "name": "source",
+              "ty": "std::sync::Arc<dyn AdrBaselineSourcePort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "AdrBaselineQueryInteractor"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "AdrBaselineCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "AdrBaselineInteractor",
+      "trait_ref": "AdrBaselineService"
+    },
+    {
+      "for_type": "AdrBaselineQuery",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineQuery",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineQuery",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineQuery",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineQueryOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineQueryOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineQueryOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineQueryOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineSourceError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineSourceError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineSourceError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineSourceError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineSourceError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "AdrBaselineSourceError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "AdrBaselineStoreError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineStoreError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineStoreError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineStoreError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineStoreError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "AdrBaselineStoreError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "AdrBaselineValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineValidationError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineValidationError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineValidationError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "AdrBaselineValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "AdrBaselineQueryError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineQueryError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineQueryError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineQueryError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineQueryError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "AdrBaselineQueryError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "AdrBaselineQueryInteractor",
+      "trait_ref": "AdrBaselineQueryService"
+    },
+    {
+      "for_type": "AdrBaselineStoreReadError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineStoreReadError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineStoreReadError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineStoreReadError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineStoreReadError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "AdrBaselineStoreReadError",
+      "trait_ref": "core::error::Error"
+    }
+  ],
+  "traits": {
+    "AdrBaselineQueryService": {
+      "action": "add",
+      "docs": "Primary application query service for ADR baseline freeze checks.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "query",
+              "ty": "AdrBaselineQuery"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<AdrBaselineQueryOutput, AdrBaselineQueryError>"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "AdrBaselineService": {
+      "action": "add",
+      "docs": "Primary application command service for ADR baseline snapshot and restore operations.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "command",
+              "ty": "AdrBaselineCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<AdrBaselineOutput, AdrBaselineError>"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "AdrBaselineSourcePort": {
+      "action": "add",
+      "docs": "Synchronous ADR source-read port; byte vectors are opaque verbatim file content. working_bytes and fork_point_bytes produce Read or Unavailable, while cited_sources and source_state produce Read. Blocking is intentional for single-shot CLI execution.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "working_bytes",
+          "params": [
+            {
+              "name": "source",
+              "ty": "&domain::adr_baseline::AdrSourceFileName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<u8>, AdrBaselineSourceError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fork_point_bytes",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "source",
+              "ty": "&domain::adr_baseline::AdrSourceFileName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<u8>, AdrBaselineSourceError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "cited_sources",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<domain::adr_baseline::AdrSourceFileName>, AdrBaselineSourceError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "source_state",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "source",
+              "ty": "&domain::adr_baseline::AdrSourceFileName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::adr_baseline::AdrBaselineSourceState, AdrBaselineSourceError>"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "AdrBaselineStorePort": {
+      "action": "add",
+      "docs": "Synchronous ADR baseline mutation port; snapshot bytes are opaque verbatim file content and snapshot time is caller-supplied. Operations may produce read or write failures; blocking is intentional for single-shot CLI execution.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "snapshot",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "source",
+              "ty": "&domain::adr_baseline::AdrSourceFileName"
+            },
+            {
+              "name": "bytes",
+              "ty": "Vec<u8>"
+            },
+            {
+              "name": "kind",
+              "ty": "domain::adr_baseline::AdrBaselineKind"
+            },
+            {
+              "name": "reason",
+              "ty": "Option<domain::NonEmptyString>"
+            },
+            {
+              "name": "timestamp",
+              "ty": "domain::Timestamp"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::adr_baseline::AdrBaselineLedgerEntry, AdrBaselineStoreError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "restore",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "source",
+              "ty": "&domain::adr_baseline::AdrSourceFileName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), AdrBaselineStoreError>"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "AdrBaselineStoreReadPort": {
+      "action": "add",
+      "docs": "Synchronous read-only ADR baseline ledger and recorded-copy verification port.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read_entries",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<domain::adr_baseline::AdrBaselineLedgerEntry>, AdrBaselineStoreReadError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_recorded_copy",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "entry",
+              "ty": "&domain::adr_baseline::AdrBaselineLedgerEntry"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::adr_baseline::AdrBaselineRecordedCopyStatus, AdrBaselineStoreReadError>"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "AdrBaselineCommand": {
+      "action": "add",
+      "docs": "ADR baseline write-command family with explicit snapshot time.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Snapshot",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "domain::TrackId"
+                },
+                {
+                  "name": "source",
+                  "ty": "domain::adr_baseline::AdrSourceFileName"
+                },
+                {
+                  "name": "kind",
+                  "ty": "domain::adr_baseline::AdrBaselineKind"
+                },
+                {
+                  "name": "reason",
+                  "ty": "Option<domain::NonEmptyString>"
+                },
+                {
+                  "name": "timestamp",
+                  "ty": "domain::Timestamp"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Restore",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "domain::TrackId"
+                },
+                {
+                  "name": "source",
+                  "ty": "domain::adr_baseline::AdrSourceFileName"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineError": {
+      "action": "add",
+      "docs": "ADR baseline write-command failure envelope.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Store",
+            "payload": {
+              "fields": [
+                "AdrBaselineStoreError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Source",
+            "payload": {
+              "fields": [
+                "AdrBaselineSourceError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Validation",
+            "payload": {
+              "fields": [
+                "AdrBaselineValidationError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineInteractor": {
+      "action": "add",
+      "docs": "ADR baseline write-command interactor; owns kind/reason validation and forwards caller-supplied snapshot time.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineOutput": {
+      "action": "add",
+      "docs": "ADR baseline write-command output.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SnapshotRecorded",
+            "payload": {
+              "fields": [
+                "domain::adr_baseline::AdrBaselineLedgerEntry"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Restored",
+            "payload": {
+              "fields": [
+                "domain::adr_baseline::AdrSourceFileName"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineQuery": {
+      "action": "add",
+      "docs": "ADR baseline freeze-check query family.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CheckReview",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "domain::TrackId"
+                },
+            {
+              "name": "primary_source",
+              "ty": "Option<domain::adr_baseline::AdrSourceFileName>"
+            }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CheckCommit",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "domain::TrackId"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "Query": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineQueryError": {
+      "action": "add",
+      "docs": "Query-only operational failures: source I/O detail or an ADR baseline read-port failure; source absence is excluded.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SourceRead",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Store",
+            "payload": {
+              "fields": [
+                "AdrBaselineStoreReadError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineQueryInteractor": {
+      "action": "add",
+      "docs": "ADR baseline freeze-check query interactor and recorded-copy verification owner.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineQueryOutput": {
+      "action": "add",
+      "docs": "Usecase-owned primary-port query output carrying the domain freeze-check outcome.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Checked",
+            "payload": {
+              "fields": [
+                "domain::adr_baseline::AdrBaselineCheckOutcome"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineSourceError": {
+      "action": "add",
+      "docs": "ADR source-read failure vocabulary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Read",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Unavailable",
+            "payload": {
+              "fields": [
+                "domain::adr_baseline::AdrSourceFileName"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineStoreError": {
+      "action": "add",
+      "docs": "ADR baseline persistence failure vocabulary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Read",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Write",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineStoreReadError": {
+      "action": "add",
+      "docs": "ADR baseline read-port failure vocabulary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Read",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineValidationError": {
+      "action": "add",
+      "docs": "ADR baseline request-validation failure vocabulary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidReason",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvalidSourceFileName",
+            "payload": {
+              "fields": [
+                "domain::adr_baseline::AdrSourceFileNameError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    }
+  }
+}

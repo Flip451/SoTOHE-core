@@ -6,6 +6,7 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
+pub use usecase::TrackId;
 use usecase::verify::VerifyService;
 
 use crate::render::CommandOutcome;
@@ -16,13 +17,28 @@ use crate::render::CommandOutcome;
 
 /// Typed input for the `verify` command family.
 pub enum VerifyInput {
-    /// Check tech-stack.md for unresolved TODO markers.
-    TechStack {
+    /// Check latest track artifacts for completeness.
+    LatestTrack {
         /// Project root directory.
         project_root: PathBuf,
     },
-    /// Check latest track artifacts for completeness.
-    LatestTrack {
+    /// Check the retention live surface for retired gate/document identifiers.
+    RetentionGate {
+        /// Project root directory.
+        project_root: PathBuf,
+    },
+    /// Verify that the configured fixed SOTP version tag resolves on its remote.
+    SotpVersionTag {
+        /// Project root directory.
+        project_root: PathBuf,
+    },
+    /// Verify that tracked repository files do not contain work-machine paths.
+    MachinePaths {
+        /// Project root directory.
+        project_root: PathBuf,
+    },
+    /// Verify that shipped template files contain no concrete source references.
+    TemplateRefs {
         /// Project root directory.
         project_root: PathBuf,
     },
@@ -99,7 +115,7 @@ pub enum VerifyInput {
     /// Verify catalogue-spec ref integrity (SoT Chain binary gate).
     CatalogueSpecRefs {
         /// Optional track ID (resolved from active branch if `None`).
-        track_id: Option<String>,
+        track_id: Option<TrackId>,
         /// Path to the track items directory.
         items_dir: PathBuf,
         /// Workspace root directory.
@@ -129,11 +145,20 @@ impl VerifyDriver {
     /// Handle a verify command.
     pub fn handle(&self, input: VerifyInput) -> CommandOutcome {
         match input {
-            VerifyInput::TechStack { project_root } => {
-                map_result(self.service.verify_tech_stack(project_root))
-            }
             VerifyInput::LatestTrack { project_root } => {
                 map_result(self.service.verify_latest_track(project_root))
+            }
+            VerifyInput::RetentionGate { project_root } => {
+                map_result(self.service.verify_retention_gate(project_root))
+            }
+            VerifyInput::SotpVersionTag { project_root } => {
+                map_result(self.service.verify_sotp_version_tag(&project_root))
+            }
+            VerifyInput::MachinePaths { project_root } => {
+                map_result(self.service.verify_machine_paths(&project_root))
+            }
+            VerifyInput::TemplateRefs { project_root } => {
+                map_result(self.service.verify_template_refs(&project_root))
             }
             VerifyInput::ArchDocs { project_root } => {
                 map_result(self.service.verify_arch_docs(project_root))
@@ -203,5 +228,170 @@ fn map_result(
             exit_code: outcome.exit_code,
         },
         Err(e) => CommandOutcome { stdout: None, stderr: Some(e.to_string()), exit_code: 1 },
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use std::path::Path;
+    use std::sync::{Arc, Mutex};
+
+    use usecase::verify::{VerifyOutcome, VerifyPortError};
+
+    use super::*;
+
+    #[derive(Default)]
+    struct RecordingService {
+        retention_root: Mutex<Option<PathBuf>>,
+        verifier_roots: Mutex<Vec<(&'static str, PathBuf)>>,
+        fail: bool,
+    }
+
+    impl RecordingService {
+        fn unused(&self) -> Result<VerifyOutcome, VerifyPortError> {
+            Err(VerifyPortError::Unavailable("unused test route".to_owned()))
+        }
+
+        fn record_verifier_route(
+            &self,
+            route: &'static str,
+            project_root: &Path,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            self.verifier_roots.lock().unwrap().push((route, project_root.to_path_buf()));
+            Ok(VerifyOutcome::success(Some(route.to_owned())))
+        }
+    }
+
+    macro_rules! unused_pathbuf_method {
+        ($name:ident) => {
+            fn $name(&self, _: PathBuf) -> Result<VerifyOutcome, VerifyPortError> {
+                self.unused()
+            }
+        };
+    }
+
+    impl VerifyService for RecordingService {
+        unused_pathbuf_method!(verify_latest_track);
+        unused_pathbuf_method!(verify_arch_docs);
+        unused_pathbuf_method!(verify_layers);
+        unused_pathbuf_method!(verify_hooks_path);
+        unused_pathbuf_method!(verify_spec_attribution);
+        unused_pathbuf_method!(verify_spec_frontmatter);
+        unused_pathbuf_method!(verify_canonical_modules);
+        unused_pathbuf_method!(verify_module_size);
+        unused_pathbuf_method!(verify_domain_purity);
+        unused_pathbuf_method!(verify_domain_strings);
+        unused_pathbuf_method!(verify_usecase_purity);
+        unused_pathbuf_method!(verify_doc_links);
+        unused_pathbuf_method!(verify_view_freshness);
+        unused_pathbuf_method!(verify_spec_signals);
+
+        fn verify_retention_gate(
+            &self,
+            project_root: PathBuf,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            *self.retention_root.lock().unwrap() = Some(project_root);
+            if self.fail {
+                Ok(VerifyOutcome::failure(Some("finding".to_owned())))
+            } else {
+                Ok(VerifyOutcome::success(Some("ok".to_owned())))
+            }
+        }
+
+        fn verify_sotp_version_tag(
+            &self,
+            project_root: &Path,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            self.record_verifier_route("sotp_version_tag", project_root)
+        }
+
+        fn verify_machine_paths(
+            &self,
+            project_root: &Path,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            self.record_verifier_route("machine_paths", project_root)
+        }
+
+        fn verify_template_refs(
+            &self,
+            project_root: &Path,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            self.record_verifier_route("template_refs", project_root)
+        }
+
+        fn verify_plan_artifact_refs(
+            &self,
+            _: Option<PathBuf>,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            self.unused()
+        }
+
+        fn verify_catalogue_spec_refs(
+            &self,
+            _: Option<TrackId>,
+            _: PathBuf,
+            _: PathBuf,
+            _: bool,
+        ) -> Result<VerifyOutcome, VerifyPortError> {
+            self.unused()
+        }
+    }
+
+    #[test]
+    fn test_verify_driver_retention_gate_routes_to_service() {
+        let service = Arc::new(RecordingService::default());
+        let driver = VerifyDriver::new(service.clone());
+        let root = PathBuf::from("workspace-root");
+
+        let outcome = driver.handle(VerifyInput::RetentionGate { project_root: root.clone() });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(service.retention_root.lock().unwrap().as_deref(), Some(root.as_path()));
+    }
+
+    #[test]
+    fn test_verify_driver_retention_gate_preserves_failure_outcome() {
+        let service = Arc::new(RecordingService {
+            retention_root: Mutex::new(None),
+            verifier_roots: Mutex::new(Vec::new()),
+            fail: true,
+        });
+        let driver = VerifyDriver::new(service);
+
+        let outcome =
+            driver.handle(VerifyInput::RetentionGate { project_root: PathBuf::from(".") });
+
+        assert_eq!(outcome.exit_code, 1);
+        assert_eq!(outcome.stderr.as_deref(), Some("finding"));
+    }
+
+    #[test]
+    fn test_verify_driver_new_verifier_routes_route_project_root_to_service() {
+        let service = Arc::new(RecordingService::default());
+        let driver = VerifyDriver::new(service.clone());
+        let root = PathBuf::from("workspace-root");
+
+        assert_eq!(
+            driver.handle(VerifyInput::SotpVersionTag { project_root: root.clone() }).exit_code,
+            0
+        );
+        assert_eq!(
+            driver.handle(VerifyInput::MachinePaths { project_root: root.clone() }).exit_code,
+            0
+        );
+        assert_eq!(
+            driver.handle(VerifyInput::TemplateRefs { project_root: root.clone() }).exit_code,
+            0
+        );
+
+        assert_eq!(
+            *service.verifier_roots.lock().unwrap(),
+            vec![
+                ("sotp_version_tag", root.clone()),
+                ("machine_paths", root.clone()),
+                ("template_refs", root),
+            ]
+        );
     }
 }

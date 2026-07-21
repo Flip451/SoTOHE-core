@@ -141,7 +141,7 @@ impl TelemetryEmitDynamicPort for FsTelemetryEmitDynamicAdapter {
         exit_code: i32,
         duration_ms: u64,
     ) -> Result<(), TelemetryEmitDynamicPortError> {
-        use crate::git_cli::{GitRepository as _, SystemGitRepo};
+        use crate::git_cli::SystemGitRepo;
         use crate::telemetry::archived_track::FsArchivedTrackTelemetryAdapter;
 
         let project_root = resolve_project_root_from_items_dir(items_dir)
@@ -231,7 +231,7 @@ fn normalize_project_root(root: &Path) -> PathBuf {
 fn resolve_items_dir_under_current_repo(
     items_dir: &Path,
 ) -> Result<PathBuf, TelemetryAdapterError> {
-    use crate::git_cli::{GitRepository as _, SystemGitRepo};
+    use crate::git_cli::SystemGitRepo;
 
     reject_items_dir_escape(items_dir)?;
 
@@ -319,7 +319,7 @@ fn ensure_trusted_root(root: &Path) -> Result<(), TelemetryAdapterError> {
 }
 
 fn ensure_current_repo_root(root: &Path) -> Result<PathBuf, TelemetryAdapterError> {
-    use crate::git_cli::{GitRepository as _, SystemGitRepo};
+    use crate::git_cli::SystemGitRepo;
 
     let canonical_root = root.canonicalize().map_err(|e| {
         TelemetryAdapterError(format!(
@@ -355,7 +355,6 @@ mod tests {
         FsTelemetryReportAdapter, ensure_trusted_root, resolve_items_dir_under_current_repo,
         resolve_project_root_from_items_dir,
     };
-    use crate::git_cli::GitRepository as _;
     use usecase::telemetry::{TelemetryReportError as UsecaseError, TelemetryReportPort as _};
 
     fn tempdir_in_current_repo() -> tempfile::TempDir {

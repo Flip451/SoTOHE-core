@@ -1,0 +1,31 @@
+[workspace]
+members = [
+  "libs/domain",
+  "libs/usecase",
+  "libs/infrastructure",
+  "apps/cli-driver",
+  "apps/cli",
+  "apps/cli-composition",
+]
+resolver = "2"
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.91"
+publish = false
+
+[workspace.dependencies]
+thiserror = "2"
+
+[workspace.lints.rust]
+warnings = "deny"
+
+[workspace.lints.clippy]
+indexing_slicing = "deny"
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+unreachable = "deny"
+todo = "deny"
+unimplemented = "deny"

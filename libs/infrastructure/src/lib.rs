@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 //! Infrastructure layer for the SoTOHE-core track state machine.
 
+pub mod adr_baseline;
 pub mod adr_decision;
 pub mod agent_profiles;
 pub mod branch_strategy;
@@ -8,9 +9,10 @@ pub use branch_strategy::{
     BranchStrategyConfigError, JsonConfigBranchStrategyAdapter, SnapshotBranchStrategyAdapter,
 };
 pub mod arch;
+pub mod capability_exec;
 pub mod code_profile_builder;
 pub mod codex_common;
-pub mod codex_planner;
+pub mod codex_runtime;
 pub mod conventions;
 pub mod demo;
 pub mod dry_check;
@@ -21,6 +23,7 @@ pub mod impl_catalog_signal_reader;
 pub mod impl_plan_codec;
 pub mod impl_plan_reader;
 pub mod pr_review;
+pub mod provider_session;
 pub mod ref_verify;
 pub mod review_v2;
 pub mod schema_export;
@@ -36,6 +39,8 @@ pub mod task_contract_reader;
 pub mod task_coverage_codec;
 pub mod tddd;
 pub mod telemetry;
+pub mod template_export;
+pub mod test_obligation;
 pub mod track;
 pub use dry_check::noop_approval::NoOpDryApprovalService;
 pub use dry_check::recording_agent::RecordingDryAgent;
@@ -44,7 +49,9 @@ pub use pr_review::SystemSleepAdapter;
 pub use semantic_dup::fragment_extractor_adapter::CodeFragmentExtractorAdapter;
 pub use semantic_dup::noop_adapter::NoopSemanticIndexPort;
 pub use semantic_dup::null_insert_proxy::NullInsertIndexProxy;
-pub use telemetry::archived_track::FsArchivedTrackTelemetryAdapter;
+pub use telemetry::archived_track::{
+    FsArchivedTelemetryFactoryAdapter, FsArchivedTrackTelemetryAdapter,
+};
 pub use telemetry::report_adapter::{FsTelemetryEmitDynamicAdapter, FsTelemetryReportAdapter};
 pub use track::fs_symlink_guard::FsSymlinkGuard;
 pub use track::gate_state::{FsRefVerifyGateStateAdapter, FsReviewGateStateAdapter};
@@ -61,7 +68,7 @@ pub(crate) fn resolve_items_dir_under_current_repo(
 ) -> Result<std::path::PathBuf, std::io::Error> {
     use std::path::Component;
 
-    use crate::git_cli::{GitRepository as _, SystemGitRepo};
+    use crate::git_cli::SystemGitRepo;
 
     if items_dir.as_os_str().is_empty() {
         return Err(std::io::Error::new(

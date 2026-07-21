@@ -12,8 +12,7 @@ use syn::spanned::Spanned;
 use syn::visit::Visit;
 
 use super::syn_helpers::has_cfg_test_attr as has_cfg_test;
-
-const USECASE_SRC_DIR: &str = "libs/usecase/src";
+use crate::arch::VerifierKind;
 
 /// Path prefixes forbidden in pure layers (domain, usecase).
 /// Any path or use-import starting with these segments is flagged.
@@ -61,16 +60,51 @@ pub(crate) fn check_layer_purity(root: &Path, src_dir: &str, layer_label: &str) 
     VerifyOutcome::from_findings(findings)
 }
 
-/// Scan `libs/usecase/src/` for forbidden patterns that violate hexagonal purity.
+/// Scan every layer opting into the given purity verifier via
+/// `architecture-rules.json`, running the shared purity engine on each
+/// layer's `<path>/src` directory.
+///
+/// When no layer declares the flag, the result is OK/skip (config-driven
+/// absence is not an error). This is the arch-rules-driven dispatch shared by
+/// the `domain-purity` and `usecase-purity` subcommands — neither hardcodes a
+/// source path.
+///
+/// # Errors
+///
+/// Returns findings for each forbidden pattern found, or a single error
+/// finding if `architecture-rules.json` cannot be loaded or parsed.
+pub(crate) fn check_arch_layers_purity(root: &Path, kind: VerifierKind) -> VerifyOutcome {
+    let targets = match crate::arch::resolve_verify_targets(root, kind) {
+        Ok(targets) => targets,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "failed to resolve verify targets from architecture-rules.json: {e}"
+            ))]);
+        }
+    };
+
+    let mut outcome = VerifyOutcome::pass();
+    for target in targets {
+        outcome.merge(check_layer_purity(root, &target.src_dir, &target.label));
+    }
+    outcome
+}
+
+/// Scan every usecase-purity opt-in layer for forbidden patterns that violate
+/// hexagonal purity.
 ///
 /// # Errors
 ///
 /// Returns findings for each forbidden pattern found.
 pub fn verify(root: &Path) -> VerifyOutcome {
-    check_layer_purity(root, USECASE_SRC_DIR, "Usecase")
+    check_arch_layers_purity(root, VerifierKind::UsecasePurity)
 }
 
 fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<VerifyFinding>) {
+    if !reject_unsafe_scan_path(dir, root, findings) {
+        return;
+    }
+
     let entries = match std::fs::read_dir(dir) {
         Ok(e) => e,
         Err(e) => {
@@ -96,9 +130,23 @@ fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<VerifyFinding>) {
             }
         };
         let path = entry.path();
-        if path.is_dir() {
+        if !reject_unsafe_scan_path(&path, root, findings) {
+            continue;
+        }
+        let file_type = match entry.file_type() {
+            Ok(file_type) => file_type,
+            Err(e) => {
+                let rel = path.strip_prefix(root).unwrap_or(&path);
+                findings.push(VerifyFinding::error(format!(
+                    "{}: cannot inspect entry type: {e}",
+                    rel.to_string_lossy()
+                )));
+                continue;
+            }
+        };
+        if file_type.is_dir() {
             scan_dir(&path, root, findings);
-        } else if path.extension().is_some_and(|ext| ext == "rs") {
+        } else if file_type.is_file() && path.extension().is_some_and(|ext| ext == "rs") {
             match std::fs::read_to_string(&path) {
                 Ok(content) => {
                     let rel = path.strip_prefix(root).unwrap_or(&path);
@@ -112,6 +160,35 @@ fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<VerifyFinding>) {
                     )));
                 }
             }
+        }
+    }
+}
+
+fn reject_unsafe_scan_path(path: &Path, root: &Path, findings: &mut Vec<VerifyFinding>) -> bool {
+    let rel = path.strip_prefix(root).unwrap_or(path);
+    match crate::track::symlink_guard::reject_symlinks_below(path, root) {
+        Ok(true) => true,
+        Ok(false) => {
+            findings.push(VerifyFinding::error(format!(
+                "{}: path disappeared during scan",
+                rel.to_string_lossy()
+            )));
+            false
+        }
+        Err(e) if e.kind() == std::io::ErrorKind::InvalidInput => {
+            findings.push(VerifyFinding::error(format!(
+                "{}: symlink detected during scan (rejected for security)",
+                rel.to_string_lossy()
+            )));
+            false
+        }
+        Err(e) => {
+            findings.push(VerifyFinding::error(format!(
+                "{}: cannot inspect path before scanning: {:?}",
+                rel.to_string_lossy(),
+                e.kind()
+            )));
+            false
         }
     }
 }
@@ -466,7 +543,22 @@ mod tests {
 
     use super::*;
 
+    const USECASE_SRC_DIR: &str = "libs/usecase/src";
+
+    /// Write a minimal `architecture-rules.json` declaring a usecase layer that
+    /// opts into the usecase-purity verifier, so `verify` resolves it as a target.
+    fn write_arch_rules(root: &Path) {
+        let json = r#"{
+  "version": 2,
+  "layers": [
+    { "crate": "usecase", "path": "libs/usecase", "verify": { "usecase_purity": true } }
+  ]
+}"#;
+        std::fs::write(root.join("architecture-rules.json"), json).unwrap();
+    }
+
     fn setup_usecase_file(root: &Path, rel: &str, content: &str) {
+        write_arch_rules(root);
         let path = root.join(USECASE_SRC_DIR).join(rel);
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent).unwrap();
@@ -722,9 +814,61 @@ mod tests {
 
     #[test]
     fn test_missing_usecase_dir_errors() {
+        // Layer declares the flag but its `<path>/src` is absent — misconfiguration.
+        let tmp = TempDir::new().unwrap();
+        write_arch_rules(tmp.path());
+        let outcome = verify(tmp.path());
+        assert!(outcome.has_errors());
+    }
+
+    #[test]
+    fn test_missing_arch_rules_errors() {
+        // No architecture-rules.json at all → load failure reported as an error.
         let tmp = TempDir::new().unwrap();
         let outcome = verify(tmp.path());
         assert!(outcome.has_errors());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_symlinked_usecase_source_dir_errors() {
+        let tmp = TempDir::new().unwrap();
+        let outside = TempDir::new().unwrap();
+        write_arch_rules(tmp.path());
+
+        let usecase_dir = tmp.path().join("libs/usecase");
+        std::fs::create_dir_all(&usecase_dir).unwrap();
+        let outside_src = outside.path().join("src");
+        std::fs::create_dir_all(&outside_src).unwrap();
+        std::fs::write(outside_src.join("workflow.rs"), "fn bad() { std::fs::read(\"x\"); }\n")
+            .unwrap();
+        std::os::unix::fs::symlink(&outside_src, usecase_dir.join("src")).unwrap();
+
+        let outcome = verify(tmp.path());
+        assert!(outcome.has_errors());
+        assert!(
+            outcome.findings().iter().any(|finding| finding.to_string().contains("symlink")),
+            "expected symlink rejection finding, got: {:?}",
+            outcome.findings()
+        );
+    }
+
+    #[test]
+    fn test_no_opt_in_layer_skips() {
+        // arch-rules present but no layer declares usecase_purity → OK/skip.
+        let tmp = TempDir::new().unwrap();
+        std::fs::write(
+            tmp.path().join("architecture-rules.json"),
+            r#"{ "version": 2, "layers": [ { "crate": "usecase", "path": "libs/usecase" } ] }"#,
+        )
+        .unwrap();
+        // Even a file that would fail purity is ignored because the layer opts out.
+        let path = tmp.path().join(USECASE_SRC_DIR).join("workflow.rs");
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        std::fs::write(&path, "fn foo() { std::fs::read(\"x\"); }\n").unwrap();
+        let outcome = verify(tmp.path());
+        assert!(outcome.is_ok());
+        assert!(outcome.findings().is_empty());
     }
 
     #[test]

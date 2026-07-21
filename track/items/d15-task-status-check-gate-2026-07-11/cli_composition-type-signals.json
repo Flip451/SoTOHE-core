@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-11T16:41:29Z",
+  "declaration_hash": "70d4ea24cfed4139545f6da1177fd949f109387d1abba4f8d4abc17b5ed3bacd",
+  "signals": [
+    {
+      "type_name": "TestObligationCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "054f61a395c1ae88f101c9d36bad808aa3fa05fede1f0a75d685903d13834fb5",
+  "signals": [
+    {
+      "type_name": "CheckTestObligationsInteractor",
+      "signal": "blue",
+      "entry_hash": "3cf7fc74f3afb0e10e4dc2cf362e0bf1a41f4117bf95393cc9cabb0eedc37dbf"
+    },
+    {
+      "type_name": "CheckTestObligationsOutcome",
+      "signal": "blue",
+      "entry_hash": "15a7bee3a346baa7a95ecddc3257883e75de6dab1533ef2967fe861eca033ea9"
+    },
+    {
+      "type_name": "PreReviewGateError",
+      "signal": "blue",
+      "entry_hash": "8f19d54204706a43fe06612b7a6c1d18db2e154d75dde935e199f2eed1a6b80e"
+    },
+    {
+      "type_name": "TestObligationResultsCommand",
+      "signal": "blue",
+      "entry_hash": "02c22a5cd2b8e652a053546260c8a7e12ad76304e10acb04871001ef5e15e896"
+    },
+    {
+      "type_name": "TestObligationResultsInteractor",
+      "signal": "blue",
+      "entry_hash": "5d44a2ec1d69d14289b226f1bd7eac0eacf021cc16d365a85ed7f241f412a89e"
+    },
+    {
+      "type_name": "TestObligationResultsOutput",
+      "signal": "blue",
+      "entry_hash": "a73aa855c992cbfcea1113661fa0eb8fead1395cf2df2f36cc7507734068ca90"
+    },
+    {
+      "type_name": "TestObligationStatusLaneSummary",
+      "signal": "blue",
+      "entry_hash": "d74fd0b53dfbbb28d32c4f00144e2dcd06b7d497cae67c7ce193db4e4a8be00c"
+    },
+    {
+      "type_name": "ImplPlanReaderPort",
+      "signal": "blue",
+      "entry_hash": "cc2aa3f4a30cfdede0526bdb9439f89589b1eda17a06ceb7c83a715def66d5cd"
+    },
+    {
+      "type_name": "TaskContractReaderPort",
+      "signal": "blue",
+      "entry_hash": "5a7f3c2e066fe8cf85d5154a71a302031a7d273b9c9cba4c271d8e50518f62ac"
+    }
+  ]
+}

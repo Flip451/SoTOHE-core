@@ -1,0 +1,40 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-18T17:06:58Z",
+  "declaration_hash": "ad96d929ccd714f12028c0eadf8a8002d6a725fd1ea6dac2553e14fe8bce80db",
+  "implementation_input_hash": "9ebbdce5e5b46cd9aaaca42aa1d5a67d4893d70125a29a8562723b3673f9616d",
+  "signals": [
+    {
+      "type_name": "CliCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CodexRuntimeCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "FromArgMatches",
+        "Subcommand"
+      ]
+    },
+    {
+      "type_name": "CodexRuntimeProvisionArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Args",
+        "FromArgMatches"
+      ]
+    },
+    {
+      "type_name": "cli::commands::codex_runtime::execute",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

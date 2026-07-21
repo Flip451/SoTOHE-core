@@ -1,0 +1,530 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "TODO マーカー状態管理の廃止 — verify tech-stack ゲート撤去と track 直下文書群の ADR / README 統合と生きた参照元の掃討",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "文書内 TODO マーカーによる状態表現を、`verify tech-stack` 実装経路と live surface の readiness / blocking gate 表現から根絶し、track lifecycle 全体で「状態はファイル存在と信号から導出する」原則を貫く。マーカーの不在に「準備完了」の意味を担わせる儀式を残さない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "技術選定・製品方針の SSoT を ADR に一本化する。`track/tech-stack.md` / `track/product.md` / `track/product-guidelines.md` という並行 SoT が存在せず、以後の技術選定・製品方針はテンプレート利用者を含め pre-track ADR で扱う形に切り替わる状態を得る。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "廃止対象（`verify tech-stack` ゲートと `track/*.md` 3 文書）を生きた SoT・自動化・読者向け文書（maintainer index / operating rules / workflow SSoT / 境界 manifest / README / Makefile / CLI 実装）から掃討し、参照整合性を機械検証で守れる状態にする。廃止対象識別子の再出現が CI 側で fail する retention 経路を持つ状態に到達する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D4"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "`verify tech-stack` ゲート全経路の実装撤去。Makefile タスク (`verify-tech-stack` / `verify-tech-stack-local`) の削除、集約タスク (`ci-local` / `ci-container`) の dependencies 配列からの当該項目の除去、CLI サブコマンド (`sotp verify tech-stack`)、cli-driver 入力 (`VerifyInput::TechStack`)、usecase port method (`verify_tech_stack`)、infrastructure adapter method + `libs/infrastructure/src/verify/tech_stack.rs` モジュール本体、および `verify/mod.rs` の `pub mod tech_stack;` 宣言、関連テストコードのいずれも live source に残らない状態を要件とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "`track/tech-stack.md` / `track/product.md` / `track/product-guidelines.md` の物理削除。3 ファイルが repository の tracked file set から除去され、`git ls-files` に含まれない状態を最終形とする。予備コピー・renamed retention・アーカイブ複製をリポジトリ内に残さない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "廃止対象文書に載っていた生きている技術選定内容の ADR 経路への吸収。方針は (a) 内容ごとに関連する既存 ADR へ integrate、(b) grandfathered=true の集約 ADR 1 枚を新設し全項目を一括で載せる、のいずれか (両者混在も可)。track 内で方針を確定し実行する。ADR front-matter は `adr.md` の schema に沿い、grandfathered=true を用いる場合は §Grandfathered 用途の限定条件 (フォーマット採択前の trace コスト回避) に整合させる。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D2"
+          }
+        ],
+        "convention_refs": [
+          {
+            "file": "knowledge/conventions/adr.md",
+            "anchor": "grandfathered 用途"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "廃止対象文書の中の読者向け製品ビジョン記述を、`README.md` に吸収する。保持必須の product.md 由来情報は Product Name `SoTOHE-core`、Vision `SoT（真実の源泉）指向のRust開発向けハーネスの核となるCLIを提供する`、Target Users `Rust で中〜大規模プロジェクトを開発するチーム`、Core Features の `track ワークフロー管理 CLI` / `メタデータ駆動の状態遷移エンジン` / `CI 連携バリデーション` とする。setup boilerplate、Success Criteria、Stakeholders、Out of Scope 等は README の既存構成と重複または reader-facing onboarding に不要な場合は吸収対象外としてよい。吸収結果は README の既存構成 (プロジェクト目的・前提条件・はじめ方) と整合するよう配置する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "`CLAUDE.md` の 2 か所の掃討: (a) Source of Truth map テーブルの `Tech stack decisions | track/tech-stack.md` 行の除去、(b) Hard invariants セクションの「`track/tech-stack.md` に未解決の TODO マーカー (`TODO` の直後に半角コロン U+003A を付した ASCII 5 バイト列) が残る限り実装がブロックされる」旨の箇条 (現行文言は `Implementation is blocked while` で始まり `has unresolved` と `markers` を含む Hard invariant 行) の除去。廃止された gate と文書を live な maintainer index に残さない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "`.claude/rules/` 配下 5 ファイル (`07-dev-environment.md` の Project Bootstrap 節、`08-orchestration.md` の Source Of Truth リスト、`09-maintainer-checklist.md` の co-update matrix、`10-guardrails.md` の「`track/tech-stack.md` を blocking な TODO マーカー (`TODO` の直後に半角コロンを付した 5 バイト列) から実装前に守る」旨の Core Guardrails 箇条 (`Keep track/tech-stack.md free of blocking` を含む行)、`01-language.md` の Documentation 節 `track/tech-stack.md, track/product*.md` の適用対象) から、`track/tech-stack.md` / `track/product.md` / `track/product-guidelines.md` への参照を除去する。orchestrator の操作ルールとして廃止対象を live に扱う記述を残さない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "`.harness/workflows/track/init.md` / `.harness/workflows/track/plan.md` の Inputs 節にある `track/tech-stack.md` を前提とする記述、および `.claude/commands/track/catchup.md` / `.claude/commands/track/setup.md` / `.claude/commands/architecture-customizer.md` から `track/tech-stack.md` / `track/product.md` / `track/product-guidelines.md` への参照および TODO マーカー確認手順を除去する。廃止対象を前提とする operational workflow・setup ドキュメントが残らない状態にする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "`.harness/config/template-boundary.json` の entries 配列から `track/tech-stack.md` / `track/product.md` / `track/product-guidelines.md` の 3 overlay エントリを除去する。廃止された原本を overlay 分類として境界 manifest に残さない。境界 manifest schema そのものの変更は行わず、エントリの単純削除で完結させる。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "参照整合性の retention を機械検証として立てる。廃止対象識別子 (Makefile タスク名 `verify-tech-stack` / `verify-tech-stack-local`、CLI サブコマンド `verify tech-stack`、Rust 型 / 関数 `VerifyCommand::TechStack` / `VerifyInput::TechStack` / `verify_tech_stack` 等) および廃止対象ファイルパス (`track/tech-stack.md` / `track/product.md` / `track/product-guidelines.md`) がリポジトリの live surface (少なくとも `CLAUDE.md`, `README.md`, `.claude/rules/**`, `.claude/commands/**`, `.claude/agents/**`, `.claude/skills/**`, `.harness/workflows/**`, `.harness/config/**`, `.harness/capabilities/**`, `Makefile.toml`, `libs/**`, `apps/**`, `knowledge/conventions/**`) に再出現した場合、`cargo make ci` が非ゼロ exit で fail する retention 経路を持たせる。実装手段の選択 (既存 verifier 拡張 / 新規 grep gate / structural test / 型システム化) は type-designer / impl-planner の裁量とし、spec 側では観測可能な振る舞い (再出現 → CI fail) だけを要件とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D4"
+          }
+        ],
+        "convention_refs": [
+          {
+            "file": "knowledge/conventions/enforce-by-mechanism.md",
+            "anchor": "Rules"
+          }
+        ]
+      },
+      {
+        "id": "IN-10",
+        "text": "`knowledge/conventions/` 配下の live 運用ルール文書から廃止対象への参照を除去する。少なくとも `README.md` の Read Order 節 / Maintenance Rules 節、`hexagonal-architecture.md` の Note / Related Documents、`testing.md` の 2 か所の Note、`nightly-dev-tool.md` の Exceptions / Related Documents、`source-attribution.md` の Blue source 例 (`[source: track/tech-stack.md]` を含む例および Placement サンプル) が対象。convention は現在形の live ルール (`adr.md` §ADR vs Convention) であり、廃止済み文書を Good example として掲げ続けることを許容しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D4"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "派生ビュー (`track/registry.md`、および `track/items/<id>/` 配下の `spec.md` / `plan.md` / `contract-map.md`) の削除・schema 変更・生成経路変更。これらは SSoT からのビューであり、ADR D3 で明示的に対象外とされている。本 track で touch しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "`knowledge/adr/**` および `knowledge/research/**` 配下の既存文書に残る `track/tech-stack.md` / `product.md` / `product-guidelines.md` への言及の遡及書き換え。ADR は永続 record として post-merge 不変 (`adr.md` §Lifecycle)、research note は過去時点の観察記録 であり、live 運用ルール掃討 (D4) の対象ではない。ただし本 track で新規に作成/更新する ADR には廃止対象への live 前提を残さない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D4"
+          }
+        ],
+        "convention_refs": [
+          {
+            "file": "knowledge/conventions/adr.md",
+            "anchor": "Lifecycle: pre-merge draft vs post-merge record"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "技術選定・製品方針に関する net-new な決定の提案 / 変更。本 track の D2 昇格経路 (IN-03) は「既存文書に載る生きている決定内容を ADR に移す」ことに限定し、この移設を口実にした新規決定・方針変更は行わない。新規決定が必要になった場合は別 track の pre-track ADR で扱う。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "廃止後のオンボーディング UX の拡充 (pre-track ADR 執筆ガイドの新設、tech-stack 一覧性を補うための ADR 集約派生ビューの生成機構、テンプレート利用者向け migration 手順の整備 等)。ADR Neutral が「必要時に pre-track ADR を書く」姿勢を明示し、Reassess When が「不在による混乱が観測されたとき」に検討する立て付けを取っているため、本 track では README への Vision 吸収に留め、それ以上の新規 UX 装置は作らない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "`verify tech-stack` 以外の verify サブコマンド群 (`verify latest-track` / `verify arch-docs` / `verify canonical-modules` 等) の再設計・整理。ADR D1 は verify tech-stack ゲートに限定した廃止決定であり、他 gate の類似構造 (「マーカー不在＝正しさ」の飛躍を持つか否か) の棚卸しは本 track で扱わない。発見した場合でも別 ADR / 別 track で扱う。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-06",
+        "text": "廃止対象を検知する CI ゲート (IN-09) の実装手段の spec 側規定。grep gate、structural test、既存 verifier 拡張、型システム化などの選択は type-designer / impl-planner の裁量。spec 側は「再出現 → CI fail」の観測可能な振る舞いだけを要件化し、機構選択は下流に委ねる。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "OS-07",
+        "text": "境界 manifest (`.harness/config/template-boundary.json`) の schema 変更や「廃止済み overlay」を記録する新分類の導入。本 track は該当 3 エントリを単純削除することで完結させ、schema や分類そのものは触らない。schema 変更が必要と判明した場合は別 track で扱う。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+            "anchor": "D4"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "廃止対象識別子・ファイルパスは、実装完了時点の live surface (CN-01 が指す集合: `CLAUDE.md`, `README.md`, `.claude/rules/**`, `.claude/commands/**`, `.claude/agents/**`, `.claude/skills/**`, `.harness/workflows/**`, `.harness/config/**`, `.harness/capabilities/**`, `Makefile.toml`, `libs/**`, `apps/**`, `knowledge/conventions/**`) から 0 件でなければならない。「隠す」「非推奨マーク」「移行期間中コメントアウト」等の中途半端な残置を許容しない。`knowledge/adr/**` と `knowledge/research/**` は post-merge 不変 record として掃討対象外 (OS-02 で明示)。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "IN-03 で行う ADR 昇格は、集約 ADR 経路を採る場合に限り grandfathered=true を用いてよい。`adr.md` §Grandfathered 用途の限定条件 (front-matter フォーマット採択前の trace コスト回避) に合致し、かつ新規決定の trace 逃避手段としては用いない。個別既存 ADR への integrate 経路では grandfathered=true を用いない (既存 ADR の front-matter を触るなら通常の trace field で埋める)。本 ADR (2026-07-08-1020) 自身の decisions は grandfathered ではない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D2"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/adr.md",
+          "anchor": "grandfathered 用途"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "派生ビュー (`track/registry.md` / 各 track の `spec.md` / `plan.md` / `contract-map.md`) の生成経路・schema・生成タイミング・出力形式のいずれも本 track で変更しない。既存機構 (`bin/sotp track views sync` 等) がそのまま動作し、track の overlay 側の削除に伴う drift もこれらのビューには波及しないことを最終形として保証する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "IN-09 の retention 機構は「存在ベース検査」で構成する。廃止識別子・ファイルパスの再出現、および live surface の同一行に TODO マーカー (本 spec では M トークンと呼び、ASCII 4 文字 `TODO` の直後に半角コロン U+003A を連接した 5 バイト列と定義する) と readiness / blocking gate 語 (`block`, `blocked`, `unresolved`, `ready`, `readiness`, `implementation`, `start`, `gate`, `proceed`, `pass`, `fail`, `実装を開始`, `準備完了`, `ブロック`) が併存する記述の再出現を、ファイル内容の存在有無から検出する。M トークンを状態フィールドとして読み取る別 mechanism は持たせない (「マーカーの不在＝内容の正しさ」の飛躍を再導入しない)。人工的な状態フィールドを新設しないこと、および fail-closed 系の CI gate として構成することを要件とする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D4"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+          "anchor": "Rules"
+        },
+        {
+          "file": "knowledge/conventions/enforce-by-mechanism.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "IN-04 の README への吸収は「置き換え」であって「新設の Vision セクション追加」ではない。現行 README の onboarding は `/adr:add <slug>` → `/track:adr2pr` を正規フローとして提示済みであり、この構造を維持したまま product.md 由来の読者向け情報を必要最小限で織り込む。「最初に埋める placeholder」概念を README に持ち込まない (ADR Neutral: pre-track ADR 姿勢に一貫させる)。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D2"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/pre-track-adr-authoring.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "CN-07",
+      "text": "本 track は新規の状態フィールド (`Status` / `approved_at` / TODO マーカー再導入 等) や事前承認ステップを新設しない。廃止対象の完成 gate は既存の (a) 信号評価 (spec/ADR/catalogue/impl の整合)、(b) `cargo make ci` の binary gate、(c) IN-09 で導入する再出現検知 gate、および (d) reviewer capability の zero_findings review、の 4 系のみで構成する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D1"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+          "anchor": "Rules"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "`Makefile.toml` の tasks セクションに `[tasks.verify-tech-stack]` および `[tasks.verify-tech-stack-local]` が存在しない。かつ `[tasks.ci-local]` と `[tasks.ci-container]` の `dependencies` 配列に `verify-tech-stack-local` が含まれない。同ファイルに対する文字列検索 (`verify-tech-stack` / `verify_tech_stack`) が 0 件。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "CLI 実装から tech-stack サブコマンドが除去されている: `sotp verify --help` の subcommand 列挙に `tech-stack` が現れない。`sotp verify tech-stack --project-root .` を invoke すると clap の unknown subcommand error で非ゼロ exit する (成功 exit 0 で通過することがない)。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "Rust 層の tech-stack 関連定義がすべて除去されている: `libs/domain/**`, `libs/usecase/**`, `libs/infrastructure/**`, `apps/cli/**`, `apps/cli-driver/**`, `apps/cli-composition/**` を対象に、識別子 `VerifyCommand::TechStack`, `VerifyInput::TechStack`, `verify_tech_stack`, `TECH_STACK_FILE`, および module 参照 `verify::tech_stack` / `pub mod tech_stack;` の live source (テストコード含む) での出現が 0 件。`cargo build --all` および `cargo make test` が pass する状態でこの 0 件を満たす (dead code 由来のコンパイル error / warning を残さない)。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "`track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md` の 3 ファイルが repository に存在しない。検証は (a) `git ls-files track/tech-stack.md track/product.md track/product-guidelines.md` の出力が空、(b) filesystem レベルでも該当 3 path が存在しない、(c) `git ls-files` で得た tracked Markdown path の basename が `tech-stack.md`, `product.md`, `product-guidelines.md` のいずれかに等しい path、または basename に `tech-stack`, `product`, `product-guidelines` のいずれかと `copy` / `backup` / `archive` / `legacy` / `old` / `retained` / `removed` のいずれかを同時に含む retention path が 0 件、(d) merge target 側の該当 3 ファイルの blob hash と同一内容の tracked file が HEAD 側に 0 件、の 4 条件で判定する。IN-03 / IN-04 による ADR / README への内容吸収は full-file copy ではないため (c)(d) の retention copy 判定対象外とする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "IN-03 の ADR 昇格経路が実施済み。方針 (a) 既存 ADR integrate なら該当 ADR の diff / commit、方針 (b) 集約 ADR 新設なら新規 ADR ファイルが `knowledge/adr/YYYY-MM-DD-HHMM-<slug>.md` として存在し、YAML front-matter (`adr_id` + `decisions[]`) が `adr.md` schema に整合する。かつ `bin/sotp signal check-adr-user` (adr_user chain の verify) がすべての新規/更新 ADR について pass する (grandfathered=true 使用箇所を含めて 🔴 が 0 件)。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D2"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/adr.md",
+          "anchor": "Schema"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "`CLAUDE.md` の掃討: (a) Source of Truth map テーブル (`## Source of Truth map`) に `Tech stack decisions` 行が含まれない、(b) Hard invariants セクションに `track/tech-stack.md` および TODO マーカー (`TODO` の直後に半角コロンを付した 5 バイト列) による実装ブロックに相当する箇条 (現行文言の `Implementation is blocked while` で始まる Hard invariant 行) が含まれない。同ファイル全体で文字列 `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md`, `verify tech-stack`, `verify-tech-stack` が 0 件。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "`.claude/rules/01-language.md`, `.claude/rules/07-dev-environment.md`, `.claude/rules/08-orchestration.md`, `.claude/rules/09-maintainer-checklist.md`, `.claude/rules/10-guardrails.md` の 5 ファイルで、文字列 `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md`, `track/product*.md`, `verify tech-stack`, `verify-tech-stack` の出現が 0 件。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "`.harness/workflows/track/init.md`, `.harness/workflows/track/plan.md`, `.claude/commands/track/catchup.md`, `.claude/commands/track/setup.md`, `.claude/commands/architecture-customizer.md` の 5 ファイルで、文字列 `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md`, `verify tech-stack`, `verify-tech-stack` の出現が 0 件、加えて TODO マーカー (`TODO` の直後に半角コロンを付した 5 バイト列) の未解決有無を確認せよ、と読者に指示する手順記述の出現が 0 件。`setup.md` の場合 `Strict tech-stack guardrails` 相当の記述も含めて除去されていること。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "`.harness/config/template-boundary.json` を JSON として parse したときの `entries` 配列に、`pattern` が `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md` に等しいエントリが 1 件も含まれない (0 件)。同ファイル内の他の overlay エントリの分類・順序・schema_version は保持する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "`knowledge/conventions/` 配下の live 運用ルール文書 (`README.md`, `hexagonal-architecture.md`, `testing.md`, `nightly-dev-tool.md`, `source-attribution.md` を最低限とし、grep で発覚する追加箇所も含む) から `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md` の出現が 0 件。source-attribution.md の Blue source 例 (`[source: track/tech-stack.md]` 等) は別の Blue source 例に差し替えられており、convention 文書の実例として廃止済み文書を掲げていない状態。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "IN-09 の retention 機構が CI ゲートとして稼働している。`cargo make ci` の実行内で、廃止対象識別子・ファイルパス、および TODO-marker state 表現の live surface (CN-01 / CN-05 定義) における出現有無をチェックするステップが実行される。TODO-marker state 表現は行単位で CN-05 で定義した M トークン (ASCII 4 文字 `TODO` の直後に半角コロン U+003A を連接した 5 バイト列) と CN-05 の readiness / blocking gate 語が同一行に併存するかを、順序の両方向 (M トークンが先 / gate 語が先) で判定する。同ステップが (a) 廃止識別子のいずれか (例: `verify-tech-stack`) を live surface のファイル 1 か所に人為的に注入した状態、(b) 英文 `Implementation is blocked while docs contain` の直後に半角スペース 1 つと M トークンを順に連結した 1 行 (最終 5 バイトが M トークンで終わる形) を live surface のファイル 1 か所に人為的に注入した状態、の双方で fail する negative test が本 track で用意されている (integration test / unit test / CI dry-run のいずれか)。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D4"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/enforce-by-mechanism.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "`cargo make ci` (fmt-check + clippy + test + deny + check-layers + verify-* + template-export-smoke + IN-09 で追加した retention gate) が exit 0 で pass する。撤去・ADR 昇格・README 吸収・掃討・掃討検知 gate 追加の総合結果として、既存の他 gate に regression が発生していない状態を要件とする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-13",
+      "text": "派生ビューが影響を受けていない: `bin/sotp track views sync` の再実行が非ゼロ exit を起こさず、`track/registry.md` および任意の既存 track の `spec.md` / `plan.md` / `contract-map.md` の生成が引き続き成功する。生成物の schema (フィールド構成) と生成タイミングに本 track 由来の変更が加わっていない (D3 の out-of-scope 遵守)。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-14",
+      "text": "`README.md` に `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md`, `verify tech-stack`, `verify-tech-stack` の出現が 0 件であり、TODO マーカー (`TODO` の直後に半角コロンを付した 5 バイト列) を読者に埋めさせる onboarding 記述が含まれない。加えて `rg -n '^#{1,3} .*(Product Overview|Product Name|Vision|Target Users|Core Features|Success Criteria|Stakeholders|Out of Scope|Placeholder|TODO)' README.md` が 0 件である。IN-04 の保持必須情報は、`README.md` に対する完全一致検索で `SoTOHE-core`, `SoT（真実の源泉）指向のRust開発向けハーネスの核となるCLIを提供する`, `Rust で中〜大規模プロジェクトを開発するチーム`, `track ワークフロー管理 CLI`, `メタデータ駆動の状態遷移エンジン`, `CI 連携バリデーション` が各 1 件以上存在することで判定する。配置は final-state の `README.md` だけから判定し、各保持必須情報の出現行について直前の ATX heading (`^#{1,3} `) が既存 heading (`# SoTOHE-core`, `## 価値：SoT Chain とは何か`, `## 前提条件`, `## はじめ方`) のいずれかであることを markdown parser または同等の line scanner で確認する。`git diff` の hunk context には依存しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/no-upstream-restatement.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/enforce-by-mechanism.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/adr.md",
+      "anchor": "Rule"
+    },
+    {
+      "file": "knowledge/conventions/no-backward-compat.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/responsibility-boundary.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    },
+    {
+      "file": "knowledge/conventions/review-protocol.md",
+      "anchor": "Rules"
+    }
+  ],
+  "signals": {
+    "blue": 40,
+    "yellow": 0,
+    "red": 0
+  }
+}

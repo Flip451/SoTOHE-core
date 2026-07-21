@@ -110,7 +110,8 @@ impl TaskContractDriver {
                 Ok(l) => Some(l),
                 Err(ValidationError::InvalidLayerId(v)) => {
                     return CommandOutcome::failure(Some(format!(
-                        "invalid layer '{v}': must be a non-empty ASCII identifier"
+                        "invalid layer '{}': must be a non-empty ASCII identifier",
+                        v.as_str()
                     )));
                 }
                 Err(e) => {
@@ -214,20 +215,25 @@ fn render_check_violations(violations: &[PreReviewGateViolation]) -> String {
     // suggestion when the liveness gate is Blocked. Soft only — no exit-code
     // change, no PreToolUse hook, no lock-file mechanism (CN-06). The orchestrator
     // (`/track:full-cycle` / `/track:adr2pr`) sees the Blocked exit and this
-    // prompt and decides whether to invoke `/track:diagnose` or self-classify the
-    // root cause. The path reference is host-agnostic: the operational SSoT
+    // prompt and MUST invoke `/track:diagnose` before dispatching any writer or
+    // applying any fix; self-classifying the rollback target is disallowed. The
+    // path reference is host-agnostic: the operational SSoT
     // (`.harness/capabilities/rollback-diagnoser.md`) is read by both the Claude
     // and Codex hosts when the `rollback-diagnoser` capability is dispatched.
     lines.push(String::new());
     lines.push(
-        "Suggest: run `/track:diagnose` with the violations above as diagnostic input to \
-         identify whether the rollback target is `adr` / `spec` / `type` / `impl_plan` / `impl`. \
-         The slash command spec lives at `.claude/commands/track/diagnose.md` (Claude host) and \
-         the provider-agnostic operational SSoT (routing taxonomy / output contract) lives at \
-         `.harness/capabilities/rollback-diagnoser.md` (read by both Claude and Codex hosts). \
-         The orchestrator dispatches the corresponding writer (adr-editor / spec-designer / \
-         type-designer / impl-planner) or applies a source fix; `/track:diagnose` is \
-         diagnose-only."
+        "YOU MUST run `/track:diagnose` with the violations above as diagnostic input \
+         BEFORE dispatching any writer (type-designer / spec-designer / adr-editor / \
+         impl-planner) or applying any source fix. Do NOT self-diagnose the rollback \
+         target — the routing decision (adr / spec / type / impl_plan / impl) belongs \
+         to the rollback-diagnoser, not to the orchestrator's judgment. The slash \
+         command spec lives at `.claude/commands/track/diagnose.md` (Claude host) and \
+         the provider-agnostic operational SSoT (routing taxonomy / output contract) \
+         lives at `.harness/capabilities/rollback-diagnoser.md` (read by both Claude \
+         and Codex hosts). The orchestrator dispatches the corresponding writer \
+         (adr-editor / spec-designer / type-designer / impl-planner) or applies a \
+         source fix ONLY AFTER receiving the diagnoser's structured verdict; \
+         `/track:diagnose` is diagnose-only."
             .to_owned(),
     );
 

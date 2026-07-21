@@ -6,8 +6,10 @@
 
 use std::path::PathBuf;
 
+use domain::tddd::type_signals_doc::CatalogueDeclarationHash;
 use domain::verify::{VerifyFinding, VerifyOutcome};
 use domain::{CatalogueSpecSignalsDocument, ContentHash, Strictness, check_catalogue_spec_signals};
+use usecase::catalogue_traversal::iter_catalogue_entries;
 
 use crate::tddd::catalogue_document_codec::CatalogueDocumentCodec;
 use crate::tddd::catalogue_spec_signals_codec;
@@ -133,13 +135,18 @@ impl CatalogueVerifyContext {
 }
 
 struct CatalogueEntryKey {
-    section: &'static str,
+    section: String,
+    entry_key: String,
     name: String,
 }
 
 impl CatalogueEntryKey {
-    fn new(section: &'static str, name: impl Into<String>) -> Self {
-        Self { section, name: name.into() }
+    fn new(
+        section: impl Into<String>,
+        entry_key: impl Into<String>,
+        name: impl Into<String>,
+    ) -> Self {
+        Self { section: section.into(), entry_key: entry_key.into(), name: name.into() }
     }
 }
 
@@ -156,8 +163,9 @@ fn catalogue_spec_signal_freshness_findings(
     doc: &CatalogueSpecSignalsDocument,
 ) -> Vec<VerifyFinding> {
     let mut findings = Vec::new();
+    let declaration_hash = type_signals_codec::declaration_hash(catalogue_text.as_bytes());
     let current_catalogue_hash = match content_hash_from_hex(
-        type_signals_codec::declaration_hash(catalogue_text.as_bytes()),
+        declaration_hash.as_digest().as_str().to_owned(),
         "catalogue declaration hash",
     ) {
         Ok(hash) => hash,
@@ -175,7 +183,7 @@ fn catalogue_spec_signal_freshness_findings(
 
     for (entry, signal) in entries.iter().zip(doc.signals.iter()) {
         let current_entry_hash =
-            match compute_catalogue_entry_hash(catalogue_text, entry.section, &entry.name) {
+            match compute_catalogue_entry_hash(catalogue_text, &entry.section, &entry.entry_key) {
                 Ok(hash) => hash,
                 Err(e) => {
                     findings.push(VerifyFinding::error(format!(
@@ -203,7 +211,7 @@ fn catalogue_spec_signal_freshness_findings(
 /// Exposed for integration tests in other crates that need to build fresh
 /// `catalogue-spec-signals.json` fixtures without going through the full
 /// refresher pipeline.
-pub fn compute_catalogue_declaration_hash(catalogue_bytes: &[u8]) -> String {
+pub fn compute_catalogue_declaration_hash(catalogue_bytes: &[u8]) -> CatalogueDeclarationHash {
     type_signals_codec::declaration_hash(catalogue_bytes)
 }
 
@@ -534,18 +542,16 @@ fn read_and_decode_catalogue(
             ))]));
         }
     };
-    let catalogue_entries: Vec<CatalogueEntryKey> = catalogue_doc
-        .types
-        .keys()
-        .map(|k| CatalogueEntryKey::new("types", k.as_str()))
-        .chain(catalogue_doc.traits.keys().map(|k| CatalogueEntryKey::new("traits", k.as_str())))
-        .chain(
-            catalogue_doc
-                .functions
-                .keys()
-                .map(|k| CatalogueEntryKey::new("functions", k.to_string())),
-        )
-        .collect();
+    let mut catalogue_entries = Vec::new();
+    for entry in iter_catalogue_entries(&catalogue_doc) {
+        let (section, entry_key) = entry.section_key.split_once(':').ok_or_else(|| {
+            VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "internal: malformed catalogue section key '{}'",
+                entry.section_key
+            ))])
+        })?;
+        catalogue_entries.push(CatalogueEntryKey::new(section, entry_key, entry.key));
+    }
     Ok((catalogue_entries, catalogue_text))
 }
 
@@ -564,7 +570,7 @@ pub fn execute_catalogue_spec_signals_check(
 ) -> VerifyOutcome {
     use std::sync::Arc;
 
-    use crate::git_cli::{GitRepository, resolve_repo_path};
+    use crate::git_cli::resolve_repo_path;
     use usecase::track_resolution::{ActiveTrackResolveInteractor, ActiveTrackResolveService};
 
     let repo = match crate::git_cli::SystemGitRepo::discover() {
@@ -644,6 +650,28 @@ mod tests {
   "functions": {}
 }"#;
 
+    const V3_CATALOGUE_ONE_TYPE_DECLARATION_HASH: &str =
+        "9581aecfa9c6f4d6da15ff8f51379f1d68dec6f2cf0b5eecffccec0e7968c5f9";
+
+    /// Minimal valid v3 domain catalogue with a single type deletion tombstone.
+    const V3_CATALOGUE_DELETE_TYPE: &str = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "RemovedType": {
+      "action": "delete",
+      "module_path": "old",
+      "spec_refs": [
+        { "file": "track/items/x/spec.json", "anchor": "IN-01" }
+      ],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
     /// Builds a `domain-catalogue-spec-signals.json` fixture referencing the given `type_name`
     /// with a Blue signal.
     ///
@@ -667,6 +695,9 @@ mod tests {
 
     fn declaration_hash_for(catalogue_content: &str) -> String {
         type_signals_codec::declaration_hash(catalogue_content.as_bytes())
+            .as_digest()
+            .as_str()
+            .to_owned()
     }
 
     fn entry_hash_for(catalogue_content: &str, section: &str, entry_key: &str) -> String {
@@ -679,6 +710,14 @@ mod tests {
             "MyType",
             &declaration_hash_for(V3_CATALOGUE_ONE_TYPE),
             &entry_hash_for(V3_CATALOGUE_ONE_TYPE, "types", "MyType"),
+        )
+    }
+
+    fn signals_referencing_deleted_type() -> String {
+        signals_referencing_type(
+            "RemovedType",
+            &declaration_hash_for(V3_CATALOGUE_DELETE_TYPE),
+            &entry_hash_for(V3_CATALOGUE_DELETE_TYPE, "types", "RemovedType"),
         )
     }
 
@@ -697,15 +736,31 @@ mod tests {
     }
 
     #[test]
-    fn test_compute_catalogue_declaration_hash_valid_catalogue_matches_declaration_hash() {
+    fn test_compute_catalogue_declaration_hash_known_catalogue_matches_recorded_snapshot_and_changed_byte_recomputes()
+     {
         let hash = compute_catalogue_declaration_hash(V3_CATALOGUE_ONE_TYPE.as_bytes());
+        assert_eq!(hash.as_digest().as_str(), V3_CATALOGUE_ONE_TYPE_DECLARATION_HASH);
 
-        assert_eq!(hash, declaration_hash_for(V3_CATALOGUE_ONE_TYPE));
-        assert_eq!(hash.len(), 64, "declaration hash must be lowercase hex SHA-256");
-        assert!(
-            hash.chars().all(|c| c.is_ascii_hexdigit() && !c.is_ascii_uppercase()),
-            "declaration hash must be lowercase hex: {hash}"
+        let signals_fixture = signals_referencing_type(
+            "MyType",
+            V3_CATALOGUE_ONE_TYPE_DECLARATION_HASH,
+            &entry_hash_for(V3_CATALOGUE_ONE_TYPE, "types", "MyType"),
         );
+        let recorded_signals = catalogue_spec_signals_codec::decode(&signals_fixture).unwrap();
+        assert_eq!(
+            hash.as_digest().as_str(),
+            recorded_signals.catalogue_declaration_hash.to_hex(),
+            "the catalogue hash must agree with the recorded signal-artifact snapshot"
+        );
+
+        let mut changed_catalogue = V3_CATALOGUE_ONE_TYPE.as_bytes().to_vec();
+        let changed_byte_index = changed_catalogue
+            .iter()
+            .position(|byte| *byte == b'M')
+            .expect("fixture must contain the MyType declaration");
+        changed_catalogue[changed_byte_index] = b'N';
+        let changed_hash = compute_catalogue_declaration_hash(&changed_catalogue);
+        assert_ne!(hash, changed_hash, "a catalogue-byte change must recompute the hash");
     }
 
     #[test]
@@ -813,6 +868,26 @@ mod tests {
         assert!(
             outcome.findings().is_empty(),
             "valid fresh catalogue-spec signals must pass: {:?}",
+            outcome.findings()
+        );
+    }
+
+    #[test]
+    fn test_delete_tombstone_with_valid_signal_counts_as_catalogue_entry() {
+        let tmp = tempfile::TempDir::new().unwrap();
+        let (items_dir, track_id) = setup_workspace(
+            tmp.path(),
+            "my-track-2026-01-01",
+            V3_CATALOGUE_DELETE_TYPE,
+            &signals_referencing_deleted_type(),
+        );
+
+        let outcome =
+            execute_catalogue_spec_signals(items_dir, track_id, tmp.path().to_path_buf(), false);
+
+        assert!(
+            outcome.findings().is_empty(),
+            "delete tombstone must be covered by matching catalogue-spec signal: {:?}",
             outcome.findings()
         );
     }

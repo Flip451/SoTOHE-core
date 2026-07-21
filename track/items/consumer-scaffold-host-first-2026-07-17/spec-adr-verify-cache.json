@@ -1,0 +1,971 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "f4389fadf8f7e32e1e4a1887b667924a65f5ff4a04ea51523bedc24ac9dad353",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存ファイルからの剪定ではなく、ゼロベースで積み上げる。採録基準は「workflow logic SSoT（`.harness/workflows/`）・capability 仕様 SSoT（`.harness/capabilities/`）・briefing 面（`.harness/briefings/`・`.harness/custom/review-prompts/`）・process 強制（`.githooks/`）・配布される CI 定義・workflow SSoT を持たない utility command の command-local 定義・sotp バイナリの案内文、のいずれかから参照されるタスク + その推移的必要」のみ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "配布 scaffold の Makefile を、workflow に必要なオーケストレーションだけから構成され、ソースリポジトリの Makefile と手動同期を要しない状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "f4389fadf8f7e32e1e4a1887b667924a65f5ff4a04ea51523bedc24ac9dad353",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Makefile タスクとして残す機構的基準を次の 2 つに限定する:"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "配布 scaffold の Makefile を、workflow に必要なオーケストレーションだけから構成され、ソースリポジトリの Makefile と手動同期を要しない状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "c52dfef1c141f48f8fc6d28e9e18a1e646fde1e8fbfc092c44ef2df1254d4ea7",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "配布 scaffold の品質ゲート（fmt チェック・clippy・test・deny・`bin/sotp verify` 群）はホスト toolchain で直接実行する。Docker は配布物の前提条件から外れる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "配布 scaffold の既定品質ゲートを Docker 非必須の host-first 実行にし、必要な利用者には同じ workflow 契約を保つ Docker 選択肢を提供する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "c52dfef1c141f48f8fc6d28e9e18a1e646fde1e8fbfc092c44ef2df1254d4ea7",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`Makefile.toml` — 本体。...環境依存部を取り込む `extend` を 1 行だけ置く（既定の参照先は `Makefile.host.toml`）"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "配布 scaffold の既定品質ゲートを Docker 非必須の host-first 実行にし、必要な利用者には同じ workflow 契約を保つ Docker 選択肢を提供する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "c4849c97b9503cc6b2ba2988f41ad984662bce424c678e08b86a9c6599c68513",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`rust-toolchain.toml` を配布物に含め、rustc / clippy / rustfmt のバージョンを固定する（rustup が自動強制する）\n- cargo-nextest / cargo-deny 等の補助ツールは bootstrap が pinned バージョンを `--locked` でインストールし、CI（D7）も同じ pin を使う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "配布 scaffold を、固定 Rust toolchain と補助ツール、CI での再現可能な sotp 調達、および個人環境への非依存により、採用直後から再現可能にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "c4849c97b9503cc6b2ba2988f41ad984662bce424c678e08b86a9c6599c68513",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "### D6: 開発者個人の環境依存と未使用の変数規約を配布物から排除する\n\n- レビュー系タスクの `asdf which codex` 参照を廃し、`CODEX_BIN` が未設定の場合は `command -v codex` のみにフォールバックする"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "配布 scaffold を、固定 Rust toolchain と補助ツール、CI での再現可能な sotp 調達、および個人環境への非依存により、採用直後から再現可能にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "c4849c97b9503cc6b2ba2988f41ad984662bce424c678e08b86a9c6599c68513",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "配布される CI 定義はコンテナ（docker exec）前提をやめ、ホストランナー上で D4 の固定 toolchain を用いて同じゲート集約を実行する形に書き換える。`bin/sotp` は gitignore 対象でクローンに存在しないため、CI 内では `install-sotp`（pinned tag からの取得）で調達する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "配布 scaffold を、固定 Rust toolchain と補助ツール、CI での再現可能な sotp 調達、および個人環境への非依存により、採用直後から再現可能にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "993f9ad26e0f70e6c188d5f7df442619787d2cc8ac9bc085ba81250b165545aa",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存ファイルからの剪定ではなく、ゼロベースで積み上げる。採録基準は「workflow logic SSoT（`.harness/workflows/`）・capability 仕様 SSoT（`.harness/capabilities/`）・briefing 面（`.harness/briefings/`・`.harness/custom/review-prompts/`）・process 強制（`.githooks/`）・配布される CI 定義・workflow SSoT を持たない utility command の command-local 定義・sotp バイナリの案内文、のいずれかから参照されるタスク + その推移的必要」のみ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "配布用 overlay Makefile を、workflow / capability / briefing / process enforcement / 配布 CI / utility command / sotp 案内文から参照されるタスクとその推移的な必要タスクだけでゼロベース再構成する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "238a34733f162b808cd63279c8af704825f74bfa5de94ef7d2c44fd0182dd258",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "単発で `bin/sotp <sub>` を呼ぶだけのラッパー（staging・sync・ブランチ操作・PR 操作・note 操作など約 10 タスク）は廃止し、ワークフロー定義面が `bin/sotp git/pr/track <sub>` を直接呼ぶ形に共同更新する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "配布 workflow 面を、集約ゲートの `cargo make <task>` と単発操作の `bin/sotp <sub>` の呼び出し規約へ共同更新し、単発 passthrough Makefile wrapper を除去する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "238a34733f162b808cd63279c8af704825f74bfa5de94ef7d2c44fd0182dd258",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ワークフロー定義面の呼び出しは「ゲート集約の `cargo make <task>`」と「単発の `bin/sotp <sub>`」の 2 種に正規化し、**同名タスクの実行環境（ホスト直実行か docker 経由か）は各リポジトリの Makefile が決める**。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "配布 workflow 面を、集約ゲートの `cargo make <task>` と単発操作の `bin/sotp <sub>` の呼び出し規約へ共同更新し、単発 passthrough Makefile wrapper を除去する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "5ce4319535870ec5042ef55831d317770e570d3e1f885aa2fd8075d90db4de4c",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "配布 scaffold の品質ゲート（fmt チェック・clippy・test・deny・`bin/sotp verify` 群）はホスト toolchain で直接実行する。Docker は配布物の前提条件から外れる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "配布 scaffold の既定品質ゲートを host toolchain で直接実行する経路へ変更し、Docker を採用前提から外す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "c5c5b8efe3fe08099a56804e9dc400d8556cfdaee2889bfa25747a78cd276399",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "配布 Makefile を「共通部」と「環境依存部」に分離する:"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "共通の配布 Makefile と対称な host / Docker 環境ファイルを整備し、環境選択を共通部の extend 参照先だけで切り替えられるようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "2b26c2edf736947e897cd578f78c68ef38a03aa390cf91063a12904795e09640",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`rust-toolchain.toml` を配布物に含め、rustc / clippy / rustfmt のバージョンを固定する（rustup が自動強制する）\n- cargo-nextest / cargo-deny 等の補助ツールは bootstrap が pinned バージョンを `--locked` でインストールし、CI（D7）も同じ pin を使う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "配布物の Rust toolchain 固定、bootstrap による補助ツールの固定版導入、および同じ pin を用いる CI 経路を整備する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5e8639986659eb56efcd7f3b8bf535de050a03b3bc49bedd42271b95f679559",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "配布される CI 定義はコンテナ（docker exec）前提をやめ、ホストランナー上で D4 の固定 toolchain を用いて同じゲート集約を実行する形に書き換える。`bin/sotp` は gitignore 対象でクローンに存在しないため、CI 内では `install-sotp`（pinned tag からの取得）で調達する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "配布 CI を host runner 上で動作する形へ変更し、CI 内で pinned tag の install-sotp により sotp を調達する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "480e0ac7f6de419574808bd1507885a504ddbe676c84940cc79f7b5c3f659e2f",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp track views validate` を実行する 3 タスク（plan-progress / track-metadata / track-registry 名義）を、ワークフローが参照している名前（track-metadata 名義）の 1 本に統合し"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "bin/sotp track views validate を重複実行する配布 task を、track views 全体を検証する track-metadata 名義の一つの task に統合する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "07ce5bfbd50b8f288a7d41ef7b5cce79315c98a028c5650f7326e9ec4fe85b3b",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "どこからも設定されない `WORKER_ID` 分岐を廃し、並列分離は既存文書と compose 定義が使う `CARGO_TARGET_DIR_RELATIVE` に一本化する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "配布面から個人環境に結び付く review 実行探索と未設定の worker 分岐を除去し、Docker 時の並列分離を CARGO_TARGET_DIR_RELATIVE に一本化する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "c15d8630a235962f29da2b1dabe0c21c77d55d958ac7ede1b6f55ed499446d8c",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "配布文書のみが参照するタスク・参照ゼロのタスクは採録せず、文書側を共同更新する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "配布文書を採録後の task 集合へ共同更新し、配布文書だけが参照する task を配布 Makefile に残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "74633bb17e4c8bdb781a1010762be1201b57ec4f5075619524bcf2ea29de85ad",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "SoTOHE 本体は従来どおり docker compose による隔離実行を維持する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "SoTOHE 本体リポジトリの Makefile 実行モデル、docker-first 方針、コンテナ内ビルド、または ci-container 構成の変更。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "f144753a3234c545f76480f888531c02465cb0c65b954df654ebdb83d3573ab8",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "配布 scaffold の品質ゲート（fmt チェック・clippy・test・deny・`bin/sotp verify` 群）はホスト toolchain で直接実行する。Docker は配布物の前提条件から外れる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "配布 scaffold で Docker を既定または必須の実行環境として維持すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "f8ba205bed878b37d75e1b41c1bd18d8ab976ed82e7b69ce2ffcb605e82eac44",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`Makefile.docker.toml` — 同名ゲートの docker 実行定義（compose から cargo を直接呼ぶ。コンテナ内に二段目の cargo make 層は設けない）。`Makefile.host.toml` と対称な peer であり、相互に依存しない"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "共通 Makefile を複製した完全独立の Docker 用 Makefile を配布すること、または host 用環境ファイルを継承する非対称な patch 構成。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "c45607215cb0542350bc0921aba31a4be3716a61fb27d1af6146cb732777225b",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "バイナリの git コミットは採らない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "配布物へ sotp バイナリを Git 管理下の成果物として commit すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "0ea6749fa92acb1fa9770175d08c271f196c64349ba28d7f75148f5d48b2253f",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "専用の preflight 検査機構は設けない。ドリフト起因のゲート問題が実際に観測された場合に再評価する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-05",
+          "text_label": "toolchain または補助ツールのドリフトだけを事前に検査する専用 preflight 機構の導入。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "9bc399b934f2a281da02280a9825602cbf7f35f5c37f6c3af56d07a2ade1f103",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "採録基準は「workflow logic SSoT（`.harness/workflows/`）・capability 仕様 SSoT（`.harness/capabilities/`）・briefing 面（`.harness/briefings/`・`.harness/custom/review-prompts/`）・process 強制（`.githooks/`）・配布される CI 定義・workflow SSoT を持たない utility command の command-local 定義・sotp バイナリの案内文、のいずれかから参照されるタスク + その推移的必要」のみ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "配布 Makefile の task 採録は workflow で必要なオーケストレーションとその構成員に限定し、単発の bin/sotp passthrough を残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "9bc399b934f2a281da02280a9825602cbf7f35f5c37f6c3af56d07a2ade1f103",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Makefile タスクとして残す機構的基準を次の 2 つに限定する:"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "配布 Makefile の task 採録は workflow で必要なオーケストレーションとその構成員に限定し、単発の bin/sotp passthrough を残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "67f6fb2a1121e7cdb7e63679c22856bf418e57b9057193f0db15ba55f56c2498",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ワークフロー定義面の呼び出しは「ゲート集約の `cargo make <task>`」と「単発の `bin/sotp <sub>`」の 2 種に正規化し、**同名タスクの実行環境（ホスト直実行か docker 経由か）は各リポジトリの Makefile が決める**。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "共有 workflow 面は、集約ゲートを cargo make、単発操作を bin/sotp とする呼び出し契約を守り、同名ゲートの実行環境は各リポジトリの Makefile が決める。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "0872cf37e903e624c18e74a88fa185cad262492022c01ca3b3c2efd8351e265a",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cargo-nextest / cargo-deny 等の補助ツールは bootstrap が pinned バージョンを `--locked` でインストールし、CI（D7）も同じ pin を使う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "host-first の再現性は固定 Rust toolchain と bootstrap / CI の locked かつ pinned な補助ツール調達で担保し、専用 preflight は導入しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6e229daf32c00c4331802f1ab8e80524d82313b58fdf79c61481693d30c9121",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`Makefile.toml` — 本体。オーケストレーション・`bin/sotp` 系ゲート・CI 集約の依存列などの環境非依存タスクをすべて持ち、環境依存部を取り込む `extend` を 1 行だけ置く（既定の参照先は `Makefile.host.toml`）"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "環境依存ゲートだけを host と Docker の対称な peer 環境ファイルへ分離し、共通部と環境部で task 名を重複させず、Docker 選択時も bin/sotp 系ゲートは host 実行に保つ。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "a7bc499f6398ce1c1efbadc86e0c5703dc4c13b3a6b4e51291b777d63fc68c02",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "レビュー系タスクの `asdf which codex` 参照を廃し、`CODEX_BIN` が未設定の場合は `command -v codex` のみにフォールバックする\n- どこからも設定されない `WORKER_ID` 分岐を廃し、並列分離は既存文書と compose 定義が使う `CARGO_TARGET_DIR_RELATIVE` に一本化する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "review 実行用の Codex 解決は CODEX_BIN または command -v codex に限り、未設定の WORKER_ID 分岐は置かず、Docker 時の並列分離は CARGO_TARGET_DIR_RELATIVE に一本化する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "e980594ef15c74d6480f33af94803bf57dc397777e1ecbaa7e188e92058db81b",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「配布文書のみが参照するタスク・参照ゼロのタスクは採録せず、文書側を共同更新する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "配布文書は削除済み task や Docker 必須という旧前提を参照せず、実行機構の挙動を重複した SSoT として維持しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e980594ef15c74d6480f33af94803bf57dc397777e1ecbaa7e188e92058db81b",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "配布 scaffold の品質ゲート（fmt チェック・clippy・test・deny・`bin/sotp verify` 群）はホスト toolchain で直接実行する。Docker は配布物の前提条件から外れる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "配布文書は削除済み task や Docker 必須という旧前提を参照せず、実行機構の挙動を重複した SSoT として維持しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "20a7cd5e5461c127e7f2c29a55bfcdc7431a002e23106523adb1dbc7dc24552a",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存ファイルからの剪定ではなく、ゼロベースで積み上げる。採録基準は「workflow logic SSoT（`.harness/workflows/`）・capability 仕様 SSoT（`.harness/capabilities/`）・briefing 面（`.harness/briefings/`・`.harness/custom/review-prompts/`）・process 強制（`.githooks/`）・配布される CI 定義・workflow SSoT を持たない utility command の command-local 定義・sotp バイナリの案内文、のいずれかから参照されるタスク + その推移的必要」のみ。配布文書のみが参照するタスク・参照ゼロのタスクは採録せず、文書側を共同更新する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "export される Makefile の task 集合は、定義済みの workflow 参照面から必要とされる task とその推移的な依存だけで構成され、配布文書だけが参照する task と参照のない task を含まず、その生成または更新にソースリポジトリの Makefile の読取り、複製、手動同期を必要としない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "946ced0c41540f7de67938582c3cd7e700712ce345b5569cad51762f9f05ec7e",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "単発で `bin/sotp <sub>` を呼ぶだけのラッパー（staging・sync・ブランチ操作・PR 操作・note 操作など約 10 タスク）は廃止し、ワークフロー定義面が `bin/sotp git/pr/track <sub>` を直接呼ぶ形に共同更新する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "workflow 面は単発の staging、sync、branch、PR、note などを bin/sotp へ直接委譲し、配布 Makefile は対応する単発 passthrough task を提供しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "87426d47fbc05a5f3cedebe7e68bfa251164ad36f9c201f6357d86ebff080956",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "配布 scaffold の品質ゲート（fmt チェック・clippy・test・deny・`bin/sotp verify` 群）はホスト toolchain で直接実行する。Docker は配布物の前提条件から外れる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "配布 scaffold の既定構成で、fmt check、clippy、test、deny、および bin/sotp verify 群を Docker なしの host toolchain で実行できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "7a547dbe87194d1b530fcb70a1f416f489e6a27be18506eb298d793bc50000c7",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "docker への切替は `Makefile.toml` の `extend` 参照先を `Makefile.docker.toml` に書き換える 1 行編集、復帰はその逆とする。タスク名の契約（D3）は不変で、切替時もワークフロー面・capability 面の変更は不要。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "Docker を選ぶ利用者は共通 Makefile の extend 参照先を host 用から Docker 用へ一行変更するだけで切り替えられ、切替前後で workflow 面と capability 面の呼び出しを変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "eacadb1523f1c09beb993fb1d0ec2f549b8b55cdf3d28905c7f2569cd52bd434",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`rust-toolchain.toml` を配布物に含め、rustc / clippy / rustfmt のバージョンを固定する（rustup が自動強制する）\n- cargo-nextest / cargo-deny 等の補助ツールは bootstrap が pinned バージョンを `--locked` でインストールし、CI（D7）も同じ pin を使う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "配布物に rust-toolchain.toml があり Rust toolchain が固定され、bootstrap と CI は cargo-nextest、cargo-deny などの補助ツールを同じ pinned version かつ --locked で導入する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "a9895b24c566c83c9a74410287b5349b8a94b2ecea3447fe16a6376c2e156328",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "配布される CI 定義はコンテナ（docker exec）前提をやめ、ホストランナー上で D4 の固定 toolchain を用いて同じゲート集約を実行する形に書き換える。`bin/sotp` は gitignore 対象でクローンに存在しないため、CI 内では `install-sotp`（pinned tag からの取得）で調達する。バイナリの git コミットは採らない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "配布 CI は host runner 上で固定 toolchain と既存のゲート集約を実行し、gitignore 対象の bin/sotp を commit せず、pinned tag の install-sotp で調達する。CI キャッシュは pinned tag に対応する取得済み sotp を再利用できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "4a91118fea95d2e5841d25d9a1128ad247e93f1813d5e56988090bfa9bd57c0c",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp track views validate` を実行する 3 タスク（plan-progress / track-metadata / track-registry 名義）を、ワークフローが参照している名前（track-metadata 名義）の 1 本に統合し、説明文を「track views 全体（metadata.json / plan.md / registry.md）の整合検証」に是正する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "track views 全体の整合検証は track-metadata 名義の一つの task として実行され、同じ bin/sotp track views validate を重複実行する task は残らない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "a0d0e65c740ca719ddeaebf3fa36c78fa33f8cb8ad5ae6ec8d7932043cc5d77d",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "レビュー系タスクの `asdf which codex` 参照を廃し、`CODEX_BIN` が未設定の場合は `command -v codex` のみにフォールバックする\n- どこからも設定されない `WORKER_ID` 分岐を廃し、並列分離は既存文書と compose 定義が使う `CARGO_TARGET_DIR_RELATIVE` に一本化する。対象の cache ディレクトリ準備タスクは、D8 の構成では docker 環境ファイル側にのみ置く"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "配布面の review 実行は asdf を参照せず、CODEX_BIN 未設定時には command -v codex を用いる。WORKER_ID 参照はなく、Docker 用の cache directory 準備は Docker 環境ファイルだけに置かれる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "bd7219c7a0b0b4ec4817d1f48c40107c40164f4c5b84f69e83111d2977c464f4",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存ファイルからの剪定ではなく、ゼロベースで積み上げる。…配布文書のみが参照するタスク・参照ゼロのタスクは採録せず、文書側を共同更新する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "配布文書は新しい host-first / Docker 任意の配布契約に整合し、削除した Makefile task または個人環境を前提とする説明を残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "bd7219c7a0b0b4ec4817d1f48c40107c40164f4c5b84f69e83111d2977c464f4",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存ファイルからの剪定ではなく、ゼロベースで積み上げる。…配布文書のみが参照するタスク・参照ゼロのタスクは採録せず、文書側を共同更新する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "配布文書は新しい host-first / Docker 任意の配布契約に整合し、削除した Makefile task または個人環境を前提とする説明を残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "bd7219c7a0b0b4ec4817d1f48c40107c40164f4c5b84f69e83111d2977c464f4",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "配布 scaffold の品質ゲート（fmt チェック・clippy・test・deny・`bin/sotp verify` 群）はホスト toolchain で直接実行する。Docker は配布物の前提条件から外れる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "配布文書は新しい host-first / Docker 任意の配布契約に整合し、削除した Makefile task または個人環境を前提とする説明を残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "bd7219c7a0b0b4ec4817d1f48c40107c40164f4c5b84f69e83111d2977c464f4",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "### D6: 開発者個人の環境依存と未使用の変数規約を配布物から排除する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "配布文書は新しい host-first / Docker 任意の配布契約に整合し、削除した Makefile task または個人環境を前提とする説明を残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D6"
+        }
+      }
+    }
+  ]
+}

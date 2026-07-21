@@ -1,5 +1,6 @@
 ---
 name: review-fix-lead
+sandbox: workspace-write
 description: Use this skill whenever you act as the review-fix-lead for a code/plan review scope in this repository (any task whose prompt assigns a scope, a round_type of fast or final, and a briefing file). Follows the canonical review + fix + re-review loop defined in the capability SSoT.
 ---
 
@@ -15,3 +16,9 @@ provider-agnostic contract for this capability. Do not duplicate it here.
 - The final line of your output MUST be exactly one of:
   `REVIEW_FIX_STATUS: completed` / `REVIEW_FIX_STATUS: blocked_cross_scope` /
   `REVIEW_FIX_STATUS: failed`.
+
+## Session resume conformance
+
+- If your dispatch is a resumed session (orchestrator opt-in continuation), follow the
+  "Session resume" section of the capability SSoT: check whether your upstream artifacts
+  changed since the prior session and re-read any that did before continuing.

@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "layer": "cli_driver",
+  "entries": [
+    {
+      "claim_hash": "d67fef13d4d84357274d11ab3e488c1c47579f5f9783dcbc36e1b0f4f93508da",
+      "evidence_hash": "0300bc9074068710b9c70164c31e56ac6e025371ced452feabb9f533c1688418",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現在ブランチを upstream から pull するだけの native subcommand `bin/sotp git sync` を新設する。switch は行わず branch 引数も取らない。sync 対象は常に「現在の git ブランチ」に固定し、`.harness/config/branch-strategy.json` や `metadata.json#branch_strategy_snapshot` を読まない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "GitInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "現在ブランチを upstream から pull するだけの native subcommand `bin/sotp git sync` を新設する。switch は行わず branch 引数も取らない。sync 対象は常に「現在の git ブランチ」に固定し、`.harness/config/branch-strategy.json` や `metadata.json#branch_strategy_snapshot` を読まない。branch 解決も config 読み取りも不要なプリミティブとすることで、snapshot 優先・global config 再読禁止の原則と構造的に衝突しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d67fef13d4d84357274d11ab3e488c1c47579f5f9783dcbc36e1b0f4f93508da",
+      "evidence_hash": "2901e6ccf173e2a5a7a37c5f296251b0ce6dba55c77df66b8b4c35feaabe8627",
+      "verdict": {
+        "kind": "pass",
+        "citation": "generic な switch+pull 合成 subcommand `bin/sotp git switch-and-pull` を廃止する。`apps/cli/src/commands/git.rs` の `SwitchAndPull` variant / `SwitchAndPullArgs` 型と、`apps/cli-composition/src/git.rs` の `git_switch_and_pull` / `git_switch_and_pull_in` / `git_switch_and_pull_impl` を削除する。deprecation shim / alias は残さず、呼び出し元は `track switch-base`（track 文脈）または `git sync`（現在ブランチ同期）へ置き換える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "GitInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "generic な switch+pull 合成 subcommand `bin/sotp git switch-and-pull` を廃止する。`apps/cli/src/commands/git.rs` の `SwitchAndPull` variant / `SwitchAndPullArgs` 型と、`apps/cli-composition/src/git.rs` の `git_switch_and_pull` / `git_switch_and_pull_in` / `git_switch_and_pull_impl` を削除する。deprecation shim / alias は残さず、呼び出し元は `track switch-base`（track 文脈）または `git sync`（現在ブランチ同期）へ置き換える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d67fef13d4d84357274d11ab3e488c1c47579f5f9783dcbc36e1b0f4f93508da",
+      "evidence_hash": "eb2130c58bbc83b0b8c30ce003a2ed1bff49d794eed6380666e33424de0cb601",
+      "verdict": {
+        "kind": "pass",
+        "citation": "switch_and_pull を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port ... に置き `bin/sotp git sync` の唯一の service API とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "GitInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "git workflow 操作の二重実装を解消する。usecase port `GitWorkflowService` → infrastructure adapter `FsGitWorkflowAdapter` → delivery `GitDriver` の既存 chain を正とし、production caller ゼロの dead code から唯一の live chain へ統合する。`GitCompositionRoot` の inline git method 群（Chain B）を削除し、`apps/cli` の git subcommand dispatch を配線済み `GitDriver` 経由にする。両系統に逐語重複している commit の fail-closed track-branch guard を単一箇所へ集約する。port method を再編し、`switch_and_pull` を trait から削除して sync（現在ブランチ pull 専用）と branch switch を分離した method として整備する。sync の command-facing 公開契約は usecase port（ADR 例示 `GitWorkflowService::sync_current_branch() -> Result<(), GitWorkflowError>`）に置き `bin/sotp git sync` の唯一の service API とする。`FsGitWorkflowAdapter` が D5 の infrastructure primitive（`SystemGitRepo::sync_current_branch` / `SyncError`）を `GitWorkflowError` へ写像し、`apps/cli` = parse + dispatch、`apps/cli-driver` = service 呼び出し + presentation 変換、`apps/cli-composition` = `GitDriver` への wiring のみ、と層責務を分ける。`track switch-base` は usecase 側 orchestration として「snapshot から base branch 解決 → branch switch service → sync service」を合成し、composition root に手順を置かない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d67fef13d4d84357274d11ab3e488c1c47579f5f9783dcbc36e1b0f4f93508da",
+      "evidence_hash": "cc548b4804ccc29d208eadafdca995b2e0d1c01c69166ada1d43352242ec1411",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`引数 parse と dispatch のみ`"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "GitInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "`apps/cli` の command module を引数 parse と dispatch のみを持つ thin bin とし、infrastructure の型・関数を直接参照しない。`apps/cli/src/commands/track/branch_ops.rs` の `rev-parse` 直埋めのような cli 層での git 判定を、usecase 経由（cli_driver の driver または usecase interactor の呼び出し）へ置き換え、cli → usecase 一本化を git 系にも徹底する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d67fef13d4d84357274d11ab3e488c1c47579f5f9783dcbc36e1b0f4f93508da",
+      "evidence_hash": "6dcb05ab98039e40275f2df635b0b5fd902259b633015952e37c66e2ba35e147",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`git sync` の pull は fast-forward only 固定とし、`--ff` / `--rebase` / `--no-ff` 等のフラグを追加しない。upstream 未設定 / divergence / worktree 未解決 のいずれも fail-closed とし、graceful skip / warning-only 継続を許容しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "GitInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "`git sync` の pull は fast-forward only 固定とし、`--ff` / `--rebase` / `--no-ff` 等のフラグを追加しない。upstream 未設定 / divergence / worktree 未解決 のいずれも fail-closed とし、graceful skip / warning-only 継続を許容しない。`switch-and-pull` が採っていた「pull 失敗を WARN で通過させ exit 0」挙動（`apps/cli-composition/src/git.rs::git_switch_and_pull_impl` の警告フォールバック）を新経路に持ち込まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d67fef13d4d84357274d11ab3e488c1c47579f5f9783dcbc36e1b0f4f93508da",
+      "evidence_hash": "68ef8bfee4963f79c6351f7f72b03473d9f60ad50cf93ca0bb8410d6026b699f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli` の command module は parse + dispatch に限定し、infrastructure の型・関数を直接参照しない。git 判定ロジックを cli 層に置かず、usecase / cli_driver 経由で呼ぶ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "GitInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "`apps/cli` の command module は parse + dispatch に限定し、infrastructure の型・関数を直接参照しない。git 判定ロジックを cli 層に置かず、usecase / cli_driver 経由で呼ぶ。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d67fef13d4d84357274d11ab3e488c1c47579f5f9783dcbc36e1b0f4f93508da",
+      "evidence_hash": "5030593340a9f3e7ff568e811bff0eee80645c6442cf73415d3198da94e19207",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track switch-base` および削除対象を除く既存 git subcommand の CLI 面（受け取る引数、stdout/stderr の内容と順序、exit code、fail-closed 挙動）を本 track で変更しない。内部 refactor / chain 統合が行われても、外部から観測可能な挙動を bit-equivalent に保つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "GitInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "`track switch-base` および削除対象を除く既存 git subcommand の CLI 面（受け取る引数、stdout/stderr の内容と順序、exit code、fail-closed 挙動）を本 track で変更しない。内部 refactor / chain 統合が行われても、外部から観測可能な挙動を bit-equivalent に保つ。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d67fef13d4d84357274d11ab3e488c1c47579f5f9783dcbc36e1b0f4f93508da",
+      "evidence_hash": "509fd1473af0dbd46648aabb43bb3c81f6c72665e0006d082c426a130c8af930",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp git sync` subcommand が存在し、引数なしで呼ぶと現在ブランチを upstream から fast-forward pull する。happy path（upstream 設定済み + ff-clean）のユニット / 統合テストが `cargo make test` で pass する。CLI `--help` の `git` サブコマンド一覧に `sync` が表示され、branch 引数を取らないことがヘルプに明示される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "GitInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`bin/sotp git sync` subcommand が存在し、引数なしで呼ぶと現在ブランチを upstream から fast-forward pull する。happy path（upstream 設定済み + ff-clean）のユニット / 統合テストが `cargo make test` で pass する。CLI `--help` の `git` サブコマンド一覧に `sync` が表示され、branch 引数を取らないことがヘルプに明示される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d67fef13d4d84357274d11ab3e488c1c47579f5f9783dcbc36e1b0f4f93508da",
+      "evidence_hash": "ec435e084353ed1e885fe4517e935454788643ca6a29cec5a8fee1824fc7a6f4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`apps/cli/src/commands/git.rs` に `SwitchAndPull` variant / `SwitchAndPullArgs` 型が存在せず、`apps/cli-composition/src/git.rs` に `git_switch_and_pull` / `git_switch_and_pull_in` / `git_switch_and_pull_impl` が存在しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/remote-sync-dedicated-command-2026-07-04/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "GitInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`apps/cli/src/commands/git.rs` に `SwitchAndPull` variant / `SwitchAndPullArgs` 型が存在せず、`apps/cli-composition/src/git.rs` に `git_switch_and_pull` / `git_switch_and_pull_in` / `git_switch_and_pull_impl` が存在しない。`cargo make ci` が pass し、削除に伴う dead reference が残らない（compile 通過が呼び出し元全消えの機械的検証を担う）。"
+        }
+      }
+    }
+  ]
+}

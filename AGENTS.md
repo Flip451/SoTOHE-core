@@ -6,6 +6,12 @@ Guidelines for automated code reviewers (e.g., Codex Cloud `@codex review`).
 
 - **Codex Cloud GitHub App** must be installed on this repository.
 
+## Agent Context
+
+- Automated PR reviewers: use the review guidelines below.
+- Coding agents working in this repository: read `CLAUDE.md` for the
+  maintainer-facing workflow index, Source of Truth chain, and guardrails.
+
 ## Review Guidelines
 
 When reviewing pull requests, focus on the following areas:

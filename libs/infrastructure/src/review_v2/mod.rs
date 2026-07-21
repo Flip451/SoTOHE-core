@@ -9,6 +9,7 @@ pub mod hasher;
 pub mod persistence;
 pub mod review_fix_runner;
 pub mod scope_config_loader;
+mod session;
 
 pub use claude_reviewer::ClaudeReviewer;
 pub use codex_reviewer::CodexReviewer;

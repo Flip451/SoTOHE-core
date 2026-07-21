@@ -39,6 +39,7 @@ use std::path::{Path, PathBuf};
 use domain::tddd::catalogue_v2::{
     CatalogueDocument, ContractRole, DataRole, FunctionRole, TypeKindV2,
 };
+use domain::tddd::type_signals_doc::CatalogueDeclarationHash;
 use domain::{CatalogueSpecSignalsDocument, ConfidenceSignal, TypeSignal};
 use thiserror::Error;
 
@@ -85,8 +86,12 @@ pub enum LoadCatalogueSpecSignalsForViewError {
     },
 
     /// The signals file is stale relative to the on-disk catalogue bytes.
-    #[error("catalogue-spec-signals at '{}' is stale (declared={declared}, actual={actual}). Run `sotp signal calc-catalog-spec <track_id>` to regenerate.", path.display())]
-    StaleHash { path: PathBuf, declared: String, actual: String },
+    #[error("catalogue-spec-signals at '{}' is stale (declared={declared:?}, actual={actual:?}). Run `sotp signal calc-catalog-spec <track_id>` to regenerate.", path.display())]
+    StaleHash {
+        path: PathBuf,
+        declared: CatalogueDeclarationHash,
+        actual: CatalogueDeclarationHash,
+    },
 }
 
 /// Load a `<layer>-catalogue-spec-signals.json` document for view rendering.
@@ -137,7 +142,11 @@ pub fn load_catalogue_spec_signals_for_view(
         LoadCatalogueSpecSignalsForViewError::Decode { path: signals_path.to_path_buf(), source }
     })?;
     let actual = type_signals_codec::declaration_hash(catalogue_bytes);
-    let declared = doc.catalogue_declaration_hash.to_hex();
+    let declared = CatalogueDeclarationHash::new(
+        domain::tddd::type_signals_doc::Sha256Digest::from_content_hash(
+            doc.catalogue_declaration_hash.clone(),
+        ),
+    );
     if declared != actual {
         return Err(LoadCatalogueSpecSignalsForViewError::StaleHash {
             path: signals_path.to_path_buf(),
@@ -392,19 +401,19 @@ pub fn render_type_catalogue_v3(
     // row corresponds to the correct positional entry in the signals document.
     let mut spec_idx: usize = 0;
 
-    for (type_name, type_entry) in &doc.types {
+    for (type_name, type_entry) in doc.types() {
         // Group by the real v3 role (display tag) so the rendered view reflects
         // the v3 taxonomy; structural shapes (enum, typestate) still take
         // precedence over the semantic DataRole. Signal lookup within the
         // section translates this back to the v2-compat key via
         // section_to_signal_kind_tag.
-        let kind_tag = type_entry_display_tag(&type_entry.role, &type_entry.kind);
-        let action = v3_action_tag(type_entry.action);
+        let kind_tag = type_entry_display_tag(type_entry.role(), type_entry.kind());
+        let action = v3_action_tag(type_entry.action());
         let details = v3_type_entry_details(
             type_entry,
             type_name.as_str(),
-            doc.crate_name.as_str(),
-            &doc.trait_impls,
+            doc.crate_name().as_str(),
+            doc.trait_impls(),
         );
         let sig_idx = has_spec_signals.then_some(spec_idx);
         spec_idx += 1;
@@ -416,9 +425,9 @@ pub fn render_type_catalogue_v3(
         ));
     }
 
-    for (trait_name, trait_entry) in &doc.traits {
-        let kind_tag = contract_role_display_tag(&trait_entry.role);
-        let action = v3_action_tag(trait_entry.action);
+    for (trait_name, trait_entry) in doc.traits() {
+        let kind_tag = contract_role_display_tag(trait_entry.role());
+        let action = v3_action_tag(trait_entry.action());
         let details = v3_trait_entry_details(trait_entry);
         let sig_idx = has_spec_signals.then_some(spec_idx);
         spec_idx += 1;
@@ -430,9 +439,9 @@ pub fn render_type_catalogue_v3(
         ));
     }
 
-    for (fn_path, fn_entry) in &doc.functions {
-        let kind_tag = function_role_display_tag(fn_entry.role);
-        let action = v3_action_tag(fn_entry.action);
+    for (fn_path, fn_entry) in doc.functions() {
+        let kind_tag = function_role_display_tag(fn_entry.role());
+        let action = v3_action_tag(fn_entry.action());
         let details = v3_function_entry_details(fn_entry);
         let sig_idx = has_spec_signals.then_some(spec_idx);
         spec_idx += 1;
@@ -609,21 +618,22 @@ mod tests {
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        let entry = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        let entry = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        doc.types.insert(TypeName::new(type_name).unwrap(), entry);
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
+        doc.insert_type(TypeName::new(type_name).unwrap(), entry);
         doc
     }
 
@@ -642,6 +652,78 @@ mod tests {
             })
             .collect();
         CatalogueSpecSignalsDocument::new(make_dummy_hash(), sigs)
+    }
+
+    #[test]
+    fn test_load_catalogue_spec_signals_for_view_missing_file_returns_not_found() {
+        let temp_dir = tempfile::tempdir().unwrap();
+        let missing_path = temp_dir.path().join("catalogue-spec-signals.json");
+
+        let error = load_catalogue_spec_signals_for_view(&missing_path, b"{}")
+            .expect_err("a missing catalogue-spec signals file must fail closed");
+
+        assert!(
+            matches!(
+                error,
+                LoadCatalogueSpecSignalsForViewError::NotFound { path }
+                    if path == missing_path
+            ),
+            "missing catalogue-spec signals must surface as NotFound"
+        );
+    }
+
+    #[test]
+    fn test_load_catalogue_spec_signals_for_view_malformed_document_returns_decode() {
+        let signals_file = tempfile::NamedTempFile::new().unwrap();
+        std::fs::write(signals_file.path(), "not valid JSON").unwrap();
+
+        let error = load_catalogue_spec_signals_for_view(signals_file.path(), b"{}")
+            .expect_err("a malformed catalogue-spec signals document must fail closed");
+
+        assert!(
+            matches!(
+                error,
+                LoadCatalogueSpecSignalsForViewError::Decode { path, .. }
+                    if path == signals_file.path()
+            ),
+            "malformed catalogue-spec signals must surface as Decode"
+        );
+    }
+
+    #[test]
+    fn test_load_catalogue_spec_signals_for_view_stale_declaration_hash_returns_stale_hash() {
+        let signals_file = tempfile::NamedTempFile::new().unwrap();
+        let stale_declaration_hash = "0".repeat(64);
+        let catalogue_bytes = br#"{"schema_version": 3, "types": {}}"#;
+        let stale_signals = format!(
+            r#"{{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "{stale_declaration_hash}",
+  "signals": []
+}}"#
+        );
+        std::fs::write(signals_file.path(), stale_signals).unwrap();
+
+        let error = load_catalogue_spec_signals_for_view(signals_file.path(), catalogue_bytes)
+            .expect_err("a stale declaration hash must fail closed");
+        let expected_declared = CatalogueDeclarationHash::new(
+            domain::tddd::type_signals_doc::Sha256Digest::try_new(stale_declaration_hash.clone())
+                .unwrap(),
+        );
+
+        assert!(
+            matches!(
+                error,
+                LoadCatalogueSpecSignalsForViewError::StaleHash {
+                    path,
+                    declared,
+                    actual,
+                } if path == signals_file.path()
+                    && declared == expected_declared
+                    && actual != expected_declared
+            ),
+            "stale declaration hash must surface as StaleHash"
+        );
     }
 
     #[test]
@@ -695,22 +777,23 @@ mod tests {
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        let plain_entry = TypeEntry {
-            action: ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        let plain_entry = TypeEntry::new(
+            ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        };
-        doc.types.insert(TypeName::new("AType").unwrap(), plain_entry.clone());
-        doc.types.insert(TypeName::new("ZType").unwrap(), plain_entry);
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        );
+        doc.insert_type(TypeName::new("AType").unwrap(), plain_entry.clone());
+        doc.insert_type(TypeName::new("ZType").unwrap(), plain_entry);
         // Signals doc has only 1 entry (for index 0 = "AType").
         // "ZType" at index 1 has no corresponding signal → should show "—".
         let spec_signals =
@@ -745,22 +828,23 @@ mod tests {
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("AType").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
         let spec_signals =
             make_spec_signals_doc(vec![("Bogus".to_owned(), ConfidenceSignal::Blue)]);
@@ -791,22 +875,23 @@ mod tests {
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("UserAccount").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::entity().unwrap(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::entity().unwrap(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
         let signals = vec![TypeSignal::new(
             "UserAccount",
@@ -852,20 +937,20 @@ mod tests {
         let mut doc = CatalogueDocument::new(3, crate_name.clone(), layer);
         let fn_path =
             FunctionPath::at_root(crate_name, FunctionName::new("register_user").unwrap());
-        doc.functions.insert(
+        doc.insert_function(
             fn_path.clone(),
-            FunctionEntry {
-                action: ItemAction::Add,
-                role: FunctionRole::UseCaseFunction,
-                params: vec![],
-                returns: TypeRef::new("()").unwrap(),
-                is_async: false,
-                generics: vec![],
-                where_predicates: vec![],
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+            FunctionEntry::new(
+                ItemAction::Add,
+                FunctionRole::UseCaseFunction,
+                vec![],
+                TypeRef::new("()").unwrap(),
+                false,
+                vec![],
+                vec![],
+                None,
+                vec![],
+                vec![],
+            ),
         );
         let signals = vec![TypeSignal::new(
             fn_path.to_string(),
@@ -909,21 +994,23 @@ mod tests {
         let layer = LayerId::try_new("domain".to_owned()).unwrap();
         let crate_name = CrateName::new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("UserRegistered").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::DomainEvent,
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::DomainEvent,
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
         let output = render_type_catalogue_v3(&doc, "domain-types.json", None, None);
         assert!(

@@ -65,7 +65,7 @@ fn test_register_user_flow() {
 }
 ```
 
-> **Note**: `track/tech-stack.md` で async runtime を採用した場合は `#[tokio::test]` + `async fn` に切り替える。
+> **Note**: async runtime の採用を ADR で決定した場合は `#[tokio::test]` + `async fn` に切り替える。
 
 ### Naming Convention
 
@@ -89,7 +89,7 @@ pub trait UserRepository: Send + Sync {
 }
 ```
 
-> **Note**: `track/tech-stack.md` で async runtime を採用した場合は native `async fn in trait`（Rust 1.75+）または `async-trait` クレートと組み合わせる。`mockall` は `#[automock]` + `#[async_trait]` の順で属性を付与する。
+> **Note**: async runtime の採用を ADR で決定した場合は native `async fn in trait`（Rust 1.75+）または `async-trait` クレートと組み合わせる。`mockall` は `#[automock]` + `#[async_trait]` の順で属性を付与する。
 
 ---
 
@@ -97,16 +97,12 @@ pub trait UserRepository: Send + Sync {
 
 ```bash
 cargo make test                 # 標準の全体テスト
-cargo make test-nocapture       # テスト出力（stdout/stderr）を表示しながら実行
 cargo make test-doc             # ドキュメントテスト（必要時のみ）
-cargo make llvm-cov             # カバレッジ（HTML レポート）
 ```
 
-特定のテストだけを実行したい場合は、コンテナシェル内で nextest のフィルタ構文を使う。
+特定のテストだけを実行したい場合は、host toolchain 上で nextest のフィルタ構文を使う。
 
 ```bash
-cargo make shell
-# コンテナ内で:
 cargo nextest run -E 'test(test_email_with_valid_format)'
 ```
 
@@ -129,4 +125,4 @@ cargo nextest run -E 'test(test_email_with_valid_format)'
 ## Decision Reference
 
 - `knowledge/conventions/coding-principles.md`: エラーハンドリング・パニック禁止ルール（テスト例外を含む）
-- `knowledge/conventions/hexagonal-architecture.md`: ポート（Trait）定義と mockall を使ったアダプタのテスト戦略
+- `knowledge/conventions/type-designer-kind-selection.md` R1: ポート（Trait）の配置

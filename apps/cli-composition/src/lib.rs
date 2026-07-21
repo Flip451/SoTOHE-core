@@ -9,8 +9,12 @@
 // Submodule declarations (grouped by command family)
 // ---------------------------------------------------------------------------
 
+mod adr_baseline;
 mod arch;
+mod capability;
+mod catalog;
 mod cmd_outcome;
+mod codex_runtime;
 mod conventions;
 mod demo;
 mod domain;
@@ -20,7 +24,6 @@ mod file;
 mod git;
 mod guard;
 mod hook;
-mod plan;
 mod pr;
 mod ref_verify;
 pub mod review_v2;
@@ -29,6 +32,8 @@ pub mod signal;
 mod signal_layer_chain;
 pub mod task_contract;
 mod telemetry;
+mod template_export;
+mod test_obligation;
 pub mod track;
 pub mod verify;
 
@@ -66,7 +71,11 @@ pub use telemetry::TelemetryReportInput;
 // Per-context composition root re-exports (AC-04 / D2)
 // ---------------------------------------------------------------------------
 
+pub use adr_baseline::{AdrBaselineCompositionRoot, AdrBaselineResolutionError};
 pub use arch::ArchCompositionRoot;
+pub use capability::CapabilityCompositionRoot;
+pub use catalog::CatalogCompositionRoot;
+pub use codex_runtime::CodexRuntimeCompositionRoot;
 pub use conventions::ConventionsCompositionRoot;
 pub use demo::DemoCompositionRoot;
 pub use domain::DomainCompositionRoot;
@@ -75,7 +84,6 @@ pub use file::FileCompositionRoot;
 pub use git::GitCompositionRoot;
 pub use guard::GuardCompositionRoot;
 pub use hook::HookCompositionRoot;
-pub use plan::PlanCompositionRoot;
 pub use pr::PrCompositionRoot;
 pub use ref_verify::RefVerifyCompositionRoot;
 pub use review_v2::ReviewCompositionRoot;
@@ -83,6 +91,8 @@ pub use semantic_dup::SemanticDupCompositionRoot;
 pub use signal::SignalCompositionRoot;
 pub use task_contract::TaskContractCompositionRoot;
 pub use telemetry::TelemetryCompositionRoot;
+pub use template_export::TemplateCompositionRoot;
+pub use test_obligation::TestObligationCompositionRoot;
 pub use track::composition_root::TrackCompositionRoot;
 pub use verify::VerifyCompositionRoot;
 

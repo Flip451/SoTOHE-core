@@ -270,7 +270,7 @@ pub trait ChainIdentity {
 ///
 /// The impure I/O methods (`calc`, `load`, `check_freshness`) live in
 /// `usecase::chain::LoadablePersistedChain`, keeping the domain trait free of
-/// I/O concerns per hexagonal-architecture port placement rules (CN-05).
+/// I/O concerns per `type-designer-kind-selection.md` R1 port placement rules (CN-05).
 ///
 /// Chain ⓪ does **not** implement this trait.
 ///

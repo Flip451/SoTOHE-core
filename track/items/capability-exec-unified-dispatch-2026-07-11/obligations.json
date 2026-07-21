@@ -1,0 +1,401 @@
+{
+  "track_id": "capability-exec-unified-dispatch-2026-07-11",
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "CapabilityExecInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "CapabilityExecInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of CapabilityExecInteractor",
+      "declaration_hash": "5a308af1e2e2080f5da1f5d4283e751161bf7a9792146622aebee54719fa203a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "GO-01"
+        },
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "GO-02"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CapabilityExecService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "CapabilityExecService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:execute' of CapabilityExecService",
+      "declaration_hash": "26b65221c891917e1acfe0ddd5fc051885cadaefb5c94280c3be4a77b5b181e8",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "GO-01"
+        },
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "GO-02"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CapabilityProfilePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "CapabilityProfilePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:resolve' of CapabilityProfilePort",
+      "declaration_hash": "bcdd97326cdc0885c8e24dfcacbe551b0a4107d73498ba6cc194a5f0ac21dc0e",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CapabilityProviderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:provider"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "CapabilityProviderPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:provider' of CapabilityProviderPort",
+      "declaration_hash": "fec448e52e9aa1f88646b0fe4a9c702a0fd09f531166a9eb9ea4bc554ccab231",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CapabilityProviderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:dispatch"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "CapabilityProviderPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:dispatch' of CapabilityProviderPort",
+      "declaration_hash": "fec448e52e9aa1f88646b0fe4a9c702a0fd09f531166a9eb9ea4bc554ccab231",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CapabilitySourcePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_briefing"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "CapabilitySourcePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load_briefing' of CapabilitySourcePort",
+      "declaration_hash": "6134b7798791dac5eda4f93629296d935b42237f17385054a791e1ce1d294249",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CapabilitySourcePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_discipline"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "CapabilitySourcePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load_discipline' of CapabilitySourcePort",
+      "declaration_hash": "6134b7798791dac5eda4f93629296d935b42237f17385054a791e1ce1d294249",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "AgentProfilesCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProfilePort"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "AgentProfilesCapabilityAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::capability_exec::CapabilityProfilePort' of AgentProfilesCapabilityAdapter",
+      "declaration_hash": "1d2d5a0394a4a7f48ccf4958e5caef84887fa6f2637e7a65a816193396c95d83",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsCapabilitySourceAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilitySourcePort"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsCapabilitySourceAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::capability_exec::CapabilitySourcePort' of FsCapabilitySourceAdapter",
+      "declaration_hash": "89df97d82abbb203438c9597c8c6f92ac40cd440a54429ee5733c3532879ef27",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "CN-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CodexCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "CodexCapabilityAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::capability_exec::CapabilityProviderPort' of CodexCapabilityAdapter",
+      "declaration_hash": "b2dbf15ef11d68d716ed1a00d797acfd51cc51c65097503d36f61acd045845ed",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ClaudeCapabilityAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::capability_exec::CapabilityProviderPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "ClaudeCapabilityAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::capability_exec::CapabilityProviderPort' of ClaudeCapabilityAdapter",
+      "declaration_hash": "bb64a6b9ee0aceff9f88462be2c78f31d7aad4ef10f2976861a1363e139ca31a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::capability::execute",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::capability::execute"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::capability::execute",
+      "declaration_hash": "2dfab6ab05f95b8392cc11d7622d8c5983f325678da0550d97502cb448f8048d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::capability::execute_exec",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::capability::execute_exec"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::capability::execute_exec",
+      "declaration_hash": "22e16cbdcaf00503f652f84ba5a67a4be1973b2833ed0d4090f97ad7af9dfa9a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::capability::execute_with",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::capability::execute_with"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::capability::execute_with",
+      "declaration_hash": "2343e4f2c72c359db84ec6001af3582942d952e0a3a045216a72a5e4ff1fdb25",
+      "spec_refs": [
+        {
+          "file_path": "track/items/capability-exec-unified-dispatch-2026-07-11/spec.json",
+          "element_id": "IN-01"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,609 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "docs": "Constructor — dependency-injected manifest, filesystem-export, and self-binary transplant ports (IN-01, IN-02).",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "manifest_port",
+              "ty": "std::sync::Arc<dyn TemplateBoundaryManifestPort>"
+            },
+            {
+              "name": "export_port",
+              "ty": "std::sync::Arc<dyn TemplateExportPort>"
+            },
+            {
+              "name": "transplant_port",
+              "ty": "std::sync::Arc<dyn SelfBinaryTransplantPort>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "type_name": "TemplateExportInteractor"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "SelfBinaryTransplantError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SelfBinaryTransplantError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "SelfBinaryTransplantError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportError",
+      "trait_ref": "core::convert::From<TemplateBoundaryManifestReadError>"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportError",
+      "trait_ref": "core::convert::From<TemplateExportPortError>"
+    },
+    {
+      "for_type": "TemplateExportError",
+      "trait_ref": "core::convert::From<SelfBinaryTransplantError>"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportInteractor",
+      "trait_ref": "TemplateExportService"
+    }
+  ],
+  "traits": {
+    "SelfBinaryTransplantPort": {
+      "action": "add",
+      "docs": "Self-binary transplant secondary port introduced for the `sotp template export` transplant stage (IN-01, IN-02, IN-07, CN-01, CN-02, CN-06, AC-01, AC-03).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "docs": "Transplant step invoked during `sotp template export`; `destination` is the target path in the exported workspace (IN-01, IN-02, CN-01, CN-02, CN-06, AC-03).",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "transplant",
+          "params": [
+            {
+              "name": "destination",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), SelfBinaryTransplantError>",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "TemplateExportPort": {
+      "action": "reference",
+      "docs": "Template export secondary port (baseline, unchanged this track). Included as `reference` so the interactor `new`-constructor's parameter-type edge stays visible in the contract-map.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "docs": "Filesystem export operation (baseline).",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "export",
+          "params": [
+            {
+              "name": "command",
+              "ty": "&TemplateExportCommand"
+            },
+            {
+              "name": "manifest",
+              "ty": "&domain::template_export::TemplateBoundaryManifest"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TemplateExportReport, TemplateExportPortError>",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "TemplateExportService": {
+      "action": "reference",
+      "docs": "`sotp template export` primary port (baseline, unchanged this track). Included as `reference` so the interactor's trait-impl edge stays visible in the contract-map.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "docs": "Primary port entrypoint (baseline; the trait signature is unchanged — only its impl body gains a transplant step).",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "export",
+          "params": [
+            {
+              "name": "command",
+              "ty": "TemplateExportCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<TemplateExportReport, TemplateExportError>",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    }
+  },
+  "types": {
+    "SelfBinaryTransplantError": {
+      "action": "add",
+      "docs": "`SelfBinaryTransplantPort::transplant` fail-closed error surface (IN-02, AC-03, CN-06).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SourcePathUnavailable",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DestinationWriteFailure",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "PermissionSetFailure",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        }
+      ]
+    },
+    "TemplateExportCommand": {
+      "action": "reference",
+      "docs": "`sotp template export` command (baseline, unchanged this track). Included as `reference` so the interactor's `TemplateExportService::export` method-parameter edge stays visible in the contract-map.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "manifest_path",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "overlay_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "output_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        }
+      ]
+    },
+    "TemplateExportError": {
+      "action": "modify",
+      "docs": "`TemplateExportService::export` error; this track adds the `BinaryTransplant` variant for the `sotp template export` transplant step (IN-01, IN-02, AC-01, AC-03, CN-06).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ManifestRead",
+            "payload": {
+              "fields": [
+                {
+                  "name": "source",
+                  "ty": "TemplateBoundaryManifestReadError"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Export",
+            "payload": {
+              "fields": [
+                {
+                  "name": "source",
+                  "ty": "TemplateExportPortError"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "BinaryTransplant",
+            "payload": {
+              "fields": [
+                {
+                  "name": "source",
+                  "ty": "SelfBinaryTransplantError"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "CN-09",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        }
+      ]
+    },
+    "TemplateExportInteractor": {
+      "action": "modify",
+      "docs": "`TemplateExportService` interactor; this track modifies the inherent `new` constructor to take a third `SelfBinaryTransplantPort` parameter (IN-01, IN-02, AC-01, AC-03). The `impl TemplateExportService for TemplateExportInteractor` block signature is unchanged.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "CN-06",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        }
+      ]
+    },
+    "TemplateExportPortError": {
+      "action": "reference",
+      "docs": "`TemplateExportPort::export` error (baseline, unchanged this track). Included as `reference` so the `TemplateExportError::Export` cross-reference edge resolves within this catalogue.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "OutputDirExists",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "OverlayMissing",
+            "payload": {
+              "fields": [
+                {
+                  "name": "pattern",
+                  "ty": "domain::template_export::TemplatePathPattern"
+                },
+                {
+                  "name": "overlay_path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "SourceMissing",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnclassifiedPath",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "domain::template_export::TemplatePathPattern"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Io",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        }
+      ]
+    },
+    "TemplateExportReport": {
+      "action": "reference",
+      "docs": "`sotp template export` report (baseline, unchanged this track). Included as `reference` so the interactor's `TemplateExportService::export` return-type edge stays visible in the contract-map.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "included_count",
+              "ty": "usize"
+            },
+            {
+              "name": "excluded_count",
+              "ty": "usize"
+            },
+            {
+              "name": "overlay_applied_count",
+              "ty": "usize"
+            },
+            {
+              "name": "output_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "template_export",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/template-export-sotp-binary-transplant-2026-07-08/spec.json"
+        }
+      ]
+    }
+  }
+}

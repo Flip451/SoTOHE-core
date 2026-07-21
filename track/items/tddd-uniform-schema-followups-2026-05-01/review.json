@@ -96,14 +96,14 @@
             {
               "message": "This references `R7 (Cross-Track Port Reference)` as if it already exists in `knowledge/conventions/type-designer-kind-selection.md`, but that convention currently only defines R1-R6. The ADR should frame this as a new rule to be added, not an existing SSoT entry.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-29-0243-cross-track-port-reference.md",
+              "file": "knowledge/adr/2026-04-29-0243-cross-track-port-reference.md",
               "line": 73,
               "category": "broken reference"
             },
             {
               "message": "The context treats `application_service` as a valid declaration target for a `secondary_adapter` implementation, but the kind-selection convention makes `application_service` usecase-only and `secondary_adapter` infrastructure-only. That failure case should be limited to `secondary_port`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-29-0243-cross-track-port-reference.md",
+              "file": "knowledge/adr/2026-04-29-0243-cross-track-port-reference.md",
               "line": 13,
               "category": "factual error"
             }

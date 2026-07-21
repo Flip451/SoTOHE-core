@@ -28,7 +28,7 @@ Summarize the current project state for the newcomer:
 1. Read `track/registry.md` — list active and completed tracks
 2. Resolve the current track: if the current git branch matches `track/<id>`, use that track. Otherwise, use the latest materialized active track (non-archived, non-done, `branch != null`). If no materialized active track exists, fall back to the latest branchless planning-only track.
 3. Read the current track's `spec.md` and `plan.md` if one exists
-4. Read `track/tech-stack.md` — highlight any unresolved `TODO:` items
+4. Read `knowledge/adr/README.md` — note recent pre-track ADRs (tech stack / product-policy decisions)
 5. Show recent git log (last 10 commits) for context
 6. Read `knowledge/conventions/README.md` — list active convention docs
 

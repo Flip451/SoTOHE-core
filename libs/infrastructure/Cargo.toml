@@ -38,8 +38,12 @@ sha2 = "0.10.9"
 fs4 = "0.13.1"
 globset = { workspace = true }
 libc = "0.2.183"
+rustix = { version = "1.1.4", features = ["fs"] }
 
 [dev-dependencies]
 rstest = { workspace = true }
 temp-env = "0.3"
 tempfile = "3.27.0"
+
+[build-dependencies]
+sha2 = "0.10.9"

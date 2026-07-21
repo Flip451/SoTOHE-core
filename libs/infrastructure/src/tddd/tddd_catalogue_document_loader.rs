@@ -143,7 +143,7 @@ mod tests {
 
         let loader = FsCatalogueDocumentLoader::new();
         let doc = loader.load(&path).unwrap();
-        assert_eq!(doc.crate_name.as_str(), "domain");
+        assert_eq!(doc.crate_name().as_str(), "domain");
     }
 
     #[test]

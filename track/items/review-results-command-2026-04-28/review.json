@@ -54,14 +54,14 @@
             {
               "message": "IN-03 requires empty scopes to render as `NotRequired(Empty)`, but AC-04 later says they should render as `[.] <scope>: not required (empty)`. Those are different user-visible output contracts, so the spec is internally inconsistent and does not give implementation a single target.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-results-command-2026-04-28/spec.json",
+              "file": "track/items/review-results-command-2026-04-28/spec.json",
               "line": 61,
               "category": "contradiction"
             },
             {
               "message": "AC-06 models the bypass path as `NotRequired(NotStarted)`, which conflicts with the rest of the design: `NotStarted` is the required-side state in the review-state taxonomy, while the bypass variant is supposed to be the no-review path. As written, the branch is semantically unimplementable because `not_started_count` cannot be derived from a `NotRequired` state.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-results-command-2026-04-28/spec.json",
+              "file": "track/items/review-results-command-2026-04-28/spec.json",
               "line": 314,
               "category": "factual error"
             }
@@ -450,7 +450,7 @@
             {
               "message": "`domain-types.md` renders a third domain-layer entry, `ReviewReader` (row 14), even though the source `domain-types.json` only defines `ReviewApprovalVerdict` and `ReviewExistsPort`. The generated catalogue/contract-map therefore disagree with the JSON SSoT and the `ReviewReader` change is left untraced; either add the JSON entry and coverage for it, or remove the extra row from the generated view.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-results-command-2026-04-28/domain-types.md",
+              "file": "track/items/review-results-command-2026-04-28/domain-types.md",
               "line": 14,
               "category": "contradiction"
             }
@@ -898,7 +898,7 @@
             {
               "message": "`FsReviewStore` is still rendered here as implementing only `ReviewExistsPort`, but the updated type artifacts declare it also implements `ReviewReader` and `ReviewWriter`. That leaves the plan-artifact set internally inconsistent about this adapter's contract surface.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-results-command-2026-04-28/contract-map.md",
+              "file": "track/items/review-results-command-2026-04-28/contract-map.md",
               "line": 21,
               "category": "contradiction"
             }
@@ -950,7 +950,7 @@
             {
               "message": "`contract-map.md` now shows a direct `FsReviewStore -> ScopeRound` edge in addition to the `FsReviewStore -.impl.-> ReviewReader` edge. That makes the diagram assert an adapter-level dependency on `ScopeRound`, which contradicts the stated intent of only surfacing the new `ReviewReader` contract relationship for `read_all_rounds`. If this map is meant to represent the contract surface, the extra direct edge is misleading and should be removed or explicitly justified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-results-command-2026-04-28/contract-map.md",
+              "file": "track/items/review-results-command-2026-04-28/contract-map.md",
               "line": 22,
               "category": "contradiction"
             }
@@ -1062,7 +1062,7 @@
             {
               "message": "The `[BLOCKED]` branch no longer prints the per-scope reason that the previous CLI emitted (`scope: state`); it now shows only bare scope names. That is a user-visible contract change for a guard command, because operators can no longer tell whether a scope is blocked by `NotStarted`, `FindingsRemain`, or `StaleHash`. The new tests in `tests.rs` only assert exit codes, so this regression is currently unprotected.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/mod.rs",
+              "file": "apps/cli/src/commands/review/mod.rs",
               "line": 208,
               "category": "behavior regression"
             }
@@ -1345,7 +1345,7 @@
             {
               "message": "`read_all_rounds` now rejects rounds whose persisted `hash` is empty, but the writer can still serialize `ReviewHash::Empty` and the existing round-trip path already accepts that case in `read_latest_finals`. As a result, `sotp review results` will fail on valid `review.json` data that contains an empty-hash round instead of reporting the history.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/review_v2/persistence/review_store.rs",
+              "file": "libs/infrastructure/src/review_v2/persistence/review_store.rs",
               "line": 221,
               "category": "correctness"
             }
@@ -1408,7 +1408,7 @@
             {
               "message": "The new `evaluate_approval` public API is only covered by success cases here. There is no test for `ReviewCycleError` propagation from `get_review_states`, and the blocked cases only assert `required_scopes.len()` instead of the actual scope set. A regression that swallows diff/hash/reader failures or returns the wrong blocked scopes would still pass this suite.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/tests.rs",
+              "file": "libs/usecase/src/review_v2/tests.rs",
               "line": 404,
               "category": "test coverage"
             }
@@ -1423,7 +1423,7 @@
             {
               "message": "`evaluate_approval()` is only covered for the diff failure path here. The method also propagates `ReviewHasherError` and `ReviewReaderError` from `get_review_states()`, but there are no tests for those error cases, so regressions in those paths would not be caught.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/review_v2/tests.rs",
+              "file": "libs/usecase/src/review_v2/tests.rs",
               "line": 532,
               "category": "test coverage"
             }

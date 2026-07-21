@@ -1,0 +1,7334 @@
+{
+  "crate_name": "domain",
+  "functions": {},
+  "inherent_impls": [],
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "add",
+      "for_type": "AnchorTextHash",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "AnchorTextHash",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "AnchorTextHash",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "AnchorTextHash",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "BoundTestsSetHash",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "BoundTestsSetHash",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "BoundTestsSetHash",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "BoundTestsSetHash",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "DeclarationHash",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "DeclarationHash",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "DeclarationHash",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "DeclarationHash",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "EdgeResolutionOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "EdgeResolutionOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "EdgeResolutionOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "EdgeResolutionOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "EdgeVerdictRecord",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "EdgeVerdictRecord",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "EdgeVerdictRecord",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "EdgeVerdictRecord",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "FulfillmentFailCategory",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "FulfillmentFailCategory",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "FulfillmentFailCategory",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "FulfillmentFailCategory",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationCheckError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationDeriveError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationEvaluateError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheDocument",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheDocument",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheDocument",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheDocument",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheEntry",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheEntry",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheEntry",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheEntry",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheKey",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheKey",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheKey",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheKey",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentVerdict",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentVerdict",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentVerdict",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentVerdict",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationResultsError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationsDocument",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationsDocument",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationsDocument",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationsDocument",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "RoleObligationRules",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "RoleObligationRules",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "RoleObligationRules",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "RoleObligationRules",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TargetEntryRoleKind",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TargetEntryRoleKind",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TargetEntryRoleKind",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TargetEntryRoleKind",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingRecord",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingRecord",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingRecord",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingRecord",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingsDocument",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingsDocument",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingsDocument",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingsDocument",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBodySpanHash",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBodySpanHash",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBodySpanHash",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBodySpanHash",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestFunctionName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestFunctionName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestFunctionName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestFunctionName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestLocation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestLocation",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestLocation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestLocation",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestModulePath",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestModulePath",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestModulePath",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestModulePath",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligation",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligation",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligation",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligation",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationAnchorId",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationAnchorId",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationAnchorId",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationAnchorId",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationBrief",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationBrief",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationBrief",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationBrief",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationBriefTemplate",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationBriefTemplate",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationBriefTemplate",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationBriefTemplate",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationDrift",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationDrift",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationDrift",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationDrift",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationDriftKind",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationDriftKind",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationDriftKind",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationDriftKind",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEdgeId",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEdgeId",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEdgeId",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEdgeId",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationId",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationId",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationId",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationId",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationItemIdentifier",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationItemIdentifier",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationItemIdentifier",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationItemIdentifier",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationKind",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationKind",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationKind",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationKind",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationMinimum",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationMinimum",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationMinimum",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationMinimum",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationPatternKind",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationPatternKind",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationPatternKind",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationPatternKind",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationPerAxis",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationPerAxis",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationPerAxis",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationPerAxis",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRule",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRule",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRule",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRule",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRulesDocument",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRulesDocument",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRulesDocument",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRulesDocument",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRulesLoadError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "UncitedSpecElementFinding",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "UncitedSpecElementFinding",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "UncitedSpecElementFinding",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "UncitedSpecElementFinding",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaivedReason",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "WaivedReason",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "WaivedReason",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaivedReason",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaivedReasonHash",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "WaivedReasonHash",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "WaivedReasonHash",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaivedReasonHash",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheDocument",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheDocument",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheDocument",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheDocument",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheEntry",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheEntry",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheEntry",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheEntry",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheKey",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheKey",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheKey",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheKey",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverVerdict",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverVerdict",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverVerdict",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverVerdict",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "DiagnosticMessage",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "DiagnosticMessage",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "DiagnosticMessage",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "DiagnosticMessage",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "DiagnosticMessage",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "add",
+      "for_type": "RoleName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "RoleName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "RoleName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "RoleName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "RoleName",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "add",
+      "for_type": "ArtifactCodecError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ArtifactCodecError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "ArtifactCodecError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "VerifyCacheError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "VerifyCacheError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "VerifyCacheError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "SemanticVerifierError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "SemanticVerifierError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "SemanticVerifierError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "TestSourceScanError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestSourceScanError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "TestSourceScanError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "modify",
+      "for_type": "ValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "DomainError",
+      "trait_ref": "core::convert::From<ValidationError>"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyTestLocations",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyTestLocations",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyTestLocations",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyTestLocations",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyEdgeIds",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyEdgeIds",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyEdgeIds",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyEdgeIds",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "SpecDocumentLoadError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "SpecDocumentLoadError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "SpecDocumentLoadError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "modify",
+      "for_type": "TraitImplDeclV2",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TraitImplDeclV2",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "TraitImplDeclV2",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "TraitImplDeclV2",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyDrifts",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyDrifts",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyDrifts",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyDrifts",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyEdgeVerdictRecords",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyEdgeVerdictRecords",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyEdgeVerdictRecords",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "NonEmptyEdgeVerdictRecords",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TraitRefScope",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TraitRefScope",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TraitRefScope",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TraitRefScope",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "RoleObligationItemsProjector",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "RoleObligationItemsProjector",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentPair",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentPair",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentPair",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentPair",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverPair",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverPair",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverPair",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverPair",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestsSource",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestsSource",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestsSource",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestsSource",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "EntryDeclaration",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "EntryDeclaration",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "EntryDeclaration",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "EntryDeclaration",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "AnchorText",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "AnchorText",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "AnchorText",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "AnchorText",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "DetectionRatePercent",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "DetectionRatePercent",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "DetectionRatePercent",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "DetectionRatePercent",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "VerifierPromptFingerprint",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "VerifierPromptFingerprint",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "VerifierPromptFingerprint",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "VerifierPromptFingerprint",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueDocumentLoaderError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueDocumentLoaderError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueDocumentLoaderError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::str::traits::FromStr"
+    },
+    {
+      "action": "reference",
+      "for_type": "CrateName",
+      "trait_ref": "core::convert::AsRef<str>"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::str::traits::FromStr"
+    },
+    {
+      "action": "reference",
+      "for_type": "TraitName",
+      "trait_ref": "core::convert::AsRef<str>"
+    }
+  ],
+  "traits": {
+    "CatalogueDocumentLoaderPort": {
+      "action": "reference",
+      "docs": "Baseline domain secondary port for loading a persisted CatalogueDocument from a typed filesystem path (IN-07 / IN-08).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+            {
+              "name": "path",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CatalogueDocument, CatalogueDocumentLoaderError>"
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::catalogue_impl_signals_ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ObligationFulfillmentCachePort": {
+      "action": "add",
+      "docs": "Domain persistence port for obligation-fulfillment verdict cache records; synchronous to match the existing domain port baseline (IN-09 / AC-06 / CN-04).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Option<ObligationFulfillmentCacheDocument>, VerifyCacheError>"
+        },
+        {
+          "docs": "Persist an obligation-fulfillment cache document.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "save",
+          "params": [
+            {
+              "name": "doc",
+              "ty": "&ObligationFulfillmentCacheDocument"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), DiagnosticMessage>"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationFulfillmentVerifierPort": {
+      "action": "add",
+      "docs": "Domain semantic-judgement port for obligation-fulfillment pairs; synchronous to match the existing domain port baseline (IN-09 / IN-11 / AC-07 / CN-08).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_pair",
+          "params": [
+            {
+              "name": "tests_source",
+              "ty": "&str"
+            },
+            {
+              "name": "entry_declaration",
+              "ty": "&str"
+            },
+            {
+              "name": "anchor_text",
+              "ty": "&str"
+            },
+            {
+              "name": "tier",
+              "ty": "ModelTier"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ObligationFulfillmentVerdict, SemanticVerifierError>"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-11",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationsArtifactPort": {
+      "action": "add",
+      "docs": "Domain artifact repository port for obligations artifacts; synchronous to match the existing domain port baseline (IN-05 / IN-07 / AC-03).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Option<ObligationsDocument>, ArtifactCodecError>"
+        },
+        {
+          "docs": "Persist an obligations document.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "save",
+          "params": [
+            {
+              "name": "doc",
+              "ty": "&ObligationsDocument"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), DiagnosticMessage>"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "SpecDocumentLoaderPort": {
+      "action": "add",
+      "docs": "Loader port for the persisted domain document `spec.json`; see IN-07 / IN-08.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "docs": "Synchronous spec document load; see IN-07 / IN-08.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+            {
+              "name": "spec_path",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<SpecDocument, SpecDocumentLoadError>",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "spec_document_loader_port",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ],
+      "supertrait_bounds": []
+    },
+    "TestBindingsArtifactPort": {
+      "action": "add",
+      "docs": "Domain artifact repository port for test-bindings artifacts; synchronous to match the existing domain port baseline (IN-06 / AC-04).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Option<TestBindingsDocument>, ArtifactCodecError>"
+        },
+        {
+          "docs": "Persist a test-bindings document.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "save",
+          "params": [
+            {
+              "name": "doc",
+              "ty": "&TestBindingsDocument"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), DiagnosticMessage>"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationRulesLoaderPort": {
+      "action": "add",
+      "docs": "Domain secondary port for loading the test-obligation rules document; synchronous to match the existing domain port baseline (IN-02 / IN-04 / AC-02).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<TestObligationRulesDocument, TestObligationRulesLoadError>"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestSourceScannerPort": {
+      "action": "add",
+      "docs": "Domain worktree-evidence port for test-source scanning; synchronous to match the existing domain port baseline (IN-06 / IN-09 / AC-06).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "scan_test_body",
+          "params": [
+            {
+              "name": "location",
+              "ty": "&TestLocation"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Option<String>, TestSourceScanError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "hash_test_body",
+          "params": [
+            {
+              "name": "source",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "TestBodySpanHash"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "WaiverCachePort": {
+      "action": "add",
+      "docs": "Domain persistence port for waiver verdict cache records; synchronous to match the existing domain port baseline (IN-09 / AC-06 / CN-04).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Option<WaiverCacheDocument>, VerifyCacheError>"
+        },
+        {
+          "docs": "Persist a waiver cache document.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "save",
+          "params": [
+            {
+              "name": "doc",
+              "ty": "&WaiverCacheDocument"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), DiagnosticMessage>"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "WaiverVerifierPort": {
+      "action": "add",
+      "docs": "Domain semantic-judgement port for waiver pairs; synchronous to match the existing domain port baseline (IN-09 / IN-11 / AC-07 / CN-08).",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_pair",
+          "params": [
+            {
+              "name": "waived_reason",
+              "ty": "&str"
+            },
+            {
+              "name": "entry_declaration",
+              "ty": "&str"
+            },
+            {
+              "name": "anchor_text",
+              "ty": "&str"
+            },
+            {
+              "name": "tier",
+              "ty": "ModelTier"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<WaiverVerdict, SemanticVerifierError>"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-11",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    }
+  },
+  "types": {
+    "AnchorText": {
+      "action": "add",
+      "docs": "Evidence-side spec anchor text for fulfillment / waiver pairs. See IN-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Validate non-empty evidence-side spec anchor text. See IN-09.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "text",
+              "ty": "String"
+            }
+          ],
+          "receiver": null,
+          "returns": "Result<Self, ValidationError>",
+          "where_predicates": []
+        },
+        {
+          "docs": "Borrow the evidence-side spec anchor text. See IN-09.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::test_obligation::pair",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "AnchorTextHash": {
+      "action": "add",
+      "docs": "Hash role value object for anchor text in verdict cache keys; see AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "hash",
+              "ty": "ContentHash"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ContentHash"
+        }
+      ],
+      "module_path": "tddd::test_obligation::hashes",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ArtifactCodecError": {
+      "action": "add",
+      "docs": "Error vocabulary for obligations and test-bindings artifact codecs; see IN-05 / IN-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Io",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "MalformedJson",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DomainInvariant",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::errors",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "BoundTestsSetHash": {
+      "action": "add",
+      "docs": "Hash role value object for bound test sets in fulfillment cache keys; see IN-09 / AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "hash",
+              "ty": "ContentHash"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ContentHash"
+        }
+      ],
+      "module_path": "tddd::test_obligation::hashes",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "CatalogueDocumentLoaderError": {
+      "action": "reference",
+      "docs": "Baseline loader error for CatalogueDocumentLoaderPort. Path payloads remain typed as std::path::PathBuf; reason is deliberately raw String because it is opaque human-readable diagnostic text with no constrained domain vocabulary (IN-07 / IN-08).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotFound",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Io",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Decode",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::catalogue_impl_signals_ports",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "CrateName": {
+      "action": "reference",
+      "docs": "Referenced identifier newtype carried as the workspace crate name in trait_ref resolution (`Workspace` trait-ref form); see IN-17.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "s",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Result<Self, IdentifierError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::identifiers",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "DeclarationHash": {
+      "action": "add",
+      "docs": "Hash role value object for catalogue entry declarations in verdict cache keys; see IN-05 / AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "hash",
+              "ty": "ContentHash"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ContentHash"
+        }
+      ],
+      "module_path": "tddd::test_obligation::hashes",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "DetectionRatePercent": {
+      "action": "add",
+      "docs": "Validated 0..=100 known-bad calibration-probe detection rate. See AC-15.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Validate the known-bad calibration-probe detection rate. See AC-15.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "u8"
+            }
+          ],
+          "receiver": null,
+          "returns": "Result<Self, ValidationError>",
+          "where_predicates": []
+        },
+        {
+          "docs": "Borrow the inner detection-rate percent value. See AC-15.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "value",
+          "params": [],
+          "receiver": "&self",
+          "returns": "u8",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::test_obligation::verdict",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "DiagnosticMessage": {
+      "action": "add",
+      "docs": "Validated diagnostic-message newtype used by test-obligation errors and verdicts; see IN-08 / IN-09 / IN-10.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Constructor for DiagnosticMessage.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "receiver": null,
+          "returns": "Result<Self, ValidationError>",
+          "where_predicates": []
+        },
+        {
+          "docs": "Borrow the inner diagnostic string.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::test_obligation::ids",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "EdgeResolutionOutcome": {
+      "action": "add",
+      "docs": "Per-edge resolution outcome vocabulary for check and results; see IN-08 / CN-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fulfilled",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Waived",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Fail",
+            "payload": {
+              "fields": [
+                "FulfillmentFailCategory"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Pending",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "MissingBinding",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::drift",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "EdgeVerdictRecord": {
+      "action": "add",
+      "docs": "Results record value object for edge verdict state; see IN-10 / AC-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "obligation_id",
+              "ty": "Option<TestObligationId>"
+            },
+            {
+              "name": "edge_id",
+              "ty": "TestObligationEdgeId"
+            },
+            {
+              "name": "claim_source",
+              "ty": "Option<DiagnosticMessage>"
+            },
+            {
+              "name": "evidence_source",
+              "ty": "Option<DiagnosticMessage>"
+            },
+            {
+              "name": "outcome",
+              "ty": "EdgeResolutionOutcome"
+            },
+            {
+              "name": "verdict_reason",
+              "ty": "Option<DiagnosticMessage>"
+            },
+            {
+              "name": "drift",
+              "ty": "Option<TestObligationDrift>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::test_obligation::drift",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "EntryDeclaration": {
+      "action": "add",
+      "docs": "Non-empty catalogue entry declaration text. See IN-09 / IN-15.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Non-empty catalogue entry declaration text. See IN-09 / IN-15.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "text",
+              "ty": "String"
+            }
+          ],
+          "receiver": null,
+          "returns": "Result<Self, ValidationError>",
+          "where_predicates": []
+        },
+        {
+          "docs": "Non-empty catalogue entry declaration text. See IN-09 / IN-15.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::test_obligation::pair",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "FulfillmentFailCategory": {
+      "action": "add",
+      "docs": "Fulfillment-fail category vocabulary; see IN-12 / AC-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Contradiction",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Substitution",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CentralUnverified",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_kebab",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&'static str"
+        }
+      ],
+      "module_path": "tddd::test_obligation::vocab",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-12",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "NonEmptyDrifts": {
+      "action": "add",
+      "docs": "Non-empty set of TestObligationDrift records surfaced by check when at least one drift is detected. See IN-13 / AC-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Construct a NonEmptyDrifts from a required first element plus the possibly-empty tail.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "first",
+              "ty": "TestObligationDrift"
+            },
+            {
+              "name": "rest",
+              "ty": "Vec<TestObligationDrift>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "docs": "Validate the vector, rejecting empty input via ConstructionError::EmptyCollection.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "values",
+              "ty": "Vec<TestObligationDrift>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Result<Self, domain::tddd::catalogue_v2::roles::ConstructionError>",
+          "where_predicates": []
+        },
+        {
+          "docs": "Return the drift records as a slice — guaranteed non-empty.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_slice",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TestObligationDrift]",
+          "where_predicates": []
+        },
+        {
+          "docs": "Return a reference to the first drift record (always present by invariant).",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "first",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationDrift",
+          "where_predicates": []
+        },
+        {
+          "docs": "Structural predicate backing the `non_empty` invariant declaration.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_non_empty",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::test_obligation::drift",
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            {
+              "name": "non_empty",
+              "predicate": {
+                "SelfMethod": "is_non_empty"
+              }
+            }
+          ]
+        }
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-13",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "NonEmptyEdgeIds": {
+      "action": "add",
+      "docs": "Non-empty set of TestObligationEdgeId values reported by the check gate. See IN-08 / AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Construct a NonEmptyEdgeIds from a required first element plus the possibly-empty tail; the invariant holds by construction.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "first",
+              "ty": "TestObligationEdgeId"
+            },
+            {
+              "name": "rest",
+              "ty": "Vec<TestObligationEdgeId>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "docs": "Validate and wrap the vector, rejecting empty input via ConstructionError::EmptyCollection.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "values",
+              "ty": "Vec<TestObligationEdgeId>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Result<Self, domain::tddd::catalogue_v2::roles::ConstructionError>",
+          "where_predicates": []
+        },
+        {
+          "docs": "Return the confirmed / escalated edges as a slice — guaranteed non-empty.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_slice",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TestObligationEdgeId]",
+          "where_predicates": []
+        },
+        {
+          "docs": "Return a reference to the first edge (always present by invariant).",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "first",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationEdgeId",
+          "where_predicates": []
+        },
+        {
+          "docs": "Structural predicate backing the `non_empty` invariant declaration.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_non_empty",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::test_obligation::ids",
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            {
+              "name": "non_empty",
+              "predicate": {
+                "SelfMethod": "is_non_empty"
+              }
+            }
+          ]
+        }
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "NonEmptyEdgeVerdictRecords": {
+      "action": "add",
+      "docs": "Non-empty set of EdgeVerdictRecord surfaced by evaluate when at least one verdict finalises as fail or as escalation. See IN-09 / AC-06 / AC-11.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Construct a NonEmptyEdgeVerdictRecords from a required first element plus the possibly-empty tail.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "first",
+              "ty": "EdgeVerdictRecord"
+            },
+            {
+              "name": "rest",
+              "ty": "Vec<EdgeVerdictRecord>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "docs": "Validate the vector, rejecting empty input via ConstructionError::EmptyCollection.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "values",
+              "ty": "Vec<EdgeVerdictRecord>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Result<Self, domain::tddd::catalogue_v2::roles::ConstructionError>",
+          "where_predicates": []
+        },
+        {
+          "docs": "Return the verdict records as a slice — guaranteed non-empty.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_slice",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[EdgeVerdictRecord]",
+          "where_predicates": []
+        },
+        {
+          "docs": "Return a reference to the first verdict record (always present by invariant).",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "first",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&EdgeVerdictRecord",
+          "where_predicates": []
+        },
+        {
+          "docs": "Structural predicate backing the `non_empty` invariant declaration.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_non_empty",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::test_obligation::drift",
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            {
+              "name": "non_empty",
+              "predicate": {
+                "SelfMethod": "is_non_empty"
+              }
+            }
+          ]
+        }
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "NonEmptyTestLocations": {
+      "action": "add",
+      "docs": "Value object for TestLocation collections cited by IN-06 / AC-04 / AC-12.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Constructor from a first TestLocation and remaining TestLocation values.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "first",
+              "ty": "TestLocation"
+            },
+            {
+              "name": "rest",
+              "ty": "Vec<TestLocation>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "docs": "Fallible constructor from a TestLocation vector.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "values",
+              "ty": "Vec<TestLocation>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Result<Self, domain::tddd::catalogue_v2::roles::ConstructionError>",
+          "where_predicates": []
+        },
+        {
+          "docs": "Borrow the contained TestLocation values as a slice.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_slice",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TestLocation]",
+          "where_predicates": []
+        },
+        {
+          "docs": "Borrow the first contained TestLocation.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "first",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestLocation",
+          "where_predicates": []
+        },
+        {
+          "docs": "Predicate for the `non_empty` invariant declaration.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_non_empty",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::test_obligation::binding",
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            {
+              "name": "non_empty",
+              "predicate": {
+                "SelfMethod": "is_non_empty"
+              }
+            }
+          ]
+        }
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationCheckError": {
+      "action": "add",
+      "docs": "Error vocabulary for `sotp test-obligation check`, including stale derived obligations; see D11 / IN-08 / AC-04 / AC-05 / AC-10 / CN-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RulesLoad",
+            "payload": {
+              "fields": [
+                "TestObligationRulesLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ObligationsAbsent",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BindingsAbsent",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "StaleObligationsArtifact",
+            "payload": {
+              "fields": [
+                {
+                  "name": "detail",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DriftsDetected",
+            "payload": {
+              "fields": [
+                {
+                  "name": "drifts",
+                  "ty": "NonEmptyDrifts"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnresolvedEdges",
+            "payload": {
+              "fields": [
+                {
+                  "name": "edges",
+                  "ty": "NonEmptyEdgeIds"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "StaleVerdicts",
+            "payload": {
+              "fields": [
+                {
+                  "name": "edges",
+                  "ty": "NonEmptyEdgeIds"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CatalogueLoad",
+            "payload": {
+              "fields": [
+                "CatalogueDocumentLoaderError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SpecLoad",
+            "payload": {
+              "fields": [
+                "SpecDocumentLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidCatalogueState",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ArtifactCodec",
+            "payload": {
+              "fields": [
+                "ArtifactCodecError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SourceScan",
+            "payload": {
+              "fields": [
+                "TestSourceScanError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CacheIo",
+            "payload": {
+              "fields": [
+                "VerifyCacheError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::errors",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationDeriveError": {
+      "action": "add",
+      "docs": "Error vocabulary for `sotp test-obligation derive`; see IN-07 / AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RulesLoad",
+            "payload": {
+              "fields": [
+                "TestObligationRulesLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TrackNotActive",
+            "payload": {
+              "fields": [
+                {
+                  "name": "branch",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CatalogueLoad",
+            "payload": {
+              "fields": [
+                "CatalogueDocumentLoaderError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SpecLoad",
+            "payload": {
+              "fields": [
+                "SpecDocumentLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidCatalogueState",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ArtifactCodec",
+            "payload": {
+              "fields": [
+                "ArtifactCodecError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ArtifactWrite",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::errors",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationEvaluateError": {
+      "action": "add",
+      "docs": "Failure modes of `sotp test-obligation evaluate` (D11 / IN-09 / AC-06 / AC-11).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TrackNotActive",
+            "payload": {
+              "fields": [
+                {
+                  "name": "branch",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CatalogueLoad",
+            "payload": {
+              "fields": [
+                "CatalogueDocumentLoaderError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SpecLoad",
+            "payload": {
+              "fields": [
+                "SpecDocumentLoadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ArtifactLoad",
+            "payload": {
+              "fields": [
+                "ArtifactCodecError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TestSourceScan",
+            "payload": {
+              "fields": [
+                "TestSourceScanError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "VerifierPort",
+            "payload": {
+              "fields": [
+                "SemanticVerifierError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CachePersistence",
+            "payload": {
+              "fields": [
+                "VerifyCacheError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SemanticFailuresConfirmed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "records",
+                  "ty": "NonEmptyEdgeVerdictRecords"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "HumanEscalationRequired",
+            "payload": {
+              "fields": [
+                {
+                  "name": "records",
+                  "ty": "NonEmptyEdgeVerdictRecords"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::errors",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationFulfillmentCacheDocument": {
+      "action": "add",
+      "docs": "Document value object for obligation-fulfillment verdict cache records; see IN-09 / AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "TrackId"
+            },
+            {
+              "name": "entries",
+              "ty": "Vec<ObligationFulfillmentCacheEntry>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "entries",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[ObligationFulfillmentCacheEntry]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TrackId"
+        }
+      ],
+      "module_path": "tddd::test_obligation::verdict",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationFulfillmentCacheEntry": {
+      "action": "add",
+      "docs": "Cache-entry value object for obligation-fulfillment verdict records; see IN-09 / CN-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "TestObligationEdgeId"
+            },
+            {
+              "name": "obligation_id",
+              "ty": "TestObligationId"
+            },
+            {
+              "name": "key",
+              "ty": "ObligationFulfillmentCacheKey"
+            },
+            {
+              "name": "verdict",
+              "ty": "ObligationFulfillmentVerdict"
+            },
+            {
+              "name": "verifier_fingerprint",
+              "ty": "Option<VerifierPromptFingerprint>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "edge_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationEdgeId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "obligation_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "key",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ObligationFulfillmentCacheKey"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verdict",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ObligationFulfillmentVerdict"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verifier_fingerprint",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&VerifierPromptFingerprint>"
+        }
+      ],
+      "module_path": "tddd::test_obligation::verdict",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationFulfillmentCacheKey": {
+      "action": "add",
+      "docs": "Cache-key value object for obligation-fulfillment verdict records; see IN-09 / AC-06 / CN-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "bound_tests_set_hash",
+              "ty": "BoundTestsSetHash"
+            },
+            {
+              "name": "declaration_hash",
+              "ty": "DeclarationHash"
+            },
+            {
+              "name": "anchor_text_hash",
+              "ty": "AnchorTextHash"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "bound_tests_set_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&BoundTestsSetHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "declaration_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&DeclarationHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "anchor_text_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&AnchorTextHash"
+        }
+      ],
+      "module_path": "tddd::test_obligation::verdict",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationFulfillmentPair": {
+      "action": "add",
+      "docs": "Fulfillment claim / evidence pair. See IN-01 / IN-09 / AC-15.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "See IN-09.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "tests_source",
+              "ty": "TestsSource"
+            },
+            {
+              "name": "entry_declaration",
+              "ty": "EntryDeclaration"
+            },
+            {
+              "name": "anchor_text",
+              "ty": "AnchorText"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "docs": "See IN-09.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "tests_source",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestsSource",
+          "where_predicates": []
+        },
+        {
+          "docs": "See IN-09.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "entry_declaration",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&EntryDeclaration",
+          "where_predicates": []
+        },
+        {
+          "docs": "See IN-09.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "anchor_text",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&AnchorText",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::test_obligation::pair",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationFulfillmentVerdict": {
+      "action": "add",
+      "docs": "Fulfillment-lane verdict vocabulary; see IN-09 / IN-12 / AC-06 / AC-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fulfilled",
+            "payload": {
+              "fields": [
+                {
+                  "name": "citation",
+                  "ty": "EvidenceCitation"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Fail",
+            "payload": {
+              "fields": [
+                {
+                  "name": "category",
+                  "ty": "FulfillmentFailCategory"
+                },
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Pending",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::verdict",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-12",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationResultsError": {
+      "action": "add",
+      "docs": "Error vocabulary for `sotp test-obligation results`; see IN-10 / AC-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "IoError",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "MalformedArtifact",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::errors",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationsDocument": {
+      "action": "add",
+      "docs": "Document value object for derived test obligations; see IN-05 / AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "TrackId"
+            },
+            {
+              "name": "obligations",
+              "ty": "Vec<TestObligation>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TrackId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "obligations",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TestObligation]"
+        },
+        {
+          "docs": "Resolves the obligation owning an edge for results provenance; see IN-10.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "owning_obligation",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "&TestObligationEdgeId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<&TestObligation>"
+        },
+        {
+          "docs": "Diagnoses obligation-document staleness; see IN-08.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "staleness_against",
+          "params": [
+            {
+              "name": "expected",
+              "ty": "&ObligationsDocument"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<DiagnosticMessage>"
+        }
+      ],
+      "module_path": "tddd::test_obligation::obligations",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "RoleName": {
+      "action": "add",
+      "docs": "Validated role-name newtype for test-obligation rules diagnostics; see IN-04 / CN-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Constructor for RoleName.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "receiver": null,
+          "returns": "Result<Self, ValidationError>",
+          "where_predicates": []
+        },
+        {
+          "docs": "Borrow the inner role name.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::test_obligation::ids",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "RoleObligationItemsProjector": {
+      "action": "add",
+      "docs": "Role-driven obligation item enumerator. See IN-04 / IN-05 / IN-07 / IN-17 / CN-10 / CN-16.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "See IN-04 / IN-07.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "docs": "See IN-05 / IN-17 / CN-10 / CN-16.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "data_role_items",
+          "params": [
+            {
+              "name": "entry",
+              "ty": "&TypeEntry"
+            },
+            {
+              "name": "per_axis",
+              "ty": "&TestObligationPerAxis"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Vec<TestObligationItemIdentifier>",
+          "where_predicates": []
+        },
+        {
+          "docs": "See IN-05 / IN-17 / CN-10 / CN-16.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "trait_impl_items",
+          "params": [
+            {
+              "name": "trait_ref",
+              "ty": "&TypeRef"
+            },
+            {
+              "name": "per_axis",
+              "ty": "&TestObligationPerAxis"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Option<Vec<TestObligationItemIdentifier>>",
+          "where_predicates": []
+        },
+        {
+          "docs": "See IN-05 / IN-17 / CN-10 / CN-16.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "contract_role_items",
+          "params": [
+            {
+              "name": "entry",
+              "ty": "&TraitEntry"
+            },
+            {
+              "name": "per_axis",
+              "ty": "&TestObligationPerAxis"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Vec<TestObligationItemIdentifier>",
+          "where_predicates": []
+        },
+        {
+          "docs": "See IN-05 / IN-17 / CN-10 / CN-16.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "function_role_items",
+          "params": [
+            {
+              "name": "per_axis",
+              "ty": "&TestObligationPerAxis"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Vec<TestObligationItemIdentifier>",
+          "where_predicates": []
+        },
+        {
+          "docs": "See IN-05 / IN-17 / CN-10 / CN-16.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "typestate_items",
+          "params": [
+            {
+              "name": "entry",
+              "ty": "&TypeEntry"
+            },
+            {
+              "name": "per_axis",
+              "ty": "&TestObligationPerAxis"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Vec<TestObligationItemIdentifier>",
+          "where_predicates": []
+        },
+        {
+          "docs": "See IN-05 / IN-17.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "type_has_typestate",
+          "params": [
+            {
+              "name": "entry",
+              "ty": "&TypeEntry"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "bool",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::test_obligation::projection",
+      "role": {
+        "DomainService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-17",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-16",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "RoleObligationRules": {
+      "action": "add",
+      "docs": "Per-role rule-list value object for the decision-table config; see IN-02 / CN-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "obligations",
+              "ty": "Vec<TestObligationRule>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "obligations",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TestObligationRule]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_empty_explicitly",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "module_path": "tddd::test_obligation::rules",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "SemanticVerifierError": {
+      "action": "add",
+      "docs": "Port-boundary error for obligation-fulfillment and waiver semantic assessment; see IN-09 / IN-11 / AC-07 / CN-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "VerifierPort",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::errors",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-11",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "SpecDocumentLoadError": {
+      "action": "add",
+      "docs": "Error returned by SpecDocumentLoaderPort::load — NotFound / Io / JsonParse / Invariant. See IN-07 / IN-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotFound",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Io",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "JsonParse",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Invariant",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "spec_document_loader_port",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TargetEntryRoleKind": {
+      "action": "add",
+      "docs": "Target-section vocabulary for applying decision-table rules; see IN-07 / IN-17.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "DataRole",
+            "payload": {
+              "fields": [
+                "DataRole"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ContractRole",
+            "payload": {
+              "fields": [
+                "ContractRole"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "FunctionRole",
+            "payload": {
+              "fields": [
+                "FunctionRole"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TraitImpl",
+            "payload": {
+              "fields": [
+                "ContractRole"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Pattern",
+            "payload": {
+              "fields": [
+                "TestObligationPatternKind"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "docs": "Returns the persistence canonical form used by obligation derivation; see IN-07.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "canonical_form",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<Self, DiagnosticMessage>"
+        }
+      ],
+      "module_path": "tddd::test_obligation::vocab",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-17",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestBindingRecord": {
+      "action": "add",
+      "docs": "Binding-record vocabulary for test-bindings artifacts; see IN-06 / AC-12 / CN-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fulfillment",
+            "payload": {
+              "fields": [
+                {
+                  "name": "obligation_id",
+                  "ty": "TestObligationId"
+                },
+                {
+                  "name": "tests",
+                  "ty": "NonEmptyTestLocations"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Waiver",
+            "payload": {
+              "fields": [
+                {
+                  "name": "edge_id",
+                  "ty": "TestObligationEdgeId"
+                },
+                {
+                  "name": "reason",
+                  "ty": "WaivedReason"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "VoluntaryBinding",
+            "payload": {
+              "fields": [
+                {
+                  "name": "edge_id",
+                  "ty": "TestObligationEdgeId"
+                },
+                {
+                  "name": "tests",
+                  "ty": "NonEmptyTestLocations"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::binding",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestBindingsDocument": {
+      "action": "add",
+      "docs": "Document value object for test-bindings artifacts; see IN-06 / AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "TrackId"
+            },
+            {
+              "name": "records",
+              "ty": "Vec<TestBindingRecord>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TrackId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "records",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TestBindingRecord]"
+        }
+      ],
+      "module_path": "tddd::test_obligation::binding",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestBodySpanHash": {
+      "action": "add",
+      "docs": "Hash role value object for a bound test function body span; see IN-09 / AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "hash",
+              "ty": "ContentHash"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ContentHash"
+        }
+      ],
+      "module_path": "tddd::test_obligation::hashes",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestFunctionName": {
+      "action": "add",
+      "docs": "Validated non-empty Rust test function name recorded in a TestBindingRecord (D9).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "name",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ids",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestLocation": {
+      "action": "add",
+      "docs": "Source-lookup value object recorded by TestBindingRecord; see IN-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "layer",
+              "ty": "LayerId"
+            },
+            {
+              "name": "module_path",
+              "ty": "TestModulePath"
+            },
+            {
+              "name": "test_name",
+              "ty": "TestFunctionName"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "layer",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&LayerId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "module_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestModulePath"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "test_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestFunctionName"
+        }
+      ],
+      "module_path": "tddd::test_obligation::binding",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestModulePath": {
+      "action": "add",
+      "docs": "Validated non-empty module path (e.g. `foo::bar`) recorded in a TestBindingRecord (D9).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ids",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligation": {
+      "action": "add",
+      "docs": "Derived obligation value object for obligations artifacts; see IN-05 / IN-07 / CN-11.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "id",
+              "ty": "TestObligationId"
+            },
+            {
+              "name": "target_entry",
+              "ty": "CatalogueEntryRef"
+            },
+            {
+              "name": "target_role",
+              "ty": "TargetEntryRoleKind"
+            },
+            {
+              "name": "brief",
+              "ty": "TestObligationBrief"
+            },
+            {
+              "name": "declaration_hash",
+              "ty": "DeclarationHash"
+            },
+            {
+              "name": "spec_refs",
+              "ty": "Vec<TestObligationAnchorId>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "target_entry",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CatalogueEntryRef"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "target_role",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TargetEntryRoleKind"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "brief",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationBrief"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "declaration_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&DeclarationHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "spec_refs",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TestObligationAnchorId]"
+        }
+      ],
+      "module_path": "tddd::test_obligation::obligations",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-11",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationAnchorId": {
+      "action": "add",
+      "docs": "Identifier value object for a spec or ADR anchor; see IN-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "file_path",
+              "ty": "String"
+            },
+            {
+              "name": "element_id",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "file_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "element_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ids",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationBrief": {
+      "action": "add",
+      "docs": "Brief text value object for a derived test obligation; see IN-05 / CN-14.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "text",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ids",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-14",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationBriefTemplate": {
+      "action": "add",
+      "docs": "Brief-template value object for test-obligation rules; see IN-02 / CN-10.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "template",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "tddd::test_obligation::rules",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationDrift": {
+      "action": "add",
+      "docs": "Drift-detail value object for test-obligation check; see IN-13 / AC-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Constructor for Missing drift.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "missing_obligation",
+          "params": [
+            {
+              "name": "obligation_id",
+              "ty": "TestObligationId"
+            },
+            {
+              "name": "detail",
+              "ty": "DiagnosticMessage"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "docs": "Constructor for Orphaned drift.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "orphaned_edge",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "TestObligationEdgeId"
+            },
+            {
+              "name": "detail",
+              "ty": "DiagnosticMessage"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "docs": "Constructor for SpecChanged drift.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "spec_changed_edge",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "TestObligationEdgeId"
+            },
+            {
+              "name": "detail",
+              "ty": "DiagnosticMessage"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "docs": "Constructor for DeclChanged drift.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "decl_changed_edge",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "TestObligationEdgeId"
+            },
+            {
+              "name": "detail",
+              "ty": "DiagnosticMessage"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "docs": "Constructor for TestChanged drift.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "test_changed_edge",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "TestObligationEdgeId"
+            },
+            {
+              "name": "detail",
+              "ty": "DiagnosticMessage"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "docs": "Constructor for ReasonChanged drift.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "reason_changed_edge",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "TestObligationEdgeId"
+            },
+            {
+              "name": "detail",
+              "ty": "DiagnosticMessage"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::test_obligation::drift",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-13",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationDriftKind": {
+      "action": "add",
+      "docs": "Drift-kind vocabulary for test-obligation check; see IN-13 / AC-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Missing",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Orphaned",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SpecChanged",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DeclChanged",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TestChanged",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ReasonChanged",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_kebab",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&'static str"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_existence",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_freshness",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "module_path": "tddd::test_obligation::vocab",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-13",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationEdgeId": {
+      "action": "add",
+      "docs": "Edge identity value object for test-obligation bindings; see IN-06 / IN-08 / CN-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "entry_key",
+              "ty": "CatalogueEntryKey"
+            },
+            {
+              "name": "anchor_id",
+              "ty": "TestObligationAnchorId"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "entry_key",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CatalogueEntryKey"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "anchor_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationAnchorId"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ids",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationId": {
+      "action": "add",
+      "docs": "Obligation identity value object; see IN-05 / CN-01 / AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "entry_key",
+              "ty": "CatalogueEntryKey"
+            },
+            {
+              "name": "obligation_kind",
+              "ty": "TestObligationKind"
+            },
+            {
+              "name": "item_identifier",
+              "ty": "TestObligationItemIdentifier"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "entry_key",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CatalogueEntryKey"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "obligation_kind",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationKind"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "item_identifier",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationItemIdentifier"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ids",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationItemIdentifier": {
+      "action": "add",
+      "docs": "Validated item-identifier newtype for TestObligationId; see IN-05 / CN-01.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ids",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationKind": {
+      "action": "add",
+      "docs": "Obligation-kind vocabulary for derivation rules; see IN-05 / CN-16 / CN-10.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Boundary",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvariantPreservation",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EventEmission",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "LogicResult",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "PredicateBothBranches",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ConstructionResult",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Result",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Reaction",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Transition",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Contract",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ContractConformance",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Logic",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_kebab",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&'static str"
+        }
+      ],
+      "module_path": "tddd::test_obligation::vocab",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-16",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationMinimum": {
+      "action": "add",
+      "docs": "Minimum-count value object for TestObligationRule; see IN-02 / AC-01.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "usize"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_usize",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize"
+        }
+      ],
+      "module_path": "tddd::test_obligation::rules",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationPatternKind": {
+      "action": "add",
+      "docs": "Pattern-section vocabulary for the decision-table config; see IN-03 / AC-01.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Typestate",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::vocab",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationPerAxis": {
+      "action": "add",
+      "docs": "Per-axis vocabulary for decision-table rules; see CN-10 / IN-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Invariant",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Method",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Handles",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ReactsTo",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Transition",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TraitMethod",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Entry",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Emits",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TraitImpl",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_kebab",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&'static str"
+        }
+      ],
+      "module_path": "tddd::test_obligation::vocab",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationRule": {
+      "action": "add",
+      "docs": "Obligation-generation rule value object for the decision-table config; see IN-02 / CN-10 / AC-01.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "kind",
+              "ty": "TestObligationKind"
+            },
+            {
+              "name": "per_axis",
+              "ty": "TestObligationPerAxis"
+            },
+            {
+              "name": "minimum",
+              "ty": "Option<TestObligationMinimum>"
+            },
+            {
+              "name": "brief_template",
+              "ty": "Option<TestObligationBriefTemplate>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "kind",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationKind"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "per_axis",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationPerAxis"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "minimum",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&TestObligationMinimum>"
+        }
+      ],
+      "module_path": "tddd::test_obligation::rules",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationRulesDocument": {
+      "action": "add",
+      "docs": "Document value object for `.harness/config/test-obligation-rules.json`; see IN-02 / IN-03 / CN-05 / AC-01 / AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Producible variants: RoleNotCovered, InvalidRuleValue.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "data_roles",
+              "ty": "Vec<(DataRole, RoleObligationRules)>"
+            },
+            {
+              "name": "contract_roles",
+              "ty": "Vec<(ContractRole, RoleObligationRules)>"
+            },
+            {
+              "name": "function_roles",
+              "ty": "Vec<(FunctionRole, RoleObligationRules)>"
+            },
+            {
+              "name": "patterns",
+              "ty": "Vec<(TestObligationPatternKind, RoleObligationRules)>"
+            },
+            {
+              "name": "trait_impls",
+              "ty": "Vec<(ContractRole, RoleObligationRules)>"
+            }
+          ],
+          "returns": "Result<Self, TestObligationRulesLoadError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "data_roles",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[(DataRole, RoleObligationRules)]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "contract_roles",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[(ContractRole, RoleObligationRules)]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "function_roles",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[(FunctionRole, RoleObligationRules)]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "patterns",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[(TestObligationPatternKind, RoleObligationRules)]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "trait_impls",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[(ContractRole, RoleObligationRules)]"
+        }
+      ],
+      "module_path": "tddd::test_obligation::rules",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationRulesLoadError": {
+      "action": "add",
+      "docs": "Error vocabulary for TestObligationRulesLoaderPort; see IN-04 / CN-05 / AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RoleNotCovered",
+            "payload": {
+              "fields": [
+                {
+                  "name": "role_name",
+                  "ty": "RoleName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ObligationsFieldOmitted",
+            "payload": {
+              "fields": [
+                {
+                  "name": "role_name",
+                  "ty": "RoleName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnknownRoleName",
+            "payload": {
+              "fields": [
+                {
+                  "name": "role_name",
+                  "ty": "RoleName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidRuleValue",
+            "payload": {
+              "fields": [
+                {
+                  "name": "role_name",
+                  "ty": "RoleName"
+                },
+                {
+                  "name": "message",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "IoError",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "MalformedJson",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::errors",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestSourceScanError": {
+      "action": "add",
+      "docs": "Port-boundary error for test-source scanning; see IN-06 / IN-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Io",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Parse",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::errors",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestsSource": {
+      "action": "add",
+      "docs": "Non-empty test source text for a fulfillment pair. See IN-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Non-empty test source text for a fulfillment pair. See IN-09.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "text",
+              "ty": "String"
+            }
+          ],
+          "receiver": null,
+          "returns": "Result<Self, ValidationError>",
+          "where_predicates": []
+        },
+        {
+          "docs": "Non-empty test source text for a fulfillment pair. See IN-09.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::test_obligation::pair",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TraitImplDeclV2": {
+      "action": "modify",
+      "docs": "Top-level trait-impl declaration entry for CatalogueDocument.trait_impls. Fields are private per knowledge/adr/2026-07-04-0525-catalogue-v2-entry-lint-conformance.md D3 and exposed through read accessors.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Construct a TraitImplDeclV2 from the complete private state.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_parts",
+          "params": [
+            {
+              "name": "action",
+              "ty": "ItemAction"
+            },
+            {
+              "name": "trait_ref",
+              "ty": "TypeRef"
+            },
+            {
+              "name": "for_type",
+              "ty": "TypeRef"
+            },
+            {
+              "name": "impl_generics",
+              "ty": "Vec<MethodGenericParam>"
+            },
+            {
+              "name": "impl_where_predicates",
+              "ty": "Vec<WherePredicateDecl>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "docs": "Construct a TraitImplDeclV2 with default Add action, no impl-level generics or where predicates.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "trait_ref",
+              "ty": "TypeRef"
+            },
+            {
+              "name": "for_type",
+              "ty": "TypeRef"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "docs": "Read the TDDD action for this impl declaration.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "action",
+          "params": [],
+          "receiver": "&self",
+          "returns": "ItemAction",
+          "where_predicates": []
+        },
+        {
+          "docs": "Read the trait reference implemented by this declaration.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "trait_ref",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TypeRef",
+          "where_predicates": []
+        },
+        {
+          "docs": "Read the self type for this impl declaration.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "for_type",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TypeRef",
+          "where_predicates": []
+        },
+        {
+          "docs": "Read impl-block-level generic parameters.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "impl_generics",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[MethodGenericParam]",
+          "where_predicates": []
+        },
+        {
+          "docs": "Read impl-block-level where predicates.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "impl_where_predicates",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[WherePredicateDecl]",
+          "where_predicates": []
+        },
+        {
+          "docs": "Classify this decl's trait_ref into SelfCrate / Workspace / External. See IN-17 / AC-16.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "trait_ref_scope",
+          "params": [],
+          "receiver": "&self",
+          "returns": "TraitRefScope",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::traits",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-17",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TraitName": {
+      "action": "reference",
+      "docs": "Baseline validated Rust-identifier newtype used for catalogue trait short names; construction rejects empty or syntactically invalid identifiers (IN-17).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "s",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Result<Self, IdentifierError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::identifiers",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TraitRefScope": {
+      "action": "add",
+      "docs": "Three-way classification of a TraitImplDeclV2.trait_ref. See IN-17 / AC-16.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SelfCrate",
+            "payload": {
+              "fields": [
+                {
+                  "name": "bare_name",
+                  "ty": "TraitName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Workspace",
+            "payload": {
+              "fields": [
+                {
+                  "name": "crate_name",
+                  "ty": "CrateName"
+                },
+                {
+                  "name": "bare_name",
+                  "ty": "TraitName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "External",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::catalogue_v2::traits",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-17",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-16",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "UncitedSpecElementFinding": {
+      "action": "add",
+      "docs": "Finding value object for uncited spec elements; see IN-16 / AC-13 / CN-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "element_id",
+              "ty": "SpecElementId"
+            },
+            {
+              "name": "section",
+              "ty": "SpecSectionKind"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::test_obligation::scope",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-16",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-13",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ValidationError": {
+      "action": "modify",
+      "docs": "Domain validation error enum; see IN-02 / IN-09 / AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "EmptyString",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvalidTrackId",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidTaskId",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidCommitHash",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidTimestamp",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidTrackBranch",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "BranchIdMismatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "id",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "branch",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "StatusOverrideMismatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "override_kind",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "required",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "actual",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "EmptyTrackTitle",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyTaskDescription",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyPlanSectionId",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyPlanSectionTitle",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DuplicateTaskId",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DuplicatePlanSectionId",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnknownTaskReference",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DuplicateTaskReference",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnreferencedTask",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "OverrideIncompatibleWithResolvedTasks",
+            "payload": {
+              "fields": [
+                "TrackStatus"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TrackActivationRequiresPlanningOnly",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "status",
+                  "ty": "TrackStatus"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TrackActivationRequiresSchemaV3",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "schema_version",
+                  "ty": "u32"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TrackAlreadyMaterialized",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "DiagnosticMessage"
+                },
+                {
+                  "name": "branch",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnsupportedTargetStatus",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SectionNotFound",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "NoSectionsAvailable",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TaskDescriptionMutated",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TaskRemoved",
+            "payload": {
+              "fields": [
+                {
+                  "name": "task_id",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DuplicateElementId",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidLayerId",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidSpecElementId",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "EmptyAdrAnchor",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyConventionAnchor",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvalidContentHash",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "EmptyInformalGroundSummary",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "MultiLineInformalGroundSummary",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyDecisionGroundRef",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvalidObligationMinimum",
+            "payload": {
+              "fields": [
+                "usize"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidDetectionRate",
+            "payload": {
+              "fields": [
+                "u8"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "error",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "VerifierPromptFingerprint": {
+      "action": "add",
+      "docs": "Hash of the judging-prompt preamble carried by cached verdicts; see IN-09 / CN-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "hash",
+              "ty": "ContentHash"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ContentHash"
+        }
+      ],
+      "module_path": "tddd::test_obligation::hashes",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "VerifyCacheError": {
+      "action": "add",
+      "docs": "Error vocabulary for obligation-fulfillment and waiver verdict cache repositories; see IN-09 / AC-06 / CN-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Io",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "MalformedJson",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::errors",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "WaivedReason": {
+      "action": "add",
+      "docs": "Waiver-reason value object for test-bindings artifacts; see IN-06 / AC-11.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "text",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ids",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "WaivedReasonHash": {
+      "action": "add",
+      "docs": "Hash role value object for waiver reasons in cache keys; see AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "hash",
+              "ty": "ContentHash"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ContentHash"
+        }
+      ],
+      "module_path": "tddd::test_obligation::hashes",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "WaiverCacheDocument": {
+      "action": "add",
+      "docs": "Document value object for waiver verdict cache records; see IN-09 / AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "TrackId"
+            },
+            {
+              "name": "entries",
+              "ty": "Vec<WaiverCacheEntry>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "entries",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[WaiverCacheEntry]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "track_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TrackId"
+        }
+      ],
+      "module_path": "tddd::test_obligation::verdict",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "WaiverCacheEntry": {
+      "action": "add",
+      "docs": "Cache-entry value object for waiver verdict records; see IN-09 / CN-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "edge_id",
+              "ty": "TestObligationEdgeId"
+            },
+            {
+              "name": "key",
+              "ty": "WaiverCacheKey"
+            },
+            {
+              "name": "verdict",
+              "ty": "WaiverVerdict"
+            },
+            {
+              "name": "verifier_fingerprint",
+              "ty": "Option<VerifierPromptFingerprint>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "edge_id",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&TestObligationEdgeId"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "key",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&WaiverCacheKey"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verdict",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&WaiverVerdict"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verifier_fingerprint",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Option<&VerifierPromptFingerprint>"
+        }
+      ],
+      "module_path": "tddd::test_obligation::verdict",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "WaiverCacheKey": {
+      "action": "add",
+      "docs": "Cache-key value object for waiver verdict records; see IN-09 / AC-06 / CN-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "waived_reason_hash",
+              "ty": "WaivedReasonHash"
+            },
+            {
+              "name": "declaration_hash",
+              "ty": "DeclarationHash"
+            },
+            {
+              "name": "anchor_text_hash",
+              "ty": "AnchorTextHash"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "waived_reason_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&WaivedReasonHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "declaration_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&DeclarationHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "anchor_text_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&AnchorTextHash"
+        }
+      ],
+      "module_path": "tddd::test_obligation::verdict",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "WaiverPair": {
+      "action": "add",
+      "docs": "Waiver claim / evidence pair. See IN-01 / IN-15 / AC-15.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "See IN-15.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "waived_reason",
+              "ty": "WaivedReason"
+            },
+            {
+              "name": "entry_declaration",
+              "ty": "EntryDeclaration"
+            },
+            {
+              "name": "anchor_text",
+              "ty": "AnchorText"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "docs": "See IN-15.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "waived_reason",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&WaivedReason",
+          "where_predicates": []
+        },
+        {
+          "docs": "See IN-15.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "entry_declaration",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&EntryDeclaration",
+          "where_predicates": []
+        },
+        {
+          "docs": "See IN-15.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "anchor_text",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&AnchorText",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::test_obligation::pair",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "WaiverVerdict": {
+      "action": "add",
+      "docs": "Waiver-lane verdict vocabulary; see IN-09 / AC-06 / AC-11.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Waived",
+            "payload": {
+              "fields": [
+                {
+                  "name": "citation",
+                  "ty": "EvidenceCitation"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Fail",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Pending",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::test_obligation::verdict",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    }
+  }
+}

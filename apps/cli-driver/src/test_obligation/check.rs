@@ -1,0 +1,323 @@
+//! Primary adapter for `sotp test-obligation check`.
+
+use std::path::PathBuf;
+use std::sync::Arc;
+
+use usecase::test_obligation::check::{
+    CheckTestObligationsApplicationService, CheckTestObligationsCommand,
+};
+use usecase::{DiagnosticMessage, TrackId};
+
+use crate::render::CommandOutcome;
+
+use super::catalogue_command_input;
+
+/// cli_driver-local DTO for `sotp test-obligation check`.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct TestObligationCheckInput {
+    track_id: Option<TrackId>,
+    current_branch: DiagnosticMessage,
+}
+
+impl TestObligationCheckInput {
+    /// Constructor for [`TestObligationCheckInput`].
+    #[must_use]
+    pub fn new(track_id: Option<TrackId>, current_branch: DiagnosticMessage) -> Self {
+        Self { track_id, current_branch }
+    }
+
+    /// Builds the input from CLI string values.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error when the optional track id or branch diagnostic is invalid.
+    #[cfg(not(doc))]
+    pub fn try_from_raw(track_id: Option<String>, current_branch: String) -> Result<Self, String> {
+        let (track_id, current_branch) = super::parse_input_parts(track_id, current_branch)?;
+        Ok(Self::new(track_id, current_branch))
+    }
+
+    /// Return the optional track id.
+    #[must_use]
+    pub fn track_id(&self) -> Option<&TrackId> {
+        self.track_id.as_ref()
+    }
+
+    /// Return the caller's current git branch.
+    #[must_use]
+    pub fn current_branch(&self) -> &DiagnosticMessage {
+        &self.current_branch
+    }
+}
+
+/// Primary adapter for `test-obligation check`.
+pub struct TestObligationCheckHandler {
+    pub service: Arc<dyn CheckTestObligationsApplicationService>,
+    /// Anchor used to make track-artifact paths (catalogue snapshots) absolute
+    /// so the handler is not sensitive to the process cwd.
+    workspace_root: PathBuf,
+}
+
+impl TestObligationCheckHandler {
+    /// Builds the handler over its application service and the discovered
+    /// workspace root. `workspace_root` is the anchor used when constructing
+    /// catalogue paths — pass the value the composition root obtained from
+    /// git worktree discovery.
+    #[must_use]
+    pub fn new(
+        service: Arc<dyn CheckTestObligationsApplicationService>,
+        workspace_root: PathBuf,
+    ) -> Self {
+        Self { service, workspace_root }
+    }
+
+    /// Handles one check command.
+    #[must_use]
+    pub fn handle(&self, input: TestObligationCheckInput) -> CommandOutcome {
+        let command_input = match catalogue_command_input(
+            &self.workspace_root,
+            input.track_id(),
+            input.current_branch(),
+        ) {
+            Ok(input) => input,
+            Err(message) => return CommandOutcome::failure(Some(message)),
+        };
+        let command = CheckTestObligationsCommand::new(command_input);
+        match self.service.execute(&command) {
+            Ok(output) => {
+                let mut text = format!(
+                    "[OK] test-obligation check passed: resolved_edges={} uncited_findings={}",
+                    output.resolved_edges().len(),
+                    output.uncited_findings().len()
+                );
+                if let Some(todo) = output.status_lane_summaries().iter().find(|summary| {
+                    summary.task_status() == usecase::test_obligation::results::TaskStatusKind::Todo
+                        && (summary.missing_count() > 0
+                            || summary.stale_count() > 0
+                            || summary.verdict_absent_count() > 0)
+                }) {
+                    text.push_str(&format!(
+                        "\n[WARN] todo-lane unresolved: missing={} stale={} verdict_absent={}",
+                        todo.missing_count(),
+                        todo.stale_count(),
+                        todo.verdict_absent_count()
+                    ));
+                }
+                CommandOutcome::success(Some(text))
+            }
+            Err(
+                usecase::test_obligation::errors::ObligationCheckError::StaleObligationsArtifact {
+                    detail,
+                },
+            ) => CommandOutcome::failure(Some(format!(
+                "test-obligation check failed: stale obligations artifact ({}); rerun test-obligation derive",
+                detail.as_str()
+            ))),
+            Err(error) => {
+                CommandOutcome::failure(Some(format!("test-obligation check failed: {error:?}")))
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use std::sync::Mutex;
+
+    use super::*;
+
+    struct StubService;
+
+    impl CheckTestObligationsApplicationService for StubService {
+        fn execute(
+            &self,
+            _cmd: &CheckTestObligationsCommand,
+        ) -> Result<
+            usecase::test_obligation::check::CheckTestObligationsOutcome,
+            usecase::test_obligation::errors::ObligationCheckError,
+        > {
+            Ok(usecase::test_obligation::check::CheckTestObligationsOutcome::new_empty_scope(
+                Vec::new(),
+            ))
+        }
+    }
+
+    #[test]
+    fn test_check_handler_with_valid_input_returns_success() {
+        let handler =
+            TestObligationCheckHandler::new(Arc::new(StubService), PathBuf::from("/repo"));
+        let branch = DiagnosticMessage::try_new("track/test-track".to_owned()).unwrap();
+
+        let outcome = handler.handle(TestObligationCheckInput::new(None, branch));
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(outcome.stdout.unwrap().contains("resolved_edges=0"));
+    }
+
+    #[test]
+    fn test_check_handler_renders_todo_lane_warning_without_failure() {
+        struct TodoWarningService;
+
+        impl CheckTestObligationsApplicationService for TodoWarningService {
+            fn execute(
+                &self,
+                _cmd: &CheckTestObligationsCommand,
+            ) -> Result<
+                usecase::test_obligation::check::CheckTestObligationsOutcome,
+                usecase::test_obligation::errors::ObligationCheckError,
+            > {
+                Ok(usecase::test_obligation::check::CheckTestObligationsOutcome::new_verified_scope(
+                    Vec::new(),
+                    Vec::new(),
+                    vec![usecase::test_obligation::results::TestObligationStatusLaneSummary::new(
+                        usecase::test_obligation::results::TaskStatusKind::Todo,
+                        1,
+                        2,
+                        3,
+                    )],
+                ))
+            }
+        }
+
+        let handler =
+            TestObligationCheckHandler::new(Arc::new(TodoWarningService), PathBuf::from("/repo"));
+        let branch = DiagnosticMessage::try_new("track/test-track".to_owned()).unwrap();
+
+        let outcome = handler.handle(TestObligationCheckInput::new(None, branch));
+
+        assert_eq!(outcome.exit_code, 0);
+        let stdout = outcome.stdout.unwrap();
+        assert!(stdout.contains("[WARN] todo-lane unresolved"));
+        assert!(stdout.contains("missing=1 stale=2 verdict_absent=3"));
+    }
+
+    #[test]
+    fn test_check_handler_anchors_catalogue_paths_at_workspace_root() {
+        struct CapturingService {
+            captured: Mutex<Option<CheckTestObligationsCommand>>,
+        }
+
+        impl CheckTestObligationsApplicationService for CapturingService {
+            fn execute(
+                &self,
+                cmd: &CheckTestObligationsCommand,
+            ) -> Result<
+                usecase::test_obligation::check::CheckTestObligationsOutcome,
+                usecase::test_obligation::errors::ObligationCheckError,
+            > {
+                *self.captured.lock().unwrap() = Some(cmd.clone());
+                Ok(usecase::test_obligation::check::CheckTestObligationsOutcome::new_empty_scope(
+                    Vec::new(),
+                ))
+            }
+        }
+
+        let service = Arc::new(CapturingService { captured: Mutex::new(None) });
+        let workspace_root = PathBuf::from("/discovered/workspace");
+        let handler = TestObligationCheckHandler::new(service.clone(), workspace_root.clone());
+        let branch = DiagnosticMessage::try_new("track/example".to_owned()).unwrap();
+
+        let outcome = handler.handle(TestObligationCheckInput::new(None, branch));
+
+        assert_eq!(outcome.exit_code, 0);
+        let captured = service.captured.lock().unwrap().clone().unwrap();
+        let track_id = TrackId::try_new("example".to_owned()).unwrap();
+        let expected = CheckTestObligationsCommand::new(
+            usecase::test_obligation::TestObligationCatalogueCommandInput::new(
+                track_id.clone(),
+                "track/example".to_owned(),
+                super::super::default_catalogue_paths(&workspace_root, &track_id),
+            ),
+        );
+        assert_eq!(captured, expected);
+    }
+
+    #[test]
+    fn test_check_handler_surfaces_fail_closed_gate_errors() {
+        struct FailingService;
+
+        impl CheckTestObligationsApplicationService for FailingService {
+            fn execute(
+                &self,
+                _cmd: &CheckTestObligationsCommand,
+            ) -> Result<
+                usecase::test_obligation::check::CheckTestObligationsOutcome,
+                usecase::test_obligation::errors::ObligationCheckError,
+            > {
+                Err(usecase::test_obligation::errors::ObligationCheckError::BindingsAbsent)
+            }
+        }
+
+        let handler =
+            TestObligationCheckHandler::new(Arc::new(FailingService), PathBuf::from("/repo"));
+        let branch = DiagnosticMessage::try_new("track/test-track".to_owned()).unwrap();
+
+        let outcome = handler.handle(TestObligationCheckInput::new(None, branch));
+
+        assert_ne!(outcome.exit_code, 0);
+        assert!(outcome.stderr.unwrap().contains("BindingsAbsent"));
+    }
+
+    #[test]
+    fn test_check_handler_with_stale_artifact_returns_nonzero() {
+        struct StaleArtifactService;
+
+        impl CheckTestObligationsApplicationService for StaleArtifactService {
+            fn execute(
+                &self,
+                _cmd: &CheckTestObligationsCommand,
+            ) -> Result<
+                usecase::test_obligation::check::CheckTestObligationsOutcome,
+                usecase::test_obligation::errors::ObligationCheckError,
+            > {
+                Err(usecase::test_obligation::errors::ObligationCheckError::StaleObligationsArtifact {
+                    detail: DiagnosticMessage::try_new("verdict stale for skipped entry".to_owned())
+                        .unwrap(),
+                })
+            }
+        }
+
+        let handler =
+            TestObligationCheckHandler::new(Arc::new(StaleArtifactService), PathBuf::from("/repo"));
+        let branch = DiagnosticMessage::try_new("track/test-track".to_owned()).unwrap();
+
+        let outcome = handler.handle(TestObligationCheckInput::new(None, branch));
+
+        assert_ne!(outcome.exit_code, 0);
+        assert!(outcome.stderr.unwrap().contains("stale obligations artifact"));
+    }
+
+    #[test]
+    fn test_check_handler_surfaces_stale_obligations_artifact_error() {
+        struct FailingService;
+
+        impl CheckTestObligationsApplicationService for FailingService {
+            fn execute(
+                &self,
+                _cmd: &CheckTestObligationsCommand,
+            ) -> Result<
+                usecase::test_obligation::check::CheckTestObligationsOutcome,
+                usecase::test_obligation::errors::ObligationCheckError,
+            > {
+                Err(usecase::test_obligation::errors::ObligationCheckError::StaleObligationsArtifact {
+                    detail: DiagnosticMessage::try_new(
+                        "missing=1, unexpected=0, changed=0".to_owned(),
+                    )
+                    .unwrap(),
+                })
+            }
+        }
+
+        let handler =
+            TestObligationCheckHandler::new(Arc::new(FailingService), PathBuf::from("/repo"));
+        let branch = DiagnosticMessage::try_new("track/test-track".to_owned()).unwrap();
+
+        let outcome = handler.handle(TestObligationCheckInput::new(None, branch));
+
+        assert_ne!(outcome.exit_code, 0);
+        let stderr = outcome.stderr.unwrap();
+        assert!(stderr.contains("stale obligations artifact"));
+        assert!(stderr.contains("missing=1"));
+    }
+}

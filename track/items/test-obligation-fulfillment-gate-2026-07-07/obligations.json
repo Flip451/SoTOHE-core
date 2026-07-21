@@ -1,0 +1,2429 @@
+{
+  "track_id": "test-obligation-fulfillment-gate-2026-07-07",
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "NonEmptyDrifts",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:non_empty"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "types",
+        "entry_key": "NonEmptyDrifts"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "ValueObject"
+      },
+      "brief": "Author a boundary test covering 'invariant:non_empty' of NonEmptyDrifts",
+      "declaration_hash": "5fce20f442333f0f4dd681ccfe5342826be43f22e8d7e481a30dac0021b7c0d0",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-13"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-05"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "NonEmptyEdgeIds",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:non_empty"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "types",
+        "entry_key": "NonEmptyEdgeIds"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "ValueObject"
+      },
+      "brief": "Author a boundary test covering 'invariant:non_empty' of NonEmptyEdgeIds",
+      "declaration_hash": "76a9845840ea09a05069b949921c9d0e73be741e3135ffe4f3cd256e219350f9",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "NonEmptyEdgeVerdictRecords",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:non_empty"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "types",
+        "entry_key": "NonEmptyEdgeVerdictRecords"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "ValueObject"
+      },
+      "brief": "Author a boundary test covering 'invariant:non_empty' of NonEmptyEdgeVerdictRecords",
+      "declaration_hash": "f3e58724a1fff249151678010cb34fbac294c896493769186d31f4ad824271de",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-11"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "NonEmptyTestLocations",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:non_empty"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "types",
+        "entry_key": "NonEmptyTestLocations"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "ValueObject"
+      },
+      "brief": "Author a boundary test covering 'invariant:non_empty' of NonEmptyTestLocations",
+      "declaration_hash": "7ba7716c03e770d5e3b3e3fa25e2b6cc2cd1f07378210994fbceebe5265bcabb",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-12"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "RoleObligationItemsProjector",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:new"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "types",
+        "entry_key": "RoleObligationItemsProjector"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:new' of RoleObligationItemsProjector",
+      "declaration_hash": "8a400f39fda03cafc38a692e144afb364360f3205acc3dd338651da313ab8378",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-10"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-16"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "RoleObligationItemsProjector",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:data_role_items"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "types",
+        "entry_key": "RoleObligationItemsProjector"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:data_role_items' of RoleObligationItemsProjector",
+      "declaration_hash": "8a400f39fda03cafc38a692e144afb364360f3205acc3dd338651da313ab8378",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-10"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-16"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "RoleObligationItemsProjector",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:trait_impl_items"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "types",
+        "entry_key": "RoleObligationItemsProjector"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:trait_impl_items' of RoleObligationItemsProjector",
+      "declaration_hash": "8a400f39fda03cafc38a692e144afb364360f3205acc3dd338651da313ab8378",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-10"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-16"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "RoleObligationItemsProjector",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:contract_role_items"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "types",
+        "entry_key": "RoleObligationItemsProjector"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:contract_role_items' of RoleObligationItemsProjector",
+      "declaration_hash": "8a400f39fda03cafc38a692e144afb364360f3205acc3dd338651da313ab8378",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-10"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-16"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "RoleObligationItemsProjector",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:function_role_items"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "types",
+        "entry_key": "RoleObligationItemsProjector"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:function_role_items' of RoleObligationItemsProjector",
+      "declaration_hash": "8a400f39fda03cafc38a692e144afb364360f3205acc3dd338651da313ab8378",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-10"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-16"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "RoleObligationItemsProjector",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:typestate_items"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "types",
+        "entry_key": "RoleObligationItemsProjector"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:typestate_items' of RoleObligationItemsProjector",
+      "declaration_hash": "8a400f39fda03cafc38a692e144afb364360f3205acc3dd338651da313ab8378",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-10"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-16"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "RoleObligationItemsProjector",
+        "obligation_kind": "logic_result",
+        "item_identifier": "method:type_has_typestate"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "types",
+        "entry_key": "RoleObligationItemsProjector"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "DomainService"
+      },
+      "brief": "Author a logic_result test covering 'method:type_has_typestate' of RoleObligationItemsProjector",
+      "declaration_hash": "8a400f39fda03cafc38a692e144afb364360f3205acc3dd338651da313ab8378",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-17"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-10"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-16"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ObligationFulfillmentCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "ObligationFulfillmentCachePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load' of ObligationFulfillmentCachePort",
+      "declaration_hash": "ade087d5a150f2d8351516ba7539535130277b76ff8e84ce1ee196f75080c8f3",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ObligationFulfillmentCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:save"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "ObligationFulfillmentCachePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:save' of ObligationFulfillmentCachePort",
+      "declaration_hash": "ade087d5a150f2d8351516ba7539535130277b76ff8e84ce1ee196f75080c8f3",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ObligationFulfillmentVerifierPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:verify_pair"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "ObligationFulfillmentVerifierPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:verify_pair' of ObligationFulfillmentVerifierPort",
+      "declaration_hash": "f98d534c451f6e02d975e55affccfd6baaf70dc25a869ba736caf00722f6cfd7",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-11"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ObligationsArtifactPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "ObligationsArtifactPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load' of ObligationsArtifactPort",
+      "declaration_hash": "595c0fc73a5a252f747bfc729abdb9f972ffd3a3295626754ca3d7038a5ecb0a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ObligationsArtifactPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:save"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "ObligationsArtifactPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:save' of ObligationsArtifactPort",
+      "declaration_hash": "595c0fc73a5a252f747bfc729abdb9f972ffd3a3295626754ca3d7038a5ecb0a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SpecDocumentLoaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "SpecDocumentLoaderPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load' of SpecDocumentLoaderPort",
+      "declaration_hash": "3625ef0ef8893be917428060f4ebf216bd25484f18c2034fba5f6158cfb417b7",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestBindingsArtifactPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "TestBindingsArtifactPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load' of TestBindingsArtifactPort",
+      "declaration_hash": "022846a7d90e9c383edb743018558b4346db55f81331fc234563fda16f5d7ae6",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestBindingsArtifactPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:save"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "TestBindingsArtifactPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:save' of TestBindingsArtifactPort",
+      "declaration_hash": "022846a7d90e9c383edb743018558b4346db55f81331fc234563fda16f5d7ae6",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestObligationRulesLoaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "TestObligationRulesLoaderPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load' of TestObligationRulesLoaderPort",
+      "declaration_hash": "c8e35f1539752dc20f0ff41cb43aa1f610701cd8a7852b8312293df9660ffd5b",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-02"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestSourceScannerPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:scan_test_body"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "TestSourceScannerPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:scan_test_body' of TestSourceScannerPort",
+      "declaration_hash": "537baa7e4a0339b7ea0f3ce04f4aa4e2d751b216c293822bde0470070bfb439f",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestSourceScannerPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:hash_test_body"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "TestSourceScannerPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:hash_test_body' of TestSourceScannerPort",
+      "declaration_hash": "537baa7e4a0339b7ea0f3ce04f4aa4e2d751b216c293822bde0470070bfb439f",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "WaiverCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "WaiverCachePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load' of WaiverCachePort",
+      "declaration_hash": "b0d39c1b4bc71377ac254b267d3c53f31e958308e3cf8c64512ba2d8c06540fd",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "WaiverCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:save"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "WaiverCachePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:save' of WaiverCachePort",
+      "declaration_hash": "b0d39c1b4bc71377ac254b267d3c53f31e958308e3cf8c64512ba2d8c06540fd",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "WaiverVerifierPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:verify_pair"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "WaiverVerifierPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:verify_pair' of WaiverVerifierPort",
+      "declaration_hash": "eec2fdc56e06ae9b41ff6d10f471905c6da1dec77b37c953a2610f0dda598000",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-11"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "CheckTestObligationsInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of CheckTestObligationsInteractor",
+      "declaration_hash": "d6a8669983281879d19855dc0dab1b12e128771e9ec4415c25109e382af30fe1",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "DeriveTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "DeriveTestObligationsInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of DeriveTestObligationsInteractor",
+      "declaration_hash": "c73c1be9e1b85e9042b10dcfa13cb8dfad0f7d8edafd6e09f754c0d92d9bc164",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "EvaluateTestObligationsInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of EvaluateTestObligationsInteractor",
+      "declaration_hash": "f2e102cbdf60d2429a1ec48c1949e413823df03cd8a16bbd3e533ec0adaeca9c",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "RefVerifyConfig",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:valid_probe_and_parallelism"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "RefVerifyConfig"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "ValueObject"
+      },
+      "brief": "Author a boundary test covering 'invariant:valid_probe_and_parallelism' of RefVerifyConfig",
+      "declaration_hash": "17c9c20e5272843bb573b5c42f263e2e54bc7898e8af7d6b3f0620be927b9ae4",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-15"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "RefVerifyPercent",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:percent_in_1_to_100"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "RefVerifyPercent"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "ValueObject"
+      },
+      "brief": "Author a boundary test covering 'invariant:percent_in_1_to_100' of RefVerifyPercent",
+      "declaration_hash": "57a9b5073dbfeaefdbeb111bf69e8f2d80910c60b555f6a9049fed4bef45ce0a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-15"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestBindingsSkeletonInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "TestBindingsSkeletonInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of TestBindingsSkeletonInteractor",
+      "declaration_hash": "1dcffc5acbce370031e866800b30eb966e49fabaec6297d7105ecc1c11f1e1e3",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-14"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "TestObligationResultsInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of TestObligationResultsInteractor",
+      "declaration_hash": "29f50166e5ee2749a4603674af809ef55c53d102d0ab84f4d7c87e053ab75f31",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CheckTestObligationsApplicationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "CheckTestObligationsApplicationService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:execute' of CheckTestObligationsApplicationService",
+      "declaration_hash": "3fd92b8837f2c23e8c2ea7d757648565985493a24bfc73e254091e46f90ee83b",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-10"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ContentHasherPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:sha256"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ContentHasherPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:sha256' of ContentHasherPort",
+      "declaration_hash": "d86e5445efdd385a73c105a15ff42e4a2fcc5863dd62aeda1676241f90d9a88a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "DeriveTestObligationsApplicationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "DeriveTestObligationsApplicationService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:execute' of DeriveTestObligationsApplicationService",
+      "declaration_hash": "0db7b23f3e23a6bb85420fcff5f6f0d438f558038a6dfee56b38da832e9cee63",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "EvaluateTestObligationsApplicationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "EvaluateTestObligationsApplicationService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:execute' of EvaluateTestObligationsApplicationService",
+      "declaration_hash": "3f25aaf85b3f7a760a35e2410f42c3ddad4e16a2faa77ee2b747bb014f699605",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SemanticEscalationDriverPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:evaluate_with_escalation"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "SemanticEscalationDriverPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:evaluate_with_escalation' of SemanticEscalationDriverPort",
+      "declaration_hash": "a7c375b31666916eb8fac6e25d62098b6ffd4ba61e78bbb5b01cbaf68eb1053b",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-15"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SemanticEscalationVerdictBridge",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:project"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "SemanticEscalationVerdictBridge"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:project' of SemanticEscalationVerdictBridge",
+      "declaration_hash": "3eb16d33118d8167fa0c3e7c4c5043b70e80695e30adeae6d38c8dfe64d5f809",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-15"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestBindingsSkeletonApplicationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "TestBindingsSkeletonApplicationService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:execute' of TestBindingsSkeletonApplicationService",
+      "declaration_hash": "627d0bf47f9700fb65857b2e256ac68680ab548e25904367f3683457552fd95d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-14"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestObligationResultsApplicationService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:execute"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "TestObligationResultsApplicationService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:execute' of TestObligationResultsApplicationService",
+      "declaration_hash": "eeb849ab690c2bf2b2806a2ee91a27f514c1f2cf7a53c5abc90af0794b9eaace",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint",
+      "declaration_hash": "34085f2b0653e59c8c3d06991372247445a5109fb1dcecd4344fac51c8d31b40",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint",
+      "declaration_hash": "3cd6381b90874bdac1514fd46404ba59f5c1952b22d6ff827a975714b2ef22e0",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "JsonTestObligationRulesLoader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::TestObligationRulesLoaderPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "JsonTestObligationRulesLoader"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::test_obligation::ports::TestObligationRulesLoaderPort' of JsonTestObligationRulesLoader",
+      "declaration_hash": "6e00d8d4ce7475e999ce54f99d30093abe1c5af1bd261cc5e26ab78a63bfd991",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-02"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "JsonObligationsCodec",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::ObligationsArtifactPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "JsonObligationsCodec"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::test_obligation::ports::ObligationsArtifactPort' of JsonObligationsCodec",
+      "declaration_hash": "648fe7023776f1e8a1264a66b5f03365c9cc08ae396454e1ff8d3c9120ecccd9",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "JsonTestBindingsCodec",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::TestBindingsArtifactPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "JsonTestBindingsCodec"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::test_obligation::ports::TestBindingsArtifactPort' of JsonTestBindingsCodec",
+      "declaration_hash": "4d6cfaf533a12839d3c3ea47a8d9748a542e41de8667b9d50171644aca948403",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "JsonObligationFulfillmentCacheCodec",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "JsonObligationFulfillmentCacheCodec"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort' of JsonObligationFulfillmentCacheCodec",
+      "declaration_hash": "3acb31d00bc2b0b96f95bd927c7a607450f4dafc93b641cc1109f11aed187d6b",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "JsonWaiverCacheCodec",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverCachePort"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "JsonWaiverCacheCodec"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::test_obligation::ports::WaiverCachePort' of JsonWaiverCacheCodec",
+      "declaration_hash": "e22ac350426f9dc08ac2100e97c49a2dc818b615b4c0263121996a92937fb6cb",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SynTestSourceScanner",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::TestSourceScannerPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "SynTestSourceScanner"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::test_obligation::ports::TestSourceScannerPort' of SynTestSourceScanner",
+      "declaration_hash": "d35e00784c9b540840119f7f9cac0d05e0074069aa470e6930472fd5ebaa25b3",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ObligationFulfillmentVerifierAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "ObligationFulfillmentVerifierAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort' of ObligationFulfillmentVerifierAdapter",
+      "declaration_hash": "fdb2a307e8c30af4eb5093af4abd404635e506e17adec65cf9a8f000df499e8c",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-11"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "WaiverVerifierAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "WaiverVerifierAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort' of WaiverVerifierAdapter",
+      "declaration_hash": "05f377f118fc98e5fc3601a4dc77cfb42328696ca396240291c5db4b7c469eeb",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-11"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FailingObligationFulfillmentVerifier",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FailingObligationFulfillmentVerifier"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort' of FailingObligationFulfillmentVerifier",
+      "declaration_hash": "d7dc358624609ed519af7a5ef7e0e1900d5300f3ff2430c1bc5bf9794e549e76",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-11"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FailingWaiverVerifier",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FailingWaiverVerifier"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::test_obligation::ports::WaiverVerifierPort' of FailingWaiverVerifier",
+      "declaration_hash": "1f6f86c72ac431bd94ec7d4638c3e19bb71aafaa10192919fc09ca701ddb061e",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-11"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsSpecDocumentLoader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::spec_document_loader_port::SpecDocumentLoaderPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsSpecDocumentLoader"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::spec_document_loader_port::SpecDocumentLoaderPort' of FsSpecDocumentLoader",
+      "declaration_hash": "df7027bba0d7ca758f571dbe4c77324811b641b3152bb512ef07654975537e53",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ObligationFulfillmentEscalationDriver",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::ObligationFulfillmentPair, domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey, domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError>"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "ObligationFulfillmentEscalationDriver"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::ObligationFulfillmentPair, domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey, domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError>' of ObligationFulfillmentEscalationDriver",
+      "declaration_hash": "0b05b4c9ed7d497a54ce13ac097d2417c29a147c15f8f5a50b85383ae8c6f15b",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-15"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "WaiverEscalationDriver",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::WaiverPair, domain::tddd::test_obligation::verdict::WaiverCacheKey, domain::tddd::test_obligation::verdict::WaiverVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError>"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "WaiverEscalationDriver"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::WaiverPair, domain::tddd::test_obligation::verdict::WaiverCacheKey, domain::tddd::test_obligation::verdict::WaiverVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError>' of WaiverEscalationDriver",
+      "declaration_hash": "64f647e33ea9f7bbfa7f8dddb77a26ee3673e36694742e8227178ae716cc1ff7",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-15"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "Sha256ContentHasher",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::test_obligation::hasher::ContentHasherPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "Sha256ContentHasher"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::test_obligation::hasher::ContentHasherPort' of Sha256ContentHasher",
+      "declaration_hash": "0f2abde8f41f26f2a44c97ae3c41ce31ce25312b5aaae5ebe6f38d15f71e2efc",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::command_context",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::command_context"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::command_context",
+      "declaration_hash": "3da23b98003246c60751f225071ef471635968064a5bacc25920e71a0687e0ca",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::command_context_with",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::command_context_with"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::command_context_with",
+      "declaration_hash": "aa9809a10ea71761f0d947a47049b2c792628d992c57893ce859ff738e8fc354",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::command_root",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::command_root"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::command_root",
+      "declaration_hash": "8fd4b809c5a4566700c147c04e0b98cd6f072d3aa65762afb497b62a29862276",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-14"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::current_branch",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::current_branch"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::current_branch",
+      "declaration_hash": "2315aa6b4f8e7d8a087a786e62d53e5b3bc39cead87fc5396e0ab77e66bdb023",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::dispatch_test_obligation",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::dispatch_test_obligation"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::dispatch_test_obligation",
+      "declaration_hash": "1d242c928e62ec4f395b671b9447224018bb93bf98fa2dd959323a91eb2d7ba6",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::execute",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::execute"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::execute",
+      "declaration_hash": "e8c84651baf7d680d1a84b98db0fb068650809d715f06bdc6afbc50e0e7c2970",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-14"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::execute_bindings_skeleton",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::execute_bindings_skeleton"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::execute_bindings_skeleton",
+      "declaration_hash": "f61e563d3791894be5a298b52cc87b7a13725aa9a1cec142442a9999bc9ab65a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-14"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::execute_bindings_skeleton_with",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::execute_bindings_skeleton_with"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::execute_bindings_skeleton_with",
+      "declaration_hash": "32b4713db28c660e68901a1cbf8eb8eed49665b57035ca1b48e6f672cc2e16aa",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::execute_check",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::execute_check"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::execute_check",
+      "declaration_hash": "8a48c73b3a03b8df5ddb73e6a43c2030fb1dcde2e993236fdda91927e41e1022",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-14"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::execute_check_with",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::execute_check_with"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::execute_check_with",
+      "declaration_hash": "a578e0cfb1184e21aaa5d61e17331c81acb2b6d1d5a50657fb7d3dcb4af0b190",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::execute_derive",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::execute_derive"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::execute_derive",
+      "declaration_hash": "24e7acf184866ced2888ef5d88658e3aa8dfebee9f30c493602113b1b0537d54",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-14"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::execute_derive_with",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::execute_derive_with"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::execute_derive_with",
+      "declaration_hash": "5c166f38519a8b0a66259a9c61805892b1ffbd10030c0cb2ecadc0138ac49812",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::execute_evaluate",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::execute_evaluate"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::execute_evaluate",
+      "declaration_hash": "ec5daf540cd3f474b4c66d370680b334c1eada0e57b9a9ed4b0b46c04aa02955",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-14"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::execute_evaluate_with",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::execute_evaluate_with"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::execute_evaluate_with",
+      "declaration_hash": "1a37a6681a950419176dbfd9b2e35700417a7190063a23c92c7341a91d6c1ca7",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::execute_results",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::execute_results"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::execute_results",
+      "declaration_hash": "14173d795bda2c94c3d74063486b27be0dc896802de1a13cc39348242c76052b",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-14"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::execute_results_with",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::execute_results_with"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::execute_results_with",
+      "declaration_hash": "cd359310b28c83b31e55c0509f5edf9a4e6ac5d8311c9df4837411e37912fed0",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::failure",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::failure"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::failure",
+      "declaration_hash": "01e7e6317b4bb28be78cf5ad191cfa8ced326601b04f1917a95445afe50bffb1",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::read_command_branch",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::read_command_branch"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::read_command_branch",
+      "declaration_hash": "6fc7af23aec335f65231f6f9981631434ee0d235b887fc6828e05624f829c7fb",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-14"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::test_obligation::read_only_command_context",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::test_obligation::read_only_command_context"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::test_obligation::read_only_command_context",
+      "declaration_hash": "7a8535a728de69d7fa44014eba3e84b7bd0f45b629999dc3c53604138ee324da",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-10"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        },
+        {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-14"
+        }
+      ]
+    }
+  ]
+}

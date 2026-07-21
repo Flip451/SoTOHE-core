@@ -10,7 +10,7 @@
             {
               "message": "`semantic_dup_check` silently ignores `ack = true` when `ack_file` is `None`, so a public caller can request ack persistence and get a success result with no file written. That makes the exported DTO accept an illegal state and drops the user's `--ack` intent without an error. Reject this combination up front or make the invariant unrepresentable in the input type.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
               "line": 292,
               "category": "error handling"
             }
@@ -68,7 +68,7 @@
             {
               "message": "Deleting `input.db_path` here can wipe arbitrary user data if the CLI is invoked with an overlapping or misconfigured `--db-path` (for example, pointing at the workspace root or another real directory). Because this happens before fragment extraction, a single bad invocation can erase the project tree before the command fails. Reject unsafe path overlaps or constrain cleanup to a dedicated index directory before calling `remove_dir_all`.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
               "line": 126,
               "category": "correctness"
             }
@@ -83,7 +83,7 @@
             {
               "message": "This destructive rebuild path has no tests covering the new behavior: neither the happy path where an existing `--db-path` is wiped and rebuilt, nor the refusal path when `--db-path` overlaps the workspace root. Because this method now deletes data before adapter construction, the missing coverage leaves a high-risk regression surface unverified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
               "line": 118,
               "category": "test coverage"
             }
@@ -170,14 +170,14 @@
             {
               "message": "If the rename of `temp_path` into `db_path` fails after the existing index has already been renamed aside, the function returns `Err` with `db_path` absent and only the `.old` backup left behind. That breaks the non-destructive rebuild guarantee and can make a transient filesystem error look like data loss.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
               "line": 229,
               "category": "correctness"
             },
             {
               "message": "The `fragment_count == 0` early return skips `commit_rebuilt_index`, so a rebuild of an emptied workspace leaves any pre-existing index in place. Because `dup-index build` is a rebuild command, this preserves stale semantic-index data instead of reflecting the current tree.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
               "line": 321,
               "category": "correctness"
             }
@@ -192,7 +192,7 @@
             {
               "message": "P1: `commit_rebuilt_index` does not actually guarantee the old index is preserved on a failed swap. After moving `db_path` to the backup, it ignores the result of restoring the backup if `rename(temp_path, db_path)` fails. If that restore also fails, the command returns an error with `db_path` still missing, which contradicts the stated non-destructive rebuild guarantee.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
               "line": 244,
               "category": "correctness"
             }
@@ -222,14 +222,14 @@
             {
               "message": "`semantic_dup_index_build` still deletes the live `db_path` when `extract_code_fragments` returns an empty set, so an empty or sparse workspace can wipe a previously working index instead of preserving it. That breaks the new non-destructive rebuild intent for `dup-index build` and makes a typo'd `--workspace-root` data-destructive.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
               "line": 375,
               "category": "correctness"
             },
             {
               "message": "The new rollback/swap behavior in `semantic_dup_index_build` is not exercised directly by any test in this file. The added unit tests only cover private helpers, so the public API's critical paths (stale-temp cleanup, crash-backup restore, and atomic commit failure handling) can regress without detection.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup.rs",
+              "file": "apps/cli-composition/src/semantic_dup.rs",
               "line": 320,
               "category": "testing"
             }
@@ -330,7 +330,7 @@
             {
               "message": "Writing the ownership marker only after `build_index` succeeds leaves a crash window: if the process dies after the LanceDB temp index has been built but before `std::fs::write(temp_path.join(OWNERSHIP_MARKER), ...)` completes, the next run sees a recognizable `.tmp-build` without the marker and Step 3 now rejects it instead of cleaning or restoring it. That strands a self-generated temp tree and blocks subsequent rebuilds until manual intervention.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/semantic_dup/build.rs",
+              "file": "apps/cli-composition/src/semantic_dup/build.rs",
               "line": 435,
               "category": "missing error handling"
             }
@@ -886,7 +886,7 @@
             {
               "message": "This sentence says the CLI composition root in `T008/T009` extracts fragments using `T007`, but `T009`’s own task text says `dup-check` reads each file listed by `--files-from` directly into `CodeFragment` values. That makes the fragment-acquisition path inconsistent for `dup-check` and overstates `T007`’s role.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/semantic-dup-detection-2026-05-29/plan.md",
+              "file": "track/items/semantic-dup-detection-2026-05-29/plan.md",
               "line": 17,
               "category": "contradiction"
             }
@@ -959,7 +959,7 @@
             {
               "message": "The `LanceDbSemanticIndexAdapter` row is marked 🔴 here, but the scope brief says the adapter structs are expected to remain 🟡 and that this view should have 0 red signals. That makes the rendered catalogue inconsistent with the intended bookkeeping state.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/semantic-dup-detection-2026-05-29/infrastructure-types.md",
+              "file": "track/items/semantic-dup-detection-2026-05-29/infrastructure-types.md",
               "line": 8,
               "category": "factual error (semantic)"
             }
@@ -1237,16 +1237,16 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs#L23) lets both `fragment` and `file` be omitted, so `sotp find-similar` parses successfully with no query and only fails later in `resolve_fragment_text`. That is out of sync with the briefing’s required fragment-or-`--file` parse contract for AC-01.",
+              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](apps/cli/src/commands/semantic_dup.rs#L23) lets both `fragment` and `file` be omitted, so `sotp find-similar` parses successfully with no query and only fails later in `resolve_fragment_text`. That is out of sync with the briefing’s required fragment-or-`--file` parse contract for AC-01.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs",
+              "file": "apps/cli/src/commands/semantic_dup.rs",
               "line": 23,
               "category": "cli parsing"
             },
             {
-              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs#L86) adds `--db-path` to `dup-index measure-quality`, but the briefing only specifies `--workspace-root` for that command. Because the CLI composition path opens the DB before computing metrics, an invalid or unwritable DB path can fail an otherwise valid quality run.",
+              "message": "P1: [apps/cli/src/commands/semantic_dup.rs](apps/cli/src/commands/semantic_dup.rs#L86) adds `--db-path` to `dup-index measure-quality`, but the briefing only specifies `--workspace-root` for that command. Because the CLI composition path opens the DB before computing metrics, an invalid or unwritable DB path can fail an otherwise valid quality run.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/semantic_dup.rs",
+              "file": "apps/cli/src/commands/semantic_dup.rs",
               "line": 86,
               "category": "requirements coverage"
             }
@@ -1322,14 +1322,14 @@
             {
               "message": "`search()` interprets LanceDB results as cosine similarity (`1.0 - _distance`, then clamp to `[0,1]`), but the query never sets `DistanceType::Cosine`. LanceDB `vector_search` defaults to L2, so this adapter will rank by L2 while reporting cosine-based scores, which can collapse most results to `0.0` and makes the returned similarities incorrect.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
               "line": 182,
               "category": "incorrect metric"
             },
             {
               "message": "`search()` treats any `open_table()` failure as “table missing” and returns `Ok(Vec::new())`. That silently hides real storage errors such as permission failures, corruption, or schema problems; only `TableNotFound` should be converted to an empty result set.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
               "line": 177,
               "category": "missing error handling"
             }
@@ -1344,14 +1344,14 @@
             {
               "message": "`LanceDbSemanticIndexAdapter` calls `Runtime::block_on` in `new`, `insert`, and `search`. Tokio documents that `block_on` panics when invoked from an async execution context, so constructing or using this adapter from async code will crash instead of returning `SemanticIndexError`. That is a panic path in library code.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
               "line": 67,
               "category": "panic"
             },
             {
               "message": "The first-insert path is a non-atomic `open_table(...); if missing -> create_table(...)` sequence. Because `insert` is `&self` and the adapter is `Send + Sync`, two callers can race on an empty database: both observe \"table not found\", one creates the table, and the other fails with a spurious `TableAlreadyExists`/`InsertFailed`, dropping the insert. Use LanceDB's create-if-exists mode or retry on table-exists.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
               "line": 133,
               "category": "concurrency"
             }
@@ -1410,7 +1410,7 @@
             {
               "message": "`is_table_not_found` does not match LanceDB's actual missing-table error text (`Table '{name}' was not found`), so the fresh-database path never triggers. As a result, the intended first-run behavior in `insert` and `search` is broken: both will surface `InsertFailed`/`SearchFailed` instead of creating the table or returning an empty result set. Match `lancedb::Error::TableNotFound` directly instead of substring-searching `to_string()`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/index.rs",
+              "file": "libs/infrastructure/src/semantic_dup/index.rs",
               "line": 343,
               "category": "correctness"
             }
@@ -1533,7 +1533,7 @@
             {
               "message": "`expected_model_onnx_path()` is checking the wrong cache layout for fastembed/hf-hub. The real cache path for a populated model is `models--<repo>/snapshots/<commit>/onnx/model.onnx`, not `{cache}/models--<repo>/onnx/model.onnx`, and `pull_from_hf()` can also switch the cache root to `HF_HOME`. As written, `FastEmbedAdapter::new()` will reject a valid pre-populated cache instead of only failing when the model is actually absent, and the offline preflight does not reliably match the loader's real cache location.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
               "line": 87,
               "category": "correctness"
             }
@@ -1548,14 +1548,14 @@
             {
               "message": "`resolve_cache_dir()` only consults `FASTEMBED_CACHE_DIR`, but fastembed's loader path still honors `HF_HOME` when it is set. That means `FastEmbedAdapter::new()` can preflight one cache root and initialize `TextEmbedding` against another, so a valid offline cache may be rejected or a runtime fetch can still happen.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
               "line": 78,
               "category": "correctness"
             },
             {
               "message": "The new tests only exercise `model_snapshots_dir` / `model_onnx_exists_in_cache`; they never call `FastEmbedAdapter::new()` on an empty temp cache or a populated cache. The changed public behavior is therefore still unverified, which leaves the offline-preflight path free to regress silently.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
               "line": 243,
               "category": "test coverage"
             }
@@ -1570,14 +1570,14 @@
             {
               "message": "This check can return true for any stale `snapshots/<commit>/onnx/model.onnx` directory, but hf-hub resolves the active file via `refs/<revision>` before looking in `snapshots/` (`hf-hub-0.5.0/src/lib.rs:141-147`). If the cached snapshot is not the one pointed to by `refs/main`, `FastEmbedAdapter::new()` will still fall through to `TextEmbedding::try_new()` and can hit the network. The offline preflight needs to validate the revision-selected snapshot, not just any snapshot.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
               "line": 130,
               "category": "correctness"
             },
             {
               "message": "Even when this preflight passes, `TextEmbedding::try_new()` still loads tokenizer/config assets from Hugging Face (`load_tokenizer_hf_hub(...)`), so a cache containing only `onnx/model.onnx` is not enough to keep `FastEmbedAdapter::new()` offline. That means the constructor can still perform runtime downloads unless the tokenizer files are also preflighted or the loader path is changed to be fully local-only.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
               "line": 199,
               "category": "correctness"
             }
@@ -1592,14 +1592,14 @@
             {
               "message": "Using `HF_HOME/hub` here does not match fastembed 5.14's `pull_from_hf`, which forwards `HF_HOME` itself as the cache dir. A cache populated under the actual `HF_HOME` root will be treated as missing and `FastEmbedAdapter::new()` will fail even though the model is present.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
               "line": 107,
               "category": "correctness"
             },
             {
               "message": "The offline preflight only checks `onnx/model.onnx` and `tokenizer.json`, but `TextEmbedding::try_new()` still calls `load_tokenizer_hf_hub()`, which fetches `config.json`, `special_tokens_map.json`, and `tokenizer_config.json` via `ApiRepo::get()` when they are absent. As written, `FastEmbedAdapter::new()` can still reach the network after the preflight passes, so the no-runtime-download guarantee is not enforced.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
               "line": 152,
               "category": "correctness"
             }
@@ -1614,14 +1614,14 @@
             {
               "message": "The new test assertions move `result` in `matches!(result, ...)` and then borrow it again in `result.err()` for the failure message. That is a use-after-move and this test module will not compile. The same pattern is repeated in the other two `new_with_cache_dir` tests.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
               "line": 528,
               "category": "tests"
             },
             {
               "message": "The patch never exercises the public `FastEmbedAdapter::new()` path; all new tests call the private `new_with_cache_dir` helper instead. That leaves the env-resolution logic in `resolve_cache_dir()` and the actual no-download guarantee of the public constructor unverified, so a regression in the shipped API could still slip through CI.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
               "line": 222,
               "category": "tests"
             }
@@ -1636,14 +1636,14 @@
             {
               "message": "Empty `HF_HOME` is treated as unset here, but `fastembed::pull_from_hf()` treats any set `HF_HOME` as authoritative. If `HF_HOME` is exported as an empty string, the preflight checks the fallback cache while the real loader uses the empty path, so `FastEmbedAdapter::new()` can still reach the network and violate the offline-only guarantee.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
               "line": 123,
               "category": "bug"
             },
             {
               "message": "The `new()` test is vacuous: it only asserts when the constructor returns `Err`, so on a machine that already has a cache it passes without exercising the offline-failure path. That leaves the public constructor's no-download behavior unverified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
               "line": 538,
               "category": "tests"
             }
@@ -1680,7 +1680,7 @@
             {
               "message": "`test_new_returns_error_when_no_env_vars_set` is not a deterministic test of the public constructor: it silently returns when `HF_HOME` or `FASTEMBED_CACHE_DIR` is set and it relies on the ambient working directory not containing a `.fastembed_cache` tree. That leaves the only `FastEmbedAdapter::new()` coverage environment-dependent, so regressions in `resolve_cache_dir()` or the constructor's env precedence can slip through CI.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
               "line": 531,
               "category": "test coverage"
             }
@@ -1717,7 +1717,7 @@
             {
               "message": "`test_new_returns_error_in_clean_ci_environment` is not hermetic: it assumes both `HF_HOME` and `FASTEMBED_CACHE_DIR` are unset and that no `.fastembed_cache` exists in the current working directory. On a developer machine or cached CI runner where any of those are present, `FastEmbedAdapter::new()` can take a different path or even succeed, so this regression test is flaky and does not reliably validate the public constructor's offline behavior.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
               "line": 546,
               "category": "testing"
             }
@@ -1732,7 +1732,7 @@
             {
               "message": "The new constructor path is not tested directly: every test in this file exercises `new_with_cache_dir(...)` instead of the public `FastEmbedAdapter::new()`, so regressions in `resolve_cache_dir()` or the `with_cache_dir(...)` wiring would still pass the suite. The comment claiming end-to-end coverage for `new()` is therefore inaccurate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/semantic_dup/embedding.rs",
+              "file": "libs/infrastructure/src/semantic_dup/embedding.rs",
               "line": 515,
               "category": "testing"
             }
@@ -1968,14 +1968,14 @@
             {
               "message": "The reservoir update is not Algorithm R: once `reservoir` reaches `MAX_SAMPLE`, every new similarity is unconditionally inserted and only a previously stored item is evicted. That makes the sample strongly biased toward later pairs, so the streaming estimates for large corpora are not uniform and can diverge materially from the intended sampled semantics.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup.rs",
+              "file": "libs/usecase/src/semantic_dup.rs",
               "line": 747,
               "category": "correctness"
             },
             {
               "message": "`cosine_percentiles` are now computed from the reservoir rather than from the full set of pairwise similarities. Even if the reservoir sampler were fixed, this changes the percentile outputs for any corpus with more than `MAX_SAMPLE` pairs, whereas the previous implementation returned exact percentiles over all similarities.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup.rs",
+              "file": "libs/usecase/src/semantic_dup.rs",
               "line": 775,
               "category": "correctness"
             }
@@ -1990,7 +1990,7 @@
             {
               "message": "`cosine_percentiles` is documented as the full cosine-similarity distribution, but this code now derives it from the `reservoir` sample once the corpus exceeds `MAX_SAMPLE`. That makes `QualityMetrics` approximate for large inputs and changes the public API's percentile values versus the previous exact implementation, which can materially skew threshold calibration.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup.rs",
+              "file": "libs/usecase/src/semantic_dup.rs",
               "line": 780,
               "category": "correctness"
             }
@@ -2005,7 +2005,7 @@
             {
               "message": "The reservoir sampler is not actually uniform: `xorshift_state as usize % welford_count` introduces modulo bias, so replacement decisions are slightly skewed toward lower indices. That breaks the stated Algorithm R guarantee and can bias `cosine_percentiles` and `above_threshold_rate` on large corpora.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup.rs",
+              "file": "libs/usecase/src/semantic_dup.rs",
               "line": 761,
               "category": "correctness"
             }
@@ -2090,7 +2090,7 @@
             {
               "message": "The new `cross_file_pairs > PAIR_BUDGET` fallback still uses fixed rejection sampling with `attempt_cap = pair_budget.saturating_mul(64)`, so a corpus can now take the sampled path even when cross-file pairs are above budget but still very rare among all pairs. In that case the loop can exit with far fewer than `PAIR_BUDGET` samples and compute biased metrics instead of exact/fully populated ones. The branch condition needs to account for acceptance rate, not just absolute cross-file pair count.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup/interactor.rs",
+              "file": "libs/usecase/src/semantic_dup/interactor.rs",
               "line": 593,
               "category": "correctness"
             }
@@ -2105,7 +2105,7 @@
             {
               "message": "The new `sampling_reliable` fallback still reintroduces a `total_pairs`-based branch here: when `cross_file_pairs > PAIR_BUDGET` but rejection sampling looks unlikely, the code switches to the deterministic cartesian-product path and returns the first `PAIR_BUDGET` cross-file pairs in path order. That is not the intended sampled approximation and can skew `measure_quality` metrics for low-acceptance corpora.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup/interactor.rs",
+              "file": "libs/usecase/src/semantic_dup/interactor.rs",
               "line": 590,
               "category": "correctness"
             }
@@ -2120,7 +2120,7 @@
             {
               "message": "The sampled branch still materializes a full CDF over every bucket pair (`Vec<(u64, usize, usize)>` built in the nested `bi`/`bj` loops). For corpora with many distinct `source_path`s, that is O(#buckets²) memory/time, so the refactor still hits the quadratic path it was supposed to remove and can blow up before any 10k-sized sample is drawn.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup/interactor.rs",
+              "file": "libs/usecase/src/semantic_dup/interactor.rs",
               "line": 613,
               "category": "performance"
             }
@@ -2135,14 +2135,14 @@
             {
               "message": "The sampled branch still stores row weights and the total row weight in `u64` (`row_cdf`, `cumulative`, `total_row_weight`). For corpora whose cross-file pair count exceeds `u64::MAX`, those values saturate and `lemire_index` samples from a truncated range, so the 'large-n' path silently becomes biased despite the earlier `u128` pair counting.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup/interactor.rs",
+              "file": "libs/usecase/src/semantic_dup/interactor.rs",
               "line": 651,
               "category": "overflow"
             },
             {
               "message": "This change pushes the module to 709 lines of production code before `#[cfg(test)]` begins, which exceeds the repository's 700-line maximum for non-test modules.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup/interactor.rs",
+              "file": "libs/usecase/src/semantic_dup/interactor.rs",
               "line": 710,
               "category": "architecture"
             }
@@ -2157,7 +2157,7 @@
             {
               "message": "The sampled branch truncates `total_row_weight` from `u128` to `usize` before generating indices. If the number of cross-file pairs exceeds `usize::MAX`, this silently wraps the RNG bound and the sampler only explores a tiny prefix of the pair space, so the returned metrics become badly biased instead of representing the full cross-file distribution.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup/interactor.rs",
+              "file": "libs/usecase/src/semantic_dup/interactor.rs",
               "line": 635,
               "category": "correctness"
             }
@@ -2172,7 +2172,7 @@
             {
               "message": "The sampled branch is still not a uniform sampler over cross-file pairs. `sampling_range` is clamped to `u64::MAX`, and the `floor(rng * sampling_range / 2^64)` mapping is used without the rejection step needed to remove modulo bias. That skews the large-corpus metrics this helper is supposed to approximate, and for `total_row_weight > u64::MAX` it silently makes the tail of the pair space unreachable.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup/interactor.rs",
+              "file": "libs/usecase/src/semantic_dup/interactor.rs",
               "line": 628,
               "category": "correctness"
             }
@@ -2187,7 +2187,7 @@
             {
               "message": "The sampled branch is no longer uniform for very large corpora: `sampling_range` is clamped to `u64::MAX`, so once `total_row_weight` exceeds that bound `lemire_exact` can only draw from a prefix of the CDF and later bucket pairs become unreachable. The subsequent `r_in_row as usize` conversion can also truncate on 32-bit builds. This silently biases the metrics instead of sampling from the full cross-file pair space.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/semantic_dup/interactor.rs",
+              "file": "libs/usecase/src/semantic_dup/interactor.rs",
               "line": 650,
               "category": "correctness"
             }

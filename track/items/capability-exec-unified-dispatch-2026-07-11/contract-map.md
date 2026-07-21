@@ -1,0 +1,564 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_capability_exec["usecase::capability_exec"]
+    direction TB
+  subgraph T28_usecase_usecase_BriefingText["capability_exec::BriefingText"]
+    direction TB
+    T28_usecase_usecase_BriefingText__self[BriefingText]
+    T28_usecase_usecase_BriefingText_try_new([try_new])
+    T28_usecase_usecase_BriefingText_as_str([as_str])
+  end
+  subgraph T41_usecase_usecase_CapabilityDispatchOutcome["capability_exec::CapabilityDispatchOutcome"]
+    direction TB
+    T41_usecase_usecase_CapabilityDispatchOutcome__self[CapabilityDispatchOutcome]
+    T41_usecase_usecase_CapabilityDispatchOutcome_Executed[Executed]
+    T41_usecase_usecase_CapabilityDispatchOutcome_DelegateInHost[DelegateInHost]
+  end
+  subgraph T41_usecase_usecase_CapabilityDispatchRequest["capability_exec::CapabilityDispatchRequest"]
+    direction TB
+    T41_usecase_usecase_CapabilityDispatchRequest__self[CapabilityDispatchRequest]
+  end
+  subgraph T35_usecase_usecase_CapabilityExecError["capability_exec::CapabilityExecError"]
+    direction TB
+    T35_usecase_usecase_CapabilityExecError__self[CapabilityExecError]
+    T35_usecase_usecase_CapabilityExecError_ProfileResolution[ProfileResolution]
+    T35_usecase_usecase_CapabilityExecError_ExecutionModeRejected[ExecutionModeRejected]
+    T35_usecase_usecase_CapabilityExecError_ModelMissing[ModelMissing]
+    T35_usecase_usecase_CapabilityExecError_UnsupportedProvider[UnsupportedProvider]
+    T35_usecase_usecase_CapabilityExecError_SourceValidation[SourceValidation]
+    T35_usecase_usecase_CapabilityExecError_AdapterPreflight[AdapterPreflight]
+    T35_usecase_usecase_CapabilityExecError_DispatchFailed[DispatchFailed]
+  end
+  subgraph T40_usecase_usecase_CapabilityExecInteractor["capability_exec::CapabilityExecInteractor"]
+    direction TB
+    T40_usecase_usecase_CapabilityExecInteractor__self[CapabilityExecInteractor]
+    T40_usecase_usecase_CapabilityExecInteractor_new([new])
+  end
+  subgraph T37_usecase_usecase_CapabilityExecRequest["capability_exec::CapabilityExecRequest"]
+    direction TB
+    T37_usecase_usecase_CapabilityExecRequest__self[CapabilityExecRequest]
+  end
+  subgraph T39_usecase_usecase_CapabilityFailureDetail["capability_exec::CapabilityFailureDetail"]
+    direction TB
+    T39_usecase_usecase_CapabilityFailureDetail__self[CapabilityFailureDetail]
+    T39_usecase_usecase_CapabilityFailureDetail_new([new])
+    T39_usecase_usecase_CapabilityFailureDetail_as_str([as_str])
+  end
+  subgraph T34_usecase_usecase_CapabilityFilePath["capability_exec::CapabilityFilePath"]
+    direction TB
+    T34_usecase_usecase_CapabilityFilePath__self[CapabilityFilePath]
+    T34_usecase_usecase_CapabilityFilePath_try_new([try_new])
+    T34_usecase_usecase_CapabilityFilePath_as_path([as_path])
+  end
+  subgraph T46_usecase_usecase_CapabilityInputValidationError["capability_exec::CapabilityInputValidationError"]
+    direction TB
+    T46_usecase_usecase_CapabilityInputValidationError__self[CapabilityInputValidationError]
+    T46_usecase_usecase_CapabilityInputValidationError_EmptyProviderName[EmptyProviderName]
+    T46_usecase_usecase_CapabilityInputValidationError_EmptyModelName[EmptyModelName]
+    T46_usecase_usecase_CapabilityInputValidationError_EmptyFilePath[EmptyFilePath]
+    T46_usecase_usecase_CapabilityInputValidationError_InvalidFilePath[InvalidFilePath]
+    T46_usecase_usecase_CapabilityInputValidationError_EmptyContent[EmptyContent]
+  end
+  subgraph T33_usecase_usecase_CapabilityProfile["capability_exec::CapabilityProfile"]
+    direction TB
+    T33_usecase_usecase_CapabilityProfile__self[CapabilityProfile]
+  end
+  subgraph T30_usecase_usecase_DisciplineText["capability_exec::DisciplineText"]
+    direction TB
+    T30_usecase_usecase_DisciplineText__self[DisciplineText]
+    T30_usecase_usecase_DisciplineText_try_new([try_new])
+    T30_usecase_usecase_DisciplineText_as_str([as_str])
+  end
+  subgraph T29_usecase_usecase_ExecutionMode["capability_exec::ExecutionMode"]
+    direction TB
+    T29_usecase_usecase_ExecutionMode__self[ExecutionMode]
+    T29_usecase_usecase_ExecutionMode_OrchestratorOutput[OrchestratorOutput]
+    T29_usecase_usecase_ExecutionMode_TypedPipeline[TypedPipeline]
+  end
+  subgraph T25_usecase_usecase_ModelName["capability_exec::ModelName"]
+    direction TB
+    T25_usecase_usecase_ModelName__self[ModelName]
+    T25_usecase_usecase_ModelName_try_new([try_new])
+    T25_usecase_usecase_ModelName_as_str([as_str])
+  end
+  subgraph T28_usecase_usecase_ProviderName["capability_exec::ProviderName"]
+    direction TB
+    T28_usecase_usecase_ProviderName__self[ProviderName]
+    T28_usecase_usecase_ProviderName_try_new([try_new])
+    T28_usecase_usecase_ProviderName_as_str([as_str])
+  end
+  subgraph R37_usecase_usecase_CapabilityExecService["capability_exec::CapabilityExecService"]
+    direction TB
+    R37_usecase_usecase_CapabilityExecService__self[CapabilityExecService]
+    R37_usecase_usecase_CapabilityExecService_execute([execute])
+  end
+  subgraph R37_usecase_usecase_CapabilityProfilePort["capability_exec::CapabilityProfilePort"]
+    direction TB
+    R37_usecase_usecase_CapabilityProfilePort__self[CapabilityProfilePort]
+    R37_usecase_usecase_CapabilityProfilePort_resolve([resolve])
+  end
+  subgraph R38_usecase_usecase_CapabilityProviderPort["capability_exec::CapabilityProviderPort"]
+    direction TB
+    R38_usecase_usecase_CapabilityProviderPort__self[CapabilityProviderPort]
+    R38_usecase_usecase_CapabilityProviderPort_provider([provider])
+    R38_usecase_usecase_CapabilityProviderPort_dispatch([dispatch])
+  end
+  subgraph R36_usecase_usecase_CapabilitySourcePort["capability_exec::CapabilitySourcePort"]
+    direction TB
+    R36_usecase_usecase_CapabilitySourcePort__self[CapabilitySourcePort]
+    R36_usecase_usecase_CapabilitySourcePort_load_briefing([load_briefing])
+    R36_usecase_usecase_CapabilitySourcePort_load_discipline([load_discipline])
+  end
+  end
+  subgraph usecase_usecase_module_dry_write_driver["usecase::dry_write_driver"]
+    direction TB
+  subgraph T30_usecase_usecase_CapabilityName["dry_write_driver::failure_details::CapabilityName"]
+    direction TB
+    T30_usecase_usecase_CapabilityName__self[CapabilityName]
+    T30_usecase_usecase_CapabilityName_try_new([try_new])
+    T30_usecase_usecase_CapabilityName_as_str([as_str])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_agent_profiles["infrastructure::agent_profiles"]
+    direction TB
+  subgraph T43_infrastructure_infrastructure_AgentProfiles["agent_profiles::AgentProfiles"]
+    direction TB
+    T43_infrastructure_infrastructure_AgentProfiles__self[AgentProfiles]
+    T43_infrastructure_infrastructure_AgentProfiles_load([load])
+    T43_infrastructure_infrastructure_AgentProfiles_resolve_capability([resolve_capability])
+    T43_infrastructure_infrastructure_AgentProfiles_resolve_execution([resolve_execution])
+    T43_infrastructure_infrastructure_AgentProfiles_resolve_model([resolve_model])
+    T43_infrastructure_infrastructure_AgentProfiles_resolve_provider([resolve_provider])
+    T43_infrastructure_infrastructure_AgentProfiles_provider_label([provider_label])
+    T43_infrastructure_infrastructure_AgentProfiles_resolve_prompt_template_path([resolve_prompt_template_path])
+  end
+  subgraph T48_infrastructure_infrastructure_AgentProfilesError["agent_profiles::AgentProfilesError"]
+    direction TB
+    T48_infrastructure_infrastructure_AgentProfilesError__self[AgentProfilesError]
+    T48_infrastructure_infrastructure_AgentProfilesError_Io[Io]
+    T48_infrastructure_infrastructure_AgentProfilesError_Symlink[Symlink]
+    T48_infrastructure_infrastructure_AgentProfilesError_PathOutsideTrustedRoot[PathOutsideTrustedRoot]
+    T48_infrastructure_infrastructure_AgentProfilesError_Parse[Parse]
+    T48_infrastructure_infrastructure_AgentProfilesError_UnsupportedSchemaVersion[UnsupportedSchemaVersion]
+    T48_infrastructure_infrastructure_AgentProfilesError_InvalidCapability[InvalidCapability]
+  end
+  subgraph T49_infrastructure_infrastructure_CapabilityConfigDto["agent_profiles::CapabilityConfigDto"]
+    direction TB
+    T49_infrastructure_infrastructure_CapabilityConfigDto__self[CapabilityConfigDto]
+    T49_infrastructure_infrastructure_CapabilityConfigDto_provider([provider])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_model([model])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_fast_provider([fast_provider])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_fast_model([fast_model])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_prompt_template_path([prompt_template_path])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_fast_reasoning_effort([fast_reasoning_effort])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_final_reasoning_effort([final_reasoning_effort])
+    T49_infrastructure_infrastructure_CapabilityConfigDto_execution_mode([execution_mode])
+  end
+  subgraph T46_infrastructure_infrastructure_ExecutionModeDto["agent_profiles::ExecutionModeDto"]
+    direction TB
+    T46_infrastructure_infrastructure_ExecutionModeDto__self[ExecutionModeDto]
+    T46_infrastructure_infrastructure_ExecutionModeDto_OrchestratorOutput[OrchestratorOutput]
+    T46_infrastructure_infrastructure_ExecutionModeDto_TypedPipeline[TypedPipeline]
+    T46_infrastructure_infrastructure_ExecutionModeDto_into_domain([into_domain])
+  end
+  subgraph T42_infrastructure_infrastructure_ModelNameDto["agent_profiles::ModelNameDto"]
+    direction TB
+    T42_infrastructure_infrastructure_ModelNameDto__self[ModelNameDto]
+    T42_infrastructure_infrastructure_ModelNameDto_try_new([try_new])
+    T42_infrastructure_infrastructure_ModelNameDto_into_domain([into_domain])
+  end
+  subgraph T45_infrastructure_infrastructure_ProviderNameDto["agent_profiles::ProviderNameDto"]
+    direction TB
+    T45_infrastructure_infrastructure_ProviderNameDto__self[ProviderNameDto]
+    T45_infrastructure_infrastructure_ProviderNameDto_try_new([try_new])
+    T45_infrastructure_infrastructure_ProviderNameDto_into_domain([into_domain])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_capability_exec["infrastructure::capability_exec"]
+    direction TB
+  subgraph T60_infrastructure_infrastructure_AgentProfilesCapabilityAdapter["capability_exec::agent_profiles::AgentProfilesCapabilityAdapter"]
+    direction TB
+    T60_infrastructure_infrastructure_AgentProfilesCapabilityAdapter__self[AgentProfilesCapabilityAdapter]
+    T60_infrastructure_infrastructure_AgentProfilesCapabilityAdapter_new([new])
+  end
+  subgraph T53_infrastructure_infrastructure_ClaudeCapabilityAdapter["capability_exec::claude::ClaudeCapabilityAdapter"]
+    direction TB
+    T53_infrastructure_infrastructure_ClaudeCapabilityAdapter__self[ClaudeCapabilityAdapter]
+    T53_infrastructure_infrastructure_ClaudeCapabilityAdapter_new([new])
+  end
+  subgraph T52_infrastructure_infrastructure_CodexCapabilityAdapter["capability_exec::codex::CodexCapabilityAdapter"]
+    direction TB
+    T52_infrastructure_infrastructure_CodexCapabilityAdapter__self[CodexCapabilityAdapter]
+    T52_infrastructure_infrastructure_CodexCapabilityAdapter_new([new])
+  end
+  subgraph T55_infrastructure_infrastructure_FsCapabilitySourceAdapter["capability_exec::source::FsCapabilitySourceAdapter"]
+    direction TB
+    T55_infrastructure_infrastructure_FsCapabilitySourceAdapter__self[FsCapabilitySourceAdapter]
+    T55_infrastructure_infrastructure_FsCapabilitySourceAdapter_new([new])
+  end
+  subgraph T41_infrastructure_infrastructure_SandboxMode["capability_exec::codex::SandboxMode"]
+    direction TB
+    T41_infrastructure_infrastructure_SandboxMode__self[SandboxMode]
+    T41_infrastructure_infrastructure_SandboxMode_ReadOnly[ReadOnly]
+    T41_infrastructure_infrastructure_SandboxMode_WorkspaceWrite[WorkspaceWrite]
+  end
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+  subgraph cli_driver_cli_driver_module_capability["cli_driver::capability"]
+    direction TB
+  subgraph T38_cli_driver_cli_driver_CapabilityDriver["capability::CapabilityDriver"]
+    direction TB
+    T38_cli_driver_cli_driver_CapabilityDriver__self[CapabilityDriver]
+    T38_cli_driver_cli_driver_CapabilityDriver_new([new])
+    T38_cli_driver_cli_driver_CapabilityDriver_handle([handle])
+  end
+  subgraph T47_cli_driver_cli_driver_CapabilityExecDriverInput["capability::CapabilityExecDriverInput"]
+    direction TB
+    T47_cli_driver_cli_driver_CapabilityExecDriverInput__self[CapabilityExecDriverInput]
+  end
+  subgraph T43_cli_driver_cli_driver_CapabilityFilePathArg["capability::CapabilityFilePathArg"]
+    direction TB
+    T43_cli_driver_cli_driver_CapabilityFilePathArg__self[CapabilityFilePathArg]
+  end
+  subgraph T39_cli_driver_cli_driver_CapabilityNameArg["capability::CapabilityNameArg"]
+    direction TB
+    T39_cli_driver_cli_driver_CapabilityNameArg__self[CapabilityNameArg]
+  end
+  subgraph T37_cli_driver_cli_driver_ProviderNameArg["capability::ProviderNameArg"]
+    direction TB
+    T37_cli_driver_cli_driver_ProviderNameArg__self[ProviderNameArg]
+  end
+  end
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+  subgraph cli_composition_cli_composition_module_capability["cli_composition::capability"]
+    direction TB
+  subgraph T57_cli_composition_cli_composition_CapabilityCompositionRoot["capability::CapabilityCompositionRoot"]
+    direction TB
+    T57_cli_composition_cli_composition_CapabilityCompositionRoot__self[CapabilityCompositionRoot]
+    T57_cli_composition_cli_composition_CapabilityCompositionRoot_new([new])
+    T57_cli_composition_cli_composition_CapabilityCompositionRoot_discover([discover])
+    T57_cli_composition_cli_composition_CapabilityCompositionRoot_capability_driver([capability_driver])
+  end
+  end
+end
+subgraph cli["cli"]
+  direction TB
+  subgraph T18_cli_cli_CliCommand["CliCommand"]
+    direction TB
+    T18_cli_cli_CliCommand__self[CliCommand]
+    T18_cli_cli_CliCommand_Arch[Arch]
+    T18_cli_cli_CliCommand_Conventions[Conventions]
+    T18_cli_cli_CliCommand_Domain[Domain]
+    T18_cli_cli_CliCommand_Guard[Guard]
+    T18_cli_cli_CliCommand_Hook[Hook]
+    T18_cli_cli_CliCommand_Track[Track]
+    T18_cli_cli_CliCommand_Git[Git]
+    T18_cli_cli_CliCommand_Pr[Pr]
+    T18_cli_cli_CliCommand_Capability[Capability]
+    T18_cli_cli_CliCommand_Review[Review]
+    T18_cli_cli_CliCommand_File[File]
+    T18_cli_cli_CliCommand_Verify[Verify]
+    T18_cli_cli_CliCommand_FindSimilar[FindSimilar]
+    T18_cli_cli_CliCommand_DupIndex[DupIndex]
+    T18_cli_cli_CliCommand_DupCheck[DupCheck]
+    T18_cli_cli_CliCommand_Telemetry[Telemetry]
+    T18_cli_cli_CliCommand_Dry[Dry]
+    T18_cli_cli_CliCommand_RefVerify[RefVerify]
+    T18_cli_cli_CliCommand_TestObligation[TestObligation]
+    T18_cli_cli_CliCommand_Signal[Signal]
+    T18_cli_cli_CliCommand_TaskContract[TaskContract]
+    T18_cli_cli_CliCommand_Catalog[Catalog]
+    T18_cli_cli_CliCommand_CatalogueLint[CatalogueLint]
+    T18_cli_cli_CliCommand_Template[Template]
+  end
+  subgraph cli_cli_module_commands["cli::commands"]
+    direction TB
+  subgraph T25_cli_cli_CapabilityCommand["commands::capability::CapabilityCommand"]
+    direction TB
+    T25_cli_cli_CapabilityCommand__self[CapabilityCommand]
+    T25_cli_cli_CapabilityCommand_Exec[Exec]
+  end
+  subgraph T26_cli_cli_CapabilityExecArgs["commands::capability::CapabilityExecArgs"]
+    direction TB
+    T26_cli_cli_CapabilityExecArgs__self[CapabilityExecArgs]
+  end
+  F42_cli_cli_cli__commands__capability__execute[[execute]]
+  F47_cli_cli_cli__commands__capability__execute_exec[[execute_exec]]
+  F47_cli_cli_cli__commands__capability__execute_with[[execute_with]]
+  end
+end
+T28_usecase_usecase_BriefingText_try_new --> T46_usecase_usecase_CapabilityInputValidationError__self
+T28_usecase_usecase_BriefingText_try_new --> T28_usecase_usecase_BriefingText__self
+T41_usecase_usecase_CapabilityDispatchOutcome_Executed --o|provider| T28_usecase_usecase_ProviderName__self
+T41_usecase_usecase_CapabilityDispatchOutcome_DelegateInHost --o|capability| T30_usecase_usecase_CapabilityName__self
+T41_usecase_usecase_CapabilityDispatchOutcome_DelegateInHost --o|briefing_file| T34_usecase_usecase_CapabilityFilePath__self
+T41_usecase_usecase_CapabilityDispatchOutcome_DelegateInHost --o|discipline| T30_usecase_usecase_DisciplineText__self
+T41_usecase_usecase_CapabilityDispatchRequest__self --o|request| T37_usecase_usecase_CapabilityExecRequest__self
+T41_usecase_usecase_CapabilityDispatchRequest__self --o|profile| T33_usecase_usecase_CapabilityProfile__self
+T41_usecase_usecase_CapabilityDispatchRequest__self --o|briefing| T28_usecase_usecase_BriefingText__self
+T41_usecase_usecase_CapabilityDispatchRequest__self --o|discipline| T30_usecase_usecase_DisciplineText__self
+T35_usecase_usecase_CapabilityExecError_ProfileResolution --o|capability| T30_usecase_usecase_CapabilityName__self
+T35_usecase_usecase_CapabilityExecError_ProfileResolution --o|detail| T39_usecase_usecase_CapabilityFailureDetail__self
+T35_usecase_usecase_CapabilityExecError_ExecutionModeRejected --o|capability| T30_usecase_usecase_CapabilityName__self
+T35_usecase_usecase_CapabilityExecError_ExecutionModeRejected --o|mode| T29_usecase_usecase_ExecutionMode__self
+T35_usecase_usecase_CapabilityExecError_ModelMissing --o|capability| T30_usecase_usecase_CapabilityName__self
+T35_usecase_usecase_CapabilityExecError_UnsupportedProvider --o|provider| T28_usecase_usecase_ProviderName__self
+T35_usecase_usecase_CapabilityExecError_SourceValidation --o|path| T34_usecase_usecase_CapabilityFilePath__self
+T35_usecase_usecase_CapabilityExecError_SourceValidation --o|detail| T39_usecase_usecase_CapabilityFailureDetail__self
+T35_usecase_usecase_CapabilityExecError_AdapterPreflight --o|capability| T30_usecase_usecase_CapabilityName__self
+T35_usecase_usecase_CapabilityExecError_AdapterPreflight --o|provider| T28_usecase_usecase_ProviderName__self
+T35_usecase_usecase_CapabilityExecError_AdapterPreflight --o|detail| T39_usecase_usecase_CapabilityFailureDetail__self
+T35_usecase_usecase_CapabilityExecError_DispatchFailed --o|provider| T28_usecase_usecase_ProviderName__self
+T35_usecase_usecase_CapabilityExecError_DispatchFailed --o|detail| T39_usecase_usecase_CapabilityFailureDetail__self
+T40_usecase_usecase_CapabilityExecInteractor_new --> T40_usecase_usecase_CapabilityExecInteractor__self
+T37_usecase_usecase_CapabilityExecRequest__self --o|capability| T30_usecase_usecase_CapabilityName__self
+T37_usecase_usecase_CapabilityExecRequest__self --o|host| T28_usecase_usecase_ProviderName__self
+T37_usecase_usecase_CapabilityExecRequest__self --o|briefing_file| T34_usecase_usecase_CapabilityFilePath__self
+T39_usecase_usecase_CapabilityFailureDetail_new --> T39_usecase_usecase_CapabilityFailureDetail__self
+T34_usecase_usecase_CapabilityFilePath_try_new --> T46_usecase_usecase_CapabilityInputValidationError__self
+T34_usecase_usecase_CapabilityFilePath_try_new --> T34_usecase_usecase_CapabilityFilePath__self
+T33_usecase_usecase_CapabilityProfile__self --o|provider| T28_usecase_usecase_ProviderName__self
+T33_usecase_usecase_CapabilityProfile__self --o|model| T25_usecase_usecase_ModelName__self
+T33_usecase_usecase_CapabilityProfile__self --o|execution_mode| T29_usecase_usecase_ExecutionMode__self
+T30_usecase_usecase_DisciplineText_try_new --> T46_usecase_usecase_CapabilityInputValidationError__self
+T30_usecase_usecase_DisciplineText_try_new --> T30_usecase_usecase_DisciplineText__self
+T25_usecase_usecase_ModelName_try_new --> T46_usecase_usecase_CapabilityInputValidationError__self
+T25_usecase_usecase_ModelName_try_new --> T25_usecase_usecase_ModelName__self
+T28_usecase_usecase_ProviderName_try_new --> T46_usecase_usecase_CapabilityInputValidationError__self
+T28_usecase_usecase_ProviderName_try_new --> T28_usecase_usecase_ProviderName__self
+R37_usecase_usecase_CapabilityExecService_execute --o T37_usecase_usecase_CapabilityExecRequest__self
+R37_usecase_usecase_CapabilityExecService_execute --> T41_usecase_usecase_CapabilityDispatchOutcome__self
+R37_usecase_usecase_CapabilityExecService_execute --> T35_usecase_usecase_CapabilityExecError__self
+R37_usecase_usecase_CapabilityProfilePort_resolve --o T30_usecase_usecase_CapabilityName__self
+R37_usecase_usecase_CapabilityProfilePort_resolve --> T35_usecase_usecase_CapabilityExecError__self
+R37_usecase_usecase_CapabilityProfilePort_resolve --> T33_usecase_usecase_CapabilityProfile__self
+R38_usecase_usecase_CapabilityProviderPort_provider --> T28_usecase_usecase_ProviderName__self
+R38_usecase_usecase_CapabilityProviderPort_dispatch --o T41_usecase_usecase_CapabilityDispatchRequest__self
+R38_usecase_usecase_CapabilityProviderPort_dispatch --> T41_usecase_usecase_CapabilityDispatchOutcome__self
+R38_usecase_usecase_CapabilityProviderPort_dispatch --> T35_usecase_usecase_CapabilityExecError__self
+R36_usecase_usecase_CapabilitySourcePort_load_briefing --o T34_usecase_usecase_CapabilityFilePath__self
+R36_usecase_usecase_CapabilitySourcePort_load_briefing --> T28_usecase_usecase_BriefingText__self
+R36_usecase_usecase_CapabilitySourcePort_load_briefing --> T35_usecase_usecase_CapabilityExecError__self
+R36_usecase_usecase_CapabilitySourcePort_load_discipline --> T35_usecase_usecase_CapabilityExecError__self
+R36_usecase_usecase_CapabilitySourcePort_load_discipline --> T30_usecase_usecase_DisciplineText__self
+T30_usecase_usecase_CapabilityName_try_new --> T30_usecase_usecase_CapabilityName__self
+T40_usecase_usecase_CapabilityExecInteractor__self -.impl.-> R37_usecase_usecase_CapabilityExecService__self
+T43_infrastructure_infrastructure_AgentProfiles_load --> T48_infrastructure_infrastructure_AgentProfilesError__self
+T43_infrastructure_infrastructure_AgentProfiles_load --> T43_infrastructure_infrastructure_AgentProfiles__self
+T43_infrastructure_infrastructure_AgentProfiles_resolve_capability --> T49_infrastructure_infrastructure_CapabilityConfigDto__self
+T49_infrastructure_infrastructure_CapabilityConfigDto_execution_mode --> T46_infrastructure_infrastructure_ExecutionModeDto__self
+T46_infrastructure_infrastructure_ExecutionModeDto_into_domain --> T29_usecase_usecase_ExecutionMode__self
+T42_infrastructure_infrastructure_ModelNameDto_try_new --> T42_infrastructure_infrastructure_ModelNameDto__self
+T42_infrastructure_infrastructure_ModelNameDto_try_new --> T46_usecase_usecase_CapabilityInputValidationError__self
+T42_infrastructure_infrastructure_ModelNameDto_into_domain --> T25_usecase_usecase_ModelName__self
+T45_infrastructure_infrastructure_ProviderNameDto_try_new --> T45_infrastructure_infrastructure_ProviderNameDto__self
+T45_infrastructure_infrastructure_ProviderNameDto_try_new --> T46_usecase_usecase_CapabilityInputValidationError__self
+T45_infrastructure_infrastructure_ProviderNameDto_into_domain --> T28_usecase_usecase_ProviderName__self
+T60_infrastructure_infrastructure_AgentProfilesCapabilityAdapter_new --> T60_infrastructure_infrastructure_AgentProfilesCapabilityAdapter__self
+T53_infrastructure_infrastructure_ClaudeCapabilityAdapter_new --> T53_infrastructure_infrastructure_ClaudeCapabilityAdapter__self
+T52_infrastructure_infrastructure_CodexCapabilityAdapter_new --> T52_infrastructure_infrastructure_CodexCapabilityAdapter__self
+T55_infrastructure_infrastructure_FsCapabilitySourceAdapter_new --> T55_infrastructure_infrastructure_FsCapabilitySourceAdapter__self
+T60_infrastructure_infrastructure_AgentProfilesCapabilityAdapter__self -.impl.-> R37_usecase_usecase_CapabilityProfilePort__self
+T55_infrastructure_infrastructure_FsCapabilitySourceAdapter__self -.impl.-> R36_usecase_usecase_CapabilitySourcePort__self
+T52_infrastructure_infrastructure_CodexCapabilityAdapter__self -.impl.-> R38_usecase_usecase_CapabilityProviderPort__self
+T53_infrastructure_infrastructure_ClaudeCapabilityAdapter__self -.impl.-> R38_usecase_usecase_CapabilityProviderPort__self
+T38_cli_driver_cli_driver_CapabilityDriver_new --> T38_cli_driver_cli_driver_CapabilityDriver__self
+T38_cli_driver_cli_driver_CapabilityDriver_handle --o T47_cli_driver_cli_driver_CapabilityExecDriverInput__self
+T47_cli_driver_cli_driver_CapabilityExecDriverInput__self --o|capability| T39_cli_driver_cli_driver_CapabilityNameArg__self
+T47_cli_driver_cli_driver_CapabilityExecDriverInput__self --o|host| T37_cli_driver_cli_driver_ProviderNameArg__self
+T47_cli_driver_cli_driver_CapabilityExecDriverInput__self --o|briefing_file| T43_cli_driver_cli_driver_CapabilityFilePathArg__self
+T57_cli_composition_cli_composition_CapabilityCompositionRoot_new --> T57_cli_composition_cli_composition_CapabilityCompositionRoot__self
+T57_cli_composition_cli_composition_CapabilityCompositionRoot_discover --> T57_cli_composition_cli_composition_CapabilityCompositionRoot__self
+T57_cli_composition_cli_composition_CapabilityCompositionRoot_capability_driver --> T38_cli_driver_cli_driver_CapabilityDriver__self
+T18_cli_cli_CliCommand_Capability --o|cmd| T25_cli_cli_CapabilityCommand__self
+T25_cli_cli_CapabilityCommand_Exec --o T26_cli_cli_CapabilityExecArgs__self
+T26_cli_cli_CapabilityExecArgs__self --o|capability| T39_cli_driver_cli_driver_CapabilityNameArg__self
+T26_cli_cli_CapabilityExecArgs__self --o|host| T37_cli_driver_cli_driver_ProviderNameArg__self
+T26_cli_cli_CapabilityExecArgs__self --o|briefing_file| T43_cli_driver_cli_driver_CapabilityFilePathArg__self
+F42_cli_cli_cli__commands__capability__execute --o T25_cli_cli_CapabilityCommand__self
+F47_cli_cli_cli__commands__capability__execute_exec --o T26_cli_cli_CapabilityExecArgs__self
+F47_cli_cli_cli__commands__capability__execute_with --o T25_cli_cli_CapabilityCommand__self
+class T28_usecase_usecase_BriefingText_try_new method_node
+class T28_usecase_usecase_BriefingText_as_str method_node
+class T28_usecase_usecase_BriefingText__self value_object
+class T41_usecase_usecase_CapabilityDispatchOutcome_Executed variant_node
+class T41_usecase_usecase_CapabilityDispatchOutcome_DelegateInHost variant_node
+class T41_usecase_usecase_CapabilityDispatchOutcome__self dto
+class T41_usecase_usecase_CapabilityDispatchRequest__self dto
+class T35_usecase_usecase_CapabilityExecError_ProfileResolution variant_node
+class T35_usecase_usecase_CapabilityExecError_ExecutionModeRejected variant_node
+class T35_usecase_usecase_CapabilityExecError_ModelMissing variant_node
+class T35_usecase_usecase_CapabilityExecError_UnsupportedProvider variant_node
+class T35_usecase_usecase_CapabilityExecError_SourceValidation variant_node
+class T35_usecase_usecase_CapabilityExecError_AdapterPreflight variant_node
+class T35_usecase_usecase_CapabilityExecError_DispatchFailed variant_node
+class T35_usecase_usecase_CapabilityExecError__self error_type
+class T40_usecase_usecase_CapabilityExecInteractor_new method_node
+class T40_usecase_usecase_CapabilityExecInteractor__self interactor
+class T37_usecase_usecase_CapabilityExecRequest__self command
+class T39_usecase_usecase_CapabilityFailureDetail_new method_node
+class T39_usecase_usecase_CapabilityFailureDetail_as_str method_node
+class T39_usecase_usecase_CapabilityFailureDetail__self value_object
+class T34_usecase_usecase_CapabilityFilePath_try_new method_node
+class T34_usecase_usecase_CapabilityFilePath_as_path method_node
+class T34_usecase_usecase_CapabilityFilePath__self value_object
+class T46_usecase_usecase_CapabilityInputValidationError_EmptyProviderName variant_node
+class T46_usecase_usecase_CapabilityInputValidationError_EmptyModelName variant_node
+class T46_usecase_usecase_CapabilityInputValidationError_EmptyFilePath variant_node
+class T46_usecase_usecase_CapabilityInputValidationError_InvalidFilePath variant_node
+class T46_usecase_usecase_CapabilityInputValidationError_EmptyContent variant_node
+class T46_usecase_usecase_CapabilityInputValidationError__self error_type
+class T33_usecase_usecase_CapabilityProfile__self dto
+class T30_usecase_usecase_DisciplineText_try_new method_node
+class T30_usecase_usecase_DisciplineText_as_str method_node
+class T30_usecase_usecase_DisciplineText__self value_object
+class T29_usecase_usecase_ExecutionMode_OrchestratorOutput variant_node
+class T29_usecase_usecase_ExecutionMode_TypedPipeline variant_node
+class T29_usecase_usecase_ExecutionMode__self value_object
+class T25_usecase_usecase_ModelName_try_new method_node
+class T25_usecase_usecase_ModelName_as_str method_node
+class T25_usecase_usecase_ModelName__self value_object
+class T28_usecase_usecase_ProviderName_try_new method_node
+class T28_usecase_usecase_ProviderName_as_str method_node
+class T28_usecase_usecase_ProviderName__self value_object
+class R37_usecase_usecase_CapabilityExecService_execute method_node
+class R37_usecase_usecase_CapabilityExecService__self app_service
+class R37_usecase_usecase_CapabilityProfilePort_resolve method_node
+class R37_usecase_usecase_CapabilityProfilePort__self secondary_port
+class R38_usecase_usecase_CapabilityProviderPort_provider method_node
+class R38_usecase_usecase_CapabilityProviderPort_dispatch method_node
+class R38_usecase_usecase_CapabilityProviderPort__self secondary_port
+class R36_usecase_usecase_CapabilitySourcePort_load_briefing method_node
+class R36_usecase_usecase_CapabilitySourcePort_load_discipline method_node
+class R36_usecase_usecase_CapabilitySourcePort__self secondary_port
+class T30_usecase_usecase_CapabilityName_try_new method_node
+class T30_usecase_usecase_CapabilityName_as_str method_node
+class T30_usecase_usecase_CapabilityName__self value_object
+class T43_infrastructure_infrastructure_AgentProfiles_load method_node
+class T43_infrastructure_infrastructure_AgentProfiles_resolve_capability method_node
+class T43_infrastructure_infrastructure_AgentProfiles_resolve_execution method_node
+class T43_infrastructure_infrastructure_AgentProfiles_resolve_model method_node
+class T43_infrastructure_infrastructure_AgentProfiles_resolve_provider method_node
+class T43_infrastructure_infrastructure_AgentProfiles_provider_label method_node
+class T43_infrastructure_infrastructure_AgentProfiles_resolve_prompt_template_path method_node
+class T43_infrastructure_infrastructure_AgentProfiles__self secondary_adapter
+class T48_infrastructure_infrastructure_AgentProfilesError_Io variant_node
+class T48_infrastructure_infrastructure_AgentProfilesError_Symlink variant_node
+class T48_infrastructure_infrastructure_AgentProfilesError_PathOutsideTrustedRoot variant_node
+class T48_infrastructure_infrastructure_AgentProfilesError_Parse variant_node
+class T48_infrastructure_infrastructure_AgentProfilesError_UnsupportedSchemaVersion variant_node
+class T48_infrastructure_infrastructure_AgentProfilesError_InvalidCapability variant_node
+class T48_infrastructure_infrastructure_AgentProfilesError__self error_type
+class T49_infrastructure_infrastructure_CapabilityConfigDto_provider method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_model method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_fast_provider method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_fast_model method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_prompt_template_path method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_fast_reasoning_effort method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_final_reasoning_effort method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto_execution_mode method_node
+class T49_infrastructure_infrastructure_CapabilityConfigDto__self dto
+class T46_infrastructure_infrastructure_ExecutionModeDto_OrchestratorOutput variant_node
+class T46_infrastructure_infrastructure_ExecutionModeDto_TypedPipeline variant_node
+class T46_infrastructure_infrastructure_ExecutionModeDto_into_domain method_node
+class T46_infrastructure_infrastructure_ExecutionModeDto__self dto
+class T42_infrastructure_infrastructure_ModelNameDto_try_new method_node
+class T42_infrastructure_infrastructure_ModelNameDto_into_domain method_node
+class T42_infrastructure_infrastructure_ModelNameDto__self dto
+class T45_infrastructure_infrastructure_ProviderNameDto_try_new method_node
+class T45_infrastructure_infrastructure_ProviderNameDto_into_domain method_node
+class T45_infrastructure_infrastructure_ProviderNameDto__self dto
+class T60_infrastructure_infrastructure_AgentProfilesCapabilityAdapter_new method_node
+class T60_infrastructure_infrastructure_AgentProfilesCapabilityAdapter__self secondary_adapter
+class T53_infrastructure_infrastructure_ClaudeCapabilityAdapter_new method_node
+class T53_infrastructure_infrastructure_ClaudeCapabilityAdapter__self secondary_adapter
+class T52_infrastructure_infrastructure_CodexCapabilityAdapter_new method_node
+class T52_infrastructure_infrastructure_CodexCapabilityAdapter__self secondary_adapter
+class T55_infrastructure_infrastructure_FsCapabilitySourceAdapter_new method_node
+class T55_infrastructure_infrastructure_FsCapabilitySourceAdapter__self secondary_adapter
+class T41_infrastructure_infrastructure_SandboxMode_ReadOnly variant_node
+class T41_infrastructure_infrastructure_SandboxMode_WorkspaceWrite variant_node
+class T41_infrastructure_infrastructure_SandboxMode__self dto
+class T38_cli_driver_cli_driver_CapabilityDriver_new method_node
+class T38_cli_driver_cli_driver_CapabilityDriver_handle method_node
+class T47_cli_driver_cli_driver_CapabilityExecDriverInput__self dto
+class T43_cli_driver_cli_driver_CapabilityFilePathArg__self dto
+class T39_cli_driver_cli_driver_CapabilityNameArg__self dto
+class T37_cli_driver_cli_driver_ProviderNameArg__self dto
+class T57_cli_composition_cli_composition_CapabilityCompositionRoot_new method_node
+class T57_cli_composition_cli_composition_CapabilityCompositionRoot_discover method_node
+class T57_cli_composition_cli_composition_CapabilityCompositionRoot_capability_driver method_node
+class T18_cli_cli_CliCommand_Arch variant_node
+class T18_cli_cli_CliCommand_Conventions variant_node
+class T18_cli_cli_CliCommand_Domain variant_node
+class T18_cli_cli_CliCommand_Guard variant_node
+class T18_cli_cli_CliCommand_Hook variant_node
+class T18_cli_cli_CliCommand_Track variant_node
+class T18_cli_cli_CliCommand_Git variant_node
+class T18_cli_cli_CliCommand_Pr variant_node
+class T18_cli_cli_CliCommand_Capability variant_node
+class T18_cli_cli_CliCommand_Review variant_node
+class T18_cli_cli_CliCommand_File variant_node
+class T18_cli_cli_CliCommand_Verify variant_node
+class T18_cli_cli_CliCommand_FindSimilar variant_node
+class T18_cli_cli_CliCommand_DupIndex variant_node
+class T18_cli_cli_CliCommand_DupCheck variant_node
+class T18_cli_cli_CliCommand_Telemetry variant_node
+class T18_cli_cli_CliCommand_Dry variant_node
+class T18_cli_cli_CliCommand_RefVerify variant_node
+class T18_cli_cli_CliCommand_TestObligation variant_node
+class T18_cli_cli_CliCommand_Signal variant_node
+class T18_cli_cli_CliCommand_TaskContract variant_node
+class T18_cli_cli_CliCommand_Catalog variant_node
+class T18_cli_cli_CliCommand_CatalogueLint variant_node
+class T18_cli_cli_CliCommand_Template variant_node
+class T18_cli_cli_CliCommand__self dto
+class T25_cli_cli_CapabilityCommand_Exec variant_node
+class T25_cli_cli_CapabilityCommand__self dto
+class T26_cli_cli_CapabilityExecArgs__self dto
+class F42_cli_cli_cli__commands__capability__execute free_function
+class F42_cli_cli_cli__commands__capability__execute function_node
+class F47_cli_cli_cli__commands__capability__execute_exec free_function
+class F47_cli_cli_cli__commands__capability__execute_exec function_node
+class F47_cli_cli_cli__commands__capability__execute_with free_function
+class F47_cli_cli_cli__commands__capability__execute_with function_node
+```

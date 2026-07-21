@@ -1,13 +1,23 @@
 //! Codex-backed implementation of the `Reviewer` usecase port.
 
+use std::fs::OpenOptions;
+use std::io::{BufRead, BufReader, Read};
 use std::path::{Path, PathBuf};
-use std::process::Child;
+use std::process::{Child, Command, Stdio};
+use std::sync::Arc;
 use std::thread;
 use std::time::{Duration, Instant};
 
+#[cfg(unix)]
+use std::os::unix::fs::OpenOptionsExt;
+
 use domain::review_v2::{
-    FastVerdict, LogInfo, ReviewTarget, ReviewerFinding, Verdict, VerdictError,
+    FastVerdict, LogInfo, ReviewTarget, ReviewerFinding, RoundType, ScopeName, Verdict,
+    VerdictError,
 };
+use domain::{CommitHash, TrackId};
+use usecase::capability_exec::{ModelName, ReasoningEffort};
+use usecase::provider_session::{ProviderSessionCachePort, ReviewerPrompt};
 use usecase::review_v2::{ReviewerError, ports::Reviewer};
 use usecase::review_workflow::{
     REVIEW_OUTPUT_SCHEMA_JSON, ReviewFinalMessageState, ReviewPayloadVerdict, ReviewVerdict,
@@ -15,9 +25,15 @@ use usecase::review_workflow::{
     render_review_payload,
 };
 
+use super::session::{ReviewerSession, effort_value};
 use crate::codex_common::{
-    POLL_INTERVAL, REVIEW_RUNTIME_DIR, codex_bin, runtime_path, spawn_codex,
+    POLL_INTERVAL, REVIEW_RUNTIME_DIR, configure_codex_command,
+    resolve_codex_runtime_for_current_repository, runtime_path, tee_stderr_to_file,
 };
+use crate::track::symlink_guard::reject_symlinks_up_to_root;
+
+type SpawnCodexReviewerResult =
+    Result<(Child, thread::JoinHandle<()>, thread::JoinHandle<Option<String>>), String>;
 
 /// Codex-backed reviewer implementation for the `Reviewer` usecase port.
 ///
@@ -26,13 +42,14 @@ use crate::codex_common::{
 /// the structured JSON verdict written to `--output-last-message`.
 pub struct CodexReviewer {
     /// Codex model name (e.g., `"gpt-5.4"` or `"gpt-5.4-mini"`).
-    model: String,
+    model: ModelName,
     /// Maximum time to wait for the Codex subprocess.
     timeout: Duration,
     /// Base review prompt to send to Codex (before the file list is appended).
     base_prompt: String,
     /// Scope label injected into the prompt (e.g., `"cli"`, `"infrastructure"`).
     scope_label: String,
+    session: ReviewerSession,
     /// Test-only: override the Codex binary path (avoids unsafe env var mutation).
     #[cfg(test)]
     bin_override: Option<std::ffi::OsString>,
@@ -42,26 +59,44 @@ impl CodexReviewer {
     /// Constructs a new `CodexReviewer`.
     ///
     /// # Arguments
+    /// - `diff_base`: optional persisted review-cycle base that scopes session reuse.
     /// - `model`: Codex model name.
     /// - `timeout`: Maximum time allowed for the review subprocess.
     /// - `base_prompt`: Review instructions without the scope file list.
+    #[allow(clippy::too_many_arguments)] // signature is the catalogue-declared contract
     pub fn new(
-        model: impl Into<String>,
+        track_id: TrackId,
+        scope: ScopeName,
+        round_type: RoundType,
+        diff_base: Option<CommitHash>,
+        model: ModelName,
+        effort: ReasoningEffort,
         timeout: Duration,
-        base_prompt: impl Into<String>,
-    ) -> Self {
+        base_prompt: ReviewerPrompt,
+        session_cache: Arc<dyn ProviderSessionCachePort>,
+    ) -> CodexReviewer {
         Self {
-            model: model.into(),
+            session: ReviewerSession::new(
+                track_id,
+                scope.clone(),
+                round_type,
+                diff_base,
+                "codex",
+                model.clone(),
+                effort,
+                session_cache,
+            ),
+            model,
             timeout,
-            base_prompt: base_prompt.into(),
-            scope_label: "scope".to_owned(),
+            base_prompt: base_prompt.as_str().to_owned(),
+            scope_label: scope.to_string(),
             #[cfg(test)]
             bin_override: None,
         }
     }
 
     /// Sets the scope label injected into the review prompt.
-    pub fn with_scope_label(mut self, label: impl Into<String>) -> Self {
+    pub fn with_scope_label(mut self, label: impl Into<String>) -> CodexReviewer {
         self.scope_label = label.into();
         self
     }
@@ -88,6 +123,7 @@ impl CodexReviewer {
             "{base}\n\n\
              ## Review scope: `{scope}`\n\n\
              Review ONLY the following files (this is the `{scope}` scope).\n\
+             Re-read the CURRENT file list and CURRENT diff, then fully re-adjudicate this entire scope.\n\
              You have read-only access to the repo — use `git diff` to see changes.\n\n\
              Files:\n{file_list}",
             base = self.base_prompt,
@@ -116,46 +152,89 @@ impl CodexReviewer {
         // Session log is NOT auto-managed — it persists for post-run debugging.
         let _cleanup = AutoManagedArtifacts::new([&output_last_message, &output_schema]);
 
-        // Reset output-last-message to empty so stale content cannot be mistaken for a verdict.
-        std::fs::write(&output_last_message, "").map_err(|e| {
-            ReviewerError::Unexpected(format!("failed to initialize output-last-message: {e}"))
-        })?;
-
         // Write output schema file.
         std::fs::write(&output_schema, REVIEW_OUTPUT_SCHEMA_JSON).map_err(|e| {
             ReviewerError::Unexpected(format!("failed to write output-schema: {e}"))
         })?;
 
         #[cfg(test)]
-        let bin = self.bin_override.clone().unwrap_or_else(codex_bin);
+        let runtime = if self.bin_override.is_none() {
+            Some(
+                resolve_codex_runtime_for_current_repository()
+                    .map_err(ReviewerError::Unexpected)?,
+            )
+        } else {
+            None
+        };
+        #[cfg(test)]
+        let (bin, runtime_for_spawn) = match (&self.bin_override, runtime.as_ref()) {
+            (Some(bin), _) => (bin.clone(), None),
+            (None, Some(runtime)) => (runtime.executable().to_os_string(), Some(runtime)),
+            (None, None) => {
+                return Err(ReviewerError::Unexpected("test Codex runtime missing".to_owned()));
+            }
+        };
         #[cfg(not(test))]
-        let bin = codex_bin();
+        let runtime =
+            resolve_codex_runtime_for_current_repository().map_err(ReviewerError::Unexpected)?;
+        #[cfg(not(test))]
+        let (bin, runtime_for_spawn) = (runtime.executable().to_os_string(), Some(&runtime));
 
-        let invocation = crate::codex_common::build_codex_read_only_invocation(
-            &self.model,
-            "high",
-            &prompt,
-            &output_last_message,
-            &output_schema,
-        );
-
-        let (child, io_handles) =
-            spawn_codex(&bin, &invocation, &session_log).map_err(ReviewerError::Unexpected)?;
-
-        run_codex_child(child, io_handles, self.timeout, output_last_message, &session_log)
+        let resume_id = self.session.resumable_id();
+        let run = |resume_id: Option<&str>| {
+            // Both resumed and fresh attempts share this path. Reset the
+            // authoritative output before every child so a failed resume
+            // cannot donate its verdict to the fresh retry.
+            initialize_output_last_message(&output_last_message).map_err(|e| {
+                ReviewerError::Unexpected(format!("failed to initialize output-last-message: {e}"))
+            })?;
+            let invocation = build_codex_reviewer_invocation(
+                self.model.as_str(),
+                effort_value(self.session.effort()),
+                resume_id,
+                &prompt,
+                &output_last_message,
+                &output_schema,
+            );
+            let (child, stderr, stdout) =
+                spawn_codex_reviewer(&bin, &invocation, &session_log, runtime_for_spawn)
+                    .map_err(ReviewerError::Unexpected)?;
+            run_codex_child(
+                child,
+                stderr,
+                stdout,
+                self.timeout,
+                output_last_message.clone(),
+                &session_log,
+            )
+        };
+        let attempted = run(resume_id.as_deref());
+        if resume_id.is_some()
+            && !matches!(
+                attempted.as_ref().map(|raw| &raw.verdict),
+                Ok(ReviewVerdict::ZeroFindings | ReviewVerdict::FindingsRemain)
+            )
+        {
+            return run(None);
+        }
+        attempted
     }
 }
 
 impl Reviewer for CodexReviewer {
     fn review(&self, target: &ReviewTarget) -> Result<(Verdict, LogInfo), ReviewerError> {
         let raw = self.run_review(target, &self.scope_label)?;
+        let session_id = raw.session_id.clone();
         let (verdict, log_info) = convert_raw_to_final(raw)?;
+        self.session.save(session_id);
         Ok((verdict, log_info))
     }
 
     fn fast_review(&self, target: &ReviewTarget) -> Result<(FastVerdict, LogInfo), ReviewerError> {
         let raw = self.run_review(target, &self.scope_label)?;
+        let session_id = raw.session_id.clone();
         let (verdict, log_info) = convert_raw_to_fast(raw)?;
+        self.session.save(session_id);
         Ok((verdict, log_info))
     }
 }
@@ -165,6 +244,7 @@ struct ReviewOutcomeRaw {
     verdict: ReviewVerdict,
     final_message: Option<String>,
     session_log_path: PathBuf,
+    session_id: Option<String>,
 }
 
 /// Converts a raw Codex outcome to a final `(Verdict, LogInfo)`.
@@ -282,7 +362,8 @@ impl Drop for AutoManagedArtifacts {
 
 fn run_codex_child(
     mut child: Child,
-    io_handles: Vec<thread::JoinHandle<()>>,
+    stderr_collector: thread::JoinHandle<()>,
+    stdout_collector: thread::JoinHandle<Option<String>>,
     timeout: Duration,
     output_last_message: PathBuf,
     session_log_path: &Path,
@@ -316,18 +397,20 @@ fn run_codex_child(
         }
     }
 
+    let session_id = if timed_out { None } else { stdout_collector.join().unwrap_or_default() };
     if !timed_out {
         // Only join drain threads when the child exited normally.
         // On timeout, descendant processes may still hold the pipe FDs open,
         // causing the drain threads to block indefinitely. Dropping the
         // JoinHandles detaches the threads — they will terminate when all
         // FD holders close their end or when the process exits.
-        for handle in io_handles {
-            let _ = handle.join();
-        }
+        let _ = stderr_collector.join();
     }
 
-    let raw_content = match std::fs::read_to_string(&output_last_message) {
+    let raw_content = match read_bounded_output_last_message(
+        &output_last_message,
+        MAX_CODEX_LAST_MESSAGE_BYTES,
+    ) {
         Ok(content) => normalize_final_message(&content),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
         Err(e) => {
@@ -359,7 +442,222 @@ fn run_codex_child(
         verdict,
         final_message,
         session_log_path: session_log_path.to_path_buf(),
+        session_id,
     })
+}
+
+/// Maximum size accepted for Codex's authoritative final-message file.
+const MAX_CODEX_LAST_MESSAGE_BYTES: u64 = 4 * 1024 * 1024;
+
+/// Reads an authoritative Codex final-message file within an explicit byte limit.
+///
+/// The extra byte detects overflow while avoiding an unbounded allocation. Callers
+/// must treat an overflow as an error because this file is the verdict source.
+fn read_bounded_output_last_message(path: &Path, max_bytes: u64) -> std::io::Result<String> {
+    let metadata = std::fs::symlink_metadata(path)?;
+    if metadata.file_type().is_symlink() {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("refusing to read symlinked output-last-message: {}", path.display()),
+        ));
+    }
+    if !metadata.file_type().is_file() {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("output-last-message is not a regular file: {}", path.display()),
+        ));
+    }
+    let file = std::fs::File::open(path)?;
+    let mut bytes = Vec::new();
+    file.take(max_bytes.saturating_add(1)).read_to_end(&mut bytes)?;
+    if bytes.len() as u64 > max_bytes {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidData,
+            format!(
+                "output-last-message exceeds maximum size of {max_bytes} bytes: {} bytes",
+                bytes.len()
+            ),
+        ));
+    }
+    String::from_utf8(bytes).map_err(|error| {
+        std::io::Error::new(
+            std::io::ErrorKind::InvalidData,
+            format!("output-last-message is not valid UTF-8: {error}"),
+        )
+    })
+}
+
+/// Empties the authoritative Codex final-message file without following symlinks.
+///
+/// The file is reset before every invocation so a failed resumed attempt cannot
+/// donate a stale verdict to its fresh retry. On Unix, `O_NOFOLLOW` closes the
+/// check-to-open race; truncation occurs only after the opened handle is verified
+/// to be a regular file.
+fn initialize_output_last_message(path: &Path) -> std::io::Result<()> {
+    match std::fs::symlink_metadata(path) {
+        Ok(metadata) if metadata.file_type().is_symlink() => {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                format!("refusing to initialize symlinked output-last-message: {}", path.display()),
+            ));
+        }
+        Ok(metadata) if !metadata.file_type().is_file() => {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                format!("output-last-message is not a regular file: {}", path.display()),
+            ));
+        }
+        Ok(_) => {}
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => {}
+        Err(error) => return Err(error),
+    }
+
+    // The runtime path is relative to the workspace. Check every existing
+    // ancestor before opening the leaf so a symlinked `tmp/` or
+    // `reviewer-runtime/` cannot redirect the authoritative verdict outside
+    // the runtime tree.
+    reject_symlinks_up_to_root(path)?;
+
+    let mut options = OpenOptions::new();
+    options.write(true).create(true);
+    #[cfg(unix)]
+    options.custom_flags(libc::O_NOFOLLOW);
+    let file = options.open(path)?;
+    if !file.metadata()?.file_type().is_file() {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            format!("output-last-message is not a regular file: {}", path.display()),
+        ));
+    }
+    file.set_len(0)
+}
+
+fn build_codex_reviewer_invocation(
+    model: &str,
+    effort: &str,
+    resume_id: Option<&str>,
+    prompt: &str,
+    output_last_message: &Path,
+    output_schema: &Path,
+) -> Vec<std::ffi::OsString> {
+    // All exec-level options must precede the `resume` subcommand: the documented
+    // form is `codex exec [OPTIONS] resume [SESSION_ID] [PROMPT]`, and options
+    // placed after `resume` are not guaranteed to bind to the run.
+    let mut args = vec![
+        "exec".into(),
+        "--model".into(),
+        model.into(),
+        "--sandbox".into(),
+        "read-only".into(),
+        "--config".into(),
+        format!("model_reasoning_effort=\"{effort}\"").into(),
+        "--json".into(),
+        "--output-schema".into(),
+        output_schema.as_os_str().to_os_string(),
+        "--output-last-message".into(),
+        output_last_message.as_os_str().to_os_string(),
+    ];
+    if let Some(session_id) = resume_id {
+        args.extend(["resume".into(), session_id.into()]);
+    }
+    args.push(prompt.into());
+    args
+}
+
+fn spawn_codex_reviewer(
+    bin: &std::ffi::OsStr,
+    args: &[std::ffi::OsString],
+    session_log_path: &Path,
+    runtime: Option<&crate::codex_common::ResolvedCodexRuntime>,
+) -> SpawnCodexReviewerResult {
+    let mut command = Command::new(bin);
+    command.args(args).stdin(Stdio::null()).stdout(Stdio::piped()).stderr(Stdio::piped());
+    if let Some(runtime) = runtime {
+        configure_codex_command(&mut command, runtime)?;
+    }
+    let mut log = std::fs::File::create(session_log_path).map_err(|error| {
+        format!("failed to create session log {}: {error}", session_log_path.display())
+    })?;
+    if let Some(runtime) = runtime {
+        use std::io::Write as _;
+        log.write_all(crate::codex_common::runtime_log_header(runtime).as_bytes()).map_err(
+            |error| format!("failed to write session log {}: {error}", session_log_path.display()),
+        )?;
+    }
+    let mut child = command
+        .spawn()
+        .map_err(|error| format!("failed to spawn {}: {error}", bin.to_string_lossy()))?;
+    let stderr = child
+        .stderr
+        .take()
+        .map(|pipe| thread::spawn(move || tee_stderr_to_file(pipe, log)))
+        .unwrap_or_else(|| thread::spawn(|| {}));
+    let stdout = child
+        .stdout
+        .take()
+        .map(|pipe| thread::spawn(move || collect_codex_session_id(pipe)))
+        .unwrap_or_else(|| thread::spawn(|| None));
+    Ok((child, stderr, stdout))
+}
+
+/// Maximum bytes retained for a single Codex JSON event while looking up `thread_id`.
+///
+/// Codex emits newline-delimited events. Larger or malformed events are discarded so a
+/// malfunctioning child cannot make the reviewer retain an unbounded stdout stream.
+const MAX_CODEX_EVENT_BYTES: usize = 64 * 1024;
+
+/// Drains Codex's JSON event stream while retaining only the first bounded `thread_id` event.
+fn collect_codex_session_id<R: Read>(pipe: R) -> Option<String> {
+    let mut reader = BufReader::new(pipe);
+    let mut event = Vec::with_capacity(MAX_CODEX_EVENT_BYTES);
+    let mut discarding_event = false;
+    let mut session_id = None;
+
+    while let Ok(buffer) = reader.fill_buf() {
+        if buffer.is_empty() {
+            break;
+        }
+
+        if session_id.is_some() {
+            let consumed = buffer.len();
+            reader.consume(consumed);
+            continue;
+        }
+
+        let newline = buffer.iter().position(|byte| *byte == b'\n');
+        let event_bytes = newline.unwrap_or(buffer.len());
+        if !discarding_event {
+            let remaining = MAX_CODEX_EVENT_BYTES.saturating_sub(event.len());
+            if event_bytes <= remaining {
+                if let Some(event_part) = buffer.get(..event_bytes) {
+                    event.extend_from_slice(event_part);
+                } else {
+                    discarding_event = true;
+                }
+            } else {
+                discarding_event = true;
+            }
+        }
+
+        let consumed = newline.map_or(buffer.len(), |index| index.saturating_add(1));
+        reader.consume(consumed);
+
+        if newline.is_some() {
+            if !discarding_event {
+                session_id = extract_codex_session_id_event(&event);
+            }
+            event.clear();
+            discarding_event = false;
+        }
+    }
+
+    session_id
+}
+
+fn extract_codex_session_id_event(event: &[u8]) -> Option<String> {
+    let event = std::str::from_utf8(event).ok()?;
+    let value = serde_json::from_str::<serde_json::Value>(event.trim()).ok()?;
+    value.get("thread_id")?.as_str().filter(|id| !id.trim().is_empty()).map(str::to_owned)
 }
 
 /// Terminates the reviewer child process.
@@ -382,9 +680,138 @@ fn terminate_reviewer_child(child: &mut Child) -> Result<(), String> {
 mod tests {
     use super::*;
 
+    struct StaticSessionCache {
+        entry: Option<usecase::provider_session::ProviderSessionCacheEntry>,
+    }
+
+    impl ProviderSessionCachePort for StaticSessionCache {
+        fn load(
+            &self,
+            _: &usecase::provider_session::ProviderSessionCacheKey,
+        ) -> Result<
+            Option<usecase::provider_session::ProviderSessionCacheEntry>,
+            usecase::provider_session::ProviderSessionCacheError,
+        > {
+            Ok(self.entry.clone())
+        }
+
+        fn save(
+            &self,
+            _: &usecase::provider_session::ProviderSessionCacheKey,
+            _: &usecase::provider_session::ProviderSessionCacheEntry,
+        ) -> Result<(), usecase::provider_session::ProviderSessionCacheError> {
+            Ok(())
+        }
+
+        fn remove(
+            &self,
+            _: &usecase::provider_session::ProviderSessionCacheKey,
+        ) -> Result<(), usecase::provider_session::ProviderSessionCacheError> {
+            Ok(())
+        }
+    }
+
+    struct EmptySessionCache;
+
+    impl ProviderSessionCachePort for EmptySessionCache {
+        fn load(
+            &self,
+            _: &usecase::provider_session::ProviderSessionCacheKey,
+        ) -> Result<
+            Option<usecase::provider_session::ProviderSessionCacheEntry>,
+            usecase::provider_session::ProviderSessionCacheError,
+        > {
+            Ok(None)
+        }
+        fn save(
+            &self,
+            _: &usecase::provider_session::ProviderSessionCacheKey,
+            _: &usecase::provider_session::ProviderSessionCacheEntry,
+        ) -> Result<(), usecase::provider_session::ProviderSessionCacheError> {
+            Ok(())
+        }
+        fn remove(
+            &self,
+            _: &usecase::provider_session::ProviderSessionCacheKey,
+        ) -> Result<(), usecase::provider_session::ProviderSessionCacheError> {
+            Ok(())
+        }
+    }
+
+    struct KeyedSessionCache {
+        entry: Option<usecase::provider_session::ProviderSessionCacheEntry>,
+        expected_key: usecase::provider_session::ProviderSessionCacheKey,
+    }
+
+    impl ProviderSessionCachePort for KeyedSessionCache {
+        fn load(
+            &self,
+            key: &usecase::provider_session::ProviderSessionCacheKey,
+        ) -> Result<
+            Option<usecase::provider_session::ProviderSessionCacheEntry>,
+            usecase::provider_session::ProviderSessionCacheError,
+        > {
+            Ok((key == &self.expected_key).then(|| self.entry.clone()).flatten())
+        }
+
+        fn save(
+            &self,
+            _: &usecase::provider_session::ProviderSessionCacheKey,
+            _: &usecase::provider_session::ProviderSessionCacheEntry,
+        ) -> Result<(), usecase::provider_session::ProviderSessionCacheError> {
+            Ok(())
+        }
+
+        fn remove(
+            &self,
+            _: &usecase::provider_session::ProviderSessionCacheKey,
+        ) -> Result<(), usecase::provider_session::ProviderSessionCacheError> {
+            Ok(())
+        }
+    }
+
+    fn test_reviewer(timeout: Duration, prompt: &str) -> CodexReviewer {
+        test_reviewer_with_cache(timeout, prompt, Arc::new(EmptySessionCache))
+    }
+
+    fn test_reviewer_with_cache(
+        timeout: Duration,
+        prompt: &str,
+        cache: Arc<dyn ProviderSessionCachePort>,
+    ) -> CodexReviewer {
+        CodexReviewer::new(
+            TrackId::try_new("test-track").unwrap(),
+            ScopeName::Other,
+            RoundType::Fast,
+            Some(CommitHash::try_new("a1b2c3d").unwrap()),
+            ModelName::try_new("gpt-5.4").unwrap(),
+            ReasoningEffort::High,
+            timeout,
+            ReviewerPrompt::try_new(prompt.to_owned()).unwrap(),
+            cache,
+        )
+    }
+
+    fn session_entry(provider: &str) -> usecase::provider_session::ProviderSessionCacheEntry {
+        session_entry_with_model(provider, "gpt-5.4")
+    }
+
+    fn session_entry_with_model(
+        provider: &str,
+        model: &str,
+    ) -> usecase::provider_session::ProviderSessionCacheEntry {
+        usecase::provider_session::ProviderSessionCacheEntry::new(
+            usecase::provider_session::ProviderSessionId::try_new("prior-session".to_owned())
+                .unwrap(),
+            usecase::capability_exec::ProviderName::try_new(provider.to_owned()).unwrap(),
+            ModelName::try_new(model.to_owned()).unwrap(),
+            ReasoningEffort::High,
+        )
+    }
+
     #[test]
     fn test_codex_reviewer_build_full_prompt_with_files() {
-        let reviewer = CodexReviewer::new("gpt-5.4", Duration::from_secs(600), "Review this code.");
+        let reviewer = test_reviewer(Duration::from_secs(600), "Review this code.");
         let files = vec![
             domain::review_v2::FilePath::new("src/lib.rs").unwrap(),
             domain::review_v2::FilePath::new("src/main.rs").unwrap(),
@@ -396,15 +823,488 @@ mod tests {
         assert!(prompt.contains("## Review scope: `domain`"));
         assert!(prompt.contains("- src/lib.rs"));
         assert!(prompt.contains("- src/main.rs"));
+        assert!(prompt.contains("CURRENT file list"));
+        assert!(prompt.contains("CURRENT diff"));
+        assert!(prompt.contains("fully re-adjudicate this entire scope"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_codex_reviewer_resume_and_fresh_rounds_reinject_flags_reread_scope_and_preserve_verdict_unit()
+     {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = tempfile::tempdir().unwrap();
+        let write_bin = |name: &str, expected_resume: bool| {
+            let script = dir.path().join(name);
+            let resume_check = if expected_resume {
+                "[ \"$has_resume\" -eq 1 ]"
+            } else {
+                "[ \"$has_resume\" -eq 0 ]"
+            };
+            std::fs::write(
+                &script,
+                format!(
+                    r#"#!/bin/sh
+has_model=0
+has_sandbox=0
+has_effort=0
+has_resume=0
+output=""
+last=""
+previous=""
+for argument in "$@"; do
+  [ "$previous" = "--model" ] && [ "$argument" = "gpt-5.4" ] && has_model=1
+  [ "$previous" = "--sandbox" ] && [ "$argument" = "read-only" ] && has_sandbox=1
+  [ "$previous" = "--output-last-message" ] && output="$argument"
+  [ "$argument" = "model_reasoning_effort=\"high\"" ] && has_effort=1
+  [ "$argument" = "resume" ] && has_resume=1
+  previous="$argument"
+  last="$argument"
+done
+[ "$has_model" -eq 1 ] && [ "$has_sandbox" -eq 1 ] && [ "$has_effort" -eq 1 ] && [ -n "$output" ] && {resume_check} || exit 9
+case "$last" in
+  *"CURRENT file list"*"CURRENT diff"*"fully re-adjudicate this entire scope"*"src/lib.rs"*) ;;
+  *) exit 10 ;;
+esac
+printf '{{"verdict":"zero_findings","findings":[]}}\n' > "$output"
+printf '{{"thread_id":"new-session"}}\n'
+"#
+                ),
+            )
+            .unwrap();
+            let mut permissions = std::fs::metadata(&script).unwrap().permissions();
+            permissions.set_mode(0o755);
+            std::fs::set_permissions(&script, permissions).unwrap();
+            script
+        };
+
+        let target =
+            ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
+        let resumed = test_reviewer_with_cache(
+            Duration::from_secs(10),
+            "Review this code.",
+            Arc::new(StaticSessionCache { entry: Some(session_entry("codex")) }),
+        )
+        .with_bin(write_bin("resume-codex.sh", true))
+        .review(&target)
+        .unwrap();
+        let model_mismatch = test_reviewer_with_cache(
+            Duration::from_secs(10),
+            "Review this code.",
+            Arc::new(StaticSessionCache {
+                entry: Some(session_entry_with_model("codex", "previous-model")),
+            }),
+        )
+        .with_bin(write_bin("model-mismatch-codex.sh", false))
+        .review(&target)
+        .unwrap();
+        let provider_mismatch = test_reviewer_with_cache(
+            Duration::from_secs(10),
+            "Review this code.",
+            Arc::new(StaticSessionCache { entry: Some(session_entry("claude")) }),
+        )
+        .with_bin(write_bin("provider-mismatch-codex.sh", false))
+        .review(&target)
+        .unwrap();
+        let first_round = test_reviewer_with_cache(
+            Duration::from_secs(10),
+            "Review this code.",
+            Arc::new(EmptySessionCache),
+        )
+        .with_bin(write_bin("first-round-codex.sh", false))
+        .review(&target)
+        .unwrap();
+
+        assert_eq!(resumed.0, model_mismatch.0);
+        assert_eq!(resumed.0, provider_mismatch.0);
+        assert_eq!(resumed.0, first_round.0);
+        assert!(matches!(resumed.0, Verdict::ZeroFindings));
+        // Codex uses distinct log paths per subprocess, but resumed and fresh
+        // results both preserve the record's verdict + non-empty log-info unit.
+        assert!(!resumed.1.as_str().is_empty());
+        assert!(!model_mismatch.1.as_str().is_empty());
+        assert!(!provider_mismatch.1.as_str().is_empty());
+        assert!(!first_round.1.as_str().is_empty());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_codex_reviewer_resume_failure_retries_fresh_invocation() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = tempfile::tempdir().unwrap();
+        let attempts = dir.path().join("attempts.log");
+        let script = dir.path().join("resume-fallback-codex.sh");
+        std::fs::write(
+            &script,
+            format!(
+                r#"#!/bin/sh
+has_resume=0
+has_model=0
+has_sandbox=0
+has_effort=0
+output=""
+previous=""
+for argument in "$@"; do
+  [ "$argument" = "resume" ] && has_resume=1
+  [ "$previous" = "--model" ] && [ "$argument" = "gpt-5.4" ] && has_model=1
+  [ "$previous" = "--sandbox" ] && [ "$argument" = "read-only" ] && has_sandbox=1
+  [ "$previous" = "--output-last-message" ] && output="$argument"
+  [ "$argument" = "model_reasoning_effort=\"high\"" ] && has_effort=1
+  previous="$argument"
+done
+[ "$has_model" -eq 1 ] && [ "$has_sandbox" -eq 1 ] && [ "$has_effort" -eq 1 ] || exit 9
+if [ "$has_resume" -eq 1 ]; then
+  printf 'resume\n' >> '{}'
+  exit 7
+fi
+printf 'fresh\n' >> '{}'
+printf '{{"verdict":"zero_findings","findings":[]}}\n' > "$output"
+printf '{{"thread_id":"new-session"}}\n'
+"#,
+                attempts.display(),
+                attempts.display()
+            ),
+        )
+        .unwrap();
+        let mut permissions = std::fs::metadata(&script).unwrap().permissions();
+        permissions.set_mode(0o755);
+        std::fs::set_permissions(&script, permissions).unwrap();
+
+        let target =
+            ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
+        let record = test_reviewer_with_cache(
+            Duration::from_secs(10),
+            "Review this code.",
+            Arc::new(StaticSessionCache { entry: Some(session_entry("codex")) }),
+        )
+        .with_bin(script)
+        .review(&target)
+        .unwrap();
+
+        assert!(matches!(record.0, Verdict::ZeroFindings));
+        assert_eq!(std::fs::read_to_string(attempts).unwrap(), "resume\nfresh\n");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_codex_reviewer_fresh_retry_does_not_adopt_failed_resume_verdict() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = tempfile::tempdir().unwrap();
+        let attempts = dir.path().join("attempts.log");
+        let script = dir.path().join("stale-resume-verdict-codex.sh");
+        std::fs::write(
+            &script,
+            format!(
+                r#"#!/bin/sh
+has_resume=0
+output=""
+previous=""
+for argument in "$@"; do
+  [ "$argument" = "resume" ] && has_resume=1
+  [ "$previous" = "--output-last-message" ] && output="$argument"
+  previous="$argument"
+done
+if [ "$has_resume" -eq 1 ]; then
+  printf 'resume\n' >> '{}'
+  printf '{{"verdict":"zero_findings","findings":[]}}\n' > "$output"
+  exit 7
+fi
+printf 'fresh\n' >> '{}'
+exit 0
+"#,
+                attempts.display(),
+                attempts.display()
+            ),
+        )
+        .unwrap();
+        let mut permissions = std::fs::metadata(&script).unwrap().permissions();
+        permissions.set_mode(0o755);
+        std::fs::set_permissions(&script, permissions).unwrap();
+
+        let target =
+            ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
+        let result = test_reviewer_with_cache(
+            Duration::from_secs(10),
+            "Review this code.",
+            Arc::new(StaticSessionCache { entry: Some(session_entry("codex")) }),
+        )
+        .with_bin(script)
+        .review(&target);
+
+        assert!(matches!(result, Err(ReviewerError::IllegalVerdict)));
+        assert_eq!(std::fs::read_to_string(attempts).unwrap(), "resume\nfresh\n");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_codex_reviewer_expired_session_starts_fresh_with_explicit_flags() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = tempfile::tempdir().unwrap();
+        let attempts = dir.path().join("attempts.log");
+        let script = dir.path().join("expired-session-codex.sh");
+        std::fs::write(
+            &script,
+            format!(
+                r#"#!/bin/sh
+has_resume=0
+has_model=0
+has_sandbox=0
+has_effort=0
+output=""
+previous=""
+for argument in "$@"; do
+  [ "$argument" = "resume" ] && has_resume=1
+  [ "$previous" = "--model" ] && [ "$argument" = "gpt-5.4" ] && has_model=1
+  [ "$previous" = "--sandbox" ] && [ "$argument" = "read-only" ] && has_sandbox=1
+  [ "$previous" = "--output-last-message" ] && output="$argument"
+  [ "$argument" = "model_reasoning_effort=\"high\"" ] && has_effort=1
+  previous="$argument"
+done
+[ "$has_model" -eq 1 ] && [ "$has_sandbox" -eq 1 ] && [ "$has_effort" -eq 1 ] && [ -n "$output" ] || exit 9
+if [ "$has_resume" -eq 1 ]; then
+  printf 'resume\n' >> '{}'
+  printf 'expired or unknown session\n' >&2
+  exit 7
+fi
+printf 'fresh\n' >> '{}'
+printf '{{"verdict":"zero_findings","findings":[]}}\n' > "$output"
+printf '{{"thread_id":"new-session"}}\n'
+"#,
+                attempts.display(),
+                attempts.display()
+            ),
+        )
+        .unwrap();
+        let mut permissions = std::fs::metadata(&script).unwrap().permissions();
+        permissions.set_mode(0o755);
+        std::fs::set_permissions(&script, permissions).unwrap();
+
+        let target =
+            ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
+        let record = test_reviewer_with_cache(
+            Duration::from_secs(10),
+            "Review this code.",
+            Arc::new(StaticSessionCache { entry: Some(session_entry("codex")) }),
+        )
+        .with_bin(script)
+        .review(&target)
+        .unwrap();
+
+        assert!(matches!(record.0, Verdict::ZeroFindings));
+        assert_eq!(std::fs::read_to_string(attempts).unwrap(), "resume\nfresh\n");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_codex_reviewer_resumes_only_matching_track_scope_and_round_key_unit() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let dir = tempfile::tempdir().unwrap();
+        let write_bin = |name: &str, expected_resume: bool| {
+            let script = dir.path().join(name);
+            let resume_check = if expected_resume {
+                "[ \"$has_resume\" -eq 1 ]"
+            } else {
+                "[ \"$has_resume\" -eq 0 ]"
+            };
+            std::fs::write(
+                &script,
+                format!(
+                    r#"#!/bin/sh
+has_resume=0
+has_model=0
+has_sandbox=0
+has_effort=0
+output=""
+previous=""
+for argument in "$@"; do
+  [ "$argument" = "resume" ] && has_resume=1
+  [ "$previous" = "--model" ] && [ "$argument" = "gpt-5.4" ] && has_model=1
+  [ "$previous" = "--sandbox" ] && [ "$argument" = "read-only" ] && has_sandbox=1
+  [ "$previous" = "--output-last-message" ] && output="$argument"
+  [ "$argument" = "model_reasoning_effort=\"high\"" ] && has_effort=1
+  previous="$argument"
+done
+[ "$has_model" -eq 1 ] && [ "$has_sandbox" -eq 1 ] && [ "$has_effort" -eq 1 ] && [ -n "$output" ] && {resume_check} || exit 9
+printf '{{"verdict":"zero_findings","findings":[]}}\n' > "$output"
+printf '{{"thread_id":"new-session"}}\n'
+"#
+                ),
+            )
+            .unwrap();
+            let mut permissions = std::fs::metadata(&script).unwrap().permissions();
+            permissions.set_mode(0o755);
+            std::fs::set_permissions(&script, permissions).unwrap();
+            script
+        };
+        let target =
+            ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let scope = ScopeName::Other;
+        let diff_base = CommitHash::try_new("a1b2c3d").unwrap();
+        let matched_key = usecase::provider_session::ProviderSessionCacheKey::Review {
+            track_id: track_id.clone(),
+            scope: scope.clone(),
+            round_type: RoundType::Fast,
+            diff_base: diff_base.clone(),
+        };
+        let wrong_track_key = usecase::provider_session::ProviderSessionCacheKey::Review {
+            track_id: TrackId::try_new("other-track").unwrap(),
+            scope: scope.clone(),
+            round_type: RoundType::Fast,
+            diff_base: diff_base.clone(),
+        };
+        let wrong_scope_key = usecase::provider_session::ProviderSessionCacheKey::Review {
+            track_id: track_id.clone(),
+            scope: ScopeName::Main(
+                domain::review_v2::MainScopeName::new("infrastructure").unwrap(),
+            ),
+            round_type: RoundType::Fast,
+            diff_base: diff_base.clone(),
+        };
+
+        let run = |round_type, expected_key, name, expects_resume| {
+            CodexReviewer::new(
+                track_id.clone(),
+                scope.clone(),
+                round_type,
+                Some(diff_base.clone()),
+                ModelName::try_new("gpt-5.4").unwrap(),
+                ReasoningEffort::High,
+                Duration::from_secs(10),
+                ReviewerPrompt::try_new("Review this code.".to_owned()).unwrap(),
+                Arc::new(KeyedSessionCache { entry: Some(session_entry("codex")), expected_key }),
+            )
+            .with_bin(write_bin(name, expects_resume))
+            .review(&target)
+            .unwrap()
+        };
+
+        assert!(matches!(
+            run(RoundType::Fast, wrong_track_key, "wrong-track-codex.sh", false).0,
+            Verdict::ZeroFindings
+        ));
+        assert!(matches!(
+            run(RoundType::Fast, wrong_scope_key, "wrong-scope-codex.sh", false).0,
+            Verdict::ZeroFindings
+        ));
+        assert!(matches!(
+            run(RoundType::Final, matched_key.clone(), "fast-keyed-final-codex.sh", false).0,
+            Verdict::ZeroFindings
+        ));
+        assert!(matches!(
+            run(RoundType::Fast, matched_key, "matching-key-codex.sh", true).0,
+            Verdict::ZeroFindings
+        ));
     }
 
     #[test]
     fn test_codex_reviewer_build_full_prompt_empty_target_returns_base_prompt() {
-        let reviewer = CodexReviewer::new("gpt-5.4", Duration::from_secs(600), "Review this code.");
+        let reviewer = test_reviewer(Duration::from_secs(600), "Review this code.");
         let target = ReviewTarget::new(vec![]);
         let prompt = reviewer.build_full_prompt(&target, "domain");
 
         assert_eq!(prompt, "Review this code.");
+    }
+
+    #[test]
+    fn test_codex_resume_args_reinject_all_execution_flags() {
+        let args = build_codex_reviewer_invocation(
+            "codex-model",
+            "xhigh",
+            Some("prior-session"),
+            "Review.",
+            Path::new("tmp/last-message.json"),
+            Path::new("tmp/schema.json"),
+        );
+        let args: Vec<&str> = args.iter().filter_map(|arg| arg.to_str()).collect();
+        assert!(args.windows(2).any(|pair| pair == ["resume", "prior-session"]));
+        assert!(args.windows(2).any(|pair| pair == ["--model", "codex-model"]));
+        assert!(args.windows(2).any(|pair| pair == ["--sandbox", "read-only"]));
+        assert!(args.contains(&"model_reasoning_effort=\"xhigh\""));
+    }
+
+    #[test]
+    fn test_collect_codex_session_id_discards_oversized_event_and_keeps_draining() {
+        let mut stdout = vec![b'x'; MAX_CODEX_EVENT_BYTES.saturating_add(1)];
+        stdout.push(b'\n');
+        stdout.extend_from_slice(br#"{"thread_id":"captured-session"}"#);
+        stdout.push(b'\n');
+        stdout.extend_from_slice(b"discarded-after-session\n");
+
+        assert_eq!(
+            collect_codex_session_id(std::io::Cursor::new(stdout)),
+            Some("captured-session".to_owned())
+        );
+    }
+
+    #[test]
+    fn test_read_bounded_output_last_message_over_limit_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("last-message.json");
+        std::fs::write(&path, b"abcde").unwrap();
+
+        let error = read_bounded_output_last_message(&path, 4).unwrap_err();
+
+        assert_eq!(error.kind(), std::io::ErrorKind::InvalidData);
+        assert!(error.to_string().contains("exceeds maximum size of 4 bytes"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_read_bounded_output_last_message_symlink_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let target = dir.path().join("real-last-message.json");
+        let link = dir.path().join("last-message.json");
+        std::fs::write(&target, b"{}\n").unwrap();
+        std::os::unix::fs::symlink(&target, &link).unwrap();
+
+        let error = read_bounded_output_last_message(&link, 4).unwrap_err();
+
+        assert_eq!(error.kind(), std::io::ErrorKind::InvalidInput);
+        assert!(error.to_string().contains("symlinked output-last-message"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_initialize_output_last_message_symlink_returns_error_without_truncating_target() {
+        let dir = tempfile::tempdir().unwrap();
+        let target = dir.path().join("verdict.json");
+        let link = dir.path().join("last-message.json");
+        std::fs::write(&target, b"preserve this verdict").unwrap();
+        std::os::unix::fs::symlink(&target, &link).unwrap();
+
+        let error = initialize_output_last_message(&link).unwrap_err();
+
+        assert_eq!(error.kind(), std::io::ErrorKind::InvalidInput);
+        assert!(error.to_string().contains("symlinked output-last-message"));
+        assert_eq!(std::fs::read(&target).unwrap(), b"preserve this verdict");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_initialize_output_last_message_symlinked_parent_preserves_target() {
+        let dir = tempfile::tempdir().unwrap();
+        let redirected_parent = dir.path().join("redirected");
+        let link_parent = dir.path().join("runtime");
+        std::fs::create_dir_all(&redirected_parent).unwrap();
+        std::fs::write(redirected_parent.join("last-message.json"), b"preserve this verdict")
+            .unwrap();
+        std::os::unix::fs::symlink(&redirected_parent, &link_parent).unwrap();
+
+        let error =
+            initialize_output_last_message(&link_parent.join("last-message.json")).unwrap_err();
+
+        assert_eq!(error.kind(), std::io::ErrorKind::InvalidInput);
+        assert!(error.to_string().contains("refusing to follow symlink"));
+        assert_eq!(
+            std::fs::read(redirected_parent.join("last-message.json")).unwrap(),
+            b"preserve this verdict"
+        );
     }
 
     #[test]
@@ -459,8 +1359,7 @@ exit 0
         perms.set_mode(0o755);
         std::fs::set_permissions(&script, perms).unwrap();
 
-        let reviewer = CodexReviewer::new("gpt-5.4-mini", Duration::from_secs(10), "Review.")
-            .with_bin(&script);
+        let reviewer = test_reviewer(Duration::from_secs(10), "Review.").with_bin(&script);
         let target =
             ReviewTarget::new(vec![domain::review_v2::FilePath::new("src/lib.rs").unwrap()]);
         let result = reviewer.review(&target);

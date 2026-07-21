@@ -14,7 +14,7 @@ use super::snapshot::{
     TrackSchemaPeek, collect_track_snapshots, decode_legacy_metadata, load_impl_plan_opt,
     load_task_coverage_opt,
 };
-use crate::git_cli::{GitRepository, SystemGitRepo};
+use crate::git_cli::SystemGitRepo;
 use crate::spec;
 use crate::tddd::catalogue_document_codec::{CatalogueDocumentCodec, CatalogueDocumentCodecError};
 use crate::tddd::type_signals_codec;
@@ -356,7 +356,7 @@ pub fn sync_rendered_views(
                                             let current = type_signals_codec::declaration_hash(
                                                 catalogue_content.as_bytes(),
                                             );
-                                            if sd.declaration_hash() == current {
+                                            if *sd.declaration_hash() == current {
                                                 Some(sd.signals().to_vec())
                                             } else {
                                                 eprintln!(

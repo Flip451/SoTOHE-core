@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "6c7f1882a11fc310a22ca9ace1a76fcd4e7f6d19f7298e7d776447ff8b44eedf",
+  "signals": [
+    {
+      "type_name": "CapabilityCommand",
+      "signal": "blue",
+      "entry_hash": "6658051c490fc9af0c57139bcfab032e4f4228d312200abe895df169604fb811"
+    },
+    {
+      "type_name": "CapabilityExecArgs",
+      "signal": "blue",
+      "entry_hash": "4958600806899f2b65ac3feba65450c5fa4e9e258e894c8732d671ac695fb40c"
+    },
+    {
+      "type_name": "CliCommand",
+      "signal": "blue",
+      "entry_hash": "6f1fea024b4964bf3026e1aa9f11a82b30b1c43fadb5c7581df2c24fda34c9b5"
+    },
+    {
+      "type_name": "cli::commands::capability::execute",
+      "signal": "blue",
+      "entry_hash": "d4560a02b7dbdf65d329ad8a98c87f464fe50677afccb7c41da6dacdb7ce4c5f"
+    },
+    {
+      "type_name": "cli::commands::capability::execute_exec",
+      "signal": "blue",
+      "entry_hash": "c4d89cf5ff673e15f66836e2486cb8f97397dfe38f1a16833b26ecae2aad98a6"
+    },
+    {
+      "type_name": "cli::commands::capability::execute_with",
+      "signal": "blue",
+      "entry_hash": "3f938ddece33f0fe43df755ea5c913a861530deaa5810d13f7e0128b189f8339"
+    },
+    {
+      "type_name": "PlanCodexLocalArgs",
+      "signal": "blue",
+      "entry_hash": "33c42a7f7565e52941bfab2c6f9ebd88cd8f4b170fde9bcd8c724edd9192298e"
+    },
+    {
+      "type_name": "PlanCommand",
+      "signal": "blue",
+      "entry_hash": "33c42a7f7565e52941bfab2c6f9ebd88cd8f4b170fde9bcd8c724edd9192298e"
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::execute_codex_local",
+      "signal": "blue",
+      "entry_hash": "ae4eb60746dc517f99a07aa8571768996ff91debc60e1ad07732044fa7b8b672"
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::plan_input_from_args",
+      "signal": "blue",
+      "entry_hash": "ae4eb60746dc517f99a07aa8571768996ff91debc60e1ad07732044fa7b8b672"
+    },
+    {
+      "type_name": "cli::commands::plan::codex_local::run_execute_codex_local",
+      "signal": "blue",
+      "entry_hash": "ae4eb60746dc517f99a07aa8571768996ff91debc60e1ad07732044fa7b8b672"
+    },
+    {
+      "type_name": "cli::commands::plan::execute",
+      "signal": "blue",
+      "entry_hash": "ae4eb60746dc517f99a07aa8571768996ff91debc60e1ad07732044fa7b8b672"
+    }
+  ]
+}

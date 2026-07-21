@@ -8,9 +8,15 @@ publish.workspace = true
 [lints]
 workspace = true
 
+[features]
+# Compiles test-only composition seams. It is intentionally off by default so
+# these helpers never appear in the production rustdoc surface.
+test-support = ["infrastructure/test-helpers"]
+
 [dev-dependencies]
 infrastructure = { path = "../../libs/infrastructure", features = ["test-helpers"] }
 mockall = "0.13"
+rustdoc-types = "0.57"
 temp-env = "0.3"
 tempfile = "3.27.0"
 

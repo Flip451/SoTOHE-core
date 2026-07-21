@@ -1,0 +1,1063 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "b71f550ddd951d68f4f3df734aba0ff2e10e6ab7341285f56e58d5a715229d1e",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-designer はカタログ JSON を直接執筆しない。`sotp` が提供する API に意図（どの型に、どの role、どの spec anchor、どんな型形状）を入力すると、schema 準拠のエントリ骨格が穴埋め箇所付きでカタログ JSON に追記される。type-designer の仕事は意図の入力と穴埋めのみとなり、カタログ schema の深い理解を必要としない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "`.harness/capabilities/type-designer.md` の Phase 2 カタログ執筆手順を、ADR で決定済みの生成+注釈 workflow（`sotp catalog init` / `add` / `import` による生成 → `$todo` 穴埋め + `sotp catalog cite` による注釈 → `sotp catalog check` による検証）に置き換える。現状の手順書は type-designer に対し `<layer>-types.json` への直接 Write/Edit でのエントリ書き下ろしを指示したままであり、新しい API の主要な利用者である type-designer 自身が新 API を使わないという運用上の欠落を解消する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "b71f550ddd951d68f4f3df734aba0ff2e10e6ab7341285f56e58d5a715229d1e",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「sotp catalog init — active track の全 TDDD 対象 layer の catalogue file を空の skeleton（schema_version 付き）として生成する」「sotp catalog add — 新規型の意図入力」「sotp catalog import — 既存型の取り込み」「sotp catalog cite — 生成後の anchor 追加」「sotp catalog check — 完成検査」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "`.harness/capabilities/type-designer.md` の Phase 2 カタログ執筆手順を、ADR で決定済みの生成+注釈 workflow（`sotp catalog init` / `add` / `import` による生成 → `$todo` 穴埋め + `sotp catalog cite` による注釈 → `sotp catalog check` による検証）に置き換える。現状の手順書は type-designer に対し `<layer>-types.json` への直接 Write/Edit でのエントリ書き下ろしを指示したままであり、新しい API の主要な利用者である type-designer 自身が新 API を使わないという運用上の欠落を解消する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "c48a3296f9a6b67926140529b2eb465b6bf2400047e41484085b42812cc9cf8d",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "schema の知識（フィールド構成・schema_version・書式・エントリ順序）は sotp 側に一元化する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "カタログ schema の深い理解を執筆作業から切り離すという方針を、手順書の記述内容の面でも実現する。field 構成や具体的な JSON 例のような schema 詳細知識を Phase 2 の執筆手順書から分離し、手順書は「いつ・どの `sotp catalog` コマンドをどう呼ぶか」に焦点を絞る。分離した詳細知識は別の参照文書に一元化し、生成物の読解や `$todo` の意味理解が必要になったときにだけ参照する構成にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "c48a3296f9a6b67926140529b2eb465b6bf2400047e41484085b42812cc9cf8d",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "workflow 手順書は生成 + 注釈の手順に限定し、カタログ schema の詳細 ... は持たない。この情報は ... 独立した参照マニュアルに置く。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "カタログ schema の深い理解を執筆作業から切り離すという方針を、手順書の記述内容の面でも実現する。field 構成や具体的な JSON 例のような schema 詳細知識を Phase 2 の執筆手順書から分離し、手順書は「いつ・どの `sotp catalog` コマンドをどう呼ぶか」に焦点を絞る。分離した詳細知識は別の参照文書に一元化し、生成物の読解や `$todo` の意味理解が必要になったときにだけ参照する構成にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "6c631f4d99e8f5119eee9aab0f9a501115a196158527a5c52504227ccc85ac35",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-designer はカタログ JSON を直接執筆しない。`sotp` が提供する API に意図（どの型に、どの role、どの spec anchor、どんな型形状）を入力すると、schema 準拠のエントリ骨格が穴埋め箇所付きでカタログ JSON に追記される。type-designer の仕事は意図の入力と穴埋めのみとなり、カタログ schema の深い理解を必要としない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "手順書のカタログ執筆手順（reconnaissance の後・signal 評価の前に位置する、ドラフト作成 + `<layer>-types.json` への直接 Write/Edit の手順）を、生成フェーズの記述に置き換える。track で初めてカタログを扱う際の `sotp catalog init`（全 TDDD 対象 layer の skeleton 生成）、新規型の意図入力 `sotp catalog add`（`--layer` / `--kind` / `--name` / `--role` / `--anchor` / 形状 flags による意図入力）、既存型の取り込み `sotp catalog import`（`--action reference|modify|delete`、rustdoc 経由での取り込み）という 3 コマンドの使い分けを記述する。type-designer が `<layer>-types.json` の内容を直接 Write/Edit で書き下ろす指示は残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "6c631f4d99e8f5119eee9aab0f9a501115a196158527a5c52504227ccc85ac35",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-designer による既存 shape の手動転記を廃止する。いずれの action でも「現状の記述」を人手で書き起こす工程が消える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "手順書のカタログ執筆手順（reconnaissance の後・signal 評価の前に位置する、ドラフト作成 + `<layer>-types.json` への直接 Write/Edit の手順）を、生成フェーズの記述に置き換える。track で初めてカタログを扱う際の `sotp catalog init`（全 TDDD 対象 layer の skeleton 生成）、新規型の意図入力 `sotp catalog add`（`--layer` / `--kind` / `--name` / `--role` / `--anchor` / 形状 flags による意図入力）、既存型の取り込み `sotp catalog import`（`--action reference|modify|delete`、rustdoc 経由での取り込み）という 3 コマンドの使い分けを記述する。type-designer が `<layer>-types.json` の内容を直接 Write/Edit で書き下ろす指示は残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "6c631f4d99e8f5119eee9aab0f9a501115a196158527a5c52504227ccc85ac35",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「意図入力は 1 エントリ = 1 回の sotp サブコマンド呼び出しとし、意図（layer / kind / name / role / spec anchor / 型形状）は引数として渡す。意図マニフェストのような第二の入力 schema は作らない」「既存型の形状は D3 の reference API が rustdoc から取り込む」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "手順書のカタログ執筆手順（reconnaissance の後・signal 評価の前に位置する、ドラフト作成 + `<layer>-types.json` への直接 Write/Edit の手順）を、生成フェーズの記述に置き換える。track で初めてカタログを扱う際の `sotp catalog init`（全 TDDD 対象 layer の skeleton 生成）、新規型の意図入力 `sotp catalog add`（`--layer` / `--kind` / `--name` / `--role` / `--anchor` / 形状 flags による意図入力）、既存型の取り込み `sotp catalog import`（`--action reference|modify|delete`、rustdoc 経由での取り込み）という 3 コマンドの使い分けを記述する。type-designer が `<layer>-types.json` の内容を直接 Write/Edit で書き下ろす指示は残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "6c631f4d99e8f5119eee9aab0f9a501115a196158527a5c52504227ccc85ac35",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog init` — active track の全 TDDD 対象 layer ... `sotp catalog add` — 新規型の意図入力 ... `sotp catalog import` — 既存型の取り込み"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "手順書のカタログ執筆手順（reconnaissance の後・signal 評価の前に位置する、ドラフト作成 + `<layer>-types.json` への直接 Write/Edit の手順）を、生成フェーズの記述に置き換える。track で初めてカタログを扱う際の `sotp catalog init`（全 TDDD 対象 layer の skeleton 生成）、新規型の意図入力 `sotp catalog add`（`--layer` / `--kind` / `--name` / `--role` / `--anchor` / 形状 flags による意図入力）、既存型の取り込み `sotp catalog import`（`--action reference|modify|delete`、rustdoc 経由での取り込み）という 3 コマンドの使い分けを記述する。type-designer が `<layer>-types.json` の内容を直接 Write/Edit で書き下ろす指示は残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "82dea12cc8c631eff825e58b7b308277a0b4d467bb6a15dacf3d04b48e1a723e",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "木の任意のノード（リーフ・オブジェクト・配列要素・セクション丸ごと）を `{ \"$todo\": \"記入指示\" }` に置き換えられる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "手順書の注釈フェーズを記述する。生成されたエントリに残る `$todo` ノード（記入指示付きの穴）への記入は、通常の file edit として行う（1 ファイル = 1 writer 原則は維持する）。spec anchor の事後追加は `sotp catalog cite` で行い、実在しない anchor を渡した場合は入力時に reject されることを明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "82dea12cc8c631eff825e58b7b308277a0b4d467bb6a15dacf3d04b48e1a723e",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- `spec_refs`: 参照先 anchor の実在を入力時に検証し、実在しない anchor は reject する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "手順書の注釈フェーズを記述する。生成されたエントリに残る `$todo` ノード（記入指示付きの穴）への記入は、通常の file edit として行う（1 ファイル = 1 writer 原則は維持する）。spec anchor の事後追加は `sotp catalog cite` で行い、実在しない anchor を渡した場合は入力時に reject されることを明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "82dea12cc8c631eff825e58b7b308277a0b4d467bb6a15dacf3d04b48e1a723e",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "生成後のカタログ編集（穴埋め・修正）は通常の file edit として自由とする（1 ファイル = 1 writer の原則は従来どおり）。入力時検証（D5）は早期フィードバックであり、強制ではない。強制は `sotp catalog check`（D8）— `$todo` 残存（try_complete の Err）・全 entry の `spec_refs` 参照先 anchor 実在・grounding absence（catalogue-spec signal Red）・role 語彙・schema 妥当の一括再検証 — が担い、Phase 2 完了ゲートと commit gate（track-active-gate の依存チェーン）の両方に配線する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "手順書の注釈フェーズを記述する。生成されたエントリに残る `$todo` ノード（記入指示付きの穴）への記入は、通常の file edit として行う（1 ファイル = 1 writer 原則は維持する）。spec anchor の事後追加は `sotp catalog cite` で行い、実在しない anchor を渡した場合は入力時に reject されることを明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "e426a5d372cead26c56c148723c63a0b5d541867d50f186b02efb8d0363bc9c4",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "強制は `sotp catalog check`（D8）— `$todo` 残存（try_complete の Err）・全 entry の `spec_refs` 参照先 anchor 実在・grounding absence（catalogue-spec signal Red）・role 語彙・schema 妥当の一括再検証 — が担い、Phase 2 完了ゲートと commit gate（track-active-gate の依存チェーン）の両方に配線する。check の fail は非零 exit で block する。\n\n`catalog check` は呼び出し側から判定モードを受け取らない。catalogue file の存在状況から状態を自動判定する。対象 catalogue file がまだ 1 つも存在しない Phase 0 / 1 では no-op + warning で skip し、非零終了にしない。一方で、対象 track に catalogue file が 1 つでも存在する場合は catalogue 作成が開始済みとみなし、TDDD 対象 layer の catalogue file 不在、`$todo` 残存、全 entry の `spec_refs` 参照先 anchor 不在、grounding absence（Reference を含む全 action の catalogue-spec signal Red）、role 語彙外、schema 不正を非零 exit で block する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "手順書の検証フェーズを記述する。`sotp catalog check` の実行により、`$todo` の残存有無・`spec_refs` 参照先 anchor の実在・grounding の有無（catalogue-spec signal が Red でないか）・role 語彙・schema 妥当性を一括確認する。対象 track にまだ catalogue file が 1 つも存在しない場合は no-op + warning で skip され、catalogue 作成が開始済みの場合は非零 exit で block することを明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "e426a5d372cead26c56c148723c63a0b5d541867d50f186b02efb8d0363bc9c4",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「対象 catalogue file がまだ 1 つも存在しない Phase 0 / 1 では no-op + warning で skip し、対象 track に catalogue file が 1 つでも存在する場合は `$todo` 残存・全 entry の `spec_refs` 参照先 anchor 不在・grounding absence ...・role 語彙外・schema 不正...を block する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "手順書の検証フェーズを記述する。`sotp catalog check` の実行により、`$todo` の残存有無・`spec_refs` 参照先 anchor の実在・grounding の有無（catalogue-spec signal が Red でないか）・role 語彙・schema 妥当性を一括確認する。対象 track にまだ catalogue file が 1 つも存在しない場合は no-op + warning で skip され、catalogue 作成が開始済みの場合は非零 exit で block することを明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "d033e9c01675fcea5a02e3d545a87a5774ebe73093bc8bacd0a421add4fe4ed4",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「schema の知識（フィールド構成・schema_version・書式・エントリ順序）は sotp 側に一元化する。writer prompt が持つ知識は catalogue schema 全体から sotp API の使い方（意図入力と穴埋めの手順）に縮小する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "手順書の v5 Schema Reference 節（TypeEntry / TraitEntry / FunctionEntry の field 構成テーブル・discriminated-object の wire format 等）と Catalogue Pattern Cookbook 節（具体的な JSON 例）を、authoring-workflow の記述から除去する。カタログ schema の深い理解を必要としないという方針を、手順書の記述内容の面で実現する。この2節に隣接する境界的な節（Catalogue Lint Rule Kinds reference・Distribution & Config）を移設対象に含めるかどうかは、CN-05 の判定規則を実装フェーズで当該節の全文に適用して決める。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "d033e9c01675fcea5a02e3d545a87a5774ebe73093bc8bacd0a421add4fe4ed4",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-designer の workflow 手順書は生成 + 注釈の手順に限定し、カタログ schema の詳細（フィールド構成、role / kind / shape の表現形、entry の JSON 記述例）は持たない。この情報は `knowledge/conventions/` 配下の独立した参照マニュアルに置く。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "手順書の v5 Schema Reference 節（TypeEntry / TraitEntry / FunctionEntry の field 構成テーブル・discriminated-object の wire format 等）と Catalogue Pattern Cookbook 節（具体的な JSON 例）を、authoring-workflow の記述から除去する。カタログ schema の深い理解を必要としないという方針を、手順書の記述内容の面で実現する。この2節に隣接する境界的な節（Catalogue Lint Rule Kinds reference・Distribution & Config）を移設対象に含めるかどうかは、CN-05 の判定規則を実装フェーズで当該節の全文に適用して決める。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "56450e34fb8425a656e063a4d4725d21f9dd075e00f4568729e7d0f7b7603338",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-designer の workflow 手順書は生成 + 注釈の手順に限定し、カタログ schema の詳細（フィールド構成、role / kind / shape の表現形、entry の JSON 記述例）は持たない。この情報は `knowledge/conventions/` 配下の独立した参照マニュアルに置く。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "IN-04 で手順書から除去する内容の受け皿として、`knowledge/conventions/catalogue-schema-reference.md` を新設する。マニュアルは `bin/sotp conventions add` / `bin/sotp conventions update-index` の既存ツールを使って `knowledge/conventions/README.md` の convention-docs index に登録する（index の手編集はしない）。手順書 (`.harness/capabilities/type-designer.md`) は、注釈フェーズで生成物を読み解く必要が生じる箇所からこのマニュアルを明示的に参照する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "987c3c702765cb6d0545f64ca6ef19667ef8bf160a6cd59773faf29d27a69214",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「schema の知識（フィールド構成・schema_version・書式・エントリ順序）は sotp 側に一元化する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "新設マニュアル（`knowledge/conventions/catalogue-schema-reference.md`）の冒頭に、schema の権威は sotp の実装（codec）にあり本マニュアルはその記述的な写しであること、内容が乖離した場合は sotp の実装側が正しいことを述べる注記を置く。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "987c3c702765cb6d0545f64ca6ef19667ef8bf160a6cd59773faf29d27a69214",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "このマニュアルは参照のための記述であり、schema の権威は sotp の実装側にある。マニュアルの記述と実装が乖離した場合は sotp 側を正とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "新設マニュアル（`knowledge/conventions/catalogue-schema-reference.md`）の冒頭に、schema の権威は sotp の実装（codec）にあり本マニュアルはその記述的な写しであること、内容が乖離した場合は sotp の実装側が正しいことを述べる注記を置く。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "ccf699afb4f2764a9ac116abe5a315d8d366d9fe4ee7d7311a15fbfc5b40d081",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-designer はカタログ JSON を直接執筆しない。`sotp` が提供する API に意図（どの型に、どの role、どの spec anchor、どんな型形状）を入力すると、schema 準拠のエントリ骨格が穴埋め箇所付きでカタログ JSON に追記される。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "手順書の self-verification ステップ（現行 12a: 各ステップの completion receipt 確認）が根拠とするコマンド一覧を更新する。現行の「Write/Edit tool call が `<layer>-types.json` を書いたこと」を receipt とする要件を、生成+注釈+検証の各コマンド（`sotp catalog init` / `add` / `import` / `cite` / `check`）の実行結果（exit code・`$todo` 残存の有無）を receipt とする要件に置き換える。「Bash exit code を確認してから Glob で存在確認する」という 12a 自体の自己検証の構造は変えない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "cb66e380d507dfa5cd2effd0c04d5fbc6a804f95d4c3974b151dda2483432999",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-designer の workflow 手順書は生成 + 注釈の手順に限定し、カタログ schema の詳細（フィールド構成、role / kind / shape の表現形、entry の JSON 記述例）は持たない。この情報は `knowledge/conventions/` 配下の独立した参照マニュアルに置く。\n\nこのマニュアルは参照のための記述であり、schema の権威は sotp の実装側にある。マニュアルの記述と実装が乖離した場合は sotp 側を正とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "`knowledge/conventions/type-designer-kind-selection.md` に加える本トラックの変更を、D9 の配置決定に伴う3箇所の `kind` field wire-format 参照先修正と、レビューの過程で見つかった実装現況とのずれを説明文内で正す修正の二種類に限定して行う。参照先修正では、現状の「`.claude/agents/type-designer.md`「The `kind` field」節を参照」という stale な記述を、D9 が置き場所として定めた新設マニュアル（`knowledge/conventions/catalogue-schema-reference.md`）内の該当記述を指すよう更新する。`kind` field の wire-format 記述（role / kind / shape の表現形）は IN-04 / IN-05 により当該マニュアルへ移設されるため、この参照修正は D9 の配置決定を実装面で完成させるものである。実物一致修正では、R7 が参照先 port の role を `SecondaryPort` のみに限定していた記述を R1 のマトリクスが認める `Repository` も含む形に正し、declare 漏れの検出メカニズムの説明を、実在しない `port_index` ではなく実際に動く `build_trait_index` を指す記述に改める。これらはいずれも R1〜R10 が示す判断基準そのものの変更ではなく、参照先と説明文を D9 の配置先および実装現況に一致させる範囲にとどめる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "92e7b609bdf2137488e07a6c4627532148080631c146e2bd069b7d57e85c5da2",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「カタログエントリの情報量（引数型・返り値型・generics・bound・codec 等の完全な型情報）は削減しない。稼働済みの catalogue linter ルール群…は、いずれも完全な型情報を検査面として前提とする。impl → catalogue の構造検証…も従来どおり維持する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "D1（カタログの完全な型情報維持）および D8（`sotp catalog` CLI surface の決定）が対象とする sotp の Rust 実装・`Makefile.toml`・CI 設定への変更は本トラックの対象外とする。両 decision の実装（catalogue の型情報を検査する linter・型カタログ schema・`sotp catalog init` / `add` / `import` / `cite` / `check` の CLI 本体）は別トラックで完了済みであり、本トラックは D2 / D9 が対象とする運用ドキュメントの整合のみを行う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "92e7b609bdf2137488e07a6c4627532148080631c146e2bd069b7d57e85c5da2",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は本 ADR の scope 外であり、既存の綴りのまま残る。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "D1（カタログの完全な型情報維持）および D8（`sotp catalog` CLI surface の決定）が対象とする sotp の Rust 実装・`Makefile.toml`・CI 設定への変更は本トラックの対象外とする。両 decision の実装（catalogue の型情報を検査する linter・型カタログ schema・`sotp catalog init` / `add` / `import` / `cite` / `check` の CLI 本体）は別トラックで完了済みであり、本トラックは D2 / D9 が対象とする運用ドキュメントの整合のみを行う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "f634ebabb711de952d3185f5e7daa62a6f9b823bac4ff21103b5b5f675504ace",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カタログエントリの情報量（引数型・返り値型・generics・bound・codec 等の完全な型情報）は削減しない。稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）は、いずれも完全な型情報を検査面として前提とする。impl → catalogue の構造検証（type-signals の宣言 vs 実装一致検査）も従来どおり維持する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "手順書の書き換えは、カタログ執筆手順（IN-01〜IN-03）、schema 詳細節の除去と新設マニュアル参照（IN-04〜IN-05）、およびその直接の依存物（IN-07 の 12a receipt 記述）に限定する。reconnaissance フェーズ（baseline-capture・baseline-graph 生成・depth=1 / depth=2 読解）と signal 評価フェーズ（`calc-catalog-spec` / `calc-impl-catalog` / contract-map / views sync）、および現行 12b（signal freshness 確認）・12c（convention Review Checklist 確認）の要求は、生成メカニズムの変更後も構造・目的とも維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "f634ebabb711de952d3185f5e7daa62a6f9b823bac4ff21103b5b5f675504ace",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "writer prompt が持つ知識は catalogue schema 全体から sotp API の使い方（意図入力と穴埋めの手順）に縮小する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "手順書の書き換えは、カタログ執筆手順（IN-01〜IN-03）、schema 詳細節の除去と新設マニュアル参照（IN-04〜IN-05）、およびその直接の依存物（IN-07 の 12a receipt 記述）に限定する。reconnaissance フェーズ（baseline-capture・baseline-graph 生成・depth=1 / depth=2 読解）と signal 評価フェーズ（`calc-catalog-spec` / `calc-impl-catalog` / contract-map / views sync）、および現行 12b（signal freshness 確認）・12c（convention Review Checklist 確認）の要求は、生成メカニズムの変更後も構造・目的とも維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "ff96325276c21906eb43fb9577d6b65d058732f8cfdaaf4be9c224be2e71a57d",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この情報は `knowledge/conventions/` 配下の独立した参照マニュアルに置く。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "IN-04 で手順書から除去する内容（schema の field 構成テーブル・JSON 例）は削除ではなく `knowledge/conventions/catalogue-schema-reference.md` への移設とし、情報を失わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "9cb156c98d01329bc6065dcea2632a5fc0ec3708fe7d8dec46fbbdb65284f18a",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「writer prompt が持つ知識は catalogue schema 全体から sotp API の使い方（意図入力と穴埋めの手順）に縮小する。」「穴埋め箇所（`$todo` ノード、D4）には記入指示を埋め込めるため、記入方法の案内は静的な prompt ではなく生成物自身が担える。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "手順書の workflow 記述だけを読めば、`sotp catalog` の各コマンドをいつ・どの引数で呼ぶか、生成物に残る `$todo` をどう埋めるかが分かる状態を保つ。新設マニュアルは生成物の読解やデバッグのための補助的な参照であり、通常の生成 → 注釈 → 検証フローの実行に新設マニュアルを事前に読んでおくことを前提としない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "766b6751ed66a390860689e3dcb40697f3da581e7c7605e7fd5d8f74b619cfb6",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-designer はカタログ JSON を直接執筆しない。`sotp` が提供する API に意図（どの型に、どの role、どの spec anchor、どんな型形状）を入力すると、schema 準拠のエントリ骨格が穴埋め箇所付きでカタログ JSON に追記される。type-designer の仕事は意図の入力と穴埋めのみとなり、カタログ schema の深い理解を必要としない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "role / kind の選定という意図形成は type-designer の作業として本変更後も残るため（D2）、その判断の意図を定める `knowledge/conventions/type-designer-kind-selection.md` の R1〜R10 が示す判断基準そのものは本トラックで変更しない。手順書からの当該 convention への参照（12c Review Checklist の SSoT としての位置づけ）も内容・意味とも維持する。本トラックで当該ファイルに加える変更は、D9 の配置決定に伴う参照先修正（IN-08）と、レビューの過程で見つかった実装現況とのずれ（実在しない仕組みへの言及、R1 が定める規則との食い違い）を実物に合わせて正す修正の二種類に限る。後者は R1〜R10 が示す判断基準そのものを書き換えるものではなく、判断基準を説明する文中の記述を実物と一致させる範囲にとどめる。本トラックでは、R7 が参照先 port の role を `SecondaryPort` のみに限定していた記述を、R1 のマトリクスが認める `Repository` も含む形に正し、declare 漏れの検出メカニズムの説明を、実在しない `port_index` ではなく実際に動く `build_trait_index` を指す記述に改めた。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "766b6751ed66a390860689e3dcb40697f3da581e7c7605e7fd5d8f74b619cfb6",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「workflow 手順書は生成 + 注釈の手順に限定し ... この情報は `knowledge/conventions/` 配下の独立した参照マニュアルに置く」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "role / kind の選定という意図形成は type-designer の作業として本変更後も残るため（D2）、その判断の意図を定める `knowledge/conventions/type-designer-kind-selection.md` の R1〜R10 が示す判断基準そのものは本トラックで変更しない。手順書からの当該 convention への参照（12c Review Checklist の SSoT としての位置づけ）も内容・意味とも維持する。本トラックで当該ファイルに加える変更は、D9 の配置決定に伴う参照先修正（IN-08）と、レビューの過程で見つかった実装現況とのずれ（実在しない仕組みへの言及、R1 が定める規則との食い違い）を実物に合わせて正す修正の二種類に限る。後者は R1〜R10 が示す判断基準そのものを書き換えるものではなく、判断基準を説明する文中の記述を実物と一致させる範囲にとどめる。本トラックでは、R7 が参照先 port の role を `SecondaryPort` のみに限定していた記述を、R1 のマトリクスが認める `Repository` も含む形に正し、declare 漏れの検出メカニズムの説明を、実在しない `port_index` ではなく実際に動く `build_trait_index` を指す記述に改めた。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "71a6839edc4683162fc8f10d8c1e018c981d9cf92521b7b19395a5b5785c343e",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「writer prompt が持つ知識は catalogue schema 全体から sotp API の使い方に縮小する」 / 「schema の知識（フィールド構成・schema_version・書式・エントリ順序）は sotp 側に一元化する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "手順書のどの節を新設マニュアル（`knowledge/conventions/catalogue-schema-reference.md`）へ移設するかは、次の判定規則に従う。`sotp catalog` に渡す意図（role / kind / action）を形成するための判断材料（Design Principles の role/kind 決定木、Action Semantics、Reconnaissance helpers 等）は手順書に残し、生成物や wire format を読み解くための記述的な schema reference（v5 Schema Reference の field 構成テーブル、Catalogue Pattern Cookbook 等）は新設マニュアルへ移設する。IN-04 が明示する2節以外の境界的な節（Catalogue Lint Rule Kinds reference・Distribution & Config）の判定は、この規則を実装フェーズで当該節の全文に適用して行う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "71a6839edc4683162fc8f10d8c1e018c981d9cf92521b7b19395a5b5785c343e",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-designer の workflow 手順書は生成 + 注釈の手順に限定し、カタログ schema の詳細（フィールド構成、role / kind / shape の表現形、entry の JSON 記述例）は持たない。この情報は `knowledge/conventions/` 配下の独立した参照マニュアルに置く。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "手順書のどの節を新設マニュアル（`knowledge/conventions/catalogue-schema-reference.md`）へ移設するかは、次の判定規則に従う。`sotp catalog` に渡す意図（role / kind / action）を形成するための判断材料（Design Principles の role/kind 決定木、Action Semantics、Reconnaissance helpers 等）は手順書に残し、生成物や wire format を読み解くための記述的な schema reference（v5 Schema Reference の field 構成テーブル、Catalogue Pattern Cookbook 等）は新設マニュアルへ移設する。IN-04 が明示する2節以外の境界的な節（Catalogue Lint Rule Kinds reference・Distribution & Config）の判定は、この規則を実装フェーズで当該節の全文に適用して行う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "3dae77b8903f60fff502bac12d9fb77f7c0b5fc77c32f4b4e7b324af36df69d4",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-designer はカタログ JSON を直接執筆しない。`sotp` が提供する API に意図（どの型に、どの role、どの spec anchor、どんな型形状）を入力すると、schema 準拠のエントリ骨格が穴埋め箇所付きでカタログ JSON に追記される。type-designer の仕事は意図の入力と穴埋めのみとなり、カタログ schema の深い理解を必要としない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`.harness/capabilities/type-designer.md` のカタログ執筆手順が、生成（`sotp catalog init` / `add` / `import`）→ 注釈（`$todo` 穴埋め + `sotp catalog cite`）→ 検証（`sotp catalog check`）の 3 段階として記述されている。type-designer が `<layer>-types.json` の内容を直接 Write/Edit で書き下ろすことを指示する文が残っていない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "3dae77b8903f60fff502bac12d9fb77f7c0b5fc77c32f4b4e7b324af36df69d4",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "意図入力は 1 エントリ = 1 回の sotp サブコマンド呼び出しとし、意図（layer / kind / name / role / spec anchor / 型形状）は引数として渡す。意図マニフェストのような第二の入力 schema は作らない（schema 知識が writer prompt に戻るため）。入力仕様の参照面は `--help` とする。... 書き込みはエントリ単位で原子的とし、エントリの順序・整形は決定論的とする"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`.harness/capabilities/type-designer.md` のカタログ執筆手順が、生成（`sotp catalog init` / `add` / `import`）→ 注釈（`$todo` 穴埋め + `sotp catalog cite`）→ 検証（`sotp catalog check`）の 3 段階として記述されている。type-designer が `<layer>-types.json` の内容を直接 Write/Edit で書き下ろすことを指示する文が残っていない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "3dae77b8903f60fff502bac12d9fb77f7c0b5fc77c32f4b4e7b324af36df69d4",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "動詞は 5 つ: `sotp catalog init` / `add` / `import` / `cite` / `check`"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`.harness/capabilities/type-designer.md` のカタログ執筆手順が、生成（`sotp catalog init` / `add` / `import`）→ 注釈（`$todo` 穴埋め + `sotp catalog cite`）→ 検証（`sotp catalog check`）の 3 段階として記述されている。type-designer が `<layer>-types.json` の内容を直接 Write/Edit で書き下ろすことを指示する文が残っていない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "e2ac8f853d815f1a64ca009ad47894928ef8b60c97cad17c2ec55cfee5a74884",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "カタログエントリの情報量（引数型・返り値型・generics・bound・codec 等の完全な型情報）は削減しない。稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）は、いずれも完全な型情報を検査面として前提とする。impl → catalogue の構造検証（type-signals の宣言 vs 実装一致検査）も従来どおり維持する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "reconnaissance（baseline-capture・baseline-graph・depth=1 / depth=2 読解）と signal 評価（`calc-catalog-spec` / `calc-impl-catalog` / contract-map / views sync）の各手順、および現行 12b（signal freshness）・12c（convention Review Checklist 確認）の要求が、書き換え後の手順書にも欠落なく残っている。12a の step-completion receipt の記述が、生成+注釈+検証コマンド群の実行結果を根拠とする形に更新されている。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e2ac8f853d815f1a64ca009ad47894928ef8b60c97cad17c2ec55cfee5a74884",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-designer はカタログ JSON を直接執筆しない。`sotp` が提供する API に意図を入力すると、schema 準拠のエントリ骨格が穴埋め箇所付きでカタログ JSON に追記される。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "reconnaissance（baseline-capture・baseline-graph・depth=1 / depth=2 読解）と signal 評価（`calc-catalog-spec` / `calc-impl-catalog` / contract-map / views sync）の各手順、および現行 12b（signal freshness）・12c（convention Review Checklist 確認）の要求が、書き換え後の手順書にも欠落なく残っている。12a の step-completion receipt の記述が、生成+注釈+検証コマンド群の実行結果を根拠とする形に更新されている。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "b1471247a1fae1cc4d508144285b8ef609685e93e9e5e13dbdbe4cc9526d21c7",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "writer prompt が持つ知識は catalogue schema 全体から sotp API の使い方（意図入力と穴埋めの手順）に縮小する。schema の知識（フィールド構成・schema_version・書式・エントリ順序）は sotp 側に一元化する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`.harness/capabilities/type-designer.md` の authoring-workflow 記述から、v5 Schema Reference の field 構成テーブルと Catalogue Pattern Cookbook の JSON 例が除去されている。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "42f33a69998887c37b26e1e3e9976be74b55a9160faf9edfa3eecc1de5f4e3c1",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「この情報は `knowledge/conventions/` 配下の独立した参照マニュアルに置く。」「手順から外した知識を受け皿なく失わせず」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "AC-03 で除去された内容が削除されておらず、`knowledge/conventions/catalogue-schema-reference.md` に移設されて内容が保持されている。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "386ea09b519133c2cc360b4d5e90803cf562d49766286ded8665a3ef753d02c1",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "schema の知識（フィールド構成・schema_version・書式・エントリ順序）は sotp 側に一元化する。writer prompt が持つ知識は catalogue schema 全体から sotp API の使い方（意図入力と穴埋めの手順）に縮小する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`knowledge/conventions/catalogue-schema-reference.md` の冒頭に、schema の権威は sotp の実装（codec）にあること、本マニュアルは記述的な写しであること、乖離時は sotp の実装側が正しいことを述べる注記がある。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "386ea09b519133c2cc360b4d5e90803cf562d49766286ded8665a3ef753d02c1",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "このマニュアルは参照のための記述であり、schema の権威は sotp の実装側にある。マニュアルの記述と実装が乖離した場合は sotp 側を正とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`knowledge/conventions/catalogue-schema-reference.md` の冒頭に、schema の権威は sotp の実装（codec）にあること、本マニュアルは記述的な写しであること、乖離時は sotp の実装側が正しいことを述べる注記がある。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "c6db5b6767eb72b85ac3948646b7c0c8304602aaab5b2656207bf18022cea670",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「この情報は `knowledge/conventions/` 配下の独立した参照マニュアルに置く。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`knowledge/conventions/catalogue-schema-reference.md` が `knowledge/conventions/README.md` の convention-docs index に登録されており、`bin/sotp conventions verify-index` が pass する。`.harness/capabilities/type-designer.md` が `knowledge/conventions/catalogue-schema-reference.md` を明示的に参照している。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "0e5c3c7efa3f81cd3654cd2fb3168523f482c67befcf23936b89336991e94c86",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「type-designer はカタログ JSON を直接執筆しない。」 / 「writer prompt が持つ知識は catalogue schema 全体から sotp API の使い方（意図入力と穴埋めの手順）に縮小する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "`.claude/agents/type-designer.md` と `.agents/skills/type-designer/SKILL.md` の本文に、D2 が決定した生成+注釈 workflow と矛盾する記述（カタログ JSON を直接執筆する手順の指示等）が残っていない。両ファイルは `.harness/capabilities/type-designer.md` へ delegate するのみで手順を複製していないことを確認する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6dc25bed3423e6356c81c6bacdba461772b8a331d107e593a513790af3dc99e",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「稼働済みの catalogue linter ルール群（ロール意味論・Aggregate 境界・アーキテクチャ配置・primitive obsession 防止）は、いずれも完全な型情報を検査面として前提とする。impl → catalogue の構造検証（type-signals の宣言 vs 実装一致検査）も従来どおり維持する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "本トラックによる変更差分が、D2 / D9 が対象とする成果物（`.harness/capabilities/type-designer.md`・`knowledge/conventions/catalogue-schema-reference.md`・`knowledge/conventions/type-designer-kind-selection.md` の参照先修正および実装現況とのずれを正す修正・wrapper 2 ファイルの整合性検証）に閉じており、D1 / D8 が対象とする sotp の Rust 実装（catalogue の型情報を検査する linter・型カタログ schema・`sotp catalog` CLI surface）・`Makefile.toml`・CI 設定には及んでいない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6dc25bed3423e6356c81c6bacdba461772b8a331d107e593a513790af3dc99e",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「type-designer はカタログ JSON を直接執筆しない。`sotp` が提供する API に意図（どの型に、どの role、どの spec anchor、どんな型形状）を入力すると、schema 準拠のエントリ骨格が穴埋め箇所付きでカタログ JSON に追記される。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "本トラックによる変更差分が、D2 / D9 が対象とする成果物（`.harness/capabilities/type-designer.md`・`knowledge/conventions/catalogue-schema-reference.md`・`knowledge/conventions/type-designer-kind-selection.md` の参照先修正および実装現況とのずれを正す修正・wrapper 2 ファイルの整合性検証）に閉じており、D1 / D8 が対象とする sotp の Rust 実装（catalogue の型情報を検査する linter・型カタログ schema・`sotp catalog` CLI surface）・`Makefile.toml`・CI 設定には及んでいない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6dc25bed3423e6356c81c6bacdba461772b8a331d107e593a513790af3dc99e",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は本 ADR の scope 外」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "本トラックによる変更差分が、D2 / D9 が対象とする成果物（`.harness/capabilities/type-designer.md`・`knowledge/conventions/catalogue-schema-reference.md`・`knowledge/conventions/type-designer-kind-selection.md` の参照先修正および実装現況とのずれを正す修正・wrapper 2 ファイルの整合性検証）に閉じており、D1 / D8 が対象とする sotp の Rust 実装（catalogue の型情報を検査する linter・型カタログ schema・`sotp catalog` CLI surface）・`Makefile.toml`・CI 設定には及んでいない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6dc25bed3423e6356c81c6bacdba461772b8a331d107e593a513790af3dc99e",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この情報は `knowledge/conventions/` 配下の独立した参照マニュアルに置く。マニュアルの記述と実装が乖離した場合は sotp 側を正とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "本トラックによる変更差分が、D2 / D9 が対象とする成果物（`.harness/capabilities/type-designer.md`・`knowledge/conventions/catalogue-schema-reference.md`・`knowledge/conventions/type-designer-kind-selection.md` の参照先修正および実装現況とのずれを正す修正・wrapper 2 ファイルの整合性検証）に閉じており、D1 / D8 が対象とする sotp の Rust 実装（catalogue の型情報を検査する linter・型カタログ schema・`sotp catalog` CLI surface）・`Makefile.toml`・CI 設定には及んでいない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "6283863f0e00657e9fcfa1fbabe9343201a0470dc36a91198710dc192a4100ed",
+      "evidence_hash": "7b6e3a0eeecd645c64501d1fe6da4de9acd09442b771510f910285bcc5301deb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「schema の詳細リファレンスは `knowledge/conventions/` 配下の参照文書として独立させる」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "`knowledge/conventions/type-designer-kind-selection.md` の3箇所の `kind` field wire-format 参照が、`knowledge/conventions/catalogue-schema-reference.md`（D9 が定めた schema reference マニュアル）内の該当記述を指している。R1〜R10 が示す判断基準そのものには本トラックによる差分がない一方、判断基準を説明する文中の記述を実物と一致させる修正（R7 が参照先 port の role を `SecondaryPort` のみに限定していた記述を `Repository` も含む形に正したこと、および declare 漏れの検出メカニズムの参照を `port_index` から `build_trait_index` に改めたこと）は CN-04 が許可する範囲内の修正である。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-1345-catalogue-generation-annotation.md",
+          "decision_id": "D9"
+        }
+      }
+    }
+  ]
+}

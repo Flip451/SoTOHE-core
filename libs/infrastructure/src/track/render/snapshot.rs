@@ -450,7 +450,11 @@ pub fn collect_track_snapshots(root: &Path) -> Result<Vec<TrackSnapshot>, Render
             let (t, m) = decode_legacy_metadata(&raw, &metadata_path).map_err(|source| {
                 RenderError::InvalidMetadata { path: metadata_path.clone(), source }
             })?;
-            (t, m, legacy_status)
+            // Archive location is authoritative for every supported schema version.
+            // Legacy metadata keeps its stored status for tracks still under
+            // `track/items/`, but an archive directory always renders as archived.
+            let status = if is_archive { "archived".to_owned() } else { legacy_status };
+            (t, m, status)
         };
 
         snapshots.push(TrackSnapshot {

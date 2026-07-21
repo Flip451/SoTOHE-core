@@ -10,7 +10,7 @@
 
 ## Read Order
 
-1. `track/tech-stack.md`
+1. `knowledge/adr/README.md`（pre-track ADR 索引 — 技術選定・製品方針の決定）
 2. この `README.md` の `Current Files` を上から順に読む
 3. 実装対象に直接関係する個別ルール文書を優先して再確認する
 
@@ -35,7 +35,7 @@
 
 - 新しい実装規約を追加したら、必要に応じてこの `README.md` の読み順や補足説明を更新する
 - 既存ルールを破る例外を認める場合は、理由と適用範囲を必ず明記する
-- `track/tech-stack.md` と矛盾する場合は、先に tech stack の決定を更新する
+- 技術選定の決定（ADR）と矛盾する場合は、先に ADR を supersede してから規約を更新する
 - `private/` や `config/secrets/` のような機密ディレクトリを新設する場合は、この配下に対応する規約文書を追加し、同時に `.claude/settings.json` の `Read` / `Grep` deny へ明示的なパスを追加する
 
 ## Suggested Files
@@ -57,18 +57,19 @@
 <!-- convention-docs:start -->
 - `testing.md`: Testing Convention
 - `adr.md`: Convention: Architecture Decision Records (ADR)
-- `bash-write-guard.md`: Bash File-Write Guard (CON-07)
+- `bash-write-guard.md`: Bash File-Write Guard
 - `branch-strategy.md`: Branch Strategy Convention
+- `catalogue-schema-reference.md`: Catalogue Schema Reference (v5)
 - `coding-principles.md`: Coding Principles Convention
 - `dry-check-workflow.md`: DRY Check Workflow Convention
 - `enforce-by-mechanism.md`: Enforce by Mechanism Convention
 - `filesystem-persistence-guard.md`: Filesystem Persistence Guard Convention
 - `git-notes.md`: Git Notes Convention
-- `hexagonal-architecture.md`: Hexagonal Architecture Convention
 - `impl-delegation-arch-guard.md`: Implementation Delegation Architecture Guard
 - `language-policy.md`: Language Policy Convention
 - `nightly-dev-tool.md`: Nightly Toolchain Dev-Tool Convention
 - `no-backward-compat.md`: No Backward Compatibility Convention
+- `no-upstream-restatement.md`: No Upstream Restatement Convention
 - `pre-track-adr-authoring.md`: Pre-Track ADR Authoring Convention
 - `prefer-type-safe-abstractions.md`: Prefer Type-Safe Abstractions Convention
 - `responsibility-boundary.md`: Responsibility Boundary: Framework Enforcement vs Consumer Configuration

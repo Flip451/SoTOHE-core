@@ -31,30 +31,114 @@ fn write_file(root: &std::path::Path, rel: &str, content: &str) {
     std::fs::write(&path, content).unwrap();
 }
 
-fn setup_minimal_tech_stack(root: &std::path::Path) {
-    write_file(root, "track/tech-stack.md", "# Tech Stack\n- Resolved\n");
-}
-
-#[test]
-fn test_tech_stack_subcommand_returns_success_for_clean_project() {
-    let tmp = TempDir::new().unwrap();
-    setup_minimal_tech_stack(tmp.path());
-    let exit = execute(VerifyCommand::TechStack(make_args(tmp.path())));
-    assert_eq!(exit, ExitCode::SUCCESS);
-}
-
-#[test]
-fn test_tech_stack_subcommand_returns_failure_for_missing_file() {
-    let tmp = TempDir::new().unwrap();
-    let exit = execute(VerifyCommand::TechStack(make_args(tmp.path())));
-    assert_eq!(exit, ExitCode::FAILURE);
-}
-
 #[test]
 fn test_latest_track_subcommand_returns_success_with_no_tracks() {
     let tmp = TempDir::new().unwrap();
     let exit = execute(VerifyCommand::LatestTrack(make_args(tmp.path())));
     assert_eq!(exit, ExitCode::SUCCESS);
+}
+
+#[test]
+fn test_retention_gate_clap_parses_project_root_flag() {
+    let tmp = TempDir::new().unwrap();
+    let cli = TestCli::try_parse_from([
+        "sotp",
+        "retention-gate",
+        "--project-root",
+        tmp.path().to_str().unwrap(),
+    ])
+    .unwrap();
+
+    match cli.cmd {
+        VerifyCommand::RetentionGate(args) => assert_eq!(args.project_root, tmp.path()),
+        _ => panic!("expected RetentionGate variant"),
+    }
+}
+
+#[test]
+fn test_sotp_version_tag_clap_parses_project_root_flag() {
+    let cli =
+        TestCli::try_parse_from(["sotp", "sotp-version-tag", "--project-root", "workspace-root"])
+            .unwrap();
+
+    match cli.cmd {
+        VerifyCommand::SotpVersionTag(args) => {
+            assert_eq!(args.project_root, std::path::Path::new("workspace-root"));
+        }
+        _ => panic!("expected SotpVersionTag variant"),
+    }
+}
+
+#[test]
+fn test_machine_paths_clap_parses_project_root_flag() {
+    let cli =
+        TestCli::try_parse_from(["sotp", "machine-paths", "--project-root", "workspace-root"])
+            .unwrap();
+
+    match cli.cmd {
+        VerifyCommand::MachinePaths(args) => {
+            assert_eq!(args.project_root, std::path::Path::new("workspace-root"));
+        }
+        _ => panic!("expected MachinePaths variant"),
+    }
+}
+
+#[test]
+fn test_template_refs_clap_parses_project_root_flag() {
+    let cli =
+        TestCli::try_parse_from(["sotp", "template-refs", "--project-root", "workspace-root"])
+            .unwrap();
+
+    match cli.cmd {
+        VerifyCommand::TemplateRefs(args) => {
+            assert_eq!(args.project_root, std::path::Path::new("workspace-root"));
+        }
+        _ => panic!("expected TemplateRefs variant"),
+    }
+}
+
+#[test]
+fn test_new_verifier_subcommands_dispatch_to_wired_routes() {
+    let root = TempDir::new().unwrap();
+    let driver = cli_composition::VerifyCompositionRoot::new().verify_driver();
+    let commands = [
+        (VerifyCommand::SotpVersionTag(make_args(root.path())), "--- verify sotp version tag ---"),
+        (VerifyCommand::MachinePaths(make_args(root.path())), "--- verify machine paths ---"),
+        (VerifyCommand::TemplateRefs(make_args(root.path())), "--- verify template refs ---"),
+    ];
+
+    for (command, expected_label) in commands {
+        let outcome = dispatch_to_outcome(&driver, command);
+
+        assert_eq!(outcome.exit_code, 1, "missing fixture inputs must fail closed");
+        let stdout = outcome.stdout.unwrap_or_default();
+        assert!(
+            stdout.contains(expected_label),
+            "expected route label {expected_label:?}: {stdout}"
+        );
+    }
+}
+
+#[test]
+fn test_retention_gate_subcommand_returns_success_for_clean_surface() {
+    let tmp = TempDir::new().unwrap();
+    write_file(tmp.path(), "README.md", "# Clean\n");
+
+    let exit = execute(VerifyCommand::RetentionGate(make_args(tmp.path())));
+
+    assert_eq!(exit, ExitCode::SUCCESS);
+}
+
+#[test]
+fn test_retention_gate_subcommand_returns_failure_for_retired_token() {
+    let tmp = TempDir::new().unwrap();
+    let kebab = ["tech", "stack"].join("-");
+    let token = format!("verify-{kebab}");
+    write_file(tmp.path(), "README.md", &format!("{token}\n"));
+
+    let exit = execute(VerifyCommand::RetentionGate(make_args(tmp.path())));
+
+    assert_eq!(exit, ExitCode::FAILURE);
 }
 
 #[test]
@@ -66,12 +150,19 @@ fn test_arch_docs_subcommand_returns_failure_for_missing_rules() {
 
 #[test]
 fn test_project_root_flag_is_respected() {
+    // ArchDocs scans the directory supplied via --project-root: an empty temp
+    // dir has no architecture-rules.json, so the command must fail even though
+    // the process CWD (the real workspace) would pass the same check.
     let tmp = TempDir::new().unwrap();
-    setup_minimal_tech_stack(tmp.path());
-    // Execute with explicit --project-root pointing to the temp dir.
-    let args = VerifyArgs { project_root: tmp.path().to_path_buf() };
-    let exit = execute(VerifyCommand::TechStack(args));
-    assert_eq!(exit, ExitCode::SUCCESS);
+    let cli = TestCli::try_parse_from([
+        "sotp",
+        "arch-docs",
+        "--project-root",
+        tmp.path().to_str().unwrap(),
+    ])
+    .unwrap();
+    let exit = execute(cli.cmd);
+    assert_eq!(exit, ExitCode::FAILURE);
 }
 
 #[test]
@@ -184,6 +275,11 @@ fn test_module_size_subcommand_returns_failure_for_missing_rules() {
 #[test]
 fn test_domain_strings_subcommand_returns_success_for_clean_domain() {
     let tmp = TempDir::new().unwrap();
+    write_file(
+        tmp.path(),
+        "architecture-rules.json",
+        r#"{"version":2,"layers":[{"crate":"domain","path":"libs/domain","verify":{"domain_strings":true}}]}"#,
+    );
     write_file(tmp.path(), "libs/domain/src/lib.rs", "pub struct Foo { pub count: u32 }\n");
     let exit = execute(VerifyCommand::DomainStrings(make_args(tmp.path())));
     assert_eq!(exit, ExitCode::SUCCESS);
@@ -201,6 +297,11 @@ fn test_domain_strings_subcommand_returns_failure_for_missing_domain() {
 #[test]
 fn test_domain_purity_subcommand_returns_success_for_clean_domain() {
     let tmp = TempDir::new().unwrap();
+    write_file(
+        tmp.path(),
+        "architecture-rules.json",
+        r#"{"version":2,"layers":[{"crate":"domain","path":"libs/domain","verify":{"domain_purity":true}}]}"#,
+    );
     write_file(tmp.path(), "libs/domain/src/lib.rs", "pub struct Foo;\n");
     let exit = execute(VerifyCommand::DomainPurity(make_args(tmp.path())));
     assert_eq!(exit, ExitCode::SUCCESS);
@@ -218,6 +319,11 @@ fn test_domain_purity_subcommand_returns_failure_for_missing_domain() {
 #[test]
 fn test_usecase_purity_subcommand_returns_success_for_clean_usecase() {
     let tmp = TempDir::new().unwrap();
+    write_file(
+        tmp.path(),
+        "architecture-rules.json",
+        r#"{"version":2,"layers":[{"crate":"usecase","path":"libs/usecase","verify":{"usecase_purity":true}}]}"#,
+    );
     write_file(
         tmp.path(),
         "libs/usecase/src/lib.rs",
@@ -573,4 +679,26 @@ fn test_dispatch_catalogue_spec_refs_fail_closed_on_resolver_error() {
         Some(ExitCode::FAILURE),
         "CatalogueSpecRefs must return Some(FAILURE) (fail-closed) when resolver errors"
     );
+}
+
+#[test]
+fn test_catalogue_spec_refs_invalid_track_id_is_rejected_by_parser() {
+    let result =
+        TestCli::try_parse_from(["sotp", "catalogue-spec-refs", "--track-id", "../escape"]);
+
+    assert!(result.is_err(), "invalid track IDs must be rejected during argument parsing");
+}
+
+#[test]
+fn test_catalogue_spec_refs_valid_track_id_is_parsed_as_driver_input() {
+    let cli =
+        TestCli::try_parse_from(["sotp", "catalogue-spec-refs", "--track-id", "my-track-2026"])
+            .unwrap();
+
+    match cli.cmd {
+        VerifyCommand::CatalogueSpecRefs(args) => {
+            assert_eq!(args.track_id.as_ref().map(AsRef::as_ref), Some("my-track-2026"));
+        }
+        _ => panic!("expected CatalogueSpecRefs variant"),
+    }
 }

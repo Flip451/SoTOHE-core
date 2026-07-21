@@ -10,14 +10,14 @@
             {
               "message": "Steps 3 and 6 call `/track:commit` without a commit-message argument. Per `.claude/commands/track/commit.md`, empty arguments take the interactive candidate-message path, so this orchestrator will pause for user input and violate its own 'Fully autonomous' constraint.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "file": ".claude/commands/track/adr2pr.md",
               "line": 17,
               "category": "logic"
             },
             {
               "message": "Step 4 delegates to `/track:plan`, but `.claude/commands/track/plan.md` can stop at termination and ask the user to accept/revert/manual-edit/abort when the ADR working tree differs from HEAD. This file never defines an automatic policy for that decision, so the chain is not actually autonomous end-to-end.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "file": ".claude/commands/track/adr2pr.md",
               "line": 18,
               "category": "logic"
             }
@@ -54,7 +54,7 @@
             {
               "message": "Step 4 bypasses `/track:plan`, but it does not re-specify the red/yellow/ERROR re-invocation rules that `/track:plan` owns. The referenced phase commands are single-shot wrappers, so the instruction to handle escalation via the phase commands' own rules is inaccurate and can leave unresolved signals stuck before step 8.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "file": ".claude/commands/track/adr2pr.md",
               "line": 32,
               "category": "error handling"
             }
@@ -69,7 +69,7 @@
             {
               "message": "Both `/track:commit` steps are invoked with no staging step in between. The canonical commit flow requires staging the post-review worktree first (`cargo make add-all` or `track-add-paths`), and `track-commit-message` only commits already staged files. As written, the first and second commits can fail on an empty index or leave generated files / ADR edits uncommitted.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "file": ".claude/commands/track/adr2pr.md",
               "line": 17,
               "category": "workflow"
             }
@@ -84,7 +84,7 @@
             {
               "message": "Step 5 says the plan artifacts are committed at step 7, but the actual commit step is 8 and step 7 is staging. That internal mismatch makes the execution order ambiguous.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "file": ".claude/commands/track/adr2pr.md",
               "line": 19,
               "category": "correctness"
             }
@@ -121,14 +121,14 @@
             {
               "message": "Yellow handling is internally inconsistent. This step says to follow `/track:plan`'s Phase 1-3 loops exactly, but the referenced Phase 1 loop allows 🟡 to advance, while this file separately requires every 🟡 to be resolved at the phase where it appears. A phase that returns yellow has no single valid action under the current wording.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "file": ".claude/commands/track/adr2pr.md",
               "line": 42,
               "category": "contradiction"
             },
             {
               "message": "The rationale for not invoking `/track:plan` overstates its termination behavior. `/track:plan` only pauses in Termination when the ADR working tree differs from HEAD; it does not unconditionally pause for a user decision. The justification at this line is therefore factually incorrect.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "file": ".claude/commands/track/adr2pr.md",
               "line": 34,
               "category": "factual error"
             }
@@ -143,7 +143,7 @@
             {
               "message": "Steps 4 and 8 invoke `/track:commit` with no arguments, but `.claude/commands/track/commit.md` explicitly stops and asks the user to choose or edit a commit message when `$ARGUMENTS` is empty. That makes the workflow non-autonomous and violates the command's own Constraint 2.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "file": ".claude/commands/track/adr2pr.md",
               "line": 18,
               "category": "logic"
             }
@@ -158,7 +158,7 @@
             {
               "message": "`/track:review` is scheduled here before `spec.md` exists. `track/review.md` Step 0 expects the current track's `spec.md`, and `track/init.md` says `spec.md` is created later in Phase 1 and is not required for the first commit, so this step order is internally inconsistent and can make the initial baseline-review stage fail.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "file": ".claude/commands/track/adr2pr.md",
               "line": 16,
               "category": "logic"
             }
@@ -188,7 +188,7 @@
             {
               "message": "The first `/track:review` is scheduled before `spec.md` exists, but `track/review.md` Step 0 requires the current track's `spec.md`, `plan.md`, and `metadata.json` and does not document a fallback path. On a fresh track this makes the baseline-review stage potentially fail before the first commit.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/commands/track/adr2pr.md",
+              "file": ".claude/commands/track/adr2pr.md",
               "line": 16,
               "category": "factual error"
             }
@@ -439,9 +439,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`Decision D` and `Decision U` are not injective in the plan’s own `1 layer N crate` model. The ADR explicitly allows multiple crates per layer ([A](\\/home\\/flip451\\/individual\\/t-rust\\/templates\\/SoTOHE-core\\/knowledge\\/adr\\/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md#L140)), but Type/Trait node IDs are built only from `sanitized_layer` + short name ([D](\\/home\\/flip451\\/individual\\/t-rust\\/templates\\/SoTOHE-core\\/knowledge\\/adr\\/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md#L171)), and the top-module subgraph ID also omits `crate_name` ([U](\\/home\\/flip451\\/individual\\/t-rust\\/templates\\/SoTOHE-core\\/knowledge\\/adr\\/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md#L281)). In a layer with two crates that reuse the same short type/trait name or top-level module segment, unrelated items will collapse into the same rendered node/subgraph.",
+              "message": "`Decision D` and `Decision U` are not injective in the plan’s own `1 layer N crate` model. The ADR explicitly allows multiple crates per layer ([A](knowledge\\/adr\\/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md#L140)), but Type/Trait node IDs are built only from `sanitized_layer` + short name ([D](knowledge\\/adr\\/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md#L171)), and the top-module subgraph ID also omits `crate_name` ([U](knowledge\\/adr\\/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md#L281)). In a layer with two crates that reuse the same short type/trait name or top-level module segment, unrelated items will collapse into the same rendered node/subgraph.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
+              "file": "knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
               "line": 140,
               "category": "factual error"
             }
@@ -456,7 +456,7 @@
             {
               "message": "Decision O describes a \"global trait index\" being built from `doc.trait_impls`, but the cache it defines is keyed by `(CrateName, TraitName)` and stores `trait_subgraph_id`s. As written, the source data is the wrong layer of the model: impl records do not provide a complete trait index, so this conflates trait lookup with impl-edge traversal.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
+              "file": "knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md",
               "line": 265,
               "category": "factual error"
             }
@@ -529,7 +529,7 @@
             {
               "message": "`ContractMapRenderer` and `render_contract_map` are described as the A-3' slice-based API in `spec.json`, but this catalog entry still encodes both as owned `Vec` inputs (`Vec<CatalogueDocument>`, `Vec<LayerId>`, owned `ContractMapRenderOptions`). That contradicts the ADR/spec contract and the same file's own docs note about accepting `&[CatalogueDocument]`/`&[LayerId]`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-20/domain-types.json",
+              "file": "track/items/contract-map-v3-2026-05-20/domain-types.json",
               "line": 221,
               "category": "contradiction"
             }
@@ -544,7 +544,7 @@
             {
               "message": "T004 is scheduled in phase 1 even though it depends on `ContractMapRenderAdapter`, which is only introduced in T005. That makes the CLI wiring step impossible to execute in the listed order unless the adapter task is moved earlier or split into a stub/constructor task.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-20/impl-plan.json",
+              "file": "track/items/contract-map-v3-2026-05-20/impl-plan.json",
               "line": 24,
               "category": "infeasibility"
             }
@@ -559,14 +559,14 @@
             {
               "message": "The public render API now has two competing layer inputs: `ContractMapRenderOptions.layers` here, and `layer_order` in the new `render_contract_map(...)` contract (`track/items/contract-map-v3-2026-05-20/spec.json:45`). The plan never defines precedence or a distinct meaning for `layers`, so callers can supply inconsistent layer sets/order and the renderer's behavior becomes ambiguous.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-20/domain-types.json",
+              "file": "track/items/contract-map-v3-2026-05-20/domain-types.json",
               "line": 68,
               "category": "contradiction"
             },
             {
               "message": "This generated contract-map view still says detailed v3 rendering is deferred and labels the artifact as an IN-24 placeholder, but the current spec explicitly says IN-24 must be replaced by the v3 full renderer (`track/items/contract-map-v3-2026-05-20/spec.json:247`). That makes the artifact stale and contradicts the rest of the track.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-20/contract-map.md",
+              "file": "track/items/contract-map-v3-2026-05-20/contract-map.md",
               "line": 2,
               "category": "contradiction"
             }
@@ -588,7 +588,7 @@
             {
               "message": "`T001`/`S001` describes the `render_contract_map` API change as `BTreeMap -> Vec<CatalogueDocument>`, but the canonical contract in `spec.json` already fixes this as a borrowed slice `render_contract_map(catalogues: &[CatalogueDocument], ...)` and the generated domain type catalog matches that shape. The plan text is therefore inconsistent with the target API shape and could send implementation in the wrong direction.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-20/plan.md",
+              "file": "track/items/contract-map-v3-2026-05-20/plan.md",
               "line": 14,
               "category": "contradiction"
             }
@@ -647,7 +647,7 @@
             {
               "message": "`T003` models `ContractMapRendererAdapter::new` as infallible and says the style config is loaded at `render`, but ADR P-3 says the adapter should load `.harness/config/contract-map-style.toml` during construction. Those lifecycles are incompatible: construction-time loading would need a fallible constructor (or equivalent error path), while render-time loading violates the ADR. The plan and the design decision are therefore inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-20/plan.md",
+              "file": "track/items/contract-map-v3-2026-05-20/plan.md",
               "line": 26,
               "category": "contradiction"
             }
@@ -662,7 +662,7 @@
             {
               "message": "`contract-map.md` is still a pre-Decision-P placeholder: it says detailed v3 rendering is deferred and still lists `domain::tddd::contract_map_render::render_contract_map`, but the updated ADR/plan now treat the renderer as fully specified and delete that free function. That leaves this artifact contradicting the rest of the plan package.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/contract-map-v3-2026-05-20/contract-map.md",
+              "file": "track/items/contract-map-v3-2026-05-20/contract-map.md",
               "line": 2,
               "category": "contradiction"
             }
@@ -1202,7 +1202,7 @@
             {
               "message": "`ContractMapRendererAdapter` does not actually fail closed on style-config input: the TOML DTOs are permissive `Deserialize` structs with no `deny_unknown_fields`, so typoed/extra keys are silently accepted, and `load_style_config()` maps every read error to `StyleConfigNotFound` instead of distinguishing unreadable or malformed files. That lets a broken `.harness/config/contract-map-style.toml` be treated as if it were merely absent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
               "line": 44,
               "category": "validation"
             }
@@ -1217,7 +1217,7 @@
             {
               "message": "Swallowing `ContractMapRenderer::render` errors here turns `StyleConfigNotFound` / `StyleConfigInvalid` into a silent no-op, so `sync_rendered_views` can return success while leaving a stale or missing `contract-map.md` behind. That defeats the new fail-closed contract-map style loading behavior.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "file": "libs/infrastructure/src/track/render.rs",
               "line": 1236,
               "category": "missing error handling"
             }
@@ -1232,14 +1232,14 @@
             {
               "message": "Renderer failures are downgraded to a warning and treated as success, so a missing or invalid `.harness/config/contract-map-style.toml` leaves any existing `contract-map.md` untouched and the sync pass reports success. That violates the new fail-closed contract and can silently ship stale output.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "file": "libs/infrastructure/src/track/render.rs",
               "line": 1236,
               "category": "error-handling"
             },
             {
               "message": "The style-config DTOs deserialize permissively. Because `StyleConfig` and the nested structs do not use `deny_unknown_fields`, typos or stray keys/sections in `contract-map-style.toml` are ignored instead of producing `StyleConfigInvalid`. Malformed configs can therefore pass validation and render with defaults.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
               "line": 41,
               "category": "validation"
             }
@@ -1254,14 +1254,14 @@
             {
               "message": "The style-config schema is only strict at the top level. Nested tables such as `[role.*]`, `[edge.*]`, and `[filter]` still use serde's default unknown-field behavior, so typos inside those sections are silently accepted and the adapter returns `Ok` instead of `StyleConfigInvalid`. That breaks the fail-closed CN-02 / AC-11 contract.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
               "line": 47,
               "category": "correctness"
             },
             {
               "message": "The style config is read directly with `std::fs::read_to_string` and never passed through the shared symlink guard. A symlinked `.harness/config/contract-map-style.toml` will be followed and parsed instead of rejected, so the fail-closed 'symlinked' case described in `track/render.rs` is not actually enforced.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
               "line": 172,
               "category": "security"
             }
@@ -1298,7 +1298,7 @@
             {
               "message": "`load_style_config` only checks `symlink_metadata` on the final config path and then re-opens the file with `read_to_string`. That leaves the fail-closed guard bypassable via a symlinked parent directory or a swap between the metadata check and the read, so the adapter can still follow an attacker-controlled path instead of rejecting it. Use the existing full-path symlink guard (`reject_symlinks_below` or equivalent no-follow open) before reading the style config.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter.rs",
               "line": 183,
               "category": "security"
             }
@@ -1342,14 +1342,14 @@
             {
               "message": "P1: The renderer emits edges to raw `sanitize(...)` strings for type refs instead of the synthesized ids used when the corresponding type entries are rendered. That means field/param/return/alias edges will land on ghost nodes instead of the actual `T...` subgraphs for internal types. See `emit.rs` at line 92, and the same pattern at lines 100, 154, 171, 237, and 240.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/emit.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/emit.rs",
               "line": 92,
               "category": "correctness"
             },
             {
               "message": "P1: Trait-impl resolution loses the crate dimension. `build_trait_index` keys by `(crate_name, trait_name)`, but `resolve_trait_subgraph` compares only against the raw `trait_ref` string. In a workspace with duplicate local trait names, impl edges can point to the wrong crate's trait; and a generic local trait ref like `Foo<T>` will never resolve. See `render/mod.rs` at lines 218 and 239, and the call site at 445.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
               "line": 239,
               "category": "correctness"
             }
@@ -1364,14 +1364,14 @@
             {
               "message": "Valid local `TypeRef` strings with a qualifier (`crate::Foo`, `self::Foo`, `super::Foo`, or a workspace-qualified path) never hit the index because `contains(\"::\")` forces a sanitize fallback. That means field/param/return/variant/type-alias edges will point at ghost nodes instead of the rendered item whenever upstream emits a qualified local ref.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
               "line": 296,
               "category": "correctness"
             },
             {
               "message": "The new node index keys only on bare name, so the last catalogue that defines `Foo` overwrites earlier ones. Edge resolution is therefore order-dependent and can attach to the wrong crate/layer when two rendered catalogues share a short name, which breaks the collision-free requirement in the brief.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
               "line": 262,
               "category": "correctness"
             }
@@ -1386,7 +1386,7 @@
             {
               "message": "`build_node_index` indexes both `TypeEntry` and `TraitEntry` names, but `resolve_type_ref_node_id` is used for field/param/return/type-alias edges, which should target type nodes only. As written, a `TypeRef` that matches only a trait name will now connect to that trait subgraph, and a name shared by a type and a trait becomes ambiguous and falls back to a ghost node, breaking an otherwise valid type edge.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
               "line": 296,
               "category": "correctness"
             }
@@ -1423,14 +1423,14 @@
             {
               "message": "`resolve_trait_subgraph` checks `contains(\"::\")` on the raw string before removing generic arguments, so valid self-crate trait refs with qualified generic args (for example `MyTrait<std::vec::Vec<T>>`) are classified as external and silently skipped. That drops legitimate trait-impl edges.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
               "line": 373,
               "category": "correctness"
             },
             {
               "message": "`resolve_trait_subgraph` returns the first short-name match across all catalogues and never uses the owning crate as a tie-breaker. In a workspace where two crates define the same trait short name, an impl in crate A can be attached to crate B's trait subgraph depending on map order, producing the wrong edge.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
               "line": 379,
               "category": "correctness"
             }
@@ -1445,7 +1445,7 @@
             {
               "message": "Bare `TypeRef` resolution is now workspace-global when the name is unique: if the current crate has no local match, `ids.len() == 1` returns another crate's node. That can silently wire a bare ref or generic param like `T`/`Self` to the wrong type graph node, even though bare refs are meant to denote self-crate names.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
               "line": 88,
               "category": "correctness"
             }
@@ -1460,14 +1460,14 @@
             {
               "message": "Trait-impl rendering still skips every external `for_type` here. A valid impl like `impl MyTrait for std::vec::Vec<i32>` hits `continue`, so the graph drops the `-.impl.->` edge entirely even though the v3 schema explicitly allows external self types.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
               "line": 560,
               "category": "correctness"
             },
             {
               "message": "`Self` is never mapped to the enclosing entry's node id in this resolver, so method signatures such as `fn clone(&self) -> Self` still render a ghost `Self` node instead of wiring back to the current type subgraph. That leaves a common valid `TypeRef` unresolved in the new pipeline.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
               "line": 342,
               "category": "correctness"
             }
@@ -1482,14 +1482,14 @@
             {
               "message": "`NodeIndex::resolve` only matches bare names against `current_crate::Name` and does an exact lookup for the qualified branch, so valid self-crate paths like `crate::Foo`, `self::Bar`, `super::Baz`, or `crate::module::Type` never resolve to the rendered type node and fall back to `sanitize(...)`. That breaks edges for any field/param/return/alias/trait_impl source expressed as a local path instead of a bare name.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
               "line": 63,
               "category": "correctness"
             },
             {
               "message": "`resolve_trait_subgraph` checks `contains(\"::\")` before stripping generic arguments, so a valid internal trait ref such as `MyTrait<crate::Foo>` is treated as external and silently skipped. The new generic stripping only works when the generic arguments themselves are unqualified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
               "line": 364,
               "category": "correctness"
             }
@@ -1626,7 +1626,7 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: `PlainStruct` and `TupleStruct` still look up `edge.field` before checking whether any field target resolved. In `[emit.rs:193](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/emit.rs#L193)` and `[emit.rs:215](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/emit.rs#L215)`, a struct whose fields are all primitives/undeclared/external will still fail with `RenderFailed` if `[edge.field]` is absent, even though no field edge would be emitted. That breaks the new silent-skip contract and can make otherwise valid renders fail.",
+              "message": "P1: `PlainStruct` and `TupleStruct` still look up `edge.field` before checking whether any field target resolved. In `[emit.rs:193](libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/emit.rs#L193)` and `[emit.rs:215](libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/emit.rs#L215)`, a struct whose fields are all primitives/undeclared/external will still fail with `RenderFailed` if `[edge.field]` is absent, even though no field edge would be emitted. That breaks the new silent-skip contract and can make otherwise valid renders fail.",
               "severity": "P1",
               "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/emit.rs",
               "line": 193,
@@ -1672,14 +1672,14 @@
             {
               "message": "`collect_type_names_from_syn` only recurses into `GenericArgument::Type`, so valid type refs that use associated-type bindings are dropped. A signature like `Iterator<Item = Foo>` will only yield `Iterator`; the declared inner type `Foo` never reaches `node_index`, which means the renderer silently omits a real edge.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
               "line": 417,
               "category": "broken-reference"
             },
             {
               "message": "The `Type::Path` branch discards `qself` and treats every path as an ordinary type candidate. Projections such as `<T as Trait>::Assoc` or `Self::Output` are therefore reduced to `Assoc`/`Output`, which can resolve to an unrelated declared catalogue node and create a bogus edge instead of skipping the projection.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
+              "file": "libs/infrastructure/src/tddd/contract_map_renderer_adapter/render/mod.rs",
               "line": 404,
               "category": "broken-reference"
             }
@@ -1779,14 +1779,14 @@
             {
               "message": "The new regression test never asserts the CN-07 branch/track-id mismatch outcome; it drops `result` on the floor, so the test passes even if `execute_contract_map` succeeds or fails for the wrong reason. The branch-guard wiring is no longer actually covered here.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "file": "apps/cli/src/commands/track/tddd/contract_map.rs",
               "line": 192,
               "category": "testing"
             },
             {
               "message": "This test treats any `Err` as success, including git-discovery failure. As written it does not verify that `execute_type_signals` forwards the current branch or that the interactor returns `BranchTrackMismatch` for a mismatched track id, so the CN-07 CLI regression is no longer guarded.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
               "line": 517,
               "category": "testing"
             }
@@ -1801,14 +1801,14 @@
             {
               "message": "The new branch-guard tests do not actually pin the CN-07 behavior. `test_execute_contract_map_rejects_non_track_branch` duplicates the invalid-track-id case, and `test_execute_contract_map_rejects_branch_track_id_mismatch` only checks `is_err()` without setting up a fixture that distinguishes branch mismatch from later loader/interactor failures. If the CLI stops forwarding or checking the current branch, these tests can still pass.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "file": "apps/cli/src/commands/track/tddd/contract_map.rs",
               "line": 140,
               "category": "test coverage"
             },
             {
               "message": "This CN-07 regression test is too permissive: it accepts `cannot discover git repo`, `cannot read current branch`, or any message containing either `does not match` / `not an active track branch`. That means a broken branch-resolution path can still keep the test green, so it does not reliably verify that the CLI forwards the real current branch into the usecase.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
               "line": 492,
               "category": "test coverage"
             }
@@ -1845,14 +1845,14 @@
             {
               "message": "Canonicalizing only `workspace_root` before `starts_with(repo.root())` makes the repo-membership check sensitive to path aliases. A checkout/workspace reached through a symlink can resolve to a different lexical path than the one returned by `git rev-parse --show-toplevel`, so valid invocations can be rejected before rendering. The same asymmetry is used in `signals.rs` and has the same failure mode.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "file": "apps/cli/src/commands/track/tddd/contract_map.rs",
               "line": 50,
               "category": "correctness"
             },
             {
               "message": "These updated tests no longer reach the behavior their names describe. Because `execute_type_signals` now fails the new git/workspace preflight for the tempdir fixtures, the cases here only assert `is_err()` and never exercise layer binding resolution or the evaluator paths. That drops coverage for the main public API and can hide regressions in the code this file is meant to protect.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
               "line": 393,
               "category": "testing"
             }
@@ -1867,14 +1867,14 @@
             {
               "message": "P1: The updated `execute_type_signals` tests no longer exercise the success path they are meant to protect. Both CLI integration tests now use track IDs that intentionally trip the new CN-07 branch guard, so they only prove early rejection and never reach layer resolution or evaluator dispatch. That leaves the new branch-forwarding wiring unverified at the CLI layer, so a regression that breaks the matching-branch path would not be caught.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
               "line": 417,
               "category": "test coverage"
             },
             {
               "message": "P1: The new contract-map tests cover only mismatched-branch rejection. There is no CLI-level test for the matching `track/<id>` case, so the new branch gate and the call into `RenderContractMapInteractor` are unverified from this layer. If branch discovery or the guard logic regresses, the current test set will still pass.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/contract_map.rs",
+              "file": "apps/cli/src/commands/track/tddd/contract_map.rs",
               "line": 147,
               "category": "test coverage"
             }
@@ -1889,7 +1889,7 @@
             {
               "message": "These test replacements no longer exercise the CLI's `--layer` forwarding path or the branch-forwarding success path deterministically. `test_execute_type_signals_with_unknown_layer_returns_error` now only checks branch mismatch, so a regression in unknown-layer handling would be uncaught, and `test_execute_type_signals_branch_guard_passes_for_current_track` can still pass on any later non-branch failure because it never sets up fixtures that prove the interactor was reached. The new CN-07 wiring therefore has no effective CLI-level coverage.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/tddd/signals.rs",
+              "file": "apps/cli/src/commands/track/tddd/signals.rs",
               "line": 387,
               "category": "test coverage"
             }

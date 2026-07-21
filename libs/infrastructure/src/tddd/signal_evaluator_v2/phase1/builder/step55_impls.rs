@@ -106,7 +106,7 @@ pub(crate) fn process_standalone_impls(
         match own_action {
             ItemAction::Add => {
                 if in_b {
-                    return Err(Phase1Error::ActionContradiction(format!(
+                    return Err(Phase1Error::action_contradiction(format!(
                         "action=Add declared for trait impl '{impl_key}' but it already exists in baseline"
                     )));
                 }
@@ -115,14 +115,14 @@ pub(crate) fn process_standalone_impls(
             }
             ItemAction::Modify => {
                 if !in_b {
-                    return Err(Phase1Error::ActionContradiction(format!(
+                    return Err(Phase1Error::action_contradiction(format!(
                         "action=Modify declared for trait impl '{impl_key}' but it does not exist in baseline"
                     )));
                 }
                 let s_id = match b_key_to_s_id.get(impl_key).copied() {
                     Some(id) => id,
                     None => {
-                        return Err(Phase1Error::ActionContradiction(format!(
+                        return Err(Phase1Error::action_contradiction(format!(
                             "action=Modify: trait impl '{impl_key}' expected in S but not found (internal error)"
                         )));
                     }
@@ -144,7 +144,7 @@ pub(crate) fn process_standalone_impls(
             }
             ItemAction::Reference => {
                 if !in_b {
-                    return Err(Phase1Error::ActionContradiction(format!(
+                    return Err(Phase1Error::action_contradiction(format!(
                         "action=Reference declared for trait impl '{impl_key}' but it does not exist in baseline"
                     )));
                 }
@@ -203,14 +203,14 @@ pub(crate) fn process_standalone_impls(
             }
             ItemAction::Delete => {
                 if !in_b {
-                    return Err(Phase1Error::ActionContradiction(format!(
+                    return Err(Phase1Error::action_contradiction(format!(
                         "action=Delete declared for trait impl '{impl_key}' but it does not exist in baseline"
                     )));
                 }
                 let s_id = match b_key_to_s_id.get(impl_key).copied() {
                     Some(id) => id,
                     None => {
-                        return Err(Phase1Error::ActionContradiction(format!(
+                        return Err(Phase1Error::action_contradiction(format!(
                             "action=Delete: trait impl '{impl_key}' expected in S but not found (internal error)"
                         )));
                     }

@@ -11,6 +11,13 @@ personality = "pragmatic"
 hooks = true
 multi_agent = true
 shell_snapshot = true
+# Blocking shell-tool semantics are required: capability wrappers (reviewer /
+# fixer dispatch, cargo make gates) run multi-minute commands whose exit code
+# and stdout must return to the agent in the same tool call. unified_exec
+# yields a detached "running session" after its wait window instead of the
+# final result. With it disabled, an undersized timeout fails loudly (exit
+# 124) and the agent retries with a larger timeout parameter.
+unified_exec = false
 
 [agents]
 max_threads = 6
@@ -52,7 +59,7 @@ statusMessage = "Checking git operation policy"
 
 # `apply_patch` is listed explicitly: Codex routes file edits through apply_patch,
 # which matches Write/Edit matchers but reports `tool_name: "apply_patch"` in the
-# hook input. The guard (libs/usecase/src/hook/test_file_deletion.rs) parses the
+# hook input. The guard (the CLI's test-file-deletion hook logic) parses the
 # apply_patch payload (carried in tool_input.command) for `*** Delete File:`
 # directives targeting test files. Without the explicit matcher entry the guard
 # would not fire on apply_patch test-file deletions.

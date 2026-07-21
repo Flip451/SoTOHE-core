@@ -7,7 +7,8 @@ use crate::NonEmptyString;
 
 // ── FilePath ──────────────────────────────────────────────────────────
 
-/// A validated repo-relative file path used in review scope classification and hashing.
+/// A validated repo-relative file path used in review scope classification,
+/// hashing, and structured-artifact persistence.
 ///
 /// Rejects empty strings, absolute paths, and `..` traversal components.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, PartialOrd, Ord)]
@@ -17,9 +18,10 @@ impl FilePath {
     /// Creates a validated repo-relative file path.
     ///
     /// # Errors
-    /// - `FilePathError::Empty` if empty
-    /// - `FilePathError::Absolute` if the path starts with `/` or contains a Windows drive prefix
-    /// - `FilePathError::Traversal` if the path contains `..` components (Unix or Windows separators)
+    ///
+    /// - `FilePathError::Empty` if the value is empty.
+    /// - `FilePathError::Absolute` if it starts with `/`, a Windows drive prefix, or a rooted path.
+    /// - `FilePathError::Traversal` if it contains a `..` component with Unix or Windows separators.
     pub fn new(s: impl Into<String>) -> Result<Self, FilePathError> {
         let s = s.into();
         if s.is_empty() {

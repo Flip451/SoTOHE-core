@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-15T01:45:37Z",
+  "declaration_hash": "bf4abc45faaa85dc579fdc2a0c54aa0b96e4f64e715b92d4a389ac1768440eda",
+  "signals": [
+    {
+      "type_name": "FsTemplateExportAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FsVerifyAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "VerifyPort"
+      ]
+    },
+    {
+      "type_name": "infrastructure::verify::machine_paths::verify",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::sotp_version_tag::verify",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::verify::template_refs::verify",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

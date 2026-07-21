@@ -9,8 +9,8 @@
 
 Run the DRY fix phase (DFP) for the current track branch. The workflow drives the
 `dry-fix-lead` (dfl) capability through the whole-codebase DRY gate (single scope) until the
-gate passes, is opted out, or the loop is exhausted. DFP is **loosely coupled** to review
-(D1/OS-01): this workflow does NOT invoke the `review` workflow. The DRY gate and the review
+gate passes, is opted out, or the loop is exhausted. DFP is **loosely coupled** to review:
+this workflow does NOT invoke the `review` workflow. The DRY gate and the review
 gate are independent. The sequencing of DFP and RFP is owned by the caller (`full-cycle`
 workflow) or the user.
 
@@ -50,18 +50,16 @@ Use the track id resolved in Step 0a. Read `spec.md` and `plan.md` for context.
 
 **Step 1: Launch the dfl capability**
 
-Resolve `capabilities.dry-fix-lead` from `.harness/config/agent-profiles.json` and dispatch
-to the appropriate runner via the provider-agnostic wrapper:
+Dispatch the `dry-fix-lead` capability through the invocation form the caller's adapter
+defines (`.claude/commands/track/dry-check.md` / `.agents/skills/track-dry-check/SKILL.md`).
+The adapter is responsible for provider-specific invocation; provider routing itself is
+resolved from `.harness/config/agent-profiles.json` (`capabilities.dry-fix-lead`).
 
-```
-cargo make track-local-dry-fix -- --track-id <id> --briefing-file <path>
-```
-
-The briefing file is generated from the most recent `sotp dry write` `DryCheckFinding` output
-and the track context gathered in Step 0b. The `cargo make` wrapper resolves the provider
-internally and runs the dfl loop: `sotp dry write` → fix DRY violations →
-`cargo make ci-rust` → `sotp dry write` → `sotp dry check-approved`, iterating until the gate
-passes or the loop is exhausted.
+The briefing file is generated from the most recent `sotp dry write` `DryCheckFinding`
+output and the track context gathered in Step 0b. Regardless of the adapter's chosen
+invocation, the dfl loop that runs internally is `sotp dry write` → fix DRY violations →
+`cargo make ci-rust` → `sotp dry write` → `sotp dry check-approved`, iterating until the
+gate passes or the loop is exhausted.
 
 **Step 2: Read the terminal state**
 

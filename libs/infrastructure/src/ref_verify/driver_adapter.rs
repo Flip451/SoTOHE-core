@@ -67,7 +67,7 @@ fn resolve_project_root(items_dir: &Path) -> Result<PathBuf, RefVerifyAdapterErr
             ensure_current_repo_root(&root)
         }
         _ => Err(RefVerifyAdapterError(format!(
-            "--items-dir must point to '<project-root>/track/items'; got {}",
+            "items_dir (--items-dir) must point to '<project root>/track/items'; got {}",
             items_dir.display()
         ))),
     }
@@ -108,7 +108,7 @@ fn ensure_trusted_project_root(root: &Path) -> Result<(), RefVerifyAdapterError>
 }
 
 fn ensure_current_repo_root(root: &Path) -> Result<PathBuf, RefVerifyAdapterError> {
-    use crate::git_cli::{GitRepository as _, SystemGitRepo};
+    use crate::git_cli::SystemGitRepo;
 
     let canonical_root = root.canonicalize().map_err(|e| {
         RefVerifyAdapterError(format!(
@@ -200,11 +200,11 @@ fn load_ref_verify_config(
     let defaults = usecase::ref_verify::RefVerifyConfig::default();
     let injection = dto
         .known_bad_injection_rate_percent
-        .unwrap_or_else(|| defaults.known_bad_injection_rate_percent.as_u8());
+        .unwrap_or_else(|| defaults.known_bad_injection_rate_percent().as_u8());
     let threshold = dto
         .known_bad_detection_threshold_percent
-        .unwrap_or_else(|| defaults.known_bad_detection_threshold_percent.as_u8());
-    let parallelism = dto.max_parallelism.unwrap_or_else(|| defaults.max_parallelism.as_usize());
+        .unwrap_or_else(|| defaults.known_bad_detection_threshold_percent().as_u8());
+    let parallelism = dto.max_parallelism.unwrap_or_else(|| defaults.max_parallelism().as_usize());
 
     usecase::ref_verify::RefVerifyConfig::try_new(injection, threshold, parallelism)
         .map_err(|e| RefVerifyAdapterError(format!("ref-verify config validation failed: {e}")))
@@ -213,12 +213,12 @@ fn load_ref_verify_config(
 fn load_agent_profiles(project_root: &Path) -> Result<AgentProfiles, RefVerifyAdapterError> {
     let profiles_path = project_root.join(AGENT_PROFILES_PATH);
     reject_workspace_symlinks(&profiles_path, project_root, "agent-profiles.json")?;
-    AgentProfiles::load(&profiles_path)
+    AgentProfiles::load(project_root, &profiles_path)
         .map_err(|e| RefVerifyAdapterError(format!("cannot load agent-profiles.json: {e}")))
 }
 
 fn current_git_branch(project_root: &Path) -> Result<String, RefVerifyAdapterError> {
-    use crate::git_cli::{GitRepository as _, SystemGitRepo};
+    use crate::git_cli::SystemGitRepo;
     SystemGitRepo::discover_from(project_root)
         .map_err(|e| RefVerifyAdapterError(format!("cannot discover git repo: {e}")))?
         .current_branch()

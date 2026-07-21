@@ -3,7 +3,11 @@
 
 use std::path::PathBuf;
 
+use domain::tddd::LayerId;
+use domain::{TrackBranch, TrackId};
 use thiserror::Error;
+
+use crate::git_workflow::DiagnosticText;
 
 /// Request DTO for [`TypeSignalsService::run`].
 pub struct TypeSignalsRequest {
@@ -14,35 +18,21 @@ pub struct TypeSignalsRequest {
     /// The field is retained for forward-compatibility and testing convenience.
     pub items_dir: PathBuf,
     /// Track identifier slug (e.g. `"my-track-2026-01-01"`).
-    pub track_id: String,
+    pub track_id: TrackId,
     /// Current git branch (e.g. `"track/my-feature-2026-04-24"`). Used by the
     /// active-track guard (CN-07) to reject non-`track/` branches and
     /// branch/track-id mismatches.
-    pub branch: String,
+    pub branch: TrackBranch,
     /// Cargo workspace root used for rustdoc export.
     pub workspace_root: PathBuf,
     /// Optional layer filter (`--layer`). When `None`, all TDDD-enabled layers
     /// are processed.
-    pub layer: Option<String>,
+    pub layer: Option<LayerId>,
 }
 
 /// Error variants for [`TypeSignalsService::run`].
 #[derive(Debug, Error)]
 pub enum TypeSignalsError {
-    /// The track ID is not a valid slug.
-    #[error("invalid track id: {reason}")]
-    InvalidTrackId {
-        /// Human-readable reason.
-        reason: String,
-    },
-    /// The supplied branch does not start with `track/`, so the guard
-    /// (CN-07) rejects it to keep type-signals off archived / main / plan/
-    /// branches.
-    #[error("type-signals rejected: branch '{branch}' is not an active track branch (CN-07)")]
-    NonActiveTrack {
-        /// The branch name that triggered the guard.
-        branch: String,
-    },
     /// The branch `track/<suffix>` disagrees with the track_id argument.
     /// Safeguards against CLI wrappers that mishandle branch/track_id mapping.
     #[error(
@@ -51,16 +41,16 @@ pub enum TypeSignalsError {
     )]
     BranchTrackMismatch {
         /// The branch name that triggered the guard.
-        branch: String,
+        branch: TrackBranch,
         /// The track identifier from the request.
-        track_id: String,
+        track_id: TrackId,
     },
     /// `architecture-rules.json` could not be loaded or a specific layer was
     /// not found.
     #[error("layer bindings load failed: {reason}")]
     LayerBindingsLoad {
         /// Human-readable reason.
-        reason: String,
+        reason: DiagnosticText,
     },
     /// No TDDD-enabled layers were found.
     #[error(
@@ -72,15 +62,15 @@ pub enum TypeSignalsError {
     #[error("type-signals evaluation failed for layer '{layer_id}': {reason}")]
     EvaluationFailed {
         /// Layer id for which evaluation failed.
-        layer_id: String,
+        layer_id: LayerId,
         /// Human-readable reason.
-        reason: String,
+        reason: DiagnosticText,
     },
     /// The request contains an inconsistent combination of fields.
     #[error("inconsistent request: {reason}")]
     InconsistentRequest {
         /// Human-readable reason.
-        reason: String,
+        reason: DiagnosticText,
     },
 }
 
@@ -91,7 +81,7 @@ pub enum TypeSignalsError {
 /// 1. Track-ID validation.
 /// 2. Track-status guard (active-track check).
 /// 3. Layer-bindings resolution.
-/// 4. Per-layer signal evaluation (absent catalogue always skipped, present always strict).
+/// 4. Per-layer signal evaluation with conservative freshness verification.
 pub trait TypeSignalsService: Send + Sync {
     /// Runs the type-signals evaluation for the given request.
     ///

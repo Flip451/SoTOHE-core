@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "12d6ab9fb1970d85a20eafefae7ebd3412da44f04b6d1f4944c04e15e71e5f63",
+  "signals": [
+    {
+      "type_name": "AdrBaselineCodecError",
+      "signal": "blue",
+      "entry_hash": "a732f2029ef497a4231c48b7927d70d11b3c147943d7a12990765b1f0ed76d1a"
+    },
+    {
+      "type_name": "AdrBaselineLedgerRecordDto",
+      "signal": "blue",
+      "entry_hash": "98d756d634f321af7bdde83ff933751031d92155c569e81e1823d44bdb3008c3"
+    },
+    {
+      "type_name": "FsAdrBaselineStore",
+      "signal": "blue",
+      "entry_hash": "6837f8efe3fac3fbd857d4b104321e083f61d2a5b9bea083ccffcd3ce9bf357a"
+    },
+    {
+      "type_name": "FsGitAdrBaselineSource",
+      "signal": "blue",
+      "entry_hash": "2ef26cbc84e2a19c4b1de2183c3e4c57eb22ed522466314364bf846e37ec0bfe"
+    },
+    {
+      "type_name": "infrastructure::adr_baseline::decode_ledger_line",
+      "signal": "blue",
+      "entry_hash": "f11386d133363a7ee7c4d7aefad01118b548d06441201872d96a2dc02dd29fdb"
+    },
+    {
+      "type_name": "infrastructure::adr_baseline::encode_ledger_entry",
+      "signal": "blue",
+      "entry_hash": "1afcb3c86c5c97160204ac67fee8227a7d51ad978475918585d92aae4b7ed494"
+    }
+  ]
+}

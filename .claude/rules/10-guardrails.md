@@ -4,10 +4,8 @@ Core guardrails:
 
 - Prefer `/track:*` in user-facing guidance
 - Do not use direct `git add` / `git commit`
-- Do not tell users to run `*-local` tasks directly
-- Keep `track/tech-stack.md` free of blocking `TODO:` before implementation
 - Keep `track/registry.md`, `spec.md`, and `plan.md` synchronized
-- Keep `cargo make ci`, `cargo make deny`, and `cargo make verify-*` as reproducible final gates (`run --rm`)
+- Keep `cargo make ci`, `cargo make deny`, and `cargo make verify-*` as reproducible final gates
 - Before committing code changes, run the `reviewer` capability review cycle
   (review -> fix -> review -> ... -> no findings). Do not commit until the reviewer
   reports zero findings. The reviewer provider is resolved via `.harness/config/agent-profiles.json`.
@@ -46,7 +44,7 @@ them to `.claude/settings.json` is the consumer's choice and risk — there is n
 - `Bash(find:*)` — `-exec`/`-execdir` で任意 utility exec、`-delete`/`-fprint` で destructive 操作可能 (env 型の wrap-execute 脆弱性)。維持
 - `Bash(sort:*)` — GNU sort の `--compress-program=PROG` で temporary files 処理時に任意プログラムを exec する wrap-execute 脆弱性 (env / find -exec と同型)。維持
 - `Bash(env:*)` — `env [name=value ...] [utility [argument ...]]` 形式で任意 utility を exec する wrapper。allow すると `env git commit` 等で他の guardrail を bypass できるため維持
-- `Bash(git add:*)`, `Bash(git commit:*)` etc. — use `cargo make` wrappers instead
+- `Bash(git add:*)`, `Bash(git commit:*)` etc. — use `/track:*` or guarded `bin/sotp` workflow commands instead
 
 If asked to add one of these, explain the risk and suggest the safer alternative tools. The
 consumer may still choose to add it (their responsibility); SoTOHE no longer rejects it via CI.
@@ -64,38 +62,24 @@ ripgrep ベースの `Grep` / `Glob` で完全置換できる検索は専用 too
 `Bash(head ...)` / `Bash(tail ...)` も同様に allow 済だが、Read tool の offset/limit で
 ファイルの一部を読めるのでまず Read を検討する。
 
-## Bash Output Redirect Constraint
-
-Do not use `2>/dev/null` in Claude Code Bash tool calls.
-The file-write guard (`bash-write-guard`) scans for `>` patterns and treats
-`2>` as an output redirect, blocking the command. `2>&1` (FD duplication) is not affected.
-
 ## Hook Constraint
 
-The `sotp hook dispatch block-direct-git-ops` guard scans the entire Bash command string for protected git-operation keywords.
-This includes string literals, prompt text, and heredocs.
-
-To avoid unnecessary retries:
-
-- `python3 -c`: do not embed code containing protected git keywords. Write a `.py` file, then run it.
-- `codex exec` / `gemini -p`: do not embed prompts containing protected git keywords. Write the prompt to a briefing file first.
-- heredoc / `cat >`: also scanned. Use the Write/Edit tool instead.
-- **New file creation**: The `Write` tool rejects writes to unread files, so first `Read` the target path (an error is returned if the file does not exist). Then `Write` can create it. `touch` is in `FORBIDDEN_ALLOW` and must not be added to `allow`.
-- Fallback: when Codex is blocked by the hook, use the native subcommands with `--briefing-file`:
-  - Planner: `bin/sotp plan codex-local --model {model} --briefing-file <path>`
-  - Reviewer: `bin/sotp review local --round-type {fast|final} --group {scope} --model {model} --briefing-file <path>`
-  - These subcommands convert the briefing file path to `"Read {path} and perform the task"` internally, keeping git keywords out of the Bash command string.
+Command-enforcement semantics are owned by the [bash write guard convention](../../knowledge/conventions/bash-write-guard.md)
+and its hook dispatcher. The ADR index records the governing decision. Use workflow commands
+rather than attempting to construct a guard token yourself.
 
 ## Sandbox and Hook Coverage Warning (External Subprocesses)
 
 Claude Code hooks (e.g. `sotp hook dispatch block-direct-git-ops`) only intercept
 **Claude Code's own tool calls**. They do NOT apply to operations performed inside
-an external subprocess (e.g. Codex CLI with `--sandbox workspace-write`).
+an external subprocess (e.g. Codex CLI with `--sandbox workspace-write`). Repository Git hooks
+are separate: Git invokes them for the operations they cover, including when the caller is an
+external subprocess. See the hook dispatcher for their current enforcement semantics.
 
 | Sandbox | File writes | Git operations | Hook coverage |
 |---------|-------------|----------------|---------------|
 | `read-only` | Blocked by sandbox | Blocked by sandbox | N/A |
-| `workspace-write` | Allowed | **Allowed — hooks do NOT fire** | None |
+| `workspace-write` | Allowed | Allowed; repository Git hooks still apply | Claude Code hooks do not apply |
 
 **`--full-auto` implies `--sandbox workspace-write`**: Codex CLI's `--full-auto` flag
 forces `--sandbox workspace-write`, overriding any subsequent `--sandbox read-only`.
@@ -103,20 +87,16 @@ Do not use `--full-auto` for `reviewer` or `researcher` — use `--sandbox read-
 
 **Consequences when using `workspace-write`:**
 
-- The external subprocess can run `git add` / `git commit` / `git push` directly,
-  bypassing the `sotp` guard hook (`block-direct-git-ops`).
+- The external subprocess can run `git add` and write ordinary files without Claude Code
+  hook interception. Repository Git hooks continue to govern the ref updates and pushes they cover.
 - The external subprocess can write any file without hook-based validation.
 
 **Rules for `workspace-write` usage:**
 
-1. Prefer `read-only` for `planner` / `reviewer` / `researcher` — they should never need to write files.
-2. When `implementer` is routed to an external provider with `workspace-write`, instruct it explicitly:
-   - Do not run `git add` or `git commit` directly.
-   - Do not run `git push` under any circumstance.
-   - For selective staging, write repo-relative paths to `tmp/track-commit/add-paths.txt` and run `cargo make track-add-paths`.
-   - For guarded commits, use `/track:commit` or the exact wrappers `cargo make track-commit-message` / `cargo make track-note`.
-3. Hook protections apply to all operations performed during autonomous task execution.
-   Do not bypass hook coverage by routing through external subprocesses.
+1. Prefer `read-only` for `researcher` and `rollback-diagnoser` — they should never need to write files.
+2. When an external `orchestrator-output` capability needs `workspace-write` (for example, `implementer`), invoke it through `bin/sotp capability exec`. The dispatcher derives the sandbox from the provider-native skill and injects the shared no-direct-git discipline; do not bypass that path with a hand-assembled provider command. Typed-pipeline capabilities keep their dedicated routes.
+3. Treat Claude Code hooks and repository Git hooks as separate controls. Do not use an
+   external subprocess to evade the workflow-command requirement.
 
 ## Duplicate Implementation Prevention
 
@@ -128,6 +108,24 @@ Before writing new parsing/analysis logic, verify the following:
 4. If none of the above finds a match, have the `researcher` capability perform a quick survey of crates.io for equivalent functionality
 
 Reference: `knowledge/conventions/shell-parsing.md`
+
+## ADR Baseline Guardrail
+
+ADR baseline copies and `ledger.jsonl` under `track/items/<id>/adr-baseline/` are machine-owned.
+Only `bin/sotp adr-baseline snapshot` may add them and only `bin/sotp adr-baseline restore` may
+restore an ADR from them. Never hand-edit, copy, delete, or re-create a baseline record. At Phase
+0, the orchestrator designates primary ADR source(s) by init-stamping them; the ledger init
+records are the designation records, with no separate primary identity. The pre-review CLI
+requires a nonempty init-record designation set and verifies every recorded ledger copy; a
+current ADR that differs from its latest baseline is a normal Phase 0 draft state and does not
+block review. `--primary-source <file>` is available only for a direct
+`bin/sotp adr-baseline check-review` invocation. Byte matching fail-closes at the commit gate
+and track-aware CI (`check-commit`); spec-cited ADR coverage is enforced separately at the
+commit gate. A failed `check-review` or `check-commit` is fail-closed; use the
+diagnoser/recovery path instead of bypassing the gate.
+
+This is an independent byte-comparison guard. Do not weaken or modify `adr_user` evaluation or
+`.harness/config/signal-gates.json` to accommodate it.
 
 ## Reviewer Capability Constraint
 

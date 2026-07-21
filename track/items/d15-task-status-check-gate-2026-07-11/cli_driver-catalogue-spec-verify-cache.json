@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "layer": "cli_driver",
+  "entries": [
+    {
+      "claim_hash": "5a8be2988ae1ee529694788ca335c2f2cb3eea75338f9f298e786954ec91435b",
+      "evidence_hash": "fc55fe09bc5f56a58a638076644ab46a4477e72f9907ea64c06b6a31ade4aaa3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`obligations.json` の target entry が `task-contract.json` の entry 帰属と `impl-plan.json` の `tasks[]` status を経由して決定論的に lane へ解決されることを検証する。同一の missing、stale、または verdict 欠如が、done / in_progress 帰属では非零 exit で block し、todo 帰属だけでは 🟡 warning を表示して exit 0 となることを検証する。複数 task 帰属では done または in_progress が todo より優先する strictest-wins により strict lane の結果になることも検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationCheckHandler"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`obligations.json` の target entry が `task-contract.json` の entry 帰属と `impl-plan.json` の `tasks[]` status を経由して決定論的に lane へ解決されることを検証する。同一の missing、stale、または verdict 欠如が、done / in_progress 帰属では非零 exit で block し、todo 帰属だけでは 🟡 warning を表示して exit 0 となることを検証する。複数 task 帰属では done または in_progress が todo より優先する strictest-wins により strict lane の結果になることも検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5a8be2988ae1ee529694788ca335c2f2cb3eea75338f9f298e786954ec91435b",
+      "evidence_hash": "c88d6a415dc3e688cfb2421b7300f009e72dc990182cee3613a15360b63475bc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "todo task にだけ未解消が残る `check` は pass し、warning 出力で todo lane の未解消を識別できる。一方、義務が導出されない fulfillment binding（`orphaned`）、unattributable entry、rules totality 違反、または malformed artifact がある場合は todo status であっても非零 exit で block する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationCheckHandler"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "todo task にだけ未解消が残る `check` は pass し、warning 出力で todo lane の未解消を識別できる。一方、義務が導出されない fulfillment binding（`orphaned`）、unattributable entry、rules totality 違反、または malformed artifact がある場合は todo status であっても非零 exit で block する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5a8be2988ae1ee529694788ca335c2f2cb3eea75338f9f298e786954ec91435b",
+      "evidence_hash": "11b11600e1c6ba059c3cdd894b85426e72fa756707f325e09b9871e1efb56004",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fingerprint 不一致または fingerprint 不在の cache entry は current verdict として採用されず、verdict 欠如として扱われる。その結果は done / in_progress lane では block、todo lane では warning と exit 0 になることを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationCheckHandler"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "fingerprint 不一致または fingerprint 不在の cache entry は current verdict として採用されず、verdict 欠如として扱われる。その結果は done / in_progress lane では block、todo lane では warning と exit 0 になることを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5a8be2988ae1ee529694788ca335c2f2cb3eea75338f9f298e786954ec91435b",
+      "evidence_hash": "1edb0d52acaefd8e8ad7c86369615c845b6a102565b59c74ebd592edf5eeb42e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "strictest-wins の task 帰属解決が `skipped` となる missing、stale、または verdict 欠如は、todo 猶予として warning にせず、`check` が非零 exit で fail-closed に block することを検証する。`results` が skipped の未解消を独立 lane として表示し、unresolved や read error の有無にかかわらず exit 0 を維持することも検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationCheckHandler"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "strictest-wins の task 帰属解決が `skipped` となる missing、stale、または verdict 欠如は、todo 猶予として warning にせず、`check` が非零 exit で fail-closed に block することを検証する。`results` が skipped の未解消を独立 lane として表示し、unresolved や read error の有無にかかわらず exit 0 を維持することも検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cfd1e4ab3e96e92caa16d43e31ca541758963efa5612663758984fa343488d37",
+      "evidence_hash": "5ca6484d1b979f49e3c75d38f3da1c2dfcdd56711db243113d64f3ea773ba9af",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp test-obligation results` が todo / in_progress / done ごとに unresolved 件数を表示し、各 lane で missing / stale / verdict 欠如を区別して集計する。unresolved の有無や read error の有無にかかわらず exit は常に 0 であり、gate の合否を表さないことを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationResultsHandler"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`sotp test-obligation results` が todo / in_progress / done ごとに unresolved 件数を表示し、各 lane で missing / stale / verdict 欠如を区別して集計する。unresolved の有無や read error の有無にかかわらず exit は常に 0 であり、gate の合否を表さないことを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cfd1e4ab3e96e92caa16d43e31ca541758963efa5612663758984fa343488d37",
+      "evidence_hash": "1edb0d52acaefd8e8ad7c86369615c845b6a102565b59c74ebd592edf5eeb42e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`results` が skipped の未解消を独立 lane として表示し、unresolved や read error の有無にかかわらず exit 0 を維持することも検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/d15-task-status-check-gate-2026-07-11/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationResultsHandler"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "strictest-wins の task 帰属解決が `skipped` となる missing、stale、または verdict 欠如は、todo 猶予として warning にせず、`check` が非零 exit で fail-closed に block することを検証する。`results` が skipped の未解消を独立 lane として表示し、unresolved や read error の有無にかかわらず exit 0 を維持することも検証する。"
+        }
+      }
+    }
+  ]
+}

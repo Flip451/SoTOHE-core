@@ -512,9 +512,21 @@ fn reviewer_unexpected_after_spawn(message: &str) -> bool {
 #[allow(clippy::unwrap_used, clippy::expect_used)]
 mod tests {
     use std::process::Command;
+    use std::sync::Arc;
     use std::time::Duration;
 
+    use domain::{
+        TrackId,
+        review_v2::{RoundType, ScopeName},
+    };
     use infrastructure::review_v2::ClaudeReviewer;
+    use usecase::{
+        capability_exec::{ModelName, ReasoningEffort},
+        provider_session::{
+            ProviderSessionCacheEntry, ProviderSessionCacheError, ProviderSessionCacheKey,
+            ProviderSessionCachePort, ReviewerPrompt,
+        },
+    };
 
     use super::*;
     use crate::review_v2::process_guards::CwdGuard;
@@ -582,8 +594,38 @@ mod tests {
         .unwrap();
     }
 
+    struct EmptySessionCache;
+    impl ProviderSessionCachePort for EmptySessionCache {
+        fn load(
+            &self,
+            _: &ProviderSessionCacheKey,
+        ) -> Result<Option<ProviderSessionCacheEntry>, ProviderSessionCacheError> {
+            Ok(None)
+        }
+        fn save(
+            &self,
+            _: &ProviderSessionCacheKey,
+            _: &ProviderSessionCacheEntry,
+        ) -> Result<(), ProviderSessionCacheError> {
+            Ok(())
+        }
+        fn remove(&self, _: &ProviderSessionCacheKey) -> Result<(), ProviderSessionCacheError> {
+            Ok(())
+        }
+    }
+
     fn make_claude_reviewer() -> ClaudeReviewer {
-        ClaudeReviewer::new("claude-opus-4-7", Duration::from_secs(10), "Review.")
+        ClaudeReviewer::new(
+            TrackId::try_new("test-track").unwrap(),
+            ScopeName::Other,
+            RoundType::Fast,
+            None,
+            ModelName::try_new("claude-opus-4-7").unwrap(),
+            ReasoningEffort::High,
+            Duration::from_secs(10),
+            ReviewerPrompt::try_new("Review.".to_owned()).unwrap(),
+            Arc::new(EmptySessionCache),
+        )
     }
 
     #[test]
@@ -650,7 +692,7 @@ mod tests {
     /// Builds a `ClaudeReviewer` that uses the given binary path instead of `claude`.
     #[cfg(unix)]
     fn make_reviewer_with_bin(bin: impl Into<std::ffi::OsString>) -> ClaudeReviewer {
-        ClaudeReviewer::new("claude-opus-4-7", Duration::from_secs(10), "Review.").with_bin(bin)
+        make_claude_reviewer().with_bin(bin)
     }
 
     #[cfg(unix)]

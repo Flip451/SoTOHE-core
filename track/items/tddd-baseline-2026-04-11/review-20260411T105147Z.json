@@ -113,7 +113,7 @@
             {
               "message": "The DTOs are permissive by default: `serde` will ignore unknown fields here, and the `#[serde(default)]` vecs make typos or schema drift decode as empty `members`/`methods` instead of failing. For a source-of-truth baseline codec, this is silent input corruption; reject unknown fields or add equivalent validation at the DTO boundary.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
               "line": 34,
               "category": "validation"
             }
@@ -128,14 +128,14 @@
             {
               "message": "The DTOs are permissive here: serde will ignore unknown fields, and the `#[serde(default)]` vectors turn typos or schema drift into empty `members`/`methods` instead of failing fast. For a source-of-truth baseline codec, that means malformed input can deserialize successfully with silently dropped data; reject unknown fields or validate the required arrays explicitly.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
               "line": 34,
               "category": "correctness"
             },
             {
               "message": "`encode()` builds the `types` and `traits` payloads from `HashMap`s and passes them straight to `serde_json::to_string_pretty`, so key order depends on hash iteration. That makes `baseline-capture` output non-deterministic across runs for the same baseline, which is a poor fit for a committed artifact and will create spurious diffs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
               "line": 131,
               "category": "determinism"
             }
@@ -449,14 +449,14 @@
             {
               "message": "`assert_eq!(*entry.kind(), TypeKind::Struct)` moves a `TypeKind` out of a shared reference, but `TypeKind` is not `Copy` in `schema.rs`, so this test code will not compile. The same pattern appears again in `test_type_baseline_get_type_returns_entry` at line 321.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/baseline.rs",
+              "file": "libs/domain/src/tddd/baseline.rs",
               "line": 255,
               "category": "compilation"
             },
             {
               "message": "`TypeBaseline::new` stores `captured_at` as a raw `String`, so malformed timestamps can be constructed without validation even though this crate already has a validated `Timestamp` domain type. That makes the aggregate accept illegal state instead of enforcing the ISO 8601 constraint at the boundary.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/baseline.rs",
+              "file": "libs/domain/src/tddd/baseline.rs",
               "line": 127,
               "category": "validation"
             }
@@ -566,7 +566,7 @@
             {
               "message": "`Timestamp::now()` is a new public API, but this change adds no test coverage for its contract. Please add a test that asserts the returned value round-trips through `as_str()`/`Display` and that `as_datetime()` stays aligned to whole-second precision.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/timestamp.rs",
+              "file": "libs/domain/src/timestamp.rs",
               "line": 64,
               "category": "testing"
             }
@@ -581,7 +581,7 @@
             {
               "message": "Add unit coverage for the new public `Timestamp::now()` constructor. There is no test that verifies the second-precision UTC invariant or the `Timestamp::new(ts.as_str())` round-trip, so a regression here would ship unnoticed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/timestamp.rs",
+              "file": "libs/domain/src/timestamp.rs",
               "line": 64,
               "category": "testing"
             }
@@ -753,21 +753,21 @@
             {
               "message": "`domain-types-baseline.json` is still described as being auto-captured by the first `domain-type-signals` run in the lifecycle table, which contradicts the new `baseline-capture` / `domain-type-signals` split in §4 and leaves two incompatible lifecycles in the same ADR.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md",
+              "file": "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md",
               "line": 77,
               "category": "consistency"
             },
             {
               "message": "The implementation plan still bundles baseline generation and baseline reading into `baseline.rs` and says `/track:design` auto-generates the baseline, but the ADR now assigns generation to `baseline-capture` and signal evaluation/loading to `signals.rs`. Following this plan would put the responsibilities in the wrong module.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/strategy/tddd-implementation-plan.md",
+              "file": "knowledge/strategy/tddd-implementation-plan.md",
               "line": 31,
               "category": "consistency"
             },
             {
               "message": "The split-command design no longer matches the \"same rustdoc export\" rationale: both `baseline-capture` and `domain-type-signals` independently build TypeGraph, so `/track:design` now implies a second rustdoc export unless a shared cache/hand-off is specified. That cost and data flow need to be made explicit or the rationale removed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md",
+              "file": "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md",
               "line": 34,
               "category": "design"
             }
@@ -804,14 +804,14 @@
             {
               "message": "The task bundle still describes the removed auto-capture flow: `T006` says baseline generation/load lives in `baseline.rs`, and `T007` still says `/track:design` auto-generates the baseline. That contradicts the new split-command ADR and can steer implementation back to the old bootstrap path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-baseline-2026-04-11/metadata.json",
+              "file": "track/items/tddd-baseline-2026-04-11/metadata.json",
               "line": 48,
               "category": "consistency"
             },
             {
               "message": "The manual verification list no longer checks the required `/track:design` integration. It validates `baseline-capture` and `domain-type-signals` directly, but a broken Step 4 that never calls `baseline-capture` would still pass every listed check.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-baseline-2026-04-11/verification.md",
+              "file": "track/items/tddd-baseline-2026-04-11/verification.md",
               "line": 11,
               "category": "verification"
             }
@@ -826,14 +826,14 @@
             {
               "message": "`/track:design` now unconditionally calls `baseline-capture`, but `baseline-capture` is specified to error whenever `domain-types-baseline.json` already exists. Because the baseline is also meant to be committed with the design artifacts, rerunning the design workflow on the same track becomes non-idempotent and will fail unless the user manually deletes the file or the command threads `--force` through.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md",
+              "file": "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md",
               "line": 159,
               "category": "workflow"
             },
             {
               "message": "`action: \"delete\"` is accepted as Blue whenever the type is absent from code, but the ADR never requires that the declaration actually match an entry in the baseline. That means a fabricated delete declaration for a type that never existed can pass as a successful deletion instead of being rejected.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-11-0003-type-action-declarations.md",
+              "file": "knowledge/adr/2026-04-11-0003-type-action-declarations.md",
               "line": 31,
               "category": "validation"
             }

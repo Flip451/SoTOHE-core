@@ -1,0 +1,244 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "u64"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>",
+          "docs": "Uses the shared capability-input validation error used by sibling newtype constructors; this constructor's concrete failure is ZeroTimeoutSeconds."
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_secs",
+          "params": [],
+          "receiver": "&self",
+          "returns": "u64"
+        }
+      ],
+      "type_name": "TimeoutSeconds"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecRequest",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecRequest",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecRequest",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityExecRequest",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityInputValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityInputValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityInputValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "TimeoutSeconds",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TimeoutSeconds",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TimeoutSeconds",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "TimeoutSeconds",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TimeoutSeconds",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CapabilityExecRequest": {
+      "action": "modify",
+      "docs": "Capability-dispatch command carrying a typed optional provider-process timeout from the CLI boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "CapabilityName"
+            },
+            {
+              "name": "host",
+              "ty": "ProviderName"
+            },
+            {
+              "name": "briefing_file",
+              "ty": "CapabilityFilePath"
+            },
+            {
+              "name": "timeout",
+              "ty": "Option<TimeoutSeconds>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "CapabilityInputValidationError": {
+      "action": "modify",
+      "docs": "CapabilityInputValidationError adds ZeroTimeoutSeconds (IN-03, CN-02, AC-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "EmptyProviderName",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyModelName",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyFilePath",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvalidFilePath",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EmptyContent",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ZeroTimeoutSeconds",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "TimeoutSeconds": {
+      "action": "add",
+      "docs": "Usecase capability-dispatch timeout value object; placed here as a technical orchestration parameter (IN-03, CN-02).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        }
+      ]
+    }
+  }
+}

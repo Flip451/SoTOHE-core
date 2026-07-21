@@ -7,7 +7,7 @@ description: |
   clone vs borrow), trait design or review ("トレイト設計", Repository pattern, method signatures,
   return types), Rust architecture planning (domain layer, usecase layer, hexagonal/DDD,
   Command/Query patterns), and implementation planning for Rust features ("実装計画", "設計したい").
-  Also trigger when a capability (planner/reviewer/implementer) is assigned to Codex
+  Also trigger when an `orchestrator-output` capability is assigned to Codex
   in `.harness/config/agent-profiles.json`. Do NOT trigger for simple Cargo.toml edits, cargo fmt/clippy fixes, test assertion
   updates, dependency version lookups, or non-Rust tasks.
 metadata:
@@ -31,13 +31,29 @@ capabilities.<capability>.model  →  {model}
 
 All templates below use `{model}` as a placeholder. Replace it with the actual value from `agent-profiles.json`.
 
+## Profile-routed capability dispatch
+
+For a capability with `execution_mode: "orchestrator-output"`, write the task to a briefing
+file and dispatch it through the repository command:
+
+```bash
+bin/sotp capability exec <capability> --host claude --briefing-file <path>
+```
+
+`capability exec` resolves the capability's provider and model from the profile, validates the
+provider-native definition, and applies the Codex skill's declared sandbox. Do not add `--model`
+or `--sandbox` to this command, and do not replace it with a hand-assembled `codex exec` call.
+The typed-pipeline capabilities (such as the local reviewer loop) keep their dedicated commands.
+The direct Codex examples below are only for free-form, read-only consultations that are not a
+profile-routed capability invocation.
+
 ### Reasoning Effort
 
 Append `--config model_reasoning_effort="{effort}"` to control reasoning depth:
 
 ```bash
 timeout 180 codex exec --model {model} --config model_reasoning_effort="high" \
-  --sandbox read-only --full-auto "{task}" 2>&1
+  --sandbox read-only "{task}" 2>&1
 ```
 
 Values: `low`, `medium`, `high`. Default varies by model. Use `high` for complex design/review tasks.
@@ -49,14 +65,14 @@ Values: `low`, `medium`, `high`. Default varies by model. Use `high` for complex
 - Compiler error diagnosis (E-codes)
 - Implementation planning (TDD-friendly)
 - Complex Rust code review
-- When `planner` / `reviewer` / `implementer` capability is assigned to Codex
+- When an `orchestrator-output` capability is assigned to Codex
 
 ## Usage Patterns
 
 ### Architecture Design
 
 ```bash
-timeout 180 codex exec --model {model} --sandbox read-only --full-auto "
+timeout 180 codex exec --model {model} --sandbox read-only "
 Design Rust architecture for: {feature description}
 
 Current context:
@@ -76,7 +92,7 @@ Provide:
 ### Ownership/Lifetime Design
 
 ```bash
-timeout 180 codex exec --model {model} --sandbox read-only --full-auto "
+timeout 180 codex exec --model {model} --sandbox read-only "
 Design the ownership model for:
 
 {struct or function description}
@@ -94,7 +110,7 @@ Provide:
 ### Compiler Error Diagnosis
 
 ```bash
-timeout 180 codex exec --model {model} --sandbox read-only --full-auto "
+timeout 180 codex exec --model {model} --sandbox read-only "
 Diagnose this Rust compiler error:
 
 Error code: {E0XXX}
@@ -112,7 +128,7 @@ and suggest a fix that preserves the intended semantics.
 ### Implementation Planning
 
 ```bash
-timeout 180 codex exec --model {model} --sandbox read-only --full-auto "
+timeout 180 codex exec --model {model} --sandbox read-only "
 Create a TDD implementation plan for: {feature}
 
 Requirements: {list of requirements}
@@ -197,10 +213,16 @@ Prefer writing content to a file over inline embedding when:
    bin/sotp review local --round-type {round_type} --group {scope} --model {model} --briefing-file tmp/codex-briefing.md
    ```
 
+   For profile-routed capability work, use the dispatcher instead:
+
+   ```bash
+   bin/sotp capability exec <capability> --host claude --briefing-file tmp/codex-briefing.md
+   ```
+
    For other read-only Codex consultations, direct `codex exec` is still fine:
 
    ```bash
-   timeout 180 codex exec --model {model} --sandbox read-only --full-auto \
+   timeout 180 codex exec --model {model} --sandbox read-only \
      "Read tmp/codex-briefing.md and perform the task described there." 2>&1
    ```
 

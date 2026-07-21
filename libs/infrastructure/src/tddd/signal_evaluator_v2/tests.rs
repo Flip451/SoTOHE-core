@@ -1,6 +1,5 @@
 //! Tests for `SignalEvaluatorV2` (AC-08).
 
-#![cfg(test)]
 #![allow(clippy::unwrap_used, clippy::indexing_slicing, clippy::expect_used, non_snake_case)]
 
 use std::collections::{BTreeMap, HashMap};
@@ -1056,7 +1055,7 @@ fn crate_with_external_trait_impl(
     }
 }
 
-/// T039 (AC-14, case b): `StructuralPartialEq` / `StructuralEq` Impls present
+/// T039 (AC-14, case b): compiler-internal trait Impls present
 /// only in C must NOT trigger `CMinusSUnionD`.  These are compiler-internal
 /// phantom traits that cannot be declared in any workspace catalogue.
 ///
@@ -1068,6 +1067,7 @@ fn test_t039_compiler_internal_traits_excluded_from_identity_map() {
     for (trait_segments, qualified_name) in [
         (["core", "marker", "StructuralPartialEq"].as_slice(), "core::marker::StructuralPartialEq"),
         (["core", "marker", "StructuralEq"].as_slice(), "core::marker::StructuralEq"),
+        (["core", "clone", "TrivialClone"].as_slice(), "core::clone::TrivialClone"),
     ] {
         let a = ExtendedCrate::new(empty_crate(), BTreeMap::new());
         let b = empty_crate();
@@ -1227,12 +1227,16 @@ fn test_t039_compiler_internal_trait_classifier_scope() {
     assert!(is_compiler_internal_trait("core::marker::StructuralEq"));
     assert!(is_compiler_internal_trait("std::marker::StructuralPartialEq"));
     assert!(is_compiler_internal_trait("std::marker::StructuralEq"));
+    assert!(is_compiler_internal_trait("core::clone::TrivialClone"));
+    assert!(is_compiler_internal_trait("std::clone::TrivialClone"));
     // Fallback-form (two segments: core_canonical_path fallback for unknown names) also matches.
     assert!(is_compiler_internal_trait("core::StructuralPartialEq"));
     assert!(is_compiler_internal_trait("core::StructuralEq"));
+    assert!(is_compiler_internal_trait("core::TrivialClone"));
     // Bare short-name fallback (normalize_impl_trait_path when ID absent from krate.paths).
     assert!(is_compiler_internal_trait("StructuralPartialEq"));
     assert!(is_compiler_internal_trait("StructuralEq"));
+    assert!(is_compiler_internal_trait("TrivialClone"));
 
     // Third-party qualified paths with the same short name do NOT match (exact-path check).
     assert!(
@@ -3524,48 +3528,54 @@ fn test_impl_block_generics_symmetric_compare_blue() {
 
     // A-side: `impl<T: Clone> MyTrait for Foo` — impl_generics: [T: Clone]
     // ADR `2026-05-20-0048` D1/D2: top-level trait_impls; new API: (trait_ref, for_type).
-    let mut trait_impl =
-        TraitImplDeclV2::new(TypeRef::new("MyTrait").unwrap(), TypeRef::new("Foo").unwrap());
-    trait_impl.impl_generics = vec![MethodGenericParam {
-        name: ParamName::new("T").unwrap(),
-        bounds: vec![TypeRef::new("Clone").unwrap()],
-    }];
+    let trait_impl = TraitImplDeclV2::from_parts(
+        domain::tddd::catalogue_v2::ItemAction::Add,
+        TypeRef::new("MyTrait").unwrap(),
+        TypeRef::new("Foo").unwrap(),
+        vec![MethodGenericParam {
+            name: ParamName::new("T").unwrap(),
+            bounds: vec![TypeRef::new("Clone").unwrap()],
+        }],
+        vec![],
+    );
 
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("Foo").unwrap(),
-        TypeEntry {
-            action: domain::tddd::catalogue_v2::ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            domain::tddd::catalogue_v2::ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
-    doc.trait_impls.push(trait_impl);
+    doc.push_trait_impl(trait_impl);
     // Also register the local trait "MyTrait" (needed for local trait id resolution).
     use domain::tddd::catalogue_v2::entries::TraitEntry;
-    doc.traits.insert(
+    doc.insert_trait(
         TraitName::new("MyTrait").unwrap(),
-        TraitEntry {
-            action: domain::tddd::catalogue_v2::ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TraitEntry::new(
+            domain::tddd::catalogue_v2::ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -3771,39 +3781,41 @@ fn test_existing_catalogue_no_change_in_signal_for_trait_impl_no_generics() {
     let trait_impl =
         TraitImplDeclV2::new(CatTypeRef::new("MyTrait").unwrap(), CatTypeRef::new("Foo").unwrap());
 
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("Foo").unwrap(),
-        TypeEntry {
-            action: domain::tddd::catalogue_v2::ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            domain::tddd::catalogue_v2::ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
-    doc.trait_impls.push(trait_impl);
-    doc.traits.insert(
+    doc.push_trait_impl(trait_impl);
+    doc.insert_trait(
         TraitName::new("MyTrait").unwrap(),
-        TraitEntry {
-            action: domain::tddd::catalogue_v2::ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TraitEntry::new(
+            domain::tddd::catalogue_v2::ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     let a = CatalogueToExtendedCrateCodec::new().encode(doc).unwrap();
@@ -4364,50 +4376,52 @@ fn test_adr0048_cross_crate_impl_add_evaluates_blue() {
     );
 
     // Declare `MyTrait` (self-crate trait, Add).
-    doc.traits.insert(
+    doc.insert_trait(
         TraitName::new("MyTrait").unwrap(),
-        TraitEntry {
-            action: domain::tddd::catalogue_v2::ItemAction::Add,
-            role: ContractRole::SpecificationPort,
-            methods: vec![],
-            assoc_types: vec![],
-            assoc_consts: vec![],
-            supertrait_bounds: vec![],
-            generics: vec![],
-            where_predicates: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+        TraitEntry::new(
+            domain::tddd::catalogue_v2::ItemAction::Add,
+            ContractRole::SpecificationPort,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     // Declare `SelfType` (self-crate type, Add).
-    doc.types.insert(
+    doc.insert_type(
         TypeName::new("SelfType").unwrap(),
-        TypeEntry {
-            action: domain::tddd::catalogue_v2::ItemAction::Add,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+        TypeEntry::new(
+            domain::tddd::catalogue_v2::ItemAction::Add,
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-            module_path: ModulePath::root(),
-            docs: None,
-            spec_refs: vec![],
-            informal_grounds: vec![],
-        },
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
     );
 
     // Case B: `impl MyTrait for std::vec::Vec<i32>` — external self type.
-    doc.trait_impls.push(TraitImplDeclV2::new(
+    doc.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("MyTrait").unwrap(),
         TypeRef::new("std::vec::Vec<i32>").unwrap(),
     ));
 
     // Case A: `impl core::fmt::Display for SelfType` — external trait.
-    doc.trait_impls.push(TraitImplDeclV2::new(
+    doc.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("core::fmt::Display").unwrap(),
         TypeRef::new("SelfType").unwrap(),
     ));

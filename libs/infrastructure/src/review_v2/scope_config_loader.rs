@@ -2,11 +2,40 @@
 //!
 //! v2 ignores `planning_only` and `normalize` fields from the JSON file.
 //! Only `groups`, `review_operational`, and `other_track` are consumed.
+//!
+//! ## LAYER-group derivation (D5-b / IN-09 / AC-09 / CN-08)
+//!
+//! Mechanism (b) — validate, not generate. The review-scope JSON stays the
+//! source for briefing files, ceilings, and the NON-layer groups
+//! (adr/spec/types/impl-plan/harness-policy) that have no architectural
+//! counterpart. The LAYER groups (one per `architecture-rules.json` layer) are
+//! *not* trusted as hand-maintained JSON: [`load_v2_scope_config`] cross-checks
+//! them against `architecture-rules.json` at load time and fails closed on any
+//! drift — a missing layer group, a stale surplus layer group, or a group whose
+//! patterns are not exactly `["<layer-path>/**"]`. This keeps the two files in
+//! lockstep when the architecture-customizer skill renames/adds/moves a crate.
+//!
+//! Scope of the guard: it runs whenever `architecture-rules.json` exists under
+//! the trusted root. A real workspace *always* ships `architecture-rules.json`
+//! (it is the workspace SSoT for the layer graph, `deny.toml`, and
+//! `check-layers`), so the guard always runs in production. A synthetic
+//! workspace with no `architecture-rules.json` has nothing to drift *from*, so
+//! the guard is skipped there — this is not a backward-compat trust path
+//! (CN-10): absence of the SSoT is caught immediately by every other arch gate,
+//! not silently tolerated. The shipped-config consistency is separately pinned
+//! by an integration test over the real repo files.
+//!
+//! Validate (not generate) is the minimal-churn choice here: the LAYER groups
+//! already carry consumer-owned `briefing_file` settings, so keeping them in the
+//! JSON and validating avoids threading arch-rules-derived synthesis through the
+//! briefing/ceiling merge.
 
 use std::path::Path;
 
 use domain::TrackId;
 use domain::review_v2::{FilePath, ReviewScopeConfig, ScopeConfigError};
+
+const NON_LAYER_GROUPS: &[&str] = &["adr", "spec", "types", "impl-plan", "harness-policy"];
 
 /// Errors from loading review-scope.json for v2.
 #[derive(Debug, thiserror::Error)]
@@ -15,6 +44,12 @@ pub enum ScopeConfigLoadError {
     Io { path: String, source: std::io::Error },
     #[error("JSON parse error in {path}: {source}")]
     Parse { path: String, source: serde_json::Error },
+    /// Field-level validation failure. Also carries the layer-group drift guard
+    /// outcomes (D5-b): a present-but-unparseable `architecture-rules.json`, or a
+    /// review-scope LAYER group that drifted from arch-rules, both surface here
+    /// with a distinguishing `detail`. Folding these into the existing variant
+    /// keeps `ScopeConfigLoadError`'s public surface unchanged (no new track
+    /// catalogue entry).
     #[error("{path}: {detail}")]
     InvalidField { path: String, detail: String },
     #[error("scope config error: {0}")]
@@ -197,6 +232,15 @@ pub fn load_v2_scope_config(
         }
     }
 
+    // Layer-group drift guard (D5-b / IN-09 / AC-09 / CN-08). Every
+    // architecture-rules.json layer must have a review-scope group named after
+    // its crate, whose patterns are exactly `["<layer-path>/**"]`. Fail closed
+    // on any drift (and on a present-but-unparseable arch-rules); a workspace
+    // that ships no architecture-rules.json has nothing to drift from and skips
+    // the guard (see module docs). Non-layer groups (adr/spec/types/impl-plan/
+    // harness-policy) are consumer config and are not checked here.
+    validate_layer_groups(&doc.groups, trusted_root, &path_display)?;
+
     #[allow(clippy::type_complexity)] // matches the ReviewScopeConfig::new entries seam.
     let entries: Vec<(String, Vec<String>, Option<String>, Option<u32>)> = doc
         .groups
@@ -213,6 +257,109 @@ pub fn load_v2_scope_config(
     )?)
 }
 
+/// Cross-checks the review-scope LAYER groups against `architecture-rules.json`
+/// (D5-b / IN-09 / AC-09 / CN-08).
+///
+/// For every layer in `architecture-rules.json` (loaded from `trusted_root`)
+/// there must be a group in `groups` named after the crate, whose `patterns`
+/// are exactly `["<layer-path>/**"]`. Fails closed if `architecture-rules.json`
+/// cannot be loaded, if a layer group is missing, if a stale layer group remains
+/// after an arch-rules rename/delete, or if its patterns drift.
+///
+/// Known NON-layer groups (`adr`, `spec`, `types`, `impl-plan`,
+/// `harness-policy`) are consumer config and are intentionally not matched to
+/// arch-rules. Any other group is rejected while arch-rules is present because
+/// it is ambiguous with a stale layer scope.
+///
+/// If `architecture-rules.json` is absent under `trusted_root`, the guard is a
+/// no-op (there is nothing to drift from — see module docs); a present but
+/// malformed file is fail-closed.
+///
+/// # Errors
+/// Returns [`ScopeConfigLoadError::InvalidField`] when a present
+/// `architecture-rules.json` cannot be parsed, or on any layer-group drift; the
+/// `detail` distinguishes the cases (see the folded-variant doc on
+/// `InvalidField`).
+fn validate_layer_groups(
+    groups: &std::collections::BTreeMap<String, GroupEntry>,
+    trusted_root: &Path,
+    path_display: &str,
+) -> Result<(), ScopeConfigLoadError> {
+    // A workspace without architecture-rules.json cannot drift from it. Use
+    // symlink_metadata instead of exists(): a dangling symlink is present
+    // configuration and must flow into load_rules, where symlinks are rejected.
+    let arch_rules_path = trusted_root.join(crate::arch::ARCH_RULES_FILE);
+    match arch_rules_path.symlink_metadata() {
+        Ok(_) => {}
+        Err(e) if e.kind() == std::io::ErrorKind::NotFound => return Ok(()),
+        Err(source) => {
+            return Err(ScopeConfigLoadError::InvalidField {
+                path: path_display.to_owned(),
+                detail: format!(
+                    "architecture-rules.json cannot be inspected for layer-group validation: \
+                     {source}"
+                ),
+            });
+        }
+    }
+
+    let rules = crate::arch::load_rules(trusted_root).map_err(|source| {
+        ScopeConfigLoadError::InvalidField {
+            path: path_display.to_owned(),
+            detail: format!(
+                "architecture-rules.json is unreadable for layer-group validation: {source}"
+            ),
+        }
+    })?;
+
+    for group_name in groups.keys() {
+        let is_layer_group =
+            rules.layers().iter().any(|layer| layer.crate_name == group_name.as_str());
+        if !is_layer_group && !NON_LAYER_GROUPS.contains(&group_name.as_str()) {
+            return Err(ScopeConfigLoadError::InvalidField {
+                path: path_display.to_owned(),
+                detail: format!(
+                    "review-scope layer group drift vs architecture-rules.json: group \
+                     '{group_name}' is not an architecture-rules layer and is not a known \
+                     non-layer review group; remove stale layer group or add a matching \
+                     arch-rules layer"
+                ),
+            });
+        }
+    }
+
+    for layer in rules.layers() {
+        let expected_pattern = format!("{}/**", layer.path);
+        match groups.get(&layer.crate_name) {
+            None => {
+                return Err(ScopeConfigLoadError::InvalidField {
+                    path: path_display.to_owned(),
+                    detail: format!(
+                        "review-scope layer group drift vs architecture-rules.json: layer '{}' \
+                         ({}) has no matching review-scope group; add a '{}' group with patterns \
+                         [\"{}\"]",
+                        layer.crate_name, layer.path, layer.crate_name, expected_pattern
+                    ),
+                });
+            }
+            Some(entry) => {
+                if entry.patterns.as_slice() != std::slice::from_ref(&expected_pattern) {
+                    return Err(ScopeConfigLoadError::InvalidField {
+                        path: path_display.to_owned(),
+                        detail: format!(
+                            "review-scope layer group drift vs architecture-rules.json: group \
+                             '{}' patterns {:?} do not match (expected exactly [\"{}\"])",
+                            layer.crate_name, entry.patterns, expected_pattern
+                        ),
+                    });
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
@@ -224,9 +371,25 @@ mod tests {
         path
     }
 
+    /// Writes an `architecture-rules.json` under `dir` with the given
+    /// `(crate, path)` layers so the layer-group drift guard has something to
+    /// validate against. Every layer here must have a matching review-scope
+    /// group (patterns `["<path>/**"]`) or `load_v2_scope_config` fails closed.
+    fn write_arch_rules(dir: &Path, layers: &[(&str, &str)]) {
+        let entries: Vec<String> = layers
+            .iter()
+            .map(|(name, path)| {
+                format!(r#"{{ "crate": "{name}", "path": "{path}", "may_depend_on": [] }}"#)
+            })
+            .collect();
+        let content = format!(r#"{{ "layers": [{}] }}"#, entries.join(", "));
+        std::fs::write(dir.join("architecture-rules.json"), content).unwrap();
+    }
+
     #[test]
     fn test_load_minimal_scope_config() {
         let dir = tempfile::tempdir().unwrap();
+        write_arch_rules(dir.path(), &[("domain", "libs/domain")]);
         let path = write_scope_json(
             dir.path(),
             r#"{
@@ -244,6 +407,7 @@ mod tests {
     #[test]
     fn test_load_with_operational_and_other_track() {
         let dir = tempfile::tempdir().unwrap();
+        write_arch_rules(dir.path(), &[("domain", "libs/domain"), ("cli", "apps")]);
         let path = write_scope_json(
             dir.path(),
             r#"{
@@ -307,6 +471,7 @@ mod tests {
     #[test]
     fn test_other_track_excludes_non_current_track() {
         let dir = tempfile::tempdir().unwrap();
+        write_arch_rules(dir.path(), &[("domain", "libs/domain")]);
         let path = write_scope_json(
             dir.path(),
             r#"{
@@ -336,6 +501,10 @@ mod tests {
     #[test]
     fn test_multi_scope_classification() {
         let dir = tempfile::tempdir().unwrap();
+        write_arch_rules(
+            dir.path(),
+            &[("domain", "libs/domain"), ("usecase", "libs/usecase"), ("cli", "apps")],
+        );
         let path = write_scope_json(
             dir.path(),
             r#"{
@@ -431,11 +600,15 @@ mod tests {
     #[test]
     fn test_load_with_briefing_file_populates_accessor() {
         let dir = tempfile::tempdir().unwrap();
+        // A `domain` layer group is required to satisfy the layer-group drift
+        // guard; the assertion below targets the NON-layer `impl-plan` group.
+        write_arch_rules(dir.path(), &[("domain", "libs/domain")]);
         let path = write_scope_json(
             dir.path(),
             r#"{
                 "version": 2,
                 "groups": {
+                    "domain": { "patterns": ["libs/domain/**"] },
                     "impl-plan": {
                         "patterns": ["track/items/**"],
                         "briefing_file": ".harness/custom/review-prompts/impl-plan.md"
@@ -461,6 +634,7 @@ mod tests {
         // load; briefing_file_for_scope returns None because #[serde(default)] fills
         // the missing field with None.
         let dir = tempfile::tempdir().unwrap();
+        write_arch_rules(dir.path(), &[("domain", "libs/domain")]);
         let path = write_scope_json(
             dir.path(),
             r#"{
@@ -634,6 +808,7 @@ mod tests {
         // A group with `diff_ceiling_lines` set must surface its override via
         // diff_ceiling_for_scope, regardless of the global default.
         let dir = tempfile::tempdir().unwrap();
+        write_arch_rules(dir.path(), &[("domain", "libs/domain")]);
         let path = write_scope_json(
             dir.path(),
             r#"{
@@ -657,6 +832,7 @@ mod tests {
         // A group without `diff_ceiling_lines` must inherit the top-level
         // `default_diff_ceiling_lines`.
         let dir = tempfile::tempdir().unwrap();
+        write_arch_rules(dir.path(), &[("domain", "libs/domain")]);
         let path = write_scope_json(
             dir.path(),
             r#"{
@@ -681,6 +857,7 @@ mod tests {
         // and diff_ceiling_for_scope returns None for every scope (since both
         // serde defaults resolve to None).
         let dir = tempfile::tempdir().unwrap();
+        write_arch_rules(dir.path(), &[("domain", "libs/domain")]);
         let path = write_scope_json(
             dir.path(),
             r#"{
@@ -696,5 +873,226 @@ mod tests {
             domain::review_v2::MainScopeName::new("domain").unwrap(),
         );
         assert!(config.diff_ceiling_for_scope(&domain).is_none());
+    }
+
+    // ── layer-group drift guard (D5-b / IN-09 / AC-09 / CN-08) ─────────
+
+    #[test]
+    fn test_missing_arch_rules_skips_layer_group_guard() {
+        // No architecture-rules.json under trusted_root → nothing to drift from,
+        // so the guard is a no-op and loading succeeds. A real repo always ships
+        // arch-rules, so the guard always runs in production (see module docs).
+        let dir = tempfile::tempdir().unwrap();
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "groups": {
+                    "domain": { "patterns": ["libs/domain/**"] }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let config = load_v2_scope_config(&path, &track_id, dir.path()).unwrap();
+        assert!(config.contains_scope(&domain::review_v2::ScopeName::Main(
+            domain::review_v2::MainScopeName::new("domain").unwrap(),
+        )));
+    }
+
+    #[test]
+    fn test_malformed_arch_rules_fails_closed() {
+        // A present-but-unparseable architecture-rules.json is fail-closed: the
+        // guard cannot confirm the layer groups, so loading is rejected.
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::write(dir.path().join("architecture-rules.json"), "not json").unwrap();
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "groups": {
+                    "domain": { "patterns": ["libs/domain/**"] }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let err = load_v2_scope_config(&path, &track_id, dir.path()).unwrap_err();
+        assert!(
+            matches!(
+                &err,
+                ScopeConfigLoadError::InvalidField { detail, .. }
+                    if detail.contains("architecture-rules.json") && detail.contains("unreadable")
+            ),
+            "expected InvalidField (unreadable arch-rules) for malformed architecture-rules.json, \
+            got: {err}"
+        );
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_dangling_arch_rules_symlink_fails_closed() {
+        // A dangling symlink is not "absent": it is present configuration that
+        // must be rejected by the same symlink guard as a readable symlink.
+        let dir = tempfile::tempdir().unwrap();
+        std::os::unix::fs::symlink(
+            dir.path().join("missing-architecture-rules.json"),
+            dir.path().join("architecture-rules.json"),
+        )
+        .unwrap();
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "groups": {
+                    "domain": { "patterns": ["libs/domain/**"] }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let err = load_v2_scope_config(&path, &track_id, dir.path()).unwrap_err();
+        assert!(
+            matches!(
+                &err,
+                ScopeConfigLoadError::InvalidField { detail, .. }
+                    if detail.contains("architecture-rules.json") && detail.contains("symlink")
+            ),
+            "expected InvalidField (symlinked arch-rules) for dangling architecture-rules.json \
+             symlink, got: {err}"
+        );
+    }
+
+    #[test]
+    fn test_missing_layer_group_is_rejected() {
+        // arch-rules declares a `usecase` layer with no matching review-scope
+        // group → drift, fail closed.
+        let dir = tempfile::tempdir().unwrap();
+        write_arch_rules(dir.path(), &[("domain", "libs/domain"), ("usecase", "libs/usecase")]);
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "groups": {
+                    "domain": { "patterns": ["libs/domain/**"] }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let err = load_v2_scope_config(&path, &track_id, dir.path()).unwrap_err();
+        assert!(
+            matches!(
+                &err,
+                ScopeConfigLoadError::InvalidField { detail, .. }
+                    if detail.contains("usecase") && detail.contains("no matching")
+            ),
+            "expected InvalidField (drift) for missing usecase group, got: {err}"
+        );
+    }
+
+    #[test]
+    fn test_layer_group_pattern_drift_is_rejected() {
+        // The `domain` group's pattern does not match the arch-rules layer path
+        // (`libs/domain/**` expected, `libs/wrong/**` present) → fail closed.
+        let dir = tempfile::tempdir().unwrap();
+        write_arch_rules(dir.path(), &[("domain", "libs/domain")]);
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "groups": {
+                    "domain": { "patterns": ["libs/wrong/**"] }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let err = load_v2_scope_config(&path, &track_id, dir.path()).unwrap_err();
+        assert!(
+            matches!(
+                &err,
+                ScopeConfigLoadError::InvalidField { detail, .. }
+                    if detail.contains("domain") && detail.contains("do not match")
+            ),
+            "expected InvalidField (drift) for pattern drift, got: {err}"
+        );
+    }
+
+    #[test]
+    fn test_extra_pattern_on_layer_group_is_rejected() {
+        // A layer group must carry EXACTLY `["<path>/**"]`; an extra pattern is
+        // drift even though the first pattern matches.
+        let dir = tempfile::tempdir().unwrap();
+        write_arch_rules(dir.path(), &[("domain", "libs/domain")]);
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "groups": {
+                    "domain": { "patterns": ["libs/domain/**", "libs/extra/**"] }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let err = load_v2_scope_config(&path, &track_id, dir.path()).unwrap_err();
+        assert!(
+            matches!(
+                &err,
+                ScopeConfigLoadError::InvalidField { detail, .. } if detail.contains("drift")
+            ),
+            "expected InvalidField (drift) for extra pattern, got: {err}"
+        );
+    }
+
+    #[test]
+    fn test_stale_surplus_layer_group_is_rejected() {
+        // A group not backed by arch-rules and not one of the documented
+        // NON-layer groups is ambiguous with a layer that was renamed/deleted,
+        // so it is rejected instead of silently continuing to route files.
+        let dir = tempfile::tempdir().unwrap();
+        write_arch_rules(dir.path(), &[("domain", "libs/domain")]);
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "groups": {
+                    "domain": { "patterns": ["libs/domain/**"] },
+                    "old_usecase": { "patterns": ["libs/usecase/**"] }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let err = load_v2_scope_config(&path, &track_id, dir.path()).unwrap_err();
+        assert!(
+            matches!(
+                &err,
+                ScopeConfigLoadError::InvalidField { detail, .. }
+                    if detail.contains("old_usecase") && detail.contains("not an architecture-rules layer")
+            ),
+            "expected InvalidField (stale surplus layer group) for old_usecase, got: {err}"
+        );
+    }
+
+    #[test]
+    fn test_layer_groups_matching_arch_rules_load_ok() {
+        // Happy path: all arch-rules layers have matching groups, plus a
+        // NON-layer group (`adr`) that is allowed without an arch-rules layer.
+        let dir = tempfile::tempdir().unwrap();
+        write_arch_rules(
+            dir.path(),
+            &[("domain", "libs/domain"), ("cli_composition", "apps/cli-composition")],
+        );
+        let path = write_scope_json(
+            dir.path(),
+            r#"{
+                "version": 2,
+                "groups": {
+                    "domain": { "patterns": ["libs/domain/**"] },
+                    "cli_composition": { "patterns": ["apps/cli-composition/**"] },
+                    "adr": { "patterns": ["knowledge/adr/**"] }
+                }
+            }"#,
+        );
+        let track_id = TrackId::try_new("test-track").unwrap();
+        let config = load_v2_scope_config(&path, &track_id, dir.path()).unwrap();
+        assert!(config.contains_scope(&domain::review_v2::ScopeName::Main(
+            domain::review_v2::MainScopeName::new("cli_composition").unwrap(),
+        )));
     }
 }

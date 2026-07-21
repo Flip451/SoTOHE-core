@@ -14,35 +14,53 @@
   "capabilities": {
     "orchestrator": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-7",
+      "reasoning_effort": "high",
+      "execution_mode": "typed-pipeline"
     },
     "spec-designer": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-7[1m]",
+      "reasoning_effort": "high",
+      "execution_mode": "orchestrator-output"
     },
     "impl-planner": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-7[1m]",
+      "reasoning_effort": "high",
+      "execution_mode": "orchestrator-output"
     },
     "type-designer": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-7[1m]",
+      "reasoning_effort": "high",
+      "execution_mode": "orchestrator-output"
     },
     "adr-editor": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-7[1m]",
+      "reasoning_effort": "high",
+      "execution_mode": "orchestrator-output"
     },
     "implementer": {
       "provider": "claude",
-      "model": "claude-opus-4-7"
+      "model": "claude-opus-4-7[1m]",
+      "reasoning_effort": "high",
+      "execution_mode": "orchestrator-output"
     },
     "reviewer": {
       "provider": "codex",
       "model": "gpt-5.4",
-      "fast_model": "gpt-5.4-mini"
+      "fast_model": "gpt-5.4-mini",
+      "reasoning_effort": "xhigh",
+      "fast_reasoning_effort": "low",
+      "execution_mode": "typed-pipeline"
     },
     "researcher": {
-      "provider": "gemini"
+      "provider": "codex",
+      "model": "gpt-5.6-terra",
+      "reasoning_effort": "high",
+      "execution_mode": "orchestrator-output"
     }
   }
 }

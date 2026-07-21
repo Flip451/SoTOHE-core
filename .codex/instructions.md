@@ -15,7 +15,7 @@ Read these first:
 - `knowledge/conventions/branch-strategy.md`
 - `knowledge/conventions/track-lifecycle.md`
 - `knowledge/conventions/git-notes.md`
-- `track/tech-stack.md`
+- `knowledge/adr/README.md` (pre-track ADR index — tech stack / product-policy decisions)
 - `track/registry.md`
 - `knowledge/conventions/README.md`
 - current `track/items/<id>/metadata.json`
@@ -59,21 +59,20 @@ are thin wrappers that reference it. Read that SSoT when acting as a specialist.
 
 ## Command Policy
 
-Use guarded project wrappers for git, review, DRY, PR, and commit flows:
+Use the gate aggregates via `cargo make` and single workflow operations via guarded `bin/sotp` commands:
 
 - `cargo make ci`
 - `cargo make ci-rust`
-- `cargo make add-all`
-- `cargo make track-add-paths`
 - `cargo make track-commit-message`
-- `cargo make track-note`
-- `cargo make track-pr`
-- `cargo make track-pr-push`
-- `cargo make track-pr-ensure`
-- `cargo make track-pr-review`
 - `cargo make track-local-review-fix`
 - `cargo make track-local-review`
 - `cargo make track-local-dry-fix`
+- `bin/sotp git add-all`
+- `bin/sotp git add-from-file tmp/track-commit/add-paths.txt --cleanup`
+- `bin/sotp git note-from-file tmp/track-commit/note.md --cleanup`
+- `bin/sotp pr push`
+- `bin/sotp pr ensure-pr`
+- `bin/sotp pr review-cycle`
 
 Allowed direct Git usage is read-only inspection such as `git status`, `git diff`, `git log`,
 `git show`, `git rev-parse`, `git ls-files`, and `git notes show/list`.
@@ -99,6 +98,15 @@ Policy belongs in SoTOHE hook dispatch, not in the shell adapter.
 - Keep infrastructure behind trait boundaries.
 - Preserve hexagonal layer dependencies from `architecture-rules.json`.
 - Add focused tests for public behavior and failure cases.
+
+## Session resume
+
+Session resume is orchestrator opt-in (`sotp capability exec --resume`; reviewer rounds resume
+automatically for same-scope same-round re-entries). On both resumed and fresh dispatches every
+execution flag (model, sandbox, effort) is explicitly re-specified; a failed or expired resume
+falls back to a fresh session. When you run as a resumed session, check whether the upstream
+artifacts of your assignment changed since the prior session and re-read any that did before
+working (see `.harness/prompts/capability-exec-discipline.md`).
 
 ## Output
 

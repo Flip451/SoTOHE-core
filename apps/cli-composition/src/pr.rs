@@ -135,7 +135,7 @@ impl PrCompositionRoot {
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
     pub fn pr_push(&self, track_id: Option<String>) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+        use infrastructure::git_cli::SystemGitRepo;
 
         let ctx = resolve_branch_context(track_id.as_deref())?;
         let repo =
@@ -258,7 +258,7 @@ impl PrCompositionRoot {
         method: String,
     ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::gh_cli::{GhClient as _, SystemGhClient};
-        use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+        use infrastructure::git_cli::SystemGitRepo;
         use usecase::branch_strategy::BranchStrategyPort as _;
         use usecase::pr_workflow::{WaitDecision, decide_wait_action};
 
@@ -268,35 +268,15 @@ impl PrCompositionRoot {
             .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
         let repo =
             SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
-        // Use an explicit refspec (+refs/heads/<branch>:refs/remotes/origin/<branch>) so that
-        // refs/remotes/origin/<branch> is reliably updated. A bare `git fetch origin <branch>`
-        // only refreshes FETCH_HEAD and does not guarantee that `origin/<branch>` is updated,
-        // which would cause subsequent `git show origin/<branch>:…` reads to see a stale ref.
-        //
-        // Fetch runs BEFORE the merge-method resolution so that an omitted `--method` can be
-        // resolved from the PR head's `branch_strategy_snapshot.merge_method` via
-        // `git show origin/<branch>:track/items/<track_id>/metadata.json`, not from the local
-        // worktree (which may not contain the PR's track metadata when invoked from a fresh
-        // checkout or the configured base branch).
-        let refspec = format!("+refs/heads/{branch}:refs/remotes/origin/{branch}");
-        match repo.output(&["fetch", "origin", &refspec]) {
-            Ok(o) if !o.status.success() => {
-                let stderr = String::from_utf8_lossy(&o.stderr);
-                return Err(CompositionError::Infrastructure(format!(
-                    "git fetch origin/{branch} failed: {stderr}"
-                )));
-            }
-            Err(e) => {
-                return Err(CompositionError::Infrastructure(format!(
-                    "failed to run git fetch: {e}"
-                )));
-            }
-            Ok(_) => {}
-        }
+
+        // Fetch and read the PR branch metadata through PrGitInteractor before
+        // any gate reads from origin/<branch>. This preserves the pre-track
+        // "refresh remote ref first" behavior without invoking git primitives
+        // directly from the composition root.
+        let track_id = branch.strip_prefix("track/").unwrap_or(&branch);
+        let branch_strategy = branch_strategy_port_for_pr_ref(&repo, &branch, track_id)?;
         let method = if method.is_empty() {
-            let track_id = branch.strip_prefix("track/").unwrap_or(&branch);
-            let port = branch_strategy_port_for_pr_ref(&repo, &branch, track_id)?;
-            merge_method_to_arg(port.merge_method()).to_owned()
+            merge_method_to_arg(branch_strategy.merge_method()).to_owned()
         } else {
             method
         };
@@ -401,22 +381,29 @@ impl PrCompositionRoot {
     /// # Errors
     /// Returns `Err` when the underlying composition logic fails.
     pub fn pr_trigger_review(&self, pr: String) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
+        use infrastructure::agent_profiles::{
+            AGENT_PROFILES_PATH, AgentProfiles, ResolvedExecution, RoundType,
+        };
         use infrastructure::gh_cli::{GhClient as _, SystemGhClient};
-        use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+        use infrastructure::git_cli::SystemGitRepo;
+        use usecase::dry_write_driver::CapabilityName;
 
         let git_repo =
             SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
         let profiles_path = git_repo.root().join(AGENT_PROFILES_PATH);
-        let profiles = AgentProfiles::load(&profiles_path)
+        let profiles = AgentProfiles::load(git_repo.root(), &profiles_path)
             .map_err(|e| CompositionError::ConfigLoad(format!("{e}")))?;
-        let resolved =
-            profiles.resolve_execution("pr-reviewer", RoundType::Final).ok_or_else(|| {
-                CompositionError::WiringFailed(
-                    "pr-reviewer capability not defined in agent-profiles.json".to_owned(),
-                )
-            })?;
-        usecase::pr_review::validate_reviewer_provider(&resolved.provider)
+        let capability = CapabilityName::try_new("pr-reviewer")
+            .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
+        let resolved = profiles
+            .resolve_execution(&capability, RoundType::Final)
+            .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
+        let ResolvedExecution::HostedService { provider } = resolved else {
+            return Err(CompositionError::WiringFailed(
+                "pr-reviewer must use a hosted-service execution profile".to_owned(),
+            ));
+        };
+        usecase::pr_review::validate_reviewer_provider(provider.as_str())
             .map_err(|e| CompositionError::WiringFailed(e.to_string()))?;
 
         let client = SystemGhClient;
@@ -454,18 +441,21 @@ impl PrCompositionRoot {
         interval: u64,
         timeout: u64,
     ) -> Result<CommandOutcome, CompositionError> {
+        use std::sync::Arc;
+
+        use infrastructure::FsGitWorkflowAdapter;
         use infrastructure::gh_cli::{GhClient as _, SystemGhClient};
-        use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+        use usecase::git_workflow::{GitPrimitivePort, PrGitInteractor};
         use usecase::pr_review_polling::{
             PrReviewPollingCommand, PrReviewPollingOutput, PrReviewPollingService as _,
         };
 
-        let head = SystemGitRepo::discover().ok().and_then(|r| {
-            r.output(&["rev-parse", "HEAD"])
-                .ok()
-                .filter(|o| o.status.success())
-                .map(|o| String::from_utf8_lossy(&o.stdout).trim().to_owned())
-        });
+        // Route HEAD resolution through the usecase PrGitInteractor (T007).
+        let head = {
+            let port: Arc<dyn GitPrimitivePort> = Arc::new(FsGitWorkflowAdapter::new());
+            let interactor = PrGitInteractor::new(port);
+            interactor.resolve_head().ok().flatten().map(|h| h.as_ref().to_owned())
+        };
 
         let repo_nwo = SystemGhClient
             .repo_nwo()
@@ -508,23 +498,30 @@ impl PrCompositionRoot {
         track_id: Option<String>,
         resume: bool,
     ) -> Result<CommandOutcome, CompositionError> {
-        use infrastructure::agent_profiles::{AGENT_PROFILES_PATH, AgentProfiles, RoundType};
+        use infrastructure::agent_profiles::{
+            AGENT_PROFILES_PATH, AgentProfiles, ResolvedExecution, RoundType,
+        };
         use infrastructure::gh_cli::{GhClient as _, SystemGhClient};
-        use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+        use infrastructure::git_cli::SystemGitRepo;
+        use usecase::dry_write_driver::CapabilityName;
 
         let repo =
             SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
 
         let profiles_path = repo.root().join(AGENT_PROFILES_PATH);
-        let profiles = AgentProfiles::load(&profiles_path)
+        let profiles = AgentProfiles::load(repo.root(), &profiles_path)
             .map_err(|e| CompositionError::ConfigLoad(format!("{e}")))?;
-        let resolved =
-            profiles.resolve_execution("pr-reviewer", RoundType::Final).ok_or_else(|| {
-                CompositionError::WiringFailed(
-                    "pr-reviewer capability not defined in agent-profiles.json".to_owned(),
-                )
-            })?;
-        usecase::pr_review::validate_reviewer_provider(&resolved.provider)
+        let capability = CapabilityName::try_new("pr-reviewer")
+            .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
+        let resolved = profiles
+            .resolve_execution(&capability, RoundType::Final)
+            .map_err(|error| CompositionError::WiringFailed(error.to_string()))?;
+        let ResolvedExecution::HostedService { provider } = resolved else {
+            return Err(CompositionError::WiringFailed(
+                "pr-reviewer must use a hosted-service execution profile".to_owned(),
+            ));
+        };
+        usecase::pr_review::validate_reviewer_provider(provider.as_str())
             .map_err(|e| CompositionError::WiringFailed(e.to_string()))?;
 
         let branch = repo
@@ -619,7 +616,7 @@ fn branch_strategy_port_for_track(
     track_id: &str,
 ) -> Result<infrastructure::branch_strategy::SnapshotBranchStrategyAdapter, CompositionError> {
     use domain::TrackReader as _;
-    use infrastructure::git_cli::{GitRepository as _, SystemGitRepo};
+    use infrastructure::git_cli::SystemGitRepo;
     use infrastructure::track::fs_store::FsTrackStore;
 
     let repo =
@@ -649,27 +646,26 @@ fn branch_strategy_port_for_track(
 /// not found` (or use stale metadata) for a PR whose track was created after the last
 /// pull.
 fn branch_strategy_port_for_pr_ref(
-    repo: &infrastructure::git_cli::SystemGitRepo,
+    _repo: &infrastructure::git_cli::SystemGitRepo,
     branch: &str,
     track_id: &str,
 ) -> Result<infrastructure::branch_strategy::SnapshotBranchStrategyAdapter, CompositionError> {
-    use infrastructure::git_cli::GitRepository as _;
+    use std::sync::Arc;
 
-    let path = format!("track/items/{track_id}/metadata.json");
-    let output = repo.output(&["show", &format!("origin/{branch}:{path}")]).map_err(|e| {
-        CompositionError::Infrastructure(format!(
-            "failed to run git show origin/{branch}:{path}: {e}"
-        ))
-    })?;
-    if !output.status.success() {
-        let stderr = String::from_utf8_lossy(&output.stderr);
-        return Err(CompositionError::WiringFailed(format!(
-            "track '{track_id}' metadata not found on origin/{branch}: {stderr}"
-        )));
-    }
-    let json = String::from_utf8(output.stdout).map_err(|e| {
-        CompositionError::Infrastructure(format!(
-            "metadata.json on origin/{branch} is not UTF-8: {e}"
+    use infrastructure::FsGitWorkflowAdapter;
+    use usecase::git_workflow::{GitPrimitivePort, PrGitInteractor};
+
+    // Route the `git show origin/<branch>:track/items/<track_id>/metadata.json`
+    // read through the usecase PrGitInteractor (T007 / T008). The interactor
+    // internally performs the fetch + show pair so callers don't need to
+    // reach into private SystemGitRepo helpers.
+    let validated_id = domain::TrackId::try_new(track_id)
+        .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
+    let port: Arc<dyn GitPrimitivePort> = Arc::new(FsGitWorkflowAdapter::new());
+    let interactor = PrGitInteractor::new(port);
+    let json = interactor.fetch_and_read_metadata_at_ref(branch, &validated_id).map_err(|e| {
+        CompositionError::WiringFailed(format!(
+            "track '{track_id}' metadata not found on origin/{branch}: {e}"
         ))
     })?;
     let (metadata, _) = infrastructure::track::codec::decode(&json).map_err(|e| {

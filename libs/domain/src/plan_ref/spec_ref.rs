@@ -5,6 +5,7 @@ use std::fmt;
 use std::path::PathBuf;
 
 use crate::ValidationError;
+use crate::tddd::test_obligation::ids::DiagnosticMessage;
 
 /// Validated newtype for a spec.json element identifier.
 ///
@@ -27,7 +28,7 @@ impl SpecElementId {
         if is_valid_spec_element_id(&value) {
             Ok(Self(value))
         } else {
-            Err(ValidationError::InvalidSpecElementId(value))
+            Err(ValidationError::InvalidSpecElementId(DiagnosticMessage::try_new(value)?))
         }
     }
 }
@@ -100,23 +101,37 @@ impl ContentHash {
     pub fn try_from_hex(s: impl AsRef<str>) -> Result<Self, ValidationError> {
         let s = s.as_ref();
         if s.len() != 64 {
-            return Err(ValidationError::InvalidContentHash(s.to_string()));
+            return Err(ValidationError::InvalidContentHash(DiagnosticMessage::try_new(
+                s.to_string(),
+            )?));
         }
         let mut out = [0u8; 32];
         for (i, pair) in s.as_bytes().chunks_exact(2).enumerate() {
             let Some(&high) = pair.first() else {
-                return Err(ValidationError::InvalidContentHash(s.to_string()));
+                return Err(ValidationError::InvalidContentHash(DiagnosticMessage::try_new(
+                    s.to_string(),
+                )?));
             };
             let Some(&low) = pair.get(1) else {
-                return Err(ValidationError::InvalidContentHash(s.to_string()));
+                return Err(ValidationError::InvalidContentHash(DiagnosticMessage::try_new(
+                    s.to_string(),
+                )?));
             };
             let Some(byte_slot) = out.get_mut(i) else {
-                return Err(ValidationError::InvalidContentHash(s.to_string()));
+                return Err(ValidationError::InvalidContentHash(DiagnosticMessage::try_new(
+                    s.to_string(),
+                )?));
             };
-            let high = nibble_from_lowercase_hex(high)
-                .ok_or_else(|| ValidationError::InvalidContentHash(s.to_string()))?;
-            let low = nibble_from_lowercase_hex(low)
-                .ok_or_else(|| ValidationError::InvalidContentHash(s.to_string()))?;
+            let Some(high) = nibble_from_lowercase_hex(high) else {
+                return Err(ValidationError::InvalidContentHash(DiagnosticMessage::try_new(
+                    s.to_string(),
+                )?));
+            };
+            let Some(low) = nibble_from_lowercase_hex(low) else {
+                return Err(ValidationError::InvalidContentHash(DiagnosticMessage::try_new(
+                    s.to_string(),
+                )?));
+            };
             *byte_slot = (high << 4) | low;
         }
         Ok(Self(out))
@@ -204,37 +219,37 @@ mod tests {
     #[test]
     fn spec_element_id_rejects_single_letter_prefix() {
         let err = SpecElementId::try_new("A-01").unwrap_err();
-        assert!(matches!(err, ValidationError::InvalidSpecElementId(s) if s == "A-01"));
+        assert!(matches!(err, ValidationError::InvalidSpecElementId(s) if s.as_str() == "A-01"));
     }
 
     #[test]
     fn spec_element_id_rejects_empty() {
         let err = SpecElementId::try_new("").unwrap_err();
-        assert!(matches!(err, ValidationError::InvalidSpecElementId(s) if s.is_empty()));
+        assert!(matches!(err, ValidationError::EmptyString));
     }
 
     #[test]
     fn spec_element_id_rejects_missing_digits() {
         let err = SpecElementId::try_new("IN-").unwrap_err();
-        assert!(matches!(err, ValidationError::InvalidSpecElementId(s) if s == "IN-"));
+        assert!(matches!(err, ValidationError::InvalidSpecElementId(s) if s.as_str() == "IN-"));
     }
 
     #[test]
     fn spec_element_id_rejects_missing_hyphen() {
         let err = SpecElementId::try_new("IN01").unwrap_err();
-        assert!(matches!(err, ValidationError::InvalidSpecElementId(s) if s == "IN01"));
+        assert!(matches!(err, ValidationError::InvalidSpecElementId(s) if s.as_str() == "IN01"));
     }
 
     #[test]
     fn spec_element_id_rejects_lowercase_prefix() {
         let err = SpecElementId::try_new("in-01").unwrap_err();
-        assert!(matches!(err, ValidationError::InvalidSpecElementId(s) if s == "in-01"));
+        assert!(matches!(err, ValidationError::InvalidSpecElementId(s) if s.as_str() == "in-01"));
     }
 
     #[test]
     fn spec_element_id_rejects_non_digit_suffix() {
         let err = SpecElementId::try_new("IN-01a").unwrap_err();
-        assert!(matches!(err, ValidationError::InvalidSpecElementId(s) if s == "IN-01a"));
+        assert!(matches!(err, ValidationError::InvalidSpecElementId(s) if s.as_str() == "IN-01a"));
     }
 
     #[test]
@@ -259,7 +274,7 @@ mod tests {
     #[test]
     fn content_hash_rejects_wrong_length() {
         let err = ContentHash::try_from_hex("abc").unwrap_err();
-        assert!(matches!(err, ValidationError::InvalidContentHash(s) if s == "abc"));
+        assert!(matches!(err, ValidationError::InvalidContentHash(s) if s.as_str() == "abc"));
     }
 
     #[test]

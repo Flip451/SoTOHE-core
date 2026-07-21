@@ -595,5 +595,5 @@ usecase 層の Command および error type が concept-bearing な identity 系
 - `knowledge/adr/2026-04-17-1528-tddd-contract-map.md` — Contract Map の元 ADR (§D6 で Reality View との役割分担を規定)
 - `knowledge/adr/2026-05-20-2221-contract-map-renderer-catalogue-v3-adaptation.md` — Contract Map renderer の v3 対応 sibling ADR (renderer 実装済み)。本 ADR と symmetric な設計
 - `knowledge/adr/2026-05-08-0258-tddd-typegraph-hybrid-and-codec.md` — TypeGraph hybrid + codec。本 ADR の入力 (baseline = `rustdoc_types::Crate` 純粋) の根拠 (D2)
-- `knowledge/conventions/hexagonal-architecture.md` — hexagonal port + adapter pattern の根拠
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） — hexagonal port + adapter pattern の根拠
 - `knowledge/conventions/no-backward-compat.md` — 旧 Reality View renderer との非互換 (skip migration、新規 v3 専用設計)

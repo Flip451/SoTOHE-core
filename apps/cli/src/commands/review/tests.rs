@@ -661,7 +661,7 @@ fn resolve_reviewer_fails_closed_when_reviewer_capability_missing() {
   "capabilities": {}
 }"#,
     );
-    let result = resolve_reviewer_for_test(&path, super::CodexRoundTypeArg::Fast);
+    let result = resolve_reviewer_for_test(dir.path(), &path, super::CodexRoundTypeArg::Fast);
     assert!(result.is_err(), "expected error when reviewer capability is missing");
     let err = result.unwrap_err().to_string();
     assert!(
@@ -681,11 +681,11 @@ fn resolve_reviewer_fails_closed_when_provider_is_unsupported() {
   "schema_version": 1,
   "providers": { "gemini": { "label": "Gemini CLI" } },
   "capabilities": {
-    "reviewer": { "provider": "gemini", "model": "gemini-2.5-pro" }
+    "reviewer": { "provider": "gemini", "model": "gemini-2.5-pro", "reasoning_effort": "high", "execution_mode": "typed-pipeline" }
   }
 }"#,
     );
-    let result = resolve_reviewer_for_test(&path, super::CodexRoundTypeArg::Final);
+    let result = resolve_reviewer_for_test(dir.path(), &path, super::CodexRoundTypeArg::Final);
     assert!(result.is_err(), "expected error for unsupported provider");
     let err = result.unwrap_err().to_string();
     assert!(
@@ -704,11 +704,11 @@ fn resolve_reviewer_succeeds_for_codex_provider() {
   "schema_version": 1,
   "providers": { "codex": { "label": "Codex CLI" } },
   "capabilities": {
-    "reviewer": { "provider": "codex", "model": "gpt-5.4" }
+    "reviewer": { "provider": "codex", "model": "gpt-5.4", "reasoning_effort": "high", "execution_mode": "typed-pipeline" }
   }
 }"#,
     );
-    let result = resolve_reviewer_for_test(&path, super::CodexRoundTypeArg::Final);
+    let result = resolve_reviewer_for_test(dir.path(), &path, super::CodexRoundTypeArg::Final);
     assert!(result.is_ok(), "expected Ok for codex provider; got: {:?}", result.err());
     let resolved = result.unwrap();
     assert_eq!(resolved.provider, "codex");
@@ -725,11 +725,11 @@ fn resolve_reviewer_succeeds_for_claude_provider() {
   "schema_version": 1,
   "providers": { "claude": { "label": "Claude Code" } },
   "capabilities": {
-    "reviewer": { "provider": "claude", "model": "claude-sonnet-4-6" }
+    "reviewer": { "provider": "claude", "model": "claude-sonnet-4-6", "reasoning_effort": "high", "execution_mode": "typed-pipeline" }
   }
 }"#,
     );
-    let result = resolve_reviewer_for_test(&path, super::CodexRoundTypeArg::Final);
+    let result = resolve_reviewer_for_test(dir.path(), &path, super::CodexRoundTypeArg::Final);
     assert!(result.is_ok(), "expected Ok for claude provider; got: {:?}", result.err());
     let resolved = result.unwrap();
     assert_eq!(resolved.provider, "claude");
@@ -747,11 +747,11 @@ fn resolve_reviewer_fast_round_uses_fast_model_from_codex_provider() {
   "schema_version": 1,
   "providers": { "codex": { "label": "Codex CLI" } },
   "capabilities": {
-    "reviewer": { "provider": "codex", "model": "gpt-5.4", "fast_model": "gpt-5.4-mini" }
+    "reviewer": { "provider": "codex", "model": "gpt-5.4", "fast_model": "gpt-5.4-mini", "reasoning_effort": "xhigh", "fast_reasoning_effort": "low", "execution_mode": "typed-pipeline" }
   }
 }"#,
     );
-    let result = resolve_reviewer_for_test(&path, super::CodexRoundTypeArg::Fast);
+    let result = resolve_reviewer_for_test(dir.path(), &path, super::CodexRoundTypeArg::Fast);
     assert!(result.is_ok(), "expected Ok for fast round; got: {:?}", result.err());
     let resolved = result.unwrap();
     assert_eq!(resolved.provider, "codex");
@@ -779,12 +779,15 @@ fn resolve_reviewer_fast_round_mixed_provider_selects_fast_provider() {
       "provider": "claude",
       "model": "claude-opus-4-7",
       "fast_provider": "codex",
-      "fast_model": "gpt-5.4-mini"
+      "fast_model": "gpt-5.4-mini",
+      "reasoning_effort": "max",
+      "fast_reasoning_effort": "low",
+      "execution_mode": "typed-pipeline"
     }
   }
 }"#,
     );
-    let result = resolve_reviewer_for_test(&path, super::CodexRoundTypeArg::Fast);
+    let result = resolve_reviewer_for_test(dir.path(), &path, super::CodexRoundTypeArg::Fast);
     assert!(
         result.is_ok(),
         "expected Ok for fast round with fast_provider; got: {:?}",

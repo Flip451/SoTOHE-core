@@ -1,6 +1,6 @@
 ---
 name: review-fix-lead
-model: opus
+model: claude-opus-4-7[1m]
 description: Claude subagent adapter for review-fix-lead when routing dispatches the Claude path.
 ---
 
@@ -19,3 +19,9 @@ severity policy, internal pipeline, output contract, rules). Do not duplicate it
 - Use `Read` / `Grep` / `Glob` for file inspection, not `Bash(cat/grep/head)`.
 - Report the final status in your final message as one of: `completed` / `blocked_cross_scope` /
   `failed`.
+
+## Session resume conformance
+
+- If your dispatch is a resumed session (orchestrator opt-in continuation), follow the
+  "Session resume" section of the capability SSoT: check whether your upstream artifacts
+  changed since the prior session and re-read any that did before continuing.

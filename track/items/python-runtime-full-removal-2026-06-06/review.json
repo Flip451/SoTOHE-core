@@ -10,7 +10,7 @@
             {
               "message": "This step still tells the reader to run `cargo make conventions-verify-index`, but the harness migration removed that wrapper from the allowed command set and replaced it with the native `bin/sotp conventions verify-index` flow. As written, the documented workflow is internally inconsistent and will fail for anyone following it.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/DEVELOPER_AI_WORKFLOW.md",
+              "file": "DEVELOPER_AI_WORKFLOW.md",
               "line": 158,
               "category": "correctness"
             }
@@ -145,7 +145,7 @@
             {
               "message": "The new `Conventions` entrypoint in `main.rs` is not covered by an end-to-end CLI dispatch test. The tests in `apps/cli/src/commands/conventions.rs` only exercise the nested parser and direct `execute()` calls, so a wiring regression in `Cli::parse`/`run_cli` for `CliCommand::Conventions` would slip past CI.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "file": "apps/cli/src/main.rs",
               "line": 29,
               "category": "test coverage"
             }
@@ -178,21 +178,21 @@
             {
               "message": "`ExtraDirEntry.label` is required here, but the Python reference treats it as optional with a default empty string. A valid `extra_dirs` entry without a label will now fail to load, and the error will surface as `Parse` instead of `InvalidRules`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs",
+              "file": "libs/infrastructure/src/arch.rs",
               "line": 52,
               "category": "correctness"
             },
             {
               "message": "`load_rules()` still misses Python-side validation for malformed input: empty `may_depend_on` items are accepted, and `extra_dirs` paths are not checked for duplicates or collisions with layer paths. Those cases should be rejected as `InvalidRules`; today they can be accepted or silently alter the rendered tree.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs",
+              "file": "libs/infrastructure/src/arch.rs",
               "line": 62,
               "category": "correctness"
             },
             {
               "message": "`ArchRulesError::Io` embeds `rules_path.display()` in the public error string. When the caller passes an absolute workspace root, this leaks an internal filesystem path to the user.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs",
+              "file": "libs/infrastructure/src/arch.rs",
               "line": 65,
               "category": "security"
             }
@@ -205,7 +205,7 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`load_rules()` eagerly parses `extra_dirs` ([arch.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/arch.rs#L178)), so malformed `extra_dirs` make `render_workspace_members`, `render_direct_checks`, and `render_workspace_tree(..., include_extra_dirs = false)` fail even though the Python reference ignores `extra_dirs` for those code paths. This is a behavior regression for valid workspace-member/direct-check outputs.",
+              "message": "`load_rules()` eagerly parses `extra_dirs` ([arch.rs](libs/infrastructure/src/arch.rs#L178)), so malformed `extra_dirs` make `render_workspace_members`, `render_direct_checks`, and `render_workspace_tree(..., include_extra_dirs = false)` fail even though the Python reference ignores `extra_dirs` for those code paths. This is a behavior regression for valid workspace-member/direct-check outputs.",
               "severity": "P1",
               "file": "libs/infrastructure/src/arch.rs",
               "line": 178,
@@ -250,14 +250,14 @@
             {
               "message": "`verify_convention_index` now returns `pass()` when `knowledge/conventions/` has no `.md` files and `README.md` is missing. That diverges from the Python behavior and current tests, which treat a missing README as an error, so `verify-index` can silently succeed in an empty conventions tree.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/conventions.rs",
+              "file": "libs/infrastructure/src/conventions.rs",
               "line": 186,
               "category": "correctness"
             },
             {
               "message": "`render_index_block` swallows `read_dir` errors and falls back to an empty index block. Any filesystem/permission failure while scanning `knowledge/conventions` will therefore be treated as \"no docs\", letting `update-index` rewrite README.md and `verify-index` pass instead of surfacing the I/O error.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/conventions.rs",
+              "file": "libs/infrastructure/src/conventions.rs",
               "line": 391,
               "category": "error-handling"
             }
@@ -424,7 +424,7 @@
             {
               "message": "Deleting this file removes the only direct regression coverage for the public `cargo make` wrapper surface that this diff rewires. Without an equivalent test elsewhere, accidental changes to wrapper command mappings or forwarded args in `Makefile.toml` will no longer be caught by CI.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/scripts/test_make_wrappers.py",
+              "file": "scripts/test_make_wrappers.py",
               "line": 1,
               "category": "testing"
             }
@@ -553,7 +553,7 @@
             {
               "message": "`update_convention_index` and `verify_convention_index` are rendered with the same Mermaid node id (`F82_infrastructure_infrastructure_infrastructure__conventions__...`). That collapses two distinct functions into one node, and `verify_convention_index` no longer has its own edge to `ConventionDocsError`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/contract-map.md",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/contract-map.md",
               "line": 60,
               "category": "factual error"
             }
@@ -598,7 +598,7 @@
             {
               "message": "`F82` is reused for both `update_convention_index` and `verify_convention_index`. In the Mermaid contract map, the second definition overwrites the first, so `verify_convention_index` does not have its own node/edge and the catalogue is no longer accurate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/contract-map.md",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/contract-map.md",
               "line": 61,
               "category": "factual error"
             }
@@ -657,7 +657,7 @@
             {
               "message": "`ArchRulesError` is the only new infrastructure type rendered as `🔴`, while the four `infrastructure::arch::*` entry points in the same artifact are already `🔵`. For a task that is only moved to `in_progress`, that red declaration is internally inconsistent with the rest of the plan artifact and should not appear here.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/infrastructure-types.md",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/infrastructure-types.md",
               "line": 7,
               "category": "contradiction"
             }
@@ -730,7 +730,7 @@
             {
               "message": "`infrastructure::verify::convention_docs::verify` is marked `delete` here, but `impl-plan.json` task T002 still requires the compatibility shim and its `pub mod` entry to remain until T004 rewires the caller. That makes the artifact set internally inconsistent about whether the shim still exists.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/infrastructure-types.json",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/infrastructure-types.json",
               "line": 305,
               "category": "contradiction"
             }
@@ -774,14 +774,14 @@
             {
               "message": "`T001` is recorded as `done` and `T002` as `in_progress`, and the rendered plan/counts follow that later state (`1/7 resolved`). That contradicts the scope briefing, which said this round should only advance `T001` from `todo` to `in_progress`. The plan artifacts are now one transition ahead of the requested state.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/impl-plan.json",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/impl-plan.json",
               "line": 7,
               "category": "contradiction"
             },
             {
               "message": "The generated-view note says `T002+` types remain yellow, but `infrastructure-types.md` already renders `ConventionDocsError` and all three `infrastructure::conventions::*` free functions as blue. That makes the note stale and internally inconsistent with the rendered type table.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/plan.md",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/plan.md",
               "line": 7,
               "category": "contradiction"
             }
@@ -868,7 +868,7 @@
             {
               "message": "`plan.md:7` still says `infrastructure::verify::convention_docs::verify` is the only yellow / pending T004, but `infrastructure-types.md:21` already marks that row blue. The plan artifacts now disagree on whether the shim deletion is still pending; update the summary to reflect 0 yellow or remove the stale note.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/python-runtime-full-removal-2026-06-06/plan.md",
+              "file": "track/items/python-runtime-full-removal-2026-06-06/plan.md",
               "line": 7,
               "category": "contradiction"
             }

@@ -1,0 +1,1758 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "a46698e554afbb94f48d91e0bbb3dcc8dc476db0cf34f92258a5a05011c39261",
+      "evidence_hash": "fe109946d1995c4c732bc8fb54bbffe76f5ac009147a01c150500c59b2706fa5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue または spec の変更は signal を再評価するが、rustdoc 抽出の再実行要否とは分離して判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueDeclarationHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer（crate）ごとに、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を機械的に判定する。実装側入力が不変なら rustdoc 抽出を skip し、catalogue または spec の変更は signal を再評価するが、rustdoc 抽出の再実行要否とは分離して判定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a46698e554afbb94f48d91e0bbb3dcc8dc476db0cf34f92258a5a05011c39261",
+      "evidence_hash": "ddc5c857319ee8bcff94b6ef60d1efbbdd345d5d03c95098a4e33710d77d2a07",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc 抽出の要否は、layer の artifact に記録された implementation-side input hash と現在の対応する input hash の比較だけで判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueDeclarationHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "rustdoc 抽出の要否は、layer の artifact に記録された implementation-side input hash と現在の対応する input hash の比較だけで判定する。一致時は rustdoc 抽出を skip し、不一致または判定不能時は AC-07 の条件に従って rustdoc 抽出から再計算する。declaration_hash または spec の差分は signal 再評価の要否だけを決め、両方が一致するときは評価ごと skip し、declaration_hash のみが不一致で implementation-side input hash が一致するときは AC-06 の条件に従って rustdoc を起動せず signal を再評価する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c5e04e058f1ceab51f3de8aa97688e79e45b0d563954d60c2b2239d522c1af97",
+      "evidence_hash": "3571cef764b264badeb99d012a01d1e9ddfacfe5f8de2c7fd985f804dede1a51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "edge 所有述語と waiver 優先規則を domain の obligation / binding model に置き、両 gate は同一述語を消費する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "EdgeOwnership"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "obligation gate の check と evaluate の判定対称性を修理する。edge 所有述語と waiver 優先規則を domain の obligation / binding model に置き、両 gate は同一述語を消費する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c5e04e058f1ceab51f3de8aa97688e79e45b0d563954d60c2b2239d522c1af97",
+      "evidence_hash": "ae586810ff5e04f64f712f21c0bc592181dc64875bb22b2363d8521fa268f381",
+      "verdict": {
+        "kind": "pass",
+        "citation": "waiver を持つ edge は fulfillment または自発的 binding から adjudication されず、edge を所有する全 obligation は (edge × obligation) 対ごとに独立して解決される。check と evaluate はこの規則から同一の帰結を得る。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "EdgeOwnership"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "waiver を持つ edge は fulfillment または自発的 binding から adjudication されず、edge を所有する全 obligation は (edge × obligation) 対ごとに独立して解決される。check と evaluate はこの規則から同一の帰結を得る。"
+        }
+      }
+    },
+    {
+      "claim_hash": "de4fd2927b4914b0d72ded622f0216e9243d260e847b42b3d4a876dffaab3afa",
+      "evidence_hash": "fe109946d1995c4c732bc8fb54bbffe76f5ac009147a01c150500c59b2706fa5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer 起動 wrapper は layer（crate）ごとに、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を機械的に判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ImplementationInputHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer（crate）ごとに、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を機械的に判定する。実装側入力が不変なら rustdoc 抽出を skip し、catalogue または spec の変更は signal を再評価するが、rustdoc 抽出の再実行要否とは分離して判定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "de4fd2927b4914b0d72ded622f0216e9243d260e847b42b3d4a876dffaab3afa",
+      "evidence_hash": "42e488012663edfbfda5cbf685eb05758026cbc08d403a3c9a8b7eabdeeb2299",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D3 の reuse 判定は、対象 crate の source 内容、依存解決（lockfile）、toolchain 識別子から得る content hash に基づく。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ImplementationInputHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "D3 の reuse 判定は、対象 crate の source 内容、依存解決（lockfile）、toolchain 識別子から得る content hash に基づく。判定粒度は layer（crate）単位とし、変更がある layer だけを再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "de4fd2927b4914b0d72ded622f0216e9243d260e847b42b3d4a876dffaab3afa",
+      "evidence_hash": "4d96c7f24b5212b1d4d365bae36f9db185a0d0ae6acdf0baa816e2998dd2972f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側入力 hash が artifact 記録値と一致するときは rustdoc 抽出を再実行しない。実装側入力 hash が不一致または判定不能なら、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ImplementationInputHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "catalogue または spec の変更時は signal を再評価するが、実装側入力 hash が artifact 記録値と一致するときは rustdoc 抽出を再実行しない。実装側入力 hash が不一致または判定不能なら、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "de4fd2927b4914b0d72ded622f0216e9243d260e847b42b3d4a876dffaab3afa",
+      "evidence_hash": "7f33153785739162ebf3918b9670f5bc636a95404859166e5f883cbffb5313e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する。artifact に記録された declaration_hash と実装側入力 hash を現在の対応する入力と比較して鮮度を判定し、必要な hash が使えない場合は保守的に再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ImplementationInputHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する。artifact に記録された declaration_hash と実装側入力 hash を現在の対応する入力と比較して鮮度を判定し、必要な hash が使えない場合は保守的に再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "de4fd2927b4914b0d72ded622f0216e9243d260e847b42b3d4a876dffaab3afa",
+      "evidence_hash": "a9065a33eb4a304a8ad5cc05e91b16d06b12b63099e5dc95f1f4092e14690a30",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ImplementationInputHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "de4fd2927b4914b0d72ded622f0216e9243d260e847b42b3d4a876dffaab3afa",
+      "evidence_hash": "ddc5c857319ee8bcff94b6ef60d1efbbdd345d5d03c95098a4e33710d77d2a07",
+      "verdict": {
+        "kind": "pass",
+        "citation": "layer の artifact に記録された implementation-side input hash と現在の対応する input hash の比較だけで判定する。一致時は rustdoc 抽出を skip し、不一致または判定不能時は AC-07 の条件に従って rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ImplementationInputHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "rustdoc 抽出の要否は、layer の artifact に記録された implementation-side input hash と現在の対応する input hash の比較だけで判定する。一致時は rustdoc 抽出を skip し、不一致または判定不能時は AC-07 の条件に従って rustdoc 抽出から再計算する。declaration_hash または spec の差分は signal 再評価の要否だけを決め、両方が一致するときは評価ごと skip し、declaration_hash のみが不一致で implementation-side input hash が一致するときは AC-06 の条件に従って rustdoc を起動せず signal を再評価する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "de4fd2927b4914b0d72ded622f0216e9243d260e847b42b3d4a876dffaab3afa",
+      "evidence_hash": "f4297f58a9fc5f4c1d1dcc4be1283815b456de3dd577387a3559727daadf4f52",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue または spec だけが変わった layer は、implementation-side input hash が一致するとき、rustdoc を起動せずに signal を再評価する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ImplementationInputHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue または spec だけが変わった layer は、implementation-side input hash が一致するとき、rustdoc を起動せずに signal を再評価する。rustdoc 抽出の再実行要否と signal 再評価要否は入力ごとに分離して判定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "de4fd2927b4914b0d72ded622f0216e9243d260e847b42b3d4a876dffaab3afa",
+      "evidence_hash": "ec707111f47c24a28d5c6c1e8921016b80f9f1df9c57f042f873d4658a71b468",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation-side input hash の不一致または判定不能では、rustdoc 抽出から再計算する。判定と再計算は layer（crate）単位とし、変更がある layer だけを再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ImplementationInputHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation-side input hash の不一致または判定不能では、rustdoc 抽出から再計算する。判定と再計算は layer（crate）単位とし、変更がある layer だけを再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "de4fd2927b4914b0d72ded622f0216e9243d260e847b42b3d4a876dffaab3afa",
+      "evidence_hash": "12a6dd207b9fc471c6baee3fbfc9973493acb2a524b5679be39bd041c29730dd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer type-signals artifact は、D3 の freshness 情報として計算結果と同じ artifact に declaration_hash と実装側入力 hash を記録し、必要な hash が欠ける artifact を reuse 可能と誤認しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ImplementationInputHash"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "per-layer type-signals artifact は、D3 の freshness 情報として計算結果と同じ artifact に declaration_hash と実装側入力 hash を記録し、必要な hash が欠ける artifact を reuse 可能と誤認しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "292384787dd184cf4e4455f6cc033776cfd67be5eaf848a25471851cb2c644bc",
+      "evidence_hash": "42e488012663edfbfda5cbf685eb05758026cbc08d403a3c9a8b7eabdeeb2299",
+      "verdict": {
+        "kind": "pass",
+        "citation": "判定粒度は layer（crate）単位とし、変更がある layer だけを再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "LayerId"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "D3 の reuse 判定は、対象 crate の source 内容、依存解決（lockfile）、toolchain 識別子から得る content hash に基づく。判定粒度は layer（crate）単位とし、変更がある layer だけを再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5dc3d81388732fd8ec9ab6788152a65b6dc831e0c3dc3029fb91c13cf185b9e9",
+      "evidence_hash": "3571cef764b264badeb99d012a01d1e9ddfacfe5f8de2c7fd985f804dede1a51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "edge 所有述語と waiver 優先規則を domain の obligation / binding model に置き、両 gate は同一述語を消費する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "obligation gate の check と evaluate の判定対称性を修理する。edge 所有述語と waiver 優先規則を domain の obligation / binding model に置き、両 gate は同一述語を消費する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5dc3d81388732fd8ec9ab6788152a65b6dc831e0c3dc3029fb91c13cf185b9e9",
+      "evidence_hash": "ae586810ff5e04f64f712f21c0bc592181dc64875bb22b2363d8521fa268f381",
+      "verdict": {
+        "kind": "pass",
+        "citation": "waiver を持つ edge は fulfillment または自発的 binding から adjudication されず、edge を所有する全 obligation は (edge × obligation) 対ごとに独立して解決される。check と evaluate はこの規則から同一の帰結を得る。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "waiver を持つ edge は fulfillment または自発的 binding から adjudication されず、edge を所有する全 obligation は (edge × obligation) 対ごとに独立して解決される。check と evaluate はこの規則から同一の帰結を得る。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cb40b930c444e9521a03f71712d9b4a1e85b0db508e5081dd8ae4905cdb41587",
+      "evidence_hash": "5ceb5e27f085ca0238a8be48d32f3a5db536584a85022dd551b57fd7a498cc9b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し、scope の file list と diff を reviewer 自身が確認して全件を再判定する。初回 round と fast から final への escalation は新規 session とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "RoundType"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し、scope の file list と diff を reviewer 自身が確認して全件を再判定する。初回 round と fast から final への escalation は新規 session とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cb40b930c444e9521a03f71712d9b4a1e85b0db508e5081dd8ae4905cdb41587",
+      "evidence_hash": "c0cbefa4a3ba523a52db5b860bd64b9a6f5189de0ad613d567e3a9af4d083029",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer は resume 後も scope 全件を再判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "RoundType"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "reviewer は resume 後も scope 全件を再判定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cb40b930c444e9521a03f71712d9b4a1e85b0db508e5081dd8ae4905cdb41587",
+      "evidence_hash": "5251c561488c6b9ea1fa6eb2bca2f158658b2d64634f805bf423637d58c524bc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "session resume は review judgment と review record の単位を変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "RoundType"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-09",
+          "text_label": "session resume は review judgment と review record の単位を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cfa1fb1d677fc0138f676483e73d061567234422b98f651bdf4b3c7b7cce947b",
+      "evidence_hash": "5ceb5e27f085ca0238a8be48d32f3a5db536584a85022dd551b57fd7a498cc9b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ScopeName"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し、scope の file list と diff を reviewer 自身が確認して全件を再判定する。初回 round と fast から final への escalation は新規 session とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cfa1fb1d677fc0138f676483e73d061567234422b98f651bdf4b3c7b7cce947b",
+      "evidence_hash": "4a0192a8dce970468a6460197209eed1813e7cec9205b0fe5f587428a2e169d4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer session cache を provider と model に束縛する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ScopeName"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "reviewer session cache を provider と model に束縛する。現在の profile 解決結果の provider または model が記録値と不一致、resume 失敗、または session 期限切れなら、cache を使わず新規 session を開始する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "523a49e8e756990f9cb76cda32aabbd6ca138bf1e599edea885fe5f72d2c33bc",
+      "evidence_hash": "7f33153785739162ebf3918b9670f5bc636a95404859166e5f883cbffb5313e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存の declaration_hash と対称に実装側入力 hash を記録する。artifact に記録された declaration_hash と実装側入力 hash を現在の対応する入力と比較して鮮度を判定し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "Sha256Digest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する。artifact に記録された declaration_hash と実装側入力 hash を現在の対応する入力と比較して鮮度を判定し、必要な hash が使えない場合は保守的に再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "523a49e8e756990f9cb76cda32aabbd6ca138bf1e599edea885fe5f72d2c33bc",
+      "evidence_hash": "a9065a33eb4a304a8ad5cc05e91b16d06b12b63099e5dc95f1f4092e14690a30",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "Sha256Digest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "523a49e8e756990f9cb76cda32aabbd6ca138bf1e599edea885fe5f72d2c33bc",
+      "evidence_hash": "12a6dd207b9fc471c6baee3fbfc9973493acb2a524b5679be39bd041c29730dd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D3 の freshness 情報として計算結果と同じ artifact に declaration_hash と実装側入力 hash を記録し、必要な hash が欠ける artifact を reuse 可能と誤認しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "Sha256Digest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "per-layer type-signals artifact は、D3 の freshness 情報として計算結果と同じ artifact に declaration_hash と実装側入力 hash を記録し、必要な hash が欠ける artifact を reuse 可能と誤認しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "613847554768974e08d8ebff80755dc7b14c46bd3949d0f2f1f74e7dc6c945e1",
+      "evidence_hash": "7f33153785739162ebf3918b9670f5bc636a95404859166e5f883cbffb5313e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "artifact に記録された declaration_hash と実装側入力 hash を現在の対応する入力と比較して鮮度を判定し、必要な hash が使えない場合は保守的に再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "Sha256DigestError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する。artifact に記録された declaration_hash と実装側入力 hash を現在の対応する入力と比較して鮮度を判定し、必要な hash が使えない場合は保守的に再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "613847554768974e08d8ebff80755dc7b14c46bd3949d0f2f1f74e7dc6c945e1",
+      "evidence_hash": "a9065a33eb4a304a8ad5cc05e91b16d06b12b63099e5dc95f1f4092e14690a30",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "Sha256DigestError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "613847554768974e08d8ebff80755dc7b14c46bd3949d0f2f1f74e7dc6c945e1",
+      "evidence_hash": "12a6dd207b9fc471c6baee3fbfc9973493acb2a524b5679be39bd041c29730dd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D3 の freshness 情報として計算結果と同じ artifact に declaration_hash と実装側入力 hash を記録し、必要な hash が欠ける artifact を reuse 可能と誤認しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "Sha256DigestError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "per-layer type-signals artifact は、D3 の freshness 情報として計算結果と同じ artifact に declaration_hash と実装側入力 hash を記録し、必要な hash が欠ける artifact を reuse 可能と誤認しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7f51f900b481487022f283e9c8cbc5b63ecbe6ac4e660af9df91797ecec85bf7",
+      "evidence_hash": "3571cef764b264badeb99d012a01d1e9ddfacfe5f8de2c7fd985f804dede1a51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "edge 所有述語と waiver 優先規則を domain の obligation / binding model に置き、両 gate は同一述語を消費する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TestBindingsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "obligation gate の check と evaluate の判定対称性を修理する。edge 所有述語と waiver 優先規則を domain の obligation / binding model に置き、両 gate は同一述語を消費する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7f51f900b481487022f283e9c8cbc5b63ecbe6ac4e660af9df91797ecec85bf7",
+      "evidence_hash": "ae586810ff5e04f64f712f21c0bc592181dc64875bb22b2363d8521fa268f381",
+      "verdict": {
+        "kind": "pass",
+        "citation": "waiver を持つ edge は fulfillment または自発的 binding から adjudication されず、edge を所有する全 obligation は (edge × obligation) 対ごとに独立して解決される。check と evaluate はこの規則から同一の帰結を得る。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TestBindingsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "waiver を持つ edge は fulfillment または自発的 binding から adjudication されず、edge を所有する全 obligation は (edge × obligation) 対ごとに独立して解決される。check と evaluate はこの規則から同一の帰結を得る。"
+        }
+      }
+    },
+    {
+      "claim_hash": "acd525b7a1d3b3df1f1c66f294aec1ca4f1a44075f4eaff023d59f89fa059680",
+      "evidence_hash": "3571cef764b264badeb99d012a01d1e9ddfacfe5f8de2c7fd985f804dede1a51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "edge 所有述語と waiver 優先規則を domain の obligation / binding model に置き、両 gate は同一述語を消費する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligation"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "obligation gate の check と evaluate の判定対称性を修理する。edge 所有述語と waiver 優先規則を domain の obligation / binding model に置き、両 gate は同一述語を消費する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "acd525b7a1d3b3df1f1c66f294aec1ca4f1a44075f4eaff023d59f89fa059680",
+      "evidence_hash": "ae586810ff5e04f64f712f21c0bc592181dc64875bb22b2363d8521fa268f381",
+      "verdict": {
+        "kind": "pass",
+        "citation": "waiver を持つ edge は fulfillment または自発的 binding から adjudication されず、edge を所有する全 obligation は (edge × obligation) 対ごとに独立して解決される。check と evaluate はこの規則から同一の帰結を得る。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligation"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "waiver を持つ edge は fulfillment または自発的 binding から adjudication されず、edge を所有する全 obligation は (edge × obligation) 対ごとに独立して解決される。check と evaluate はこの規則から同一の帰結を得る。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ae4e34a05bab27a3ecadbf2f967f0f1f24b889b2b312bdc761ae9dde77b605c4",
+      "evidence_hash": "6d2a30fdf5534cc4e151228c59801756099590e42661757725ae2c39a9f32cce",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-signals 評価の書込み対象は、現在 branch と照合済みの track identity に束縛し、不一致は拒否する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TrackBranch"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-11",
+          "text_label": "type-signals 評価の書込み対象は、現在 branch と照合済みの track identity に束縛し、不一致は拒否する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "211af6f72e52315d4a2c411e0d030ace13afd2d742867bc9396be54c0c5f4072",
+      "evidence_hash": "5ceb5e27f085ca0238a8be48d32f3a5db536584a85022dd551b57fd7a498cc9b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track・scope・round 種別に結び付く prior session を resume し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TrackId"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "fix 後の同一 scope・同一 round 種別の reviewer 再 round で、track・scope・round 種別に結び付く prior session を resume し、scope の file list と diff を reviewer 自身が確認して全件を再判定する。初回 round と fast から final への escalation は新規 session とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "211af6f72e52315d4a2c411e0d030ace13afd2d742867bc9396be54c0c5f4072",
+      "evidence_hash": "4cabd2650852dcafaf577955b9d2f99d99cb1597a3454dd512217be528610884",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track 内では track・capability、track 外では workspace transient 配下の capability・対象 artifact の repo-relative path で分離する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TrackId"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-09",
+          "text_label": "capability resume cache を、track 内では track・capability、track 外では workspace transient 配下の capability・対象 artifact の repo-relative path で分離する。対象 path が未確定の track 外 dispatch は cache を使わず記録もしない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b8fa715deeced660a8e0266b9bd5c15e6fa40e01551be25bb5545311e2ee1739",
+      "evidence_hash": "fe109946d1995c4c732bc8fb54bbffe76f5ac009147a01c150500c59b2706fa5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側入力が不変なら rustdoc 抽出を skip し、catalogue または spec の変更は signal を再評価するが、rustdoc 抽出の再実行要否とは分離して判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer（crate）ごとに、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を機械的に判定する。実装側入力が不変なら rustdoc 抽出を skip し、catalogue または spec の変更は signal を再評価するが、rustdoc 抽出の再実行要否とは分離して判定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b8fa715deeced660a8e0266b9bd5c15e6fa40e01551be25bb5545311e2ee1739",
+      "evidence_hash": "4d96c7f24b5212b1d4d365bae36f9db185a0d0ae6acdf0baa816e2998dd2972f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側入力 hash が artifact 記録値と一致するときは rustdoc 抽出を再実行しない。実装側入力 hash が不一致または判定不能なら、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "catalogue または spec の変更時は signal を再評価するが、実装側入力 hash が artifact 記録値と一致するときは rustdoc 抽出を再実行しない。実装側入力 hash が不一致または判定不能なら、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b8fa715deeced660a8e0266b9bd5c15e6fa40e01551be25bb5545311e2ee1739",
+      "evidence_hash": "7f33153785739162ebf3918b9670f5bc636a95404859166e5f883cbffb5313e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する。artifact に記録された declaration_hash と実装側入力 hash を現在の対応する入力と比較して鮮度を判定し、必要な hash が使えない場合は保守的に再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する。artifact に記録された declaration_hash と実装側入力 hash を現在の対応する入力と比較して鮮度を判定し、必要な hash が使えない場合は保守的に再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b8fa715deeced660a8e0266b9bd5c15e6fa40e01551be25bb5545311e2ee1739",
+      "evidence_hash": "a9065a33eb4a304a8ad5cc05e91b16d06b12b63099e5dc95f1f4092e14690a30",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b8fa715deeced660a8e0266b9bd5c15e6fa40e01551be25bb5545311e2ee1739",
+      "evidence_hash": "ddc5c857319ee8bcff94b6ef60d1efbbdd345d5d03c95098a4e33710d77d2a07",
+      "verdict": {
+        "kind": "pass",
+        "citation": "layer の artifact に記録された implementation-side input hash と現在の対応する input hash の比較だけで判定する。一致時は rustdoc 抽出を skip し、不一致または判定不能時は AC-07 の条件に従って rustdoc 抽出から再計算する。declaration_hash または spec の差分は signal 再評価の要否だけを決め"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "rustdoc 抽出の要否は、layer の artifact に記録された implementation-side input hash と現在の対応する input hash の比較だけで判定する。一致時は rustdoc 抽出を skip し、不一致または判定不能時は AC-07 の条件に従って rustdoc 抽出から再計算する。declaration_hash または spec の差分は signal 再評価の要否だけを決め、両方が一致するときは評価ごと skip し、declaration_hash のみが不一致で implementation-side input hash が一致するときは AC-06 の条件に従って rustdoc を起動せず signal を再評価する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b8fa715deeced660a8e0266b9bd5c15e6fa40e01551be25bb5545311e2ee1739",
+      "evidence_hash": "f4297f58a9fc5f4c1d1dcc4be1283815b456de3dd577387a3559727daadf4f52",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue または spec だけが変わった layer は、implementation-side input hash が一致するとき、rustdoc を起動せずに signal を再評価する。rustdoc 抽出の再実行要否と signal 再評価要否は入力ごとに分離して判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue または spec だけが変わった layer は、implementation-side input hash が一致するとき、rustdoc を起動せずに signal を再評価する。rustdoc 抽出の再実行要否と signal 再評価要否は入力ごとに分離して判定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b8fa715deeced660a8e0266b9bd5c15e6fa40e01551be25bb5545311e2ee1739",
+      "evidence_hash": "ec707111f47c24a28d5c6c1e8921016b80f9f1df9c57f042f873d4658a71b468",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation-side input hash の不一致または判定不能では、rustdoc 抽出から再計算する。判定と再計算は layer（crate）単位とし、変更がある layer だけを再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation-side input hash の不一致または判定不能では、rustdoc 抽出から再計算する。判定と再計算は layer（crate）単位とし、変更がある layer だけを再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b8fa715deeced660a8e0266b9bd5c15e6fa40e01551be25bb5545311e2ee1739",
+      "evidence_hash": "12a6dd207b9fc471c6baee3fbfc9973493acb2a524b5679be39bd041c29730dd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer type-signals artifact は、D3 の freshness 情報として計算結果と同じ artifact に declaration_hash と実装側入力 hash を記録し、必要な hash が欠ける artifact を reuse 可能と誤認しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "per-layer type-signals artifact は、D3 の freshness 情報として計算結果と同じ artifact に declaration_hash と実装側入力 hash を記録し、必要な hash が欠ける artifact を reuse 可能と誤認しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e062f0ad57d26f6a00f9031aff2432f724242114c2a8c1b750709b9587071999",
+      "evidence_hash": "7f33153785739162ebf3918b9670f5bc636a95404859166e5f883cbffb5313e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "artifact に記録された declaration_hash と実装側入力 hash を現在の対応する入力と比較して鮮度を判定し、必要な hash が使えない場合は保守的に再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsLoadResult"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する。artifact に記録された declaration_hash と実装側入力 hash を現在の対応する入力と比較して鮮度を判定し、必要な hash が使えない場合は保守的に再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e062f0ad57d26f6a00f9031aff2432f724242114c2a8c1b750709b9587071999",
+      "evidence_hash": "12a6dd207b9fc471c6baee3fbfc9973493acb2a524b5679be39bd041c29730dd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "必要な hash が欠ける artifact を reuse 可能と誤認しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsLoadResult"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "per-layer type-signals artifact は、D3 の freshness 情報として計算結果と同じ artifact に declaration_hash と実装側入力 hash を記録し、必要な hash が欠ける artifact を reuse 可能と誤認しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0fe08d11dad3a2277e38b84e1851f0cd72fd1f81ea287d50c682e6cbc10a8217",
+      "evidence_hash": "fe109946d1995c4c732bc8fb54bbffe76f5ac009147a01c150500c59b2706fa5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側入力が不変なら rustdoc 抽出を skip し、catalogue または spec の変更は signal を再評価するが、rustdoc 抽出の再実行要否とは分離して判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsReuseDecision"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer（crate）ごとに、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を機械的に判定する。実装側入力が不変なら rustdoc 抽出を skip し、catalogue または spec の変更は signal を再評価するが、rustdoc 抽出の再実行要否とは分離して判定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0fe08d11dad3a2277e38b84e1851f0cd72fd1f81ea287d50c682e6cbc10a8217",
+      "evidence_hash": "4d96c7f24b5212b1d4d365bae36f9db185a0d0ae6acdf0baa816e2998dd2972f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue または spec の変更時は signal を再評価するが、実装側入力 hash が artifact 記録値と一致するときは rustdoc 抽出を再実行しない。実装側入力 hash が不一致または判定不能なら、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsReuseDecision"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "catalogue または spec の変更時は signal を再評価するが、実装側入力 hash が artifact 記録値と一致するときは rustdoc 抽出を再実行しない。実装側入力 hash が不一致または判定不能なら、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0fe08d11dad3a2277e38b84e1851f0cd72fd1f81ea287d50c682e6cbc10a8217",
+      "evidence_hash": "a9065a33eb4a304a8ad5cc05e91b16d06b12b63099e5dc95f1f4092e14690a30",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsReuseDecision"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0fe08d11dad3a2277e38b84e1851f0cd72fd1f81ea287d50c682e6cbc10a8217",
+      "evidence_hash": "ddc5c857319ee8bcff94b6ef60d1efbbdd345d5d03c95098a4e33710d77d2a07",
+      "verdict": {
+        "kind": "pass",
+        "citation": "declaration_hash または spec の差分は signal 再評価の要否だけを決め、両方が一致するときは評価ごと skip し、declaration_hash のみが不一致で implementation-side input hash が一致するときは AC-06 の条件に従って rustdoc を起動せず signal を再評価する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsReuseDecision"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "rustdoc 抽出の要否は、layer の artifact に記録された implementation-side input hash と現在の対応する input hash の比較だけで判定する。一致時は rustdoc 抽出を skip し、不一致または判定不能時は AC-07 の条件に従って rustdoc 抽出から再計算する。declaration_hash または spec の差分は signal 再評価の要否だけを決め、両方が一致するときは評価ごと skip し、declaration_hash のみが不一致で implementation-side input hash が一致するときは AC-06 の条件に従って rustdoc を起動せず signal を再評価する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0fe08d11dad3a2277e38b84e1851f0cd72fd1f81ea287d50c682e6cbc10a8217",
+      "evidence_hash": "f4297f58a9fc5f4c1d1dcc4be1283815b456de3dd577387a3559727daadf4f52",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue または spec だけが変わった layer は、implementation-side input hash が一致するとき、rustdoc を起動せずに signal を再評価する。rustdoc 抽出の再実行要否と signal 再評価要否は入力ごとに分離して判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsReuseDecision"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue または spec だけが変わった layer は、implementation-side input hash が一致するとき、rustdoc を起動せずに signal を再評価する。rustdoc 抽出の再実行要否と signal 再評価要否は入力ごとに分離して判定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0fe08d11dad3a2277e38b84e1851f0cd72fd1f81ea287d50c682e6cbc10a8217",
+      "evidence_hash": "ec707111f47c24a28d5c6c1e8921016b80f9f1df9c57f042f873d4658a71b468",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation-side input hash の不一致または判定不能では、rustdoc 抽出から再計算する。判定と再計算は layer（crate）単位とし、変更がある layer だけを再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsReuseDecision"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation-side input hash の不一致または判定不能では、rustdoc 抽出から再計算する。判定と再計算は layer（crate）単位とし、変更がある layer だけを再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8674d3b804bed0cd21426b90a7b04760978946df5d04dc7005e33add1fcdaabf",
+      "evidence_hash": "7f33153785739162ebf3918b9670f5bc636a95404859166e5f883cbffb5313e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsSchemaVersion"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する。artifact に記録された declaration_hash と実装側入力 hash を現在の対応する入力と比較して鮮度を判定し、必要な hash が使えない場合は保守的に再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8674d3b804bed0cd21426b90a7b04760978946df5d04dc7005e33add1fcdaabf",
+      "evidence_hash": "12a6dd207b9fc471c6baee3fbfc9973493acb2a524b5679be39bd041c29730dd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "計算結果と同じ artifact に declaration_hash と実装側入力 hash を記録し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsSchemaVersion"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "per-layer type-signals artifact は、D3 の freshness 情報として計算結果と同じ artifact に declaration_hash と実装側入力 hash を記録し、必要な hash が欠ける artifact を reuse 可能と誤認しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2efbbd40bf63c22b95ce5ef52fbd3e2bc59981072c858146d1c72fc64a1235be",
+      "evidence_hash": "7f33153785739162ebf3918b9670f5bc636a95404859166e5f883cbffb5313e1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsSchemaVersionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "per-layer type-signals artifact 自体に、既存の declaration_hash と対称に実装側入力 hash を記録する。artifact に記録された declaration_hash と実装側入力 hash を現在の対応する入力と比較して鮮度を判定し、必要な hash が使えない場合は保守的に再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2efbbd40bf63c22b95ce5ef52fbd3e2bc59981072c858146d1c72fc64a1235be",
+      "evidence_hash": "12a6dd207b9fc471c6baee3fbfc9973493acb2a524b5679be39bd041c29730dd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "必要な hash が欠ける artifact を reuse 可能と誤認しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsSchemaVersionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "per-layer type-signals artifact は、D3 の freshness 情報として計算結果と同じ artifact に declaration_hash と実装側入力 hash を記録し、必要な hash が欠ける artifact を reuse 可能と誤認しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "75bc5be31648e3e35d55f9ff3bd3956c08985018cb2d5d2de4725e52ab4e420a",
+      "evidence_hash": "3571cef764b264badeb99d012a01d1e9ddfacfe5f8de2c7fd985f804dede1a51",
+      "verdict": {
+        "kind": "pass",
+        "citation": "edge 所有述語と waiver 優先規則を domain の obligation / binding model に置き、両 gate は同一述語を消費する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "WaiverCacheEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-10",
+          "text_label": "obligation gate の check と evaluate の判定対称性を修理する。edge 所有述語と waiver 優先規則を domain の obligation / binding model に置き、両 gate は同一述語を消費する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "75bc5be31648e3e35d55f9ff3bd3956c08985018cb2d5d2de4725e52ab4e420a",
+      "evidence_hash": "ae586810ff5e04f64f712f21c0bc592181dc64875bb22b2363d8521fa268f381",
+      "verdict": {
+        "kind": "pass",
+        "citation": "waiver を持つ edge は fulfillment または自発的 binding から adjudication されず、edge を所有する全 obligation は (edge × obligation) 対ごとに独立して解決される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "WaiverCacheEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-11",
+          "text_label": "waiver を持つ edge は fulfillment または自発的 binding から adjudication されず、edge を所有する全 obligation は (edge × obligation) 対ごとに独立して解決される。check と evaluate はこの規則から同一の帰結を得る。"
+        }
+      }
+    },
+    {
+      "claim_hash": "71d63f5ef37e6f40347bdd9148eac2148b94d6a4b52ee6f0810d924175105a62",
+      "evidence_hash": "fe109946d1995c4c732bc8fb54bbffe76f5ac009147a01c150500c59b2706fa5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer 起動 wrapper は layer（crate）ごとに、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を機械的に判定する。実装側入力が不変なら rustdoc 抽出を skip し、catalogue または spec の変更は signal を再評価するが、rustdoc 抽出の再実行要否とは分離して判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "SchemaExporter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer（crate）ごとに、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を機械的に判定する。実装側入力が不変なら rustdoc 抽出を skip し、catalogue または spec の変更は signal を再評価するが、rustdoc 抽出の再実行要否とは分離して判定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "71d63f5ef37e6f40347bdd9148eac2148b94d6a4b52ee6f0810d924175105a62",
+      "evidence_hash": "4d96c7f24b5212b1d4d365bae36f9db185a0d0ae6acdf0baa816e2998dd2972f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue または spec の変更時は signal を再評価するが、実装側入力 hash が artifact 記録値と一致するときは rustdoc 抽出を再実行しない。実装側入力 hash が不一致または判定不能なら、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "SchemaExporter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "catalogue または spec の変更時は signal を再評価するが、実装側入力 hash が artifact 記録値と一致するときは rustdoc 抽出を再実行しない。実装側入力 hash が不一致または判定不能なら、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "71d63f5ef37e6f40347bdd9148eac2148b94d6a4b52ee6f0810d924175105a62",
+      "evidence_hash": "f4297f58a9fc5f4c1d1dcc4be1283815b456de3dd577387a3559727daadf4f52",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue または spec だけが変わった layer は、implementation-side input hash が一致するとき、rustdoc を起動せずに signal を再評価する。rustdoc 抽出の再実行要否と signal 再評価要否は入力ごとに分離して判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "SchemaExporter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue または spec だけが変わった layer は、implementation-side input hash が一致するとき、rustdoc を起動せずに signal を再評価する。rustdoc 抽出の再実行要否と signal 再評価要否は入力ごとに分離して判定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "71d63f5ef37e6f40347bdd9148eac2148b94d6a4b52ee6f0810d924175105a62",
+      "evidence_hash": "ec707111f47c24a28d5c6c1e8921016b80f9f1df9c57f042f873d4658a71b468",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation-side input hash の不一致または判定不能では、rustdoc 抽出から再計算する。判定と再計算は layer（crate）単位とし、変更がある layer だけを再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "SchemaExporter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation-side input hash の不一致または判定不能では、rustdoc 抽出から再計算する。判定と再計算は layer（crate）単位とし、変更がある layer だけを再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d0272be83866b55f0cca12e1c95ded5af1b802814955c5f56ba3ed2a22cac2c8",
+      "evidence_hash": "fe109946d1995c4c732bc8fb54bbffe76f5ac009147a01c150500c59b2706fa5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側入力が不変なら rustdoc 抽出を skip し、catalogue または spec の変更は signal を再評価するが、rustdoc 抽出の再実行要否とは分離して判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer（crate）ごとに、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を機械的に判定する。実装側入力が不変なら rustdoc 抽出を skip し、catalogue または spec の変更は signal を再評価するが、rustdoc 抽出の再実行要否とは分離して判定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d0272be83866b55f0cca12e1c95ded5af1b802814955c5f56ba3ed2a22cac2c8",
+      "evidence_hash": "4d96c7f24b5212b1d4d365bae36f9db185a0d0ae6acdf0baa816e2998dd2972f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側入力 hash が artifact 記録値と一致するときは rustdoc 抽出を再実行しない。実装側入力 hash が不一致または判定不能なら、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "catalogue または spec の変更時は signal を再評価するが、実装側入力 hash が artifact 記録値と一致するときは rustdoc 抽出を再実行しない。実装側入力 hash が不一致または判定不能なら、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d0272be83866b55f0cca12e1c95ded5af1b802814955c5f56ba3ed2a22cac2c8",
+      "evidence_hash": "a9065a33eb4a304a8ad5cc05e91b16d06b12b63099e5dc95f1f4092e14690a30",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d0272be83866b55f0cca12e1c95ded5af1b802814955c5f56ba3ed2a22cac2c8",
+      "evidence_hash": "ddc5c857319ee8bcff94b6ef60d1efbbdd345d5d03c95098a4e33710d77d2a07",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc 抽出の要否は、layer の artifact に記録された implementation-side input hash と現在の対応する input hash の比較だけで判定する。一致時は rustdoc 抽出を skip し、不一致または判定不能時は AC-07 の条件に従って rustdoc 抽出から再計算する。declaration_hash または spec の差分は signal 再評価の要否だけを決め、両方が一致するときは評価ごと skip し、declaration_hash のみが不一致で implementation-side input hash が一致するときは AC-06 の条件に従って rustdoc を起動せず signal を再評価する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "rustdoc 抽出の要否は、layer の artifact に記録された implementation-side input hash と現在の対応する input hash の比較だけで判定する。一致時は rustdoc 抽出を skip し、不一致または判定不能時は AC-07 の条件に従って rustdoc 抽出から再計算する。declaration_hash または spec の差分は signal 再評価の要否だけを決め、両方が一致するときは評価ごと skip し、declaration_hash のみが不一致で implementation-side input hash が一致するときは AC-06 の条件に従って rustdoc を起動せず signal を再評価する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d0272be83866b55f0cca12e1c95ded5af1b802814955c5f56ba3ed2a22cac2c8",
+      "evidence_hash": "f4297f58a9fc5f4c1d1dcc4be1283815b456de3dd577387a3559727daadf4f52",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue または spec だけが変わった layer は、implementation-side input hash が一致するとき、rustdoc を起動せずに signal を再評価する。rustdoc 抽出の再実行要否と signal 再評価要否は入力ごとに分離して判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue または spec だけが変わった layer は、implementation-side input hash が一致するとき、rustdoc を起動せずに signal を再評価する。rustdoc 抽出の再実行要否と signal 再評価要否は入力ごとに分離して判定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d0272be83866b55f0cca12e1c95ded5af1b802814955c5f56ba3ed2a22cac2c8",
+      "evidence_hash": "ec707111f47c24a28d5c6c1e8921016b80f9f1df9c57f042f873d4658a71b468",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implementation-side input hash の不一致または判定不能では、rustdoc 抽出から再計算する。判定と再計算は layer（crate）単位とし、変更がある layer だけを再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation-side input hash の不一致または判定不能では、rustdoc 抽出から再計算する。判定と再計算は layer（crate）単位とし、変更がある layer だけを再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4af89c4440b20a61f772233b357c0a22a09c5930f40681928c57f5ce641ae8ab",
+      "evidence_hash": "a9065a33eb4a304a8ad5cc05e91b16d06b12b63099e5dc95f1f4092e14690a30",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsExecutionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cafbb6ce0143e156cd6332c46d59b2200300c8a5da4cbd70b53746c446d63d79",
+      "evidence_hash": "fe109946d1995c4c732bc8fb54bbffe76f5ac009147a01c150500c59b2706fa5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "reviewer 起動 wrapper は layer（crate）ごとに、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を機械的に判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "TypeSignalsExecutorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "reviewer 起動 wrapper は layer（crate）ごとに、対象 crate の source 内容・依存解決（lockfile）・toolchain 識別子から得る実装側入力 hash を機械的に判定する。実装側入力が不変なら rustdoc 抽出を skip し、catalogue または spec の変更は signal を再評価するが、rustdoc 抽出の再実行要否とは分離して判定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cafbb6ce0143e156cd6332c46d59b2200300c8a5da4cbd70b53746c446d63d79",
+      "evidence_hash": "4d96c7f24b5212b1d4d365bae36f9db185a0d0ae6acdf0baa816e2998dd2972f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue または spec の変更時は signal を再評価するが、実装側入力 hash が artifact 記録値と一致するときは rustdoc 抽出を再実行しない。実装側入力 hash が不一致または判定不能なら、rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "TypeSignalsExecutorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "catalogue または spec の変更時は signal を再評価するが、実装側入力 hash が artifact 記録値と一致するときは rustdoc 抽出を再実行しない。実装側入力 hash が不一致または判定不能なら、rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cafbb6ce0143e156cd6332c46d59b2200300c8a5da4cbd70b53746c446d63d79",
+      "evidence_hash": "a9065a33eb4a304a8ad5cc05e91b16d06b12b63099e5dc95f1f4092e14690a30",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "TypeSignalsExecutorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-07",
+          "text_label": "実装側入力 hash を判定できない場合は、signal 評価の skip をせず rustdoc 抽出から再計算する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cafbb6ce0143e156cd6332c46d59b2200300c8a5da4cbd70b53746c446d63d79",
+      "evidence_hash": "ddc5c857319ee8bcff94b6ef60d1efbbdd345d5d03c95098a4e33710d77d2a07",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc 抽出の要否は、layer の artifact に記録された implementation-side input hash と現在の対応する input hash の比較だけで判定する。一致時は rustdoc 抽出を skip し、不一致または判定不能時は AC-07 の条件に従って rustdoc 抽出から再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "TypeSignalsExecutorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "rustdoc 抽出の要否は、layer の artifact に記録された implementation-side input hash と現在の対応する input hash の比較だけで判定する。一致時は rustdoc 抽出を skip し、不一致または判定不能時は AC-07 の条件に従って rustdoc 抽出から再計算する。declaration_hash または spec の差分は signal 再評価の要否だけを決め、両方が一致するときは評価ごと skip し、declaration_hash のみが不一致で implementation-side input hash が一致するときは AC-06 の条件に従って rustdoc を起動せず signal を再評価する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cafbb6ce0143e156cd6332c46d59b2200300c8a5da4cbd70b53746c446d63d79",
+      "evidence_hash": "f4297f58a9fc5f4c1d1dcc4be1283815b456de3dd577387a3559727daadf4f52",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue または spec だけが変わった layer は、implementation-side input hash が一致するとき、rustdoc を起動せずに signal を再評価する。rustdoc 抽出の再実行要否と signal 再評価要否は入力ごとに分離して判定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "TypeSignalsExecutorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue または spec だけが変わった layer は、implementation-side input hash が一致するとき、rustdoc を起動せずに signal を再評価する。rustdoc 抽出の再実行要否と signal 再評価要否は入力ごとに分離して判定する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cafbb6ce0143e156cd6332c46d59b2200300c8a5da4cbd70b53746c446d63d79",
+      "evidence_hash": "ec707111f47c24a28d5c6c1e8921016b80f9f1df9c57f042f873d4658a71b468",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装側の入力 hash の不一致または判定不能では、rustdoc 抽出から再計算する。判定と再計算は layer（crate）単位とし、変更がある layer だけを再計算する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/agent-dispatch-cost-reduction-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "TypeSignalsExecutorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "implementation-side input hash の不一致または判定不能では、rustdoc 抽出から再計算する。判定と再計算は layer（crate）単位とし、変更がある layer だけを再計算する。"
+        }
+      }
+    }
+  ]
+}

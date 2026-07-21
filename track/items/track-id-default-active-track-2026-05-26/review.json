@@ -114,7 +114,7 @@
             {
               "message": "This adds a new public `BranchReaderPort` implementation on `SystemGitRepo`, but there are no tests in `git_cli/mod.rs` covering the happy path or the error mapping for this adapter. That leaves the new public API unverified and makes regressions in the delegation/mapping easy to miss.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "file": "libs/infrastructure/src/git_cli/mod.rs",
               "line": 235,
               "category": "testing"
             }
@@ -129,14 +129,14 @@
             {
               "message": "This patch is no longer limited to the single impl block requested in CN-05: it appends unit tests under `mod tests`, so the change surface extends beyond the allowed block.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "file": "libs/infrastructure/src/git_cli/mod.rs",
               "line": 743,
               "category": "architecture"
             },
             {
               "message": "The new `BranchReaderPort` adapter has no test for the only error branch (`GitError` -> `BranchReadError::ReadFailed`). The added tests cover the success path and the `Ok(None)` path only, so an error-mapping regression would not be caught.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "file": "libs/infrastructure/src/git_cli/mod.rs",
               "line": 748,
               "category": "testing"
             }
@@ -151,7 +151,7 @@
             {
               "message": "This patch exceeds the briefing's CN-05 boundary: it adds a new `#[cfg(test)]` test block after the adapter impl, even though T002 was supposed to stay within a single `impl BranchReaderPort for SystemGitRepo` block in `libs/infrastructure/src/git_cli/` only.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/git_cli/mod.rs",
+              "file": "libs/infrastructure/src/git_cli/mod.rs",
               "line": 743,
               "category": "scope"
             }
@@ -195,7 +195,7 @@
             {
               "message": "The new error path tells users to \"provide an explicit track-id\", but `verify catalogue-spec-signals` has no track-id argument. On a non-track branch this remediation is impossible within this command, so the failure message contradicts the CLI surface.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/catalogue_spec_signals.rs",
+              "file": "libs/infrastructure/src/verify/catalogue_spec_signals.rs",
               "line": 399,
               "category": "contradiction"
             }
@@ -271,14 +271,14 @@
             {
               "message": "`SystemGitRepo::discover_from(&project_root)` is run before `TaskOperationInteractor::new` here, so every `skip_branch_check = false` add/set/clear mutation now requires a git repository even when the interactor would have skipped the branch guard for a branchless track. That regresses valid branchless operations and also changes validation precedence (for example, a bad `task_id` can now surface as a git-discovery error if the repo is missing). The same eager-discovery pattern repeats at lines 84 and 125.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
               "line": 23,
               "category": "correctness"
             },
             {
               "message": "The same eager `SystemGitRepo::discover_from(&project_root)` happens before `TaskOperationInteractor` is invoked here, so transition now depends on git discovery even in cases where the use case would have rejected bad input first or skipped the branch guard for a branchless track. That breaks valid non-git/branchless transition flows and changes error precedence.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/transition.rs",
+              "file": "apps/cli/src/commands/track/transition.rs",
               "line": 26,
               "category": "correctness"
             }
@@ -307,14 +307,14 @@
             {
               "message": "`resolve_track_id()` always calls `SystemGitRepo::discover()` on the process CWD. That is fine for the plain `track/*` commands, but it makes the new omitted-`track-id` path inconsistent for the `--workspace-root` commands in this file (`type-signals`, `baseline-graph`, `contract-map`, `catalogue-spec-signals`, `catalogue-impl-signals`, `baseline-capture`): if the CLI is launched from a different checkout or subdirectory, the helper can resolve a different active track than the workspace the command actually operates on, so the later workspace-root branch guards can fail or target the wrong track.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
+              "file": "apps/cli/src/commands/track/mod.rs",
               "line": 90,
               "category": "correctness"
             },
             {
               "message": "The added `resolve_track_id` tests short-circuit on repo discovery/current-branch failures and on non-matching branch shapes, so on detached HEAD, main, or any non-git CI environment they can all pass without exercising either the active-branch default or the fail-closed path. That leaves the new behavior required by the brief effectively unverified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
+              "file": "apps/cli/src/commands/track/mod.rs",
               "line": 753,
               "category": "tests"
             }
@@ -517,7 +517,7 @@
             {
               "message": "`verify catalogue-spec-signals` now decides whether to skip using `resolve_ci_verify_track_id_from_root(&args.workspace_root)`, but the actual verification path still resolves the repository from the process CWD inside `execute_catalogue_spec_signals_check`. If `--workspace-root` does not match the current directory's repo, the skip decision and the real check can consult different branches, so this subcommand can skip or fail against the wrong checkout.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
+              "file": "apps/cli/src/commands/verify.rs",
               "line": 324,
               "category": "correctness"
             }
@@ -532,7 +532,7 @@
             {
               "message": "The new AC-16 coverage only exercises the private helper and `print_skip()`. None of the tests assert the actual `execute(VerifyCommand::...)` dispatch behavior on a non-track branch, so a regression in the `SpecStates`/`PlanArtifactRefs`/`CatalogueSpecRefs`/`CatalogueSpecSignals` match arms or the explicit-argument bypass would still pass the suite.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/verify.rs",
+              "file": "apps/cli/src/commands/verify.rs",
               "line": 1414,
               "category": "testing"
             }
@@ -590,7 +590,7 @@
             {
               "message": "P1: `dispatch_track_set_override` is not parsing the status positionally; it takes the first non-flag token anywhere in the arg list. That means valid invocations with `--track-id` or `--reason` before the status can be misread (`my-track` becomes the status in `--track-id my-track blocked`), and the later `filter(|s| *s != status)` drops every token equal to the status, so a legitimate reason like `--reason blocked` or a track-id named `clear` gets stripped. This can route to the wrong subcommand or make the forwarded argv invalid.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "file": "apps/cli/src/commands/make.rs",
               "line": 369,
               "category": "correctness"
             }
@@ -605,14 +605,14 @@
             {
               "message": "`dispatch_track_set_override` only looks at the first token after stripping a leading `--`, so any invocation that puts `--track-id` or `--reason` before the status now errors instead of routing on the first non-flag positional. That makes the wrapper order-sensitive in a way the briefing contract explicitly forbids.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "file": "apps/cli/src/commands/make.rs",
               "line": 367,
               "category": "correctness"
             },
             {
               "message": "The new wrapper-argv test block covers add-task/transition/next-task/task-counts, but it never exercises `dispatch_track_set_override`, the only changed wrapper with branch-specific routing (`clear-override` vs `set-override`). A regression in status extraction or branch selection would ship without any test coverage here.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make_tests.rs",
+              "file": "apps/cli/src/commands/make_tests.rs",
               "line": 107,
               "category": "test coverage"
             }
@@ -627,7 +627,7 @@
             {
               "message": "`build_set_override_args` treats every hyphen-prefixed token as a flag that consumes the next word as its value. That breaks the supported valueless `--skip-branch-check` option for `track-set-override`/`track-clear-override`: `cargo make track-set-override -- --skip-branch-check blocked` will skip `blocked` as if it were the flag value, fail to find a status, and return the usage error instead of routing to `set-override blocked`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/make.rs",
+              "file": "apps/cli/src/commands/make.rs",
               "line": 389,
               "category": "correctness"
             }
@@ -678,7 +678,7 @@
             {
               "message": "The override happy-path tests no longer verify persisted state. `test_execute_set_override_happy_path` dropped the metadata assertion, and `test_execute_clear_override_happy_path` no longer pre-seeds an override before clearing. A regression that makes set/clear a no-op would still pass, so the CLI mutation path is no longer covered.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
               "line": 500,
               "category": "test coverage"
             }
@@ -691,16 +691,16 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: The `set_override`/`clear_override` happy-path tests stopped verifying the actual mutation. `test_execute_set_override_happy_path` no longer checks that `metadata.json` contains `blocked`, and `test_execute_clear_override_happy_path` no longer sets up an existing override before calling clear, so regressions in persistence or clearing would still pass the CLI tests. See [state_ops.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs#L500) and [state_ops.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs#L516).",
+              "message": "P1: The `set_override`/`clear_override` happy-path tests stopped verifying the actual mutation. `test_execute_set_override_happy_path` no longer checks that `metadata.json` contains `blocked`, and `test_execute_clear_override_happy_path` no longer sets up an existing override before calling clear, so regressions in persistence or clearing would still pass the CLI tests. See [state_ops.rs](apps/cli/src/commands/track/state_ops.rs#L500) and [state_ops.rs](apps/cli/src/commands/track/state_ops.rs#L516).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
               "line": 500,
               "category": "test coverage"
             },
             {
-              "message": "P1: The transition integration suite now returns early unless the checkout branch is `track/<id>`. On detached HEAD or a normal feature branch, the whole file becomes a no-op, so the new explicit `--track-id` write guard and the end-to-end transition path get no coverage in those environments. See [transition_integration.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/tests/transition_integration.rs#L117).",
+              "message": "P1: The transition integration suite now returns early unless the checkout branch is `track/<id>`. On detached HEAD or a normal feature branch, the whole file becomes a no-op, so the new explicit `--track-id` write guard and the end-to-end transition path get no coverage in those environments. See [transition_integration.rs](apps/cli/tests/transition_integration.rs#L117).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/tests/transition_integration.rs",
+              "file": "apps/cli/tests/transition_integration.rs",
               "line": 117,
               "category": "test coverage"
             }
@@ -715,7 +715,7 @@
             {
               "message": "These transition integration tests now early-return unless the checkout is already on a `track/*` branch, so the success/reopen/missing-items-dir paths are skipped in the common CI/default-branch case. That leaves the new WRITE-guard and end-to-end transition flow untested outside the hand-picked branch context.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/tests/transition_integration.rs",
+              "file": "apps/cli/tests/transition_integration.rs",
               "line": 117,
               "category": "test coverage"
             }
@@ -897,7 +897,7 @@
             {
               "message": "`matches!(mode, ResolveMode::Read)` moves `mode`, but the function uses `mode` again in the later `match mode` expression. Because `ResolveMode` is not `Copy`, this code will not compile as written.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/mod.rs",
+              "file": "apps/cli/src/commands/track/mod.rs",
               "line": 112,
               "category": "build"
             }
@@ -1061,7 +1061,7 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new R9 bullet at [knowledge/conventions/type-designer-kind-selection.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/type-designer-kind-selection.md#L205) says `kind.shape.fields[].ty` for both plain and tuple shapes, but `StructShapeDto::Tuple` stores tuple fields as bare strings, not `{ ty }` objects. That wording would send authors toward a nonexistent schema path for tuple newtypes and contradict the codec DTO.",
+              "message": "The new R9 bullet at [knowledge/conventions/type-designer-kind-selection.md](knowledge/conventions/type-designer-kind-selection.md#L205) says `kind.shape.fields[].ty` for both plain and tuple shapes, but `StructShapeDto::Tuple` stores tuple fields as bare strings, not `{ ty }` objects. That wording would send authors toward a nonexistent schema path for tuple newtypes and contradict the codec DTO.",
               "severity": "P1",
               "file": "knowledge/conventions/type-designer-kind-selection.md",
               "line": 205,
@@ -1745,7 +1745,7 @@
             {
               "message": "`AC-03` still says any explicit `--track-id` is used regardless of the current branch, but `AC-18` later redefines WRITE commands to fail closed when the explicit id does not match the active branch. As written, `sotp track signals --track-id my-track` on `main` is both accepted and rejected by the spec.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-id-default-active-track-2026-05-26/spec.md",
+              "file": "track/items/track-id-default-active-track-2026-05-26/spec.md",
               "line": 61,
               "category": "contradiction"
             }
@@ -1884,7 +1884,7 @@
             {
               "message": "`BranchMismatch` is added as a new `ActiveTrackResolveError` variant, but the contract map never draws the corresponding relation to `ActiveTrackResolveError__self` the way it does for `BranchRead` and `Resolution`. As rendered, the new variant looks disconnected from the error type it belongs to.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-id-default-active-track-2026-05-26/contract-map.md",
+              "file": "track/items/track-id-default-active-track-2026-05-26/contract-map.md",
               "line": 81,
               "category": "factual error"
             }
@@ -1935,7 +1935,7 @@
             {
               "message": "`T017` says `T016 introduced resolve_track_id_from_root_for_write`, but `T016` is still `todo` in the same plan. That makes the rendered plan internally inconsistent about whether the root-aware helper already exists or is still pending.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-id-default-active-track-2026-05-26/plan.md",
+              "file": "track/items/track-id-default-active-track-2026-05-26/plan.md",
               "line": 139,
               "category": "contradiction"
             }
@@ -1950,7 +1950,7 @@
             {
               "message": "T017 now says it introduces `resolve_track_id_from_root_for_write`, but the earlier S15/S16 text in this same plan still assigns that helper to T016. That leaves the plan internally inconsistent about which task owns the helper introduction and the task order.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-id-default-active-track-2026-05-26/plan.md",
+              "file": "track/items/track-id-default-active-track-2026-05-26/plan.md",
               "line": 139,
               "category": "contradiction"
             }
@@ -1965,7 +1965,7 @@
             {
               "message": "This update says `resolve_track_id_from_root_for_write` is already added by T017 and that T016 should only apply the existing helper, but the still-pending T016 description below still says to implement the same helper as part of that task. As written, the plan assigns the helper introduction to both T017 and T016, so the task split is internally inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/track-id-default-active-track-2026-05-26/plan.md",
+              "file": "track/items/track-id-default-active-track-2026-05-26/plan.md",
               "line": 127,
               "category": "contradiction"
             }

@@ -109,7 +109,7 @@ pub(super) fn v3_type_entry_details(
     self_crate_name: &str,
     doc_trait_impls: &[domain::tddd::catalogue_v2::TraitImplDeclV2],
 ) -> String {
-    match &entry.kind {
+    match entry.kind() {
         TypeKindV2::Struct(sk) if sk.typestate.is_some() => {
             let Some(ts) = sk.typestate.as_ref() else {
                 return "\u{2014}".to_owned(); // unreachable: guard is_some above
@@ -132,7 +132,7 @@ pub(super) fn v3_type_entry_details(
                 variants.iter().map(|v| v.name.as_str()).collect::<Vec<_>>().join(", ")
             }
         }
-        _ if matches!(entry.role, DataRole::SecondaryAdapter) => {
+        _ if matches!(entry.role(), DataRole::SecondaryAdapter) => {
             // SecondaryAdapter: render declared trait impls from the document-level
             // `trait_impls` list (ADR `2026-05-20-0048` D1), filtering by `for_type`.
             // Only local types (crate::, self::, super::, self-crate-qualified, or bare name)
@@ -140,10 +140,10 @@ pub(super) fn v3_type_entry_details(
             let impls: Vec<String> = doc_trait_impls
                 .iter()
                 .filter(|ti| {
-                    for_type_local_bare_name(ti.for_type.as_str(), self_crate_name)
+                    for_type_local_bare_name(ti.for_type().as_str(), self_crate_name)
                         == Some(type_name)
                 })
-                .map(|ti| format!("impl {}", trait_ref_short_name(ti.trait_ref.as_str())))
+                .map(|ti| format!("impl {}", trait_ref_short_name(ti.trait_ref().as_str())))
                 .collect();
             if impls.is_empty() {
                 "\u{2014}".to_owned() // —
@@ -160,10 +160,10 @@ pub(super) fn v3_type_entry_details(
 /// - `SecondaryPort` / `ApplicationService` / `SpecificationPort`: method signatures
 ///   joined by `, ` — or `—` when no methods declared.
 pub(super) fn v3_trait_entry_details(entry: &TraitEntry) -> String {
-    if entry.methods.is_empty() {
+    if entry.methods().is_empty() {
         "\u{2014}".to_owned() // —
     } else {
-        entry.methods.iter().map(|m| m.signature_string()).collect::<Vec<_>>().join(", ")
+        entry.methods().iter().map(|m| m.signature_string()).collect::<Vec<_>>().join(", ")
     }
 }
 
@@ -171,9 +171,9 @@ pub(super) fn v3_trait_entry_details(entry: &TraitEntry) -> String {
 ///
 /// Emits the function signature: `[async ]fn(params) -> returns`.
 pub(super) fn v3_function_entry_details(entry: &FunctionEntry) -> String {
-    let async_prefix = if entry.is_async { "async " } else { "" };
+    let async_prefix = if entry.is_async() { "async " } else { "" };
     let params: Vec<String> =
-        entry.params.iter().map(|p| format!("{}: {}", p.name, p.ty)).collect();
+        entry.params().iter().map(|p| format!("{}: {}", p.name, p.ty)).collect();
     let params_str = params.join(", ");
-    format!("{}fn({}) -> {}", async_prefix, params_str, entry.returns)
+    format!("{}fn({}) -> {}", async_prefix, params_str, entry.returns())
 }

@@ -17,4 +17,4 @@ hook のセルフテストにのみ残存する。新規の検証ロジック・
 `knowledge/` 配下のファイル名タイムスタンプはローカル時間（JST）を使用する。
 UTC ではない。
 
-例: `2026-04-07-2244-forgecode-comparison.md`（JST 22:44）
+例: `<YYYY-MM-DD-HHMM>-forgecode-comparison.md`（JST 22:44）

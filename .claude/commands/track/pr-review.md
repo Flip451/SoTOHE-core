@@ -10,13 +10,16 @@ User invokes this command as `/track:pr-review`. `$ARGUMENTS` is unused (reserve
 
 ## Claude Code invocation constraints
 
-This command runs directly — no subagents. Key wrappers used in sequence:
+This command runs directly — no subagents. Key commands used in sequence:
 
-- `cargo make track-pr-push` — push the track branch
+- `bin/sotp pr push` — push the track branch
 - `bin/sotp pr ensure-pr` — create or reuse a PR
-- `cargo make track-pr-review` — trigger + poll + parse the Codex Cloud review cycle
+- `bin/sotp pr review-cycle` — trigger + poll + parse the Codex Cloud review cycle
 
-Prerequisites: Codex Cloud GitHub App must be installed; `gh` CLI must be authenticated. Resolve `capabilities.pr-reviewer` from `.harness/config/agent-profiles.json`; if the provider is not `codex`, fail and direct the user to use `/track:review` instead.
+Prerequisites: Codex Cloud GitHub App must be installed; `gh` CLI must be authenticated.
+`sotp pr review-cycle` resolves `capabilities.pr-reviewer` internally from
+`.harness/config/agent-profiles.json` and fails if the provider is not `codex`; surface that
+error and direct the user to use `/track:review` instead.
 
 ## Report format
 

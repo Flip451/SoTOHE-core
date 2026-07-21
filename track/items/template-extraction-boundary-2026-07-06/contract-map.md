@@ -1,0 +1,413 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_template_export["domain::template_export"]
+    direction TB
+  subgraph T38_domain_domain_TemplateBoundaryManifest["template_export::TemplateBoundaryManifest"]
+    direction TB
+    T38_domain_domain_TemplateBoundaryManifest__self[TemplateBoundaryManifest]
+    T38_domain_domain_TemplateBoundaryManifest_try_new([try_new])
+    T38_domain_domain_TemplateBoundaryManifest_entries([entries])
+    T38_domain_domain_TemplateBoundaryManifest_classify([classify])
+    T38_domain_domain_TemplateBoundaryManifest_patterns_are_unique([patterns_are_unique])
+    T38_domain_domain_TemplateBoundaryManifest_patterns_are_prefix_free([patterns_are_prefix_free])
+  end
+  subgraph T43_domain_domain_TemplateBoundaryManifestError["template_export::TemplateBoundaryManifestError"]
+    direction TB
+    T43_domain_domain_TemplateBoundaryManifestError__self[TemplateBoundaryManifestError]
+    T43_domain_domain_TemplateBoundaryManifestError_DuplicatePattern[DuplicatePattern]
+    T43_domain_domain_TemplateBoundaryManifestError_EmptyManifest[EmptyManifest]
+    T43_domain_domain_TemplateBoundaryManifestError_NestedPattern[NestedPattern]
+  end
+  subgraph T40_domain_domain_TemplatePathClassification["template_export::TemplatePathClassification"]
+    direction TB
+    T40_domain_domain_TemplatePathClassification__self[TemplatePathClassification]
+    T40_domain_domain_TemplatePathClassification_Include[Include]
+    T40_domain_domain_TemplatePathClassification_Exclude[Exclude]
+    T40_domain_domain_TemplatePathClassification_Overlay[Overlay]
+  end
+  subgraph T31_domain_domain_TemplatePathEntry["template_export::TemplatePathEntry"]
+    direction TB
+    T31_domain_domain_TemplatePathEntry__self[TemplatePathEntry]
+    T31_domain_domain_TemplatePathEntry_new([new])
+    T31_domain_domain_TemplatePathEntry_pattern([pattern])
+    T31_domain_domain_TemplatePathEntry_classification([classification])
+  end
+  subgraph T33_domain_domain_TemplatePathPattern["template_export::TemplatePathPattern"]
+    direction TB
+    T33_domain_domain_TemplatePathPattern__self[TemplatePathPattern]
+    T33_domain_domain_TemplatePathPattern_try_new([try_new])
+    T33_domain_domain_TemplatePathPattern_as_str([as_str])
+    T33_domain_domain_TemplatePathPattern_is_workspace_relative([is_workspace_relative])
+  end
+  subgraph T38_domain_domain_TemplatePathPatternError["template_export::TemplatePathPatternError"]
+    direction TB
+    T38_domain_domain_TemplatePathPatternError__self[TemplatePathPatternError]
+    T38_domain_domain_TemplatePathPatternError_InvalidPattern[InvalidPattern]
+  end
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_template_export["usecase::template_export"]
+    direction TB
+  subgraph T49_usecase_usecase_TemplateBoundaryManifestReadError["template_export::TemplateBoundaryManifestReadError"]
+    direction TB
+    T49_usecase_usecase_TemplateBoundaryManifestReadError__self[TemplateBoundaryManifestReadError]
+    T49_usecase_usecase_TemplateBoundaryManifestReadError_NotFound[NotFound]
+    T49_usecase_usecase_TemplateBoundaryManifestReadError_Parse[Parse]
+    T49_usecase_usecase_TemplateBoundaryManifestReadError_InvalidPattern[InvalidPattern]
+    T49_usecase_usecase_TemplateBoundaryManifestReadError_InvalidManifest[InvalidManifest]
+    T49_usecase_usecase_TemplateBoundaryManifestReadError_Io[Io]
+  end
+  subgraph T37_usecase_usecase_TemplateExportCommand["template_export::TemplateExportCommand"]
+    direction TB
+    T37_usecase_usecase_TemplateExportCommand__self[TemplateExportCommand]
+  end
+  subgraph T35_usecase_usecase_TemplateExportError["template_export::TemplateExportError"]
+    direction TB
+    T35_usecase_usecase_TemplateExportError__self[TemplateExportError]
+    T35_usecase_usecase_TemplateExportError_ManifestRead[ManifestRead]
+    T35_usecase_usecase_TemplateExportError_Export[Export]
+  end
+  subgraph T40_usecase_usecase_TemplateExportInteractor["template_export::TemplateExportInteractor"]
+    direction TB
+    T40_usecase_usecase_TemplateExportInteractor__self[TemplateExportInteractor]
+    T40_usecase_usecase_TemplateExportInteractor_new([new])
+  end
+  subgraph T39_usecase_usecase_TemplateExportPortError["template_export::TemplateExportPortError"]
+    direction TB
+    T39_usecase_usecase_TemplateExportPortError__self[TemplateExportPortError]
+    T39_usecase_usecase_TemplateExportPortError_OutputDirExists[OutputDirExists]
+    T39_usecase_usecase_TemplateExportPortError_OverlayMissing[OverlayMissing]
+    T39_usecase_usecase_TemplateExportPortError_SourceMissing[SourceMissing]
+    T39_usecase_usecase_TemplateExportPortError_UnclassifiedPath[UnclassifiedPath]
+    T39_usecase_usecase_TemplateExportPortError_Io[Io]
+  end
+  subgraph T36_usecase_usecase_TemplateExportReport["template_export::TemplateExportReport"]
+    direction TB
+    T36_usecase_usecase_TemplateExportReport__self[TemplateExportReport]
+  end
+  subgraph R44_usecase_usecase_TemplateBoundaryManifestPort["template_export::TemplateBoundaryManifestPort"]
+    direction TB
+    R44_usecase_usecase_TemplateBoundaryManifestPort__self[TemplateBoundaryManifestPort]
+    R44_usecase_usecase_TemplateBoundaryManifestPort_read([read])
+  end
+  subgraph R34_usecase_usecase_TemplateExportPort["template_export::TemplateExportPort"]
+    direction TB
+    R34_usecase_usecase_TemplateExportPort__self[TemplateExportPort]
+    R34_usecase_usecase_TemplateExportPort_export([export])
+  end
+  subgraph R37_usecase_usecase_TemplateExportService["template_export::TemplateExportService"]
+    direction TB
+    R37_usecase_usecase_TemplateExportService__self[TemplateExportService]
+    R37_usecase_usecase_TemplateExportService_export([export])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_template_export["infrastructure::template_export"]
+    direction TB
+  subgraph T63_infrastructure_infrastructure_FsTemplateBoundaryManifestAdapter["template_export::FsTemplateBoundaryManifestAdapter"]
+    direction TB
+    T63_infrastructure_infrastructure_FsTemplateBoundaryManifestAdapter__self[FsTemplateBoundaryManifestAdapter]
+    T63_infrastructure_infrastructure_FsTemplateBoundaryManifestAdapter_new([new])
+  end
+  subgraph T53_infrastructure_infrastructure_FsTemplateExportAdapter["template_export::FsTemplateExportAdapter"]
+    direction TB
+    T53_infrastructure_infrastructure_FsTemplateExportAdapter__self[FsTemplateExportAdapter]
+    T53_infrastructure_infrastructure_FsTemplateExportAdapter_new([new])
+  end
+  subgraph T64_infrastructure_infrastructure_TemplateBoundaryManifestCodecError["template_export::codec::TemplateBoundaryManifestCodecError"]
+    direction TB
+    T64_infrastructure_infrastructure_TemplateBoundaryManifestCodecError__self[TemplateBoundaryManifestCodecError]
+    T64_infrastructure_infrastructure_TemplateBoundaryManifestCodecError_SchemaVersion[SchemaVersion]
+    T64_infrastructure_infrastructure_TemplateBoundaryManifestCodecError_Json[Json]
+    T64_infrastructure_infrastructure_TemplateBoundaryManifestCodecError_Pattern[Pattern]
+    T64_infrastructure_infrastructure_TemplateBoundaryManifestCodecError_Manifest[Manifest]
+  end
+  subgraph T57_infrastructure_infrastructure_TemplateBoundaryManifestDto["template_export::codec::TemplateBoundaryManifestDto"]
+    direction TB
+    T57_infrastructure_infrastructure_TemplateBoundaryManifestDto__self[TemplateBoundaryManifestDto]
+  end
+  subgraph T59_infrastructure_infrastructure_TemplatePathClassificationDto["template_export::codec::TemplatePathClassificationDto"]
+    direction TB
+    T59_infrastructure_infrastructure_TemplatePathClassificationDto__self[TemplatePathClassificationDto]
+    T59_infrastructure_infrastructure_TemplatePathClassificationDto_Include[Include]
+    T59_infrastructure_infrastructure_TemplatePathClassificationDto_Exclude[Exclude]
+    T59_infrastructure_infrastructure_TemplatePathClassificationDto_Overlay[Overlay]
+  end
+  subgraph T50_infrastructure_infrastructure_TemplatePathEntryDto["template_export::codec::TemplatePathEntryDto"]
+    direction TB
+    T50_infrastructure_infrastructure_TemplatePathEntryDto__self[TemplatePathEntryDto]
+  end
+  F85_infrastructure_infrastructure_infrastructure__template_export__codec__decode_manifest[[decode_manifest]]
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+  subgraph cli_driver_cli_driver_module_template_export["cli_driver::template_export"]
+    direction TB
+  subgraph T36_cli_driver_cli_driver_TemplateDriver["template_export::TemplateDriver"]
+    direction TB
+    T36_cli_driver_cli_driver_TemplateDriver__self[TemplateDriver]
+    T36_cli_driver_cli_driver_TemplateDriver_new([new])
+    T36_cli_driver_cli_driver_TemplateDriver_handle([handle])
+  end
+  subgraph T41_cli_driver_cli_driver_TemplateExportInput["template_export::TemplateExportInput"]
+    direction TB
+    T41_cli_driver_cli_driver_TemplateExportInput__self[TemplateExportInput]
+  end
+  subgraph T35_cli_driver_cli_driver_TemplateInput["template_export::TemplateInput"]
+    direction TB
+    T35_cli_driver_cli_driver_TemplateInput__self[TemplateInput]
+    T35_cli_driver_cli_driver_TemplateInput_Export[Export]
+  end
+  end
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+  subgraph cli_composition_cli_composition_module_template_export["cli_composition::template_export"]
+    direction TB
+  subgraph T55_cli_composition_cli_composition_TemplateCompositionRoot["template_export::TemplateCompositionRoot"]
+    direction TB
+    T55_cli_composition_cli_composition_TemplateCompositionRoot__self[TemplateCompositionRoot]
+    T55_cli_composition_cli_composition_TemplateCompositionRoot_new([new])
+    T55_cli_composition_cli_composition_TemplateCompositionRoot_template_driver([template_driver])
+    T55_cli_composition_cli_composition_TemplateCompositionRoot_handle([handle])
+  end
+  end
+end
+subgraph cli["cli"]
+  direction TB
+  subgraph T18_cli_cli_CliCommand["CliCommand"]
+    direction TB
+    T18_cli_cli_CliCommand__self[CliCommand]
+    T18_cli_cli_CliCommand_Arch[Arch]
+    T18_cli_cli_CliCommand_Conventions[Conventions]
+    T18_cli_cli_CliCommand_Domain[Domain]
+    T18_cli_cli_CliCommand_Guard[Guard]
+    T18_cli_cli_CliCommand_Hook[Hook]
+    T18_cli_cli_CliCommand_Track[Track]
+    T18_cli_cli_CliCommand_Git[Git]
+    T18_cli_cli_CliCommand_Pr[Pr]
+    T18_cli_cli_CliCommand_Plan[Plan]
+    T18_cli_cli_CliCommand_Review[Review]
+    T18_cli_cli_CliCommand_File[File]
+    T18_cli_cli_CliCommand_Verify[Verify]
+    T18_cli_cli_CliCommand_FindSimilar[FindSimilar]
+    T18_cli_cli_CliCommand_DupIndex[DupIndex]
+    T18_cli_cli_CliCommand_DupCheck[DupCheck]
+    T18_cli_cli_CliCommand_Telemetry[Telemetry]
+    T18_cli_cli_CliCommand_Dry[Dry]
+    T18_cli_cli_CliCommand_RefVerify[RefVerify]
+    T18_cli_cli_CliCommand_Signal[Signal]
+    T18_cli_cli_CliCommand_TaskContract[TaskContract]
+    T18_cli_cli_CliCommand_Catalog[Catalog]
+    T18_cli_cli_CliCommand_CatalogueLint[CatalogueLint]
+    T18_cli_cli_CliCommand_Template[Template]
+    T18_cli_cli_CliCommand_Demo[Demo]
+  end
+  subgraph cli_cli_module_commands["cli::commands"]
+    direction TB
+  subgraph T23_cli_cli_TemplateCommand["commands::template::TemplateCommand"]
+    direction TB
+    T23_cli_cli_TemplateCommand__self[TemplateCommand]
+    T23_cli_cli_TemplateCommand_Export[Export]
+  end
+  subgraph T26_cli_cli_TemplateExportArgs["commands::template::TemplateExportArgs"]
+    direction TB
+    T26_cli_cli_TemplateExportArgs__self[TemplateExportArgs]
+  end
+  F41_cli_cli_cli__commands__template__dispatch[[dispatch]]
+  F40_cli_cli_cli__commands__template__execute[[execute]]
+  end
+end
+T38_domain_domain_TemplateBoundaryManifest_try_new --o T31_domain_domain_TemplatePathEntry__self
+T38_domain_domain_TemplateBoundaryManifest_try_new --> T38_domain_domain_TemplateBoundaryManifest__self
+T38_domain_domain_TemplateBoundaryManifest_try_new --> T43_domain_domain_TemplateBoundaryManifestError__self
+T38_domain_domain_TemplateBoundaryManifest_entries --> T31_domain_domain_TemplatePathEntry__self
+T38_domain_domain_TemplateBoundaryManifest_classify --o T33_domain_domain_TemplatePathPattern__self
+T38_domain_domain_TemplateBoundaryManifest_classify --> T40_domain_domain_TemplatePathClassification__self
+T43_domain_domain_TemplateBoundaryManifestError_DuplicatePattern --o|pattern| T33_domain_domain_TemplatePathPattern__self
+T43_domain_domain_TemplateBoundaryManifestError_NestedPattern --o|ancestor| T33_domain_domain_TemplatePathPattern__self
+T43_domain_domain_TemplateBoundaryManifestError_NestedPattern --o|descendant| T33_domain_domain_TemplatePathPattern__self
+T31_domain_domain_TemplatePathEntry_new --o T33_domain_domain_TemplatePathPattern__self
+T31_domain_domain_TemplatePathEntry_new --o T40_domain_domain_TemplatePathClassification__self
+T31_domain_domain_TemplatePathEntry_new --> T31_domain_domain_TemplatePathEntry__self
+T31_domain_domain_TemplatePathEntry_pattern --> T33_domain_domain_TemplatePathPattern__self
+T31_domain_domain_TemplatePathEntry_classification --> T40_domain_domain_TemplatePathClassification__self
+T33_domain_domain_TemplatePathPattern_try_new --> T33_domain_domain_TemplatePathPattern__self
+T33_domain_domain_TemplatePathPattern_try_new --> T38_domain_domain_TemplatePathPatternError__self
+T49_usecase_usecase_TemplateBoundaryManifestReadError_InvalidPattern --o|source| T38_domain_domain_TemplatePathPatternError__self
+T49_usecase_usecase_TemplateBoundaryManifestReadError_InvalidManifest --o|source| T43_domain_domain_TemplateBoundaryManifestError__self
+T35_usecase_usecase_TemplateExportError_ManifestRead --o|source| T49_usecase_usecase_TemplateBoundaryManifestReadError__self
+T35_usecase_usecase_TemplateExportError_Export --o|source| T39_usecase_usecase_TemplateExportPortError__self
+T40_usecase_usecase_TemplateExportInteractor_new --> T40_usecase_usecase_TemplateExportInteractor__self
+T39_usecase_usecase_TemplateExportPortError_OverlayMissing --o|pattern| T33_domain_domain_TemplatePathPattern__self
+T39_usecase_usecase_TemplateExportPortError_UnclassifiedPath --o|path| T33_domain_domain_TemplatePathPattern__self
+R44_usecase_usecase_TemplateBoundaryManifestPort_read --> T49_usecase_usecase_TemplateBoundaryManifestReadError__self
+R44_usecase_usecase_TemplateBoundaryManifestPort_read --> T38_domain_domain_TemplateBoundaryManifest__self
+R34_usecase_usecase_TemplateExportPort_export --o T37_usecase_usecase_TemplateExportCommand__self
+R34_usecase_usecase_TemplateExportPort_export --o T38_domain_domain_TemplateBoundaryManifest__self
+R34_usecase_usecase_TemplateExportPort_export --> T39_usecase_usecase_TemplateExportPortError__self
+R34_usecase_usecase_TemplateExportPort_export --> T36_usecase_usecase_TemplateExportReport__self
+R37_usecase_usecase_TemplateExportService_export --o T37_usecase_usecase_TemplateExportCommand__self
+R37_usecase_usecase_TemplateExportService_export --> T35_usecase_usecase_TemplateExportError__self
+R37_usecase_usecase_TemplateExportService_export --> T36_usecase_usecase_TemplateExportReport__self
+T40_usecase_usecase_TemplateExportInteractor__self -.impl.-> R37_usecase_usecase_TemplateExportService__self
+T63_infrastructure_infrastructure_FsTemplateBoundaryManifestAdapter_new --> T63_infrastructure_infrastructure_FsTemplateBoundaryManifestAdapter__self
+T53_infrastructure_infrastructure_FsTemplateExportAdapter_new --> T53_infrastructure_infrastructure_FsTemplateExportAdapter__self
+T64_infrastructure_infrastructure_TemplateBoundaryManifestCodecError_Pattern --o|source| T38_domain_domain_TemplatePathPatternError__self
+T64_infrastructure_infrastructure_TemplateBoundaryManifestCodecError_Manifest --o|source| T43_domain_domain_TemplateBoundaryManifestError__self
+T57_infrastructure_infrastructure_TemplateBoundaryManifestDto__self --o|entries| T50_infrastructure_infrastructure_TemplatePathEntryDto__self
+T50_infrastructure_infrastructure_TemplatePathEntryDto__self --o|classification| T59_infrastructure_infrastructure_TemplatePathClassificationDto__self
+F85_infrastructure_infrastructure_infrastructure__template_export__codec__decode_manifest --> T64_infrastructure_infrastructure_TemplateBoundaryManifestCodecError__self
+F85_infrastructure_infrastructure_infrastructure__template_export__codec__decode_manifest --> T38_domain_domain_TemplateBoundaryManifest__self
+T63_infrastructure_infrastructure_FsTemplateBoundaryManifestAdapter__self -.impl.-> R44_usecase_usecase_TemplateBoundaryManifestPort__self
+T53_infrastructure_infrastructure_FsTemplateExportAdapter__self -.impl.-> R34_usecase_usecase_TemplateExportPort__self
+T36_cli_driver_cli_driver_TemplateDriver_new --> T36_cli_driver_cli_driver_TemplateDriver__self
+T36_cli_driver_cli_driver_TemplateDriver_handle --o T35_cli_driver_cli_driver_TemplateInput__self
+T35_cli_driver_cli_driver_TemplateInput_Export --o T41_cli_driver_cli_driver_TemplateExportInput__self
+T55_cli_composition_cli_composition_TemplateCompositionRoot_new --> T55_cli_composition_cli_composition_TemplateCompositionRoot__self
+T55_cli_composition_cli_composition_TemplateCompositionRoot_template_driver --> T36_cli_driver_cli_driver_TemplateDriver__self
+T55_cli_composition_cli_composition_TemplateCompositionRoot_handle --o T35_cli_driver_cli_driver_TemplateInput__self
+T23_cli_cli_TemplateCommand_Export --o T26_cli_cli_TemplateExportArgs__self
+F41_cli_cli_cli__commands__template__dispatch --o T35_cli_driver_cli_driver_TemplateInput__self
+F40_cli_cli_cli__commands__template__execute --o T23_cli_cli_TemplateCommand__self
+class T38_domain_domain_TemplateBoundaryManifest_try_new method_node
+class T38_domain_domain_TemplateBoundaryManifest_entries method_node
+class T38_domain_domain_TemplateBoundaryManifest_classify method_node
+class T38_domain_domain_TemplateBoundaryManifest_patterns_are_unique method_node
+class T38_domain_domain_TemplateBoundaryManifest_patterns_are_prefix_free method_node
+class T38_domain_domain_TemplateBoundaryManifest__self value_object
+class T43_domain_domain_TemplateBoundaryManifestError_DuplicatePattern variant_node
+class T43_domain_domain_TemplateBoundaryManifestError_EmptyManifest variant_node
+class T43_domain_domain_TemplateBoundaryManifestError_NestedPattern variant_node
+class T43_domain_domain_TemplateBoundaryManifestError__self error_type
+class T40_domain_domain_TemplatePathClassification_Include variant_node
+class T40_domain_domain_TemplatePathClassification_Exclude variant_node
+class T40_domain_domain_TemplatePathClassification_Overlay variant_node
+class T40_domain_domain_TemplatePathClassification__self value_object
+class T31_domain_domain_TemplatePathEntry_new method_node
+class T31_domain_domain_TemplatePathEntry_pattern method_node
+class T31_domain_domain_TemplatePathEntry_classification method_node
+class T31_domain_domain_TemplatePathEntry__self value_object
+class T33_domain_domain_TemplatePathPattern_try_new method_node
+class T33_domain_domain_TemplatePathPattern_as_str method_node
+class T33_domain_domain_TemplatePathPattern_is_workspace_relative method_node
+class T33_domain_domain_TemplatePathPattern__self value_object
+class T38_domain_domain_TemplatePathPatternError_InvalidPattern variant_node
+class T38_domain_domain_TemplatePathPatternError__self error_type
+class T49_usecase_usecase_TemplateBoundaryManifestReadError_NotFound variant_node
+class T49_usecase_usecase_TemplateBoundaryManifestReadError_Parse variant_node
+class T49_usecase_usecase_TemplateBoundaryManifestReadError_InvalidPattern variant_node
+class T49_usecase_usecase_TemplateBoundaryManifestReadError_InvalidManifest variant_node
+class T49_usecase_usecase_TemplateBoundaryManifestReadError_Io variant_node
+class T49_usecase_usecase_TemplateBoundaryManifestReadError__self error_type
+class T37_usecase_usecase_TemplateExportCommand__self command
+class T35_usecase_usecase_TemplateExportError_ManifestRead variant_node
+class T35_usecase_usecase_TemplateExportError_Export variant_node
+class T35_usecase_usecase_TemplateExportError__self error_type
+class T40_usecase_usecase_TemplateExportInteractor_new method_node
+class T40_usecase_usecase_TemplateExportInteractor__self interactor
+class T39_usecase_usecase_TemplateExportPortError_OutputDirExists variant_node
+class T39_usecase_usecase_TemplateExportPortError_OverlayMissing variant_node
+class T39_usecase_usecase_TemplateExportPortError_SourceMissing variant_node
+class T39_usecase_usecase_TemplateExportPortError_UnclassifiedPath variant_node
+class T39_usecase_usecase_TemplateExportPortError_Io variant_node
+class T39_usecase_usecase_TemplateExportPortError__self error_type
+class T36_usecase_usecase_TemplateExportReport__self dto
+class R44_usecase_usecase_TemplateBoundaryManifestPort_read method_node
+class R44_usecase_usecase_TemplateBoundaryManifestPort__self secondary_port
+class R34_usecase_usecase_TemplateExportPort_export method_node
+class R34_usecase_usecase_TemplateExportPort__self secondary_port
+class R37_usecase_usecase_TemplateExportService_export method_node
+class R37_usecase_usecase_TemplateExportService__self app_service
+class T63_infrastructure_infrastructure_FsTemplateBoundaryManifestAdapter_new method_node
+class T63_infrastructure_infrastructure_FsTemplateBoundaryManifestAdapter__self secondary_adapter
+class T53_infrastructure_infrastructure_FsTemplateExportAdapter_new method_node
+class T53_infrastructure_infrastructure_FsTemplateExportAdapter__self secondary_adapter
+class T64_infrastructure_infrastructure_TemplateBoundaryManifestCodecError_SchemaVersion variant_node
+class T64_infrastructure_infrastructure_TemplateBoundaryManifestCodecError_Json variant_node
+class T64_infrastructure_infrastructure_TemplateBoundaryManifestCodecError_Pattern variant_node
+class T64_infrastructure_infrastructure_TemplateBoundaryManifestCodecError_Manifest variant_node
+class T64_infrastructure_infrastructure_TemplateBoundaryManifestCodecError__self error_type
+class T57_infrastructure_infrastructure_TemplateBoundaryManifestDto__self dto
+class T59_infrastructure_infrastructure_TemplatePathClassificationDto_Include variant_node
+class T59_infrastructure_infrastructure_TemplatePathClassificationDto_Exclude variant_node
+class T59_infrastructure_infrastructure_TemplatePathClassificationDto_Overlay variant_node
+class T59_infrastructure_infrastructure_TemplatePathClassificationDto__self dto
+class T50_infrastructure_infrastructure_TemplatePathEntryDto__self dto
+class F85_infrastructure_infrastructure_infrastructure__template_export__codec__decode_manifest free_function
+class F85_infrastructure_infrastructure_infrastructure__template_export__codec__decode_manifest function_node
+class T36_cli_driver_cli_driver_TemplateDriver_new method_node
+class T36_cli_driver_cli_driver_TemplateDriver_handle method_node
+class T41_cli_driver_cli_driver_TemplateExportInput__self dto
+class T35_cli_driver_cli_driver_TemplateInput_Export variant_node
+class T35_cli_driver_cli_driver_TemplateInput__self dto
+class T55_cli_composition_cli_composition_TemplateCompositionRoot_new method_node
+class T55_cli_composition_cli_composition_TemplateCompositionRoot_template_driver method_node
+class T55_cli_composition_cli_composition_TemplateCompositionRoot_handle method_node
+class T18_cli_cli_CliCommand_Arch variant_node
+class T18_cli_cli_CliCommand_Conventions variant_node
+class T18_cli_cli_CliCommand_Domain variant_node
+class T18_cli_cli_CliCommand_Guard variant_node
+class T18_cli_cli_CliCommand_Hook variant_node
+class T18_cli_cli_CliCommand_Track variant_node
+class T18_cli_cli_CliCommand_Git variant_node
+class T18_cli_cli_CliCommand_Pr variant_node
+class T18_cli_cli_CliCommand_Plan variant_node
+class T18_cli_cli_CliCommand_Review variant_node
+class T18_cli_cli_CliCommand_File variant_node
+class T18_cli_cli_CliCommand_Verify variant_node
+class T18_cli_cli_CliCommand_FindSimilar variant_node
+class T18_cli_cli_CliCommand_DupIndex variant_node
+class T18_cli_cli_CliCommand_DupCheck variant_node
+class T18_cli_cli_CliCommand_Telemetry variant_node
+class T18_cli_cli_CliCommand_Dry variant_node
+class T18_cli_cli_CliCommand_RefVerify variant_node
+class T18_cli_cli_CliCommand_Signal variant_node
+class T18_cli_cli_CliCommand_TaskContract variant_node
+class T18_cli_cli_CliCommand_Catalog variant_node
+class T18_cli_cli_CliCommand_CatalogueLint variant_node
+class T18_cli_cli_CliCommand_Template variant_node
+class T18_cli_cli_CliCommand_Demo variant_node
+class T18_cli_cli_CliCommand__self dto
+class T23_cli_cli_TemplateCommand_Export variant_node
+class T23_cli_cli_TemplateCommand__self dto
+class T26_cli_cli_TemplateExportArgs__self dto
+class F41_cli_cli_cli__commands__template__dispatch free_function
+class F41_cli_cli_cli__commands__template__dispatch function_node
+class F40_cli_cli_cli__commands__template__execute free_function
+class F40_cli_cli_cli__commands__template__execute function_node
+```

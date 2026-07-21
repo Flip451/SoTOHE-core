@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "test-obligation-fulfillment-gate-2026-07-07",
+  "title": "テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成",
+  "branch": "track/test-obligation-fulfillment-gate-2026-07-07",
+  "created_at": "2026-07-07T08:29:40Z",
+  "updated_at": "2026-07-07T08:29:40Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

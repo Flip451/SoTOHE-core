@@ -1,0 +1,117 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::verify::retention_gate::verify": {
+      "action": "add",
+      "docs": "Infrastructure verifier function added for `sotp verify retention-gate`; behavior is governed by IN-02/IN-03/IN-04/IN-05/CN-01/CN-05/AC-02/AC-03/AC-04/AC-05/AC-06.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "root",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "domain::verify::VerifyOutcome",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "FsVerifyAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "FsVerifyAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "FsVerifyAdapter",
+      "trait_ref": "usecase::verify::VerifyPort"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "FsVerifyAdapter": {
+      "action": "reference",
+      "docs": "Filesystem-backed adapter implementing `usecase::verify::VerifyPort`; this track adds the retention-gate delegation while leaving the unit adapter identity unchanged.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "verify_adapter",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        }
+      ]
+    }
+  }
+}

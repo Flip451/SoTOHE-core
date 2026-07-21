@@ -1,0 +1,622 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_error["domain::error"]
+    direction TB
+  subgraph T27_domain_domain_WorktreeError["error::WorktreeError"]
+    direction TB
+    T27_domain_domain_WorktreeError__self[WorktreeError]
+    T27_domain_domain_WorktreeError_StatusFailed[StatusFailed]
+  end
+  end
+  subgraph domain_domain_module_ids["domain::ids"]
+    direction TB
+  subgraph T24_domain_domain_CommitHash["ids::CommitHash"]
+    direction TB
+    T24_domain_domain_CommitHash__self[CommitHash]
+  end
+  subgraph T21_domain_domain_TrackId["ids::TrackId"]
+    direction TB
+    T21_domain_domain_TrackId__self[TrackId]
+  end
+  end
+  subgraph domain_domain_module_repository["domain::repository"]
+    direction TB
+  subgraph R28_domain_domain_WorktreeReader["repository::WorktreeReader"]
+    direction TB
+    R28_domain_domain_WorktreeReader__self[WorktreeReader]
+    R28_domain_domain_WorktreeReader_porcelain_status([porcelain_status])
+  end
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_git_workflow["usecase::git_workflow"]
+    direction TB
+  subgraph T30_usecase_usecase_DiagnosticText["git_workflow::DiagnosticText"]
+    direction TB
+    T30_usecase_usecase_DiagnosticText__self[DiagnosticText]
+    T30_usecase_usecase_DiagnosticText_new([new])
+    T30_usecase_usecase_DiagnosticText_as_str([as_str])
+  end
+  subgraph T35_usecase_usecase_ExplicitTrackBranch["git_workflow::ExplicitTrackBranch"]
+    direction TB
+    T35_usecase_usecase_ExplicitTrackBranch__self[ExplicitTrackBranch]
+  end
+  subgraph T32_usecase_usecase_GitWorkflowError["git_workflow::GitWorkflowError"]
+    direction TB
+    T32_usecase_usecase_GitWorkflowError__self[GitWorkflowError]
+    T32_usecase_usecase_GitWorkflowError_Validation[Validation]
+    T32_usecase_usecase_GitWorkflowError_NoBranch[NoBranch]
+    T32_usecase_usecase_GitWorkflowError_DetachedHead[DetachedHead]
+    T32_usecase_usecase_GitWorkflowError_BranchMismatch[BranchMismatch]
+    T32_usecase_usecase_GitWorkflowError_Message[Message]
+    T32_usecase_usecase_GitWorkflowError_Unavailable[Unavailable]
+    T32_usecase_usecase_GitWorkflowError_SyncUpstreamNotSet[SyncUpstreamNotSet]
+    T32_usecase_usecase_GitWorkflowError_SyncNonFastForward[SyncNonFastForward]
+    T32_usecase_usecase_GitWorkflowError_SyncWorktreeUnresolved[SyncWorktreeUnresolved]
+    T32_usecase_usecase_GitWorkflowError_Fs[Fs]
+    T32_usecase_usecase_GitWorkflowError_SwitchFailed[SwitchFailed]
+  end
+  subgraph T37_usecase_usecase_GitWorkflowInteractor["git_workflow::GitWorkflowInteractor"]
+    direction TB
+    T37_usecase_usecase_GitWorkflowInteractor__self[GitWorkflowInteractor]
+    T37_usecase_usecase_GitWorkflowInteractor_new([new])
+  end
+  subgraph T31_usecase_usecase_PrGitInteractor["git_workflow::PrGitInteractor"]
+    direction TB
+    T31_usecase_usecase_PrGitInteractor__self[PrGitInteractor]
+    T31_usecase_usecase_PrGitInteractor_new([new])
+    T31_usecase_usecase_PrGitInteractor_fetch_and_read_metadata_at_ref([fetch_and_read_metadata_at_ref])
+    T31_usecase_usecase_PrGitInteractor_resolve_head([resolve_head])
+  end
+  subgraph T35_usecase_usecase_ReviewGitInteractor["git_workflow::ReviewGitInteractor"]
+    direction TB
+    T35_usecase_usecase_ReviewGitInteractor__self[ReviewGitInteractor]
+    T35_usecase_usecase_ReviewGitInteractor_new([new])
+    T35_usecase_usecase_ReviewGitInteractor_resolve_head_for_track_branch([resolve_head_for_track_branch])
+    T35_usecase_usecase_ReviewGitInteractor_resolve_diff_base([resolve_diff_base])
+  end
+  subgraph T32_usecase_usecase_TrackBranchClaim["git_workflow::TrackBranchClaim"]
+    direction TB
+    T32_usecase_usecase_TrackBranchClaim__self[TrackBranchClaim]
+  end
+  subgraph T34_usecase_usecase_TrackGitInteractor["git_workflow::TrackGitInteractor"]
+    direction TB
+    T34_usecase_usecase_TrackGitInteractor__self[TrackGitInteractor]
+    T34_usecase_usecase_TrackGitInteractor_new([new])
+    T34_usecase_usecase_TrackGitInteractor_create_track_branch([create_track_branch])
+    T34_usecase_usecase_TrackGitInteractor_switch_to_track_branch([switch_to_track_branch])
+    T34_usecase_usecase_TrackGitInteractor_switch_to_base([switch_to_base])
+    T34_usecase_usecase_TrackGitInteractor_archive_track([archive_track])
+  end
+  subgraph R32_usecase_usecase_GitPrimitivePort["git_workflow::GitPrimitivePort"]
+    direction TB
+    R32_usecase_usecase_GitPrimitivePort__self[GitPrimitivePort]
+    R32_usecase_usecase_GitPrimitivePort_current_branch([current_branch])
+    R32_usecase_usecase_GitPrimitivePort_sync_current_branch([sync_current_branch])
+    R32_usecase_usecase_GitPrimitivePort_switch_branch([switch_branch])
+    R32_usecase_usecase_GitPrimitivePort_create_branch([create_branch])
+    R32_usecase_usecase_GitPrimitivePort_branch_exists([branch_exists])
+    R32_usecase_usecase_GitPrimitivePort_move_path([move_path])
+    R32_usecase_usecase_GitPrimitivePort_fetch_branch([fetch_branch])
+    R32_usecase_usecase_GitPrimitivePort_show_file_at_ref([show_file_at_ref])
+    R32_usecase_usecase_GitPrimitivePort_resolve_commit([resolve_commit])
+    R32_usecase_usecase_GitPrimitivePort_resolve_repo_root([resolve_repo_root])
+    R32_usecase_usecase_GitPrimitivePort_stage_all([stage_all])
+    R32_usecase_usecase_GitPrimitivePort_stage_from_file([stage_from_file])
+    R32_usecase_usecase_GitPrimitivePort_commit_from_message_file([commit_from_message_file])
+    R32_usecase_usecase_GitPrimitivePort_note_from_file([note_from_file])
+    R32_usecase_usecase_GitPrimitivePort_unstage([unstage])
+    R32_usecase_usecase_GitPrimitivePort_read_explicit_track_branch([read_explicit_track_branch])
+    R32_usecase_usecase_GitPrimitivePort_collect_track_branch_claims([collect_track_branch_claims])
+  end
+  subgraph R34_usecase_usecase_GitWorkflowService["git_workflow::GitWorkflowService"]
+    direction TB
+    R34_usecase_usecase_GitWorkflowService__self[GitWorkflowService]
+    R34_usecase_usecase_GitWorkflowService_stage_all([stage_all])
+    R34_usecase_usecase_GitWorkflowService_stage_from_file([stage_from_file])
+    R34_usecase_usecase_GitWorkflowService_commit_from_file([commit_from_file])
+    R34_usecase_usecase_GitWorkflowService_note_from_file([note_from_file])
+    R34_usecase_usecase_GitWorkflowService_unstage([unstage])
+    R34_usecase_usecase_GitWorkflowService_current_branch_track_id([current_branch_track_id])
+    R34_usecase_usecase_GitWorkflowService_sync_current_branch([sync_current_branch])
+  end
+  subgraph R34_usecase_usecase_TrackArchiveFsPort["git_workflow::TrackArchiveFsPort"]
+    direction TB
+    R34_usecase_usecase_TrackArchiveFsPort__self[TrackArchiveFsPort]
+    R34_usecase_usecase_TrackArchiveFsPort_path_is_dir([path_is_dir])
+    R34_usecase_usecase_TrackArchiveFsPort_path_exists([path_exists])
+    R34_usecase_usecase_TrackArchiveFsPort_create_dir_all([create_dir_all])
+    R34_usecase_usecase_TrackArchiveFsPort_rename_path([rename_path])
+    R34_usecase_usecase_TrackArchiveFsPort_list_dir_file_names([list_dir_file_names])
+    R34_usecase_usecase_TrackArchiveFsPort_remove_dir([remove_dir])
+  end
+  F66_usecase_usecase_usecase__git_workflow__validate_stage_path_entries[[validate_stage_path_entries]]
+  F66_usecase_usecase_usecase__git_workflow__verify_auto_detected_branch[[verify_auto_detected_branch]]
+  F67_usecase_usecase_usecase__git_workflow__verify_explicit_track_branch[[verify_explicit_track_branch]]
+  end
+  subgraph usecase_usecase_module_telemetry["usecase::telemetry"]
+    direction TB
+  subgraph T44_usecase_usecase_TelemetryAggregateInteractor["telemetry::TelemetryAggregateInteractor"]
+    direction TB
+    T44_usecase_usecase_TelemetryAggregateInteractor__self[TelemetryAggregateInteractor]
+    T44_usecase_usecase_TelemetryAggregateInteractor_new([new])
+  end
+  subgraph T46_usecase_usecase_TelemetryAggregateServiceError["telemetry::TelemetryAggregateServiceError"]
+    direction TB
+    T46_usecase_usecase_TelemetryAggregateServiceError__self[TelemetryAggregateServiceError]
+    T46_usecase_usecase_TelemetryAggregateServiceError_ReportUnavailable[ReportUnavailable]
+    T46_usecase_usecase_TelemetryAggregateServiceError_EmitUnavailable[EmitUnavailable]
+  end
+  subgraph T39_usecase_usecase_TelemetryEmitInteractor["telemetry::TelemetryEmitInteractor"]
+    direction TB
+    T39_usecase_usecase_TelemetryEmitInteractor__self[TelemetryEmitInteractor]
+    T39_usecase_usecase_TelemetryEmitInteractor_new([new])
+    T39_usecase_usecase_TelemetryEmitInteractor_emit_archived([emit_archived])
+  end
+  subgraph T41_usecase_usecase_TelemetryReportInteractor["telemetry::TelemetryReportInteractor"]
+    direction TB
+    T41_usecase_usecase_TelemetryReportInteractor__self[TelemetryReportInteractor]
+    T41_usecase_usecase_TelemetryReportInteractor_new([new])
+    T41_usecase_usecase_TelemetryReportInteractor_report([report])
+  end
+  subgraph T37_usecase_usecase_TelemetryReportOutput["telemetry::TelemetryReportOutput"]
+    direction TB
+    T37_usecase_usecase_TelemetryReportOutput__self[TelemetryReportOutput]
+  end
+  subgraph R44_usecase_usecase_ArchivedTelemetryFactoryPort["telemetry::ArchivedTelemetryFactoryPort"]
+    direction TB
+    R44_usecase_usecase_ArchivedTelemetryFactoryPort__self[ArchivedTelemetryFactoryPort]
+    R44_usecase_usecase_ArchivedTelemetryFactoryPort_build([build])
+  end
+  subgraph R42_usecase_usecase_ArchivedTrackTelemetryPort["telemetry::ArchivedTrackTelemetryPort"]
+    direction TB
+    R42_usecase_usecase_ArchivedTrackTelemetryPort__self[ArchivedTrackTelemetryPort]
+  end
+  subgraph R41_usecase_usecase_TelemetryAggregateService["telemetry::TelemetryAggregateService"]
+    direction TB
+    R41_usecase_usecase_TelemetryAggregateService__self[TelemetryAggregateService]
+  end
+  subgraph R35_usecase_usecase_TelemetryReportPort["telemetry::TelemetryReportPort"]
+    direction TB
+    R35_usecase_usecase_TelemetryReportPort__self[TelemetryReportPort]
+  end
+  end
+  subgraph usecase_usecase_module_track_resolution["usecase::track_resolution"]
+    direction TB
+  subgraph T31_usecase_usecase_BranchReadError["track_resolution::BranchReadError"]
+    direction TB
+    T31_usecase_usecase_BranchReadError__self[BranchReadError]
+    T31_usecase_usecase_BranchReadError_ReadFailed[ReadFailed]
+  end
+  subgraph R32_usecase_usecase_BranchReaderPort["track_resolution::BranchReaderPort"]
+    direction TB
+    R32_usecase_usecase_BranchReaderPort__self[BranchReaderPort]
+    R32_usecase_usecase_BranchReaderPort_current_branch([current_branch])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_git_cli["infrastructure::git_cli"]
+    direction TB
+  subgraph T50_infrastructure_infrastructure_FsGitWorkflowAdapter["git_cli::workflow_adapter::FsGitWorkflowAdapter"]
+    direction TB
+    T50_infrastructure_infrastructure_FsGitWorkflowAdapter__self[FsGitWorkflowAdapter]
+    T50_infrastructure_infrastructure_FsGitWorkflowAdapter_new([new])
+  end
+  subgraph T48_infrastructure_infrastructure_FsWorkspaceAdapter["git_cli::workflow_adapter::FsWorkspaceAdapter"]
+    direction TB
+    T48_infrastructure_infrastructure_FsWorkspaceAdapter__self[FsWorkspaceAdapter]
+    T48_infrastructure_infrastructure_FsWorkspaceAdapter_new([new])
+  end
+  subgraph T38_infrastructure_infrastructure_GitError["git_cli::GitError"]
+    direction TB
+    T38_infrastructure_infrastructure_GitError__self[GitError]
+    T38_infrastructure_infrastructure_GitError_CurrentDir[CurrentDir]
+    T38_infrastructure_infrastructure_GitError_Spawn[Spawn]
+    T38_infrastructure_infrastructure_GitError_CommandFailed[CommandFailed]
+    T38_infrastructure_infrastructure_GitError_EmptyRepoRoot[EmptyRepoRoot]
+  end
+  subgraph T39_infrastructure_infrastructure_SyncError["git_cli::SyncError"]
+    direction TB
+    T39_infrastructure_infrastructure_SyncError__self[SyncError]
+    T39_infrastructure_infrastructure_SyncError_UpstreamNotSet[UpstreamNotSet]
+    T39_infrastructure_infrastructure_SyncError_NonFastForward[NonFastForward]
+    T39_infrastructure_infrastructure_SyncError_WorktreeUnresolved[WorktreeUnresolved]
+    T39_infrastructure_infrastructure_SyncError_Spawn[Spawn]
+  end
+  subgraph T43_infrastructure_infrastructure_SystemGitRepo["git_cli::SystemGitRepo"]
+    direction TB
+    T43_infrastructure_infrastructure_SystemGitRepo__self[SystemGitRepo]
+    T43_infrastructure_infrastructure_SystemGitRepo_discover([discover])
+    T43_infrastructure_infrastructure_SystemGitRepo_discover_from([discover_from])
+    T43_infrastructure_infrastructure_SystemGitRepo_root([root])
+    T43_infrastructure_infrastructure_SystemGitRepo_resolve_path([resolve_path])
+    T43_infrastructure_infrastructure_SystemGitRepo_current_branch([current_branch])
+    T43_infrastructure_infrastructure_SystemGitRepo_push_branch([push_branch])
+    T43_infrastructure_infrastructure_SystemGitRepo_index_tree_hash([index_tree_hash])
+    T43_infrastructure_infrastructure_SystemGitRepo_stage_all_excluding([stage_all_excluding])
+    T43_infrastructure_infrastructure_SystemGitRepo_sync_current_branch([sync_current_branch])
+  end
+  subgraph T46_infrastructure_infrastructure_TrackBranchError["git_cli::TrackBranchError"]
+    direction TB
+    T46_infrastructure_infrastructure_TrackBranchError__self[TrackBranchError]
+    T46_infrastructure_infrastructure_TrackBranchError_LoadFailed[LoadFailed]
+  end
+  subgraph T47_infrastructure_infrastructure_TrackBranchRecord["git_cli::TrackBranchRecord"]
+    direction TB
+    T47_infrastructure_infrastructure_TrackBranchRecord__self[TrackBranchRecord]
+  end
+  F82_infrastructure_infrastructure_infrastructure__git_cli__collect_track_branch_claims[[collect_track_branch_claims]]
+  F81_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch[[load_explicit_track_branch]]
+  F96_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch_from_items_dir[[load_explicit_track_branch_from_items_dir]]
+  F72_infrastructure_infrastructure_infrastructure__git_cli__resolve_repo_path[[resolve_repo_path]]
+  end
+  subgraph infrastructure_infrastructure_module_telemetry["infrastructure::telemetry"]
+    direction TB
+  subgraph T63_infrastructure_infrastructure_FsArchivedTelemetryFactoryAdapter["telemetry::archived_track::FsArchivedTelemetryFactoryAdapter"]
+    direction TB
+    T63_infrastructure_infrastructure_FsArchivedTelemetryFactoryAdapter__self[FsArchivedTelemetryFactoryAdapter]
+    T63_infrastructure_infrastructure_FsArchivedTelemetryFactoryAdapter_new([new])
+  end
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+  subgraph cli_driver_cli_driver_module_git["cli_driver::git"]
+    direction TB
+  subgraph T30_cli_driver_cli_driver_GitInput["git::GitInput"]
+    direction TB
+    T30_cli_driver_cli_driver_GitInput__self[GitInput]
+    T30_cli_driver_cli_driver_GitInput_AddAll[AddAll]
+    T30_cli_driver_cli_driver_GitInput_AddFromFile[AddFromFile]
+    T30_cli_driver_cli_driver_GitInput_CommitFromFile[CommitFromFile]
+    T30_cli_driver_cli_driver_GitInput_NoteFromFile[NoteFromFile]
+    T30_cli_driver_cli_driver_GitInput_Sync[Sync]
+    T30_cli_driver_cli_driver_GitInput_Unstage[Unstage]
+    T30_cli_driver_cli_driver_GitInput_CurrentBranchTrackIdStrict[CurrentBranchTrackIdStrict]
+  end
+  end
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+  subgraph cli_composition_cli_composition_module_git["cli_composition::git"]
+    direction TB
+  subgraph T50_cli_composition_cli_composition_GitCompositionRoot["git::GitCompositionRoot"]
+    direction TB
+    T50_cli_composition_cli_composition_GitCompositionRoot__self[GitCompositionRoot]
+    T50_cli_composition_cli_composition_GitCompositionRoot_new([new])
+    T50_cli_composition_cli_composition_GitCompositionRoot_git_driver([git_driver])
+  end
+  end
+end
+subgraph cli["cli"]
+  direction TB
+  subgraph cli_cli_module_commands["cli::commands"]
+    direction TB
+  subgraph T26_cli_cli_CommitFromFileArgs["commands::git::CommitFromFileArgs"]
+    direction TB
+    T26_cli_cli_CommitFromFileArgs__self[CommitFromFileArgs]
+  end
+  subgraph T16_cli_cli_FileArgs["commands::git::FileArgs"]
+    direction TB
+    T16_cli_cli_FileArgs__self[FileArgs]
+  end
+  subgraph T18_cli_cli_GitCommand["commands::git::GitCommand"]
+    direction TB
+    T18_cli_cli_GitCommand__self[GitCommand]
+    T18_cli_cli_GitCommand_AddAll[AddAll]
+    T18_cli_cli_GitCommand_AddFromFile[AddFromFile]
+    T18_cli_cli_GitCommand_CommitFromFile[CommitFromFile]
+    T18_cli_cli_GitCommand_NoteFromFile[NoteFromFile]
+    T18_cli_cli_GitCommand_Sync[Sync]
+    T18_cli_cli_GitCommand_Unstage[Unstage]
+  end
+  subgraph T19_cli_cli_UnstageArgs["commands::git::UnstageArgs"]
+    direction TB
+    T19_cli_cli_UnstageArgs__self[UnstageArgs]
+  end
+  end
+end
+R28_domain_domain_WorktreeReader_porcelain_status --> T27_domain_domain_WorktreeError__self
+T30_usecase_usecase_DiagnosticText_new --> T30_usecase_usecase_DiagnosticText__self
+T32_usecase_usecase_GitWorkflowError_Validation --o T30_usecase_usecase_DiagnosticText__self
+T32_usecase_usecase_GitWorkflowError_DetachedHead --o T30_usecase_usecase_DiagnosticText__self
+T32_usecase_usecase_GitWorkflowError_BranchMismatch --o|current| T30_usecase_usecase_DiagnosticText__self
+T32_usecase_usecase_GitWorkflowError_BranchMismatch --o|expected| T30_usecase_usecase_DiagnosticText__self
+T32_usecase_usecase_GitWorkflowError_Message --o T30_usecase_usecase_DiagnosticText__self
+T32_usecase_usecase_GitWorkflowError_Unavailable --o T30_usecase_usecase_DiagnosticText__self
+T32_usecase_usecase_GitWorkflowError_SyncNonFastForward --o|stderr| T30_usecase_usecase_DiagnosticText__self
+T32_usecase_usecase_GitWorkflowError_SyncWorktreeUnresolved --o|stderr| T30_usecase_usecase_DiagnosticText__self
+T32_usecase_usecase_GitWorkflowError_Fs --o|detail| T30_usecase_usecase_DiagnosticText__self
+T32_usecase_usecase_GitWorkflowError_SwitchFailed --o|branch| T30_usecase_usecase_DiagnosticText__self
+T37_usecase_usecase_GitWorkflowInteractor_new --> T37_usecase_usecase_GitWorkflowInteractor__self
+T31_usecase_usecase_PrGitInteractor_new --> T31_usecase_usecase_PrGitInteractor__self
+T31_usecase_usecase_PrGitInteractor_fetch_and_read_metadata_at_ref --o T21_domain_domain_TrackId__self
+T31_usecase_usecase_PrGitInteractor_fetch_and_read_metadata_at_ref --> T32_usecase_usecase_GitWorkflowError__self
+T31_usecase_usecase_PrGitInteractor_resolve_head --> T32_usecase_usecase_GitWorkflowError__self
+T31_usecase_usecase_PrGitInteractor_resolve_head --> T24_domain_domain_CommitHash__self
+T35_usecase_usecase_ReviewGitInteractor_new --> T35_usecase_usecase_ReviewGitInteractor__self
+T35_usecase_usecase_ReviewGitInteractor_resolve_head_for_track_branch --o T21_domain_domain_TrackId__self
+T35_usecase_usecase_ReviewGitInteractor_resolve_head_for_track_branch --> T32_usecase_usecase_GitWorkflowError__self
+T35_usecase_usecase_ReviewGitInteractor_resolve_head_for_track_branch --> T24_domain_domain_CommitHash__self
+T35_usecase_usecase_ReviewGitInteractor_resolve_diff_base --> T32_usecase_usecase_GitWorkflowError__self
+T35_usecase_usecase_ReviewGitInteractor_resolve_diff_base --> T24_domain_domain_CommitHash__self
+T34_usecase_usecase_TrackGitInteractor_new --> T34_usecase_usecase_TrackGitInteractor__self
+T34_usecase_usecase_TrackGitInteractor_create_track_branch --o T21_domain_domain_TrackId__self
+T34_usecase_usecase_TrackGitInteractor_create_track_branch --> T32_usecase_usecase_GitWorkflowError__self
+T34_usecase_usecase_TrackGitInteractor_switch_to_track_branch --o T21_domain_domain_TrackId__self
+T34_usecase_usecase_TrackGitInteractor_switch_to_track_branch --> T32_usecase_usecase_GitWorkflowError__self
+T34_usecase_usecase_TrackGitInteractor_switch_to_base --> T32_usecase_usecase_GitWorkflowError__self
+T34_usecase_usecase_TrackGitInteractor_archive_track --o T21_domain_domain_TrackId__self
+T34_usecase_usecase_TrackGitInteractor_archive_track --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_current_branch --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_sync_current_branch --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_switch_branch --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_create_branch --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_branch_exists --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_move_path --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_fetch_branch --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_show_file_at_ref --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_resolve_commit --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_resolve_commit --> T24_domain_domain_CommitHash__self
+R32_usecase_usecase_GitPrimitivePort_resolve_repo_root --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_stage_all --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_stage_from_file --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_commit_from_message_file --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_note_from_file --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_unstage --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_read_explicit_track_branch --> T35_usecase_usecase_ExplicitTrackBranch__self
+R32_usecase_usecase_GitPrimitivePort_read_explicit_track_branch --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_collect_track_branch_claims --> T32_usecase_usecase_GitWorkflowError__self
+R32_usecase_usecase_GitPrimitivePort_collect_track_branch_claims --> T32_usecase_usecase_TrackBranchClaim__self
+R34_usecase_usecase_GitWorkflowService_stage_all --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_GitWorkflowService_stage_from_file --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_GitWorkflowService_commit_from_file --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_GitWorkflowService_note_from_file --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_GitWorkflowService_unstage --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_GitWorkflowService_current_branch_track_id --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_GitWorkflowService_current_branch_track_id --> T21_domain_domain_TrackId__self
+R34_usecase_usecase_GitWorkflowService_sync_current_branch --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_TrackArchiveFsPort_path_is_dir --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_TrackArchiveFsPort_path_exists --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_TrackArchiveFsPort_create_dir_all --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_TrackArchiveFsPort_rename_path --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_TrackArchiveFsPort_list_dir_file_names --> T32_usecase_usecase_GitWorkflowError__self
+R34_usecase_usecase_TrackArchiveFsPort_remove_dir --> T32_usecase_usecase_GitWorkflowError__self
+F66_usecase_usecase_usecase__git_workflow__validate_stage_path_entries --> T32_usecase_usecase_GitWorkflowError__self
+F66_usecase_usecase_usecase__git_workflow__verify_auto_detected_branch --o T32_usecase_usecase_TrackBranchClaim__self
+F66_usecase_usecase_usecase__git_workflow__verify_auto_detected_branch --> T32_usecase_usecase_GitWorkflowError__self
+F67_usecase_usecase_usecase__git_workflow__verify_explicit_track_branch --o T35_usecase_usecase_ExplicitTrackBranch__self
+F67_usecase_usecase_usecase__git_workflow__verify_explicit_track_branch --> T32_usecase_usecase_GitWorkflowError__self
+T44_usecase_usecase_TelemetryAggregateInteractor_new --o T41_usecase_usecase_TelemetryReportInteractor__self
+T44_usecase_usecase_TelemetryAggregateInteractor_new --o T39_usecase_usecase_TelemetryEmitInteractor__self
+T44_usecase_usecase_TelemetryAggregateInteractor_new --> T44_usecase_usecase_TelemetryAggregateInteractor__self
+T39_usecase_usecase_TelemetryEmitInteractor_new --> T39_usecase_usecase_TelemetryEmitInteractor__self
+T39_usecase_usecase_TelemetryEmitInteractor_emit_archived --o T21_domain_domain_TrackId__self
+T39_usecase_usecase_TelemetryEmitInteractor_emit_archived --> T46_usecase_usecase_TelemetryAggregateServiceError__self
+T41_usecase_usecase_TelemetryReportInteractor_new --> T41_usecase_usecase_TelemetryReportInteractor__self
+T41_usecase_usecase_TelemetryReportInteractor_report --o T21_domain_domain_TrackId__self
+T41_usecase_usecase_TelemetryReportInteractor_report --> T46_usecase_usecase_TelemetryAggregateServiceError__self
+T41_usecase_usecase_TelemetryReportInteractor_report --> T37_usecase_usecase_TelemetryReportOutput__self
+R32_usecase_usecase_BranchReaderPort_current_branch --> T31_usecase_usecase_BranchReadError__self
+T37_usecase_usecase_GitWorkflowInteractor__self -.impl.-> R34_usecase_usecase_GitWorkflowService__self
+T44_usecase_usecase_TelemetryAggregateInteractor__self -.impl.-> R41_usecase_usecase_TelemetryAggregateService__self
+T50_infrastructure_infrastructure_FsGitWorkflowAdapter_new --> T50_infrastructure_infrastructure_FsGitWorkflowAdapter__self
+T48_infrastructure_infrastructure_FsWorkspaceAdapter_new --> T48_infrastructure_infrastructure_FsWorkspaceAdapter__self
+T39_infrastructure_infrastructure_SyncError_NonFastForward --o|stderr| T30_usecase_usecase_DiagnosticText__self
+T39_infrastructure_infrastructure_SyncError_WorktreeUnresolved --o|stderr| T30_usecase_usecase_DiagnosticText__self
+T39_infrastructure_infrastructure_SyncError_Spawn --o|detail| T30_usecase_usecase_DiagnosticText__self
+T43_infrastructure_infrastructure_SystemGitRepo_discover --> T38_infrastructure_infrastructure_GitError__self
+T43_infrastructure_infrastructure_SystemGitRepo_discover --> T43_infrastructure_infrastructure_SystemGitRepo__self
+T43_infrastructure_infrastructure_SystemGitRepo_discover_from --> T38_infrastructure_infrastructure_GitError__self
+T43_infrastructure_infrastructure_SystemGitRepo_discover_from --> T43_infrastructure_infrastructure_SystemGitRepo__self
+T43_infrastructure_infrastructure_SystemGitRepo_current_branch --> T38_infrastructure_infrastructure_GitError__self
+T43_infrastructure_infrastructure_SystemGitRepo_push_branch --> T38_infrastructure_infrastructure_GitError__self
+T43_infrastructure_infrastructure_SystemGitRepo_index_tree_hash --> T38_infrastructure_infrastructure_GitError__self
+T43_infrastructure_infrastructure_SystemGitRepo_stage_all_excluding --> T38_infrastructure_infrastructure_GitError__self
+T43_infrastructure_infrastructure_SystemGitRepo_sync_current_branch --> T39_infrastructure_infrastructure_SyncError__self
+F82_infrastructure_infrastructure_infrastructure__git_cli__collect_track_branch_claims --> T46_infrastructure_infrastructure_TrackBranchError__self
+F82_infrastructure_infrastructure_infrastructure__git_cli__collect_track_branch_claims --> T47_infrastructure_infrastructure_TrackBranchRecord__self
+F81_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch --> T46_infrastructure_infrastructure_TrackBranchError__self
+F81_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch --> T47_infrastructure_infrastructure_TrackBranchRecord__self
+F96_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch_from_items_dir --> T46_infrastructure_infrastructure_TrackBranchError__self
+F96_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch_from_items_dir --> T47_infrastructure_infrastructure_TrackBranchRecord__self
+T63_infrastructure_infrastructure_FsArchivedTelemetryFactoryAdapter_new --> T63_infrastructure_infrastructure_FsArchivedTelemetryFactoryAdapter__self
+T43_infrastructure_infrastructure_SystemGitRepo__self -.impl.-> R28_domain_domain_WorktreeReader__self
+T43_infrastructure_infrastructure_SystemGitRepo__self -.impl.-> R32_usecase_usecase_BranchReaderPort__self
+T50_infrastructure_infrastructure_FsGitWorkflowAdapter__self -.impl.-> R32_usecase_usecase_GitPrimitivePort__self
+T48_infrastructure_infrastructure_FsWorkspaceAdapter__self -.impl.-> R34_usecase_usecase_TrackArchiveFsPort__self
+T63_infrastructure_infrastructure_FsArchivedTelemetryFactoryAdapter__self -.impl.-> R44_usecase_usecase_ArchivedTelemetryFactoryPort__self
+T50_cli_composition_cli_composition_GitCompositionRoot_new --> T50_cli_composition_cli_composition_GitCompositionRoot__self
+T18_cli_cli_GitCommand_AddFromFile --o T16_cli_cli_FileArgs__self
+T18_cli_cli_GitCommand_CommitFromFile --o T26_cli_cli_CommitFromFileArgs__self
+T18_cli_cli_GitCommand_NoteFromFile --o T16_cli_cli_FileArgs__self
+T18_cli_cli_GitCommand_Unstage --o T19_cli_cli_UnstageArgs__self
+class T27_domain_domain_WorktreeError_StatusFailed variant_node
+class T27_domain_domain_WorktreeError__self error_type
+class T24_domain_domain_CommitHash__self value_object
+class T21_domain_domain_TrackId__self value_object
+class R28_domain_domain_WorktreeReader_porcelain_status method_node
+class R28_domain_domain_WorktreeReader__self secondary_port
+class T30_usecase_usecase_DiagnosticText_new method_node
+class T30_usecase_usecase_DiagnosticText_as_str method_node
+class T30_usecase_usecase_DiagnosticText__self value_object
+class T35_usecase_usecase_ExplicitTrackBranch__self dto
+class T32_usecase_usecase_GitWorkflowError_Validation variant_node
+class T32_usecase_usecase_GitWorkflowError_NoBranch variant_node
+class T32_usecase_usecase_GitWorkflowError_DetachedHead variant_node
+class T32_usecase_usecase_GitWorkflowError_BranchMismatch variant_node
+class T32_usecase_usecase_GitWorkflowError_Message variant_node
+class T32_usecase_usecase_GitWorkflowError_Unavailable variant_node
+class T32_usecase_usecase_GitWorkflowError_SyncUpstreamNotSet variant_node
+class T32_usecase_usecase_GitWorkflowError_SyncNonFastForward variant_node
+class T32_usecase_usecase_GitWorkflowError_SyncWorktreeUnresolved variant_node
+class T32_usecase_usecase_GitWorkflowError_Fs variant_node
+class T32_usecase_usecase_GitWorkflowError_SwitchFailed variant_node
+class T32_usecase_usecase_GitWorkflowError__self error_type
+class T37_usecase_usecase_GitWorkflowInteractor_new method_node
+class T37_usecase_usecase_GitWorkflowInteractor__self interactor
+class T31_usecase_usecase_PrGitInteractor_new method_node
+class T31_usecase_usecase_PrGitInteractor_fetch_and_read_metadata_at_ref method_node
+class T31_usecase_usecase_PrGitInteractor_resolve_head method_node
+class T31_usecase_usecase_PrGitInteractor__self use_case
+class T35_usecase_usecase_ReviewGitInteractor_new method_node
+class T35_usecase_usecase_ReviewGitInteractor_resolve_head_for_track_branch method_node
+class T35_usecase_usecase_ReviewGitInteractor_resolve_diff_base method_node
+class T35_usecase_usecase_ReviewGitInteractor__self use_case
+class T32_usecase_usecase_TrackBranchClaim__self dto
+class T34_usecase_usecase_TrackGitInteractor_new method_node
+class T34_usecase_usecase_TrackGitInteractor_create_track_branch method_node
+class T34_usecase_usecase_TrackGitInteractor_switch_to_track_branch method_node
+class T34_usecase_usecase_TrackGitInteractor_switch_to_base method_node
+class T34_usecase_usecase_TrackGitInteractor_archive_track method_node
+class T34_usecase_usecase_TrackGitInteractor__self use_case
+class R32_usecase_usecase_GitPrimitivePort_current_branch method_node
+class R32_usecase_usecase_GitPrimitivePort_sync_current_branch method_node
+class R32_usecase_usecase_GitPrimitivePort_switch_branch method_node
+class R32_usecase_usecase_GitPrimitivePort_create_branch method_node
+class R32_usecase_usecase_GitPrimitivePort_branch_exists method_node
+class R32_usecase_usecase_GitPrimitivePort_move_path method_node
+class R32_usecase_usecase_GitPrimitivePort_fetch_branch method_node
+class R32_usecase_usecase_GitPrimitivePort_show_file_at_ref method_node
+class R32_usecase_usecase_GitPrimitivePort_resolve_commit method_node
+class R32_usecase_usecase_GitPrimitivePort_resolve_repo_root method_node
+class R32_usecase_usecase_GitPrimitivePort_stage_all method_node
+class R32_usecase_usecase_GitPrimitivePort_stage_from_file method_node
+class R32_usecase_usecase_GitPrimitivePort_commit_from_message_file method_node
+class R32_usecase_usecase_GitPrimitivePort_note_from_file method_node
+class R32_usecase_usecase_GitPrimitivePort_unstage method_node
+class R32_usecase_usecase_GitPrimitivePort_read_explicit_track_branch method_node
+class R32_usecase_usecase_GitPrimitivePort_collect_track_branch_claims method_node
+class R32_usecase_usecase_GitPrimitivePort__self secondary_port
+class R34_usecase_usecase_GitWorkflowService_stage_all method_node
+class R34_usecase_usecase_GitWorkflowService_stage_from_file method_node
+class R34_usecase_usecase_GitWorkflowService_commit_from_file method_node
+class R34_usecase_usecase_GitWorkflowService_note_from_file method_node
+class R34_usecase_usecase_GitWorkflowService_unstage method_node
+class R34_usecase_usecase_GitWorkflowService_current_branch_track_id method_node
+class R34_usecase_usecase_GitWorkflowService_sync_current_branch method_node
+class R34_usecase_usecase_GitWorkflowService__self app_service
+class R34_usecase_usecase_TrackArchiveFsPort_path_is_dir method_node
+class R34_usecase_usecase_TrackArchiveFsPort_path_exists method_node
+class R34_usecase_usecase_TrackArchiveFsPort_create_dir_all method_node
+class R34_usecase_usecase_TrackArchiveFsPort_rename_path method_node
+class R34_usecase_usecase_TrackArchiveFsPort_list_dir_file_names method_node
+class R34_usecase_usecase_TrackArchiveFsPort_remove_dir method_node
+class R34_usecase_usecase_TrackArchiveFsPort__self secondary_port
+class F66_usecase_usecase_usecase__git_workflow__validate_stage_path_entries free_function
+class F66_usecase_usecase_usecase__git_workflow__validate_stage_path_entries function_node
+class F66_usecase_usecase_usecase__git_workflow__verify_auto_detected_branch free_function
+class F66_usecase_usecase_usecase__git_workflow__verify_auto_detected_branch function_node
+class F67_usecase_usecase_usecase__git_workflow__verify_explicit_track_branch free_function
+class F67_usecase_usecase_usecase__git_workflow__verify_explicit_track_branch function_node
+class T44_usecase_usecase_TelemetryAggregateInteractor_new method_node
+class T44_usecase_usecase_TelemetryAggregateInteractor__self interactor
+class T46_usecase_usecase_TelemetryAggregateServiceError_ReportUnavailable variant_node
+class T46_usecase_usecase_TelemetryAggregateServiceError_EmitUnavailable variant_node
+class T46_usecase_usecase_TelemetryAggregateServiceError__self error_type
+class T39_usecase_usecase_TelemetryEmitInteractor_new method_node
+class T39_usecase_usecase_TelemetryEmitInteractor_emit_archived method_node
+class T39_usecase_usecase_TelemetryEmitInteractor__self use_case
+class T41_usecase_usecase_TelemetryReportInteractor_new method_node
+class T41_usecase_usecase_TelemetryReportInteractor_report method_node
+class T41_usecase_usecase_TelemetryReportInteractor__self use_case
+class T37_usecase_usecase_TelemetryReportOutput__self dto
+class R44_usecase_usecase_ArchivedTelemetryFactoryPort_build method_node
+class R44_usecase_usecase_ArchivedTelemetryFactoryPort__self secondary_port
+class R42_usecase_usecase_ArchivedTrackTelemetryPort__self secondary_port
+class R41_usecase_usecase_TelemetryAggregateService__self app_service
+class R35_usecase_usecase_TelemetryReportPort__self secondary_port
+class T31_usecase_usecase_BranchReadError_ReadFailed variant_node
+class T31_usecase_usecase_BranchReadError__self error_type
+class R32_usecase_usecase_BranchReaderPort_current_branch method_node
+class R32_usecase_usecase_BranchReaderPort__self secondary_port
+class T50_infrastructure_infrastructure_FsGitWorkflowAdapter_new method_node
+class T50_infrastructure_infrastructure_FsGitWorkflowAdapter__self secondary_adapter
+class T48_infrastructure_infrastructure_FsWorkspaceAdapter_new method_node
+class T48_infrastructure_infrastructure_FsWorkspaceAdapter__self secondary_adapter
+class T38_infrastructure_infrastructure_GitError_CurrentDir variant_node
+class T38_infrastructure_infrastructure_GitError_Spawn variant_node
+class T38_infrastructure_infrastructure_GitError_CommandFailed variant_node
+class T38_infrastructure_infrastructure_GitError_EmptyRepoRoot variant_node
+class T38_infrastructure_infrastructure_GitError__self error_type
+class T39_infrastructure_infrastructure_SyncError_UpstreamNotSet variant_node
+class T39_infrastructure_infrastructure_SyncError_NonFastForward variant_node
+class T39_infrastructure_infrastructure_SyncError_WorktreeUnresolved variant_node
+class T39_infrastructure_infrastructure_SyncError_Spawn variant_node
+class T39_infrastructure_infrastructure_SyncError__self error_type
+class T43_infrastructure_infrastructure_SystemGitRepo_discover method_node
+class T43_infrastructure_infrastructure_SystemGitRepo_discover_from method_node
+class T43_infrastructure_infrastructure_SystemGitRepo_root method_node
+class T43_infrastructure_infrastructure_SystemGitRepo_resolve_path method_node
+class T43_infrastructure_infrastructure_SystemGitRepo_current_branch method_node
+class T43_infrastructure_infrastructure_SystemGitRepo_push_branch method_node
+class T43_infrastructure_infrastructure_SystemGitRepo_index_tree_hash method_node
+class T43_infrastructure_infrastructure_SystemGitRepo_stage_all_excluding method_node
+class T43_infrastructure_infrastructure_SystemGitRepo_sync_current_branch method_node
+class T43_infrastructure_infrastructure_SystemGitRepo__self secondary_adapter
+class T46_infrastructure_infrastructure_TrackBranchError_LoadFailed variant_node
+class T46_infrastructure_infrastructure_TrackBranchError__self error_type
+class T47_infrastructure_infrastructure_TrackBranchRecord__self dto
+class F82_infrastructure_infrastructure_infrastructure__git_cli__collect_track_branch_claims free_function
+class F82_infrastructure_infrastructure_infrastructure__git_cli__collect_track_branch_claims function_node
+class F81_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch free_function
+class F81_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch function_node
+class F96_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch_from_items_dir free_function
+class F96_infrastructure_infrastructure_infrastructure__git_cli__load_explicit_track_branch_from_items_dir function_node
+class F72_infrastructure_infrastructure_infrastructure__git_cli__resolve_repo_path free_function
+class F72_infrastructure_infrastructure_infrastructure__git_cli__resolve_repo_path function_node
+class T63_infrastructure_infrastructure_FsArchivedTelemetryFactoryAdapter_new method_node
+class T63_infrastructure_infrastructure_FsArchivedTelemetryFactoryAdapter__self secondary_adapter
+class T30_cli_driver_cli_driver_GitInput_AddAll variant_node
+class T30_cli_driver_cli_driver_GitInput_AddFromFile variant_node
+class T30_cli_driver_cli_driver_GitInput_CommitFromFile variant_node
+class T30_cli_driver_cli_driver_GitInput_NoteFromFile variant_node
+class T30_cli_driver_cli_driver_GitInput_Sync variant_node
+class T30_cli_driver_cli_driver_GitInput_Unstage variant_node
+class T30_cli_driver_cli_driver_GitInput_CurrentBranchTrackIdStrict variant_node
+class T30_cli_driver_cli_driver_GitInput__self dto
+class T50_cli_composition_cli_composition_GitCompositionRoot_new method_node
+class T50_cli_composition_cli_composition_GitCompositionRoot_git_driver method_node
+class T26_cli_cli_CommitFromFileArgs__self dto
+class T16_cli_cli_FileArgs__self dto
+class T18_cli_cli_GitCommand_AddAll variant_node
+class T18_cli_cli_GitCommand_AddFromFile variant_node
+class T18_cli_cli_GitCommand_CommitFromFile variant_node
+class T18_cli_cli_GitCommand_NoteFromFile variant_node
+class T18_cli_cli_GitCommand_Sync variant_node
+class T18_cli_cli_GitCommand_Unstage variant_node
+class T18_cli_cli_GitCommand__self dto
+class T19_cli_cli_UnstageArgs__self dto
+```

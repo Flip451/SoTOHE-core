@@ -17,4 +17,7 @@ Rules:
 - Every goal, scope item, constraint, and acceptance criterion needs structured grounding.
 - Run the SoTOHE signal pipeline after writing spec.json.
 - Report blue/yellow/red counts and any open questions to the orchestrator.
+- On a resumed session (orchestrator opt-in continuation), follow the "Session resume" section
+  of the capability SSoT: check whether upstream artifacts changed since the prior session and
+  re-read any that did before continuing.
 """

@@ -1,0 +1,291 @@
+{
+  "crate_name": "domain",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "action_contradiction",
+          "params": [
+            {
+              "name": "detail",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "unresolved_type_ref",
+          "params": [
+            {
+              "name": "detail",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "dangling_id",
+          "params": [
+            {
+              "name": "detail",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "rustdoc_root_resolution",
+          "params": [
+            {
+              "name": "detail",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "type_name": "Phase1Error"
+    }
+  ],
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "Phase1Error",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "Phase1Error",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "Phase1Error",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "Phase1Error",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "Phase1Error",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "Phase1Error",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticMessage",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticMessage",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticMessage",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticMessage",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "DiagnosticMessage",
+      "trait_ref": "core::hash::Hash"
+    }
+  ],
+  "traits": {
+    "SignalEvaluatorPort": {
+      "action": "reference",
+      "docs": "Unchanged secondary port carried so the modified SignalEvaluatorV2 adapter's implementation edge remains explicit.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "docs": "Retains the existing synchronous port contract; the infrastructure adapter may block while resolving cargo metadata.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "evaluate",
+          "params": [
+            {
+              "name": "a",
+              "ty": "ExtendedCrate"
+            },
+            {
+              "name": "b",
+              "ty": "rustdoc_types::Crate"
+            },
+            {
+              "name": "c",
+              "ty": "rustdoc_types::Crate"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ThreeWayEvaluationReport, Phase1Error>"
+        }
+      ],
+      "module_path": "tddd::signal_evaluator::port",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "DiagnosticMessage": {
+      "action": "reference",
+      "docs": "Existing DiagnosticMessage declaration referenced by Phase1Error (IN-07).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "tddd::test_obligation::ids",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "Phase1Error": {
+      "action": "modify",
+      "docs": "Modified Phase1Error declaration: adds RustdocRootResolution and replaces diagnostic payload fields with DiagnosticMessage (IN-05, AC-09, IN-07).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ActionContradiction",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnresolvedTypeRef",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DanglingId",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "RustdocRootResolution",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::signal_evaluator::phase1_error",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/capability-exec-infra-repair-2026-07-13/spec.json"
+        }
+      ]
+    }
+  }
+}

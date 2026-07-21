@@ -1,0 +1,300 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a3e4f1999abb36bd0afa442f06252f6657e69b0a02dac6e66155385d8886269",
+          "at": "2026-07-13T14:32:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a3e4f1999abb36bd0afa442f06252f6657e69b0a02dac6e66155385d8886269",
+          "at": "2026-07-13T14:36:37Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 is not deterministically observable as written: both occurrences resolve to the same `DeclaredType` node, while CN-03 requires deduplicating identical node IDs into one edge. The rendered view cannot prove that both the generic argument and associated-type binding were traversed.",
+              "severity": "P1",
+              "file": "track/items/contract-map-dyn-trait-edge-2026-07-13/spec.json",
+              "line": 258,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:db4eafde661e5a155dfdcfbbe765c9163f22afc2a93eaaf88084882ea8a8624a",
+          "at": "2026-07-13T13:57:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 claims `dyn Trait` edges are handled across TypeRef positions and common hexagonal injection patterns, but AC-01..07 do not deterministically cover field, variant payload, type alias, function parameter, or method parameter positions. An implementation could omit those call paths while satisfying every AC.",
+              "severity": "P1",
+              "file": "track/items/contract-map-dyn-trait-edge-2026-07-13/spec.json",
+              "line": 8,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:9214f78342496bade359921fb1001e511bad5dbdcdda1efd80c892d01b311cdc",
+          "at": "2026-07-13T14:02:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4115774dda4bf51729bedbe28c76c8f0937475ce45e885f97079c8f8c7688587",
+          "at": "2026-07-13T14:05:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 は trait 解決の共通化によって二重実装と drift を防ぐことを目標にしていますが、AC-06/AC-07 は両経路の挙動だけを検証するため、別々の resolver 実装でも合格できます。共通 resolver の利用を決定的に確認できる AC がなく、GO-02 の構造的な意図を完了時に証明できません。",
+              "severity": "P1",
+              "file": "track/items/contract-map-dyn-trait-edge-2026-07-13/spec.json",
+              "line": 18,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:4115774dda4bf51729bedbe28c76c8f0937475ce45e885f97079c8f8c7688587",
+          "at": "2026-07-13T14:10:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ba9427253c6b9f02e4640950bc2de4e23c3c46eb763ea89f30defe18834564e",
+          "at": "2026-07-13T14:12:56Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70b6b70222c456ae77239cd53cbc7292c901659bd5abc8a27fbc24b2e157ff30",
+          "at": "2026-07-13T13:56:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70b6b70222c456ae77239cd53cbc7292c901659bd5abc8a27fbc24b2e157ff30",
+          "at": "2026-07-13T14:01:24Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001のdescriptionがIN/CNの挙動契約（候補分離、4段fallback、silent skip、dedup等）を長文で再記述しています。target + operation + anchor citeに縮約してください。",
+              "severity": "P1",
+              "file": "track/items/contract-map-dyn-trait-edge-2026-07-13/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002のdescriptionがAC-01〜07の期待挙動をケースごとに再記述しています。テスト追加のtarget/operationとAC anchorだけを残してください。",
+              "severity": "P1",
+              "file": "track/items/contract-map-dyn-trait-edge-2026-07-13/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "plan.summaryのT001項目がtrait fallbackやcandidate処理の設計挙動を再記述しています。実装対象・操作・anchor citeに限定してください。",
+              "severity": "P1",
+              "file": "track/items/contract-map-dyn-trait-edge-2026-07-13/impl-plan.json",
+              "line": 19,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "plan.summaryのT002項目が7つの回帰ケースの挙動契約を再記述しています。テスト対象とAC/IN/CNのanchor citeに限定してください。",
+              "severity": "P1",
+              "file": "track/items/contract-map-dyn-trait-edge-2026-07-13/impl-plan.json",
+              "line": 20,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "section.id=S1のdescriptionがspec/ADRの候補解決・edge style挙動を再記述しています。target + operation + anchor citeに縮約してください。",
+              "severity": "P1",
+              "file": "track/items/contract-map-dyn-trait-edge-2026-07-13/impl-plan.json",
+              "line": 28,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "section.id=S2のdescriptionがAC-01〜07およびCN/INの挙動を再記述しています。テスト追加の操作とanchor citeだけを残してください。",
+              "severity": "P1",
+              "file": "track/items/contract-map-dyn-trait-edge-2026-07-13/impl-plan.json",
+              "line": 38,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:e396f47d1ab3d5b7a6105c89fdfbe4b6faebd32a8630e96f9d289c6a2dc62005",
+          "at": "2026-07-13T13:56:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68116779054d0ce121425b73c349233a6099d7db1de30030c00f098c5c33c090",
+          "at": "2026-07-13T14:01:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001/S1 は `resolve_trait_subgraph` の変更先を `render/node_index.rs` としていますが、この symbol は現在 `render/type_ref.rs` に定義されています。移動・抽出する指示もないため、executor は「node_index.rs へ移す」のか「type_ref.rs で変更する」のかを判断できません。移動操作を明記するか、対象 file/symbol を修正してください。",
+              "severity": "P1",
+              "file": "track/items/contract-map-dyn-trait-edge-2026-07-13/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:68116779054d0ce121425b73c349233a6099d7db1de30030c00f098c5c33c090",
+          "at": "2026-07-13T14:05:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe1fe56dc3d2ac80c64d68fe33398a3248d62e16476553899a6b3f37f5307836",
+          "at": "2026-07-13T14:11:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67a7aeb6cb309ffe6620d5fc412b83cedc31dc45b822c63fc6e32837ee53bc02",
+          "at": "2026-07-13T14:31:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67a7aeb6cb309ffe6620d5fc412b83cedc31dc45b822c63fc6e32837ee53bc02",
+          "at": "2026-07-13T14:34:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1f118f251270f20d7751aeba20b3aaeb58ef8692523e6b62451443711d42a51",
+          "at": "2026-07-13T14:42:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1f118f251270f20d7751aeba20b3aaeb58ef8692523e6b62451443711d42a51",
+          "at": "2026-07-13T14:45:40Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 は field / variant / alias の `dyn Trait` edge も対象にしますが、D4 は `method_param` / `method_returns` の style key しか規定していません。既存の `field` / `variant_payload` / `alias` key を使うのか不明で、下流実装の受入れ条件が一意に定まりません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-0308-contract-map-dyn-trait-return-edge.md",
+              "line": 79,
+              "category": "inconsistent decisions within same ADR"
+            },
+            {
+              "message": "D1 は TraitObject の bound path の抽出だけを定め、複数 bound や generic / associated-type arguments の扱いを定義していません。`dyn Port + Send`、`dyn Iterator<Item = DeclaredType>`、`dyn Port<DeclaredType>` で trait edge のみか内部の宣言型 edge も出すのか不明です。D5 も単純な `Arc<dyn DeclaredPort>` のみで、この差異を固定できません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-0308-contract-map-dyn-trait-return-edge.md",
+              "line": 47,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:3d97313de8567f9090e16eca68bf448ce008e03c29007213d930bec75cdd54f9",
+          "at": "2026-07-13T12:49:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D5 is ambiguous: it requires a minimum of 3 regression cases but enumerates 5 concrete cases without stating whether all five are mandatory. Downstream spec/task coverage cannot derive a deterministic acceptance set; cases 4–5 could be omitted while satisfying the stated minimum.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-0308-contract-map-dyn-trait-return-edge.md",
+              "line": 103,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:7b2b5e850ff296622d77538d315acd133a03d455aea7181bb1ab029195ee3530",
+          "at": "2026-07-13T12:59:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fbc595faeebb1132904b87cbc6d755dc56bd93c6073e98509f188775b273abc6",
+          "at": "2026-07-13T13:02:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 の qualified path 規則は `crate::Port` / `self::Port` / `super::Port` の扱いを決めていません。記載どおり先頭 segment を crate 名にすると、catalogue の TypeRef 規約で有効なこれらの自 crate 参照が trait_index の `(current_crate, Port)` に到達せず、今回解消するはずの edge 欠落が残ります。spec.json が観測可能な挙動を導出できるよう、Rust 相対 prefix の解決規則と回帰ケースを明記してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-0308-contract-map-dyn-trait-return-edge.md",
+              "line": 72,
+              "category": "decision underspecified for downstream consumption"
+            }
+          ],
+          "hash": "rvw1:sha256:fbc595faeebb1132904b87cbc6d755dc56bd93c6073e98509f188775b273abc6",
+          "at": "2026-07-13T13:05:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 は `crate::` / `self::` / `super::` を `current_crate` に正規化すると決める一方、この規則を「既存 `resolve_trait_subgraph` と同一」として共通化を要求しています。しかし現行 resolver は修飾パスの先頭 segment を常に crate 名として扱うため、共通化すると既存の trait_impl edge の解決意味論まで変更されます。`dyn Trait` edge の ADR がこの追加変更を意図しているか不明で、下流の spec/test が trait_impl 側の受入条件を導出できません。既存 resolver も変更対象とするのかを明示してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-13-0308-contract-map-dyn-trait-return-edge.md",
+              "line": 80,
+              "category": "scope_leakage_into_adr_body"
+            }
+          ],
+          "hash": "rvw1:sha256:44c2ff80f54083d3a4aab29ce2d87fb7444deea9dea3e0792b9f02fee9a5e7f8",
+          "at": "2026-07-13T13:07:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d695afec3b8f04bf03479c1bc7da4a5d338643d3ce0f4c3e1f42b0ba4caf9e95",
+          "at": "2026-07-13T13:10:07Z"
+        }
+      ]
+    }
+  }
+}

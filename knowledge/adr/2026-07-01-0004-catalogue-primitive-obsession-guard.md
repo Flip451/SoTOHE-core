@@ -273,7 +273,7 @@ layer 軸に `"all"` のような特殊値を設ける、あるいは新 variant
 - `knowledge/adr/` — ADR 索引
 - `architecture-rules.json` — layer 名・層構成の SSoT。本 lint の layer 参照はここを参照し、既定 config の層名も同 SSoT から列挙生成する（D6・D7）
 - `knowledge/conventions/prefer-type-safe-abstractions.md` — 本 lint が強制する Newtype / enum-first ルール
-- `knowledge/conventions/hexagonal-architecture.md` — domain port + infrastructure 実装の分離根拠（D3）、DTO を境界の外部形式とする根拠、および外側の層が下位エラーを透過ラップする根拠（D7）
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） — domain port + infrastructure 実装の分離根拠（D3）、DTO を境界の外部形式とする根拠、および外側の層が下位エラーを透過ラップする根拠（D7）
 - `knowledge/adr/2026-05-25-0000-tddd-pattern-semantics-extension.md` — 型カタログ linter framework（opt-in ルール機構 / `RuleTarget` + config）の確立。本 ADR はその framework に新 variant を足し、D7 の粒度 config も同じ config 面に乗せる
 - `knowledge/adr/2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md` — 既存 framework へルールを追加した前例（`KindLayerConstraint` の layer 粒度・`RuleTarget` の role 粒度を config で宣言した事例）
 - `knowledge/adr/2026-06-18-0822-typeref-parser-qualified-path-support.md` — カタログ TypeRef を syn でパースする `type_ref_parser` の実装 ADR（D2 が再利用する走査基盤）

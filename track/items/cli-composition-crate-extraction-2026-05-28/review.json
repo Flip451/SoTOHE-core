@@ -46,14 +46,14 @@
             {
               "message": "T003 asks `libs/infrastructure` to add a `cli_composition` dependency for the re-export shim while D1/D6 require `apps/cli-composition` to keep a direct `infrastructure` dependency. That creates a Cargo package dependency cycle (`infrastructure` -> `cli_composition` -> `infrastructure`), so the staged migration cannot compile as written.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
               "line": 18,
               "category": "infeasibility"
             },
             {
               "message": "T006 step 3 says remaining `apps/cli/src` imports may be rerouted through `cli_composition` public API or `domain`, but D3/CN-01 reduce `apps/cli` to a single `cli_composition` dependency. There is no allowed final path that uses `domain` directly from `apps/cli`, so this instruction conflicts with the stated end state.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
               "line": 104,
               "category": "contradiction"
             }
@@ -105,7 +105,7 @@
             {
               "message": "`T005` moves `persist_commit_hash_for_track` out of `libs/infrastructure/src/review_v2/mod.rs` into `apps/cli-composition`, but `T006` still requires `libs/infrastructure/src/review_v2/mod.rs` to contain that same free function, and `spec.json` AC-07 says the module should contain only adapter types. The final state cannot satisfy all three; choose one location for the helper and update the conflicting task/spec entry accordingly.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
+              "file": "track/items/cli-composition-crate-extraction-2026-05-28/impl-plan.json",
               "line": 29,
               "category": "contradiction"
             }
@@ -765,14 +765,14 @@
             {
               "message": "`make_track_review_results` discards the incoming `raw_args` and constructs `ReviewResultsInput` with hardcoded defaults (`scope: None`, `all: false`, `limit: 0`, `round_type: \"all\"`, `no_hint: false`). That means every `cargo make track-review-results -- ...` filter the dispatcher forwards is silently ignored, so the wrapper cannot actually expose the review-results options it is supposed to relay.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 284,
               "category": "functional_regression"
             },
             {
               "message": "The positional parsing in the make-task wrappers is lossy: `make_track_transition`, `make_track_add_task`, and `make_track_set_override` all compute positionals with `filter(|w| !w.starts_with('-'))`, so flag values are treated as positional arguments. For example, `--track-id my-track T001 done` can make `task_id` become `my-track`, and `--track-id`/`--reason` can corrupt the status/description. These wrappers need flag-aware parsing, not a raw non-`-` filter.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 336,
               "category": "argument_parsing"
             }
@@ -787,7 +787,7 @@
             {
               "message": "`make_track_review_results` discards the caller's `--scope`, `--round-type`, `--limit`, and `--no-hint` arguments and hardcodes `scope: None`, `limit: 0`, and `round_type: \"all\"`. That means `cargo make track-review-results -- --track-id ... --scope ... --round-type ... --limit 1` cannot produce the scoped findings block required by the review protocol, so this wrapper reports the wrong review-results data.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 291,
               "category": "workflow correctness"
             }
@@ -802,7 +802,7 @@
             {
               "message": "`--limit` is parsed with `parse::<u32>().ok().unwrap_or(0)`, so `cargo make track-review-results -- --limit all` or any malformed limit silently degrades to summary-only output instead of preserving the requested history or returning an error. That is a user-visible behavior regression in the wrapper.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 294,
               "category": "error-handling"
             }
@@ -876,14 +876,14 @@
             {
               "message": "The write-guard was only applied to `review_run_local`; `review_run_codex` and `review_run_claude` still resolve `track_id` through `resolve_track_id_or_branch`, so `review codex-local` / `review claude-local` can still write `review.json` for an arbitrary track from the wrong branch. That reintroduces the cross-track write/corruption risk D7 is supposed to block.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
               "line": 56,
               "category": "correctness"
             },
             {
               "message": "`extract_positionals` treats every token that starts with `-` as a flag and drops it, so legitimate free-form positional text beginning with `-` is silently mangled or discarded. That breaks `make_track_add_task` descriptions and `make_track_set_override` reasons whenever the user input starts with a dash.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 549,
               "category": "input-parsing"
             }
@@ -920,21 +920,21 @@
             {
               "message": "The new positional parser still drops the token after any known flag even when that flag's value is missing. A malformed `cargo make` invocation like `--section` or `--track-id` without a value can therefore be reinterpreted as a different task/description instead of failing fast, which is the kind of silent misparse this hardening pass was meant to eliminate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 592,
               "category": "correctness"
             },
             {
               "message": "This module is 736 lines long, over the repository's 700-line cap. The new parser helpers and tests push it past the architectural limit, so it should be split before merge.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 736,
               "category": "architecture"
             },
             {
               "message": "This module is 737 lines long, over the repository's 700-line cap. The new resolution façade and tests push it past the architectural limit, so it should be split before merge.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/mod.rs",
+              "file": "apps/cli-composition/src/track/mod.rs",
               "line": 737,
               "category": "architecture"
             }
@@ -949,14 +949,14 @@
             {
               "message": "P1: The new argument-parsing helpers still treat the next token as a value even when it is another flag. Malformed invocations such as `--commit-hash --track-id ...`, `--section --after ...`, or `--scope --limit 1` will be misparsed instead of failing closed, so `track_transition`, `track_add_task`, `track_set_override`, and `track_review_results` can act on the wrong task or silently drop required inputs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 523,
               "category": "argument_parsing"
             },
             {
               "message": "P1: The production portion of this module now runs to 703 lines before the test module starts, which exceeds the repo's 700-line maximum for a production file. That violates the scope checklist and makes the module harder to review and maintain.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/mod.rs",
+              "file": "apps/cli-composition/src/track/mod.rs",
               "line": 704,
               "category": "architecture"
             }
@@ -1007,7 +1007,7 @@
             {
               "message": "The timeout-recovery path now accepts any Codex review on the same commit SHA, even if it was submitted before the current `trigger_timestamp`. That lets a review from a previous cycle on an unchanged branch be resurrected as the result of the current cycle after a timeout, which defeats the freshness check that the main polling loop still enforces.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/pr/poll.rs",
+              "file": "apps/cli-composition/src/pr/poll.rs",
               "line": 353,
               "category": "logic"
             }
@@ -1115,14 +1115,14 @@
             {
               "message": "The new hand-rolled parsing only recognizes `--flag <value>` tokens. Valid clap-style `--base=...`, `--interval=...`, `--timeout=...`, and `--method=...` inputs are treated as absent, so explicit overrides are silently dropped and the code falls back to `main`/15/600/merge.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 620,
               "category": "correctness"
             },
             {
               "message": "`parse_pr_merge_args` no longer enforces the `merge|squash|rebase` method set. An invalid `--method` value is forwarded to `gh pr merge` instead of being rejected up front like the clap-based CLI does.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 655,
               "category": "correctness"
             }
@@ -1137,14 +1137,14 @@
             {
               "message": "`parse_pr_ensure_args` is not clap-equivalent: it treats `--base` as optional data and falls back to `main` when the flag is malformed, and it only inspects the first token for the track id. As a result, invocations like `cargo make track-pr-ensure --base develop my-track` or `--base` with no value will act on the wrong branch instead of failing the way the baseline CLI does.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 620,
               "category": "correctness"
             },
             {
               "message": "`parse_pr_merge_args` no longer matches the baseline clap parser: it only treats the first token as the PR number, so valid orderings that put flags first (for example `cargo make track-pr-merge --timeout 60 123`) lose the PR entirely, and it accepts any `--method` string instead of rejecting values outside `merge|squash|rebase` up front.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 641,
               "category": "correctness"
             }
@@ -1159,14 +1159,14 @@
             {
               "message": "`parse_pr_ensure_args` reads the token after `--base` unconditionally, so malformed input like `cargo make track-pr-ensure --base --track-id abc` treats `--track-id` as the base branch instead of failing like the clap-based path. That can silently route PR creation to the wrong base branch.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 620,
               "category": "correctness"
             },
             {
               "message": "`parse_pr_merge_args` ignores every flag except `--interval`, `--timeout`, and `--method`. The old wrapper forwarded the full arg list to `sotp pr wait-and-merge`, where clap would reject unknown arguments; here an invocation like `cargo make track-pr-merge --bogus 1 123` is silently accepted and the stray positional token can be mistaken for the PR number.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 660,
               "category": "correctness"
             }
@@ -1181,14 +1181,14 @@
             {
               "message": "`parse_pr_ensure_args` still swallows malformed input instead of failing like the baseline clap parser: `--base` with no value (or followed by another flag) falls back to `\"main\"`, and unknown flags/extra positionals are ignored rather than rejected. That means typos can be misinterpreted as a valid `track_id`/default base instead of surfacing an error.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 633,
               "category": "missing_error_handling"
             },
             {
               "message": "`parse_pr_merge_args` does not enforce the single required `pr` positional. It records the first non-flag token and silently ignores any additional positionals, and when no positional is provided it forwards `\"\"` to `pr_wait_and_merge` instead of rejecting the invocation. Baseline `WaitAndMergeArgs` would fail fast in both cases.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 681,
               "category": "missing_error_handling"
             }
@@ -1203,14 +1203,14 @@
             {
               "message": "`make_track_pr` still runs `make_track_pr_push(raw_args.clone())` before the new parser, and that push path still uses `words.first()` as the track id. As a result, flag-first invocations such as `cargo make track-pr -- --base develop my-track` will push a branch named `--base` before the ensure step runs, so the combined wrapper still drops the restored flag ordering.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 216,
               "category": "correctness"
             },
             {
               "message": "`parse_pr_ensure_args` treats `--track-id` as a value-taking flag but never assigns its value to `track_id`; it only skips over the token. That means `make_track_pr_ensure -- --track-id foo` silently falls back to branch-derived resolution instead of honoring the user-supplied track id, which can create or reuse the wrong PR.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 653,
               "category": "correctness"
             }
@@ -1225,14 +1225,14 @@
             {
               "message": "`parse_pr_ensure_args` and `parse_pr_merge_args` do not actually mirror clap here: they only accept `--flag VALUE` tokens, so valid invocations like `--base=develop`, `--interval=5`, `--timeout=60`, and `--method=squash` are treated as unknown flags. They also stop at the first positional and silently ignore any later positional tokens, whereas the clap-backed commands would reject extra arguments. That reintroduces argument-handling regressions for the wrappers this refactor is supposed to preserve.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 640,
               "category": "correctness"
             },
             {
               "message": "`make_track_pr_push` now treats every `-`-prefixed token as a flag and blindly skips the following token if it does not start with `-`. That means an unknown or boolean flag can consume the real track id, so `cargo make track-pr-push --resume my-track` (or any typoed flag before the track id) will silently drop `my-track` and call `pr_push(None)`, pushing the current branch instead of erroring like the baseline dispatcher would.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 203,
               "category": "correctness"
             }
@@ -1247,14 +1247,14 @@
             {
               "message": "`parse_pr_ensure_args` and `parse_pr_merge_args` accept the first positional token and silently discard any later positional tokens. That means invocations such as `cargo make track-pr-merge 42 99` or `cargo make track-pr-ensure foo bar` proceed instead of failing, which diverges from the clap-backed CLI behavior and can act on the wrong PR/track. Reject surplus positional arguments instead of ignoring them.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 699,
               "category": "correctness"
             },
             {
               "message": "`expand_eq_flags` rewrites `--flag=value` into separate tokens, but the parsers then reject any value token starting with `-`. As a result, valid clap forms like `--base=-feature` or `--track-id=-foo` are no longer accepted, because the equals syntax loses the distinction between a literal string value and a new flag. Preserve the `=` form or special-case dash-leading values.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 623,
               "category": "correctness"
             }
@@ -1284,14 +1284,14 @@
             {
               "message": "`parse_pr_ensure_args` overwrites repeated options instead of surfacing the clap-style `ArgumentConflict`. `--base` and `--track-id` are both `ArgAction::Set`-style options in the baseline CLI, so invocations like `cargo make track-pr-ensure --base main --base develop` or `--track-id foo --track-id bar` should fail closed, not silently pick the last value and target the wrong base/track.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 646,
               "category": "correctness"
             },
             {
               "message": "`parse_pr_merge_args` has the same duplicate-option bug for `--interval`, `--timeout`, and `--method`: later occurrences silently override earlier ones, but clap’s default `Set` action would reject repeated options. That means malformed calls like `cargo make track-pr-merge 123 --timeout 60 --timeout 5` can merge with the wrong settings instead of failing.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": 749,
               "category": "correctness"
             }
@@ -1379,7 +1379,7 @@
             {
               "message": "This refactor removes the `#[cfg(test)]` coverage from `make.rs` and adds no replacement tests for the new forwarding helpers. The new `build_set_override_args` state machine and the `pr push`/`pr ensure` compatibility shim are now untested, so regressions in `--track-id`/`--reason` routing will only show up at runtime.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/make.rs",
+              "file": "apps/cli-composition/src/make.rs",
               "line": null,
               "category": "testing"
             }
@@ -1408,14 +1408,14 @@
             {
               "message": "`resolve_track_id_from_branch_uses_project_root_not_items_dir` does not reproduce the regression it claims to pin: it switches to the repo root, where `track/items` already exists, so the pre-fix `discover_from(items_dir)` path would still pass. The subdirectory invocation that actually failed is not covered, so this test will not catch a relapse.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
               "line": 704,
               "category": "testing"
             },
             {
               "message": "`resolve_track_id_from_branch_returns_branch_error_on_non_track_branch` changes the process CWD to a tempdir and never restores it. When the tempdir is dropped, later tests inherit a deleted working directory, making the suite order-dependent and flaky.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
               "line": 757,
               "category": "testing"
             }
@@ -1430,7 +1430,7 @@
             {
               "message": "P1: The new regression test mutates the process CWD, but its `cwd_lock` is private to this module. Sibling `review_v2` test modules (`run.rs` and `commit_hash.rs`) use their own separate locks, so under parallel test execution the different `set_current_dir` call sites can still interleave and make CI flaky. The production fix is fine; the test needs a shared, crate-wide serialization mechanism or to avoid changing CWD.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
               "line": 668,
               "category": "testing"
             }
@@ -1445,7 +1445,7 @@
             {
               "message": "The regression coverage here does not exercise the actual failure mode from the briefing. The new test uses an absolute `items_dir`, and the `resolve_project_root` unit test is independent, so both still pass if `resolve_track_id_from_branch`/`resolve_track_id_or_branch_write` keep calling `SystemGitRepo::discover_from(items_dir)`. The bug only reproduces when the process starts in a repo subdirectory with a relative `track/items` path, so add a test that runs from that context and invokes the helper with the relative path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/mod.rs",
+              "file": "apps/cli-composition/src/review_v2/mod.rs",
               "line": 671,
               "category": "testing"
             }

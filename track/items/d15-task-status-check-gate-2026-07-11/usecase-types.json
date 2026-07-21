@@ -1,0 +1,772 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "task_status",
+              "ty": "domain::TaskStatusKind"
+            },
+            {
+              "name": "missing_count",
+              "ty": "usize"
+            },
+            {
+              "name": "stale_count",
+              "ty": "usize"
+            },
+            {
+              "name": "verdict_absent_count",
+              "ty": "usize"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "task_status",
+          "params": [],
+          "receiver": "&self",
+          "returns": "domain::TaskStatusKind"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "missing_count",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "stale_count",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verdict_absent_count",
+          "params": [],
+          "receiver": "&self",
+          "returns": "usize"
+        }
+      ],
+      "type_name": "TestObligationStatusLaneSummary"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "TestObligationStatusLaneSummary",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TestObligationStatusLaneSummary",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TestObligationStatusLaneSummary",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TestObligationStatusLaneSummary",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "CheckTestObligationsOutcome",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CheckTestObligationsOutcome",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CheckTestObligationsOutcome",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CheckTestObligationsOutcome",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligationResultsCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligationResultsCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligationResultsCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligationResultsCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligationResultsOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligationResultsOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligationResultsOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligationResultsOutput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CheckTestObligationsInteractor",
+      "trait_ref": "CheckTestObligationsApplicationService"
+    },
+    {
+      "action": "reference",
+      "for_type": "TestObligationResultsInteractor",
+      "trait_ref": "TestObligationResultsApplicationService"
+    }
+  ],
+  "traits": {
+    "ImplPlanReaderPort": {
+      "action": "reference",
+      "docs": "Secondary port for reading task statuses from impl-plan.json; reused unchanged for obligation lane attribution.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read_task_statuses",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<std::collections::HashMap<domain::TaskId, domain::TaskStatusKind>, PreReviewGateError>"
+        }
+      ],
+      "module_path": "pre_review_gate",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "TaskContractReaderPort": {
+      "action": "reference",
+      "docs": "Secondary port for reading task-contract.json; reused unchanged for entry-to-task attribution.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::task_contract::TaskContractDocument, PreReviewGateError>"
+        }
+      ],
+      "module_path": "pre_review_gate",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "CheckTestObligationsInteractor": {
+      "action": "modify",
+      "docs": "CheckTestObligationsInteractor constructor and decision surface updated; see IN-01, IN-02, IN-03, IN-04, IN-06, and IN-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "rules_loader",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestObligationRulesLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "obligations_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "bindings_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "source_scanner",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_cache",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort + Send + Sync>"
+            },
+            {
+              "name": "waiver_cache",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "waiver_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "std::sync::Arc<dyn domain::SpecDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "task_contract_reader",
+              "ty": "std::sync::Arc<dyn TaskContractReaderPort>"
+            },
+            {
+              "name": "impl_plan_reader",
+              "ty": "std::sync::Arc<dyn ImplPlanReaderPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::check",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "CheckTestObligationsOutcome": {
+      "action": "modify",
+      "docs": "Usecase-local output DTO retained outside the domain model because it carries application-orchestration results; surface updated per IN-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new_verified_scope",
+          "params": [
+            {
+              "name": "resolved_edges",
+              "ty": "Vec<domain::tddd::test_obligation::ids::TestObligationEdgeId>"
+            },
+            {
+              "name": "uncited_findings",
+              "ty": "Vec<domain::tddd::test_obligation::scope::UncitedSpecElementFinding>"
+            },
+            {
+              "name": "status_lane_summaries",
+              "ty": "Vec<TestObligationStatusLaneSummary>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new_empty_scope",
+          "params": [
+            {
+              "name": "uncited_findings",
+              "ty": "Vec<domain::tddd::test_obligation::scope::UncitedSpecElementFinding>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolved_edges",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[domain::tddd::test_obligation::ids::TestObligationEdgeId]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "uncited_findings",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[domain::tddd::test_obligation::scope::UncitedSpecElementFinding]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "status_lane_summaries",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TestObligationStatusLaneSummary]"
+        }
+      ],
+      "module_path": "test_obligation::check",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "PreReviewGateError": {
+      "action": "reference",
+      "docs": "Existing usecase error vocabulary returned unchanged by the reused attribution reader ports; String payloads are unconstrained opaque I/O diagnostics, not domain concepts.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TaskContractNotFound",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TaskContractReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "SignalReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "layer",
+                  "ty": "domain::tddd::LayerId"
+                },
+                {
+                  "name": "message",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ImplPlanReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "TestObligationResultsCommand": {
+      "action": "modify",
+      "docs": "Command carrying the catalogue-aware input needed for informational task-status lane aggregation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "catalogue_paths",
+              "ty": "Vec<std::path::PathBuf>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::results",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "TestObligationResultsInteractor": {
+      "action": "modify",
+      "docs": "TestObligationResultsInteractor constructor and aggregation surface modification. IN-05, IN-07, AC-05, AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "obligations_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "bindings_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "source_scanner",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_cache",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort + Send + Sync>"
+            },
+            {
+              "name": "waiver_cache",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "waiver_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "std::sync::Arc<dyn domain::SpecDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "task_contract_reader",
+              "ty": "std::sync::Arc<dyn TaskContractReaderPort>"
+            },
+            {
+              "name": "impl_plan_reader",
+              "ty": "std::sync::Arc<dyn ImplPlanReaderPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::results",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "TestObligationResultsOutput": {
+      "action": "modify",
+      "docs": "TestObligationResultsOutput shape modification. IN-05, AC-05, AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "lane_summaries",
+              "ty": "Vec<TestObligationLaneSummary>"
+            },
+            {
+              "name": "records",
+              "ty": "Vec<domain::tddd::test_obligation::drift::EdgeVerdictRecord>"
+            },
+            {
+              "name": "uncited_findings",
+              "ty": "Vec<domain::tddd::test_obligation::scope::UncitedSpecElementFinding>"
+            },
+            {
+              "name": "status_lane_summaries",
+              "ty": "Result<Vec<TestObligationStatusLaneSummary>, domain::tddd::test_obligation::ids::DiagnosticMessage>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "lane_summaries",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[TestObligationLaneSummary]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "records",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[domain::tddd::test_obligation::drift::EdgeVerdictRecord]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "uncited_findings",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[domain::tddd::test_obligation::scope::UncitedSpecElementFinding]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "status_lane_summaries",
+          "params": [],
+          "receiver": "&self",
+          "returns": "Result<&[TestObligationStatusLaneSummary], &domain::tddd::test_obligation::ids::DiagnosticMessage>"
+        }
+      ],
+      "module_path": "test_obligation::results",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        }
+      ]
+    },
+    "TestObligationStatusLaneSummary": {
+      "action": "add",
+      "docs": "Usecase-local status-lane summary DTO (IN-02, IN-05, IN-07, AC-05, AC-07).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation::results",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/d15-task-status-check-gate-2026-07-11/spec.json"
+        }
+      ]
+    }
+  }
+}

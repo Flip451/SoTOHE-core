@@ -1,5 +1,6 @@
 ---
 name: dry-fix-lead
+sandbox: workspace-write
 description: Use this skill whenever you act as the dry-fix-lead for the DRY fix phase (DFP) in this repository (any task whose prompt assigns a track id and a briefing file). Follows the canonical DRY-gate loop defined in the capability SSoT.
 ---
 

@@ -1,0 +1,856 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "73adebf45f9ae31891a9028dab61495f4ada573633668f78fd89b3aa9881af90",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 0 の baseline review では入力箱 ADR を in-place で収束させ、各編集を adr-diagnoser が監査し、意味を orchestrator に自己裁定させない。収束 diff は user が裁定し、承認文面を review-refinement として刻印してから commit で境界を閉じる"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "track 運用文書が、Phase 0 で user 裁定済みの入力 ADR を収束させて境界を閉じ、Phase 1+ で生じる意味変更を別の delta ADR draft として扱う二箱分離モデルを一貫して規定する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "73adebf45f9ae31891a9028dab61495f4ada573633668f78fd89b3aa9881af90",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Phase 0 裁定境界後は入力箱 ADR への意味的な in-place 編集を禁止し、精緻化を含む意味変更と新決定をすべて track-born draft として delta 箱に起草する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "track 運用文書が、Phase 0 で user 裁定済みの入力 ADR を収束させて境界を閉じ、Phase 1+ で生じる意味変更を別の delta ADR draft として扱う二箱分離モデルを一貫して規定する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "a78e350675782ac94b36dd5d77895e1e0f3570cca2575ab80b805860c6bc41aa",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 0 の baseline review では入力箱 ADR を in-place で収束させ、各編集を adr-diagnoser が監査し、意味を orchestrator に自己裁定させない。収束 diff は user が裁定し、承認文面を review-refinement として刻印してから commit で境界を閉じる"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "pre-track ADR authoring convention が、Phase 0 の同席 in-place 収束、編集ごとの診断監査、user による収束 diff の裁定、review-refinement の経過措置を含む境界閉鎖と、境界後の入力箱 freeze を明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "a78e350675782ac94b36dd5d77895e1e0f3570cca2575ab80b805860c6bc41aa",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 0 裁定境界後は入力箱 ADR への意味的な in-place 編集を禁止し、精緻化を含む意味変更と新決定をすべて track-born draft として delta 箱に起草する。draft は非 user 系根拠で 🟡 として strict merge gate で user 裁定まで merge を止め"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "pre-track ADR authoring convention が、Phase 0 の同席 in-place 収束、編集ごとの診断監査、user による収束 diff の裁定、review-refinement の経過措置を含む境界閉鎖と、境界後の入力箱 freeze を明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "987798163a90c35ddf35ad705657734f786649aa1ceac0e7160e4af1db6e3da9",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 0 の baseline review では入力箱 ADR を in-place で収束させ、各編集を adr-diagnoser が監査し、意味を orchestrator に自己裁定させない。収束 diff は user が裁定し、承認文面を review-refinement として刻印してから commit で境界を閉じる"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "adr-diagnoser と adr-editor の capability contracts および対応 skill descriptions が、Phase 0 編集監査、Phase 1+ delta 入庫の三択判定、user 裁定の実装差分に対する conformance 再監査、不一致トリアージ、および各 verdict の責務境界を整合して記述する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "987798163a90c35ddf35ad705657734f786649aa1ceac0e7160e4af1db6e3da9",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "delta draft は、入庫の前に必ず adr-diagnoser が判定する。判定は三択である。記録済み決定を変えないなら、そのまま入庫する。決定を変えずに済む別の解決があるなら、その解決を添えて差し戻す。決定の修正が避けられない場合だけ、決定修正の提案として入庫し、user の裁定を待つ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "adr-diagnoser と adr-editor の capability contracts および対応 skill descriptions が、Phase 0 編集監査、Phase 1+ delta 入庫の三択判定、user 裁定の実装差分に対する conformance 再監査、不一致トリアージ、および各 verdict の責務境界を整合して記述する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "987798163a90c35ddf35ad705657734f786649aa1ceac0e7160e4af1db6e3da9",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ただし draft が正式な決定になるのは user が明示的に採用したときだけであり、採用まで merge は通らない。supersede / refine の関係は採用された delta 側だけに記録し、入力箱 ADR は書き換えない。棄却された draft は撤回し、そこから導出された下流成果物を merge 前に再作業する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "adr-diagnoser と adr-editor の capability contracts および対応 skill descriptions が、Phase 0 編集監査、Phase 1+ delta 入庫の三択判定、user 裁定の実装差分に対する conformance 再監査、不一致トリアージ、および各 verdict の責務境界を整合して記述する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "0f843314770369dad6d60c0b2bddfb2fcdd4667d77378c0a22fbb660534cc5ca",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "入力箱 ADR の byte 照合は、その ADR の ledger 最新記録を kind にかかわらず基準とし、ゲートで fail-closed に行う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "track plan、review、adr2pr、merge の workflow SSoTs と対応する thin adapters が、ledger 最新記録を基準とする fail-closed 照合、Phase 0 loop、Phase 1+ の delta 起草・入庫経路、採用・棄却後の再作業、および全 protected source を対象とする terminal audit を同じ運用として記述する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "0f843314770369dad6d60c0b2bddfb2fcdd4667d77378c0a22fbb660534cc5ca",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 0 裁定境界後は入力箱 ADR への意味的な in-place 編集を禁止し、精緻化を含む意味変更と新決定をすべて track-born draft として delta 箱に起草する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "track plan、review、adr2pr、merge の workflow SSoTs と対応する thin adapters が、ledger 最新記録を基準とする fail-closed 照合、Phase 0 loop、Phase 1+ の delta 起草・入庫経路、採用・棄却後の再作業、および全 protected source を対象とする terminal audit を同じ運用として記述する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "0f843314770369dad6d60c0b2bddfb2fcdd4667d77378c0a22fbb660534cc5ca",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「棄却された draft は撤回し、そこから導出された下流成果物を merge 前に再作業する。凍結を保ったまま、pipeline を止めずに決定の進化を表現するためである。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "track plan、review、adr2pr、merge の workflow SSoTs と対応する thin adapters が、ledger 最新記録を基準とする fail-closed 照合、Phase 0 loop、Phase 1+ の delta 起草・入庫経路、採用・棄却後の再作業、および全 protected source を対象とする terminal audit を同じ運用として記述する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "0f843314770369dad6d60c0b2bddfb2fcdd4667d77378c0a22fbb660534cc5ca",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "merge 前の terminal 監査では、全 protected source の track 中の変更来歴を user に提示する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "track plan、review、adr2pr、merge の workflow SSoTs と対応する thin adapters が、ledger 最新記録を基準とする fail-closed 照合、Phase 0 loop、Phase 1+ の delta 起草・入庫経路、採用・棄却後の再作業、および全 protected source を対象とする terminal audit を同じ運用として記述する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "b88b899da03ca88d008a764841e02165cc80cc1045774dd1e4cead0d61b944b3",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "入力箱 ADR の byte 照合は、その ADR の ledger 最新記録を kind にかかわらず基準とし、ゲートで fail-closed に行う。review 入口の検査は既存決定どおり台帳健全性（init 記録の存在を含む）に限り、byte 照合を行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "対象文書群が、admission_class、supersedes、refines の目標 front-matter 形式、判定 verdict、gate 発火、conformance、復旧の運用詳細を規定し、schema と review-refinement kind の Rust 実装は後続 code track に委ねる経過措置を明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "b88b899da03ca88d008a764841e02165cc80cc1045774dd1e4cead0d61b944b3",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "delta draft は、入庫の前に必ず adr-diagnoser が判定する。判定は三択である。記録済み決定を変えないなら、そのまま入庫する。決定を変えずに済む別の解決があるなら、その解決を添えて差し戻す。決定の修正が避けられない場合だけ、決定修正の提案として入庫し、user の裁定を待つ。判定に迷う場合は差し戻す。入庫後に draft を書き換えた場合は、判定からやり直す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "対象文書群が、admission_class、supersedes、refines の目標 front-matter 形式、判定 verdict、gate 発火、conformance、復旧の運用詳細を規定し、schema と review-refinement kind の Rust 実装は後続 code track に委ねる経過措置を明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "b88b899da03ca88d008a764841e02165cc80cc1045774dd1e4cead0d61b944b3",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ただし draft が正式な決定になるのは user が明示的に採用したときだけであり、採用まで merge は通らない。supersede / refine の関係は採用された delta 側だけに記録し、入力箱 ADR は書き換えない。棄却された draft は撤回し、そこから導出された下流成果物を merge 前に再作業する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "対象文書群が、admission_class、supersedes、refines の目標 front-matter 形式、判定 verdict、gate 発火、conformance、復旧の運用詳細を規定し、schema と review-refinement kind の Rust 実装は後続 code track に委ねる経過措置を明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "b88b899da03ca88d008a764841e02165cc80cc1045774dd1e4cead0d61b944b3",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録の意味裁定は user に属し、誤分類と裁定された記録は復元で回復する。残余リスクを隠蔽不能にするためである。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "対象文書群が、admission_class、supersedes、refines の目標 front-matter 形式、判定 verdict、gate 発火、conformance、復旧の運用詳細を規定し、schema と review-refinement kind の Rust 実装は後続 code track に委ねる経過措置を明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "6780cd3e91ffdfa0b77989227f64250e0ff607002e303ecedde7ce26e191ae0d",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "（新 kind の実装までは、既存 escalation kind と reason 冒頭の明記を唯一の経過例外とする）"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "review-refinement kind と admission_class、supersedes、refines の Rust schema・validator 実装は本 track で行わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "95f1817ef187028b718e51f2dfb21fb7b2efd5f4f065be5be9037885bea8e1df",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「delta draft は、入庫の前に必ず adr-diagnoser が判定する。」「守護者が防御し、本当に必要な修正提案だけを user に届けるためである。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "文書は ADR の決定を逐語的に複製せず、各運用文書の読者が担う行為、境界、gate 条件、失敗時の routing を規定する。orchestrator は意味を自己裁定しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "95f1817ef187028b718e51f2dfb21fb7b2efd5f4f065be5be9037885bea8e1df",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録の意味裁定は user に属し、誤分類と裁定された記録は復元で回復する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "文書は ADR の決定を逐語的に複製せず、各運用文書の読者が担う行為、境界、gate 条件、失敗時の routing を規定する。orchestrator は意味を自己裁定しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "2e9035373b13d3386e78c885005419f454271f0a4c9fc5fc77e67b66a315cecd",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "入力箱 ADR の byte 照合は、その ADR の ledger 最新記録を kind にかかわらず基準とし、ゲートで fail-closed に行う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "二箱分離の運用は fail-closed を維持する。境界後の入力箱への意味的 in-place 編集、不確実な delta 入庫、未採用 delta の merge、または未解消の復旧・再作業を許容する経路を文書化してはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "2e9035373b13d3386e78c885005419f454271f0a4c9fc5fc77e67b66a315cecd",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 0 裁定境界後は入力箱 ADR への意味的な in-place 編集を禁止し、精緻化を含む意味変更と新決定をすべて track-born draft として delta 箱に起草する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "二箱分離の運用は fail-closed を維持する。境界後の入力箱への意味的 in-place 編集、不確実な delta 入庫、未採用 delta の merge、または未解消の復旧・再作業を許容する経路を文書化してはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "2e9035373b13d3386e78c885005419f454271f0a4c9fc5fc77e67b66a315cecd",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「delta draft は、入庫の前に必ず adr-diagnoser が判定する。」「決定を変えずに済む別の解決があるなら、その解決を添えて差し戻す。」「判定に迷う場合は差し戻す。」「守護者が防御し、本当に必要な修正提案だけを user に届けるためである。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "二箱分離の運用は fail-closed を維持する。境界後の入力箱への意味的 in-place 編集、不確実な delta 入庫、未採用 delta の merge、または未解消の復旧・再作業を許容する経路を文書化してはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "2e9035373b13d3386e78c885005419f454271f0a4c9fc5fc77e67b66a315cecd",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「supersede / refine の関係は採用された delta 側だけに記録し、入力箱 ADR は書き換えない。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "二箱分離の運用は fail-closed を維持する。境界後の入力箱への意味的 in-place 編集、不確実な delta 入庫、未採用 delta の merge、または未解消の復旧・再作業を許容する経路を文書化してはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "53445bb79c2ce3f35c3c2769d63064a6faee36ff08b738c3bcc7b9cb39e5a23e",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 0 の baseline review では入力箱 ADR を in-place で収束させ、各編集を adr-diagnoser が監査し、意味を orchestrator に自己裁定させない。収束 diff は user が裁定し、承認文面を review-refinement として刻印してから commit で境界を閉じる"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "pre-track ADR authoring convention は、Phase 0 の収束・user 裁定・境界閉鎖手順と、Phase 1+ の入力箱 freeze・delta 箱への起草手順を分離された節または見出しで記述する。各手順文は、adr-editor、adr-diagnoser、orchestrator、user の担当 actor と処理順序を明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "53445bb79c2ce3f35c3c2769d63064a6faee36ff08b738c3bcc7b9cb39e5a23e",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Phase 0 裁定境界後は入力箱 ADR への意味的な in-place 編集を禁止し、精緻化を含む意味変更と新決定をすべて track-born draft として delta 箱に起草する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "pre-track ADR authoring convention は、Phase 0 の収束・user 裁定・境界閉鎖手順と、Phase 1+ の入力箱 freeze・delta 箱への起草手順を分離された節または見出しで記述する。各手順文は、adr-editor、adr-diagnoser、orchestrator、user の担当 actor と処理順序を明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "660ae6912833ca5f8ecfe341abf9a3db8e8493837f943ce32d81fc874cf0307b",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 0 の baseline review では入力箱 ADR を in-place で収束させ、各編集を adr-diagnoser が監査し、意味を orchestrator に自己裁定させない。収束 diff は user が裁定し、承認文面を review-refinement として刻印してから commit で境界を閉じる"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "adr-diagnoser と adr-editor の contracts は、入庫前・入庫後・user 採用・user 棄却・baseline 不一致の各入力に対し、許可できる編集、required re-audit、verdict 形式、fail-closed の戻り先を矛盾なく示す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "660ae6912833ca5f8ecfe341abf9a3db8e8493837f943ce32d81fc874cf0307b",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「delta draft は、入庫の前に必ず adr-diagnoser が判定する。判定は三択である。記録済み決定を変えないなら、そのまま入庫する。決定を変えずに済む別の解決があるなら、その解決を添えて差し戻す。決定の修正が避けられない場合だけ、決定修正の提案として入庫し、user の裁定を待つ。判定に迷う場合は差し戻す。入庫後に draft を書き換えた場合は、判定からやり直す。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "adr-diagnoser と adr-editor の contracts は、入庫前・入庫後・user 採用・user 棄却・baseline 不一致の各入力に対し、許可できる編集、required re-audit、verdict 形式、fail-closed の戻り先を矛盾なく示す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "660ae6912833ca5f8ecfe341abf9a3db8e8493837f943ce32d81fc874cf0307b",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ただし draft が正式な決定になるのは user が明示的に採用したときだけであり、採用まで merge は通らない。棄却された draft は撤回し、そこから導出された下流成果物を merge 前に再作業する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "adr-diagnoser と adr-editor の contracts は、入庫前・入庫後・user 採用・user 棄却・baseline 不一致の各入力に対し、許可できる編集、required re-audit、verdict 形式、fail-closed の戻り先を矛盾なく示す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "660ae6912833ca5f8ecfe341abf9a3db8e8493837f943ce32d81fc874cf0307b",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "記録の意味裁定は user に属し、誤分類と裁定された記録は復元で回復する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "adr-diagnoser と adr-editor の contracts は、入庫前・入庫後・user 採用・user 棄却・baseline 不一致の各入力に対し、許可できる編集、required re-audit、verdict 形式、fail-closed の戻り先を矛盾なく示す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "b6eabcf4489d9595aa2f6fa2a0e84b2707e7a7bdcd6b1253900478fbc4f1c425",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "入力箱 ADR の byte 照合は、その ADR の ledger 最新記録を kind にかかわらず基準とし、ゲートで fail-closed に行う。review 入口の検査は既存決定どおり台帳健全性（init 記録の存在を含む）に限り、byte 照合を行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "更新された track workflow SSoTs と thin adapters は、review 入口で ledger integrity のみを確認し、commit gate と track-aware CI で ledger 最新記録との byte 照合を fail-closed に行い、Phase 1+ の meaning change を delta 起草・入庫・user 裁定・merge recovery・terminal audit へ一貫して接続する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "b6eabcf4489d9595aa2f6fa2a0e84b2707e7a7bdcd6b1253900478fbc4f1c425",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Phase 0 裁定境界後は入力箱 ADR への意味的な in-place 編集を禁止し、精緻化を含む意味変更と新決定をすべて track-born draft として delta 箱に起草する。draft は非 user 系根拠で 🟡 として strict merge gate で user 裁定まで merge を止める」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "更新された track workflow SSoTs と thin adapters は、review 入口で ledger integrity のみを確認し、commit gate と track-aware CI で ledger 最新記録との byte 照合を fail-closed に行い、Phase 1+ の meaning change を delta 起草・入庫・user 裁定・merge recovery・terminal audit へ一貫して接続する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "b6eabcf4489d9595aa2f6fa2a0e84b2707e7a7bdcd6b1253900478fbc4f1c425",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "入庫済みの draft は、user の裁定を待つ間も下流成果物が cite して作業を進められる。ただし draft が正式な決定になるのは user が明示的に採用したときだけであり、採用まで merge は通らない。棄却された draft は撤回し、そこから導出された下流成果物を merge 前に再作業する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "更新された track workflow SSoTs と thin adapters は、review 入口で ledger integrity のみを確認し、commit gate と track-aware CI で ledger 最新記録との byte 照合を fail-closed に行い、Phase 1+ の meaning change を delta 起草・入庫・user 裁定・merge recovery・terminal audit へ一貫して接続する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "b6eabcf4489d9595aa2f6fa2a0e84b2707e7a7bdcd6b1253900478fbc4f1c425",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "merge 前の terminal 監査では、全 protected source の track 中の変更来歴を user に提示する。記録の意味裁定は user に属し、誤分類と裁定された記録は復元で回復する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "更新された track workflow SSoTs と thin adapters は、review 入口で ledger integrity のみを確認し、commit gate と track-aware CI で ledger 最新記録との byte 照合を fail-closed に行い、Phase 1+ の meaning change を delta 起草・入庫・user 裁定・merge recovery・terminal audit へ一貫して接続する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "a04068daf660d2849a21ca5a6eccea6dda662b9702efc867d17770facab82e84",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新 kind の実装までは、既存 escalation kind と reason 冒頭の明記を唯一の経過例外とする"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "対象文書群は、admission_class、supersedes、refines、review-refinement と既存 escalation を使う単一経過措置を目標運用として明示し、対応する schema・kind・validator の実装が未着手でも現行 Rust の実装済み仕様であると誤認させない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "a04068daf660d2849a21ca5a6eccea6dda662b9702efc867d17770facab82e84",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "delta draft は、入庫の前に必ず adr-diagnoser が判定する。判定は三択である。記録済み決定を変えないなら、そのまま入庫する。決定を変えずに済む別の解決があるなら、その解決を添えて差し戻す。決定の修正が避けられない場合だけ、決定修正の提案として入庫し、user の裁定を待つ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "対象文書群は、admission_class、supersedes、refines、review-refinement と既存 escalation を使う単一経過措置を目標運用として明示し、対応する schema・kind・validator の実装が未着手でも現行 Rust の実装済み仕様であると誤認させない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "a04068daf660d2849a21ca5a6eccea6dda662b9702efc867d17770facab82e84",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "supersede / refine の関係は採用された delta 側だけに記録し、入力箱 ADR は書き換えない。このため、決定の現在の内容は、元の決定に採用済みの修正を採用順に重ねて読むことで得る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "対象文書群は、admission_class、supersedes、refines、review-refinement と既存 escalation を使う単一経過措置を目標運用として明示し、対応する schema・kind・validator の実装が未着手でも現行 Rust の実装済み仕様であると誤認させない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "f26fcaef2c375d971aefefc0a43effaca2c5b419c66f11cdc96eec698bbc9be0",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「棄却された draft は撤回し、そこから導出された下流成果物を merge 前に再作業する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "merge の terminal audit 文書は、すべての protected source の保護開始記録から終端までの来歴を user に提示し、誤分類と裁定された記録を復元、再監査、必要な downstream rework によって回復する経路を示す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "f26fcaef2c375d971aefefc0a43effaca2c5b419c66f11cdc96eec698bbc9be0",
+      "evidence_hash": "abe2a668241d74fab4505ccbda5f7ea05c0038a34f4bb9cf8e2c64a6aaa0307e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "merge 前の terminal 監査では、全 protected source の track 中の変更来歴を user に提示する。記録の意味裁定は user に属し、誤分類と裁定された記録は復元で回復する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "merge の terminal audit 文書は、すべての protected source の保護開始記録から終端までの来歴を user に提示し、誤分類と裁定された記録を復元、再監査、必要な downstream rework によって回復する経路を示す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-19-0616-two-box-decision-separation.md",
+          "decision_id": "D6"
+        }
+      }
+    }
+  ]
+}

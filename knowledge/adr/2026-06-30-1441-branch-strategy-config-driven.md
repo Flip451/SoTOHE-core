@@ -84,7 +84,7 @@ track kind (feature / hotfix / release) 軸は、SoTOHE の中核前提である
 ### Related conventions
 
 - `knowledge/conventions/no-backward-compat.md` — 後方互換性なしの判断と整合する
-- `knowledge/conventions/hexagonal-architecture.md` — Port abstraction (BranchStrategyPort) の配置根拠
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） — Port abstraction (BranchStrategyPort) の配置根拠
 
 ## Decision
 
@@ -361,7 +361,7 @@ D5 の理由により却下。
 
 - `knowledge/adr/` — ADR 索引
 - `knowledge/conventions/no-backward-compat.md` — D5 の根拠 convention
-- `knowledge/conventions/hexagonal-architecture.md` — `BranchStrategyPort` の配置原則
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） — `BranchStrategyPort` の配置原則
 - `knowledge/adr/2026-06-15-0025-operational-docs-restructure-unified.md` — 先行 ADR (workflow.md 解体 + `branch-strategy.md` convention 新設、本 ADR の主要ランディングゾーン)
 - `knowledge/conventions/branch-strategy.md` — D6 で全文書き換え対象 (本 ADR の主要 surface)
 - `knowledge/conventions/{task-completion-flow,adr,dry-check-workflow,review-protocol}.md` — D6 で部分書き換え対象

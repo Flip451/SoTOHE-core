@@ -8,7 +8,7 @@ use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
 use cli_composition::VerifyCompositionRoot;
-use cli_driver::verify::{VerifyDriver, VerifyInput};
+use cli_driver::verify::{TrackId, VerifyDriver, VerifyInput};
 
 /// Arguments for spec-level verify subcommands.
 #[derive(Args)]
@@ -20,10 +20,16 @@ pub struct SpecVerifyArgs {
 /// Verify subcommands for CI validation.
 #[derive(Subcommand)]
 pub enum VerifyCommand {
-    /// Check tech-stack.md for unresolved TODO markers.
-    TechStack(VerifyArgs),
     /// Check latest track artifacts for completeness.
     LatestTrack(VerifyArgs),
+    /// Check the retention live surface for retired gate/document identifiers.
+    RetentionGate(VerifyArgs),
+    /// Verify that the configured fixed SOTP version tag resolves on its remote.
+    SotpVersionTag(VerifyArgs),
+    /// Verify that tracked repository files do not contain work-machine paths.
+    MachinePaths(VerifyArgs),
+    /// Verify that shipped template files contain no concrete source references.
+    TemplateRefs(VerifyArgs),
     /// Check architecture docs synchronization and text patterns.
     ArchDocs(VerifyArgs),
     /// Check workspace layer dependency rules via cargo metadata.
@@ -66,8 +72,8 @@ pub enum VerifyCommand {
 pub struct CatalogueSpecRefsArgs {
     /// Track ID (directory name under items_dir).
     /// When omitted, resolved from the current git branch (`track/<id>`).
-    #[arg(long)]
-    track_id: Option<String>,
+    #[arg(long, value_parser = parse_track_id)]
+    track_id: Option<TrackId>,
 
     /// Path to the track items root directory.
     #[arg(long, default_value = "track/items")]
@@ -100,6 +106,16 @@ pub struct VerifyArgs {
     project_root: PathBuf,
 }
 
+/// Parse a CLI track ID into the driver-facing validated type.
+///
+/// Keeping validation in Clap ensures command dispatch remains a direct
+/// `VerifyInput` → driver call, without a domain-validation branch in the bin.
+fn parse_track_id(value: &str) -> Result<TrackId, clap::Error> {
+    TrackId::try_new(value).map_err(|error| {
+        clap::Error::raw(clap::error::ErrorKind::InvalidValue, format!("invalid track ID: {error}"))
+    })
+}
+
 impl VerifyCommand {
     /// Returns the `track/items` path that the underlying command would use as its items root.
     ///
@@ -110,8 +126,11 @@ impl VerifyCommand {
     pub fn items_dir(&self) -> PathBuf {
         match self {
             // Project-root–based commands: derive items_dir from project_root.
-            VerifyCommand::TechStack(a)
-            | VerifyCommand::LatestTrack(a)
+            VerifyCommand::LatestTrack(a)
+            | VerifyCommand::RetentionGate(a)
+            | VerifyCommand::SotpVersionTag(a)
+            | VerifyCommand::MachinePaths(a)
+            | VerifyCommand::TemplateRefs(a)
             | VerifyCommand::ArchDocs(a)
             | VerifyCommand::Layers(a)
             | VerifyCommand::HooksPath(a)
@@ -174,15 +193,24 @@ impl VerifyCommand {
 /// Dispatches `cmd` to the verify driver and returns the raw `CommandOutcome`
 /// without printing anything.
 ///
-/// `execute_with_summary` delegates here so the 20-arm match is not duplicated.
+/// `execute_with_summary` delegates here so the per-variant match is not duplicated.
 #[allow(clippy::too_many_lines)]
 fn dispatch_to_outcome(driver: &VerifyDriver, cmd: VerifyCommand) -> cli_driver::CommandOutcome {
     match cmd {
-        VerifyCommand::TechStack(args) => {
-            driver.handle(VerifyInput::TechStack { project_root: args.project_root })
-        }
         VerifyCommand::LatestTrack(args) => {
             driver.handle(VerifyInput::LatestTrack { project_root: args.project_root })
+        }
+        VerifyCommand::RetentionGate(args) => {
+            driver.handle(VerifyInput::RetentionGate { project_root: args.project_root })
+        }
+        VerifyCommand::SotpVersionTag(args) => {
+            driver.handle(VerifyInput::SotpVersionTag { project_root: args.project_root })
+        }
+        VerifyCommand::MachinePaths(args) => {
+            driver.handle(VerifyInput::MachinePaths { project_root: args.project_root })
+        }
+        VerifyCommand::TemplateRefs(args) => {
+            driver.handle(VerifyInput::TemplateRefs { project_root: args.project_root })
         }
         VerifyCommand::ArchDocs(args) => {
             driver.handle(VerifyInput::ArchDocs { project_root: args.project_root })
@@ -355,7 +383,7 @@ pub(super) fn dispatch_plan_artifact_refs_with_resolver(
         None => {
             use std::sync::Arc;
 
-            use infrastructure::git_cli::GitRepository as _;
+            // GitRepository trait removed in T008; SystemGitRepo methods are now inherent.
             use usecase::track_resolution::{
                 ActiveTrackResolveInteractor, ActiveTrackResolveService as _,
             };

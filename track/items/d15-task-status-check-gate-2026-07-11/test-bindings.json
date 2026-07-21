@@ -1,0 +1,199 @@
+{
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_strictest_non_todo_attribution_blocks_missing_binding"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_new_resolves_task_contract_and_impl_plan_strictest_wins"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_done_attribution_blocks_every_unresolved_kind"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_in_progress_blocks_while_todo_warns_and_passes"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_new_injected_readers_choose_blocking_and_warning_lanes"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_stale_classification_is_status_independent_before_final_gate"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_todo_stale_verdict_warns_without_blocking"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_missing_bound_test_with_fresh_cache_respects_final_status_lane"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_unattributable_entry_returns_task_attribution_error"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_new_accepts_and_wires_declared_dependencies"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_skipped_attribution_blocks_stale_verdict"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_new_fails_closed_for_skipped_missing_and_absent_verdicts"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_structural_failures_block_regardless_of_task_status"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_with_skipped_and_todo_attribution_blocks"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_same_entry_in_two_layers_uses_obligation_origin_for_status_lane"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_orphaned_binding_across_task_statuses_returns_same_drift"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_malformed_artifacts_block_across_task_statuses"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_coverage_broken_entry_blocks_across_task_statuses"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_new_keeps_unresolved_skipped_lane_informational"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_interactor_with_unresolved_or_status_read_error_returns_ok"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::status_lanes::tests", "test_name": "test_strictest_status_with_shared_entry_competing_attributions_uses_total_order"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_interactor_aggregates_status_lanes_without_gate_failure"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_new_aggregates_todo_in_progress_and_done_lanes"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_new_keeps_unresolved_skipped_lane_informational"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_interactor_with_unresolved_or_status_read_error_returns_ok"},
+        {"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_with_malformed_artifact_error_returns_informational_success"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_results_interactor_with_absent_verifier_fingerprint_counts_verdict_absent"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::status_lanes::tests", "test_name": "test_target_for_direct_edge_with_reference_peer_uses_active_origin"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ObligationCheckError", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "IN-04"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_unattributable_entry_returns_task_attribution_error"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CheckTestObligationsOutcome", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::test_obligation::check::tests", "test_name": "test_check_handler_renders_todo_lane_warning_without_failure"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CheckTestObligationsOutcome", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "IN-07"}},
+      "tests": [
+        {"layer": "cli_driver", "module_path": "cli_driver::test_obligation::check::tests", "test_name": "test_check_handler_renders_todo_lane_warning_without_failure"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_outcome_retains_skipped_lane_summary"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CheckTestObligationsOutcome", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "AC-07"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_skipped_attribution_blocks_missing_binding"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::check_tests", "test_name": "test_check_outcome_retains_skipped_lane_summary"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationResultsCommand", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "IN-05"}},
+      "tests": [
+        {"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_renders_all_status_lanes_informationally"},
+        {"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_forwards_catalogue_paths_to_results_command"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationResultsOutput", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "IN-05"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_renders_all_status_lanes_informationally"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationResultsOutput", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "IN-07"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_renders_all_status_lanes_informationally"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationResultsOutput", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "AC-05"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_renders_all_status_lanes_informationally"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationResultsOutput", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "AC-07"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_renders_all_status_lanes_informationally"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationStatusLaneSummary", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::test_obligation::check::tests", "test_name": "test_check_handler_renders_todo_lane_warning_without_failure"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationStatusLaneSummary", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "IN-05"}},
+      "tests": [
+        {"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_renders_all_status_lanes_informationally"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_status_lane_summary_keeps_all_lanes_and_unresolved_breakdowns"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationStatusLaneSummary", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "IN-07"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_renders_all_status_lanes_informationally"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationStatusLaneSummary", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "AC-05"}},
+      "tests": [
+        {"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_renders_all_status_lanes_informationally"},
+        {"layer": "usecase", "module_path": "usecase::test_obligation::results_tests", "test_name": "test_status_lane_summary_keeps_all_lanes_and_unresolved_breakdowns"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationStatusLaneSummary", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "AC-07"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_renders_all_status_lanes_informationally"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationCheckHandler", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "AC-01"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::test_obligation::check::tests", "test_name": "test_check_handler_renders_todo_lane_warning_without_failure"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationCheckHandler", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "AC-02"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::test_obligation::check::tests", "test_name": "test_check_handler_renders_todo_lane_warning_without_failure"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationCheckHandler", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "AC-04"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::test_obligation::check::tests", "test_name": "test_check_handler_renders_todo_lane_warning_without_failure"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationCheckHandler", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "AC-07"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::test_obligation::check::tests", "test_name": "test_check_handler_with_stale_artifact_returns_nonzero"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationResultsHandler", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "AC-05"}},
+      "tests": [
+        {"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_renders_all_status_lanes_informationally"},
+        {"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_with_io_error_returns_informational_success"},
+        {"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_with_malformed_artifact_error_returns_informational_success"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationResultsHandler", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "AC-07"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::test_obligation::results::tests", "test_name": "test_results_handler_renders_all_status_lanes_informationally"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationCompositionRoot", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "IN-01"}},
+      "tests": [
+        {"layer": "cli_composition", "module_path": "cli_composition::test_obligation::tests", "test_name": "test_composition_root_wires_status_artifacts_for_check_and_results"},
+        {"layer": "cli_composition", "module_path": "cli_composition::test_obligation::tests", "test_name": "test_composition_root_resolves_shared_entry_to_in_progress_lane"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationCompositionRoot", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "IN-05"}},
+      "tests": [
+        {"layer": "cli_composition", "module_path": "cli_composition::test_obligation::tests", "test_name": "test_composition_root_results_wires_informational_status_lanes"},
+        {"layer": "cli_composition", "module_path": "cli_composition::test_obligation::tests", "test_name": "test_composition_root_wires_status_artifacts_for_check_and_results"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationCompositionRoot", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "IN-07"}},
+      "tests": [{"layer": "cli_composition", "module_path": "cli_composition::test_obligation::tests", "test_name": "test_composition_root_wires_status_artifacts_for_check_and_results"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "TestObligationCompositionRoot", "anchor_id": {"file_path": "track/items/d15-task-status-check-gate-2026-07-11/spec.json", "element_id": "AC-07"}},
+      "tests": [{"layer": "cli_composition", "module_path": "cli_composition::test_obligation::tests", "test_name": "test_composition_root_wires_status_artifacts_for_check_and_results"}]
+    }
+  ],
+  "track_id": "d15-task-status-check-gate-2026-07-11"
+}

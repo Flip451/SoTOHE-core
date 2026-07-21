@@ -48,6 +48,7 @@ pub(super) fn emit_entry<'a>(
         Vec<&'a domain::tddd::catalogue_v2::methods::MethodDeclaration>,
     >,
     node_index: &NodeIndex,
+    trait_index: &BTreeMap<(String, String), String>,
     layer: &str,
     crate_name: &str,
 ) -> Result<(), ContractMapRendererError> {
@@ -63,7 +64,7 @@ pub(super) fn emit_entry<'a>(
             let rep_node_id = type_rep_node_id(layer, crate_name, type_name);
 
             // Build entry subgraph label: full module path + name (U-6d-iii).
-            let label = build_entry_label(&type_entry.module_path, type_name);
+            let label = build_entry_label(type_entry.module_path(), type_name);
             // Short name used as the representative node label (matches subgraph title).
             let short_name = type_name;
 
@@ -80,7 +81,7 @@ pub(super) fn emit_entry<'a>(
             // T006: methods from TypeEntry.methods.
             // Collect transition method names for typestate (Decision G-2'b).
             let transition_method_names: Vec<&str> =
-                if let TypeKindV2::Struct(ref sk) = type_entry.kind {
+                if let TypeKindV2::Struct(sk) = type_entry.kind() {
                     if let Some(ref ts) = sk.typestate {
                         ts.transitions().transition_methods().iter().map(|m| m.as_str()).collect()
                     } else {
@@ -91,7 +92,7 @@ pub(super) fn emit_entry<'a>(
                 };
 
             // T007: enum variant nodes (H-3 / IN-09).
-            if let TypeKindV2::Enum { ref variants } = type_entry.kind {
+            if let TypeKindV2::Enum { variants } = type_entry.kind() {
                 for variant in variants {
                     let variant_id = format!("{entry_sg_id}_{}", sanitize(variant.name.as_str()));
                     let variant_label = variant.name.as_str();
@@ -125,6 +126,7 @@ pub(super) fn emit_entry<'a>(
                                 let target_ids = resolve_type_ref_node_ids(
                                     tr.as_str(),
                                     node_index,
+                                    trait_index,
                                     crate_name,
                                     None, // variant payloads have no Self context
                                 );
@@ -141,6 +143,7 @@ pub(super) fn emit_entry<'a>(
                                 let target_ids = resolve_type_ref_node_ids(
                                     field.ty.as_str(),
                                     node_index,
+                                    trait_index,
                                     crate_name,
                                     None, // variant fields have no Self context
                                 );
@@ -164,7 +167,7 @@ pub(super) fn emit_entry<'a>(
             // Pass rep_node_id as self_node_id so that `Self` TypeRef in method
             // signatures resolves to the representative node, not the subgraph.
             emit_method_nodes(
-                &type_entry.methods,
+                type_entry.methods(),
                 &entry_sg_id,
                 &transition_method_names,
                 subgraph_lines,
@@ -172,6 +175,7 @@ pub(super) fn emit_entry<'a>(
                 class_attach,
                 style,
                 node_index,
+                trait_index,
                 crate_name,
                 Some(rep_node_id.as_str()),
             )?;
@@ -189,6 +193,7 @@ pub(super) fn emit_entry<'a>(
                     class_attach,
                     style,
                     node_index,
+                    trait_index,
                     crate_name,
                     Some(rep_node_id.as_str()),
                 )?;
@@ -202,10 +207,11 @@ pub(super) fn emit_entry<'a>(
             // (ADR 2026-04-17-1528 §D1 — silent skip for primitives / external types).
             // Uses resolve_type_ref_node_ids so that reference-wrapped alias targets
             // (e.g. `&DeclaredType`) are also resolved correctly.
-            if let TypeKindV2::TypeAlias { ref target } = type_entry.kind {
+            if let TypeKindV2::TypeAlias { target } = type_entry.kind() {
                 let target_ids = resolve_type_ref_node_ids(
                     target.as_str(),
                     node_index,
+                    trait_index,
                     crate_name,
                     None, // type alias targets have no Self context
                 );
@@ -223,13 +229,14 @@ pub(super) fn emit_entry<'a>(
             // (e.g. a field `result: Result<OkType, ErrType>` → edges to both).
             // `edge_arrow_label` is deferred until we know an edge will be emitted
             // (fail-closed per CN-02 — missing [edge.field] only errors when it would be used).
-            if let TypeKindV2::Struct(ref sk) = type_entry.kind {
+            if let TypeKindV2::Struct(sk) = type_entry.kind() {
                 if let StructShape::Plain { ref fields, has_stripped_fields } = sk.shape {
                     if !has_stripped_fields && !fields.is_empty() {
                         for field in fields {
                             let target_ids = resolve_type_ref_node_ids(
                                 field.ty.as_str(),
                                 node_index,
+                                trait_index,
                                 crate_name,
                                 None, // struct fields have no Self context
                             );
@@ -254,7 +261,7 @@ pub(super) fn emit_entry<'a>(
             // A single positional field type may yield edges to MULTIPLE declared types.
             // `edge_arrow_label` is deferred until we know an edge will be emitted
             // (fail-closed per CN-02 — missing [edge.field] only errors when it would be used).
-            if let TypeKindV2::Struct(ref sk) = type_entry.kind {
+            if let TypeKindV2::Struct(sk) = type_entry.kind() {
                 if let StructShape::Tuple { ref fields, has_stripped_fields } = sk.shape {
                     if !has_stripped_fields && !fields.is_empty() {
                         for (idx, field_ty) in fields.iter().enumerate() {
@@ -262,6 +269,7 @@ pub(super) fn emit_entry<'a>(
                             let target_ids = resolve_type_ref_node_ids(
                                 field_ty.as_str(),
                                 node_index,
+                                trait_index,
                                 crate_name,
                                 None, // tuple struct fields have no Self context
                             );
@@ -281,14 +289,14 @@ pub(super) fn emit_entry<'a>(
 
             // Class attach: the role class is attached to the representative node (which
             // carries the type identity) rather than the subgraph container.
-            let role_key = type_entry.role.to_string();
+            let role_key = type_entry.role().to_string();
             if let Some(rs) = style.role.get(&role_key) {
                 class_attach.push(format!("class {rep_node_id} {}", rs.class));
             }
 
             // T009: [pattern.Typestate] overlay_class for typestate structs (any shape).
             // Also attached to the representative node.
-            if let TypeKindV2::Struct(ref sk) = type_entry.kind {
+            if let TypeKindV2::Struct(sk) = type_entry.kind() {
                 if sk.typestate.is_some() {
                     if let Some(ps) = style.pattern.get("Typestate") {
                         class_attach.push(format!("class {rep_node_id} {}", ps.overlay_class));
@@ -301,7 +309,7 @@ pub(super) fn emit_entry<'a>(
             let entry_sg_id = trait_node_id(layer, crate_name, trait_name);
             // The representative node id is the sole valid edge target for this trait.
             let rep_node_id = trait_rep_node_id(layer, crate_name, trait_name);
-            let label = build_entry_label(&trait_entry.module_path, trait_name);
+            let label = build_entry_label(trait_entry.module_path(), trait_name);
             let short_name = trait_name;
 
             // T005: trait entry subgraph (empty even with 0 methods, AC-02).
@@ -318,7 +326,7 @@ pub(super) fn emit_entry<'a>(
             // Pass None for self_node_id: trait methods' `Self` has no fixed type resolution
             // at render time (the concrete impl type is unknown).
             emit_method_nodes(
-                &trait_entry.methods,
+                trait_entry.methods(),
                 &entry_sg_id,
                 &[], // no typestate transitions for traits
                 subgraph_lines,
@@ -326,6 +334,7 @@ pub(super) fn emit_entry<'a>(
                 class_attach,
                 style,
                 node_index,
+                trait_index,
                 crate_name,
                 None, // Self unresolvable in trait context
             )?;
@@ -334,7 +343,7 @@ pub(super) fn emit_entry<'a>(
             // inside the trait subgraph (mirrors `assoc_type[{fp}]:{bounds}={default}`
             // fingerprint).  No edge is emitted for the bounds/default (they affect signal
             // equality via the fingerprint, not graph topology).
-            for assoc_type in &trait_entry.assoc_types {
+            for assoc_type in trait_entry.assoc_types() {
                 let assoc_node_id =
                     format!("{entry_sg_id}_assoctype_{}", sanitize(assoc_type.name.as_str()));
                 let assoc_label = format!("type {}", assoc_type.name.as_str());
@@ -350,7 +359,7 @@ pub(super) fn emit_entry<'a>(
 
             // D4: associated const nodes — render each AssocConstDecl as a labelled node
             // inside the trait subgraph (mirrors `assoc_const:{ty}={val}` fingerprint).
-            for assoc_const in &trait_entry.assoc_consts {
+            for assoc_const in trait_entry.assoc_consts() {
                 let assoc_node_id =
                     format!("{entry_sg_id}_assocconst_{}", sanitize(assoc_const.name.as_str()));
                 let assoc_label = format!("const {}", assoc_const.name.as_str());
@@ -367,7 +376,7 @@ pub(super) fn emit_entry<'a>(
             subgraph_lines.push("  end".to_string());
 
             // Role class attach: attached to the representative node (carries trait identity).
-            let role_key = trait_entry.role.to_string();
+            let role_key = trait_entry.role().to_string();
             if let Some(rs) = style.role.get(&role_key) {
                 class_attach.push(format!("class {rep_node_id} {}", rs.class));
             }
@@ -391,10 +400,11 @@ pub(super) fn emit_entry<'a>(
             // `edge_arrow_label` is deferred until we know an edge will be emitted
             // (fail-closed per CN-02 — missing [edge.method_param] / [edge.method_returns]
             // only errors when the key would actually be used).
-            for param in &fn_entry.params {
+            for param in fn_entry.params() {
                 let target_ids = resolve_type_ref_node_ids(
                     param.ty.as_str(),
                     node_index,
+                    trait_index,
                     crate_name,
                     None, // free functions have no Self context
                 );
@@ -404,8 +414,9 @@ pub(super) fn emit_entry<'a>(
                 }
             }
             let ret_targets = resolve_type_ref_node_ids(
-                fn_entry.returns.as_str(),
+                fn_entry.returns().as_str(),
                 node_index,
+                trait_index,
                 crate_name,
                 None, // free functions have no Self context
             );
@@ -415,7 +426,7 @@ pub(super) fn emit_entry<'a>(
             }
 
             // Class attach.
-            let role_key = fn_entry.role.to_string();
+            let role_key = fn_entry.role().to_string();
             if let Some(rs) = style.role.get(&role_key) {
                 class_attach.push(format!("class {fn_node_id} {}", rs.class));
             }
@@ -457,13 +468,14 @@ fn build_entry_label(
 fn resolve_method_type_refs(
     type_ref_str: &str,
     node_index: &NodeIndex,
+    trait_index: &BTreeMap<(String, String), String>,
     current_crate: &str,
     self_node_id: Option<&str>,
 ) -> Vec<String> {
     // Delegate to resolve_type_ref_node_ids, forwarding self_node_id so that
     // "Self" in both top-level (`"Self"`) and nested (`"Option<Self>"`,
     // `"Result<Self, E>"`) positions is substituted correctly.
-    resolve_type_ref_node_ids(type_ref_str, node_index, current_crate, self_node_id)
+    resolve_type_ref_node_ids(type_ref_str, node_index, trait_index, current_crate, self_node_id)
 }
 
 /// Emit method nodes inside an entry subgraph.
@@ -483,6 +495,7 @@ pub(super) fn emit_method_nodes<'a>(
     class_attach: &mut Vec<String>,
     style: &StyleConfig,
     node_index: &NodeIndex,
+    trait_index: &BTreeMap<(String, String), String>,
     current_crate: &str,
     // The node_id of the enclosing entry subgraph, used to resolve `"Self"` TypeRef
     // to the current type's node instead of a ghost node (OS-04 / fallback policy).
@@ -517,6 +530,7 @@ pub(super) fn emit_method_nodes<'a>(
             let target_ids = resolve_method_type_refs(
                 param.ty.as_str(),
                 node_index,
+                trait_index,
                 current_crate,
                 self_node_id,
             );
@@ -536,6 +550,7 @@ pub(super) fn emit_method_nodes<'a>(
         let returns_targets = resolve_method_type_refs(
             method.returns.as_str(),
             node_index,
+            trait_index,
             current_crate,
             self_node_id,
         );

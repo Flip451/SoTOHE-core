@@ -1,7 +1,7 @@
 use std::ffi::OsString;
 use std::io::{BufRead, BufReader, Write};
 use std::path::PathBuf;
-use std::process::{Command, Stdio};
+use std::process::{Command, ExitStatus, Stdio};
 use std::sync::atomic::{AtomicU64, Ordering};
 use std::thread;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -37,7 +37,8 @@ pub(super) fn spawn_and_collect_codex(
     args: &[OsString],
     safe_env: &[(OsString, OsString)],
     prompt: &str,
-) -> Result<(String, PathBuf), ReviewFixRunnerError> {
+    runtime: Option<&crate::codex_common::ResolvedCodexRuntime>,
+) -> Result<(String, ExitStatus, PathBuf), ReviewFixRunnerError> {
     let log_path = fixer_runtime_path("review-fix-codex-session", "log")?;
     let mut command = Command::new(bin);
     command.args(args);
@@ -71,7 +72,7 @@ pub(super) fn spawn_and_collect_codex(
             collector_result_for_log(join_output_collector(stdout_handle, "stdout"), "stdout");
         let (stderr, _) =
             collector_result_for_log(join_output_collector(stderr_handle, "stderr"), "stderr");
-        write_session_log(&log_path, bin, &exit_status, &stdout, &stderr);
+        write_session_log(&log_path, bin, &exit_status, &stdout, &stderr, runtime);
         return Err(ReviewFixRunnerError::SpawnFailed(format!(
             "{message}; session log: {}",
             log_path.display()
@@ -80,19 +81,19 @@ pub(super) fn spawn_and_collect_codex(
     let exit_status = child.wait().map_err(|e| {
         ReviewFixRunnerError::SpawnFailed(format!("failed to wait for codex fixer: {e}"))
     })?;
-    let exit_status = exit_status.to_string();
+    let exit_status_text = exit_status.to_string();
     let (stdout, stdout_error) =
         collector_result_for_log(join_output_collector(stdout_handle, "stdout"), "stdout");
     let (stderr, stderr_error) =
         collector_result_for_log(join_output_collector(stderr_handle, "stderr"), "stderr");
-    write_session_log(&log_path, bin, &exit_status, &stdout, &stderr);
+    write_session_log(&log_path, bin, &exit_status_text, &stdout, &stderr, runtime);
     if let Some(error) = stdout_error.or(stderr_error) {
         return Err(ReviewFixRunnerError::Unexpected(format!(
             "{error}; session log: {}",
             log_path.display()
         )));
     }
-    Ok((stdout, log_path))
+    Ok((stdout, exit_status, log_path))
 }
 
 pub(super) fn collector_result_for_log(

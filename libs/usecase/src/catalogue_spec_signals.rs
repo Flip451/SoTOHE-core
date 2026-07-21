@@ -504,21 +504,22 @@ mod tests {
         let crate_name = CrateName::new("domain").unwrap();
         let layer = domain::tddd::LayerId::try_new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        let entry = TypeEntry {
+        let entry = TypeEntry::new(
             action,
-            role: DataRole::value_object(),
-            kind: TypeKindV2::Struct(StructKind::new(
+            DataRole::value_object(),
+            TypeKindV2::Struct(StructKind::new(
                 StructShape::Plain { fields: vec![], has_stripped_fields: false },
                 None,
             )),
-            methods: vec![],
-
-            module_path: ModulePath::root(),
-            docs: None,
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
             spec_refs,
             informal_grounds,
-        };
-        doc.types.insert(TypeName::new(name).unwrap(), entry);
+        );
+        doc.insert_type(TypeName::new(name).unwrap(), entry);
         doc
     }
 
@@ -541,21 +542,22 @@ mod tests {
         let layer = domain::tddd::LayerId::try_new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
         for (name, action, spec_refs, informal_grounds) in entries {
-            let entry = TypeEntry {
+            let entry = TypeEntry::new(
                 action,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-
-                module_path: ModulePath::root(),
-                docs: None,
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
                 spec_refs,
                 informal_grounds,
-            };
-            doc.types.insert(TypeName::new(name).unwrap(), entry);
+            );
+            doc.insert_type(TypeName::new(name).unwrap(), entry);
         }
         doc
     }
@@ -728,13 +730,13 @@ mod tests {
     }
 
     /// An `ItemAction::Reference` entry with empty `spec_refs` and empty
-    /// `informal_grounds` must evaluate to `Blue` (ADR
-    /// `2026-05-11-1257-tddd-v2-catalogue-spec-link-restoration.md` D5).
+    /// `informal_grounds` must evaluate to `Red`; every catalogue entry must
+    /// carry formal or informal grounding.
     /// This test verifies the action-threading path for the `Reference` variant
     /// specifically — a regression in `entry.action` access or the
     /// `evaluate_catalogue_entry_signal` call site would produce `Red` instead of `Blue`.
     #[test]
-    fn refresh_reference_action_with_no_spec_refs_or_informal_evaluates_to_blue() {
+    fn refresh_reference_action_with_no_spec_refs_or_informal_evaluates_to_red() {
         let (cat, _) = catalogue_entry_with_action(
             "ExternalType",
             ItemAction::Reference,
@@ -754,8 +756,8 @@ mod tests {
         assert_eq!(doc.signals[0].type_name, "ExternalType");
         assert_eq!(
             doc.signals[0].signal,
-            domain::ConfidenceSignal::Blue,
-            "Reference action with empty spec_refs + informal_grounds must be Blue (D5 exemption)"
+            domain::ConfidenceSignal::Red,
+            "Reference action with empty spec_refs + informal_grounds must be Red"
         );
     }
 

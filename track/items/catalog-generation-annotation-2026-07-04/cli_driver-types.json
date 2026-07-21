@@ -1,0 +1,631 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "docs": "Catalogue method declaration `CatalogDriver::new`.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::catalog_gen::CatalogService>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "docs": "Catalogue method declaration `CatalogDriver::handle`.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "CatalogInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome",
+          "where_predicates": []
+        }
+      ],
+      "type_name": "CatalogDriver"
+    }
+  ],
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "CatalogKindSelect",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CatalogKindSelect",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CatalogKindSelect",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "CatalogKindSelect",
+      "trait_ref": "core::clone::TrivialClone"
+    },
+    {
+      "for_type": "CatalogKindSelect",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CatalogKindSelect",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CatalogImportSelect",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CatalogImportSelect",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CatalogImportSelect",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "CatalogImportSelect",
+      "trait_ref": "core::clone::TrivialClone"
+    },
+    {
+      "for_type": "CatalogImportSelect",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CatalogImportSelect",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CatalogInitInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CatalogInitInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CatalogAddInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CatalogAddInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CatalogImportInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CatalogImportInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CatalogCiteInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CatalogCiteInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CatalogCheckInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CatalogCheckInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CatalogInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CatalogInput",
+      "trait_ref": "core::clone::Clone"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CatalogAddInput": {
+      "action": "add",
+      "docs": "Input DTO for catalog add at the CLI-driver boundary. See IN-03, IN-09, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "layer",
+              "ty": "String"
+            },
+            {
+              "name": "kind",
+              "ty": "CatalogKindSelect"
+            },
+            {
+              "name": "name",
+              "ty": "String"
+            },
+            {
+              "name": "role",
+              "ty": "String"
+            },
+            {
+              "name": "anchors",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "fields",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "methods",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "variants",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "trait_impls",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "inherent_methods",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "generics",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "where_predicates",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "impl_generics",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "impl_where_predicates",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "inherent_impl_generics",
+              "ty": "Vec<String>"
+            },
+            {
+              "name": "inherent_impl_where_predicates",
+              "ty": "Vec<String>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        }
+      ]
+    },
+    "CatalogCheckInput": {
+      "action": "add",
+      "docs": "Input DTO carrying track_id, items_dir, and optional layer. See IN-06, AC-11.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "layer",
+              "ty": "Option<String>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        }
+      ]
+    },
+    "CatalogCiteInput": {
+      "action": "add",
+      "docs": "Input DTO for catalog cite at the CLI-driver boundary. See IN-05, AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "layer",
+              "ty": "String"
+            },
+            {
+              "name": "entry",
+              "ty": "String"
+            },
+            {
+              "name": "anchors",
+              "ty": "Vec<String>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        }
+      ]
+    },
+    "CatalogDriver": {
+      "action": "add",
+      "docs": "Primary adapter driver holding an Arc<dyn CatalogService>. See IN-01, AC-01.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        }
+      ]
+    },
+    "CatalogImportInput": {
+      "action": "add",
+      "docs": "Input DTO for catalog import at the CLI-driver boundary. See IN-04, AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "layer",
+              "ty": "String"
+            },
+            {
+              "name": "type_path",
+              "ty": "String"
+            },
+            {
+              "name": "action",
+              "ty": "CatalogImportSelect"
+            },
+            {
+              "name": "anchors",
+              "ty": "Vec<String>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        }
+      ]
+    },
+    "CatalogImportSelect": {
+      "action": "add",
+      "docs": "DTO enum of the three import actions. See IN-04, AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Reference",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Modify",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Delete",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        }
+      ]
+    },
+    "CatalogInitInput": {
+      "action": "add",
+      "docs": "Input DTO carrying track_id and items_dir. See IN-02, AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "String"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        }
+      ]
+    },
+    "CatalogInput": {
+      "action": "add",
+      "docs": "DTO enum of the five catalog driver inputs. See IN-01, AC-01.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Init",
+            "payload": {
+              "fields": [
+                "CatalogInitInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Add",
+            "payload": {
+              "fields": [
+                "CatalogAddInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Import",
+            "payload": {
+              "fields": [
+                "CatalogImportInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Cite",
+            "payload": {
+              "fields": [
+                "CatalogCiteInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Check",
+            "payload": {
+              "fields": [
+                "CatalogCheckInput"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        }
+      ]
+    },
+    "CatalogKindSelect": {
+      "action": "add",
+      "docs": "DTO enum of the five catalogue entry kinds. See IN-03, AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Struct",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Enum",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TypeAlias",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Trait",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Function",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/catalog-generation-annotation-2026-07-04/spec.json"
+        }
+      ]
+    }
+  }
+}

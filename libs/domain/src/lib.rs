@@ -1,6 +1,7 @@
 #![forbid(unsafe_code)]
 //! Domain layer for the SoTOHE-core track state machine.
 
+pub mod adr_baseline;
 pub mod adr_decision;
 pub mod auto_phase;
 pub mod branch_strategy;
@@ -22,17 +23,25 @@ pub mod semantic_dup;
 mod signal;
 pub mod skill_compliance;
 pub mod spec;
+pub mod spec_document_loader_port;
 pub mod spec_file_loader_port;
 pub mod symlink_guard_port;
 pub mod task_contract;
 pub mod task_coverage;
 pub mod tddd;
+pub mod template_export;
 mod timestamp;
 mod track;
 pub mod track_phase;
 pub use track_phase::{FixpointStep, ReviewScopeSet, ReviewScopeSetError};
 pub mod verify;
 
+pub use adr_baseline::{
+    AdrBaselineCheckOutcome, AdrBaselineCheckOutcomeError, AdrBaselineCheckViolation,
+    AdrBaselineCheckViolations, AdrBaselineKind, AdrBaselineLedgerEntry,
+    AdrBaselineRecordedCopyStatus, AdrBaselineSourceState, AdrSourceFileName,
+    AdrSourceFileNameError,
+};
 pub use adr_decision::{
     AcceptedDecision, AdrDecisionCommon, AdrDecisionCommonError, AdrDecisionEntry, AdrFilePort,
     AdrFilePortError, AdrFrontMatter, AdrFrontMatterError, AdrVerifyReport, DecisionGroundRef,
@@ -79,6 +88,7 @@ pub use spec::{
     SpecRequirement, SpecScope, SpecSection, SpecValidationError, check_spec_doc_signals,
     evaluate_requirement_signal,
 };
+pub use spec_document_loader_port::{SpecDocumentLoadError, SpecDocumentLoaderPort};
 pub use spec_file_loader_port::{SpecFileLoadError, SpecFileLoaderPort};
 pub use symlink_guard_port::{SymlinkGuardError, SymlinkGuardPort};
 pub use task_coverage::{TASK_COVERAGE_SCHEMA_VERSION, TaskCoverageDocument};
@@ -104,7 +114,13 @@ pub use tddd::semantic_verify::{
     SemanticVerifyEntry, SpecAdrVerifyCacheDocument,
 };
 pub use tddd::type_signals_doc::{
+    CatalogueDeclarationHash, ImplementationInputHash, Sha256Digest, Sha256DigestError,
     TYPE_SIGNALS_SCHEMA_VERSION, TypeSignalsDocument, TypeSignalsLoadResult,
+    TypeSignalsReuseDecision, TypeSignalsSchemaVersion, TypeSignalsSchemaVersionError,
+};
+pub use template_export::{
+    TemplateBoundaryManifest, TemplateBoundaryManifestError, TemplatePathClassification,
+    TemplatePathEntry, TemplatePathPattern, TemplatePathPatternError,
 };
 pub use timestamp::Timestamp;
 pub use track::{
@@ -137,7 +153,7 @@ mod tests {
 
         assert!(matches!(
             result,
-            Err(ValidationError::InvalidTrackId(value)) if value == "Not A Slug"
+            Err(ValidationError::InvalidTrackId(value)) if value.as_str() == "Not A Slug"
         ));
     }
 
@@ -147,7 +163,7 @@ mod tests {
 
         assert!(matches!(
             result,
-            Err(ValidationError::InvalidCommitHash(value)) if value == "abc123"
+            Err(ValidationError::InvalidCommitHash(value)) if value.as_str() == "abc123"
         ));
     }
 

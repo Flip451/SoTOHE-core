@@ -1,0 +1,510 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "7a501a95ba99e19180c4702bf0a911801c97ede4c40ecc39795b505d8812a6c5",
+      "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
+      "verdict": {
+        "kind": "pass",
+        "citation": "workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTemplateBoundaryManifestAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7a501a95ba99e19180c4702bf0a911801c97ede4c40ecc39795b505d8812a6c5",
+      "evidence_hash": "f602d6f1a29c649323eb0e200bb9857e5d73b143e8cf56aeeb613b4556815f56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界 SSoT の機械可読 manifest ファイルがリポジトリ内の固定位置に存在し、workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。... export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTemplateBoundaryManifestAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "境界 SSoT の機械可読 manifest ファイルがリポジトリ内の固定位置に存在し、workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7a501a95ba99e19180c4702bf0a911801c97ede4c40ecc39795b505d8812a6c5",
+      "evidence_hash": "c83ec54956e5cf3df4959a6800854f8d7ba62b30f74e19827a3c8745f346e996",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界の SSoT は機械可読 manifest (path → include / exclude / overlay 分類) 一元管理とする。散文のみの境界文書は SSoT にしない。分類の変更は manifest 側の変更で完結し、sotp 側のコード側は schema と読み込みロジックの安定性のみを保証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTemplateBoundaryManifestAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "境界の SSoT は機械可読 manifest (path → include / exclude / overlay 分類) 一元管理とする。散文のみの境界文書は SSoT にしない。分類の変更は manifest 側の変更で完結し、sotp 側のコード側は schema と読み込みロジックの安定性のみを保証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0ae3e672d2d350a4b16365fa63c5b69d08a2c8d73297839142095196ae0b3e20",
+      "evidence_hash": "1b0a0125f1a45663d66d693c6b46fbed31a74347b9705beca58b7dcb97d1f3ac",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTemplateExportAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "export 実行経路の新設。`sotp template export` サブコマンドないし同等の cargo make タスクが、境界 manifest + overlay ディレクトリ + 実リポジトリ tree を入力として汎用テンプレートツリーを出力ディレクトリに生成する。生成は境界 manifest の `include` / `exclude` / `overlay` 分類だけで駆動され、Makefile.toml / Cargo.toml / deny.toml / Dockerfile / track/*.md 等の内容をパースして書き換える経路を実装に含めない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0ae3e672d2d350a4b16365fa63c5b69d08a2c8d73297839142095196ae0b3e20",
+      "evidence_hash": "237fc6328c3b05092522f0558e42e04f4317b67777620535f98e98ecddc0a7fc",
+      "verdict": {
+        "kind": "pass",
+        "citation": "overlay ディレクトリの新設。テンプレートに必要だが sotp 固有値を含むファイル (Makefile.toml / Cargo.toml / deny.toml / Dockerfile / bootstrap 系タスク / 汎用化した track/*.md 等) のテンプレート版を静的ファイルとして格納する。export はこれらを差し込むだけで、export 実行時にファイル内容を組み立てない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTemplateExportAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "overlay ディレクトリの新設。テンプレートに必要だが sotp 固有値を含むファイル (Makefile.toml / Cargo.toml / deny.toml / Dockerfile / bootstrap 系タスク / 汎用化した track/*.md 等) のテンプレート版を静的ファイルとして格納する。export はこれらを差し込むだけで、export 実行時にファイル内容を組み立てない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0ae3e672d2d350a4b16365fa63c5b69d08a2c8d73297839142095196ae0b3e20",
+      "evidence_hash": "e4b8a64f4141fd9ed0c54b75135c3e9bcf5381aa84dbd256d49e8ba3f0ef7c66",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTemplateExportAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp template export` (または同等の cargo make タスク) が CLI に存在し、境界 manifest + overlay ディレクトリ + 実リポジトリ tree から、指定された出力ディレクトリに汎用テンプレートツリーを生成する。同じ入力からは同じ出力が決定論的に得られる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0ae3e672d2d350a4b16365fa63c5b69d08a2c8d73297839142095196ae0b3e20",
+      "evidence_hash": "a320070d6a3cef2727e1b5ac9f62aa646e2f3372c43438868c0fb3e939d7cb75",
+      "verdict": {
+        "kind": "pass",
+        "citation": "overlay ディレクトリがリポジトリ内に存在し、テンプレート版 Makefile.toml / Cargo.toml / deny.toml / Dockerfile / bootstrap タスク / 汎用化した track/*.md / 6 crate プレースホルダの Cargo.toml と placeholder ソース等を静的ファイルとして格納する。export はこれらを出力ディレクトリの対応 path に配置するのみで、テンプレート実行時にファイル内容を組み立てない (プログラム的書き換えなし)。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTemplateExportAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "overlay ディレクトリがリポジトリ内に存在し、テンプレート版 Makefile.toml / Cargo.toml / deny.toml / Dockerfile / bootstrap タスク / 汎用化した track/*.md / 6 crate プレースホルダの Cargo.toml と placeholder ソース等を静的ファイルとして格納する。export はこれらを出力ディレクトリの対応 path に配置するのみで、テンプレート実行時にファイル内容を組み立てない (プログラム的書き換えなし)。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0ae3e672d2d350a4b16365fa63c5b69d08a2c8d73297839142095196ae0b3e20",
+      "evidence_hash": "172080f9ca69879be51e2833a45ddd743016971a26f97dfba744417e6c48e0e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "export はプログラム的なファイル書き換えを行わない。処理は境界 manifest の分類に従った `include` のコピー、`exclude` の除外、`overlay` 側テンプレート版ファイルの上書きだけで構成する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTemplateExportAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "export はプログラム的なファイル書き換えを行わない。処理は境界 manifest の分類に従った `include` のコピー、`exclude` の除外、`overlay` 側テンプレート版ファイルの上書きだけで構成する。Makefile.toml / Cargo.toml / deny.toml / Dockerfile 等の内容を parse して書き換える経路を実装に含めない (overlay 方式で単純さを優先)。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a02de4bc70b003783d77a899a484cf4a8c8d59c8d8583118cd58dd448f6946ad",
+      "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界 SSoT としての機械可読 manifest の新設。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateBoundaryManifestCodecError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a02de4bc70b003783d77a899a484cf4a8c8d59c8d8583118cd58dd448f6946ad",
+      "evidence_hash": "f602d6f1a29c649323eb0e200bb9857e5d73b143e8cf56aeeb613b4556815f56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateBoundaryManifestCodecError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "境界 SSoT の機械可読 manifest ファイルがリポジトリ内の固定位置に存在し、workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a02de4bc70b003783d77a899a484cf4a8c8d59c8d8583118cd58dd448f6946ad",
+      "evidence_hash": "c83ec54956e5cf3df4959a6800854f8d7ba62b30f74e19827a3c8745f346e996",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界の SSoT は機械可読 manifest (path → include / exclude / overlay 分類) 一元管理とする。… sopt 側のコード側は schema と読み込みロジックの安定性のみを保証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateBoundaryManifestCodecError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "境界の SSoT は機械可読 manifest (path → include / exclude / overlay 分類) 一元管理とする。散文のみの境界文書は SSoT にしない。分類の変更は manifest 側の変更で完結し、sotp 側のコード側は schema と読み込みロジックの安定性のみを保証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "57c25f3995002620991cbeb5fa4bfedcabac1a5a98de4706e83d0afc5f63eb01",
+      "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateBoundaryManifestDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "57c25f3995002620991cbeb5fa4bfedcabac1a5a98de4706e83d0afc5f63eb01",
+      "evidence_hash": "f602d6f1a29c649323eb0e200bb9857e5d73b143e8cf56aeeb613b4556815f56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界 SSoT の機械可読 manifest ファイルがリポジトリ内の固定位置に存在し、workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateBoundaryManifestDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "境界 SSoT の機械可読 manifest ファイルがリポジトリ内の固定位置に存在し、workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "57c25f3995002620991cbeb5fa4bfedcabac1a5a98de4706e83d0afc5f63eb01",
+      "evidence_hash": "c83ec54956e5cf3df4959a6800854f8d7ba62b30f74e19827a3c8745f346e996",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界の SSoT は機械可読 manifest (path → include / exclude / overlay 分類) 一元管理とする。散文のみの境界文書は SSoT にしない。分類の変更は manifest 側の変更で完結し、sotp 側のコード側は schema と読み込みロジックの安定性のみを保証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateBoundaryManifestDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "境界の SSoT は機械可読 manifest (path → include / exclude / overlay 分類) 一元管理とする。散文のみの境界文書は SSoT にしない。分類の変更は manifest 側の変更で完結し、sotp 側のコード側は schema と読み込みロジックの安定性のみを保証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "173d413db49510673257878f8cb7ebd2a6f594764261f57e8b74164f0e2ef20c",
+      "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
+      "verdict": {
+        "kind": "pass",
+        "citation": "workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TemplatePathClassificationDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "173d413db49510673257878f8cb7ebd2a6f594764261f57e8b74164f0e2ef20c",
+      "evidence_hash": "f602d6f1a29c649323eb0e200bb9857e5d73b143e8cf56aeeb613b4556815f56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TemplatePathClassificationDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "境界 SSoT の機械可読 manifest ファイルがリポジトリ内の固定位置に存在し、workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a8190c7c3a27d8ee668be447692a9220be5c1879e0638f656de3f5d5f46a2bcc",
+      "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
+      "verdict": {
+        "kind": "pass",
+        "citation": "workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TemplatePathEntryDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a8190c7c3a27d8ee668be447692a9220be5c1879e0638f656de3f5d5f46a2bcc",
+      "evidence_hash": "f602d6f1a29c649323eb0e200bb9857e5d73b143e8cf56aeeb613b4556815f56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「境界 SSoT の機械可読 manifest ファイルがリポジトリ内の固定位置に存在し、workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。」"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TemplatePathEntryDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "境界 SSoT の機械可読 manifest ファイルがリポジトリ内の固定位置に存在し、workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d8a4578d95853ed01caf7b659166bb7d0617c172a2e78efab1738e908b1a600f",
+      "evidence_hash": "0ad476f11c9a08723ac8eb4a693ce141b0b349fee10a33e06625b7da24dbe208",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。」"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::template_export::codec::decode_manifest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "境界 SSoT としての機械可読 manifest の新設。workspace tree の各 path を `include` (テンプレートにそのまま含める) / `exclude` (テンプレートから外す) / `overlay` (overlay ディレクトリ側のテンプレート版で上書き) のいずれかに分類する。sotp ソース (`libs/*` / `apps/*`) は `overlay` に分類する — overlay の適用意味論が同一パスに対する sotp ソースの除去と 6 crate 雛形の差し込みを同時に果たし、D3 の 6 crate プレースホルダ出荷と AC-06 の「テンプレート workspace に sotp ソース非含有」を同時に満たす (`exclude` 単独では雛形が出荷されない)。`vendor/` + patch、`Cargo.lock`、`build-sotp` タスク、`.gitignore` の sotp 動的 cache エントリ、`track/items/` や `knowledge/adr/` の開発履歴、Python 残渣、SoTOHE-core 固有の deny.toml exception 等は `exclude`。overlay 分類は overlay ディレクトリ側に対応するテンプレート版ファイルの存在を要求する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d8a4578d95853ed01caf7b659166bb7d0617c172a2e78efab1738e908b1a600f",
+      "evidence_hash": "f602d6f1a29c649323eb0e200bb9857e5d73b143e8cf56aeeb613b4556815f56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界 SSoT の機械可読 manifest ファイルがリポジトリ内の固定位置に存在し、workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::template_export::codec::decode_manifest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "境界 SSoT の機械可読 manifest ファイルがリポジトリ内の固定位置に存在し、workspace tree の全 path を `include` / `exclude` / `overlay` のいずれかに分類する。未分類 path の存在、`overlay` 分類なのに overlay 側にファイルが存在しない矛盾、重複分類は、export 実行 (および manifest validation) の時点で fail-closed で検出される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d8a4578d95853ed01caf7b659166bb7d0617c172a2e78efab1738e908b1a600f",
+      "evidence_hash": "c83ec54956e5cf3df4959a6800854f8d7ba62b30f74e19827a3c8745f346e996",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界の SSoT は機械可読 manifest (path → include / exclude / overlay 分類) 一元管理とする。… sopt 側のコード側は schema と読み込みロジックの安定性のみを保証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/template-extraction-boundary-2026-07-06/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::template_export::codec::decode_manifest"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "境界の SSoT は機械可読 manifest (path → include / exclude / overlay 分類) 一元管理とする。散文のみの境界文書は SSoT にしない。分類の変更は manifest 側の変更で完結し、sotp 側のコード側は schema と読み込みロジックの安定性のみを保証する。"
+        }
+      }
+    }
+  ]
+}

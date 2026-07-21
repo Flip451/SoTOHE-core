@@ -613,14 +613,14 @@
             {
               "message": "The `resolve_full_auto*` zero-reference gate is too broad as written. The track explicitly leaves `knowledge/research/` out of scope, and the repo still contains historical references to these symbols in knowledge docs, so `rg 0` across the whole workspace will not be satisfiable unless you narrow the grep to the implementation files or add cleanup tasks for the remaining docs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
               "line": 364,
               "category": "spec.consistency"
             },
             {
               "message": "The repo-wide grep acceptance criteria for `.claude/agent-profiles.json` and the deprecated capability names are still over-scoped. `knowledge/adr/2026-04-09-2235-agent-profiles-redesign.md` and `knowledge/strategy/TODO.md` are still in `knowledge/` and still reference these strings, but this track does not schedule a full rewrite of those documents. Either exclude those files from the checks or add explicit cleanup tasks; otherwise the gates at lines 501 and 516 will never pass.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
               "line": 501,
               "category": "spec.consistency"
             }
@@ -810,7 +810,7 @@
             {
               "message": "Acceptance criterion 2 is internally inconsistent: it says the three sample files should have mutually different `planner.provider` values, but the same criterion explicitly sets `planner=claude` for both `default` and `claude-heavy`. As written, this cannot be satisfied or mechanically verified.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/agent-profiles-redesign-2026-04-10/spec.json",
+              "file": "track/items/agent-profiles-redesign-2026-04-10/spec.json",
               "line": 337,
               "category": "spec.consistency"
             }
@@ -1465,7 +1465,7 @@
             {
               "message": "`resolve_reviewer_provider` now parses raw JSON and never checks `schema_version`, so any unsupported/future agent-profiles shape that still contains `capabilities.reviewer.provider = \"codex\"` will pass this guard and let `@codex review` proceed. This loses the fail-closed validation that the canonical loader enforces.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/pr_review.rs",
+              "file": "libs/usecase/src/pr_review.rs",
               "line": 359,
               "category": "validation"
             }
@@ -1480,7 +1480,7 @@
             {
               "message": "`resolve_reviewer_provider` still hand-parses `serde_json::Value` instead of delegating to `AgentProfiles::load(...).resolve_execution(\"reviewer\", RoundType::Final)` as the redesign specifies. That keeps a second copy of the agent-profiles schema in `usecase`, so validation can drift from the canonical loader and the new `schema_version` gate here has no loader-backed regression coverage.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/pr_review.rs",
+              "file": "libs/usecase/src/pr_review.rs",
               "line": 359,
               "category": "architecture"
             }

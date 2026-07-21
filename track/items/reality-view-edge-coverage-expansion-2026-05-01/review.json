@@ -39,7 +39,7 @@
             {
               "message": "P1: `collect_edges()` drops valid trait-method edges when a trait and a workspace type share the same short name, because the new trait scan uses `target != trait_name.as_str()` as if this were a self-loop. That comparison is namespace-blind, so a trait `Foo` returning/accepting a type `Foo` is silently omitted even though the renderer already disambiguates the nodes with `_trait_foo`. This loses real edges in both flat and clustered diagrams.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 423,
               "category": "correctness"
             }
@@ -54,7 +54,7 @@
             {
               "message": "The new trait-method scan emits edges without the same `target != trait_name` self-loop guard used for inherent methods. If a workspace trait and type share a short name, `collect_edges()` will now produce a spurious `_trait_Foo --> Foo` edge in both flat and clustered renders, which contradicts the intended D2 behavior and can pollute diagrams.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 427,
               "category": "correctness"
             }
@@ -69,7 +69,7 @@
             {
               "message": "`render_type_graph_clustered` now short-circuits every `trait_method_*` edge before the existing cross-target path, so a trait that has both in-cluster and out-of-cluster method references only shows the in-cluster subset. The out-of-cluster dependencies disappear entirely once the trait node is inserted, which makes the cluster diagram incomplete for multi-cluster traits and diverges from the edge set collected in `collect_edges`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 560,
               "category": "correctness"
             }
@@ -113,7 +113,7 @@
             {
               "message": "The new legend line is malformed in both renderers (`line 243` and again at `line 763`): Markdown will close the HTML comment immediately after `Edge legend:`, so the remainder of the string is emitted as visible text (`= return-derived, --o = argument-derived (gray) -->`) before the heading. That corrupts every generated flat/clustered file and defeats the intended hidden header comment.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/type_graph_render.rs",
+              "file": "libs/infrastructure/src/tddd/type_graph_render.rs",
               "line": 243,
               "category": "correctness"
             }

@@ -13,24 +13,27 @@
 
 use std::path::{Path, PathBuf};
 use std::process::Command;
+use std::time::Duration;
 
 use domain::schema::{
     FunctionInfo, ImplInfo, SchemaExport, SchemaExportError, SchemaExporter, TraitInfo, TypeInfo,
     TypeKind,
 };
+use domain::tddd::catalogue_v2::CrateName;
 use rustdoc_types::{ItemEnum, Visibility};
 
 #[path = "schema_export/format_helpers.rs"]
 mod format_helpers;
 
 #[path = "schema_export/bin_target.rs"]
-mod bin_target;
+pub mod bin_target;
+pub(crate) use bin_target::{RustdocTargetResolution, resolve_rustdoc_root_name};
 
 #[path = "schema_export/extract.rs"]
 mod extract;
 use extract::{
     extract_enum_variants, extract_methods, extract_module_path, extract_params,
-    extract_return_type_names, extract_struct_fields, format_return,
+    extract_return_type_names, extract_struct_fields, format_return, struct_shape_kind,
 };
 
 #[path = "schema_export/trait_origins.rs"]
@@ -78,6 +81,31 @@ impl RustdocSchemaExporter {
         check_nightly_available()?;
         bin_target::run_rustdoc(&self.workspace_root, crate_name)
     }
+
+    /// Resolves a previously generated rustdoc JSON path without launching rustdoc.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SchemaExportError`] when target resolution or the path-safety
+    /// checks cannot establish a trusted existing-snapshot location.
+    pub fn existing_rustdoc_json_path(
+        &self,
+        crate_name: &str,
+    ) -> Result<std::path::PathBuf, SchemaExportError> {
+        let package_name = CrateName::new(crate_name.to_owned()).map_err(|error| {
+            SchemaExportError::RustdocFailed(format!(
+                "invalid catalogue crate name `{crate_name}`: {error}"
+            ))
+        })?;
+        let resolution = resolve_rustdoc_root_name(&self.workspace_root, &package_name)
+            .map_err(|error| SchemaExportError::RustdocFailed(error.to_string()))?;
+        let target_dir = path_resolution::resolve_target_dir_strict(&self.workspace_root)?;
+        let path = target_dir
+            .join("doc")
+            .join(format!("{}.json", resolution.rustdoc_root_name().as_str()));
+        ensure_rustdoc_json_path_safe(&target_dir, &path, "type-signals snapshot reuse")?;
+        Ok(path)
+    }
 }
 
 impl SchemaExporter for RustdocSchemaExporter {
@@ -104,10 +132,15 @@ impl usecase::export_schema::SchemaExporterPort for RustdocSchemaExporter {
 }
 
 fn check_nightly_available() -> Result<(), SchemaExportError> {
-    let output = Command::new("rustup")
-        .args(["run", "nightly", "rustc", "--version"])
-        .output()
-        .map_err(|_| SchemaExportError::NightlyNotFound)?;
+    let mut command = Command::new("rustup");
+    command.args(["run", "nightly", "rustc", "--version"]);
+    let output = crate::capability_exec::process::run_command_with_bounded_output(
+        &mut command,
+        16 * 1024 * 1024,
+        Duration::from_secs(120),
+        "nightly rustc availability",
+    )
+    .map_err(|_| SchemaExportError::NightlyNotFound)?;
 
     if !output.status.success() {
         return Err(SchemaExportError::NightlyNotFound);
@@ -117,7 +150,7 @@ fn check_nightly_available() -> Result<(), SchemaExportError> {
 
 /// Validate that a computed rustdoc JSON path is safely rooted at `target_dir`.
 ///
-/// `target_dir` is the resolved Cargo target directory (from `resolve_target_dir`),
+/// `target_dir` is the resolved Cargo target directory,
 /// which may legitimately live outside the workspace when callers set an absolute
 /// `CARGO_TARGET_DIR` (e.g., `/cargo-target` in CI containers — see the
 /// Dockerfile's `IMAGE_CARGO_TARGET_DIR`). The workspace root is not the
@@ -147,6 +180,15 @@ pub(super) fn ensure_rustdoc_json_path_safe(
 
     reject_symlinks_for_rustdoc_path(&normalized_json, &trusted_root, source)?;
     Ok(())
+}
+
+/// The `Id` of an impl's `for_` type when it resolves to a named path, used to
+/// look up the target type's module path via `extract_module_path`.
+fn impl_target_id(ty: &rustdoc_types::Type) -> Option<&rustdoc_types::Id> {
+    match ty {
+        rustdoc_types::Type::ResolvedPath(path) => Some(&path.id),
+        _ => None,
+    }
 }
 
 fn build_schema_export(
@@ -185,6 +227,8 @@ fn build_schema_export(
                 continue;
             }
             let target = format_helpers::format_type(&i.for_);
+            let target_module_path =
+                impl_target_id(&i.for_).and_then(|id| extract_module_path(id, krate));
             let (trait_name, trait_def_path) = match &i.trait_ {
                 Some(p) => {
                     let short = p.path.rsplit("::").next().unwrap_or(&p.path).to_string();
@@ -201,11 +245,12 @@ fn build_schema_export(
             };
             let methods = extract_methods(&i.items, krate)?;
             if !methods.is_empty() || trait_name.is_some() {
-                impls.push(ImplInfo::with_trait_def_path(
+                impls.push(ImplInfo::with_target_details(
                     target,
                     trait_name,
                     methods,
                     trait_def_path,
+                    target_module_path,
                 ));
             }
             continue;
@@ -224,6 +269,7 @@ fn build_schema_export(
         match &item.inner {
             ItemEnum::Struct(s) => {
                 let members = extract_struct_fields(s, krate);
+                let shape = struct_shape_kind(s);
                 let ti = if let Some(mp) = module_path {
                     TypeInfo::with_module_path(
                         name,
@@ -234,7 +280,8 @@ fn build_schema_export(
                     )
                 } else {
                     TypeInfo::new(name, TypeKind::Struct, item.docs.clone(), members)
-                };
+                }
+                .with_struct_shape(Some(shape));
                 types.push(ti);
             }
             ItemEnum::Enum(e) => {
@@ -252,7 +299,8 @@ fn build_schema_export(
                 };
                 types.push(ti);
             }
-            ItemEnum::TypeAlias(_) => {
+            ItemEnum::TypeAlias(alias) => {
+                let alias_target = Some(format_helpers::format_type(&alias.type_));
                 let ti = if let Some(mp) = module_path {
                     TypeInfo::with_module_path(
                         name,
@@ -263,7 +311,8 @@ fn build_schema_export(
                     )
                 } else {
                     TypeInfo::new(name, TypeKind::TypeAlias, item.docs.clone(), Vec::new())
-                };
+                }
+                .with_alias_target(alias_target);
                 types.push(ti);
             }
             ItemEnum::Function(f) if !method_ids.contains(&item.id) => {
@@ -318,7 +367,7 @@ mod tests {
 
     use super::extract::{extract_enum_variants, extract_params, extract_receiver, format_return};
     use super::format_helpers::{collect_type_names, format_type};
-    use super::path_resolution::resolve_configured_target_dir;
+    use super::path_resolution::{resolve_configured_target_dir, resolve_target_dir_strict};
     use super::trait_origins::{build_trait_origins, resolve_trait_origin};
     use super::*;
 
@@ -425,6 +474,70 @@ mod tests {
 
         assert!(matches!(err, SchemaExportError::RustdocFailed(_)));
         assert!(err.to_string().contains("symlink guard"));
+    }
+
+    #[test]
+    fn test_existing_rustdoc_json_path_resolvable_crate_returns_existing_target_doc_path() {
+        let workspace = tempfile::tempdir().unwrap();
+        let manifest = workspace.path().join("Cargo.toml");
+        let source = workspace.path().join("src/lib.rs");
+        std::fs::write(
+            &manifest,
+            "[package]\nname = \"fixture_workspace\"\nversion = \"0.1.0\"\nedition = \"2021\"\n\n[lib]\nname = \"fixture_root\"\npath = \"src/lib.rs\"\n",
+        )
+        .unwrap();
+        std::fs::create_dir_all(source.parent().unwrap()).unwrap();
+        std::fs::write(&source, "pub struct Fixture;\n").unwrap();
+        let expected =
+            resolve_target_dir_strict(workspace.path()).unwrap().join("doc/fixture_root.json");
+        std::fs::create_dir_all(expected.parent().unwrap()).unwrap();
+        let rustdoc_json = format!(
+            r#"{{"root":0,"crate_version":null,"includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
+            rustdoc_types::FORMAT_VERSION
+        );
+        std::fs::write(&expected, rustdoc_json).unwrap();
+
+        let path = RustdocSchemaExporter::new(workspace.path().to_path_buf())
+            .existing_rustdoc_json_path("fixture_workspace")
+            .unwrap();
+
+        assert_eq!(path, expected);
+        assert!(path.is_file());
+        let content = std::fs::read_to_string(&path).unwrap();
+        let parsed: rustdoc_types::Crate = serde_json::from_str(&content).unwrap();
+        assert_eq!(parsed.format_version, rustdoc_types::FORMAT_VERSION);
+    }
+
+    #[test]
+    fn test_existing_rustdoc_json_path_unresolvable_workspace_returns_rustdoc_failed() {
+        let workspace = tempfile::tempdir().unwrap();
+        let missing_workspace = workspace.path().join("missing-workspace");
+
+        let error = RustdocSchemaExporter::new(missing_workspace)
+            .existing_rustdoc_json_path("fixture_workspace")
+            .unwrap_err();
+
+        assert!(matches!(error, SchemaExportError::RustdocFailed(_)));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_resolve_configured_target_dir_absolute_symlinked_ancestor_returns_error() {
+        let workspace = tempfile::tempdir().unwrap();
+        let target_parent = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let linked_ancestor = target_parent.path().join("linked-target-parent");
+        std::os::unix::fs::symlink(outside.path(), &linked_ancestor).unwrap();
+
+        let error = resolve_configured_target_dir(
+            workspace.path(),
+            linked_ancestor.join("target"),
+            "CARGO_TARGET_DIR",
+        )
+        .unwrap_err();
+
+        assert!(matches!(error, SchemaExportError::RustdocFailed(_)));
+        assert!(error.to_string().contains("symlink guard rejected"));
     }
 
     fn trait_bound(name: &str) -> rustdoc_types::GenericBound {
@@ -955,5 +1068,136 @@ mod tests {
         assert_eq!(origins.get("std::fmt::Display"), Some(&"std".to_string()));
         // The old short-name key is gone — no ambiguous "Display" entry.
         assert!(!origins.contains_key("Display"));
+    }
+
+    /// Helper: build a public type-alias `Item` aliasing the given target type.
+    fn make_type_alias_item(
+        id: u32,
+        name: &str,
+        target: rustdoc_types::Type,
+    ) -> (rustdoc_types::Id, rustdoc_types::Item) {
+        let item_id = rustdoc_types::Id(id);
+        let alias_inner = rustdoc_types::TypeAlias {
+            type_: target,
+            generics: rustdoc_types::Generics { params: vec![], where_predicates: vec![] },
+        };
+        let item = rustdoc_types::Item {
+            id: item_id,
+            crate_id: 0,
+            name: Some(name.to_owned()),
+            span: None,
+            visibility: Visibility::Public,
+            docs: None,
+            links: std::collections::HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::TypeAlias(alias_inner),
+        };
+        (item_id, item)
+    }
+
+    /// Finding F1 (round 8): `build_schema_export` records a type alias's target
+    /// type (short-name rendered form) so `catalog import` can emit it verbatim
+    /// instead of a `$todo` hole.
+    #[test]
+    fn test_build_schema_export_type_alias_captures_target() {
+        let (alias_id, alias_item) = make_type_alias_item(
+            1,
+            "MyAlias",
+            resolved("Vec", Some(vec![type_arg(simple("String"))])),
+        );
+        let mut index = std::collections::HashMap::new();
+        index.insert(alias_id, alias_item);
+        let krate = minimal_krate(
+            index,
+            std::collections::HashMap::new(),
+            std::collections::HashMap::new(),
+        );
+
+        let export = build_schema_export("crate_root", &krate).unwrap();
+        let alias = export.types().iter().find(|t| t.name() == "MyAlias").unwrap();
+        assert_eq!(alias.kind(), &TypeKind::TypeAlias);
+        assert_eq!(alias.alias_target(), Some("Vec<String>"));
+    }
+
+    /// Helper: build a public struct `Item` with the given `StructKind`.
+    fn make_struct_item(
+        id: u32,
+        name: &str,
+        kind: rustdoc_types::StructKind,
+    ) -> (rustdoc_types::Id, rustdoc_types::Item) {
+        let item_id = rustdoc_types::Id(id);
+        let struct_inner = rustdoc_types::Struct {
+            kind,
+            generics: rustdoc_types::Generics { params: vec![], where_predicates: vec![] },
+            impls: vec![],
+        };
+        let item = rustdoc_types::Item {
+            id: item_id,
+            crate_id: 0,
+            name: Some(name.to_owned()),
+            span: None,
+            visibility: Visibility::Public,
+            docs: None,
+            links: std::collections::HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::Struct(struct_inner),
+        };
+        (item_id, item)
+    }
+
+    /// Finding F1 (round 12): `build_schema_export` records a struct's declared
+    /// shape so `catalog import` can emit the correct `unit` / `tuple` / `plain`
+    /// shape even when the visibility filter drops every field. A plain struct
+    /// whose fields are all private (`has_stripped_fields: true`, empty public
+    /// field list) must carry `StructShapeKind::Plain { has_stripped_fields: true
+    /// }` rather than being indistinguishable from a unit struct.
+    #[test]
+    fn test_build_schema_export_struct_captures_stripped_plain_shape() {
+        let (struct_id, struct_item) = make_struct_item(
+            1,
+            "Opaque",
+            rustdoc_types::StructKind::Plain { fields: vec![], has_stripped_fields: true },
+        );
+        let mut index = std::collections::HashMap::new();
+        index.insert(struct_id, struct_item);
+        let krate = minimal_krate(
+            index,
+            std::collections::HashMap::new(),
+            std::collections::HashMap::new(),
+        );
+
+        let export = build_schema_export("crate_root", &krate).unwrap();
+        let opaque = export.types().iter().find(|t| t.name() == "Opaque").unwrap();
+        assert_eq!(opaque.kind(), &TypeKind::Struct);
+        assert!(opaque.members().is_empty(), "all fields private → no public members survive");
+        assert_eq!(
+            opaque.struct_shape(),
+            Some(&domain::schema::StructShapeKind::Plain { has_stripped_fields: true })
+        );
+    }
+
+    /// A tuple struct with a stripped (private) positional field is captured as
+    /// `StructShapeKind::Tuple { has_stripped_fields: true }` — the private slot
+    /// is a `None` entry in rustdoc's positional field list.
+    #[test]
+    fn test_build_schema_export_struct_captures_stripped_tuple_shape() {
+        let (struct_id, struct_item) =
+            make_struct_item(1, "Handle", rustdoc_types::StructKind::Tuple(vec![None]));
+        let mut index = std::collections::HashMap::new();
+        index.insert(struct_id, struct_item);
+        let krate = minimal_krate(
+            index,
+            std::collections::HashMap::new(),
+            std::collections::HashMap::new(),
+        );
+
+        let export = build_schema_export("crate_root", &krate).unwrap();
+        let handle = export.types().iter().find(|t| t.name() == "Handle").unwrap();
+        assert_eq!(
+            handle.struct_shape(),
+            Some(&domain::schema::StructShapeKind::Tuple { has_stripped_fields: true })
+        );
     }
 }

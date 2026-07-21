@@ -1,6 +1,6 @@
 ---
 name: dry-fix-lead
-model: opus
+model: claude-opus-4-7[1m]
 description: Claude subagent adapter for dry-fix-lead when routing dispatches the Claude path.
 ---
 

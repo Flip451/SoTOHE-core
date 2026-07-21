@@ -14,7 +14,7 @@ use crate::arch::{self, LayerEntry};
 /// Checks:
 /// 1. `architecture-rules.json` matches `Cargo.toml` workspace members.
 /// 2. `architecture-rules.json` matches `deny.toml` deny rules.
-/// 3. Each workspace member path appears in `Cargo.toml` and `track/tech-stack.md`.
+/// 3. Each workspace member path appears in `Cargo.toml`.
 ///
 /// # Errors
 ///
@@ -38,7 +38,7 @@ pub fn verify(root: &Path) -> VerifyOutcome {
     // Verify deny.toml deny rules match.
     outcome.merge(verify_deny_rules(root, layers));
 
-    // Verify each workspace member is referenced in Cargo.toml and tech-stack.md.
+    // Verify each workspace member is referenced in Cargo.toml.
     outcome.merge(verify_member_references(root, layers));
 
     outcome
@@ -249,8 +249,6 @@ fn verify_member_references(root: &Path, layers: &[LayerEntry]) -> VerifyOutcome
     let mut outcome = VerifyOutcome::pass();
 
     let cargo_content = std::fs::read_to_string(root.join("Cargo.toml")).unwrap_or_default();
-    let tech_stack_content =
-        std::fs::read_to_string(root.join("track").join("tech-stack.md")).unwrap_or_default();
 
     for layer in layers {
         let member = &layer.path;
@@ -260,13 +258,6 @@ fn verify_member_references(root: &Path, layers: &[LayerEntry]) -> VerifyOutcome
         if !cargo_content.contains(&quoted) {
             outcome.add(VerifyFinding::error(format!(
                 "Missing in Cargo.toml: workspace member {member}"
-            )));
-        }
-
-        // Check tech-stack.md contains the member path.
-        if !tech_stack_content.contains(member.as_str()) {
-            outcome.add(VerifyFinding::error(format!(
-                "Missing in track/tech-stack.md: tech-stack workspace map {member}"
             )));
         }
     }
@@ -324,17 +315,12 @@ deny = [
         );
     }
 
-    fn setup_tech_stack(root: &Path) {
-        write_file(root, "track/tech-stack.md", "# Tech Stack\n- libs/domain\n- apps/cli\n");
-    }
-
     #[test]
     fn test_synced_rules_pass() {
         let tmp = TempDir::new().unwrap();
         setup_rules(tmp.path());
         setup_cargo(tmp.path());
         setup_deny(tmp.path());
-        setup_tech_stack(tmp.path());
         let outcome = verify(tmp.path());
         assert!(outcome.is_ok(), "findings: {:?}", outcome.findings());
     }
@@ -345,7 +331,6 @@ deny = [
         setup_rules(tmp.path());
         write_file(tmp.path(), "Cargo.toml", "[workspace]\nmembers = [\"libs/domain\"]\n");
         setup_deny(tmp.path());
-        setup_tech_stack(tmp.path());
         let outcome = verify(tmp.path());
         assert!(outcome.has_errors());
     }
@@ -363,18 +348,6 @@ deny = [
         setup_rules(tmp.path());
         setup_cargo(tmp.path());
         write_file(tmp.path(), "deny.toml", "[bans]\ndeny = []\n");
-        setup_tech_stack(tmp.path());
-        let outcome = verify(tmp.path());
-        assert!(outcome.has_errors());
-    }
-
-    #[test]
-    fn test_missing_tech_stack_reference_fails() {
-        let tmp = TempDir::new().unwrap();
-        setup_rules(tmp.path());
-        setup_cargo(tmp.path());
-        setup_deny(tmp.path());
-        write_file(tmp.path(), "track/tech-stack.md", "# Tech Stack\n");
         let outcome = verify(tmp.path());
         assert!(outcome.has_errors());
     }

@@ -24,8 +24,11 @@ or failure-recovery procedures here.
 
 ### (3) Sub-workflow and capability invocation
 
-- The DRY fix loop is delegated to the `dry-fix-lead` capability via
-  `$dry-fix-lead` (`.codex/agents/dry-fix-lead.toml`).
+- The DRY fix loop is dispatched through the wrapper
+  `cargo make track-local-dry-fix -- --track-id <id> --briefing-file <path>`, which resolves
+  `capabilities.dry-fix-lead` internally from `.harness/config/agent-profiles.json`. Never
+  invoke `$dry-fix-lead` (`.codex/agents/dry-fix-lead.toml`) directly on an assumed provider;
+  if the wrapper does not support the resolved provider, report the failure and stop (fail-closed).
 - DRY gate verification uses `bin/sotp dry check-approved --track-id <id>`.
 
 ### (4) Reporting format

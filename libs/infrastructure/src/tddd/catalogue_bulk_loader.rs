@@ -176,10 +176,10 @@ pub fn load_all_catalogues_native(
                 // A mismatch would cause entries to render under the wrong layer
                 // subgraph (or be omitted) when the interactor flattens
                 // `.values()` and the renderer groups by `doc.layer`.
-                if doc.layer.as_ref() != layer_id.as_ref() {
+                if doc.layer().as_ref() != layer_id.as_ref() {
                     return Err(LoadAllCataloguesNativeError::LayerMismatch {
                         binding_layer: layer_id.as_ref().to_owned(),
-                        doc_layer: doc.layer.as_ref().to_owned(),
+                        doc_layer: doc.layer().as_ref().to_owned(),
                         path: catalogue_path,
                     });
                 }

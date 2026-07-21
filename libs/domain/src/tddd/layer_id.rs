@@ -25,6 +25,7 @@
 use std::fmt;
 
 use crate::ValidationError;
+use crate::tddd::test_obligation::ids::DiagnosticMessage;
 
 /// A validated architecture layer identifier (e.g. `domain`, `usecase`,
 /// `my-gateway`).
@@ -44,7 +45,7 @@ impl LayerId {
         if is_valid_layer_id(&value) {
             Ok(Self(value))
         } else {
-            Err(ValidationError::InvalidLayerId(value))
+            Err(ValidationError::InvalidLayerId(DiagnosticMessage::try_new(value)?))
         }
     }
 }
@@ -91,7 +92,7 @@ mod tests {
     #[test]
     fn test_layer_id_rejects_empty_string() {
         let err = LayerId::try_new("").unwrap_err();
-        assert!(matches!(err, ValidationError::InvalidLayerId(s) if s.is_empty()));
+        assert!(matches!(err, ValidationError::EmptyString));
     }
 
     #[test]

@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "4e36da0045945eb9e68184afa9de007e34c6a51c07c627da5f364df6af7e4514",
+      "evidence_hash": "e80f90842d6a4c32970a634a0cdb2e16bf838318ff84f0d5f429306f55197670",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検証済み newtype `DiagnosticMessage` へ移行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DiagnosticMessage"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`Phase1Error` を catalogue で modify 宣言する際は、既存の `ActionContradiction`、`UnresolvedTypeRef`、`DanglingId` variant の payload を生の `String` のまま保持せず、検証済み newtype `DiagnosticMessage` へ移行する。これにより `RustdocRootResolution` を追加した post-state 全体を `ErrorType` の variant field に対する primitive obsession guard に適合させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ab20b3c76beb1ff7d55fd1b0265c2ac3266852bf23cadcf7a20499e828a0f260",
+      "evidence_hash": "9376ae729d1fac6bf061f4c7d1dc531e589b8978d97f2a3d57a62170074e0013",
+      "verdict": {
+        "kind": "pass",
+        "citation": "選択した metadata target の name を rustdoc 実行 target とし、その `-` を `_` に正規化した値を rustdoc crate root とする。schema export、catalog import の型照合、signal 評価器の identity key 正規化はこの同じ翻訳機構を使用し、catalogue 利用者向けの型 path は package 名 root のまま維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "Phase1Error"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "選択した metadata target の name を rustdoc 実行 target とし、その `-` を `_` に正規化した値を rustdoc crate root とする。schema export、catalog import の型照合、signal 評価器の identity key 正規化はこの同じ翻訳機構を使用し、catalogue 利用者向けの型 path は package 名 root のまま維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ab20b3c76beb1ff7d55fd1b0265c2ac3266852bf23cadcf7a20499e828a0f260",
+      "evidence_hash": "1adc55e60c077cfdc79d0b48f55be7da6aa29292b2bbda75a2f09152b2a7315c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "signal 評価器の identity key 正規化が共有 resolver を使い、既存の crate 名 literal 対応表に依存せず、rename 後の package / target の組合せを metadata から解決することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "Phase1Error"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "signal 評価器の identity key 正規化が共有 resolver を使い、既存の crate 名 literal 対応表に依存せず、rename 後の package / target の組合せを metadata から解決することを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ab20b3c76beb1ff7d55fd1b0265c2ac3266852bf23cadcf7a20499e828a0f260",
+      "evidence_hash": "e80f90842d6a4c32970a634a0cdb2e16bf838318ff84f0d5f429306f55197670",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`Phase1Error` を catalogue で modify 宣言する際は、既存の `ActionContradiction`、`UnresolvedTypeRef`、`DanglingId` variant の payload を生の `String` のまま保持せず、検証済み newtype `DiagnosticMessage` へ移行する。これにより `RustdocRootResolution` を追加した post-state 全体を `ErrorType` の variant field に対する primitive obsession guard に適合させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/domain-types.json",
+          "section_key": "types",
+          "entry_key": "Phase1Error"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`Phase1Error` を catalogue で modify 宣言する際は、既存の `ActionContradiction`、`UnresolvedTypeRef`、`DanglingId` variant の payload を生の `String` のまま保持せず、検証済み newtype `DiagnosticMessage` へ移行する。これにより `RustdocRootResolution` を追加した post-state 全体を `ErrorType` の variant field に対する primitive obsession guard に適合させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3af1c277e52ce100ecd113c90c22bdddcbca6a500498b0e08ceff7a16340f498",
+      "evidence_hash": "9376ae729d1fac6bf061f4c7d1dc531e589b8978d97f2a3d57a62170074e0013",
+      "verdict": {
+        "kind": "pass",
+        "citation": "signal 評価器の identity key 正規化はこの同じ翻訳機構を使用"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "SignalEvaluatorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "選択した metadata target の name を rustdoc 実行 target とし、その `-` を `_` に正規化した値を rustdoc crate root とする。schema export、catalog import の型照合、signal 評価器の identity key 正規化はこの同じ翻訳機構を使用し、catalogue 利用者向けの型 path は package 名 root のまま維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3af1c277e52ce100ecd113c90c22bdddcbca6a500498b0e08ceff7a16340f498",
+      "evidence_hash": "1adc55e60c077cfdc79d0b48f55be7da6aa29292b2bbda75a2f09152b2a7315c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "signal 評価器の identity key 正規化が共有 resolver を使い、既存の crate 名 literal 対応表に依存せず、rename 後の package / target の組合せを metadata から解決することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/capability-exec-infra-repair-2026-07-13/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "SignalEvaluatorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "signal 評価器の identity key 正規化が共有 resolver を使い、既存の crate 名 literal 対応表に依存せず、rename 後の package / target の組合せを metadata から解決することを検証する。"
+        }
+      }
+    }
+  ]
+}

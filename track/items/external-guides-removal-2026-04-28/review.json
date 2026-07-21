@@ -375,7 +375,7 @@
             {
               "message": "Context line 20 calls `guide:add` a skill, but D1 line 49 identifies the same entry point as the `/guide:add` slash command and explicitly says there is no `.claude/skills/` counterpart. That is an internal semantic mismatch about the deletion target.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/adr/2026-04-28-1258-remove-external-guides.md",
+              "file": "knowledge/adr/2026-04-28-1258-remove-external-guides.md",
               "line": 20,
               "category": "contradiction"
             }
@@ -568,7 +568,7 @@
             {
               "message": "The top-level summary still says the track is \"deletion-only with zero Rust source code changes\" and that deletion targets span \"6 categories\", but T006 now explicitly deletes Rust code and introduces a seventh category. That makes the summary inconsistent with the rest of the plan. The same stale wording also appears in `impl-plan.json`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/external-guides-removal-2026-04-28/plan.md",
+              "file": "track/items/external-guides-removal-2026-04-28/plan.md",
               "line": 6,
               "category": "contradiction"
             }

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "07bfd09d6aa97609836dc310a12b087662cffb64da06650e417f0653655c02ff",
+  "signals": [
+    {
+      "type_name": "TestObligationCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "fecd8ef9b2e2f7a82045878a30911588f08a02662552db69ea9d554cfe072aca"
+    }
+  ]
+}

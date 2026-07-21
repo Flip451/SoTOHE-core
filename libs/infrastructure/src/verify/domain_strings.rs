@@ -1,33 +1,57 @@
-//! Verify that `libs/domain/src/` has no `pub` struct fields of type `String`.
+//! Verify that domain-strings opt-in layers have no `pub` struct fields of type
+//! `String`.
 //!
 //! Newtypes (`pub struct Foo(String)`) are excluded because the inner field
 //! is not `pub`. Only named struct fields `pub field: String` are flagged.
+//!
+//! The scanned source paths are resolved from `architecture-rules.json` layer
+//! entries that declare `verify.domain_strings: true` — no path is hardcoded.
 
 use std::path::Path;
 
 use domain::verify::{VerifyFinding, VerifyOutcome};
 
-const DOMAIN_SRC_DIR: &str = "libs/domain/src";
+use crate::arch::VerifierKind;
 
-/// Scan `libs/domain/src/` for `pub` struct fields typed `String`.
+/// Scan every domain-strings opt-in layer for `pub` struct fields typed `String`.
+///
+/// When no layer declares the flag, the result is OK/skip (config-driven
+/// absence is not an error).
 ///
 /// # Errors
 ///
-/// Returns findings for each `pub field: String` found.
+/// Returns findings for each `pub field: String` found, or a single error
+/// finding if `architecture-rules.json` cannot be loaded or parsed.
 pub fn verify(root: &Path) -> VerifyOutcome {
-    let domain_src = root.join(DOMAIN_SRC_DIR);
-    if !domain_src.is_dir() {
-        return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
-            "Domain source directory not found: {DOMAIN_SRC_DIR}"
-        ))]);
-    }
+    let targets = match crate::arch::resolve_verify_targets(root, VerifierKind::DomainStrings) {
+        Ok(targets) => targets,
+        Err(e) => {
+            return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
+                "failed to resolve verify targets from architecture-rules.json: {e}"
+            ))]);
+        }
+    };
 
     let mut findings = Vec::new();
-    scan_dir(&domain_src, root, &mut findings);
+    for target in targets {
+        let src = root.join(&target.src_dir);
+        if !src.is_dir() {
+            findings.push(VerifyFinding::error(format!(
+                "{} source directory not found: {}",
+                target.label, target.src_dir
+            )));
+            continue;
+        }
+        scan_dir(&src, root, &mut findings);
+    }
     VerifyOutcome::from_findings(findings)
 }
 
 fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<VerifyFinding>) {
+    if !reject_unsafe_scan_path(dir, root, findings) {
+        return;
+    }
+
     let entries = match std::fs::read_dir(dir) {
         Ok(e) => e,
         Err(e) => {
@@ -53,9 +77,23 @@ fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<VerifyFinding>) {
             }
         };
         let path = entry.path();
-        if path.is_dir() {
+        if !reject_unsafe_scan_path(&path, root, findings) {
+            continue;
+        }
+        let file_type = match entry.file_type() {
+            Ok(file_type) => file_type,
+            Err(e) => {
+                let rel = path.strip_prefix(root).unwrap_or(&path);
+                findings.push(VerifyFinding::error(format!(
+                    "{}: cannot inspect entry type: {e}",
+                    rel.to_string_lossy()
+                )));
+                continue;
+            }
+        };
+        if file_type.is_dir() {
             scan_dir(&path, root, findings);
-        } else if path.extension().is_some_and(|ext| ext == "rs") {
+        } else if file_type.is_file() && path.extension().is_some_and(|ext| ext == "rs") {
             match std::fs::read_to_string(&path) {
                 Ok(content) => check_file(&path, root, &content, findings),
                 Err(e) => {
@@ -66,6 +104,35 @@ fn scan_dir(dir: &Path, root: &Path, findings: &mut Vec<VerifyFinding>) {
                     )));
                 }
             }
+        }
+    }
+}
+
+fn reject_unsafe_scan_path(path: &Path, root: &Path, findings: &mut Vec<VerifyFinding>) -> bool {
+    let rel = path.strip_prefix(root).unwrap_or(path);
+    match crate::track::symlink_guard::reject_symlinks_below(path, root) {
+        Ok(true) => true,
+        Ok(false) => {
+            findings.push(VerifyFinding::error(format!(
+                "{}: path disappeared during scan",
+                rel.to_string_lossy()
+            )));
+            false
+        }
+        Err(e) if e.kind() == std::io::ErrorKind::InvalidInput => {
+            findings.push(VerifyFinding::error(format!(
+                "{}: symlink detected during scan (rejected for security)",
+                rel.to_string_lossy()
+            )));
+            false
+        }
+        Err(e) => {
+            findings.push(VerifyFinding::error(format!(
+                "{}: cannot inspect path before scanning: {:?}",
+                rel.to_string_lossy(),
+                e.kind()
+            )));
+            false
         }
     }
 }
@@ -159,7 +226,22 @@ mod tests {
 
     use super::*;
 
+    const DOMAIN_SRC_DIR: &str = "libs/domain/src";
+
+    /// Write a minimal `architecture-rules.json` declaring a domain layer that
+    /// opts into the domain-strings verifier.
+    fn write_arch_rules(root: &Path) {
+        let json = r#"{
+  "version": 2,
+  "layers": [
+    { "crate": "domain", "path": "libs/domain", "verify": { "domain_strings": true } }
+  ]
+}"#;
+        std::fs::write(root.join("architecture-rules.json"), json).unwrap();
+    }
+
     fn setup_domain_file(root: &Path, rel: &str, content: &str) {
+        write_arch_rules(root);
         let path = root.join(DOMAIN_SRC_DIR).join(rel);
         if let Some(parent) = path.parent() {
             std::fs::create_dir_all(parent).unwrap();
@@ -222,9 +304,50 @@ mod tests {
 
     #[test]
     fn test_missing_domain_dir_errors() {
+        // Layer declares the flag but its `<path>/src` is absent — misconfiguration.
         let tmp = TempDir::new().unwrap();
+        write_arch_rules(tmp.path());
         let outcome = verify(tmp.path());
         assert!(outcome.has_errors());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_symlinked_domain_source_file_errors() {
+        let tmp = TempDir::new().unwrap();
+        let outside = TempDir::new().unwrap();
+        write_arch_rules(tmp.path());
+
+        let domain_src = tmp.path().join(DOMAIN_SRC_DIR);
+        std::fs::create_dir_all(&domain_src).unwrap();
+        let outside_file = outside.path().join("review.rs");
+        std::fs::write(&outside_file, "pub struct Foo {\n    pub verdict: String,\n}\n").unwrap();
+        std::os::unix::fs::symlink(&outside_file, domain_src.join("review.rs")).unwrap();
+
+        let outcome = verify(tmp.path());
+        assert!(outcome.has_errors());
+        assert!(
+            outcome.findings().iter().any(|finding| finding.to_string().contains("symlink")),
+            "expected symlink rejection finding, got: {:?}",
+            outcome.findings()
+        );
+    }
+
+    #[test]
+    fn test_no_opt_in_layer_skips() {
+        // arch-rules present but no layer declares domain_strings → OK/skip.
+        let tmp = TempDir::new().unwrap();
+        std::fs::write(
+            tmp.path().join("architecture-rules.json"),
+            r#"{ "version": 2, "layers": [ { "crate": "domain", "path": "libs/domain" } ] }"#,
+        )
+        .unwrap();
+        let path = tmp.path().join(DOMAIN_SRC_DIR).join("review.rs");
+        std::fs::create_dir_all(path.parent().unwrap()).unwrap();
+        std::fs::write(&path, "pub struct Foo {\n    pub verdict: String,\n}\n").unwrap();
+        let outcome = verify(tmp.path());
+        assert!(outcome.is_ok());
+        assert!(outcome.findings().is_empty());
     }
 
     #[test]

@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "1bed246d43f875d12380f6520d25675ff2e3c3c4ca08981d24ac0f7f6abe60b0",
+  "signals": [
+    {
+      "type_name": "CheckTestObligationsCommand",
+      "signal": "blue",
+      "entry_hash": "7b0cf8df3153c20a97755010eacfdcd881969df909a2e83be4120c5ee23172cc"
+    },
+    {
+      "type_name": "CheckTestObligationsInteractor",
+      "signal": "blue",
+      "entry_hash": "4a480beddd490fb9813ac61894d712aa5fa29c5c50ac70965fa3fc0e162da3dd"
+    },
+    {
+      "type_name": "CheckTestObligationsOutcome",
+      "signal": "blue",
+      "entry_hash": "f9d63391d33d9780d884d6f6c45f6da280e520a2045616079cf03de27ca5fcd7"
+    },
+    {
+      "type_name": "DeriveTestObligationsCommand",
+      "signal": "blue",
+      "entry_hash": "62661557b0be80a838bc391658ec7af8cbefee549cf7098c4b0582f33163a4d0"
+    },
+    {
+      "type_name": "DeriveTestObligationsInteractor",
+      "signal": "blue",
+      "entry_hash": "8a9cc792615b753540d48bf56b7f97c4881bad585f8d19a64054f039846ef06d"
+    },
+    {
+      "type_name": "EvaluateTestObligationsCommand",
+      "signal": "blue",
+      "entry_hash": "048ed227673266e1bedb35b8e8bca3ef2e2e691cce41f3dd4c45503c2402ebf4"
+    },
+    {
+      "type_name": "EvaluateTestObligationsFuture",
+      "signal": "blue",
+      "entry_hash": "51f33aee77d3ef1ae56575a1c509c4e78386dda1d9528080a4c4334937d95d95"
+    },
+    {
+      "type_name": "EvaluateTestObligationsInteractor",
+      "signal": "blue",
+      "entry_hash": "bcfb1f7a5658414c8c5b9e26d4eeb05bd646df1fbbd7d51c6e19c745e3e0d269"
+    },
+    {
+      "type_name": "EvaluateTestObligationsOutcome",
+      "signal": "blue",
+      "entry_hash": "d959d07a3b8d5009cebbac9e5d608bf769348067d9f60473574ad2ff2ebb3aa1"
+    },
+    {
+      "type_name": "RefVerifyCacheKey",
+      "signal": "blue",
+      "entry_hash": "ee5512c323174577609e4ff87285211d98c7c06f6004dd97a4811d8021a6b135"
+    },
+    {
+      "type_name": "RefVerifyConfig",
+      "signal": "blue",
+      "entry_hash": "94bc65eb45e3317d193def38a2791812555fcb3167cb7e4d50d5c5e727e490ec"
+    },
+    {
+      "type_name": "RefVerifyPercent",
+      "signal": "blue",
+      "entry_hash": "198b80541a91ad86ae8296f211a7acf96cffb34da8a4740f82a84aa756308a3a"
+    },
+    {
+      "type_name": "SemanticCalibrationProbeConfig",
+      "signal": "blue",
+      "entry_hash": "28c360c63142590fc66bbb397458afeb336af3ef5f9b5a87de83f2e5fc8d2f01"
+    },
+    {
+      "type_name": "SemanticEscalationFuture",
+      "signal": "blue",
+      "entry_hash": "0bda77b4510e84e7e13966a19dc8aeccd69e13f4dc22829f0f0274a418f02812"
+    },
+    {
+      "type_name": "TestBindingsSkeletonCommand",
+      "signal": "blue",
+      "entry_hash": "0b914d3efb5e2048e35b452561bccecf688eb1de52459d99cdbe7f4cb91387c6"
+    },
+    {
+      "type_name": "TestBindingsSkeletonError",
+      "signal": "blue",
+      "entry_hash": "f6812a477b1209afec0dc40cbce1dd3785a9bfb57eadad581d139c5fa9e9315e"
+    },
+    {
+      "type_name": "TestBindingsSkeletonInteractor",
+      "signal": "blue",
+      "entry_hash": "f66465af939b25571352bae4b7147791bbb512e806edb182cdcd1f116784ca6f"
+    },
+    {
+      "type_name": "TestBindingsSkeletonOutcome",
+      "signal": "blue",
+      "entry_hash": "f8b7ac82763b1468240c9c0113779020ae5127d0515b9e4f4cb2b88c0729ba25"
+    },
+    {
+      "type_name": "TestBindingsSkeletonRecord",
+      "signal": "blue",
+      "entry_hash": "a09f2f40150a2bdb2ebc4e72e91602457d1cdb0eb6628851c1179620fc1a0af8"
+    },
+    {
+      "type_name": "TestObligationCatalogueCommandInput",
+      "signal": "blue",
+      "entry_hash": "b46799a3d1491d7f32beb0a89e05bb79de7b9becca1669d8646cd5cce5a44ba6"
+    },
+    {
+      "type_name": "TestObligationChainLabel",
+      "signal": "blue",
+      "entry_hash": "fc1dbaaca953db2b96cedd33ad0ec8ece8bc00fd5690f4bd93fbdd34e77434c7"
+    },
+    {
+      "type_name": "TestObligationEvaluateConfig",
+      "signal": "blue",
+      "entry_hash": "2f51e2c742ee3141ac14176452e348bc42fb465b8fc7e5b2841ec835900445c3"
+    },
+    {
+      "type_name": "TestObligationEvaluateConfigError",
+      "signal": "blue",
+      "entry_hash": "452bf28cbc642238b69b77c378eb68063b7750076877cbcc788b6682176bae52"
+    },
+    {
+      "type_name": "TestObligationLaneSummary",
+      "signal": "blue",
+      "entry_hash": "965456bc8a3b2100ce1dc1314ae05641191a291beaafc0f9230cfae3792f3bb3"
+    },
+    {
+      "type_name": "TestObligationResultsCommand",
+      "signal": "blue",
+      "entry_hash": "cfd6f2c43decc6ff0a8639d1dc18f1469565cd59686e25ef6d2fdb4a06f025da"
+    },
+    {
+      "type_name": "TestObligationResultsInteractor",
+      "signal": "blue",
+      "entry_hash": "0d55122a189837928b909f6b3e01d91108b2a27b1fc50c6236364ee39794e10d"
+    },
+    {
+      "type_name": "TestObligationResultsOutput",
+      "signal": "blue",
+      "entry_hash": "950a8000ac1f82d7a2f3f54e87df983efa76a00c925e1ea22f43f13e3250e989"
+    },
+    {
+      "type_name": "CheckTestObligationsApplicationService",
+      "signal": "blue",
+      "entry_hash": "4d09d2fbfc6d2c983cd85cb3507bdc2ec55599f091df2a0c08bf2d355226dee9"
+    },
+    {
+      "type_name": "ContentHasherPort",
+      "signal": "blue",
+      "entry_hash": "e91f7962250d055f5ac01b1887e24f222f8122d7591dee56b63e4a3715cf4190"
+    },
+    {
+      "type_name": "DeriveTestObligationsApplicationService",
+      "signal": "blue",
+      "entry_hash": "1b182a5ac05eb6820f4f065b365c5782c4f050f9b2be7c03128db956aafc0310"
+    },
+    {
+      "type_name": "EvaluateTestObligationsApplicationService",
+      "signal": "blue",
+      "entry_hash": "e763bba9dcaf9ceb5ca68823331e5984364725bc8c2ee060ce8b87b42b7e95f7"
+    },
+    {
+      "type_name": "SemanticEscalationDriverPort",
+      "signal": "blue",
+      "entry_hash": "16c0eb54711a6a4ebbf68374a0dd4368e3ba185906d5093193c8d74c797ddcc7"
+    },
+    {
+      "type_name": "SemanticEscalationVerdictBridge",
+      "signal": "blue",
+      "entry_hash": "abcdbca1fd6c914ab7aad02cba9d9d54ccd452fbc345283ff40791346d0dab8f"
+    },
+    {
+      "type_name": "TestBindingsSkeletonApplicationService",
+      "signal": "blue",
+      "entry_hash": "e9a67b9ddb3b81f38a86c1436c4a83d2534b8709fc77528b390fa5690b0fac2d"
+    },
+    {
+      "type_name": "TestObligationResultsApplicationService",
+      "signal": "blue",
+      "entry_hash": "c2a23f7a8f3b264ed0b1d34584cecd90bb33cf987da8a3af0932aedb4ff43c61"
+    }
+  ]
+}

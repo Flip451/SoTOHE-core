@@ -222,7 +222,7 @@
             {
               "message": "`T002` describes `AdrSignalEvaluator::evaluate` as taking `AdrDecisionEntry` by value, but the domain contract for the same type says the method should take `&AdrDecisionEntry`. That leaves the planned API shape inconsistent across the plan and type catalogue, so implementers would have to choose between two conflicting signatures.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/plan.md",
               "line": 30,
               "category": "contradiction"
             }
@@ -793,7 +793,7 @@
             {
               "message": "`T003` says `AdrDecisionCommon` is built from each DTO's `grounds` field, but `AdrDecisionDto` does not define any `grounds` field in this scope. The codec needs to derive `AdrDecisionCommon` from the explicit trace fields (`user_decision_ref`, `review_finding_ref`, `candidate_selection`, `grandfathered`) instead; as written, this task description points implementers at a non-existent input and is semantically wrong.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/adr-decision-traceability-lifecycle-2026-04-27/impl-plan.json",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/impl-plan.json",
               "line": 18,
               "category": "factual error"
             }
@@ -1091,21 +1091,21 @@
             {
               "message": "This file still describes `AdrFrontMatter` / `AdrDecisionEntry` in terms of the removed `AdrFrontMatterCodec` and `AdrSignalEvaluator` symbols. The current catalogue redesign models those responsibilities as `parse_adr_frontmatter` and `evaluate_adr_decision`, so the domain catalogue is internally inconsistent with the updated architecture.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/domain-types.json",
               "line": 6,
               "category": "contradiction"
             },
             {
               "message": "`parse_adr_frontmatter` is catalogued as taking `str` by value. That is not a valid Rust parameter type for a callable function; this needs to be `&str` or `String`, otherwise the described API cannot be implemented as written.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/adr-decision-traceability-lifecycle-2026-04-27/infrastructure-types.json",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/infrastructure-types.json",
               "line": 74,
               "category": "factual error"
             },
             {
               "message": "`VerifyAdrSignalsError` still says `AdrSignalEvaluator::evaluate` is the infallible evaluator, but the redesign renamed that computation to the free function `evaluate_adr_decision`. This stale symbol name makes the usecase catalogue drift from the rest of the plan artifacts.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/adr-decision-traceability-lifecycle-2026-04-27/usecase-types.json",
+              "file": "track/items/adr-decision-traceability-lifecycle-2026-04-27/usecase-types.json",
               "line": 110,
               "category": "contradiction"
             }
@@ -1866,14 +1866,14 @@
             {
               "message": "The file now advertises `free_function` as a valid catalogue kind, but the selection guidance never mentions it. There is no decision-tree branch or cookbook example for choosing `free_function`, so a type-designer following this file has no documented path to emit the new kind.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "file": ".claude/agents/type-designer.md",
               "line": 144,
               "category": "contradiction"
             },
             {
               "message": "The `NonEmptyReviewerFindings` example uses a named `inner` member, but the current schema convention for tuple structs is positional names (`\"0\"`, `\"1\"`, ...). Copying this example would produce an `expected_members` shape that cannot match the rustdoc output for the actual tuple struct in `libs/domain/src/review_v2/types.rs`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "file": ".claude/agents/type-designer.md",
               "line": 289,
               "category": "factual error"
             }
@@ -1903,7 +1903,7 @@
             {
               "message": "Pattern 1's `AdrDecisionCommon` example omits `candidate_selection`, but that field is part of the lifecycle's shared payload in the ADR track spec. As written, the cookbook no longer mirrors the actual common struct and can teach authors an incomplete typestate model.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.claude/agents/type-designer.md",
+              "file": ".claude/agents/type-designer.md",
               "line": 211,
               "category": "factual error"
             }

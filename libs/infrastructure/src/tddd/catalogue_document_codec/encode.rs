@@ -1,5 +1,7 @@
 //! Domain → DTO conversions for [`CatalogueDocument`] (encode path).
 
+use std::collections::{BTreeMap, btree_map::Entry};
+
 use domain::tddd::catalogue_v2::composite::{StructShape, TypeKindV2, TypestateMarker};
 use domain::tddd::catalogue_v2::entries::{
     AssocConstDecl, AssocTypeDecl, FunctionEntry, InherentImplDeclV2, TraitEntry, TypeEntry,
@@ -7,8 +9,8 @@ use domain::tddd::catalogue_v2::entries::{
 use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, InvariantPredicate};
 use domain::tddd::catalogue_v2::variants::{FieldDecl, VariantDecl, VariantPayload};
 use domain::tddd::catalogue_v2::{
-    BoundOp, CatalogueDocument, InvariantDecl, MethodDeclaration, MethodGenericParam,
-    ParamDeclaration, TraitImplDeclV2, WherePredicateDecl,
+    BoundOp, CatalogueDocument, DeletionRecord, InvariantDecl, MethodDeclaration,
+    MethodGenericParam, ParamDeclaration, TraitImplDeclV2, WherePredicateDecl,
 };
 
 use crate::tddd::spec_ground_codec::{informal_grounds_to_dtos, spec_refs_to_dtos};
@@ -24,6 +26,7 @@ use super::dto::{
 use super::dto_roles::{
     ContractRoleDto, DataRoleDto, IdentityAccessorDto, InvariantDeclDto, InvariantPredicateDto,
 };
+use super::dto_slots::{EntrySlotDto, TombstoneDto};
 
 // ---------------------------------------------------------------------------
 // Top-level entry point
@@ -32,35 +35,113 @@ use super::dto_roles::{
 pub(super) fn domain_to_dto(
     doc: &CatalogueDocument,
 ) -> Result<CatalogueDocumentDto, CatalogueDocumentCodecError> {
-    let types = doc
-        .types
+    let mut types: BTreeMap<String, EntrySlotDto<TypeEntryDto>> = doc
+        .types()
         .iter()
-        .map(|(k, v)| type_entry_to_dto(v).map(|dto| (k.as_str().to_owned(), dto)))
+        .map(|(k, v)| {
+            type_entry_to_dto(v).map(|dto| (k.as_str().to_owned(), EntrySlotDto::Live(dto)))
+        })
         .collect::<Result<_, _>>()?;
-    let traits = doc
-        .traits
+    let mut traits: BTreeMap<String, EntrySlotDto<TraitEntryDto>> = doc
+        .traits()
         .iter()
-        .map(|(k, v)| trait_entry_to_dto(v).map(|dto| (k.as_str().to_owned(), dto)))
+        .map(|(k, v)| {
+            trait_entry_to_dto(v).map(|dto| (k.as_str().to_owned(), EntrySlotDto::Live(dto)))
+        })
         .collect::<Result<_, _>>()?;
-    let functions = doc
-        .functions
+    let mut functions: BTreeMap<String, EntrySlotDto<FunctionEntryDto>> = doc
+        .functions()
         .iter()
-        .map(|(k, v)| function_entry_to_dto(v).map(|dto| (k.to_string(), dto)))
+        .map(|(k, v)| function_entry_to_dto(v).map(|dto| (k.to_string(), EntrySlotDto::Live(dto))))
         .collect::<Result<_, _>>()?;
+
+    // Deletion records re-join their section's map as grounded tombstones,
+    // keyed by name (types / traits) or path (functions). BTreeMap keeps the
+    // merged map in name order, so live entries and tombstones interleave
+    // deterministically.
+    for record in doc.deletions() {
+        match record {
+            DeletionRecord::Type { name, module_path, spec_refs, informal_grounds } => {
+                insert_tombstone(
+                    &mut types,
+                    "type",
+                    name.as_str().to_owned(),
+                    tombstone_dto(module_path.to_string(), spec_refs, informal_grounds),
+                )?;
+            }
+            DeletionRecord::Trait { name, module_path, spec_refs, informal_grounds } => {
+                insert_tombstone(
+                    &mut traits,
+                    "trait",
+                    name.as_str().to_owned(),
+                    tombstone_dto(module_path.to_string(), spec_refs, informal_grounds),
+                )?;
+            }
+            DeletionRecord::Function { path, spec_refs, informal_grounds } => {
+                insert_tombstone(
+                    &mut functions,
+                    "function",
+                    path.to_string(),
+                    tombstone_dto(String::new(), spec_refs, informal_grounds),
+                )?;
+            }
+        }
+    }
+
     let inherent_impls =
-        doc.inherent_impls.iter().map(inherent_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
+        doc.inherent_impls().iter().map(inherent_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
     let trait_impls =
-        doc.trait_impls.iter().map(trait_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
+        doc.trait_impls().iter().map(trait_impl_to_dto).collect::<Result<Vec<_>, _>>()?;
     Ok(CatalogueDocumentDto {
         schema_version: SCHEMA_VERSION,
-        crate_name: doc.crate_name.as_str().to_owned(),
-        layer: doc.layer.as_ref().to_owned(),
+        crate_name: doc.crate_name().as_str().to_owned(),
+        layer: doc.layer().as_ref().to_owned(),
         types,
         traits,
         functions,
         inherent_impls,
         trait_impls,
     })
+}
+
+/// Build a grounded deletion tombstone DTO for a removed entry.
+///
+/// `module_path` is the crate-relative module of a type / trait deletion, or the
+/// empty string for a crate-root item or a function (whose module lives in the
+/// map key). `ModulePath::root()` renders as the empty string, which the DTO
+/// omits from JSON.
+fn tombstone_dto(
+    module_path: String,
+    spec_refs: &[domain::SpecRef],
+    informal_grounds: &[domain::InformalGroundRef],
+) -> TombstoneDto {
+    TombstoneDto {
+        action: "delete".to_owned(),
+        module_path,
+        spec_refs: spec_refs_to_dtos(spec_refs),
+        informal_grounds: informal_grounds_to_dtos(informal_grounds),
+    }
+}
+
+fn insert_tombstone<T>(
+    map: &mut BTreeMap<String, EntrySlotDto<T>>,
+    entry_kind: &str,
+    key: String,
+    tombstone: TombstoneDto,
+) -> Result<(), CatalogueDocumentCodecError> {
+    match map.entry(key) {
+        Entry::Vacant(slot) => {
+            slot.insert(EntrySlotDto::Tombstone(tombstone));
+            Ok(())
+        }
+        Entry::Occupied(slot) => Err(CatalogueDocumentCodecError::InvalidEntry {
+            entry_name: slot.key().clone(),
+            reason: format!(
+                "delete tombstone collides with an existing {entry_kind} entry; refusing to \
+                 overwrite a semantics-affecting catalogue entry during encode"
+            ),
+        }),
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -70,16 +151,23 @@ pub(super) fn domain_to_dto(
 pub(super) fn type_entry_to_dto(
     entry: &TypeEntry,
 ) -> Result<TypeEntryDto, CatalogueDocumentCodecError> {
-    let methods = entry.methods.iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
+    let methods = entry.methods().iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
+    let where_predicates = entry
+        .where_predicates()
+        .iter()
+        .map(where_predicate_decl_to_dto)
+        .collect::<Result<_, _>>()?;
     Ok(TypeEntryDto {
-        action: entry.action.to_string(),
-        role: data_role_to_dto(&entry.role),
-        kind: type_kind_to_dto(&entry.kind),
+        action: entry.action().to_string(),
+        role: data_role_to_dto(entry.role()),
+        kind: type_kind_to_dto(entry.kind()),
         methods,
-        module_path: entry.module_path.to_string(),
-        docs: entry.docs.clone(),
-        spec_refs: spec_refs_to_dtos(&entry.spec_refs),
-        informal_grounds: informal_grounds_to_dtos(&entry.informal_grounds),
+        generics: method_generic_params_to_dtos(entry.generics()),
+        where_predicates,
+        module_path: entry.module_path().to_string(),
+        docs: entry.docs().map(|d| d.as_str().to_owned()),
+        spec_refs: spec_refs_to_dtos(entry.spec_refs()),
+        informal_grounds: informal_grounds_to_dtos(entry.informal_grounds()),
     })
 }
 
@@ -294,33 +382,19 @@ fn method_generic_params_to_dtos(generics: &[MethodGenericParam]) -> Vec<MethodG
 
 /// Encodes a top-level `TraitImplDeclV2` to its DTO form (ADR `2026-05-20-0048` D2).
 ///
-/// Emits `action`, `trait_ref`, and `for_type` fields. Validates `trait_ref` as a
-/// Rust path expression (not a reference, slice, or tuple) and validates both
-/// `trait_ref` and `for_type` as syn-parseable type expressions to guarantee
-/// encode/decode round-trip consistency for in-memory `TraitImplDeclV2` values
-/// that were not originally constructed via the JSON decoder.
+/// Emits `action`, `trait_ref`, and `for_type` fields exactly as stored in the
+/// schema's `TypeRef` slots.
 fn trait_impl_to_dto(t: &TraitImplDeclV2) -> Result<TraitImplDto, CatalogueDocumentCodecError> {
-    let err = |reason: String| CatalogueDocumentCodecError::InvalidEntry {
-        entry_name: t.trait_ref.as_str().to_owned(),
-        reason,
-    };
-    super::decode::validate_type_ref_str(t.trait_ref.as_str())
-        .map_err(|e| err(format!("invalid trait_ref syntax: {e}")))?;
-    // Mirror the decode-path path-type constraint: trait_ref must be a path, not a reference etc.
-    super::decode::validate_trait_ref_is_path(t.trait_ref.as_str())
-        .map_err(|e| err(format!("invalid trait_ref (must be a path): {e}")))?;
-    super::decode::validate_type_ref_str(t.for_type.as_str())
-        .map_err(|e| err(format!("invalid for_type syntax: {e}")))?;
     let impl_where_predicates = t
-        .impl_where_predicates
+        .impl_where_predicates()
         .iter()
         .map(where_predicate_decl_to_dto)
         .collect::<Result<Vec<_>, _>>()?;
     Ok(TraitImplDto {
-        action: t.action.to_string(),
-        trait_ref: t.trait_ref.as_str().to_owned(),
-        for_type: t.for_type.as_str().to_owned(),
-        impl_generics: method_generic_params_to_dtos(&t.impl_generics),
+        action: t.action().to_string(),
+        trait_ref: t.trait_ref().as_str().to_owned(),
+        for_type: t.for_type().as_str().to_owned(),
+        impl_generics: method_generic_params_to_dtos(t.impl_generics()),
         impl_where_predicates,
     })
 }
@@ -328,24 +402,31 @@ fn trait_impl_to_dto(t: &TraitImplDeclV2) -> Result<TraitImplDto, CatalogueDocum
 pub(super) fn trait_entry_to_dto(
     entry: &TraitEntry,
 ) -> Result<TraitEntryDto, CatalogueDocumentCodecError> {
-    let methods = entry.methods.iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
-    let where_predicates =
-        entry.where_predicates.iter().map(where_predicate_decl_to_dto).collect::<Result<_, _>>()?;
-    let assoc_types = entry.assoc_types.iter().map(assoc_type_decl_to_dto).collect();
-    let assoc_consts = entry.assoc_consts.iter().map(assoc_const_decl_to_dto).collect();
+    let methods = entry.methods().iter().map(method_decl_to_dto).collect::<Result<_, _>>()?;
+    let where_predicates = entry
+        .where_predicates()
+        .iter()
+        .map(where_predicate_decl_to_dto)
+        .collect::<Result<_, _>>()?;
+    let assoc_types = entry.assoc_types().iter().map(assoc_type_decl_to_dto).collect();
+    let assoc_consts = entry.assoc_consts().iter().map(assoc_const_decl_to_dto).collect();
     Ok(TraitEntryDto {
-        action: entry.action.to_string(),
-        role: contract_role_to_dto(&entry.role),
+        action: entry.action().to_string(),
+        role: contract_role_to_dto(entry.role()),
         methods,
         assoc_types,
         assoc_consts,
-        supertrait_bounds: entry.supertrait_bounds.iter().map(|b| b.as_str().to_owned()).collect(),
-        generics: method_generic_params_to_dtos(&entry.generics),
+        supertrait_bounds: entry
+            .supertrait_bounds()
+            .iter()
+            .map(|b| b.as_str().to_owned())
+            .collect(),
+        generics: method_generic_params_to_dtos(entry.generics()),
         where_predicates,
-        module_path: entry.module_path.to_string(),
-        docs: entry.docs.clone(),
-        spec_refs: spec_refs_to_dtos(&entry.spec_refs),
-        informal_grounds: informal_grounds_to_dtos(&entry.informal_grounds),
+        module_path: entry.module_path().to_string(),
+        docs: entry.docs().map(|d| d.as_str().to_owned()),
+        spec_refs: spec_refs_to_dtos(entry.spec_refs()),
+        informal_grounds: informal_grounds_to_dtos(entry.informal_grounds()),
     })
 }
 
@@ -396,18 +477,21 @@ pub(super) fn inherent_impl_to_dto(
 pub(super) fn function_entry_to_dto(
     entry: &FunctionEntry,
 ) -> Result<FunctionEntryDto, CatalogueDocumentCodecError> {
-    let where_predicates =
-        entry.where_predicates.iter().map(where_predicate_decl_to_dto).collect::<Result<_, _>>()?;
+    let where_predicates = entry
+        .where_predicates()
+        .iter()
+        .map(where_predicate_decl_to_dto)
+        .collect::<Result<_, _>>()?;
     Ok(FunctionEntryDto {
-        action: entry.action.to_string(),
-        role: entry.role.to_string(),
-        params: entry.params.iter().map(param_decl_to_dto).collect(),
-        returns: entry.returns.as_str().to_owned(),
-        is_async: entry.is_async,
-        generics: method_generic_params_to_dtos(&entry.generics),
+        action: entry.action().to_string(),
+        role: entry.role().to_string(),
+        params: entry.params().iter().map(param_decl_to_dto).collect(),
+        returns: entry.returns().as_str().to_owned(),
+        is_async: entry.is_async(),
+        generics: method_generic_params_to_dtos(entry.generics()),
         where_predicates,
-        docs: entry.docs.clone(),
-        spec_refs: spec_refs_to_dtos(&entry.spec_refs),
-        informal_grounds: informal_grounds_to_dtos(&entry.informal_grounds),
+        docs: entry.docs().map(|d| d.as_str().to_owned()),
+        spec_refs: spec_refs_to_dtos(entry.spec_refs()),
+        informal_grounds: informal_grounds_to_dtos(entry.informal_grounds()),
     })
 }

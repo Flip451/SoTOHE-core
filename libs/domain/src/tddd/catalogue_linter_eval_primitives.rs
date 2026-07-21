@@ -221,9 +221,11 @@ pub(super) fn evaluate_forbid_primitive_in_types<S: PrimitiveOccurrenceScanner>(
 /// Collects `NamedField` / `VariantField` / `TypeAliasTarget` slots from a
 /// type entry's own shape, `Param` / `Return` / `Bound` slots from its
 /// methods (`TypeEntry.methods` merged with matching `inherent_impls`, via
-/// `collect_methods_for_type`), and `Bound` slots from any matching
-/// `inherent_impls` block's own `impl_generics` / `impl_where_predicates` --
-/// impl-block-level bounds (e.g. `impl<T: Into<Result<(), String>>> Foo<T>`)
+/// `collect_methods_for_type`), `Bound` slots from the type declaration's own
+/// `generics` / `where_predicates`, and `Bound` slots from any matching
+/// `inherent_impls` block's own `impl_generics` / `impl_where_predicates`.
+///
+/// Impl-block-level bounds (e.g. `impl<T: Into<Result<(), String>>> Foo<T>`)
 /// are distinct from a method's own generics and would otherwise never be
 /// scanned (PR #179 round 2 P1). `Bound` slots are collected according to
 /// `bound_filter`.
@@ -236,7 +238,7 @@ fn collect_type_entry_slots(
     for (name, entry) in type_entries_for_target(catalogue, rule.target()) {
         let entry_name = name.as_str().to_owned();
 
-        match &entry.kind {
+        match entry.kind() {
             TypeKindV2::Struct(struct_kind) => {
                 // Only the `Plain` (named-field) shape has a `NamedField`-equivalent
                 // slot; `Tuple` struct fields are unnamed and have no matching
@@ -298,13 +300,21 @@ fn collect_type_entry_slots(
             );
         }
 
+        push_generic_and_where_slots(
+            &entry_name,
+            entry.generics(),
+            entry.where_predicates(),
+            bound_filter,
+            slots,
+        );
+
         // Impl-block-level bounds (`impl<T: Into<Result<(), String>>> Foo<T>`)
         // are carried on `InherentImplDeclV2.impl_generics` /
         // `impl_where_predicates`, not on any method -- `collect_methods_for_type`
         // above only merges each impl block's *methods*, so these must be
         // collected separately here (PR #179 round 2 P1).
         for impl_decl in catalogue
-            .inherent_impls
+            .inherent_impls()
             .iter()
             .filter(|decl| decl.type_name.as_str() == entry_name.as_str())
         {
@@ -336,7 +346,7 @@ fn collect_trait_entry_slots(
     for (name, entry) in trait_entries_for_target(catalogue, rule.target()) {
         let entry_name = name.as_str();
 
-        for method in &entry.methods {
+        for method in entry.methods() {
             push_param_return_generic_slots(
                 entry_name,
                 &method.params,
@@ -350,13 +360,13 @@ fn collect_trait_entry_slots(
 
         push_generic_and_where_slots(
             entry_name,
-            &entry.generics,
-            &entry.where_predicates,
+            entry.generics(),
+            entry.where_predicates(),
             bound_filter,
             slots,
         );
 
-        for bound in &entry.supertrait_bounds {
+        for bound in entry.supertrait_bounds() {
             if bound_filter.should_collect(bound) {
                 slots.push(PrimitiveSlot::new(
                     entry_name.to_owned(),
@@ -366,7 +376,7 @@ fn collect_trait_entry_slots(
             }
         }
 
-        for assoc_type in &entry.assoc_types {
+        for assoc_type in entry.assoc_types() {
             for bound in &assoc_type.bounds {
                 if bound_filter.should_collect(bound) {
                     slots.push(PrimitiveSlot::new(
@@ -395,10 +405,10 @@ fn collect_function_entry_slots(
         let entry_name = path.to_string();
         push_param_return_generic_slots(
             &entry_name,
-            &entry.params,
-            &entry.returns,
-            &entry.generics,
-            &entry.where_predicates,
+            entry.params(),
+            entry.returns(),
+            entry.generics(),
+            entry.where_predicates(),
             bound_filter,
             slots,
         );

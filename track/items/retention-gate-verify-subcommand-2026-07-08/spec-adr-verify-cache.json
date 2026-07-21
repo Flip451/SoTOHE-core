@@ -1,0 +1,1017 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "8794e8b656cc560a5346250981096875b2922d3aa2a9319b599635a75071f769",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "integration test (`apps/cli/tests/retention_gate.rs`) を削除し、スキャナを verify チェーン（infrastructure の checker + usecase の port/service method + CLI サブコマンド）に移す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "既存の retention gate を `apps/cli/tests/retention_gate.rs` の integration test から撤去し、`sotp verify` 配下の通常の verifier として再実装する。repo tree scan 型ゲートはテストスイート内の特殊ケースではなく、infrastructure checker、usecase port/service、CLI-driver input、CLI subcommand、composition wiring を通る established verify chain で実行される状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "385c97c9d709812466d810bc500021f0845ec77d31734d576908a61dcdacb216",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検査の意味論（存在ベース / fail-closed / negative test 保持）は変えない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "retention gate の検査意味論を維持する。live surface の存在ベース scan、scanner I/O 問題での fail-closed、廃止識別子・廃止 path の検出、M token と readiness/blocking gate word が同一行に併存する state-expression の両順序検出、clean layout と gate word を伴わない M-token note の pass を維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "385c97c9d709812466d810bc500021f0845ec77d31734d576908a61dcdacb216",
+      "evidence_hash": "eaecfc5949313528cfb41baacb596ac3a27c49f64f883ebebf3fa331645df6ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "廃止後の生きた SoT・自動化・読者向け文書は、`verify tech-stack` ゲートや廃止する `track/*.md` 文書群を現行の前提として扱わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "retention gate の検査意味論を維持する。live surface の存在ベース scan、scanner I/O 問題での fail-closed、廃止識別子・廃止 path の検出、M token と readiness/blocking gate word が同一行に併存する state-expression の両順序検出、clean layout と gate word を伴わない M-token note の pass を維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "7f4dcab6f0c1e18dbf566e886f738f5df9c52dec57d6c8a54a7a85fd24d41a9c",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate は maintainer repo 限定の退行ガードとする。配布除外は overlay Makefile の ci 依存配列に gate task を載せないことで実現する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "retention gate を maintainer repository 限定の regression guard として root `Makefile.toml` の maintainer CI へ接続し、exported template 側には継承させない。配布除外は overlay Makefile に gate task を接続しないことで実現し、`apps/` 配下の per-file boundary-manifest exclude には依存しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "3dfd3aa01474fa1aff112f5fbdf1cc5c18b72f32a5b5a0de52fe1e7e624d9059",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "integration test (`apps/cli/tests/retention_gate.rs`) を削除し、スキャナを verify チェーン（infrastructure の checker + usecase の port/service method + CLI サブコマンド）に移す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`apps/cli/tests/retention_gate.rs` を削除し、retention gate の本体を integration test として残さない。既存 test file が担っていた scan capability は verifier 実装とその単体/境界テストに移り、whole-repo scan を cargo test の副作用として発火させない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "7c695db81da5d823f9789f613efa488ba2d76227b564e6b2306ab1a7468676f4",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "integration test (`apps/cli/tests/retention_gate.rs`) を削除し、スキャナを verify チェーン（infrastructure の checker + usecase の port/service method + CLI サブコマンド）に移す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "retention gate を `sotp verify` のサブコマンドとして実行可能にする。CLI entrypoint、CLI-driver input、usecase service/port、infrastructure checker、composition root wiring が established verify pattern と整合し、scanner が isolated helper や test-only code path に閉じない状態を要件とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "c8956a5b437e78b723411a5d636d233837194c33bef09afeae6599a4496453f0",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検査の意味論（存在ベース / fail-closed / negative test 保持）は変えない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "scan 対象は現行 gate の live surface と同等にし、root/pattern set は `CLAUDE.md`, `README.md`, `.claude/rules/**`, `.claude/commands/**`, `.claude/agents/**`, `.claude/skills/**`, `.harness/workflows/**`, `.harness/config/**`, `.harness/capabilities/**`, `Makefile.toml`, `libs/**`, `apps/**`, `knowledge/conventions/**` とする。これらの存在する root/pattern を存在ベースで scan し、存在しない root は violation ではなく absence として扱う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "c8956a5b437e78b723411a5d636d233837194c33bef09afeae6599a4496453f0",
+      "evidence_hash": "eaecfc5949313528cfb41baacb596ac3a27c49f64f883ebebf3fa331645df6ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「廃止後の生きた SoT・自動化・読者向け文書は、`verify tech-stack` ゲートや廃止する `track/*.md` 文書群を現行の前提として扱わない。どの参照元を更新対象にするかは spec / impl-plan 側で導出し」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "scan 対象は現行 gate の live surface と同等にし、root/pattern set は `CLAUDE.md`, `README.md`, `.claude/rules/**`, `.claude/commands/**`, `.claude/agents/**`, `.claude/skills/**`, `.harness/workflows/**`, `.harness/config/**`, `.harness/capabilities/**`, `Makefile.toml`, `libs/**`, `apps/**`, `knowledge/conventions/**` とする。これらの存在する root/pattern を存在ベースで scan し、存在しない root は violation ではなく absence として扱う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "7e64bddd3fedd7c24abd896b0785cd346ca2a9514e31a7575b63a0e89bdcd7ff",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「integration test (`apps/cli/tests/retention_gate.rs`) を削除し、スキャナを verify チェーン（infrastructure の checker + usecase の port/service method + CLI サブコマンド）に移す。... 検査の意味論（存在ベース / fail-closed / negative test 保持）は変えない。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "retired identifier / retired path 検出を維持する。対象には `verify-tech-stack`, `verify-tech-stack-local`, `verify tech-stack`, `VerifyCommand::TechStack`, `VerifyInput::TechStack`, `verify_tech_stack`, `TECH_STACK_FILE`, `verify::tech_stack`, `pub mod tech_stack;`, `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md` と同等の現行 forbidden surface が含まれる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "7e64bddd3fedd7c24abd896b0785cd346ca2a9514e31a7575b63a0e89bdcd7ff",
+      "evidence_hash": "eaecfc5949313528cfb41baacb596ac3a27c49f64f883ebebf3fa331645df6ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「廃止後の生きた SoT・自動化・読者向け文書は、`verify tech-stack` ゲートや廃止する `track/*.md` 文書群を現行の前提として扱わない。どの参照元を更新対象にするかは spec / impl-plan 側で導出し、この ADR では参照整合性の方針だけを決定する。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "retired identifier / retired path 検出を維持する。対象には `verify-tech-stack`, `verify-tech-stack-local`, `verify tech-stack`, `VerifyCommand::TechStack`, `VerifyInput::TechStack`, `verify_tech_stack`, `TECH_STACK_FILE`, `verify::tech_stack`, `pub mod tech_stack;`, `track/tech-stack.md`, `track/product.md`, `track/product-guidelines.md` と同等の現行 forbidden surface が含まれる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "d7c53027be42c8af4ca65b2b07d1125ad292d4329c901d9084e79edc4461dc40",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検査の意味論（存在ベース / fail-closed / negative test 保持）は変えない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "M token と readiness/blocking gate word が同一行に併存する state-expression 検出を維持する。M token が先に現れる行と gate word が先に現れる行のどちらも violation になり、gate word を伴わない plain M-token note は violation にならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d7c53027be42c8af4ca65b2b07d1125ad292d4329c901d9084e79edc4461dc40",
+      "evidence_hash": "eaecfc5949313528cfb41baacb596ac3a27c49f64f883ebebf3fa331645df6ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "廃止後の生きた SoT・自動化・読者向け文書は、`verify tech-stack` ゲートや廃止する `track/*.md` 文書群を現行の前提として扱わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "M token と readiness/blocking gate word が同一行に併存する state-expression 検出を維持する。M token が先に現れる行と gate word が先に現れる行のどちらも violation になり、gate word を伴わない plain M-token note は violation にならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "1d9e3ab512463334341548a474d6a6ace0cc162d10ad8868027d24a5c4d63535",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Makefile に gate task を追加し ci 依存に接続する。検査の意味論（存在ベース / fail-closed / negative test 保持）は変えない。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "root `Makefile.toml` に maintainer-only gate task を追加し、maintainer CI dependencies から実行される状態にする。gate の単発実行も可能にし、diagnostic surface は `sotp verify` の通常 verifier と同じ非ゼロ exit / finding 表示で扱う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "1d9e3ab512463334341548a474d6a6ace0cc162d10ad8868027d24a5c4d63535",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate は maintainer repo 限定の退行ガードとする。配布除外は overlay Makefile の ci 依存配列に gate task を載せないことで実現する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "root `Makefile.toml` に maintainer-only gate task を追加し、maintainer CI dependencies から実行される状態にする。gate の単発実行も可能にし、diagnostic surface は `sotp verify` の通常 verifier と同じ非ゼロ exit / finding 表示で扱う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "bfa29f82996a8e67339f280ffa059c47d7812d60754b69057503319b9a019935",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate は maintainer repo 限定の退行ガードとする。配布除外は overlay Makefile の ci 依存配列に gate task を載せないことで実現する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "`overlay/Makefile.toml` への retention gate task 追加、または overlay CI dependencies への接続。exported template は maintainer-only retention gate を継承しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "50b291cd0f2feb982a78cea7dd191027650ca0a1f998b04a75a56b4c5359ea99",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "配布除外は overlay Makefile の ci 依存配列に gate task を載せないことで実現する。利用者側での同等ゲートの要否は利用者の責任範囲とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "`apps/` 配下の per-file boundary-manifest exclude による配布除外。boundary manifest の prefix-free invariant と整合しない rejected path であり、本 track では採らない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "082af3593738a07466aefdedaa5db48195a550f014a91263052927b2887f29c4",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "integration test (`apps/cli/tests/retention_gate.rs`) を削除し、スキャナを verify チェーン（infrastructure の checker + usecase の port/service method + CLI サブコマンド）に移す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "runtime skip、環境変数 opt-out、overlay presence 判定などによって integration test を残す経路。D1 は test file の削除と verify subcommand 化を決定しているため、test 内部の条件分岐で配布問題を避ける方式は扱わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "082af3593738a07466aefdedaa5db48195a550f014a91263052927b2887f29c4",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate は maintainer repo 限定の退行ガードとする。配布除外は overlay Makefile の ci 依存配列に gate task を載せないことで実現する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "runtime skip、環境変数 opt-out、overlay presence 判定などによって integration test を残す経路。D1 は test file の削除と verify subcommand 化を決定しているため、test 内部の条件分岐で配布問題を避ける方式は扱わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "66f0c1aa9d1711f4d13b0c7be24871961854fdbbd04dec2ce94ec6bdc45eda07",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "スキャナを verify チェーン（infrastructure の checker + usecase の port/service method + CLI サブコマンド）に移す。... 検査の意味論（存在ベース / fail-closed / negative test 保持）は変えない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "scan semantics の拡張または緩和。新しい retired token family の追加、gate word set の再設計、live surface policy の縮小/拡大は本 track の目的ではなく、現行 gate の意味論を verify chain に移すことに限定する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "2a3cb47592c0160c1ac58aa840f0a07db072bcfb38bfd08867772779cb312c1e",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate を verify サブコマンドとして再実装する\n\nintegration test (`apps/cli/tests/retention_gate.rs`) を削除し、スキャナを verify チェーン（infrastructure の checker + usecase の port/service method + CLI サブコマンド）に移す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-05",
+          "text_label": "他の repo-tree scan 型 tests や shipped-config consistency tests の verify 化。ADR は同形式の別 test について将来の再評価対象として切り出しており、本 track は retention gate だけを対象にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d618a011deadd58484669d5b11d4b819864d454d3d672ac5c087a52ab947a242",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "integration test (`apps/cli/tests/retention_gate.rs`) を削除し、スキャナを verify チェーン（infrastructure の checker + usecase の port/service method + CLI サブコマンド）に移す。Makefile に gate task を追加し ci 依存に接続する。検査の意味論（存在ベース / fail-closed / negative test 保持）は変えない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "scanner I/O problem は fail-closed とする。directory listing / file read / path traversal に失敗した場合、verifier は success として扱わず、library/usecase production code では panic ではなく `Result` error として伝搬し、CLI で non-zero exit に変換する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "7ca54016df94a80d1c89f34b68e5107deea909d56eb18208a618e1e26b998b5a",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate は maintainer repo 限定の退行ガードとする。配布除外は overlay Makefile の ci 依存配列に gate task を載せないことで実現する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "distribution boundary は Makefile 接続で表現する。maintainer repository では root `Makefile.toml` の CI dependency から gate が実行され、exported template では `overlay/Makefile.toml` がその dependency を持たないため gate が実行されない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "5ad9328bdfbf9ff4c4d008ed410d7de753c199e8bf06885e5af37a6d06811d7d",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「retention gate は maintainer repo 限定の退行ガードとする。配布除外は overlay Makefile の ci 依存配列に gate task を載せないことで実現する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "boundary manifest の `apps/` subtree に per-file exclude を追加して distribution を解決しない。final state は prefix-free invariant に依存する manifest workaround を持たず、Makefile 接続の差分だけで maintainer-only 性を成立させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "e485f6f6984eaa9a71887ab099f106efa496e564ab746dce3a43176b3a09d79b",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検査の意味論（存在ベース / fail-closed / negative test 保持）は変えない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "track artifact と implementation-facing diagnostic は retired marker literal を M token として扱う。M token の存在は gate word との same-line co-existence を検査するための content signal であり、状態 field や readiness declaration として読み取る別 mechanism を導入しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e485f6f6984eaa9a71887ab099f106efa496e564ab746dce3a43176b3a09d79b",
+      "evidence_hash": "eaecfc5949313528cfb41baacb596ac3a27c49f64f883ebebf3fa331645df6ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「`verify tech-stack` ゲート（文書内 TODO マーカーの検査）を実装ごと廃止する。... 以後も文書内の TODO マーカーを状態として消費する機構は作らない。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "track artifact と implementation-facing diagnostic は retired marker literal を M token として扱う。M token の存在は gate word との same-line co-existence を検査するための content signal であり、状態 field や readiness declaration として読み取る別 mechanism を導入しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e485f6f6984eaa9a71887ab099f106efa496e564ab746dce3a43176b3a09d79b",
+      "evidence_hash": "eaecfc5949313528cfb41baacb596ac3a27c49f64f883ebebf3fa331645df6ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "廃止後の生きた SoT・自動化・読者向け文書は、`verify tech-stack` ゲートや廃止する `track/*.md` 文書群を現行の前提として扱わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "track artifact と implementation-facing diagnostic は retired marker literal を M token として扱う。M token の存在は gate word との same-line co-existence を検査するための content signal であり、状態 field や readiness declaration として読み取る別 mechanism を導入しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "4d3c032962b8c9b05bf5acf2999fa6eccbcb891ee3c9ea856736521bafbf4206",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検査の意味論（存在ベース / fail-closed / negative test 保持）は変えない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "new verifier tests must cover both detection and non-detection behavior. Negative tests prove forbidden identifier/path injection and M-token state-expression injection fail the scanner; positive tests prove a clean synthetic live surface and an M-token note without readiness/blocking gate words pass."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "4d3c032962b8c9b05bf5acf2999fa6eccbcb891ee3c9ea856736521bafbf4206",
+      "evidence_hash": "eaecfc5949313528cfb41baacb596ac3a27c49f64f883ebebf3fa331645df6ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "廃止後の生きた SoT・自動化・読者向け文書は、`verify tech-stack` ゲートや廃止する `track/*.md` 文書群を現行の前提として扱わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "new verifier tests must cover both detection and non-detection behavior. Negative tests prove forbidden identifier/path injection and M-token state-expression injection fail the scanner; positive tests prove a clean synthetic live surface and an M-token note without readiness/blocking gate words pass."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "5975374712b323d98959bf95d732ff6c4556b3d3ad5a291d622e78d0d82c6bef",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "integration test (`apps/cli/tests/retention_gate.rs`) を削除し、スキャナを verify チェーン（infrastructure の checker + usecase の port/service method + CLI サブコマンド）に移す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`apps/cli/tests/retention_gate.rs` no longer exists, and no equivalent integration test remains that scans the maintainer repository live surface as part of cargo test. Retention checking is reachable through the new `sotp verify` path instead."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "58547dee0274ffca238879a4da7f7f1b49b1321221ee7a0a47fd7b6da73b1830",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "スキャナを verify チェーン（infrastructure の checker + usecase の port/service method + CLI サブコマンド）に移す。検査の意味論（存在ベース / fail-closed / negative test 保持）は変えない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "`sotp verify --help` exposes a retention gate subcommand, and invoking that subcommand against the clean maintainer repository exits 0 with the same pass meaning as the removed integration test's clean-workspace assertion. Source inspection and `cargo make check-layers` show the execution path is wired through the established verify chain: infrastructure checker, usecase port/service, CLI-driver input, CLI subcommand, and composition root wiring. The CLI path invokes the usecase service through that chain rather than calling a scanner helper directly."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "c4fd38020244adefe6f88efe6728db17b19d549425e057b8df3ae6a5ac6f0a09",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "integration test (`apps/cli/tests/retention_gate.rs`) を削除し、スキャナを verify チェーン（infrastructure の checker + usecase の port/service method + CLI サブコマンド）に移す。Makefile に gate task を追加し ci 依存に接続する。検査の意味論（存在ベース / fail-closed / negative test 保持）は変えない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "A deterministic scanner test asserts the configured live-surface root/pattern set equals IN-03. Injecting any retired identifier or retired path from IN-04 into a representative file for each IN-03 root/pattern that exists in the fixture causes the verifier/scanner to fail non-zero and report a finding that identifies the path, line, and retired token category."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "c4fd38020244adefe6f88efe6728db17b19d549425e057b8df3ae6a5ac6f0a09",
+      "evidence_hash": "eaecfc5949313528cfb41baacb596ac3a27c49f64f883ebebf3fa331645df6ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "廃止後の生きた SoT・自動化・読者向け文書は、`verify tech-stack` ゲートや廃止する `track/*.md` 文書群を現行の前提として扱わない。どの参照元を更新対象にするかは spec / impl-plan 側で導出し、この ADR では参照整合性の方針だけを決定する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "A deterministic scanner test asserts the configured live-surface root/pattern set equals IN-03. Injecting any retired identifier or retired path from IN-04 into a representative file for each IN-03 root/pattern that exists in the fixture causes the verifier/scanner to fail non-zero and report a finding that identifies the path, line, and retired token category."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "e684610246f3f52512c69ca1767cfc007fa031b62da3e156acdf13f521010fc3",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「検査の意味論（存在ベース / fail-closed / negative test 保持）は変えない。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "Injecting an M-token state expression with a readiness/blocking gate word before the M token causes verifier failure, and injecting the reversed order on the same line also causes verifier failure."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e684610246f3f52512c69ca1767cfc007fa031b62da3e156acdf13f521010fc3",
+      "evidence_hash": "eaecfc5949313528cfb41baacb596ac3a27c49f64f883ebebf3fa331645df6ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "廃止後の生きた SoT・自動化・読者向け文書は、`verify tech-stack` ゲートや廃止する `track/*.md` 文書群を現行の前提として扱わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "Injecting an M-token state expression with a readiness/blocking gate word before the M token causes verifier failure, and injecting the reversed order on the same line also causes verifier failure."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "805a7e82283797d2cfc2851dbf624615ac363ffd043eeb9614a157bbad12f76b",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検査の意味論（存在ベース / fail-closed / negative test 保持）は変えない"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "A clean synthetic live-surface layout passes the scanner, and a line containing an M token without any readiness/blocking gate word on the same line also passes. This verifies the gate detects state expressions rather than plain task notes."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "805a7e82283797d2cfc2851dbf624615ac363ffd043eeb9614a157bbad12f76b",
+      "evidence_hash": "eaecfc5949313528cfb41baacb596ac3a27c49f64f883ebebf3fa331645df6ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "廃止後の生きた SoT・自動化・読者向け文書は、`verify tech-stack` ゲートや廃止する `track/*.md` 文書群を現行の前提として扱わない。どの参照元を更新対象にするかは spec / impl-plan 側で導出し、この ADR では参照整合性の方針だけを決定する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "A clean synthetic live-surface layout passes the scanner, and a line containing an M token without any readiness/blocking gate word on the same line also passes. This verifies the gate detects state expressions rather than plain task notes."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "e7508118cfec3e79a34d36a9eb6096569d7c213a4fa816a6f17e78b0c0349189",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "スキャナを verify チェーン（infrastructure の checker + usecase の port/service method + CLI サブコマンド）に移す。Makefile に gate task を追加し ci 依存に接続する。検査の意味論（存在ベース / fail-closed / negative test 保持）は変えない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "A scanner I/O failure scenario is covered by a test and produces an error result / non-zero verifier outcome rather than success, silent skip, or a production-code panic."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "15fcb8eb512851b3cdb676c0b031a98142d613cbd34ce0346246afe63b35932a",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Makefile に gate task を追加し ci 依存に接続する。…スキャナを verify チェーン（infrastructure の checker + usecase の port/service method + CLI サブコマンド）に移す。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "root `Makefile.toml` defines a maintainer retention gate task and the maintainer CI dependency chain invokes it. The task can also be run directly for local diagnosis."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "15fcb8eb512851b3cdb676c0b031a98142d613cbd34ce0346246afe63b35932a",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate は maintainer repo 限定の退行ガードとする。配布除外は overlay Makefile の ci 依存配列に gate task を載せないことで実現する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "root `Makefile.toml` defines a maintainer retention gate task and the maintainer CI dependency chain invokes it. The task can also be run directly for local diagnosis."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "4dea0bf17cc70962f6ec53ec6b3284f4dfb75e0737e29ea6511c992e1cf0c01b",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate は maintainer repo 限定の退行ガードとする。配布除外は overlay Makefile の ci 依存配列に gate task を載せないことで実現する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "`overlay/Makefile.toml` does not define or depend on the maintainer retention gate task. Exported templates therefore do not run the maintainer-only retention gate in their default CI path."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "6e5266f94adb252f671f1726741e83ae35d1e567f3a723ccc37b444d57ce52c6",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「配布除外は overlay Makefile の ci 依存配列に gate task を載せないことで実現する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "The final diff does not add any `apps/` per-file boundary-manifest exclude to make the retention gate disappear from exports. The distribution exclusion is explained by the root/overlay Makefile connection difference alone."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "568cef254432b465541163f0b677fc0d7f5cfa1f73ace091b2f9f01496e2031a",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Makefile に gate task を追加し ci 依存に接続する。検査の意味論（存在ベース / fail-closed / negative test 保持）は変えない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "`cargo make ci` in the maintainer repository includes the new retention gate and exits 0 on a clean tree, while the verifier's targeted negative tests demonstrate non-zero behavior for injected retired identifiers and M-token state expressions."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "568cef254432b465541163f0b677fc0d7f5cfa1f73ace091b2f9f01496e2031a",
+      "evidence_hash": "b9957aebfc5d5122d4249f38860ab7a5f7eac4ce0048cf931e8382adccca69d3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "retention gate は maintainer repo 限定の退行ガードとする。配布除外は overlay Makefile の ci 依存配列に gate task を載せないことで実現する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "`cargo make ci` in the maintainer repository includes the new retention gate and exits 0 on a clean tree, while the verifier's targeted negative tests demonstrate non-zero behavior for injected retired identifiers and M-token state expressions."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-2306-retention-gate-verify-subcommand.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "568cef254432b465541163f0b677fc0d7f5cfa1f73ace091b2f9f01496e2031a",
+      "evidence_hash": "eaecfc5949313528cfb41baacb596ac3a27c49f64f883ebebf3fa331645df6ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "廃止後の生きた SoT・自動化・読者向け文書は、`verify tech-stack` ゲートや廃止する `track/*.md` 文書群を現行の前提として扱わない。どの参照元を更新対象にするかは spec / impl-plan 側で導出し、この ADR では参照整合性の方針だけを決定する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "`cargo make ci` in the maintainer repository includes the new retention gate and exits 0 on a clean tree, while the verifier's targeted negative tests demonstrate non-zero behavior for injected retired identifiers and M-token state expressions."
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-08-1020-retire-todo-marker-state-and-track-docs.md",
+          "decision_id": "D4"
+        }
+      }
+    }
+  ]
+}

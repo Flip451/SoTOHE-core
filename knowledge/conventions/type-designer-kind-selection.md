@@ -34,7 +34,7 @@
 > - v5 wire format: `schema_version: 5`, `crate_name`, `layer`, `types: {}` (TypeEntry), `traits: {}` (TraitEntry), `functions: {}` (FunctionEntry), `inherent_impls: []` / `trait_impls: []` の 2 つの top-level array。 `trait_impls` は `action` / `trait_ref` / `for_type` を持つ独立 entry (`TraitImplDeclV2`); `inherent_impls` は `action` を持たず `type_name` / `impl_generics` / `impl_where_predicates` / `methods` を持つ (`InherentImplDeclV2`、 target type への帰属で識別される)。 codec は v1–v4 を fail-closed で reject する (v4 は `SchemaVersionRequiresMigration` で migration prompt を返す)。
 > - v5 roles: `types` エントリは `role: DataRole` (**17 値**: `ValueObject` / `Entity` / `AggregateRoot` / `DomainService` / `UseCase` / `EventPolicy` / `DomainEvent` / `Specification` / `Factory` / `Interactor` / `Command` / `Query` / `Dto` / `ErrorType` / `SecondaryAdapter` / `CompositionRoot` / `PrimaryAdapter`)、 `traits` エントリは `role: ContractRole` (**4 値**: `SpecificationPort` / `ApplicationService` / `SecondaryPort` / `Repository`)、 `functions` エントリは `role: FunctionRole` (2 値: `FreeFunction` / `UseCaseFunction`)。 `DataRole` / `ContractRole` のうち `ValueObject` / `Entity` / `AggregateRoot` / `DomainService` / `UseCase` / `EventPolicy` / `Repository` は **data-carrying variant** (payload field を持つ) で、 wire format は discriminated-object 形式 (例: `{ "EventPolicy": { "reacts_to": ["OrderPlaced"] } }`)。 旧 plain-string 形式 (`"role": "ValueObject"`) は codec が parse error として reject。
 > - v5 kind (構造軸): `types` は `kind: { "kind": "struct" | "enum" | "type_alias", ... }` で記述する
-> - 旧 v2 の `type_definitions` / `TypeDefinitionKind` は廃止済み (ADR `knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md`)
+> - 旧 v2 の `type_definitions` / `TypeDefinitionKind` は廃止済みで、codec は受け付けない。
 >
 > 本マトリクスは **層配置** の制約のみを規定する。各 role / entry に必要な具体的フィールド (`kind`, `methods` 等) および top-level の `trait_impls` / `inherent_impls` (impl block を独立 entry として持つ array) の定義は `libs/domain/src/tddd/catalogue_v2/` の `TypeEntry` / `TraitEntry` / `FunctionEntry` / `TraitImplDeclV2` / `InherentImplDeclV2` / `CatalogueDocument` を正本とする。
 
@@ -44,29 +44,33 @@
 | `Entity` (DataRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | entity は domain 概念。他層での使用は domain leak |
 | `AggregateRoot` (DataRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | aggregate root は domain 概念 |
 | `DomainService` (DataRole) | ✓ | △ | ✗ | ✗ | ✗ | ✗ | domain knowledge を集約する behavior 中心 struct。usecase は trans-domain な application logic で要根拠 |
-| `EventPolicy` (DataRole) | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | ✗ | event-driven policy。 domain 層のみ許可 (ADR D16: `KindLayerConstraint` で強制)。 payload に `reacts_to: NonEmptyVec<TypeRef>` を持ち、 DomainEvent 役の型のみ参照可 |
-| `DomainEvent` (DataRole) | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | ✗ | aggregate が emit する事実。 domain 層のみ (ADR D9 / D16)。 enum 形 / unit struct どちらも可。 mutation surface (`&mut self` / public field) は linter が禁止 |
+| `EventPolicy` (DataRole) | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | ✗ | event-driven policy。 domain 層のみ許可。`KindLayerConstraint` がこの配置を強制する。payload に `reacts_to: NonEmptyVec<TypeRef>` を持ち、DomainEvent 役の型のみ参照可 |
+| `DomainEvent` (DataRole) | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | ✗ | aggregate が emit する事実。domain 層のみ。enum 形 / unit struct どちらも可。mutation surface (`&mut self` / public field) は linter が禁止 |
 | `Specification` (DataRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | domain predicate。他層は domain leak |
 | `Factory` (DataRole) | ✓ | ✓ | △ | ✗ | ✗ | ✗ | 集約 / entity factory。infrastructure に置くのは要根拠 |
 | `UseCase` (DataRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | name と意味が usecase 層を表す。他層は役割違反 |
 | `Interactor` (DataRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | ApplicationService trait の実装。usecase 層 |
 | `Command` (DataRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | CQRS command。usecase 層が受け取る入力 |
 | `Query` (DataRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | CQRS query。usecase 層が受け取る入力 |
-| `Dto` (DataRole) | ✗ | △ | **✓** | ✓ | ✗ | ✓ | serde 境界 = infrastructure (CN-05: domain は serde-free)。usecase は要根拠。cli / cli_driver では clap args・input DTO・出力 DTO に使用 |
+| `Dto` (DataRole) | ✗ | △ | **✓** | ✓ | ✗ | ✓ | serde 境界は infrastructure に置き、domain は serde-free に保つ。usecase は要根拠。cli / cli_driver では clap args・input DTO・出力 DTO に使用 |
 | `ErrorType` (DataRole) | ✓ | ✓ | ✓ | ✓ | ✓ | ✗ | layer-flexible (各層がそれぞれの責務に応じた error 型を持つ)。cli_driver は handle が常に CommandOutcome を返すため ErrorType を持たない |
-| `SecondaryAdapter` (DataRole) | ✗ | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | secondary port の実装 = infrastructure (CN-05) |
-| `CompositionRoot` (DataRole) | ✗ | ✗ | ✗ | ✗ | **✓ ONLY** | ✗ | object graph を組む純 DI の住所。cli_composition 層のみ (ADR 1420 D2: KindLayerConstraint で強制) |
-| `PrimaryAdapter` (DataRole) | ✗ | ✗ | ✗ | ✗ | ✗ | **✓ ONLY** | driving adapter (invoke+render)。cli_driver 層のみ (ADR 1420 D2: KindLayerConstraint で強制)。domain/usecase 固有ロールをメソッドシグネチャに出さない (NoRoleInMethodSignature で強制) |
-| `SpecificationPort` (ContractRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | driven port は domain (hexagonal) |
-| `SecondaryPort` (ContractRole) | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | hexagonal: driven port は domain または usecase (CN-05; usecase port 例: `Reviewer`, `DiffGetter`) |
-| `ApplicationService` (ContractRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | hexagonal: driving port (use-case interface) は usecase layer |
-| `Repository` (ContractRole) | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | aggregate root の永続化 port (data-carrying: payload に `aggregate: TypeRef` を持ち、 参照先は AggregateRoot 役で宣言)。 domain または usecase に置く |
+| `SecondaryAdapter` (DataRole) | ✗ | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | secondary port の実装は infrastructure に置く |
+| `CompositionRoot` (DataRole) | ✗ | ✗ | ✗ | ✗ | **✓ ONLY** | ✗ | object graph を組む純 DI の住所。cli_composition 層のみ。`KindLayerConstraint` がこの配置を強制する |
+| `PrimaryAdapter` (DataRole) | ✗ | ✗ | ✗ | ✗ | ✗ | **✓ ONLY** | driving adapter (invoke+render)。cli_driver 層のみ。domain/usecase 固有ロールをメソッドシグネチャに出さない (`NoRoleInMethodSignature` で強制) |
+| `SpecificationPort` (ContractRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | domain の仕様を表す port |
+| `SecondaryPort` (ContractRole) | ✓ | ✓ | ✗ | ✗ | ✗ | ✗ | domain / usecase のいずれにも置ける driven port |
+| `ApplicationService` (ContractRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | usecase interface |
+| `Repository` (ContractRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | aggregate root の永続化 port (data-carrying: payload に `aggregate: TypeRef` を持ち、 参照先は AggregateRoot 役で宣言)。 aggregate の語彙で説明されるため domain に置く |
 | `FreeFunction` (FunctionRole) | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | layer-flexible (top-level pub fn)。cli_composition は配線を CompositionRoot のメソッドとして書くため pub free function が生じない |
 | `UseCaseFunction` (FunctionRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | use-case entrypoint function。usecase 層 |
 
 凡例: `✓` = OK, `△` = 要根拠 (default ではない、docs フィールドに根拠を記録)、`✗` = forbidden, `**ONLY**` = この層以外で使うことを禁止
 
 `✗` または **ONLY** を破る role × layer 選択は、`bin/sotp signal calc-impl-catalog` の signal 評価以前に **role 違反** として draft 段階で却下する。
+
+#### Port placement tie-break
+
+port が domain の不変条件または aggregate の語彙で説明できるなら domain に置く。アプリケーションのオーケストレーションが必要とする技術的能力なら usecase に置く。たとえば aggregate の永続化は domain の `Repository`、レビュー実行や差分取得の能力は usecase の `SecondaryPort` として分類する。
 
 R7 (Cross-Track Port Reference) も参照すること: top-level `trait_impls` のうち `for_type` が `SecondaryAdapter` 型を指す entry の `trait_ref` が参照する port が当該 track の catalogue に未 declare の場合、`-.impl.->` edge が silently skip される。
 
@@ -87,25 +91,26 @@ R7 (Cross-Track Port Reference) も参照すること: top-level `trait_impls` �
 
 例外: トレイト境界に組み込む必要がある (`Arc<dyn Service>` で渡したい等) 場合は `role: Interactor` + `role: ApplicationService` ペアを使う。`FreeFunction` は trait 境界に組み込めない。
 
-### R3. ValueObject Semantic Restriction (validated value のみ)
+### R3. ValueObject Semantic Restriction
 
-`role: ValueObject` は「validated value (検証済み値)」の意味に厳格に限定する。**behavior を持つ struct は ValueObject ではない**。
+`role: ValueObject` は値等価で識別される値を表す。自身の値から新しい値または述語を導出する side-effect-free な method は許容する。一方、依存または外部リソースを扱う behavior 中心の service 的 struct は ValueObject ではない。
 
 | OK (ValueObject) | NG (ValueObject 違反) |
 |---|---|
-| `Email(String)` newtype + `new()` で形式検証 | `parse_*` / `evaluate_*` / `compute_*` などの計算 method を持つ struct |
+| `Email(String)` newtype + `new()` で形式検証 | `parse_*` のように外部表現を解釈する service 的 struct |
+| `Money::add` / `DateRange::overlaps` のように値から値・述語を導出する method | `Codec` / `Validator` / `Resolver` のように依存または外部 resource を扱う struct |
 | `AdrDecisionCommon { id, refs, ... }` 検証付き shared payload | `Codec` / `Validator` / `Resolver` のような behavior 中心の struct |
 | 複合 primitive を集めた読み取り専用の record | trait 実装を意図する struct (→ `role: Interactor` / `role: SecondaryAdapter`) |
 
-「validated value」の判定基準: `new()` (またはコンストラクタ) で field に格納される値の不変条件 (invariant) を確立し、その後は read-only として参照されるか。値そのものを返す getter / accessor は OK。**値以外の何かを計算して返す method は behavior** であり `ValueObject` 違反。
+判定は構造条件より意味論を優先する。値等価で識別され、method がその値だけから値または述語を導出するなら ValueObject である。依存、外部 resource、または service の責務を中心にするなら ValueObject ではない。
 
 behavior を持つ struct は以下のいずれかに振り分ける:
 
 - 依存なし stateless → `role: FreeFunction` (R2)
 - 依存あり (port を呼び出す) → `role: Interactor` (usecase) または `role: SecondaryAdapter` (infrastructure)
 - 集約構築 → `role: Factory`
-- 状態遷移あり → typestate cluster (`role: ValueObject` で各 state を typestate marker 付き `struct` として表現し、遷移メソッドを `methods` に宣言。wire format は `.claude/agents/type-designer.md`「The `kind` field」節を参照)
-- field を持つ domain behavior (状態遷移なし、依存なし) → `role: DomainService` (R6)
+- 状態遷移あり → typestate cluster (`role: ValueObject` で各 state を typestate marker 付き `struct` として表現し、遷移メソッドを `methods` に宣言。wire format は `knowledge/conventions/catalogue-schema-reference.md`「The `kind` field」節を参照)
+- 値の同一性ではなく domain behavior を中心にする struct → `role: DomainService` (R6)
 
 ### R4. Kind Distribution Reconnaissance (起草前の偵察義務)
 
@@ -136,15 +141,15 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 
 `role: ValueObject` で迷ったときの最も多い真の答えは `role: FreeFunction` (R2) である。次に多いのは `role: Interactor` (依存あり) / `role: SecondaryAdapter` (port 実装) / `role: DomainService` (R6: field を持つ domain behavior)。`role: ValueObject` を選ぶ前に、これらの候補を必ず検討する。
 
-### R6. DomainService Selection Criteria (S1: field を持つ domain behavior の住所)
+### R6. DomainService Selection Criteria (domain behavior の住所)
 
-`role: DomainService` は **field を持ち behavior method を持つ domain struct** の正しい住所である。`role: ValueObject` (R3 違反) や `role: Interactor` (依存ありの usecase 層) との混同を防ぐため、以下の全条件を満たす場合に採用する。
+値等価で識別され、side-effect-free な導出 method だけを持つ型は DomainService ではなく ValueObject (R3) である。`role: DomainService` は値ではなく domain behavior を中心にする struct の住所であり、`role: Interactor` (依存ありの usecase 層) との混同を防ぐため、以下の全条件を満たす場合に採用する。
 
 採用条件 (AND):
 
 - struct (enum / typestate cluster ではない)
 - `kind.shape.fields` >= 1 field (state を保持する; ゼロフィールドは R2 の `FreeFunction` 候補)
-- `methods` >= 1 entry (behavior を持つ; ゼロメソッドは R3 の `ValueObject` 候補)
+- `methods` >= 1 entry (domain behavior を持つ; 導出 method だけなら R3 の `ValueObject` 候補)
 - 状態遷移なし (ある場合は typestate pattern — R3 の振り分け)
 - `ApplicationService` / `SecondaryPort` の実装ではない (実装する場合は `role: Interactor` / `role: SecondaryAdapter`)
 - 配置層は domain (default) / usecase (要根拠 — trans-domain な application logic で domain knowledge を集約する場合のみ、`docs` フィールドに根拠を記録) / infrastructure (forbidden)
@@ -152,19 +157,19 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 判定例:
 
 - `PolicyEvaluator { rules: Vec<Rule> }` + `evaluate(&self, ctx: &Context) -> Decision` → `role: DomainService` (state あり、behavior あり、依存なし)
-- `Email(String)` + `new()` のみ → `role: ValueObject` (R3: 検証済み値、behavior なし)
+- `Email(String)` + `new()` / `normalized()` → `role: ValueObject` (R3: 値からの side-effect-free な導出)
 - `parse_yaml(input: &str) -> Result<...>` → `role: FreeFunction` (R2: state なし、依存なし)
 - `RegisterUserInteractor { repo: Arc<dyn UserRepository> }` + `execute(&self, cmd) -> ...` → `role: Interactor` (R1: 依存あり、usecase 層)
 
 ### R7. Cross-Track Port Reference (SecondaryAdapter が参照する port は当該 track catalogue に declare する)
 
-top-level `trait_impls[]` のうち `for_type` が `role: SecondaryAdapter` の型を指す entry の `trait_ref` で参照する trait (port) は、当該 track の `<layer>-types.json` のいずれかに `role: SecondaryPort` の `traits` エントリとして存在することが必須である。
+top-level `trait_impls[]` のうち `for_type` が `role: SecondaryAdapter` の型を指す entry の `trait_ref` で参照する trait (port) は、当該 track の `<layer>-types.json` のいずれかに `traits` エントリとして存在することが必須である。role は port の性質に応じて `SecondaryPort` (汎用 driven port) または `Repository` (aggregate root の永続化 port) のいずれかを選ぶ (R1 参照)。
 
-当該 track で改変しない baseline 由来の port は `action: "reference"` で declare する。declare 漏れは contract-map renderer の `port_index` lookup が unmatched となり、`SecondaryAdapter -.impl.-> port` edge が silently skip される。
+当該 track で改変しない baseline 由来の port は `action: "reference"` で declare する。declare 漏れは contract-map renderer のグローバル trait index (`build_trait_index`) の lookup が unmatched となり、`SecondaryAdapter -.impl.-> port` edge が silently skip される。
 
 #### declare 義務
 
-- top-level `trait_impls[]` に `for_type: <SecondaryAdapter 型>` + `trait_ref: <port>` の entry を書いた以上、対応する `role: SecondaryPort` entry を当該 track の catalogue に作成する責任は type-designer に帰属する
+- top-level `trait_impls[]` に `for_type: <SecondaryAdapter 型>` + `trait_ref: <port>` の entry を書いた以上、対応する `traits` entry (role は `SecondaryPort` または `Repository`) を当該 track の catalogue に作成する責任は type-designer に帰属する
 - 当該 track で変更しない baseline 由来の port は `action: "reference"` で declare し catalogue への exposure を確保する
 
 #### `action: "reference"` の semantics
@@ -176,9 +181,7 @@ top-level `trait_impls[]` のうち `for_type` が `role: SecondaryAdapter` の�
 
 #### declare 漏れの影響
 
-`port_index: BTreeMap<String, Vec<String>>` は当該 track の `role: SecondaryPort` entry のみを登録する。当該 track の catalogue に `role: SecondaryPort` entry が存在しない trait 名は lookup で unmatched となり、`-.impl.->` edge が生成されない。graph 上の接合点が可視化されず、設計の空白が表面化しにくくなる。
-
-**関連 ADR**: `knowledge/adr/2026-04-29-0243-cross-track-port-reference.md#D1`
+contract-map renderer のグローバル trait index (`build_trait_index`) は当該 track の catalogue の `traits` エントリを role を問わず登録する (`action: delete` のみ除外)。当該 track の catalogue に対応する `traits` entry が存在しない trait 名は lookup で unmatched となり、`-.impl.->` edge が生成されない。graph 上の接合点が可視化されず、設計の空白が表面化しにくくなる。
 
 ### R8. Method Type Full Declaration (method / param 型フィールドは generic 引数を含む完全型文字列で宣言する)
 
@@ -198,8 +201,6 @@ top-level `trait_impls[]` のうち `for_type` が `role: SecondaryAdapter` の�
 #### lint ゲート
 
 bare wrapper 名のみの宣言を catalogue の codec / verify CLI が schema validation で reject する lint を後続作業として組み込む。実装前は設計レビューで確認する (過渡期間)。
-
-**関連 ADR**: `knowledge/adr/2026-04-29-0240-method-type-full-generic-declaration.md#D1`
 
 ### R9. No Primitive Obsession (制約ある概念を生 primitive で宣言しない)
 
@@ -250,7 +251,7 @@ draft が本ルールに違反する (制約ある概念を生 primitive で宣�
 
 **serde / domain 純粋性を概念モデリング省略の口実にしてはならない**:
 
-- domain serde-free (R1 の CN-05 / ADR `2026-04-14-1531-domain-serde-ripout.md`) は、概念を domain にモデル化しない理由には **ならない**。外部形式 (TOML / JSON 等) から読む必要がある概念は、(a) domain 層に serde-free なドメインオブジェクトを定義し、(b) infrastructure 層に `role: Dto` の serde DTO を定義して相互変換する (R1: `Dto` は infrastructure)。purity は「domain モデル + infra DTO」の対で解決する。
+- domain を serde-free に保つことは、概念を domain にモデル化しない理由には **ならない**。外部形式 (TOML / JSON 等) から読む必要がある概念は、(a) domain 層に serde-free なドメインオブジェクトを定義し、(b) infrastructure 層に `role: Dto` の serde DTO を定義して相互変換する (R1: `Dto` は infrastructure)。purity は「domain モデル + infra DTO」の対で解決する。
 - 「serde が要るから infra の生 struct に留める」「domain に置けないと判断してカタログから省略する」は **いずれも R10 違反**。
 
 判別 (概念か否か):
@@ -263,7 +264,7 @@ draft が本ルールに違反する (制約ある概念を生 primitive で宣�
 - 「許可された種別の有限集合」という概念 → domain に `role: ValueObject` の `enum` を定義。外部設定から読むなら infrastructure に `role: Dto` を置いて変換。`Vec<String>` を infra に持つのは R9 + R10 違反
 - 検証付き識別子の概念 → domain に `role: ValueObject` newtype。infra DTO フィールドも生 `String` にはしない — `deserialize_with` カスタムデシリアライザで受けてフィールド型を domain VO にするか、serde-free な domain enum を持つ場合はinfra 側に deserializable な mirror newtype を定義して変換する
 
-**根拠**: hexagonal — ドメインモデル (概念) は最内核の domain 層に属する (`architecture-rules.json` で domain は `may_depend_on: []`、`knowledge/conventions/hexagonal-architecture.md`)。本ルールは当プロジェクト固有 convention (hexagonal 前提) であり、agent 定義でなく本 convention に置く (横断性のため)。
+**根拠**: domain は `architecture-rules.json` の `may_depend_on: []` で定義される最内層である。本ルールは当プロジェクト固有 convention であり、agent 定義でなく本 convention に置く (横断性のため)。
 
 ## Examples
 
@@ -272,7 +273,7 @@ draft が本ルールに違反する (制約ある概念を生 primitive で宣�
 - `parse_adr_frontmatter` を `role: FreeFunction` で `infrastructure-types.json` の `functions` エントリに置く (R2)
 - `evaluate_adr_decision` を `role: FreeFunction` で `domain-types.json` の `functions` エントリに置く (R2 + R1: `FreeFunction` は layer-flexible)
 - `AdrDecisionCommon { id, user_decision_ref, ... }` を `role: ValueObject` で domain の `types` エントリに置く (R3: 検証済み shared payload で behavior なし)
-- `ProposedDecision` / `AcceptedDecision` / ... を `role: ValueObject` + typestate marker 付き `struct` で domain に置き、`AdrDecisionEntry` を `role: ValueObject` + `kind: { "kind": "enum" }` の wrapper として並置 (decision tree: state machine + heterogeneous Vec。typestate の wire format は `.claude/agents/type-designer.md`「The `kind` field」節を参照)
+- `ProposedDecision` / `AcceptedDecision` / ... を `role: ValueObject` + typestate marker 付き `struct` で domain に置き、`AdrDecisionEntry` を `role: ValueObject` + `kind: { "kind": "enum" }` の wrapper として並置 (decision tree: state machine + heterogeneous Vec。typestate の wire format は `knowledge/conventions/catalogue-schema-reference.md`「The `kind` field」節を参照)
 - `FsAdrFileAdapter` を `role: SecondaryAdapter` で infrastructure の `types` エントリに置く (R1: `SecondaryAdapter` は infrastructure ONLY)
 - baseline 由来の `ReviewReader` port を当該 track の `domain-types.json` に `action: "reference"` で `role: SecondaryPort` の `traits` エントリとして declare する (R7: declare により `FsReviewStore -.impl.-> ReviewReader` edge が contract-map に出る)
 - `methods[].returns` フィールドに `"Result<AdrFrontMatter, AdrFrontMatterCodecError>"` と完全型文字列を書く (R8: `extract_type_names()` が `AdrFrontMatter` / `AdrFrontMatterCodecError` への edge を生成できる)
@@ -284,7 +285,7 @@ draft が本ルールに違反する (制約ある概念を生 primitive で宣�
 - `AdrSignalsVerifyAdapter` を `role: UseCase` で `infrastructure-types.json` に起草 (R1 違反: `UseCase` は usecase ONLY)
   - 正しい修正: usecase 層に `role: Interactor` + `role: ApplicationService` ペアを置き、infrastructure には `role: SecondaryAdapter` を置く
 - 状態遷移を持つ ADR decision を `role: ValueObject` + `kind: { "kind": "enum" }` (`DecisionStatus { Proposed, Accepted, ... }`) で起草し、別 entry に `role: ValueObject` + `kind: { "kind": "struct", "shape": { "kind": "plain", "fields": [...], "has_stripped_fields": false } }` (`status: DecisionStatus`, `implemented_in: Option<String>`) を置く (R3 違反 + 決定木違反)
-  - 正しい修正: typestate cluster + enum wrapper (`role: ValueObject` + typestate marker 付き `struct` で各 state を起草し、heterogeneous Vec 用の enum wrapper を `role: ValueObject` + `kind: { "kind": "enum" }` で追加。typestate の wire format は `.claude/agents/type-designer.md`「The `kind` field」節を参照)
+  - 正しい修正: typestate cluster + enum wrapper (`role: ValueObject` + typestate marker 付き `struct` で各 state を起草し、heterogeneous Vec 用の enum wrapper を `role: ValueObject` + `kind: { "kind": "enum" }` で追加。typestate の wire format は `knowledge/conventions/catalogue-schema-reference.md`「The `kind` field」節を参照)
 - 「他の role が fit しないので」という理由で `role: ValueObject` を選ぶ (R5 違反)
   - 正しい修正: 決定木を再適用 → `role: FreeFunction` 候補を検討 → それでも確定しないなら `## Open Questions` に escalation
 - `FsReviewStore` (baseline 由来の `ReviewReader` / `ReviewWriter` port を implement する adapter) を `infrastructure-types.json` に `role: SecondaryAdapter` で起草したが、当該 track の catalogue に `ReviewReader` / `ReviewWriter` の `role: SecondaryPort` entry を declare しない (R7 違反: declare 漏れによる `-.impl.->` edge の silently skip)
@@ -299,11 +300,11 @@ type-designer 自身および reviewer は draft 段階で以下を確認する:
 
 - [ ] 各 entry の `role` × layer の組合せが R1 マトリクスで OK か (✗ / ONLY 違反がないか、`DomainService` は infrastructure 層に置かれていないか)
 - [ ] zero-field struct + 1 method の entry がないか (あれば R2: `role: FreeFunction` に折り畳めないか確認)
-- [ ] `role: ValueObject` の entry がすべて R3 を満たすか (validated value のみで behavior を持たないか、`methods` が空か — ただし typestate state の entry は遷移メソッドを `methods` に持つため例外)
-- [ ] field + behavior を持つ domain struct が `role: DomainService` (R6) で起草されているか (`role: ValueObject` / `role: Interactor` への誤分類がないか)
+- [ ] `role: ValueObject` の entry がすべて R3 を満たすか (値等価で識別され、`methods` が生成時に不変条件を確立する constructor / validation、または自身の値から値または述語を導出する side-effect-free なものに限られるか。依存や外部リソースを扱う service 的 behavior がないか。typestate state の entry は遷移メソッドを `methods` に持つ)
+- [ ] R6 の採用条件を満たし、値等価で識別される ValueObject (R3) ではない service 中心の field + behavior を持つ domain struct が `role: DomainService` で起草されているか (`role: ValueObject` / `role: Interactor` への誤分類がないか)
 - [ ] role 起草前に偵察 (R4) を実施したか (近接 track の role 分布を確認したか)
 - [ ] catch-all として `role: ValueObject` / `role: UseCase` を選んでいないか (R5)
-- [ ] top-level `trait_impls[]` のうち `for_type` が `role: SecondaryAdapter` の型を指す entry の `trait_ref` で参照するすべての trait (port) が当該 track の catalogue に `role: SecondaryPort` の `traits` エントリとして declare されているか (R7)。baseline 由来の port は `action: "reference"` で declare されているか
+- [ ] top-level `trait_impls[]` のうち `for_type` が `role: SecondaryAdapter` の型を指す entry の `trait_ref` で参照するすべての trait (port) が当該 track の catalogue に `traits` エントリ (role は `SecondaryPort` または `Repository`) として declare されているか (R7)。baseline 由来の port は `action: "reference"` で declare されているか
 - [ ] `methods[].returns` / `methods[].params[].ty` (TypeEntry / TraitEntry) および FunctionEntry の `returns` / `params[].ty` に bare wrapper 名のみの宣言 (`Result` / `Option` / `Vec` / `Box` / `Arc` / `Rc` / `Cow` / `BTreeMap` / `HashMap` / `HashSet` / `BTreeSet`) がないか (R8)
 - [ ] field / payload / param / returns / map キーで、制約ある概念を生 primitive (`String` 等) で宣言していないか (R9)。制約があれば値オブジェクト (newtype / enum) を定義しているか。**`role: Dto` / serde 境界も例外ではない** — 概念を名指す map キー・filter 値は domain enum (serde は infra mirror enum 経由) で型付けているか。生 primitive は color / 自由ラベル等の真に不透明な提示専用値のみで、その場合 `docs` に根拠が記録されているか
 - [ ] ドメイン上の概念がすべて R1 マトリクスで domain 層に合法な role (ValueObject / Entity / AggregateRoot / DomainService / Specification / Factory / ErrorType) のいずれかで domain 層に定義され、カタログに宣言されているか (R10)。role 選定は R1–R6 の判断木に従う。serde / 外部形式の都合を口実に domain モデリングをスキップして infra 生 struct に留めたり、層配置を避けて概念をカタログから省略したりしていないか。外部形式が要る概念は「domain オブジェクト + infra `role: Dto`」の対で表現しているか
@@ -320,12 +321,9 @@ type-designer 自身および reviewer は draft 段階で以下を確認する:
 ## Related Documents
 
 - `knowledge/conventions/prefer-type-safe-abstractions.md` — enum-first / typestate / newtype の design principle (本 convention は role 選定への適用)
-- `knowledge/conventions/hexagonal-architecture.md` — layer 境界と port placement (R1 の根拠)
 - `knowledge/conventions/pre-track-adr-authoring.md` — ADR 配置規則 (catalogue の上流 SSoT)
 - `architecture-rules.json` — TDDD 対応層の SSoT (R1 layer 列挙の根拠)
 - `libs/domain/src/tddd/catalogue_v2/roles.rs` — `DataRole` / `ContractRole` / `FunctionRole` enum 定義 (現行 schema の role 正本; v2 の `TypeDefinitionKind` に相当)
 - `libs/domain/src/tddd/catalogue_v2/entries.rs` — `TypeEntry` / `TraitEntry` / `FunctionEntry` + `TypeKindV2` / `CompositePattern` 定義 (現行 schema の型正本)
 - `libs/infrastructure/src/tddd/catalogue_document_codec/` — v5 catalogue serde codec (将来の R1 自動化候補; TypeKindDto / PatternDto 等の wire format 定義)
-- `knowledge/adr/2026-05-08-0248-tddd-catalogue-layer-schema-axis-separation.md` — role / kind 軸分離の設計 ADR (DataRole / ContractRole / FunctionRole 導入の決定記録)
-- `knowledge/adr/2026-04-29-0243-cross-track-port-reference.md` — R7 の決定記録 (cross-track port reference の意味論・declare 義務)
-- `knowledge/adr/2026-04-29-0240-method-type-full-generic-declaration.md` — R8 の決定記録 (method / param 型フィールドの完全型宣言規範)
+- `knowledge/adr/README.md` — 設計判断の索引（履歴を確認する必要がある場合）

@@ -1,0 +1,3957 @@
+{
+  "track_id": "test-obligation-fulfillment-gate-2026-07-07",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "FailingWaiverVerifier",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "ab44f98a0bb432994df0ac7491aabf4a5a00bdb98a0aea3d6be0773754bd92f4",
+        "declaration_hash": "1f6f86c72ac431bd94ec7d4638c3e19bb71aafaa10192919fc09ca701ddb061e",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "この stand-in は全呼出しで `VerifierPort` error を返して verdict を一切生成しない"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::test_obligation::failure",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "2f15a340068bc8e97547ee6a0205ade7f1188ebd2323e24f3e804a90b310257c",
+        "declaration_hash": "01e7e6317b4bb28be78cf5ad191cfa8ced326601b04f1917a95445afe50bffb1",
+        "anchor_text_hash": "7bc9fedeac270b98f77789e0857ba4d0516dc096c4c02bd5c98445bc01fa6730"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "verdict gate は `check` の責務であり、`results` は informational（exit 常に 0）"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AnchorText",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "5e206d8fc72451edae32cb99829c1234ff162e748abbb86a724af2ed7e9939de",
+        "declaration_hash": "f61c42fcbd81c4427094018d15b4284b81eccbec998be20c66366664b4ac3331",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Evidence-side spec anchor text for fulfillment / waiver pairs. See IN-09.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ArtifactCodecError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "a88206a56af9e7f0b8bc100e93989293244422f3430cba5eeba44eab21a61a67",
+        "declaration_hash": "9aa0c2a454e04a140af441edce90810af2ef0ff04e7c55cf152d49e876fa7fe5",
+        "anchor_text_hash": "3c5acf05aa2b34161959f8cab9bcb86676033dc7d92f6dd52d6485b17d911066"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ArtifactCodecError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "3f84b53f5bd90e539bde73ba45ca235aaec39be5dd23080e6a1f61c049f3638d",
+        "declaration_hash": "9aa0c2a454e04a140af441edce90810af2ef0ff04e7c55cf152d49e876fa7fe5",
+        "anchor_text_hash": "34fba76f1f2370836bde6e2f844cbdbe3ef56a15534bfea3acc9262693d3dc65"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BoundTestsSetHash",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "e71cb11dbb0dfcca8332ab5548910ccf4223d8d6f62f242df637bd9cfa036bfb",
+        "declaration_hash": "7e57bba3615f11090ae40f6ffb9feac1dc9420ad4f04bd5ce6b0fab4e4d66eb3",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "2a882002763f609d12b6b806bdf27b6a963101f7a6fb0e6a2dd6bcd2bc6e27f4",
+        "declaration_hash": "0ab80fb0409e22d805a88634a73ee9d1b8120843a468ee90091f18f4e905fc0b",
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Structured output of CheckTestObligationsInteractor; see IN-08 / AC-04 / AC-10 / AC-13."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "992c1c03b840e55782e39d39e901bfda94e8fc190cf2cc1b8f6685b0f9ad0c3c",
+        "declaration_hash": "0ab80fb0409e22d805a88634a73ee9d1b8120843a468ee90091f18f4e905fc0b",
+        "anchor_text_hash": "2ec5d0f388487e1a45112cb601d93a18d6a58dd72131c07a45a9f7ba9471da14"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CliCommand",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-14"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "c7358ab618e19c7b839d17ebd9521c6d8b59cbc3bf1fb14cf8a1e5f48bee278f",
+        "declaration_hash": "1f4cf8418e3f5aafe8bfddb3c00fa6ddb1d51a8fbce1c47a9720fafbb5a29645",
+        "anchor_text_hash": "5f1a57e5aada23c582a8e9638363a9efaed8d2498241bc14fd56e96bacce4af6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto, kind: Enum"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CliCommand",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "cd713fbabef9e47113852ad1b90b280e3a0b445bb2a5c81eb9838f2e4d6ba45d",
+        "declaration_hash": "1f4cf8418e3f5aafe8bfddb3c00fa6ddb1d51a8fbce1c47a9720fafbb5a29645",
+        "anchor_text_hash": "7bc9fedeac270b98f77789e0857ba4d0516dc096c4c02bd5c98445bc01fa6730"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "DataRoleKey",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "6d01888f501691cc154592cf1ebec1502cc90b3ee2cc3f7a0fef5e599c06296c",
+        "declaration_hash": "82c74038d84eee6574938248ca9c54f5975bf750ffeebf6d5eec07e2d9abe956",
+        "anchor_text_hash": "64d50949df2df23c3e4e6a885ca2a2f08123c1aa5bd557de8e18a19dfc5b60d4"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Serde-map key DTO for domain DataRole; see IN-03 / CN-05."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "DeclarationHash",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "4a25f11e1e268aadc574ee6e1f5a82fcbec744fdbf7d18eaf291939159c08624",
+        "declaration_hash": "c997c3c89c2771b8204cfa550adc150d6a6814b2a83f13e202c0aab478228153",
+        "anchor_text_hash": "3c5acf05aa2b34161959f8cab9bcb86676033dc7d92f6dd52d6485b17d911066"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Hash role value object for catalogue entry declarations in verdict cache keys; see IN-05 / AC-06."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "DeriveTestObligationsCommand",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "174dd9bd49ec73fbcf75d8aee26a20d7f461687cf1caa967b76d3d7108b61b5c",
+        "declaration_hash": "0b8f3dda4bde12c6ba8fa993f05bb1585ae99360dfaf73d7bc8951dcfef5284c",
+        "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "DiagnosticMessage",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "eeecd0f5217332ffc520340a70c23678d7830773678f4b2e59f7467b2babab09",
+        "declaration_hash": "34219b65b2085ca4367bba24fb559e7aa19fe51763a97d946eddb6aad14f39d6",
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Validated diagnostic-message newtype used by test-obligation errors and verdicts; see IN-08 / IN-09 / IN-10."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "DiagnosticMessage",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "ebb05eac38ce2481127fcc77b2470d5cc43c66e0316b36fead9935086a5645cc",
+        "declaration_hash": "34219b65b2085ca4367bba24fb559e7aa19fe51763a97d946eddb6aad14f39d6",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "DiagnosticMessage",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "b2b9fa81d7d3d5105a3da0a9536c0db6bf13d5eaff73c86a978660d3e62ef0de",
+        "declaration_hash": "34219b65b2085ca4367bba24fb559e7aa19fe51763a97d946eddb6aad14f39d6",
+        "anchor_text_hash": "ac928ab35b0e8fbc2f84bd32b6533080109ebc933489bc0b729793dbe67ab246"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Validated diagnostic-message newtype used by test-obligation errors and verdicts; see IN-08 / IN-09 / IN-10."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "EdgeResolutionOutcome",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "eb52865c5120a66ddcfc333ef321cd3913164d0fbda075b255aa4123b10b93ef",
+        "declaration_hash": "1b364228145485f31c6358ff481a4a6ffbee337feb33ac528396ed01a6b9655a",
+        "anchor_text_hash": "fcfecfd0efd1ddf6c39834b8a29e3842aa0a6b7ff940c033508b9b5f620a0a01"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "EdgeResolutionOutcome",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "a988ee385b7c10b3ff134efd9deac5954df98c2c10f09b4b3ac2970855f9632b",
+        "declaration_hash": "1b364228145485f31c6358ff481a4a6ffbee337feb33ac528396ed01a6b9655a",
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "invariants: [], methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "EdgeVerdictRecord",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "879ed4e25b0f7c5d2266ba4a6769cb886fe170034979c1fc528cf818e1746a0a",
+        "declaration_hash": "b618dac86575624b5f3d27cecd7420bbfb08b52a937496885e6bd0e5a85a2d83",
+        "anchor_text_hash": "f3b931241466d6279230a10422f1047ccec14fdf2c262b59876899f16ccf13bb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Results record value object for edge verdict state; see IN-10 / AC-09."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "EdgeVerdictRecord",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "ce60b308509f0191ef7fe2e375235aa87937ded523cd7db2d78e367086a905f7",
+        "declaration_hash": "b618dac86575624b5f3d27cecd7420bbfb08b52a937496885e6bd0e5a85a2d83",
+        "anchor_text_hash": "ac928ab35b0e8fbc2f84bd32b6533080109ebc933489bc0b729793dbe67ab246"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Results record value object for edge verdict state; see IN-10 / AC-09."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "EntryDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "202c9c33326d1477e8bd2345ad4dd02742881e523c4b918608c8b40edd7bf106",
+        "declaration_hash": "130cba6651f5d7fe75200ff1901ed7d9bf48b5878e29e44587768fe146d5c2db",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Non-empty catalogue entry declaration text. See IN-09 / IN-15."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "EntryDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-15"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "776774cae8c8a60eea57f060c51eade32b94a81faa44ebd4029bdc89beceab52",
+        "declaration_hash": "130cba6651f5d7fe75200ff1901ed7d9bf48b5878e29e44587768fe146d5c2db",
+        "anchor_text_hash": "41f3b285525a3aa56c7cd68d78da855099fb9f353a94a96e0da3f4f830a7a6f5"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "waiver 検証 fail の routing 経路の実装。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateTestObligationsCommand",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "d00c5883ee2cecbd5777f3b7b9303d21c309d4a2a992f4583edcfb42d7464191",
+        "declaration_hash": "b4ddb959f34a20b18c77dd5eb555a95cdeef57eb6fee131b142b7602acac16f2",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Command, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateTestObligationsFuture",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "b258ced25cced905440256a6fd90c1782a1ddc399bb13a2aaa38a5ea98caf5f6",
+        "declaration_hash": "81601d1819a143b505b6d5d25d58a84b272bc3dc055a5cb8458792b8ac66b4d4",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: Dto, kind: TypeAlias"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateTestObligationsFuture",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "9c2da653b0945c0855a324e1cfe6b10d18d8e61e26d7b5b8a01898e97cbd6f1d",
+        "declaration_hash": "81601d1819a143b505b6d5d25d58a84b272bc3dc055a5cb8458792b8ac66b4d4",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Future alias returned by EvaluateTestObligationsApplicationService::execute"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateTestObligationsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "85355a6874447bbf63a8abdf631a9ed11829a61245dc44379ebd7e7e3ceebedf",
+        "declaration_hash": "6e44b0b981e06a7d15c7679d4b78071fb707d4df02e0bb12025e75b8d9e0bf33",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FulfillmentFailCategoryDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "eecaa94515816cf8376c8e81ee4907bd9aecfc1033959d84e0a53154e04e9cef",
+        "declaration_hash": "3622f0b1a4ee12588b08c37bc1dc65a2885f5312fc7e4ba7c7aebc3253a12a79",
+        "anchor_text_hash": "d34cd75254543ba2866b1ac65be62619073e6042ce397cbe7007f4fb1431f219"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FulfillmentFailCategoryDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-12"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "86ad11cbfc704a8fcb5951262490d523ed29f4bbeceb0c28cbfe9f51fcb4c702",
+        "declaration_hash": "3622f0b1a4ee12588b08c37bc1dc65a2885f5312fc7e4ba7c7aebc3253a12a79",
+        "anchor_text_hash": "65f485b9c7b0b8c4d14c8336e4cf22d264716d86f4bd825396329067980211b8"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto, kind: Enum"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "c3840e67fa86483c03b50f122ccf1e79946ed412504b5391d26c10e9d7e09b4e",
+        "declaration_hash": "397b1db103c8aa03b785dd85e130cf033119c3e9bb549426fb3dffce922dd84b",
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "93a6a6284878bfdd8d1ddde4e98a8fa591abcc2b7de811f4d62a9bebe9af6ef1",
+        "declaration_hash": "397b1db103c8aa03b785dd85e130cf033119c3e9bb549426fb3dffce922dd84b",
+        "anchor_text_hash": "2ec5d0f388487e1a45112cb601d93a18d6a58dd72131c07a45a9f7ba9471da14"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "26ecd1f5789def2a57987a2560a01a5994de8e3280f4027d6e1c707068ba2747",
+        "declaration_hash": "397b1db103c8aa03b785dd85e130cf033119c3e9bb549426fb3dffce922dd84b",
+        "anchor_text_hash": "4802b74415a134607211305c91ff4d591a481cc1ae3e15a6cb105a84ca3d96ec"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationDeriveError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "bb02526a9798ca45ed84756eb4dfae9860e6ec83f3ee27f6ffde84407ab30d16",
+        "declaration_hash": "fbea61e63cc4443f866d8835fd037e2a517277730a7a1f92a3f05d8cf619cc33",
+        "anchor_text_hash": "23ef7b6f69fba30ba0154c5a917cde7d21d58c34c8a688f6b54a554405bd4b76"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ErrorType, kind: Enum"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationDeriveError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "0474c9aaf6285ee2ad4cae2fbf67803d7697d1d7cae4ef9332ee8a83975fdf01",
+        "declaration_hash": "fbea61e63cc4443f866d8835fd037e2a517277730a7a1f92a3f05d8cf619cc33",
+        "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationEvaluateError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "5fcf72820d9fbfae30196b9f73ac64358622cfdafc49e552daf0ec2681df27a2",
+        "declaration_hash": "8523aef248a0fbe0b7f5a335cd92f0d1d0add9690ee02f1d2e02b130e990975e",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationEvaluateError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "0bfc4ab57f47f94c1fdb7c839742d91a4f5fd683ebcc7fff130ec686523b73b7",
+        "declaration_hash": "8523aef248a0fbe0b7f5a335cd92f0d1d0add9690ee02f1d2e02b130e990975e",
+        "anchor_text_hash": "f13f752583eee93d7254e58c4a00d56fe07c53adbc2f8a244c5d06b882a9b9f6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationEvaluateError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "26152c6157a3719b72db5409ae583d8ca93f07e4eb559a73f26c80d922ce7db0",
+        "declaration_hash": "8523aef248a0fbe0b7f5a335cd92f0d1d0add9690ee02f1d2e02b130e990975e",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "21897b4ca43a9f6915f6123be5777d0da6cb80b3c4e74679c89766e2a2865648",
+        "declaration_hash": "a7ce71e05bf3ec8c96a11f988fe6abde8ae3f69d30b129adb3b7cef561d2b75c",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Document value object for obligation-fulfillment verdict cache records; see IN-09 / AC-06."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "1601801d9b82adb74949111609ebf6cd78748267e4eee7c48abed3a430d15501",
+        "declaration_hash": "a7ce71e05bf3ec8c96a11f988fe6abde8ae3f69d30b129adb3b7cef561d2b75c",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Document value object for obligation-fulfillment verdict cache records; see IN-09 / AC-06."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheDocumentDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "626ac80524643fceffaa153df27f6f14787e84404a40f4ef3a5aa9cc5dae4dbe",
+        "declaration_hash": "653fcd971ddbcbba279036db7f2483ef551ae0932e79a83ab71282eea7e575b8",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: Dto, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheEntryDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "0fd74eaee8d1302015736fca232cbe597d5311d6dc38b2690cc0126a589810a6",
+        "declaration_hash": "8a9434be3f1cea8a33c173d725012355ef9e121b56bed7ee0a703a5b04d37b1e",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "shape: Plain { fields: [], has_stripped_fields: true }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentEscalationDriver",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "OS-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "d429b624bb2d26fedf8894b5588e6149fc4afae6d78a2b7ba609b60571d0ebdb",
+        "declaration_hash": "69692ab21911b5d8deb24395eb958f4bdbd5f74c22f001fecd40cde1ac7abc2c",
+        "anchor_text_hash": "35de0f382feeb0d003761a60ba3760ceddb61c74d4d6dca1fda782e2f5221e54"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "責務中立 core（IN-01）で共有すべきものだけを共有する。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentPair",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-15"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "0542f269a41cabde37403fc70e81c03629f7aaeee530779a68d6b46c19a53ab9",
+        "declaration_hash": "1a027bdc672fe7fdf2ec58c7550cf02a952dab9012b8617ca7190e3cd512541b",
+        "anchor_text_hash": "88cc841b2447a5f6dce2821a251e1360348f69b3cc7bb1571cb4cdae73696fbf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Fulfillment claim / evidence pair. See IN-01 / IN-09 / AC-15.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentPair",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "c42a501ae3d68f0fa864e35d9f46081061d68d0f7c188a3f8d50eb9413e80a47",
+        "declaration_hash": "1a027bdc672fe7fdf2ec58c7550cf02a952dab9012b8617ca7190e3cd512541b",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentVerdict",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "548ff80fed30e35ccd2f6212be003a01f4fcfe3940a822becebc9cda6cb79984",
+        "declaration_hash": "9da9ec1deabc316a5be22081301f8688f6ec7da2fd3c6ed59e4f1b66f5b0cbc9",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentVerdict",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "b8ec7c61f186c89c5f348e133269570e9c7f50af52c69ce02747e72199aa66e3",
+        "declaration_hash": "9da9ec1deabc316a5be22081301f8688f6ec7da2fd3c6ed59e4f1b66f5b0cbc9",
+        "anchor_text_hash": "d34cd75254543ba2866b1ac65be62619073e6042ce397cbe7007f4fb1431f219"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "invariants: []\",\"methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentVerdict",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-12"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "63e275480c7bfbd337376c91e04b295175ffeba41da6cd5897e6d4643c5b79fe",
+        "declaration_hash": "9da9ec1deabc316a5be22081301f8688f6ec7da2fd3c6ed59e4f1b66f5b0cbc9",
+        "anchor_text_hash": "65f485b9c7b0b8c4d14c8336e4cf22d264716d86f4bd825396329067980211b8"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }, kind: Enum { ... }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentVerdictDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "6db52506a3e3efd8d3a998d48384cbe12748b18b6d454df5775f2d119f61c379",
+        "declaration_hash": "b586711c4e26de95361b6c581ffa6de0f4044cfad321d0bfd90c65320708ca5e",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentVerdictDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "5f41e165e94b1df4e982cd8cd5c27a1d096c4bab0c5c8706941f7d9356d81eca",
+        "declaration_hash": "b586711c4e26de95361b6c581ffa6de0f4044cfad321d0bfd90c65320708ca5e",
+        "anchor_text_hash": "d34cd75254543ba2866b1ac65be62619073e6042ce397cbe7007f4fb1431f219"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationResultsError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "76debba20475d20718de0ae458cc4ec255d48dd17db00418a6d0dcb2e6ab1331",
+        "declaration_hash": "abcb89057e809ee897aefab7d6e8892fec5b35b6a6eb9821e73df384bcff5219",
+        "anchor_text_hash": "f3b931241466d6279230a10422f1047ccec14fdf2c262b59876899f16ccf13bb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationResultsError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "23767c6b8f5a93951020956dc7eded0f45c37d0cd17ff1b2650b06f38bc471cc",
+        "declaration_hash": "abcb89057e809ee897aefab7d6e8892fec5b35b6a6eb9821e73df384bcff5219",
+        "anchor_text_hash": "ac928ab35b0e8fbc2f84bd32b6533080109ebc933489bc0b729793dbe67ab246"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationsCodecError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "6c3784cfa5ca89349aee52b974a1475de920a78c91f4fe8476585e8129b95570",
+        "declaration_hash": "b6d3073a46a2d8d9c772625ac19bfdf53536fc7e138c73ed7170e1455d7806f6",
+        "anchor_text_hash": "3c5acf05aa2b34161959f8cab9bcb86676033dc7d92f6dd52d6485b17d911066"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: TypeAlias { target: TypeRef(\"domain::tddd::test_obligation::errors::ArtifactCodecError\") }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "RefVerifyCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-15"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "7671501ae35fd071a7b375d877262c7dfaeec2559c8b624a99a88ae7d15befe1",
+        "declaration_hash": "60ed2047bbcf87028d708b65f571c479372c013a8e6c32a3b7371fd325a19534",
+        "anchor_text_hash": "88cc841b2447a5f6dce2821a251e1360348f69b3cc7bb1571cb4cdae73696fbf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Full hash-frozen cache key for one ref-verify pair; see IN-01 / AC-15."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SemanticCalibrationProbeConfig",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-15"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "13c1ffbc566e57a5940e3251cede544d5d2a968632470728fe115f1310874797",
+        "declaration_hash": "dac28858c06e94300d5548e226a9b2e479c12f95993e20e285c187c0b147f7f6",
+        "anchor_text_hash": "88cc841b2447a5f6dce2821a251e1360348f69b3cc7bb1571cb4cdae73696fbf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SemanticCalibrationProbeConfig",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "be3963073ac4f414e000574f7d735965eed9360d5a2cf6cf9d202145c49a563e",
+        "declaration_hash": "dac28858c06e94300d5548e226a9b2e479c12f95993e20e285c187c0b147f7f6",
+        "anchor_text_hash": "b7c9b797f7e2ec1e968f432b9ad95a46cbe4b2fecc29ce7e43cbbee784d19246"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SemanticEscalationFuture",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-15"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "ac4b9ee731ae6ba19ab64f47340e9df76cb99542a68ff86af6d2736a5347551c",
+        "declaration_hash": "b7a48210326cc93fcd5dac847bc662d846d2cccd001090d573448351abf392c9",
+        "anchor_text_hash": "88cc841b2447a5f6dce2821a251e1360348f69b3cc7bb1571cb4cdae73696fbf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeAlias { target: TypeRef(\"std::pin::Pin<std::boxed::Box<dyn core::future::Future<Output = Result<V, E>> + Send + 'a>>\") }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SemanticEscalationFuture",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "8c276981cc218d5364a031b1b1944c2f2684905c5bd33a359e9239a77de43119",
+        "declaration_hash": "b7a48210326cc93fcd5dac847bc662d846d2cccd001090d573448351abf392c9",
+        "anchor_text_hash": "b7c9b797f7e2ec1e968f432b9ad95a46cbe4b2fecc29ce7e43cbbee784d19246"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeAlias { target: TypeRef(\"std::pin::Pin<std::boxed::Box<dyn core::future::Future<Output = Result<V, E>> + Send + 'a>>\") }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SemanticVerifierError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "b9be075a897ac5fc18b20aef374df406e24342399b876f7416773eb6383aa494",
+        "declaration_hash": "f2d73940fa4797fb93ee730dbd59fa6577ac7b18d34151760a8a5075e24fe933",
+        "anchor_text_hash": "a9d2ea6b1e87b023912bfa00993f079cbecf95652ea9045af495c650513c8edd"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SemanticVerifierError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "e9a14f5516c58355a7ad1a272728591125a17e7758815f358e1100b90b0de380",
+        "declaration_hash": "f2d73940fa4797fb93ee730dbd59fa6577ac7b18d34151760a8a5075e24fe933",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SpecDocumentLoadError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "95a759ec258f924ad50bb142d26e484c8bd6285019077e8541ebd90d00f892f4",
+        "declaration_hash": "b067fd33dc2f3be8c92e0a2d4ab68a7a00e7c2c586a2f10dc330a81e9a60ba20",
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingRecord",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "b72eedfa1b02da8905be974547e3cca00bac014b01727e22d8b47232619a41c1",
+        "declaration_hash": "5b58ef76168216809cb8a0845718b149bc59e2e343c1170e2d2ca98401bf8d5a",
+        "anchor_text_hash": "fcfecfd0efd1ddf6c39834b8a29e3842aa0a6b7ff940c033508b9b5f620a0a01"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Binding-record vocabulary for test-bindings artifacts; see IN-06 / AC-12 / CN-02."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingsCodecError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "535bb0888d2d02e7b38eb0cf3f08fbe8cf4de29765e8fefa83172bf22f1dc15c",
+        "declaration_hash": "c10563b6d2b08f1ac8f9509bc8222400f3868e7f3763f90f4d71cd6a837a6519",
+        "anchor_text_hash": "34fba76f1f2370836bde6e2f844cbdbe3ef56a15534bfea3acc9262693d3dc65"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: ErrorType, kind: TypeAlias { target: TypeRef(\"domain::tddd::test_obligation::errors::ArtifactCodecError\") }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingsDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "acf165795b6f9be7953d49ae8abc188d81429e336348e1167cd68781fe272dae",
+        "declaration_hash": "092933c73a4bbd171185cc51a96b74804fb8fdb8e1846ec004374fb48e07c462",
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Document value object for test-bindings artifacts; see IN-06 / AC-04."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingsSkeletonArgs",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "f3a97cc379a2f262a812c0c722d70efe3c3a4aaa54f6b665b7686a84fadc51b9",
+        "declaration_hash": "41c9f4cac9bc05f6bfff2a3c4852131ea5fa9928f8da0c84139908b0c331e2c9",
+        "anchor_text_hash": "7bc9fedeac270b98f77789e0857ba4d0516dc096c4c02bd5c98445bc01fa6730"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"role: Dto\"; \"bindings-skeleton は authoring helper\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingsSkeletonArgs",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "f692473fe4b7369e2dd9ab0a551a547a0d84d62b00d469b82f83c1eaf5ae47e4",
+        "declaration_hash": "41c9f4cac9bc05f6bfff2a3c4852131ea5fa9928f8da0c84139908b0c331e2c9",
+        "anchor_text_hash": "34fba76f1f2370836bde6e2f844cbdbe3ef56a15534bfea3acc9262693d3dc65"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Struct(StructKind { shape: Plain { fields: [FieldDecl { name: FieldName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }], has_stripped_fields: false }, typestate: None })"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingsSkeletonCommand",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-14"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "189614c1b206803bd1902a7906f14def2066400fa5b5e7605a90434210d2dfdf",
+        "declaration_hash": "cbd82af7f1234f940d38b8398fd89c5fe9f122fe1625809baef6b3c3ead1ee68",
+        "anchor_text_hash": "5f1a57e5aada23c582a8e9638363a9efaed8d2498241bc14fd56e96bacce4af6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Command input for TestBindingsSkeletonApplicationService; see IN-06 / CN-09 / AC-14."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingsSkeletonError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "319177b0b18382128d45fb48b1fdb4c11c1276392da7776e6079530bf8ba7b33",
+        "declaration_hash": "93c09f4cbd7cf8e53f5007e1b5f4038f819f94ed59e335bb240e17ff4b7a935c",
+        "anchor_text_hash": "34fba76f1f2370836bde6e2f844cbdbe3ef56a15534bfea3acc9262693d3dc65"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"ObligationsAbsent\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"ArtifactLoad\")), payload: Tuple([TypeRef(\"domain::tddd::test_obligation::errors::ArtifactCodecError\")]) }] }, methods: [], generics: [], where_predicates: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingsSkeletonInput",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-14"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "961d9ac85e5081783382a6609056e55ec83c5e4b3c2352e25ba1f4f8093152fb",
+        "declaration_hash": "6dde25683f19f9e892b8d2a0f11ed280175b2bbb54a90a84dc3e67eb674f751e",
+        "anchor_text_hash": "5f1a57e5aada23c582a8e9638363a9efaed8d2498241bc14fd56e96bacce4af6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingsSkeletonInput",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "a43faa0067c429de7af4cbf037b8fc04650b71a81a72b34f5b0dd687a04f07a0",
+        "declaration_hash": "6dde25683f19f9e892b8d2a0f11ed280175b2bbb54a90a84dc3e67eb674f751e",
+        "anchor_text_hash": "7bc9fedeac270b98f77789e0857ba4d0516dc096c4c02bd5c98445bc01fa6730"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingsSkeletonInput",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "ffd62a675129f1df76b27020bd74476e16bf3c095fcb4a6939b8380734e857dc",
+        "declaration_hash": "6dde25683f19f9e892b8d2a0f11ed280175b2bbb54a90a84dc3e67eb674f751e",
+        "anchor_text_hash": "34fba76f1f2370836bde6e2f844cbdbe3ef56a15534bfea3acc9262693d3dc65"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "cli_driver-local DTO for `sotp test-obligation bindings-skeleton`"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingsSkeletonRecord",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "b4624fad957048aa2960819c6f5beaf3e46dc7871658561cce0d4c9ce57b0ece",
+        "declaration_hash": "1f84209600e63dc92aefaced4c5683e1a75b5ce18daea00f6005941faa9aba78",
+        "anchor_text_hash": "7bc9fedeac270b98f77789e0857ba4d0516dc096c4c02bd5c98445bc01fa6730"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligation",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-11"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "81da61e3420c8167973ec93824d2eb5ee406cc799e321401770fe13ebc52b9ac",
+        "declaration_hash": "fe4613feb75b53da4330df33e0828b2b8a7818d13c2eaef308a419a94b221db6",
+        "anchor_text_hash": "752f5b642b1730780b4a977d0b10d154c4bbaf4ffd68aac4fee5bcab8a96f739"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligation",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "b4e0ea05ea4a7d61232f44635122342834c1c474fde944970d8bcbfe2e2b0fbd",
+        "declaration_hash": "fe4613feb75b53da4330df33e0828b2b8a7818d13c2eaef308a419a94b221db6",
+        "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationArgs",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "6d6245a837f89fa2313be24ad5d7b034ff8e05323420e0638549d8e1473b567f",
+        "declaration_hash": "abb9dd063217646a9953e869f98b187c40b1385e7a6e934bd3848c41f3d2d199",
+        "anchor_text_hash": "7bc9fedeac270b98f77789e0857ba4d0516dc096c4c02bd5c98445bc01fa6730"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationBrief",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-14"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "6d08ea9e492ff168eaadf6cc7fce9e01b6ede1c83454911a17fd8b7e71df2591",
+        "declaration_hash": "0357fc494f1743b1bd8fe26a3f3484ce8a79666f3901315213e9a4573d73d265",
+        "anchor_text_hash": "0183f118dba3bfec58d568de7a4f8606d6bef191f84c8e1b3527149720f20468"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationBriefTemplate",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "02b0bf6c1f52c4d33e560946991641ff10a885ea59aae088927f9df96cda2772",
+        "declaration_hash": "c4d30bea10655636d7031c2bcf128e9a758fe15a0188f45071a74b8c6a411e56",
+        "anchor_text_hash": "53fcb55c4abc5add6cb246247829f7eda50f0a9069381992e8a9499014fa8a71"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Rust ソースへの hard-code は取らない。決定表は role → 義務生成ルール（義務種別 + per 軸 + brief テンプレート）を JSON で表現する。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCatalogueCommandInput",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "7acb25d22bdd4547b86a1887784096493cd2878a66e6fff0ff5d4bb0a0e2373f",
+        "declaration_hash": "1bf4dc0a09280c76a485ff41d35e02e2606b2648002a8f5957c9f8faee5bd66b",
+        "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Shared catalogue snapshot command input for derive/check commands; see IN-07 / IN-08."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCatalogueCommandInput",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "3cc481a7a687f7b803542b6d7caa937aea821c9da328df9be70a4d509ed89bd8",
+        "declaration_hash": "1bf4dc0a09280c76a485ff41d35e02e2606b2648002a8f5957c9f8faee5bd66b",
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Shared catalogue snapshot command input for derive/check commands; see IN-07 / IN-08."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationChainLabel",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "927a32623ad3f5f86d803ba34573802a07dce95d58665dec4124dc27195f8135",
+        "declaration_hash": "fb6a272196dc10e7a52709eb6b050d5073b1d22ef29be40cfa318c7e5ec88c78",
+        "anchor_text_hash": "ac928ab35b0e8fbc2f84bd32b6533080109ebc933489bc0b729793dbe67ab246"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: [], generics: [], where_predicates: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCheckArgs",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "0b4b03f80841130d47725d0c96e56ae4980892c62504f996d17e89a59589d7a5",
+        "declaration_hash": "ad3aaba31fdf06c14845d7a453f3c2e3127db4234ea852cf116f666e7f9967ac",
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCheckInput",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "172db0cd535726246145b814ab53b558f71f7bfb9c60d98ff7f461956c1d9d6d",
+        "declaration_hash": "85f9e5506eeaf45d1a8dedeeeba9d18bdbf0588aba0a7634b6b3f6310bc7402a",
+        "anchor_text_hash": "6221c2a4d8c74bf7f66d970367a34c6e7b2a8b721defed1a13a2d9914903b695"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCheckInput",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "0ced31e113e689027ad163cdb87588b44c421f1fa936d376e3e651ddd4008d0f",
+        "declaration_hash": "85f9e5506eeaf45d1a8dedeeeba9d18bdbf0588aba0a7634b6b3f6310bc7402a",
+        "anchor_text_hash": "98b477739efddc669f1fb0ae30d514b897ef5d5db9442e55cdfbb0bdd1fdc8cd"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCheckInput",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "d99eb9e99c71ea8d09b03a3fd2869c10ca837bfe3b980ff2438282b7181b8502",
+        "declaration_hash": "85f9e5506eeaf45d1a8dedeeeba9d18bdbf0588aba0a7634b6b3f6310bc7402a",
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"cli_driver-local DTO for `sotp test-obligation check`; see IN-08 / AC-04 / AC-10.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "00cfd6a059c38d06e855bd69dbcd00c7504e0506e4fe3de479d3a63cb86de1ac",
+        "declaration_hash": "ca6e2041415aef69717e41b77f49b8e0ed011a3c4f5775091d35a20da348ed7c",
+        "anchor_text_hash": "a9d2ea6b1e87b023912bfa00993f079cbecf95652ea9045af495c650513c8edd"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Composition root for `sotp test-obligation` handler and port wiring; see IN-11 / AC-07."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-14"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "d95959012c5a95e85a0bb769512182682ba5ed28027d7b8af2971ab72d91af99",
+        "declaration_hash": "ca6e2041415aef69717e41b77f49b8e0ed011a3c4f5775091d35a20da348ed7c",
+        "anchor_text_hash": "5f1a57e5aada23c582a8e9638363a9efaed8d2498241bc14fd56e96bacce4af6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Composition root for `sotp test-obligation` handler and port wiring; see IN-11 / AC-07."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "5e2567ed247a27041bd6da785b9432adcda5a5be726e9a734654d6a67933cb08",
+        "declaration_hash": "ca6e2041415aef69717e41b77f49b8e0ed011a3c4f5775091d35a20da348ed7c",
+        "anchor_text_hash": "7bc9fedeac270b98f77789e0857ba4d0516dc096c4c02bd5c98445bc01fa6730"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Composition root for `sotp test-obligation` handler and port wiring; see IN-11 / AC-07."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationDeriveArgs",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "8cca49348305fad1015719623c7f942904dd508d9d269e1ecc7564b4743c6b56",
+        "declaration_hash": "645f5ce46bce6eb8cc01aef7f2cefa91dd1868696e58a700aede8703a1bc6b66",
+        "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationDeriveInput",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "ab36411409419e6f76df78cf525fe339a64371751e3eac00d1b5a78b367f0556",
+        "declaration_hash": "26b32131defaaa351d1ebf55752a434c9e1fe2ac3fb2fb55552b1eea0e8f42d8",
+        "anchor_text_hash": "23ef7b6f69fba30ba0154c5a917cde7d21d58c34c8a688f6b54a554405bd4b76"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationDeriveInput",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "f4084716945e2d862ab77448ae433ef92fab7fdbcbe2beb9bd44e01fe411feca",
+        "declaration_hash": "26b32131defaaa351d1ebf55752a434c9e1fe2ac3fb2fb55552b1eea0e8f42d8",
+        "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationDrift",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-13"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "b86c85c2ec4c98cf3f3acaddf9a5ca7990658192c243cfbfa5e11cb46b6d1831",
+        "declaration_hash": "0c38b1773a5f4059090bb0316ef7f6b6feabb9f42527349dd02214ddbfe6e984",
+        "anchor_text_hash": "166556f55a6001e690e523787ef8803c864a179c004ddd667b4c86c23cffe47e"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationEdgeId",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "579f0506048fdf6d245397faad2af159835ba3931148bc2bd253fcfb64b05b11",
+        "declaration_hash": "03f0718ab322850cf61c0909824634bec66d0bfe5a0bb5c193d53567d2edf77e",
+        "anchor_text_hash": "fcfecfd0efd1ddf6c39834b8a29e3842aa0a6b7ff940c033508b9b5f620a0a01"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Edge identity value object for test-obligation bindings; see IN-06 / IN-08 / CN-02."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationEdgeId",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "b921ba74b9b7e5447eb19dc98eae9d13bc82707e45e5f13c8eae0d08dbc0efc4",
+        "declaration_hash": "03f0718ab322850cf61c0909824634bec66d0bfe5a0bb5c193d53567d2edf77e",
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Edge identity value object for test-obligation bindings; see IN-06 / IN-08 / CN-02."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationEvaluateArgs",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "3423b9e9ae12bcc103db2db53c75ffe956abc5048920341b7c3ce5336409fe98",
+        "declaration_hash": "7d3e3a207213145a685ddcca1f98ab743b13a60d04e918dd298cf46490d6596b",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Struct(StructKind { shape: Plain { fields: [FieldDecl { name: FieldName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }], has_stripped_fields: false }, typestate: None }), methods: [], generics: [], where_predicates: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationEvaluateConfig",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "8c4af5941a4354628985fc1c15900cee646b50c8699fe1f4bcc40e38617af721",
+        "declaration_hash": "279d0145bce6057baba24acf2ea2b73046841fc843b69fa7c80998b51ea59141",
+        "anchor_text_hash": "b7c9b797f7e2ec1e968f432b9ad95a46cbe4b2fecc29ce7e43cbbee784d19246"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject; docs: Some(\"Validate the raw config values. See IN-01 / AC-15.\")"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationEvaluateConfigError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-15"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "8edc9001cf21b0b9bab3ac20d67dde5123fa45d258e48aa93bafdbe92f823ba8",
+        "declaration_hash": "b033fe19abc0d593fec606c48596d243d1224ccd231badc789e0184fe025f046",
+        "anchor_text_hash": "88cc841b2447a5f6dce2821a251e1360348f69b3cc7bb1571cb4cdae73696fbf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationEvaluateConfigError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "d6bf67a6bd004369ed0e232f93126f0950513531afd6d4961a9cf016134d88e1",
+        "declaration_hash": "b033fe19abc0d593fec606c48596d243d1224ccd231badc789e0184fe025f046",
+        "anchor_text_hash": "b7c9b797f7e2ec1e968f432b9ad95a46cbe4b2fecc29ce7e43cbbee784d19246"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: [], generics: [], where_predicates: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationEvaluateInput",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "79d8025a26766c8460397ca2ebbc057985ff419711eb1b0b9731d75966c0b565",
+        "declaration_hash": "74eab60322f2370781f47f632736667debfb7f63d494daa4df04ce2d9e302636",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"cli_driver-local DTO for `sotp test-obligation evaluate`; see IN-09 / AC-06.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationEvaluateInput",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "18f0b69bc462285de0303e62caf5a5bb4c8fae13f4e55440d1f608d36a78365d",
+        "declaration_hash": "74eab60322f2370781f47f632736667debfb7f63d494daa4df04ce2d9e302636",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationId",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "900f0869bf08388431b546407ba061251b02287e053d84732eb32db85c16b56c",
+        "declaration_hash": "968b76790dbdca7f4ba60db680302b23020ef8c2fb0152d2eaa195bde42ff3dd",
+        "anchor_text_hash": "23ef7b6f69fba30ba0154c5a917cde7d21d58c34c8a688f6b54a554405bd4b76"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Obligation identity value object; see IN-05 / CN-01 / AC-03."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationKind",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-16"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "7dfe1279eff95a952676759d0b5210ea71fb96c432bfea19a33af0b48d2b42e7",
+        "declaration_hash": "a825d7a6deb52405ee9a5724f3ffd1300872275ef8bb080e206bf56e05a7e7aa",
+        "anchor_text_hash": "6e2982082d32efe4c4f49ca652e3225a4db26ed1ab83213f93a6344be4c6b48c"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Obligation-kind vocabulary for derivation rules"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationKindDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "2e9084d341af1a57f004f84b7481e29d94a4cabd38c45e8c2d1a88582497dda2",
+        "declaration_hash": "f3d377b09a0ece350a717c0a31f7d4cda3d7fdcd8303f448c47a7491c19636dc",
+        "anchor_text_hash": "a581549bcdf2fbd8a31954e880e3bd3f14ffbfe0b3b0a544abeaec940eac47cf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Serde DTO for TestObligationKind; see IN-05 / CN-10."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationMinimum",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "466e582f2a2e778c3df2d11dc013d50e9de27a8ced7b424994de6d452d7f81f9",
+        "declaration_hash": "47c898518b667117180bd435cd3822c9d7ce03a85383a75985fc97fe6e2efab6",
+        "anchor_text_hash": "290a7e8a65f673fe8fef8b0bcd0d6ec860feb4aa18e79cee17edf55bf0b1114b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationMinimum",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "b32355cd817293ba30fb98eb1c2521a193698f390fd779bfde8c29b68d421c40",
+        "declaration_hash": "47c898518b667117180bd435cd3822c9d7ce03a85383a75985fc97fe6e2efab6",
+        "anchor_text_hash": "53fcb55c4abc5add6cb246247829f7eda50f0a9069381992e8a9499014fa8a71"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationPatternKind",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "1c6f3d29657185d587c22be46b0cb464b0e49370ae91846fde6bb2849248cce9",
+        "declaration_hash": "10db3c322181365aafe94304152cf2d096d31de4f3638b9e5eec3649dc88fa6d",
+        "anchor_text_hash": "290a7e8a65f673fe8fef8b0bcd0d6ec860feb4aa18e79cee17edf55bf0b1114b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Typestate\")), payload: Unit }] }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationPatternKind",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "5293c73e977f9a00446176d2e11342f16ade174d65816c145f3134f5432a67f0",
+        "declaration_hash": "10db3c322181365aafe94304152cf2d096d31de4f3638b9e5eec3649dc88fa6d",
+        "anchor_text_hash": "2542f4eecd5947e2dde53ca793711e5d5eb9e82d93631e800726793a1525f458"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "patterns（typestate）"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationPerAxis",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "348f6e2b69acab0ac70891c946df83cedfef4e46c54ae2ac6790c7fb0f40b691",
+        "declaration_hash": "dbe9551a50d1b92cf6cf40b8556e7199c50a0f7037fc722b6c503ebac0963201",
+        "anchor_text_hash": "53fcb55c4abc5add6cb246247829f7eda50f0a9069381992e8a9499014fa8a71"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Per-axis vocabulary for decision-table rules; see CN-10 / IN-02."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationPerAxisDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "bb246ac2d54afba48c887a53256c94b5c34c4a79a17beb21496b43770fd5b3cd",
+        "declaration_hash": "7b7d8faa7401d3b3948b1f7a1c54d1fd7021465d86a4e77f6f9a09ff6d8224d9",
+        "anchor_text_hash": "53fcb55c4abc5add6cb246247829f7eda50f0a9069381992e8a9499014fa8a71"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto, kind: Enum"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsArgs",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "ae03431956b5248bc2634b5e32d8c7f5bc243957c7031b1fb05df96a4f9bedae",
+        "declaration_hash": "3d8a09bf9015b9eb14e943af99024b85cd4a0ad0c705bdd2400612c8a2420db8",
+        "anchor_text_hash": "f3b931241466d6279230a10422f1047ccec14fdf2c262b59876899f16ccf13bb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "fields: [FieldDecl { name: FieldName(Identifier(\"track_id\")), ty: TypeRef(\"Option<String>\") }]"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsArgs",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "159fa8d6a95624babdad261641261d63fc28c7077ffb5caa3f5a70861d2b58fe",
+        "declaration_hash": "3d8a09bf9015b9eb14e943af99024b85cd4a0ad0c705bdd2400612c8a2420db8",
+        "anchor_text_hash": "ac928ab35b0e8fbc2f84bd32b6533080109ebc933489bc0b729793dbe67ab246"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsCommand",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "b0ca791f520837c8640350f2b2dbb9a1a621e1674d9526012d4de0206f1bfbaf",
+        "declaration_hash": "55db99fb284ef65eec5009d00ae093a613249ee86382c92b08f09f4bbffc1a2e",
+        "anchor_text_hash": "ac928ab35b0e8fbc2f84bd32b6533080109ebc933489bc0b729793dbe67ab246"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Command, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsInput",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "50c4763ea3293e6fc87b1b0c96d010498cfc1f3d34d444c927869d2f098da679",
+        "declaration_hash": "c7fd6f8090c7c752cb64c56d1ce96310f3f0abeb42716752d0c34231d1a78810",
+        "anchor_text_hash": "ac928ab35b0e8fbc2f84bd32b6533080109ebc933489bc0b729793dbe67ab246"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"cli_driver-local DTO for `sotp test-obligation results`\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsOutput",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "145984761e8a3de5c24171d7e1c1e6092aab7595f3a70823a8be320ced9b3e1c",
+        "declaration_hash": "b3e15913dbfa0a1b46b5ed6e8ae80df042b44dc0476fb5a09a92300425748c38",
+        "anchor_text_hash": "f3b931241466d6279230a10422f1047ccec14fdf2c262b59876899f16ccf13bb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"verdict gate は `check` の責務であることに help text に明記される\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsOutput",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "ed7a800d14b8352ce5f621db51c7e642e2f9b2eaa3aec4d467b41ff7951f4634",
+        "declaration_hash": "b3e15913dbfa0a1b46b5ed6e8ae80df042b44dc0476fb5a09a92300425748c38",
+        "anchor_text_hash": "ac928ab35b0e8fbc2f84bd32b6533080109ebc933489bc0b729793dbe67ab246"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationRule",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "da5f9350580cb47199dc348bf3c24b1ea6a56c09bf456023e340b8c1317e10aa",
+        "declaration_hash": "fbe9e7d634d761691263dd0a6c26973e8ebb41e8ff607474feebb72b655a46c5",
+        "anchor_text_hash": "290a7e8a65f673fe8fef8b0bcd0d6ec860feb4aa18e79cee17edf55bf0b1114b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationRule",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "5ed55990570444df11416997f0fc9cab76296cde1710455ee1950dd69e36f1a6",
+        "declaration_hash": "fbe9e7d634d761691263dd0a6c26973e8ebb41e8ff607474feebb72b655a46c5",
+        "anchor_text_hash": "a581549bcdf2fbd8a31954e880e3bd3f14ffbfe0b3b0a544abeaec940eac47cf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationRule",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "c860d35699f8ecf0611291206ebb11e26ee23d755b5f7d8f95982b8eea320950",
+        "declaration_hash": "fbe9e7d634d761691263dd0a6c26973e8ebb41e8ff607474feebb72b655a46c5",
+        "anchor_text_hash": "53fcb55c4abc5add6cb246247829f7eda50f0a9069381992e8a9499014fa8a71"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"role → 義務生成ルール（義務種別 + per 軸 + brief テンプレート）を JSON で表現する。\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationRuleDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "e0c8cd6d2fcd6a23e0e8505d4efb58122d658247e4d58012ab8f654a9b5d2b43",
+        "declaration_hash": "24e5f0744fe7953745e7cb9b3f5ddc4df1195c9d85d72456c792b74c4ea411e5",
+        "anchor_text_hash": "a581549bcdf2fbd8a31954e880e3bd3f14ffbfe0b3b0a544abeaec940eac47cf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationRuleDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "d01f6af5185e11dd08c9d325d8d65f66a90276f2330c053042c5f8fdc975fa94",
+        "declaration_hash": "24e5f0744fe7953745e7cb9b3f5ddc4df1195c9d85d72456c792b74c4ea411e5",
+        "anchor_text_hash": "53fcb55c4abc5add6cb246247829f7eda50f0a9069381992e8a9499014fa8a71"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Serde DTO for TestObligationRule; see IN-02 / CN-10."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationRulesLoadError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "39255e92e6ed23d6f7cd0f3e8b6d946543a3612b54b0a75a9aae092cbc0187ef",
+        "declaration_hash": "613951756ad86254ac108a0c033821b34eebcb37397dd25d1dafe5cbdc468dfd",
+        "anchor_text_hash": "fd01edfcf94a7ebc413e46473a7d6d1479a0c2f7767e4370d0746a08ee795207"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationRulesLoadError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "ff2615552e32b83564ca138c65b747720ba8f4ca7795b2f60423c8824bd57cea",
+        "declaration_hash": "613951756ad86254ac108a0c033821b34eebcb37397dd25d1dafe5cbdc468dfd",
+        "anchor_text_hash": "64d50949df2df23c3e4e6a885ca2a2f08123c1aa5bd557de8e18a19dfc5b60d4"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "docs: Some(DocString(\"Error vocabulary for TestObligationRulesLoaderPort; see IN-04 / CN-05 / AC-02.\")), methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationRulesLoadError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "0a41913bc8d08367ea2a3cb01a0b514d1f89eb4ab341fb99768febc1611e3e19",
+        "declaration_hash": "613951756ad86254ac108a0c033821b34eebcb37397dd25d1dafe5cbdc468dfd",
+        "anchor_text_hash": "f3dcdf33f4e15a78a90f711c6df20e112a67f84c6abd460ba9660cfa3acf463b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Error vocabulary for TestObligationRulesLoaderPort"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationSubcommand",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "cfea9e4f9da4ba416fc58cbe85c90f7b56783cf5b4c0cddf6a774962817dda4e",
+        "declaration_hash": "17526351a76394d538953ff74e52c0c44ea38028db7f1782279d64971d356e41",
+        "anchor_text_hash": "7bc9fedeac270b98f77789e0857ba4d0516dc096c4c02bd5c98445bc01fa6730"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: [], generics: [], where_predicates: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestSourceScanError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "3450d31cb9b0d8c7f1fb771b98c8f8d26d41d8e50f61221c720483fda9a98246",
+        "declaration_hash": "660a91b00ab8b3ae092ea6c4f067e1adaee421d5e686a0231ab054e0e16663d0",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "docs: Some(DocString(\"Port-boundary error for test-source scanning; see IN-06 / IN-09.\")), methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "UncitedSpecElementFinding",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-13"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "051301f6dcb0ef14c8b58ea721287ab99b8fe829a585bf25c83c86fa35bf6d75",
+        "declaration_hash": "02e71b792ae15d923a956337f04039fa3d017d3212c39d1cc53930d290d24193",
+        "anchor_text_hash": "29c5158132a1ec59013b1cfbfa7ecc13b75a605da2e69345861ab964a5526afc"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "UncitedSpecElementFinding",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-07"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "e117b6dac4737267ab35dc55ae51ea77d1170f2b77c726718dd5fbb8bd2eb763",
+        "declaration_hash": "02e71b792ae15d923a956337f04039fa3d017d3212c39d1cc53930d290d24193",
+        "anchor_text_hash": "391c6aad01f9700f5e50d321c70911d153f46bd9ce3af933ce3de2b67f5008d8"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Finding value object for uncited spec elements; see IN-16 / AC-13 / CN-07."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "UncitedSpecElementFinding",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-16"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "7ca1d6204c5b812ff44c0388cf7ee5352507b1e9c8a329fe7e2afc70abe8d9e1",
+        "declaration_hash": "02e71b792ae15d923a956337f04039fa3d017d3212c39d1cc53930d290d24193",
+        "anchor_text_hash": "a3c6f88671865e1302dd1ad7598db07ce02941496dc42a218a9c7386f52e38d8"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ValidationError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "305b1b13cc72a0b12b199c6a731a78676731ba3e5711cc2d87525ec30c3716b6",
+        "declaration_hash": "95f80162085dacb619029b335fdc8c80ac1263cb726fc2c356d6c05813d414d7",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ValidationError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "35e4b1127e5c138076fb7aaba1f12b9562203e808dcdb69441d352c32cef895a",
+        "declaration_hash": "95f80162085dacb619029b335fdc8c80ac1263cb726fc2c356d6c05813d414d7",
+        "anchor_text_hash": "53fcb55c4abc5add6cb246247829f7eda50f0a9069381992e8a9499014fa8a71"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ValidationError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "bfdce4aa2f86989d4620ecafc40c37a8846e4b6ccee4979c3be19b899be46504",
+        "declaration_hash": "95f80162085dacb619029b335fdc8c80ac1263cb726fc2c356d6c05813d414d7",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "VerifyCacheError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "12a030ce063c320b9cc8962b44b106e2264071015f5b62c5de4e529d296aba2d",
+        "declaration_hash": "d7541df8cc6edd85c4bdf5cbdd206c07634602002c47fe3671864dd8cacc069b",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "VerifyCacheError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "953c7e787fc23e41e8ccb30243baf4dee2a07f2bdc2f1146edba4c32e5493610",
+        "declaration_hash": "d7541df8cc6edd85c4bdf5cbdd206c07634602002c47fe3671864dd8cacc069b",
+        "anchor_text_hash": "4802b74415a134607211305c91ff4d591a481cc1ae3e15a6cb105a84ca3d96ec"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "VerifyCacheError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "a22c871fa03b8c7358365dc6e2343a98731a375a0cb5af2458d0818d66b4a3d5",
+        "declaration_hash": "d7541df8cc6edd85c4bdf5cbdd206c07634602002c47fe3671864dd8cacc069b",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaivedReason",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "8c42ba46f43cf96c5407e72b2cedcf9e9d50f57212bf7725c0f98e9e5172922b",
+        "declaration_hash": "12c491a55458ff896b85053b71d0ba0dc732d26c988211c6d7d1aec7f6e869e8",
+        "anchor_text_hash": "f13f752583eee93d7254e58c4a00d56fe07c53adbc2f8a244c5d06b882a9b9f6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"role: ValueObject { invariants: [] }\"; \"Waiver-reason value object for test-bindings artifacts; see IN-06 / AC-11.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverCacheDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "0ab901edf36bc05cb906750910f688c7fd5cbb062e7b74d5f0ad1a7f956b2408",
+        "declaration_hash": "746f3be545da29c9472a353b6c082bd89dd3c2f0377a64c15a368f10b8d2d11f",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverCacheDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "1466d2d08fba8b0073433205fdab6862af3897e1d6d296dc650ce1be5c48debf",
+        "declaration_hash": "746f3be545da29c9472a353b6c082bd89dd3c2f0377a64c15a368f10b8d2d11f",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Document value object for waiver verdict cache records; see IN-09 / AC-06."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverCacheDocumentDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "4c09de09403d72b80523219b8bcdbc0dce4a4d48c09d9f47081ce5a8b00efbea",
+        "declaration_hash": "1bcd890ac28f0b2dddbe8b781c84763942e4aa3e8548458fef76ffc0f9ac5885",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: Dto, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None }), methods: [], generics: [], where_predicates: [],"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverCacheEntryDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "9f1bc3d972bac840c115dbb454c52f92b7643ff4cb668863dd98aef7f82efa70",
+        "declaration_hash": "af80df125ba8fdaf0d835f2788f4bdcb14d91a5f92b292c587e3333826862ae3",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverEscalationDriver",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "OS-02"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "98a79bd44a657220e37dbb74624a25923c2b020a26de2556afc060096a48a53e",
+        "declaration_hash": "0ed1672e2feb5dec46eb51276311dca17c1f015a097e3425c4098f6ca9dec039",
+        "anchor_text_hash": "35de0f382feeb0d003761a60ba3760ceddb61c74d4d6dca1fda782e2f5221e54"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Plain { fields: [], has_stripped_fields: true }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverPair",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-15"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "476e8b6c678ec66a4c9a8836349cf8029a2ed18d375a7140dd81b9f10816b3dc",
+        "declaration_hash": "394447edfec78ca8708ed563e67852741ac7d16656b3a5147a3c32f24458c0d3",
+        "anchor_text_hash": "88cc841b2447a5f6dce2821a251e1360348f69b3cc7bb1571cb4cdae73696fbf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverPair",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "96c5545b339a3d000d98472139add1ae2467350fcdaa2bf4051d2ad417cbd649",
+        "declaration_hash": "394447edfec78ca8708ed563e67852741ac7d16656b3a5147a3c32f24458c0d3",
+        "anchor_text_hash": "b7c9b797f7e2ec1e968f432b9ad95a46cbe4b2fecc29ce7e43cbbee784d19246"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "検証器固有に残すのは pair / 義務の型"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverPair",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-15"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "9c2404426eb7742066fa49355d3bdccf259d97cb6612f9b6dfaa093038e3da23",
+        "declaration_hash": "394447edfec78ca8708ed563e67852741ac7d16656b3a5147a3c32f24458c0d3",
+        "anchor_text_hash": "41f3b285525a3aa56c7cd68d78da855099fb9f353a94a96e0da3f4f830a7a6f5"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverVerdict",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "3aac0f497e3cb587c8fb9dd87244f621a3adbf7e9d51df669a3beca156d25206",
+        "declaration_hash": "63e20cc847316316e46a5fcf866b38153d8938c42b5575aba533eb0c8d45beb5",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverVerdict",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "c0eed32a064ff150aa06c038d47449ac0f760acd2d47ba4138b7b1d475c9012a",
+        "declaration_hash": "63e20cc847316316e46a5fcf866b38153d8938c42b5575aba533eb0c8d45beb5",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverVerdictDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "6a1542a8c8b67b278d32e937df04f8b28cd49736f050a73f50d4ba13e7431b45",
+        "declaration_hash": "fd674655cc34be23816ea40e494755ea288be6bc61f214503ef86eb4d2eb50dc",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: [], generics: [], where_predicates: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverVerdictDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "50784aa751b62e9a77273b1dd648aea7cb30cdd6b1ac5f15f477c23711add66d",
+        "declaration_hash": "fd674655cc34be23816ea40e494755ea288be6bc61f214503ef86eb4d2eb50dc",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationKind",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "8c3b266dd76ee2d4a2a1a8c4d1cbc540ff01230a0c761fde8168c2fe3e75bcc5",
+        "declaration_hash": "a825d7a6deb52405ee9a5724f3ffd1300872275ef8bb080e206bf56e05a7e7aa",
+        "anchor_text_hash": "a581549bcdf2fbd8a31954e880e3bd3f14ffbfe0b3b0a544abeaec940eac47cf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "決定表の per 軸語彙は宣言 payload のフィールドに対応する閉集合"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingsSkeletonCommand",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "4e390b8fae2d0a9b66531be3af1eef734c820d78723100ca43dd433e1b8a38b4",
+        "declaration_hash": "cbd82af7f1234f940d38b8398fd89c5fe9f122fe1625809baef6b3c3ead1ee68",
+        "anchor_text_hash": "34fba76f1f2370836bde6e2f844cbdbe3ef56a15534bfea3acc9262693d3dc65"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Command input for TestBindingsSkeletonApplicationService; see IN-06 / CN-09 / AC-14."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AnchorTextHash",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "33a8fbe921954ed46e701f37bd062d0a84c49e4913c5354e32f04b804c4eedef",
+        "declaration_hash": "cc27e4af35c4eeb61e11788998860956b7a7f6fcc28ca2714e708bd31b9d30ed",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Hash role value object for anchor text in verdict cache keys; see AC-06."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BoundTestsSetHash",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "d18e96429334d86db4a8e1f9c21586b07d00d5c223cbba9bcedce57588fd0ba7",
+        "declaration_hash": "7e57bba3615f11090ae40f6ffb9feac1dc9420ad4f04bd5ce6b0fab4e4d66eb3",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Hash role value object for bound test sets in fulfillment cache keys; see IN-09 / AC-06."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsCommand",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "75717e8bc57d23488634df594035dea1e4a942e74d3dc09ff3617b59e02d0450",
+        "declaration_hash": "3a216a3ad381c967b03d3c5a16842721ee0761b130b86256727c12ab4b5abc43",
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Command input for CheckTestObligationsApplicationService; see IN-08."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "50997e68e65713573d41cb90c0a00ba5bce75807447f30d529e52d27d8d4e650",
+        "declaration_hash": "0ab80fb0409e22d805a88634a73ee9d1b8120843a468ee90091f18f4e905fc0b",
+        "anchor_text_hash": "98b477739efddc669f1fb0ae30d514b897ef5d5db9442e55cdfbb0bdd1fdc8cd"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-13"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "1e551d3da7e3e8b24d0a64b8d963fa6b44b278b077ac913dd6784c2e06f7c39a",
+        "declaration_hash": "0ab80fb0409e22d805a88634a73ee9d1b8120843a468ee90091f18f4e905fc0b",
+        "anchor_text_hash": "29c5158132a1ec59013b1cfbfa7ecc13b75a605da2e69345861ab964a5526afc"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "cc0391db62770b7fefc097b56350596042d119a6ac1e210555eec6ba7029d448",
+        "declaration_hash": "0ab80fb0409e22d805a88634a73ee9d1b8120843a468ee90091f18f4e905fc0b",
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ContractRoleKey",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "378f38b695d132aeac5349e31b6a71af21ffeec437b454f5c2e58dc2e53e8742",
+        "declaration_hash": "c8fbb823739ec59f27b6aee1958c8251b00d807a2eef28865017b7f849a41282",
+        "anchor_text_hash": "64d50949df2df23c3e4e6a885ca2a2f08123c1aa5bd557de8e18a19dfc5b60d4"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "ロード時 totality 検証で fail-closed。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ContractRoleKey",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "030f5a7ea1d1d79e49a29f0319fd27814682e69482a089c2d8af0d92f7e3c7c8",
+        "declaration_hash": "c8fbb823739ec59f27b6aee1958c8251b00d807a2eef28865017b7f849a41282",
+        "anchor_text_hash": "2542f4eecd5947e2dde53ca793711e5d5eb9e82d93631e800726793a1525f458"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"SecondaryPort\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"SpecificationPort\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"Repository\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"ApplicationService\")), payload: Unit }] }, methods: [], generics: [], where_predicates: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "DataRoleKey",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "7eb3e33086e29a8599ee042dc903108a835a43f3c69257163c600ad1e97519a9",
+        "declaration_hash": "82c74038d84eee6574938248ca9c54f5975bf750ffeebf6d5eec07e2d9abe956",
+        "anchor_text_hash": "2542f4eecd5947e2dde53ca793711e5d5eb9e82d93631e800726793a1525f458"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "DeclarationHash",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "8710f8f4c86b4b878682fc7d74de3fb70bdad208f7a70bfd7b7ab0008ac3342a",
+        "declaration_hash": "c997c3c89c2771b8204cfa550adc150d6a6814b2a83f13e202c0aab478228153",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Hash role value object for catalogue entry declarations in verdict cache keys; see IN-05 / AC-06."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateTestObligationsFuture",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "244851ea0138e855ef3e540f24dc61a9bc4468a212b295f09c0c70f276ca5de6",
+        "declaration_hash": "81601d1819a143b505b6d5d25d58a84b272bc3dc055a5cb8458792b8ac66b4d4",
+        "anchor_text_hash": "a9d2ea6b1e87b023912bfa00993f079cbecf95652ea9045af495c650513c8edd"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeAlias { target: TypeRef(\"std::pin::Pin<std::boxed::Box<dyn core::future::Future<Output = Result<EvaluateTestObligationsOutcome, domain::tddd::test_obligation::errors::ObligationEvaluateError>> + Send + 'a>>\") }, methods: [], generics: [], where_predicates: [],"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateTestObligationsOutcome",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "819d57ef8d8b51a6d220c6541ee06533a131b02acede85cb31fbfd61dfe7343b",
+        "declaration_hash": "6e44b0b981e06a7d15c7679d4b78071fb707d4df02e0bb12025e75b8d9e0bf33",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Structured output of EvaluateTestObligationsInteractor; see IN-09 / AC-06."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FulfillmentFailCategory",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "239d78b32292f187df565fc3feac80678d1a6871e9d4268981e5ecf7ecd06808",
+        "declaration_hash": "a75765b525cd6252181235eadf073f069d973ee4f5d0ba090031e400c24db7a6",
+        "anchor_text_hash": "d34cd75254543ba2866b1ac65be62619073e6042ce397cbe7007f4fb1431f219"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FulfillmentFailCategory",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-12"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "bce5cb87fca9503545d32e8c8191e8acca40f4deea1c2564d5d87771abbd68de",
+        "declaration_hash": "a75765b525cd6252181235eadf073f069d973ee4f5d0ba090031e400c24db7a6",
+        "anchor_text_hash": "65f485b9c7b0b8c4d14c8336e4cf22d264716d86f4bd825396329067980211b8"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject; docs: Some(DocString(\"Fulfillment-fail category vocabulary; see IN-12 / AC-08.\"))"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FunctionRoleKey",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "e637c73aa52a9bfc5d0b4097eef736e74957ec6d4979262328107cd473159713",
+        "declaration_hash": "ec65377b357c1f8d5c963203609b0e3517c7f450d35a68007f2b9effdd6b75cf",
+        "anchor_text_hash": "64d50949df2df23c3e4e6a885ca2a2f08123c1aa5bd557de8e18a19dfc5b60d4"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Serde-map key DTO for domain FunctionRole; see IN-03 / CN-05."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FunctionRoleKey",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "987367d1d49cf181b689f5bba7556e1424450a03e4393ca8c97d0ab74a743ca7",
+        "declaration_hash": "ec65377b357c1f8d5c963203609b0e3517c7f450d35a68007f2b9effdd6b75cf",
+        "anchor_text_hash": "2542f4eecd5947e2dde53ca793711e5d5eb9e82d93631e800726793a1525f458"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "FunctionRole 2 種（UseCaseFunction / FreeFunction）"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "a756de1e0716e9a3e7466b3c97df6399f070a49c62f6bd6529d288def23566f0",
+        "declaration_hash": "397b1db103c8aa03b785dd85e130cf033119c3e9bb549426fb3dffce922dd84b",
+        "anchor_text_hash": "98b477739efddc669f1fb0ae30d514b897ef5d5db9442e55cdfbb0bdd1fdc8cd"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-08"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "49180157970e7a35194d29b03e4837d6e1bb5a16c7e86245f6ed84a046324efd",
+        "declaration_hash": "397b1db103c8aa03b785dd85e130cf033119c3e9bb549426fb3dffce922dd84b",
+        "anchor_text_hash": "e2ce343b43d4ea81d9192f618985119a5b3857c5c773baac4f2027786d8e4486"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheEntry",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "f1c90589af4a11e4ccdf5aca680430543e7948d50920b137ff079038fea5f4e9",
+        "declaration_hash": "0895703702b790672596d347133193e2e07f6f23123c6ec0dab337ca255a8ecc",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheEntry",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "a9e790e40fd7543af60b6368fde00aaccabccd4287d1e49407afab6cd5be8067",
+        "declaration_hash": "0895703702b790672596d347133193e2e07f6f23123c6ec0dab337ca255a8ecc",
+        "anchor_text_hash": "4802b74415a134607211305c91ff4d591a481cc1ae3e15a6cb105a84ca3d96ec"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Cache-entry value object for obligation-fulfillment verdict records; see IN-09 / CN-04."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "30cff51fa6573a8985d05879dd2fb1603759ebb12d4395425ab3983493cd4ef1",
+        "declaration_hash": "7eed5791ac094b05ad7113d171b2a40ee1386faf7b8a222419bf0ecb1094cc6c",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "aeb4dd022ca365c8a10de9da46ead49cbca145992e9a19114845af283b436173",
+        "declaration_hash": "7eed5791ac094b05ad7113d171b2a40ee1386faf7b8a222419bf0ecb1094cc6c",
+        "anchor_text_hash": "4802b74415a134607211305c91ff4d591a481cc1ae3e15a6cb105a84ca3d96ec"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Cache-key value object for obligation-fulfillment verdict records"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "b6dfc8a346f6320d9dd1ad470c3563b478d4fa4d210c83cd4dae77109b389710",
+        "declaration_hash": "7eed5791ac094b05ad7113d171b2a40ee1386faf7b8a222419bf0ecb1094cc6c",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Cache-key value object for obligation-fulfillment verdict records"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentPair",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "d77529913573c0e64980d5565a30f905558939f6a58c0069ceb2b926fbe10bc1",
+        "declaration_hash": "1a027bdc672fe7fdf2ec58c7550cf02a952dab9012b8617ca7190e3cd512541b",
+        "anchor_text_hash": "b7c9b797f7e2ec1e968f432b9ad95a46cbe4b2fecc29ce7e43cbbee784d19246"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentVerdict",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "eaf77c9a3d2e32ccc71e30c4428cf9f49fd470ffabb061e72c88e225e9a58e42",
+        "declaration_hash": "9da9ec1deabc316a5be22081301f8688f6ec7da2fd3c6ed59e4f1b66f5b0cbc9",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentVerdictDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "9784f4951df67aa8d5ab5e64a394ac761f453528bfa4c446dda3f39d469bd0e2",
+        "declaration_hash": "b586711c4e26de95361b6c581ffa6de0f4044cfad321d0bfd90c65320708ca5e",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PatternKey",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "bcbd902e01e90b8c55e360cae813a7f0a96a52b53f141fc4a90a27ef0f974f92",
+        "declaration_hash": "4c0ea6d802603a9c099426d0195f16f69e932ebed3367ba6f293393ea5598618",
+        "anchor_text_hash": "64d50949df2df23c3e4e6a885ca2a2f08123c1aa5bd557de8e18a19dfc5b60d4"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Typestate\")), payload: Unit }] }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PatternKey",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "0141d4c79598ae28c894f2a646cc32074fd1ef3c7c2c9931ab763bff58a781f3",
+        "declaration_hash": "4c0ea6d802603a9c099426d0195f16f69e932ebed3367ba6f293393ea5598618",
+        "anchor_text_hash": "2542f4eecd5947e2dde53ca793711e5d5eb9e82d93631e800726793a1525f458"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Typestate\")), payload: Unit }] }, methods: [], generics: [], where_predicates: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "RefVerifyCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "fcd50dc95f653a4fbc7f44c6671bc9e0f078baf2e9cdab39cee973ee7f3b5974",
+        "declaration_hash": "60ed2047bbcf87028d708b65f571c479372c013a8e6c32a3b7371fd325a19534",
+        "anchor_text_hash": "b7c9b797f7e2ec1e968f432b9ad95a46cbe4b2fecc29ce7e43cbbee784d19246"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }, typestate: None })"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "RoleName",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "0668d06f870fda4a176ec5fa382c97c1f8910c043911230232fa56d3f7fe5076",
+        "declaration_hash": "1ad389de4f3e17339191640eb85dba9ad7083704846f7f17e9a2348f37630c5d",
+        "anchor_text_hash": "64d50949df2df23c3e4e6a885ca2a2f08123c1aa5bd557de8e18a19dfc5b60d4"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "invariants: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "RoleName",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "5e1af0b6dcd05b7e53e60f87a0cb8c5149bf8302a68fbbcd9e2ba988123ccd29",
+        "declaration_hash": "1ad389de4f3e17339191640eb85dba9ad7083704846f7f17e9a2348f37630c5d",
+        "anchor_text_hash": "f3dcdf33f4e15a78a90f711c6df20e112a67f84c6abd460ba9660cfa3acf463b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SemanticVerifierError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-08"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "34684650d3ca4ee55960d432ccf365b99cf1781559de9078c46330c1ba11d67e",
+        "declaration_hash": "f2d73940fa4797fb93ee730dbd59fa6577ac7b18d34151760a8a5075e24fe933",
+        "anchor_text_hash": "b39c474de068f9e08e65ef079df13752e21eb7f3461749aada4f70c9a23331aa"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SpecDocumentLoadError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "2515c8bb16aa079c13614e75e8035a39864a699024a4661799af131a1b915484",
+        "declaration_hash": "b067fd33dc2f3be8c92e0a2d4ab68a7a00e7c2c586a2f10dc330a81e9a60ba20",
+        "anchor_text_hash": "120809d9563c30f108dd0aca511bb1c05f21e15c150061752eb7215857e28f25"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingRecord",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-12"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "4734dfa496a811e471c2296da5adf47062593a389303de5333fc5a3908ae0362",
+        "declaration_hash": "5b58ef76168216809cb8a0845718b149bc59e2e343c1170e2d2ca98401bf8d5a",
+        "anchor_text_hash": "523b212626bb334f05925300c0aacbd9790c36d5f3ab7199ed777a92696e79c4"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "docs: Some(DocString(\"Binding-record vocabulary for test-bindings artifacts; see IN-06 / AC-12 / CN-02.\")), methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingRecord",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "4d40854e8ac9dc02717568b8554d3914566899bb33af21a68e1c0b7515504090",
+        "declaration_hash": "5b58ef76168216809cb8a0845718b149bc59e2e343c1170e2d2ca98401bf8d5a",
+        "anchor_text_hash": "34fba76f1f2370836bde6e2f844cbdbe3ef56a15534bfea3acc9262693d3dc65"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBodySpanHash",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "e7bb53165b515ab503a72f4d5760dbcf27adc0ab1a1f667c9cd435497a023ff6",
+        "declaration_hash": "4ec789ea7e8c8f0d2ff4b98d82b5283337744237e77d2e4ed4520715211a38d0",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "verdict は tests pair で (bound tests 集合 hash, entry宣言 hash, anchor hash)、waiver pair で (waived理由 hash, entry宣言 hash, anchor hash) の三つ組でキャッシュに凍結される。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBodySpanHash",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "611e3b9d3b770eb95354f016bed524f3b737b0b2bcb9ca019ff9acdb254667c6",
+        "declaration_hash": "4ec789ea7e8c8f0d2ff4b98d82b5283337744237e77d2e4ed4520715211a38d0",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }, kind: Struct(StructKind { shape: Plain { fields: [], has_stripped_fields: true }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestLocation",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "b216734ec4a2021ceb1f106b31e0cb5e1dc6ec7d8f81bd3b5f878cbdf28b0cf5",
+        "declaration_hash": "89c76a2e0c3c654f0f6a1852d35e7b47d12a365df00a0fdfbe466f0fdca317f6",
+        "anchor_text_hash": "34fba76f1f2370836bde6e2f844cbdbe3ef56a15534bfea3acc9262693d3dc65"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligation",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "5d0a8fc7190790f65feb5e1e28875008012e7b4eb82562136f5e3e009c70b795",
+        "declaration_hash": "fe4613feb75b53da4330df33e0828b2b8a7818d13c2eaef308a419a94b221db6",
+        "anchor_text_hash": "3c5acf05aa2b34161959f8cab9bcb86676033dc7d92f6dd52d6485b17d911066"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationAnchorId",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "480ce9ba3aa13d7f04725141c191d41c78ea0e68e6a6d29616b3a5ecccff9752",
+        "declaration_hash": "abc59c2a6175fcd165a61e774c5beda1a96e7f0c92bd7388f4a810d7034e736c",
+        "anchor_text_hash": "34fba76f1f2370836bde6e2f844cbdbe3ef56a15534bfea3acc9262693d3dc65"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Identifier value object for a spec or ADR anchor; see IN-06."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationBrief",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "3689c1be8cdd1e648502980b4d1d0773ac13ca52a2c1e5b5284833abe2121243",
+        "declaration_hash": "0357fc494f1743b1bd8fe26a3f3484ce8a79666f3901315213e9a4573d73d265",
+        "anchor_text_hash": "3c5acf05aa2b34161959f8cab9bcb86676033dc7d92f6dd52d6485b17d911066"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationChainLabel",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "b36d464fbed5f2295ad49fba3ae58f75248594a1dde1fd04cc6fc1aaa29b43a9",
+        "declaration_hash": "fb6a272196dc10e7a52709eb6b050d5073b1d22ef29be40cfa318c7e5ec88c78",
+        "anchor_text_hash": "f3b931241466d6279230a10422f1047ccec14fdf2c262b59876899f16ccf13bb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Results-output lane discriminant for test_obligation verdict chains; see IN-10 / AC-09."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationDrift",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "2a2f353c123d09c530abeaf1ef181a8592b76c0549c6ea06929dc90297313fc8",
+        "declaration_hash": "0c38b1773a5f4059090bb0316ef7f6b6feabb9f42527349dd02214ddbfe6e984",
+        "anchor_text_hash": "2ec5d0f388487e1a45112cb601d93a18d6a58dd72131c07a45a9f7ba9471da14"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Drift-detail value object for test-obligation check; see IN-13 / AC-05.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationDriftKind",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "c58e8724df34dd5a20f7401560a1c4cf9da05f1e9f68c023fc72440bb26ca779",
+        "declaration_hash": "a8bbf64876241e3333bc36d47181f1fd83972560d14681a0aa0eeec5f6e1e069",
+        "anchor_text_hash": "2ec5d0f388487e1a45112cb601d93a18d6a58dd72131c07a45a9f7ba9471da14"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationEdgeId",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "359ccc39d1d838039bbe622fbad49186f821a5f5932db9d6ae80d1f1c628f585",
+        "declaration_hash": "03f0718ab322850cf61c0909824634bec66d0bfe5a0bb5c193d53567d2edf77e",
+        "anchor_text_hash": "34fba76f1f2370836bde6e2f844cbdbe3ef56a15534bfea3acc9262693d3dc65"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Edge identity value object for test-obligation bindings; see IN-06 / IN-08 / CN-02."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationId",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "cdeef89865cc7e5d2f59c3d6914324d36003fd3251bb4fc7b180266b6e6a93c4",
+        "declaration_hash": "968b76790dbdca7f4ba60db680302b23020ef8c2fb0152d2eaa195bde42ff3dd",
+        "anchor_text_hash": "3c5acf05aa2b34161959f8cab9bcb86676033dc7d92f6dd52d6485b17d911066"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Obligation identity value object; see IN-05 / CN-01 / AC-03."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationItemIdentifier",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "b37353e9ff3493dcb068f846a21e395ef749077d370f7bc69f4876e2b6268929",
+        "declaration_hash": "ce4cb0142ac38819b7a6cfc448aa2ad1a5aaba4100599a29cf96fca3e86a4c29",
+        "anchor_text_hash": "3c5acf05aa2b34161959f8cab9bcb86676033dc7d92f6dd52d6485b17d911066"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationKind",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "2c0f7beaa12671ff1a80da08248d440025986b05642aeb52d465a4c12d4b207f",
+        "declaration_hash": "a825d7a6deb52405ee9a5724f3ffd1300872275ef8bb080e206bf56e05a7e7aa",
+        "anchor_text_hash": "3c5acf05aa2b34161959f8cab9bcb86676033dc7d92f6dd52d6485b17d911066"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "各義務は (義務 id, 対象 entry, 義務種別, 宣言内項目識別子, brief, entry宣言 hash) を持つ。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationLaneSummary",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "ef3be71b95b0b3ab8c9952591a2ab40ec04dbbe8f6b15498fd315b44566f57d2",
+        "declaration_hash": "59949046984422b4d1be8c603872dbc7dcf23516cf7b89be8e3e4c16e8206415",
+        "anchor_text_hash": "f3b931241466d6279230a10422f1047ccec14fdf2c262b59876899f16ccf13bb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationLaneSummary",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "2db4b4714852038d2adabf6cc926b6f3e23d94fe62646bb3eb093f9540e13879",
+        "declaration_hash": "59949046984422b4d1be8c603872dbc7dcf23516cf7b89be8e3e4c16e8206415",
+        "anchor_text_hash": "ac928ab35b0e8fbc2f84bd32b6533080109ebc933489bc0b729793dbe67ab246"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "DTO row for a test-obligation results lane summary; see IN-10 / AC-09."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationPerAxis",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-10"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "c0fd8903b069682e0864a292c9110f4b1609d82cb8b5fea878bfb01ea4893bd7",
+        "declaration_hash": "dbe9551a50d1b92cf6cf40b8556e7199c50a0f7037fc722b6c503ebac0963201",
+        "anchor_text_hash": "a581549bcdf2fbd8a31954e880e3bd3f14ffbfe0b3b0a544abeaec940eac47cf"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsCommand",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "8b9bef93356702f17ecb2bd8d702dd6b7bffc1b3561aaebebf6b33dde33d2ceb",
+        "declaration_hash": "55db99fb284ef65eec5009d00ae093a613249ee86382c92b08f09f4bbffc1a2e",
+        "anchor_text_hash": "f3b931241466d6279230a10422f1047ccec14fdf2c262b59876899f16ccf13bb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Command input for TestObligationResultsApplicationService; see IN-10 / AC-09."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsInput",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "d3e280d8bedf79ee1a46704d47ffb5727074c3b32140208d6132b4162949ef26",
+        "declaration_hash": "c7fd6f8090c7c752cb64c56d1ce96310f3f0abeb42716752d0c34231d1a78810",
+        "anchor_text_hash": "f3b931241466d6279230a10422f1047ccec14fdf2c262b59876899f16ccf13bb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "docs: Some(DocString(\"cli_driver-local DTO for `sotp test-obligation results`; see IN-10 / AC-09.\"))"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestSourceScanError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "4ff32099a43af610b1d48601b6f35dcfefa80fa7e255fbc4cba42e9155838233",
+        "declaration_hash": "660a91b00ab8b3ae092ea6c4f067e1adaee421d5e686a0231ab054e0e16663d0",
+        "anchor_text_hash": "34fba76f1f2370836bde6e2f844cbdbe3ef56a15534bfea3acc9262693d3dc65"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "VerifierPromptFingerprint",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "a74d63c12940cef470f2f774032d57a178eb3adcd620d23231af19d766c757cc",
+        "declaration_hash": "139ace151c9d6e2b2dbc54cb4486411e98b499d44e48acc6e5614a985f9c24bb",
+        "anchor_text_hash": "4802b74415a134607211305c91ff4d591a481cc1ae3e15a6cb105a84ca3d96ec"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Hash of the judging-prompt preamble carried by cached verdicts"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "VerifierPromptFingerprint",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "ac111ecf51a236e809c886e6dcd96bcc4d57ae5c4e4655bb6f1b8a26b077d5a7",
+        "declaration_hash": "139ace151c9d6e2b2dbc54cb4486411e98b499d44e48acc6e5614a985f9c24bb",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaivedReason",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "841aeddeeb911fb16dad121ee4da9af3b8f18592cd5e5f75ac8971a587cb5110",
+        "declaration_hash": "12c491a55458ff896b85053b71d0ba0dc732d26c988211c6d7d1aec7f6e869e8",
+        "anchor_text_hash": "34fba76f1f2370836bde6e2f844cbdbe3ef56a15534bfea3acc9262693d3dc65"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "invariants: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaivedReasonHash",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "d551b6d7be8d8396afbde9ae481de47bd065a859bc61c4d4647917a32b8a0bb5",
+        "declaration_hash": "de97624fec103638397c80008f697598cb1cbb4a3e0856fb5b8699b1092e9cde",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "ValueObject { invariants: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "3f3d0f306a1c75a690faa62a302aa84825571f6abb327bc36b3cf4bd06d74c66",
+        "declaration_hash": "6bd6e5cf96d9620a5abc524d52a6ab95df1edc3020d8e453199e2a6b2d5abf4b",
+        "anchor_text_hash": "5dc6a81fd1af1ea6a4d516a39984d14c4843e1f6122eaf606f9f9c1fdcca4cdb"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Cache-key value object for waiver verdict records; see IN-09 / AC-06 / CN-04."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "0e02eaa65cba0eaee7455121ef20423a6edb59fc2e7ea60bad9d4072d7c672f2",
+        "declaration_hash": "6bd6e5cf96d9620a5abc524d52a6ab95df1edc3020d8e453199e2a6b2d5abf4b",
+        "anchor_text_hash": "4802b74415a134607211305c91ff4d591a481cc1ae3e15a6cb105a84ca3d96ec"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Cache-key value object for waiver verdict records"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverCacheKey",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "IN-09"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "be21431a2f050864d8a03d51001472320cd631bed131d9fd8033d81f721bfb47",
+        "declaration_hash": "6bd6e5cf96d9620a5abc524d52a6ab95df1edc3020d8e453199e2a6b2d5abf4b",
+        "anchor_text_hash": "977dd46fb1db6227f3d70c51585fab4c5cf99b475cd14f1d14693e6f81bcaab9"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Cache-key value object for waiver verdict records"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "WaiverVerdict",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "key": {
+        "waived_reason_hash": "aed1c28b19aef8939c8fb0d290221da06880d9f887fe69b7eb6dea0bd6e3c08a",
+        "declaration_hash": "63e20cc847316316e46a5fcf866b38153d8938c42b5575aba533eb0c8d45beb5",
+        "anchor_text_hash": "f13f752583eee93d7254e58c4a00d56fe07c53adbc2f8a244c5d06b882a9b9f6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: ValueObject { invariants: [] }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ]
+}

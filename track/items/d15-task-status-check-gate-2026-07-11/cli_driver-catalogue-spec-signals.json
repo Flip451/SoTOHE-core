@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "f7e8d86dead1163951ee306efe1c20bd342874b250aec68ebc1e1b43c750c5b0",
+  "signals": [
+    {
+      "type_name": "TestObligationCheckHandler",
+      "signal": "blue",
+      "entry_hash": "5a8be2988ae1ee529694788ca335c2f2cb3eea75338f9f298e786954ec91435b"
+    },
+    {
+      "type_name": "TestObligationResultsHandler",
+      "signal": "blue",
+      "entry_hash": "cfd1e4ab3e96e92caa16d43e31ca541758963efa5612663758984fa343488d37"
+    }
+  ]
+}

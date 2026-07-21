@@ -1,284 +1,365 @@
-//! Evaluation-result document for the per-layer TDDD type-signal file.
+//! Freshness-aware evaluation-result document for per-layer TDDD type signals.
 //!
-//! Holds the pure in-memory representation of `<layer>-type-signals.json`
-//! (schema_version 1). This module is part of the declaration/evaluation split
-//! introduced by ADR `knowledge/adr/2026-04-18-1400-tddd-ci-gate-and-signals-separation.md`
-//! §D1, which separates authored type declarations (`<layer>-types.json`) from
-//! generated evaluation results (`<layer>-type-signals.json`).
-//!
-//! `TypeSignalsDocument` is a pure value type: it has no state transitions and
-//! no variant-dependent data, so it is modelled as a struct with private fields
-//! and accessor methods (see `knowledge/conventions/prefer-type-safe-abstractions.md`).
-//!
-//! `TypeSignalsLoadResult` captures the outcome of loading a signal document
-//! relative to the current declaration file: `Current` / `Stale { .. }` /
-//! `Missing`. The three states carry structurally different data (Stale needs
-//! the expected hash to report; Missing carries no data), so the type uses the
-//! enum-first pattern.
+//! A document records the declaration and implementation inputs that govern
+//! reuse. Any missing implementation identity selects re-extraction.
 
-use crate::Timestamp;
+use std::fmt;
+
 use crate::tddd::catalogue::TypeSignal;
+use crate::{ContentHash, Timestamp};
 
-/// Fixed schema version for `<layer>-type-signals.json`.
-///
-/// The evaluation-result file is a new schema introduced by ADR 2026-04-18-1400.
-/// Any future incompatible format change must bump this version.
-pub const TYPE_SIGNALS_SCHEMA_VERSION: u32 = 1;
+/// Schema version for `<layer>-type-signals.json` documents.
+pub const TYPE_SIGNALS_SCHEMA_VERSION: u32 = 3;
 
-/// In-memory representation of `<layer>-type-signals.json` (schema_version 1).
-///
-/// Records the output of a single `sotp signal calc-impl-catalog` run for one layer:
-/// the per-type confidence signals, the generation timestamp, and a SHA-256
-/// fingerprint of the declaration file bytes at evaluation time. The
-/// fingerprint enables `verify_from_spec_json` to detect stale evaluation
-/// results (declaration file changed after the signals were recorded).
-///
-/// Pure value type — no state transitions, no variant-dependent data.
+/// A validated lowercase SHA-256 hexadecimal digest.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Sha256Digest {
+    value: String,
+}
+
+/// Error returned when a SHA-256 digest is malformed.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Sha256DigestError {
+    /// The digest does not contain exactly 64 characters.
+    InvalidLength,
+    /// The digest contains a non-lowercase-hexadecimal character.
+    InvalidHex,
+}
+
+impl fmt::Display for Sha256DigestError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::InvalidLength => formatter.write_str("SHA-256 digest must contain 64 characters"),
+            Self::InvalidHex => formatter.write_str("SHA-256 digest must be lowercase hexadecimal"),
+        }
+    }
+}
+
+impl std::error::Error for Sha256DigestError {}
+
+impl Sha256Digest {
+    /// Converts a computed content hash into its canonical digest representation.
+    #[must_use]
+    pub fn from_content_hash(content_hash: ContentHash) -> Self {
+        Self { value: content_hash.to_hex() }
+    }
+
+    /// Validates and stores a lowercase SHA-256 hexadecimal digest.
+    pub fn try_new(value: String) -> Result<Self, Sha256DigestError> {
+        if value.len() != 64 {
+            return Err(Sha256DigestError::InvalidLength);
+        }
+        if !value.bytes().all(|byte| byte.is_ascii_digit() || (b'a'..=b'f').contains(&byte)) {
+            return Err(Sha256DigestError::InvalidHex);
+        }
+        Ok(Self { value })
+    }
+
+    /// Returns the validated digest text.
+    #[must_use]
+    pub fn as_str(&self) -> &str {
+        &self.value
+    }
+}
+
+macro_rules! digest_identity {
+    ($name:ident, $docs:literal) => {
+        #[doc = $docs]
+        #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+        pub struct $name {
+            digest: Sha256Digest,
+        }
+
+        impl $name {
+            #[must_use]
+            pub fn new(digest: Sha256Digest) -> Self {
+                Self { digest }
+            }
+
+            #[must_use]
+            pub fn as_digest(&self) -> &Sha256Digest {
+                &self.digest
+            }
+        }
+    };
+}
+
+digest_identity!(CatalogueDeclarationHash, "Identity of the normalized catalogue declaration.");
+digest_identity!(
+    ImplementationInputHash,
+    "Identity of one layer's source contents, lockfile dependency resolution, and toolchain identity."
+);
+
+/// A non-zero persisted type-signals schema version.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct TypeSignalsSchemaVersion {
+    value: u32,
+}
+
+/// Error returned for an invalid type-signals schema version.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TypeSignalsSchemaVersionError {
+    /// Zero is not a schema version.
+    Zero,
+}
+
+impl fmt::Display for TypeSignalsSchemaVersionError {
+    fn fmt(&self, formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+        formatter.write_str("type-signals schema version must be non-zero")
+    }
+}
+
+impl std::error::Error for TypeSignalsSchemaVersionError {}
+
+impl TypeSignalsSchemaVersion {
+    /// Validates and stores a non-zero schema version.
+    pub fn try_new(value: u32) -> Result<Self, TypeSignalsSchemaVersionError> {
+        if value == 0 {
+            return Err(TypeSignalsSchemaVersionError::Zero);
+        }
+        Ok(Self { value })
+    }
+
+    /// Returns the version number.
+    #[must_use]
+    pub fn value(self) -> u32 {
+        self.value
+    }
+}
+
+/// In-memory representation of a freshness-aware `<layer>-type-signals.json`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TypeSignalsDocument {
-    schema_version: u32,
+    schema_version: TypeSignalsSchemaVersion,
     generated_at: Timestamp,
-    declaration_hash: String,
+    declaration_hash: CatalogueDeclarationHash,
+    implementation_input_hash: ImplementationInputHash,
     signals: Vec<TypeSignal>,
 }
 
 impl TypeSignalsDocument {
-    /// Creates a new `TypeSignalsDocument` with `schema_version = 1`.
+    /// Creates a document at the current schema version.
     #[must_use]
     pub fn new(
         generated_at: Timestamp,
-        declaration_hash: impl Into<String>,
+        declaration_hash: CatalogueDeclarationHash,
+        implementation_input_hash: ImplementationInputHash,
         signals: Vec<TypeSignal>,
     ) -> Self {
         Self {
-            schema_version: TYPE_SIGNALS_SCHEMA_VERSION,
+            schema_version: TypeSignalsSchemaVersion { value: TYPE_SIGNALS_SCHEMA_VERSION },
             generated_at,
-            declaration_hash: declaration_hash.into(),
+            declaration_hash,
+            implementation_input_hash,
             signals,
         }
     }
 
-    /// Creates a `TypeSignalsDocument` with an explicit `schema_version`.
-    ///
-    /// Use this only in the infrastructure codec when decoding: production
-    /// code paths should call `new` which pins the version.
+    /// Creates a document with the decoded schema version.
     #[must_use]
     pub fn with_schema_version(
-        schema_version: u32,
+        schema_version: TypeSignalsSchemaVersion,
         generated_at: Timestamp,
-        declaration_hash: impl Into<String>,
+        declaration_hash: CatalogueDeclarationHash,
+        implementation_input_hash: ImplementationInputHash,
         signals: Vec<TypeSignal>,
     ) -> Self {
-        Self { schema_version, generated_at, declaration_hash: declaration_hash.into(), signals }
+        Self { schema_version, generated_at, declaration_hash, implementation_input_hash, signals }
     }
 
-    /// Returns the schema version recorded in the document.
     #[must_use]
-    pub fn schema_version(&self) -> u32 {
+    pub fn schema_version(&self) -> TypeSignalsSchemaVersion {
         self.schema_version
     }
-
-    /// Returns the generation timestamp (ISO 8601 UTC).
     #[must_use]
     pub fn generated_at(&self) -> &Timestamp {
         &self.generated_at
     }
-
-    /// Returns the SHA-256 hex digest of the declaration file bytes at
-    /// evaluation time.
     #[must_use]
-    pub fn declaration_hash(&self) -> &str {
+    pub fn declaration_hash(&self) -> &CatalogueDeclarationHash {
         &self.declaration_hash
     }
-
-    /// Returns the per-type evaluation signals.
+    #[must_use]
+    pub fn implementation_input_hash(&self) -> &ImplementationInputHash {
+        &self.implementation_input_hash
+    }
     #[must_use]
     pub fn signals(&self) -> &[TypeSignal] {
         &self.signals
     }
 }
 
-/// Outcome of loading a `<layer>-type-signals.json` relative to the current
-/// declaration file.
-///
-/// Enum-first: the three states carry structurally distinct data. `Current`
-/// wraps the loaded document, `Stale` additionally records the expected hash
-/// so callers can report both the recorded value and the current value, and
-/// `Missing` carries no data (signal file absent).
-///
-/// Per ADR 2026-04-18-1400 §D5, both `Stale` and `Missing` are fail-closed
-/// errors on CI and merge gate paths (symmetric between routes).
+/// Result of loading a persisted type-signals document.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum TypeSignalsLoadResult {
-    /// Signal file exists and its `declaration_hash` matches the current
-    /// declaration file hash.
+    /// The persisted document matches the current catalogue declaration.
     Current(TypeSignalsDocument),
-    /// Signal file exists but its `declaration_hash` does not match the
-    /// current declaration file hash.
-    ///
-    /// `doc` is the loaded document (its recorded hash is accessible via
-    /// `doc.declaration_hash()`), and `expected_hash` is the hash of the
-    /// current declaration file bytes.
-    Stale { doc: TypeSignalsDocument, expected_hash: String },
-    /// Signal file is absent at the expected path.
+    /// The document exists but has an older declaration identity.
+    Stale(TypeSignalsDocument, CatalogueDeclarationHash),
+    /// No persisted document exists.
     Missing,
 }
 
 impl TypeSignalsLoadResult {
-    /// Returns the loaded document for the `Current` variant, or `None`
-    /// otherwise.
     #[must_use]
     pub fn as_current(&self) -> Option<&TypeSignalsDocument> {
         match self {
-            Self::Current(doc) => Some(doc),
+            Self::Current(document) => Some(document),
             _ => None,
         }
     }
-
-    /// Returns `true` when the variant is `Current`.
     #[must_use]
     pub fn is_current(&self) -> bool {
         matches!(self, Self::Current(_))
     }
-
-    /// Returns `true` when the variant is `Stale`.
     #[must_use]
     pub fn is_stale(&self) -> bool {
-        matches!(self, Self::Stale { .. })
+        matches!(self, Self::Stale(_, _))
     }
-
-    /// Returns `true` when the variant is `Missing`.
     #[must_use]
     pub fn is_missing(&self) -> bool {
         matches!(self, Self::Missing)
     }
 }
 
+/// The only safe outcomes for an attempted type-signals reuse.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum TypeSignalsReuseDecision {
+    /// Both identities match, so no evaluation is needed.
+    SkipEvaluation,
+    /// The declaration changed while the implementation identity still matches.
+    ReevaluateWithoutExtraction,
+    /// The implementation identity changed or cannot be determined.
+    ReextractAndEvaluate,
+}
+
+/// Selects the fail-closed reuse path for one layer.
+#[must_use]
+pub fn decide_type_signals_reuse(
+    recorded_declaration_hash: &CatalogueDeclarationHash,
+    recorded_implementation_input_hash: &ImplementationInputHash,
+    current_declaration_hash: &CatalogueDeclarationHash,
+    current_implementation_input_hash: Option<&ImplementationInputHash>,
+) -> TypeSignalsReuseDecision {
+    let Some(current_implementation_input_hash) = current_implementation_input_hash else {
+        return TypeSignalsReuseDecision::ReextractAndEvaluate;
+    };
+    if current_implementation_input_hash != recorded_implementation_input_hash {
+        TypeSignalsReuseDecision::ReextractAndEvaluate
+    } else if current_declaration_hash == recorded_declaration_hash {
+        TypeSignalsReuseDecision::SkipEvaluation
+    } else {
+        TypeSignalsReuseDecision::ReevaluateWithoutExtraction
+    }
+}
+
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::indexing_slicing)]
+#[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
     use crate::ConfidenceSignal;
 
-    fn ts(raw: &str) -> Timestamp {
-        Timestamp::new(raw).unwrap()
+    const A: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
+    const B: &str = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+
+    fn digest(value: &str) -> Sha256Digest {
+        Sha256Digest::try_new(value.to_owned()).unwrap()
     }
-
-    fn signal_blue(name: &str, kind: &str) -> TypeSignal {
-        TypeSignal::new(name, kind, ConfidenceSignal::Blue, true, vec![], vec![], vec![])
+    fn declaration(value: &str) -> CatalogueDeclarationHash {
+        CatalogueDeclarationHash::new(digest(value))
     }
-
-    fn sample_doc() -> TypeSignalsDocument {
-        TypeSignalsDocument::new(
-            ts("2026-04-18T12:00:00Z"),
-            "abc123",
-            vec![signal_blue("Foo", "value_object")],
-        )
+    fn implementation(value: &str) -> ImplementationInputHash {
+        ImplementationInputHash::new(digest(value))
     }
-
-    // --- TypeSignalsDocument ---
-
-    #[test]
-    fn test_new_pins_schema_version_to_one() {
-        let doc = sample_doc();
-        assert_eq!(doc.schema_version(), TYPE_SIGNALS_SCHEMA_VERSION);
-        assert_eq!(doc.schema_version(), 1);
+    fn timestamp() -> Timestamp {
+        Timestamp::new("2026-07-14T00:00:00Z").unwrap()
     }
 
     #[test]
-    fn test_new_stores_generated_at() {
-        let doc = sample_doc();
-        assert_eq!(doc.generated_at().as_str(), "2026-04-18T12:00:00Z");
-    }
-
-    #[test]
-    fn test_new_stores_declaration_hash() {
-        let doc = sample_doc();
-        assert_eq!(doc.declaration_hash(), "abc123");
-    }
-
-    #[test]
-    fn test_new_accepts_string_declaration_hash() {
-        let doc =
-            TypeSignalsDocument::new(ts("2026-04-18T12:00:00Z"), String::from("deadbeef"), vec![]);
-        assert_eq!(doc.declaration_hash(), "deadbeef");
-    }
-
-    #[test]
-    fn test_new_preserves_signals_in_order() {
-        let doc = TypeSignalsDocument::new(
-            ts("2026-04-18T12:00:00Z"),
-            "h",
-            vec![signal_blue("A", "value_object"), signal_blue("B", "enum")],
+    fn test_document_retains_only_required_freshness_inputs() {
+        let document = TypeSignalsDocument::new(
+            timestamp(),
+            declaration(A),
+            implementation(B),
+            vec![TypeSignal::new(
+                "Example",
+                "value_object",
+                ConfidenceSignal::Blue,
+                true,
+                vec![],
+                vec![],
+                vec![],
+            )],
         );
-        assert_eq!(doc.signals().len(), 2);
-        assert_eq!(doc.signals()[0].type_name(), "A");
-        assert_eq!(doc.signals()[1].type_name(), "B");
+
+        assert_eq!(document.schema_version().value(), TYPE_SIGNALS_SCHEMA_VERSION);
+        assert_eq!(document.declaration_hash().as_digest().as_str(), A);
+        assert_eq!(document.implementation_input_hash().as_digest().as_str(), B);
     }
 
     #[test]
-    fn test_with_schema_version_allows_explicit_override_for_codec() {
-        let doc =
-            TypeSignalsDocument::with_schema_version(42, ts("2026-04-18T12:00:00Z"), "h", vec![]);
-        assert_eq!(doc.schema_version(), 42);
+    fn test_sha256_digest_try_new_rejects_invalid_length_and_hex() {
+        assert_eq!(Sha256Digest::try_new("a".repeat(63)), Err(Sha256DigestError::InvalidLength));
+        assert_eq!(Sha256Digest::try_new("g".repeat(64)), Err(Sha256DigestError::InvalidHex));
     }
 
     #[test]
-    fn test_documents_with_same_fields_are_equal() {
-        assert_eq!(sample_doc(), sample_doc());
+    fn test_type_signals_schema_version_try_new_rejects_zero() {
+        assert_eq!(TypeSignalsSchemaVersion::try_new(0), Err(TypeSignalsSchemaVersionError::Zero));
     }
 
     #[test]
-    fn test_documents_differ_on_hash() {
-        let a = TypeSignalsDocument::new(ts("2026-04-18T12:00:00Z"), "a", vec![]);
-        let b = TypeSignalsDocument::new(ts("2026-04-18T12:00:00Z"), "b", vec![]);
-        assert_ne!(a, b);
-    }
-
-    // --- TypeSignalsLoadResult ---
-
-    #[test]
-    fn test_current_variant_carries_document() {
-        let result = TypeSignalsLoadResult::Current(sample_doc());
-        assert!(result.is_current());
-        assert!(!result.is_stale());
-        assert!(!result.is_missing());
-        assert_eq!(result.as_current(), Some(&sample_doc()));
+    fn test_decide_type_signals_reuse_matching_hashes_skips_evaluation() {
+        assert_eq!(
+            decide_type_signals_reuse(
+                &declaration(A),
+                &implementation(A),
+                &declaration(A),
+                Some(&implementation(A))
+            ),
+            TypeSignalsReuseDecision::SkipEvaluation
+        );
     }
 
     #[test]
-    fn test_stale_variant_carries_doc_and_expected_hash() {
-        let result =
-            TypeSignalsLoadResult::Stale { doc: sample_doc(), expected_hash: "new_hash".into() };
-        assert!(result.is_stale());
-        assert!(!result.is_current());
-        assert!(!result.is_missing());
-        assert!(result.as_current().is_none());
-        if let TypeSignalsLoadResult::Stale { doc, expected_hash } = &result {
-            assert_eq!(doc.declaration_hash(), "abc123");
-            assert_eq!(expected_hash, "new_hash");
-        }
+    fn test_decide_type_signals_reuse_catalogue_only_change_reevaluates_without_extraction() {
+        assert_eq!(
+            decide_type_signals_reuse(
+                &declaration(A),
+                &implementation(A),
+                &declaration(B),
+                Some(&implementation(A))
+            ),
+            TypeSignalsReuseDecision::ReevaluateWithoutExtraction
+        );
     }
 
     #[test]
-    fn test_missing_variant_has_no_data() {
-        let result = TypeSignalsLoadResult::Missing;
-        assert!(result.is_missing());
-        assert!(!result.is_current());
-        assert!(!result.is_stale());
-        assert!(result.as_current().is_none());
-    }
-
-    #[test]
-    fn test_equality_respects_variant_data() {
-        let a = TypeSignalsLoadResult::Current(sample_doc());
-        let b = TypeSignalsLoadResult::Current(sample_doc());
-        assert_eq!(a, b);
-
-        let stale_a = TypeSignalsLoadResult::Stale { doc: sample_doc(), expected_hash: "x".into() };
-        let stale_b = TypeSignalsLoadResult::Stale { doc: sample_doc(), expected_hash: "y".into() };
-        assert_ne!(stale_a, stale_b);
-
-        assert_eq!(TypeSignalsLoadResult::Missing, TypeSignalsLoadResult::Missing);
+    fn test_decide_type_signals_reuse_full_freshness_decision_table() {
+        // Implementation mismatches always re-extract, regardless of whether
+        // the declaration matches. A declaration mismatch alone is deliberately
+        // cheaper: it re-evaluates the existing rustdoc output.
+        assert_eq!(
+            decide_type_signals_reuse(
+                &declaration(A),
+                &implementation(A),
+                &declaration(A),
+                Some(&implementation(B))
+            ),
+            TypeSignalsReuseDecision::ReextractAndEvaluate
+        );
+        assert_eq!(
+            decide_type_signals_reuse(
+                &declaration(A),
+                &implementation(A),
+                &declaration(B),
+                Some(&implementation(B))
+            ),
+            TypeSignalsReuseDecision::ReextractAndEvaluate
+        );
+        assert_eq!(
+            decide_type_signals_reuse(&declaration(A), &implementation(A), &declaration(A), None),
+            TypeSignalsReuseDecision::ReextractAndEvaluate
+        );
     }
 }

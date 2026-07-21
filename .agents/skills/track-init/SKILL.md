@@ -20,7 +20,7 @@ or failure-recovery procedures here.
 
 - Requires `--sandbox workspace-write`: the workflow creates directories, writes
   `metadata.json`, rendered views, and creates a git branch.
-- Branch creation uses `cargo make track-branch-create`. Phase 0 produces no commit;
+- Branch creation uses `bin/sotp track branch create --items-dir track/items '<track-id>'`. Phase 0 produces no commit;
   commits are deferred to the `/track:commit` (or `$track-commit`) adapter after review.
 
 ### (3) Sub-workflow and capability invocation

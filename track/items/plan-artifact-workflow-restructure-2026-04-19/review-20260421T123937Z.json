@@ -644,7 +644,7 @@
             {
               "message": "`execute_next_task` and `execute_task_counts` now bypass the track store entirely and return success with `null`/`0` payloads for any syntactically valid track id. That makes a missing or corrupt track indistinguishable from a real empty track, so `sotp track next-task` and `task-counts` will silently report 'no work' instead of failing closed while T007 is pending.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/state_ops.rs",
+              "file": "apps/cli/src/commands/track/state_ops.rs",
               "line": 116,
               "category": "correctness"
             }
@@ -1848,7 +1848,7 @@
             {
               "message": "The new fail-closed branch only triggers when a parsed frontmatter block is present and it does not contain `status:`. A stale or hand-edited v2 `spec.md` that still has `status:` and no `### S-`/`### REQ-` headings will return `pass` here instead of forcing a `spec.json`-backed attribution check, so the attribution gate can be bypassed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/spec_attribution.rs",
+              "file": "libs/infrastructure/src/verify/spec_attribution.rs",
               "line": 202,
               "category": "logic"
             }
@@ -1951,7 +1951,7 @@
             {
               "message": "`TaskCoverageDocumentDto` deserializes each section into a `BTreeMap`, so repeated JSON object keys are silently overwritten by serde instead of being rejected. A malformed `task-coverage.json` can therefore drop earlier refs from the same section and change coverage semantics without failing validation.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/task_coverage_codec.rs",
+              "file": "libs/infrastructure/src/task_coverage_codec.rs",
               "line": 52,
               "category": "validation"
             }
@@ -2112,14 +2112,14 @@
             {
               "message": "`render_registry` still special-cases only `schema_version == 3` branchless planned tracks. After this migration, new plan-only tracks are written as schema_version 4, and `domain::track_phase::resolve_phase` already treats v4 branchless planned tracks as activatable. As a result, a newer plan-only track can incorrectly win the \"Latest active track\" slot and drive the wrong next command in `registry.md`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render.rs",
+              "file": "libs/infrastructure/src/track/render.rs",
               "line": 255,
               "category": "correctness"
             },
             {
               "message": "The new stub detection skips the task-items check whenever `plan.md` merely contains the stub sentence. That sentence is not unique to machine-generated output, so a handwritten plan can include it and bypass validation even if it has no task items. This weakens the latest-track gate into a string-match that is easy to spoof.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
               "line": 836,
               "category": "correctness"
             }
@@ -2421,7 +2421,7 @@
             {
               "message": "`resolve_path` only rejects traversal when `resolved.canonicalize()` succeeds. If a ref contains `..` and the target does not exist, the fallback `resolved.clone()` is checked with `starts_with(repo_root)`, which is lexical and does not collapse parent components, so a traversal path can slip through as a plain \"file not found\" instead of being rejected as invalid. Normalize the path components before the containment check.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 334,
               "category": "security"
             }
@@ -2451,7 +2451,7 @@
             {
               "message": "Deriving `trusted_root` from `track_dir.canonicalize()` follows symlinked track directories/ancestors, which shifts the verifier's trust boundary to the symlink target. Because `reject_symlinks_below` treats `trusted_root` as implicitly safe, a symlinked `track/items/<id>` can make this check accept and read spec/catalogue files outside the repository. Use the non-following trusted-root resolver or reject symlinked `track_dir` before building paths.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 87,
               "category": "security"
             }
@@ -2503,7 +2503,7 @@
             {
               "message": "`resolve_path()` treats an empty or dot-only `file` as valid by joining it to `repo_root`, so malformed file-based refs like `\"\"` or `\".\"` are accepted as if they pointed at the repository root. That lets bad `AdrRef`/`ConventionRef` entries pass verification instead of being rejected as invalid.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 395,
               "category": "correctness"
             }
@@ -2591,14 +2591,14 @@
             {
               "message": "The canonical-block scanner suppresses a warning when any line inside the fenced body matches an example marker. That means ordinary long blocks containing text like `example:` or `// example` will be skipped, even though the brief only calls for deliberate preceding-comment or inline tags. This creates false negatives for the new warning.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 857,
               "category": "correctness"
             },
             {
               "message": "Fence closing is detected only by fence character, not by the opening fence length. A block opened with 4+ backticks or tildes can therefore be treated as closed by a shorter 3-char fence, which truncates the counted block and can miss >10-line suspicions on valid Markdown.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 911,
               "category": "correctness"
             }
@@ -2613,21 +2613,21 @@
             {
               "message": "When `task-coverage.json` is absent, this branch only emits a warning and never inspects `impl-plan.json`, so a present-but-malformed impl plan can be silently skipped. The brief says malformed `impl-plan.json` must fail closed whenever the file is present.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 334,
               "category": "correctness"
             },
             {
               "message": "The canonical-block scanner trims every line before fence detection, so a line like `    ```rust` is treated as a fenced block even though CommonMark parses it as indented code. That can produce warning findings for content that is not actually a fenced code block.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 840,
               "category": "correctness"
             },
             {
               "message": "Example suppression only checks the first line inside the fence. If a deliberate example tag appears after a blank first line, or later in the block, the verifier still emits a canonical-block warning even though example-tagged blocks are supposed to be excluded.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 858,
               "category": "correctness"
             }
@@ -2679,14 +2679,14 @@
             {
               "message": "Treating `plan.md`/`verification.md` symlink-guard failures as warnings fails open: a symlinked or otherwise unsafe doc path skips canonical-block scanning entirely without an error finding, unlike the rest of this verifier.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 368,
               "category": "correctness"
             },
             {
               "message": "The canonical-block scanner skips any fence line with 4+ leading spaces, which misses valid fenced code blocks nested inside Markdown containers such as list items. Long fenced blocks in those contexts will not trigger the >10-line warning.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 846,
               "category": "correctness"
             }
@@ -2796,14 +2796,14 @@
             {
               "message": "The fence-body scan strips blockquote prefixes before checking for a closing fence. Inside an open fenced block, `>` is literal content, so a line like `> ```rust` can be mistaken for the terminator and suppress a long-block warning.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 944,
               "category": "correctness"
             },
             {
               "message": "Example suppression only checks the raw preceding line. A quoted marker such as `> <!-- illustrative, non-canonical -->` before a quoted fence will still warn, even though the scanner claims to handle blockquote-nested blocks.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 966,
               "category": "correctness"
             }
@@ -2848,7 +2848,7 @@
             {
               "message": "Example-marker suppression is only applied to the raw previous line. Because fence detection already normalizes blockquote/list prefixes, a fenced block inside one of those containers that is tagged with `<!-- illustrative, non-canonical -->` will still emit a warning, so the documented exclusion does not work for nested Markdown containers.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 937,
               "category": "correctness"
             }
@@ -2863,7 +2863,7 @@
             {
               "message": "The canonical-block scanner normalizes every inner line before checking for the closing fence. That strips blockquote/list prefixes from code content, so a literal line inside a fenced block like `> ```rust` or `- ```rust` can be misread as the closing fence. The scan then terminates early and can miss the warning for a genuinely long block.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 925,
               "category": "correctness"
             }
@@ -2893,14 +2893,14 @@
             {
               "message": "Closing-fence detection strips blockquote prefixes inside the fenced body, so a literal line like `> ``` ` is treated as a closer. That can terminate the scan early and suppress the >10-line warning for long blocks that contain quoted fence text.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 1012,
               "category": "logic"
             },
             {
               "message": "Opening-fence normalization is not re-applied after stripping a list-item marker. A fence nested in a list item with a blockquote marker on the same line (for example `- > ```rust`) is left as `> ```rust` and never recognized, so some long fenced blocks are invisible to the suspicion scan.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 983,
               "category": "logic"
             }
@@ -2915,7 +2915,7 @@
             {
               "message": "`normalize_for_closing_fence()` only calls `trim()`, so closing-fence detection does not apply the same CommonMark normalization as opening-fence detection. A fenced block inside a blockquote can fail to close until EOF, while an indented line like `    ````, which should be treated as content, can be mistaken for a closing fence. This will produce spurious or missed canonical-block warnings.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 1021,
               "category": "logic"
             }
@@ -2930,7 +2930,7 @@
             {
               "message": "The canonical-block suppression is too broad: `fence_info_has_example()` treats any fence info string containing `example` as exempt, so fences like ` ```notexample ` or ` ```exampleish ` suppress the warning even though they are not example markers. The preceding-line path has a similar false-negative risk because it falls back to trimmed raw text for non-fence lines, so literal code lines containing `example` can also suppress detection. That lets non-example blocks evade the new warning gate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 1202,
               "category": "correctness"
             }
@@ -2945,14 +2945,14 @@
             {
               "message": "`scan_canonical_block_suspicion()` can stop early on literal content inside a fenced block: `normalize_for_closing_fence()` strips blockquote prefixes from every inner line, so a body line like `> ```...` or `> ~~~...` is mistaken for a real closing fence. That can truncate the scan and suppress the long-block warning the brief requires.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 929,
               "category": "correctness"
             },
             {
               "message": "`is_example_marker()` is overbroad for Markdown docs: it suppresses warnings for plain prose/heading lines such as `# example` and `example:` even when they are not explicit example tags. In `plan.md` / `verification.md`, that can hide a canonical block accidentally.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 1156,
               "category": "correctness"
             }
@@ -2967,14 +2967,14 @@
             {
               "message": "The canonical-block scanner derives `stripped_prefix` from `line.len() - content.len()`, but `content` has already had trailing whitespace trimmed. On a valid opener like `> ```rust   `, the stored prefix includes part of the fence, so `close_fence_normalize()` never matches the real closer and the rest of the file gets treated as one block. That creates spurious warnings and can suppress later scans.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 1015,
               "category": "canonical-block"
             },
             {
               "message": "This module now spans roughly 2k lines, far beyond the repo's 700-line module cap, while also mixing verifier logic, the canonical-block heuristic, and a large regression suite in one file. That is an architecture violation and makes the change materially harder to review and maintain.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 1,
               "category": "architecture"
             }
@@ -3004,7 +3004,7 @@
             {
               "message": "`close_fence_normalize()` requires the closing fence to start with the exact raw prefix stripped from the opener. That is stricter than CommonMark and breaks valid fenced blocks inside list items or blockquotes where the closing fence can use a different allowed indentation/container prefix (for example, a list-item opener like `- ```rust` closes with an indented fence line, not `- ```rust`). In those cases the scanner walks to EOF, miscomputes the block length, and skips the rest of the document, so later canonical-block suspicions are never checked.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 1044,
               "category": "correctness"
             }
@@ -3019,7 +3019,7 @@
             {
               "message": "Canonical-block normalization trims all leading whitespace after `strip_container_prefix`, so the intended 4+ space indented-code-block guard is defeated. A line like `    ```rust` will still be treated as a fenced block, which can emit spurious warnings for literal markdown examples and makes the scanner misclassify common rendered-doc patterns.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 964,
               "category": "correctness"
             }
@@ -3108,7 +3108,7 @@
             {
               "message": "`fence_info_has_example()` only strips a 3-character fence prefix, so valid fenced blocks opened with 4+ backticks or tildes are not recognized as `example`-tagged and will still emit canonical-block warnings. This breaks the stated suppression rule for example blocks.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/plan_artifact_refs.rs",
+              "file": "libs/infrastructure/src/verify/plan_artifact_refs.rs",
               "line": 1068,
               "category": "correctness"
             }
@@ -3351,7 +3351,7 @@
             {
               "message": "The rendered graph still presents the approval/coverage model as live (`approved_at`, `effective_status`/`status`, `evaluate_coverage`, `task_refs`, `SpecStatus`, `CoverageResult`) even though the plan catalog deletes those concepts. That makes the plan-artifact set internally contradictory about the post-migration spec model; the graph and contract-map need to match the deleted-state intent or be explicitly marked legacy-only.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/plan-artifact-workflow-restructure-2026-04-19/domain-graph.md",
+              "file": "track/items/plan-artifact-workflow-restructure-2026-04-19/domain-graph.md",
               "line": 97,
               "category": "contradiction"
             }
@@ -4016,7 +4016,7 @@
             {
               "message": "`TrackMetadata::with_branch` now only validates the title; it no longer checks that a provided branch matches the track id, and `set_branch` can later introduce the same mismatch. That allows persisted states like `id = my-track` with `branch = track/other-track`, which violates the branch-id consistency required by the new identity-only metadata model and can misroute branch-based readers/activation logic.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/track.rs",
+              "file": "libs/domain/src/track.rs",
               "line": 300,
               "category": "validation"
             }
@@ -4061,21 +4061,21 @@
             {
               "message": "`add_task` is not fail-safe: it appends the new task before validating the target section, and it `mem::take`s `self.plan` before the same validation. Any `SectionNotFound`/`NoSectionsAvailable` error leaves the aggregate mutated and the plan dropped, so a failed call corrupts in-memory state.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
+              "file": "libs/domain/src/impl_plan.rs",
               "line": 173,
               "category": "safety"
             },
             {
               "message": "`next_num + 1` overflows when the highest existing task suffix is `u64::MAX`. That is a reachable `TaskId` value, so `add_task` can panic in debug builds or wrap to a duplicate `T000` in release builds.",
               "severity": "P0",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
+              "file": "libs/domain/src/impl_plan.rs",
               "line": 168,
               "category": "safety"
             },
             {
               "message": "`resolve_transition` only looks at `TaskStatusKind::Done`, so it cannot distinguish `DonePending` from `DoneTraced`. A traced task given target `done` plus a commit hash is mapped to `BackfillHash` and then rejected by `TrackTask::transition`, instead of being classified as an unsupported target.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/impl_plan.rs",
+              "file": "libs/domain/src/impl_plan.rs",
               "line": 239,
               "category": "correctness"
             }

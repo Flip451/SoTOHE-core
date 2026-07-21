@@ -1,0 +1,379 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_capability_exec["usecase::capability_exec"]
+    direction TB
+  subgraph R38_usecase_usecase_CapabilityProviderPort["capability_exec::CapabilityProviderPort"]
+    direction TB
+    R38_usecase_usecase_CapabilityProviderPort__self[CapabilityProviderPort]
+    R38_usecase_usecase_CapabilityProviderPort_provider([provider])
+    R38_usecase_usecase_CapabilityProviderPort_dispatch([dispatch])
+  end
+  end
+  subgraph usecase_usecase_module_codex_runtime["usecase::codex_runtime"]
+    direction TB
+  subgraph T53_usecase_usecase_CodexRuntimeProjectRootDiscoveryError["codex_runtime::CodexRuntimeProjectRootDiscoveryError"]
+    direction TB
+    T53_usecase_usecase_CodexRuntimeProjectRootDiscoveryError__self[CodexRuntimeProjectRootDiscoveryError]
+    T53_usecase_usecase_CodexRuntimeProjectRootDiscoveryError_GitRootDiscoveryFailed[GitRootDiscoveryFailed]
+  end
+  subgraph T42_usecase_usecase_CodexRuntimeProvisionError["codex_runtime::CodexRuntimeProvisionError"]
+    direction TB
+    T42_usecase_usecase_CodexRuntimeProvisionError__self[CodexRuntimeProvisionError]
+    T42_usecase_usecase_CodexRuntimeProvisionError_ProjectRootInvalid[ProjectRootInvalid]
+    T42_usecase_usecase_CodexRuntimeProvisionError_NoUsableCandidate[NoUsableCandidate]
+    T42_usecase_usecase_CodexRuntimeProvisionError_NpmQueryFailed[NpmQueryFailed]
+    T42_usecase_usecase_CodexRuntimeProvisionError_LinkUpdateFailed[LinkUpdateFailed]
+    T42_usecase_usecase_CodexRuntimeProvisionError_ProjectRootDiscoveryFailed[ProjectRootDiscoveryFailed]
+  end
+  subgraph T47_usecase_usecase_CodexRuntimeProvisionInteractor["codex_runtime::CodexRuntimeProvisionInteractor"]
+    direction TB
+    T47_usecase_usecase_CodexRuntimeProvisionInteractor__self[CodexRuntimeProvisionInteractor]
+    T47_usecase_usecase_CodexRuntimeProvisionInteractor_new([new])
+  end
+  subgraph R52_usecase_usecase_CodexRuntimeProjectRootDiscoveryPort["codex_runtime::CodexRuntimeProjectRootDiscoveryPort"]
+    direction TB
+    R52_usecase_usecase_CodexRuntimeProjectRootDiscoveryPort__self[CodexRuntimeProjectRootDiscoveryPort]
+    R52_usecase_usecase_CodexRuntimeProjectRootDiscoveryPort_discover_from([discover_from])
+  end
+  subgraph R41_usecase_usecase_CodexRuntimeProvisionPort["codex_runtime::CodexRuntimeProvisionPort"]
+    direction TB
+    R41_usecase_usecase_CodexRuntimeProvisionPort__self[CodexRuntimeProvisionPort]
+    R41_usecase_usecase_CodexRuntimeProvisionPort_provision([provision])
+  end
+  subgraph R44_usecase_usecase_CodexRuntimeProvisionService["codex_runtime::CodexRuntimeProvisionService"]
+    direction TB
+    R44_usecase_usecase_CodexRuntimeProvisionService__self[CodexRuntimeProvisionService]
+    R44_usecase_usecase_CodexRuntimeProvisionService_provision([provision])
+  end
+  end
+  subgraph usecase_usecase_module_dry_check["usecase::dry_check"]
+    direction TB
+  subgraph R33_usecase_usecase_DryCheckAgentPort["dry_check::DryCheckAgentPort"]
+    direction TB
+    R33_usecase_usecase_DryCheckAgentPort__self[DryCheckAgentPort]
+    R33_usecase_usecase_DryCheckAgentPort_judge([judge])
+  end
+  end
+  subgraph usecase_usecase_module_review_v2["usecase::review_v2"]
+    direction TB
+  subgraph R31_usecase_usecase_ReviewFixRunner["review_v2::run_review_fix::ReviewFixRunner"]
+    direction TB
+    R31_usecase_usecase_ReviewFixRunner__self[ReviewFixRunner]
+    R31_usecase_usecase_ReviewFixRunner_run_fix([run_fix])
+  end
+  subgraph R24_usecase_usecase_Reviewer["review_v2::ports::Reviewer"]
+    direction TB
+    R24_usecase_usecase_Reviewer__self[Reviewer]
+    R24_usecase_usecase_Reviewer_review([review])
+    R24_usecase_usecase_Reviewer_fast_review([fast_review])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_capability_exec["infrastructure::capability_exec"]
+    direction TB
+  subgraph T52_infrastructure_infrastructure_CodexCapabilityAdapter["capability_exec::codex::CodexCapabilityAdapter"]
+    direction TB
+    T52_infrastructure_infrastructure_CodexCapabilityAdapter__self[CodexCapabilityAdapter]
+    T52_infrastructure_infrastructure_CodexCapabilityAdapter_new([new])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_codex_common["infrastructure::codex_common"]
+    direction TB
+  subgraph T54_infrastructure_infrastructure_CodexRuntimeResolveError["codex_common::CodexRuntimeResolveError"]
+    direction TB
+    T54_infrastructure_infrastructure_CodexRuntimeResolveError__self[CodexRuntimeResolveError]
+    T54_infrastructure_infrastructure_CodexRuntimeResolveError_ProjectRootInvalid[ProjectRootInvalid]
+    T54_infrastructure_infrastructure_CodexRuntimeResolveError_RepoLocalLinkInvalid[RepoLocalLinkInvalid]
+    T54_infrastructure_infrastructure_CodexRuntimeResolveError_PathFallbackUnavailable[PathFallbackUnavailable]
+    T54_infrastructure_infrastructure_CodexRuntimeResolveError_ProbeFailed[ProbeFailed]
+  end
+  subgraph T50_infrastructure_infrastructure_ResolvedCodexRuntime["codex_common::ResolvedCodexRuntime"]
+    direction TB
+    T50_infrastructure_infrastructure_ResolvedCodexRuntime__self[ResolvedCodexRuntime]
+    T50_infrastructure_infrastructure_ResolvedCodexRuntime_executable([executable])
+    T50_infrastructure_infrastructure_ResolvedCodexRuntime_path_prefix([path_prefix])
+    T50_infrastructure_infrastructure_ResolvedCodexRuntime_real_path([real_path])
+    T50_infrastructure_infrastructure_ResolvedCodexRuntime_version([version])
+  end
+  F81_infrastructure_infrastructure_infrastructure__codex_common__resolve_codex_runtime[[resolve_codex_runtime]]
+  end
+  subgraph infrastructure_infrastructure_module_codex_runtime["infrastructure::codex_runtime"]
+    direction TB
+  subgraph T55_infrastructure_infrastructure_FsCodexRuntimeProvisioner["codex_runtime::FsCodexRuntimeProvisioner"]
+    direction TB
+    T55_infrastructure_infrastructure_FsCodexRuntimeProvisioner__self[FsCodexRuntimeProvisioner]
+    T55_infrastructure_infrastructure_FsCodexRuntimeProvisioner_new([new])
+  end
+  subgraph T72_infrastructure_infrastructure_GitCodexRuntimeProjectRootDiscoveryAdapter["codex_runtime::GitCodexRuntimeProjectRootDiscoveryAdapter"]
+    direction TB
+    T72_infrastructure_infrastructure_GitCodexRuntimeProjectRootDiscoveryAdapter__self[GitCodexRuntimeProjectRootDiscoveryAdapter]
+    T72_infrastructure_infrastructure_GitCodexRuntimeProjectRootDiscoveryAdapter_new([new])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_dry_check["infrastructure::dry_check"]
+    direction TB
+  subgraph T45_infrastructure_infrastructure_CodexDryChecker["dry_check::codex_dry_checker::CodexDryChecker"]
+    direction TB
+    T45_infrastructure_infrastructure_CodexDryChecker__self[CodexDryChecker]
+    T45_infrastructure_infrastructure_CodexDryChecker_new([new])
+  end
+  subgraph T52_infrastructure_infrastructure_CodexDryFixLocalRunner["dry_check::dry_fix_local::CodexDryFixLocalRunner"]
+    direction TB
+    T52_infrastructure_infrastructure_CodexDryFixLocalRunner__self[CodexDryFixLocalRunner]
+    T52_infrastructure_infrastructure_CodexDryFixLocalRunner_dry_run_fix_local([dry_run_fix_local])
+    T52_infrastructure_infrastructure_CodexDryFixLocalRunner_new([new])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_ref_verify["infrastructure::ref_verify"]
+    direction TB
+  F106_infrastructure_infrastructure_infrastructure__ref_verify__process_runner__make_ref_verifier_process_runner[[make_ref_verifier_process_runner]]
+  end
+  subgraph infrastructure_infrastructure_module_review_v2["infrastructure::review_v2"]
+    direction TB
+  subgraph T50_infrastructure_infrastructure_CodexReviewFixRunner["review_v2::review_fix_runner::CodexReviewFixRunner"]
+    direction TB
+    T50_infrastructure_infrastructure_CodexReviewFixRunner__self[CodexReviewFixRunner]
+    T50_infrastructure_infrastructure_CodexReviewFixRunner_new([new])
+  end
+  subgraph T43_infrastructure_infrastructure_CodexReviewer["review_v2::codex_reviewer::CodexReviewer"]
+    direction TB
+    T43_infrastructure_infrastructure_CodexReviewer__self[CodexReviewer]
+    T43_infrastructure_infrastructure_CodexReviewer_new([new])
+    T43_infrastructure_infrastructure_CodexReviewer_with_scope_label([with_scope_label])
+  end
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+  subgraph cli_driver_cli_driver_module_codex_runtime["cli_driver::codex_runtime"]
+    direction TB
+  subgraph T40_cli_driver_cli_driver_CodexRuntimeDriver["codex_runtime::CodexRuntimeDriver"]
+    direction TB
+    T40_cli_driver_cli_driver_CodexRuntimeDriver__self[CodexRuntimeDriver]
+    T40_cli_driver_cli_driver_CodexRuntimeDriver_new([new])
+    T40_cli_driver_cli_driver_CodexRuntimeDriver_handle([handle])
+  end
+  subgraph T39_cli_driver_cli_driver_CodexRuntimeInput["codex_runtime::CodexRuntimeInput"]
+    direction TB
+    T39_cli_driver_cli_driver_CodexRuntimeInput__self[CodexRuntimeInput]
+  end
+  end
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+  subgraph cli_composition_cli_composition_module_codex_runtime["cli_composition::codex_runtime"]
+    direction TB
+  subgraph T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot["codex_runtime::CodexRuntimeCompositionRoot"]
+    direction TB
+    T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot__self[CodexRuntimeCompositionRoot]
+    T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot_new([new])
+    T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot_codex_runtime_driver([codex_runtime_driver])
+  end
+  end
+end
+subgraph cli["cli"]
+  direction TB
+  subgraph T18_cli_cli_CliCommand["CliCommand"]
+    direction TB
+    T18_cli_cli_CliCommand__self[CliCommand]
+    T18_cli_cli_CliCommand_Arch[Arch]
+    T18_cli_cli_CliCommand_AdrBaseline[AdrBaseline]
+    T18_cli_cli_CliCommand_Conventions[Conventions]
+    T18_cli_cli_CliCommand_Domain[Domain]
+    T18_cli_cli_CliCommand_Guard[Guard]
+    T18_cli_cli_CliCommand_Hook[Hook]
+    T18_cli_cli_CliCommand_Track[Track]
+    T18_cli_cli_CliCommand_Git[Git]
+    T18_cli_cli_CliCommand_Pr[Pr]
+    T18_cli_cli_CliCommand_Capability[Capability]
+    T18_cli_cli_CliCommand_Review[Review]
+    T18_cli_cli_CliCommand_File[File]
+    T18_cli_cli_CliCommand_Verify[Verify]
+    T18_cli_cli_CliCommand_FindSimilar[FindSimilar]
+    T18_cli_cli_CliCommand_DupIndex[DupIndex]
+    T18_cli_cli_CliCommand_DupCheck[DupCheck]
+    T18_cli_cli_CliCommand_Telemetry[Telemetry]
+    T18_cli_cli_CliCommand_Dry[Dry]
+    T18_cli_cli_CliCommand_RefVerify[RefVerify]
+    T18_cli_cli_CliCommand_TestObligation[TestObligation]
+    T18_cli_cli_CliCommand_Signal[Signal]
+    T18_cli_cli_CliCommand_TaskContract[TaskContract]
+    T18_cli_cli_CliCommand_Catalog[Catalog]
+    T18_cli_cli_CliCommand_CatalogueLint[CatalogueLint]
+    T18_cli_cli_CliCommand_Template[Template]
+    T18_cli_cli_CliCommand_CodexRuntime[CodexRuntime]
+  end
+  subgraph cli_cli_module_commands["cli::commands"]
+    direction TB
+  subgraph T27_cli_cli_CodexRuntimeCommand["commands::codex_runtime::CodexRuntimeCommand"]
+    direction TB
+    T27_cli_cli_CodexRuntimeCommand__self[CodexRuntimeCommand]
+    T27_cli_cli_CodexRuntimeCommand_Provision[Provision]
+  end
+  subgraph T33_cli_cli_CodexRuntimeProvisionArgs["commands::codex_runtime::CodexRuntimeProvisionArgs"]
+    direction TB
+    T33_cli_cli_CodexRuntimeProvisionArgs__self[CodexRuntimeProvisionArgs]
+  end
+  F45_cli_cli_cli__commands__codex_runtime__execute[[execute]]
+  end
+end
+T42_usecase_usecase_CodexRuntimeProvisionError_ProjectRootDiscoveryFailed --o T53_usecase_usecase_CodexRuntimeProjectRootDiscoveryError__self
+T47_usecase_usecase_CodexRuntimeProvisionInteractor_new --o R41_usecase_usecase_CodexRuntimeProvisionPort__self
+T47_usecase_usecase_CodexRuntimeProvisionInteractor_new --o R52_usecase_usecase_CodexRuntimeProjectRootDiscoveryPort__self
+T47_usecase_usecase_CodexRuntimeProvisionInteractor_new --> T47_usecase_usecase_CodexRuntimeProvisionInteractor__self
+R52_usecase_usecase_CodexRuntimeProjectRootDiscoveryPort_discover_from --> T53_usecase_usecase_CodexRuntimeProjectRootDiscoveryError__self
+R41_usecase_usecase_CodexRuntimeProvisionPort_provision --> T42_usecase_usecase_CodexRuntimeProvisionError__self
+R44_usecase_usecase_CodexRuntimeProvisionService_provision --> T42_usecase_usecase_CodexRuntimeProvisionError__self
+T47_usecase_usecase_CodexRuntimeProvisionInteractor__self -.impl.-> R44_usecase_usecase_CodexRuntimeProvisionService__self
+T52_infrastructure_infrastructure_CodexCapabilityAdapter_new --> T52_infrastructure_infrastructure_CodexCapabilityAdapter__self
+F81_infrastructure_infrastructure_infrastructure__codex_common__resolve_codex_runtime --> T54_infrastructure_infrastructure_CodexRuntimeResolveError__self
+F81_infrastructure_infrastructure_infrastructure__codex_common__resolve_codex_runtime --> T50_infrastructure_infrastructure_ResolvedCodexRuntime__self
+T55_infrastructure_infrastructure_FsCodexRuntimeProvisioner_new --> T55_infrastructure_infrastructure_FsCodexRuntimeProvisioner__self
+T72_infrastructure_infrastructure_GitCodexRuntimeProjectRootDiscoveryAdapter_new --> T72_infrastructure_infrastructure_GitCodexRuntimeProjectRootDiscoveryAdapter__self
+T45_infrastructure_infrastructure_CodexDryChecker_new --> T45_infrastructure_infrastructure_CodexDryChecker__self
+T52_infrastructure_infrastructure_CodexDryFixLocalRunner_new --> T52_infrastructure_infrastructure_CodexDryFixLocalRunner__self
+T50_infrastructure_infrastructure_CodexReviewFixRunner_new --> T50_infrastructure_infrastructure_CodexReviewFixRunner__self
+T43_infrastructure_infrastructure_CodexReviewer_new --> T43_infrastructure_infrastructure_CodexReviewer__self
+T43_infrastructure_infrastructure_CodexReviewer_with_scope_label --> T43_infrastructure_infrastructure_CodexReviewer__self
+T55_infrastructure_infrastructure_FsCodexRuntimeProvisioner__self -.impl.-> R41_usecase_usecase_CodexRuntimeProvisionPort__self
+T52_infrastructure_infrastructure_CodexCapabilityAdapter__self -.impl.-> R38_usecase_usecase_CapabilityProviderPort__self
+T45_infrastructure_infrastructure_CodexDryChecker__self -.impl.-> R33_usecase_usecase_DryCheckAgentPort__self
+T43_infrastructure_infrastructure_CodexReviewer__self -.impl.-> R24_usecase_usecase_Reviewer__self
+T50_infrastructure_infrastructure_CodexReviewFixRunner__self -.impl.-> R31_usecase_usecase_ReviewFixRunner__self
+T72_infrastructure_infrastructure_GitCodexRuntimeProjectRootDiscoveryAdapter__self -.impl.-> R52_usecase_usecase_CodexRuntimeProjectRootDiscoveryPort__self
+T40_cli_driver_cli_driver_CodexRuntimeDriver_new --o R44_usecase_usecase_CodexRuntimeProvisionService__self
+T40_cli_driver_cli_driver_CodexRuntimeDriver_new --> T40_cli_driver_cli_driver_CodexRuntimeDriver__self
+T40_cli_driver_cli_driver_CodexRuntimeDriver_handle --o T39_cli_driver_cli_driver_CodexRuntimeInput__self
+T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot_new --> T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot__self
+T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot_codex_runtime_driver --> T40_cli_driver_cli_driver_CodexRuntimeDriver__self
+T18_cli_cli_CliCommand_CodexRuntime --o|cmd| T27_cli_cli_CodexRuntimeCommand__self
+T27_cli_cli_CodexRuntimeCommand_Provision --o T33_cli_cli_CodexRuntimeProvisionArgs__self
+F45_cli_cli_cli__commands__codex_runtime__execute --o T27_cli_cli_CodexRuntimeCommand__self
+class R38_usecase_usecase_CapabilityProviderPort_provider method_node
+class R38_usecase_usecase_CapabilityProviderPort_dispatch method_node
+class R38_usecase_usecase_CapabilityProviderPort__self secondary_port
+class T53_usecase_usecase_CodexRuntimeProjectRootDiscoveryError_GitRootDiscoveryFailed variant_node
+class T53_usecase_usecase_CodexRuntimeProjectRootDiscoveryError__self error_type
+class T42_usecase_usecase_CodexRuntimeProvisionError_ProjectRootInvalid variant_node
+class T42_usecase_usecase_CodexRuntimeProvisionError_NoUsableCandidate variant_node
+class T42_usecase_usecase_CodexRuntimeProvisionError_NpmQueryFailed variant_node
+class T42_usecase_usecase_CodexRuntimeProvisionError_LinkUpdateFailed variant_node
+class T42_usecase_usecase_CodexRuntimeProvisionError_ProjectRootDiscoveryFailed variant_node
+class T42_usecase_usecase_CodexRuntimeProvisionError__self error_type
+class T47_usecase_usecase_CodexRuntimeProvisionInteractor_new method_node
+class T47_usecase_usecase_CodexRuntimeProvisionInteractor__self interactor
+class R52_usecase_usecase_CodexRuntimeProjectRootDiscoveryPort_discover_from method_node
+class R52_usecase_usecase_CodexRuntimeProjectRootDiscoveryPort__self secondary_port
+class R41_usecase_usecase_CodexRuntimeProvisionPort_provision method_node
+class R41_usecase_usecase_CodexRuntimeProvisionPort__self secondary_port
+class R44_usecase_usecase_CodexRuntimeProvisionService_provision method_node
+class R44_usecase_usecase_CodexRuntimeProvisionService__self app_service
+class R33_usecase_usecase_DryCheckAgentPort_judge method_node
+class R33_usecase_usecase_DryCheckAgentPort__self secondary_port
+class R31_usecase_usecase_ReviewFixRunner_run_fix method_node
+class R31_usecase_usecase_ReviewFixRunner__self secondary_port
+class R24_usecase_usecase_Reviewer_review method_node
+class R24_usecase_usecase_Reviewer_fast_review method_node
+class R24_usecase_usecase_Reviewer__self secondary_port
+class T52_infrastructure_infrastructure_CodexCapabilityAdapter_new method_node
+class T52_infrastructure_infrastructure_CodexCapabilityAdapter__self secondary_adapter
+class T54_infrastructure_infrastructure_CodexRuntimeResolveError_ProjectRootInvalid variant_node
+class T54_infrastructure_infrastructure_CodexRuntimeResolveError_RepoLocalLinkInvalid variant_node
+class T54_infrastructure_infrastructure_CodexRuntimeResolveError_PathFallbackUnavailable variant_node
+class T54_infrastructure_infrastructure_CodexRuntimeResolveError_ProbeFailed variant_node
+class T54_infrastructure_infrastructure_CodexRuntimeResolveError__self error_type
+class T50_infrastructure_infrastructure_ResolvedCodexRuntime_executable method_node
+class T50_infrastructure_infrastructure_ResolvedCodexRuntime_path_prefix method_node
+class T50_infrastructure_infrastructure_ResolvedCodexRuntime_real_path method_node
+class T50_infrastructure_infrastructure_ResolvedCodexRuntime_version method_node
+class T50_infrastructure_infrastructure_ResolvedCodexRuntime__self value_object
+class F81_infrastructure_infrastructure_infrastructure__codex_common__resolve_codex_runtime free_function
+class F81_infrastructure_infrastructure_infrastructure__codex_common__resolve_codex_runtime function_node
+class T55_infrastructure_infrastructure_FsCodexRuntimeProvisioner_new method_node
+class T55_infrastructure_infrastructure_FsCodexRuntimeProvisioner__self secondary_adapter
+class T72_infrastructure_infrastructure_GitCodexRuntimeProjectRootDiscoveryAdapter_new method_node
+class T72_infrastructure_infrastructure_GitCodexRuntimeProjectRootDiscoveryAdapter__self secondary_adapter
+class T45_infrastructure_infrastructure_CodexDryChecker_new method_node
+class T45_infrastructure_infrastructure_CodexDryChecker__self secondary_adapter
+class T52_infrastructure_infrastructure_CodexDryFixLocalRunner_dry_run_fix_local method_node
+class T52_infrastructure_infrastructure_CodexDryFixLocalRunner_new method_node
+class T52_infrastructure_infrastructure_CodexDryFixLocalRunner__self secondary_adapter
+class F106_infrastructure_infrastructure_infrastructure__ref_verify__process_runner__make_ref_verifier_process_runner free_function
+class F106_infrastructure_infrastructure_infrastructure__ref_verify__process_runner__make_ref_verifier_process_runner function_node
+class T50_infrastructure_infrastructure_CodexReviewFixRunner_new method_node
+class T50_infrastructure_infrastructure_CodexReviewFixRunner__self secondary_adapter
+class T43_infrastructure_infrastructure_CodexReviewer_new method_node
+class T43_infrastructure_infrastructure_CodexReviewer_with_scope_label method_node
+class T43_infrastructure_infrastructure_CodexReviewer__self secondary_adapter
+class T40_cli_driver_cli_driver_CodexRuntimeDriver_new method_node
+class T40_cli_driver_cli_driver_CodexRuntimeDriver_handle method_node
+class T39_cli_driver_cli_driver_CodexRuntimeInput__self dto
+class T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot_new method_node
+class T59_cli_composition_cli_composition_CodexRuntimeCompositionRoot_codex_runtime_driver method_node
+class T18_cli_cli_CliCommand_Arch variant_node
+class T18_cli_cli_CliCommand_AdrBaseline variant_node
+class T18_cli_cli_CliCommand_Conventions variant_node
+class T18_cli_cli_CliCommand_Domain variant_node
+class T18_cli_cli_CliCommand_Guard variant_node
+class T18_cli_cli_CliCommand_Hook variant_node
+class T18_cli_cli_CliCommand_Track variant_node
+class T18_cli_cli_CliCommand_Git variant_node
+class T18_cli_cli_CliCommand_Pr variant_node
+class T18_cli_cli_CliCommand_Capability variant_node
+class T18_cli_cli_CliCommand_Review variant_node
+class T18_cli_cli_CliCommand_File variant_node
+class T18_cli_cli_CliCommand_Verify variant_node
+class T18_cli_cli_CliCommand_FindSimilar variant_node
+class T18_cli_cli_CliCommand_DupIndex variant_node
+class T18_cli_cli_CliCommand_DupCheck variant_node
+class T18_cli_cli_CliCommand_Telemetry variant_node
+class T18_cli_cli_CliCommand_Dry variant_node
+class T18_cli_cli_CliCommand_RefVerify variant_node
+class T18_cli_cli_CliCommand_TestObligation variant_node
+class T18_cli_cli_CliCommand_Signal variant_node
+class T18_cli_cli_CliCommand_TaskContract variant_node
+class T18_cli_cli_CliCommand_Catalog variant_node
+class T18_cli_cli_CliCommand_CatalogueLint variant_node
+class T18_cli_cli_CliCommand_Template variant_node
+class T18_cli_cli_CliCommand_CodexRuntime variant_node
+class T18_cli_cli_CliCommand__self dto
+class T27_cli_cli_CodexRuntimeCommand_Provision variant_node
+class T27_cli_cli_CodexRuntimeCommand__self dto
+class T33_cli_cli_CodexRuntimeProvisionArgs__self dto
+class F45_cli_cli_cli__commands__codex_runtime__execute free_function
+class F45_cli_cli_cli__commands__codex_runtime__execute function_node
+```

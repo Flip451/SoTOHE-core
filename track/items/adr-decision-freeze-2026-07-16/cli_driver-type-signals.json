@@ -1,0 +1,101 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-17T04:03:26Z",
+  "declaration_hash": "497edbb797405c646cfbf5829775bb8ad14e16149a2b1b34a6f2c8eb67512849",
+  "implementation_input_hash": "8607879199dff5d30d18a777c90392b599df2d851fa1687b7065032560816a98",
+  "signals": [
+    {
+      "type_name": "AdrBaselineDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineKindInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "AsRef<str>",
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "FromStr",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineReasonInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "AsRef<str>",
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "FromStr",
+        "PartialEq",
+        "TryFrom<String>"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineRequest",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "AdrSourceFileNameInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "AsRef<str>",
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "FromStr",
+        "PartialEq",
+        "TryFrom<String>"
+      ]
+    },
+    {
+      "type_name": "TrackIdInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "AsRef<str>",
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "FromStr",
+        "PartialEq",
+        "TryFrom<String>"
+      ]
+    }
+  ]
+}

@@ -19,8 +19,8 @@ or failure-recovery procedures here.
 ### (2) Sandbox constraint
 
 - Requires `--sandbox workspace-write`: the workflow stages files and creates a commit.
-- Staging is done via `cargo make track-add-paths` (writing paths to
-  `tmp/track-commit/add-paths.txt`) or `cargo make add-all`.
+- Staging is done via `bin/sotp git add-from-file tmp/track-commit/add-paths.txt --cleanup`
+  (writing paths to `tmp/track-commit/add-paths.txt` first) or `bin/sotp git add-all`.
 - Commit creation uses `cargo make track-commit-message` exclusively.
 - Do not run `git add` / `git commit` / `git push` directly.
 

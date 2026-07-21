@@ -42,6 +42,27 @@ mod tests {
         fs::write(track_dir.join("tracked.txt"), "archive fixture\n").unwrap();
     }
 
+    fn write_metadata_without_status(track_dir: &std::path::Path, track_id: &str) -> String {
+        let metadata = format!(
+            r#"{{
+  "schema_version": 6,
+  "id": "{track_id}",
+  "branch": "track/{track_id}",
+  "title": "Archive fixture",
+  "created_at": "2026-07-14T00:00:00Z",
+  "updated_at": "2026-07-14T00:00:00Z",
+  "branch_strategy_snapshot": {{
+    "base_branch": "main",
+    "merge_target": "main",
+    "merge_method": "squash"
+  }}
+}}
+"#
+        );
+        fs::write(track_dir.join("metadata.json"), &metadata).unwrap();
+        metadata
+    }
+
     /// Happy-path: archive moves the track dir and the gitignored `logs/` dir.
     ///
     /// CN-03 / GO-03: archived track's `logs/telemetry.jsonl` must be present
@@ -135,6 +156,41 @@ mod tests {
         assert!(
             !archived_dir.join("logs").exists(),
             "logs/ must not be created when source logs/ did not exist"
+        );
+    }
+
+    #[test]
+    fn test_execute_archive_metadata_without_status_moves_without_mutation() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path();
+        seed_repo(root, "main");
+
+        let items_dir = root.join("track").join("items");
+        let track_id = "metadata-track-2026";
+        let track_dir = items_dir.join(track_id);
+        fs::create_dir_all(&track_dir).unwrap();
+        write_tracked_file(&track_dir);
+        let original_metadata = write_metadata_without_status(&track_dir, track_id);
+
+        run_git(
+            root,
+            &[
+                "add",
+                "track/items/metadata-track-2026/tracked.txt",
+                "track/items/metadata-track-2026/metadata.json",
+            ],
+        );
+        run_git(root, &["commit", "-m", "add track", "--no-gpg-sign"]);
+
+        let result = execute_archive(items_dir, track_id.to_owned());
+        assert!(result.is_ok(), "execute_archive must succeed: {result:?}");
+        assert_eq!(result.unwrap(), ExitCode::SUCCESS);
+
+        let archived_metadata = root.join("track/archive").join(track_id).join("metadata.json");
+        assert_eq!(fs::read_to_string(archived_metadata).unwrap(), original_metadata);
+        assert!(
+            !original_metadata.contains("\"status\""),
+            "the archive fixture must have no metadata status field"
         );
     }
 }

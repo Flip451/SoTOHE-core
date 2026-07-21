@@ -308,13 +308,13 @@ fn evaluate_layer_catalogue(
                 }
             };
             let current_hash = type_signals_codec::declaration_hash(&declaration_bytes);
-            if doc.declaration_hash() != current_hash {
+            if *doc.declaration_hash() != current_hash {
                 return VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                     "{}: declaration_hash mismatch (recorded={}, current={}) — \
                      re-run `sotp signal calc-impl-catalog` to refresh the evaluation result",
                     signal_path.display(),
-                    doc.declaration_hash(),
-                    current_hash
+                    doc.declaration_hash().as_digest().as_str(),
+                    current_hash.as_digest().as_str()
                 ))]);
             }
             doc
@@ -362,7 +362,7 @@ pub fn check_impl_catalog_from_signals_file(
             signals_path.display()
         ),
         |text| type_signals_codec::decode(text).map_err(|e| e.to_string()),
-        |doc| doc.declaration_hash().to_owned(),
+        |doc| doc.declaration_hash().as_digest().as_str().to_owned(),
         |recorded, current, path| {
             format!(
                 "{}: declaration_hash mismatch (recorded={}, current={}) — \
@@ -570,22 +570,28 @@ mod tests {
         (dir, path)
     }
 
-    // Helper: write a `<layer>-type-signals.json` (schema_version 1) whose
+    // Helper: write a `<layer>-type-signals.json` (schema_version 3) whose
     // `declaration_hash` matches the on-disk bytes of the companion
     // `<layer>-types.json` file. The `signals` field is copied verbatim from
     // the declaration file's legacy `signals` array (raw JSON) so that fixture
     // declaration files with inline signals still exercise the intended
     // Blue/Yellow/Red paths in `check_type_signals` via the signal file.
+    // The implementation hash reuses the declaration hash because these
+    // fixtures only need a decodable current-schema document.
     fn write_matching_signal_file(track_dir: &Path, catalogue_name: &str, signal_name: &str) {
         let decl_bytes = std::fs::read(track_dir.join(catalogue_name)).unwrap();
         let value: serde_json::Value = serde_json::from_slice(&decl_bytes).unwrap();
         let signals_array =
             value.get("signals").and_then(|v| v.as_array()).cloned().unwrap_or_default();
-        let hash = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes);
+        let hash = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes)
+            .as_digest()
+            .as_str()
+            .to_owned();
         let signal_file = serde_json::json!({
-            "schema_version": 1,
+            "schema_version": 3,
             "generated_at": "2026-04-18T12:00:00Z",
             "declaration_hash": hash,
+            "implementation_input_hash": hash,
             "signals": signals_array,
         });
         let encoded = serde_json::to_string_pretty(&signal_file).unwrap();
@@ -1413,9 +1419,10 @@ mod tests {
     }
 
     const DOMAIN_TYPE_SIGNALS_STALE_HASH: &str = r#"{
-  "schema_version": 1,
+  "schema_version": 3,
   "generated_at": "2026-04-18T12:00:00Z",
   "declaration_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "implementation_input_hash": "0000000000000000000000000000000000000000000000000000000000000000",
   "signals": [
     { "type_name": "TrackId", "kind_tag": "value_object", "signal": "blue", "found_type": true }
   ]
@@ -1562,11 +1569,13 @@ mod tests {
         // current declaration hash.
         let decl_bytes = std::fs::read(dir.path().join("domain-types.json")).unwrap();
         let hash = crate::tddd::type_signals_codec::declaration_hash(&decl_bytes);
+        let digest = hash.as_digest().as_str().to_owned();
         let blue_signal_file = format!(
             r#"{{
-              "schema_version": 1,
+              "schema_version": 3,
               "generated_at": "2026-04-18T12:00:00Z",
-              "declaration_hash": "{hash}",
+              "declaration_hash": "{digest}",
+              "implementation_input_hash": "{digest}",
               "signals": [
                 {{
                   "type_name": "TrackId",
@@ -1575,7 +1584,7 @@ mod tests {
                   "found_type": true
                 }}
               ]
-            }}"#
+            }}"#,
         );
         std::fs::write(dir.path().join("domain-type-signals.json"), blue_signal_file).unwrap();
 
@@ -1678,11 +1687,14 @@ mod tests {
     /// Build a fresh `<layer>-type-signals.json` JSON string whose
     /// `declaration_hash` matches the given catalogue bytes.
     fn build_fresh_type_signals(catalogue_bytes: &[u8], signal: &str) -> String {
-        let hash = crate::tddd::type_signals_codec::declaration_hash(catalogue_bytes);
+        let hash = crate::tddd::type_signals_codec::declaration_hash(catalogue_bytes)
+            .as_digest()
+            .as_str()
+            .to_owned();
         // `TypeSignalDto` requires `kind_tag`, `signal`, and `found_type` fields
         // (deny_unknown_fields; missing fields fail decoding).
         format!(
-            r#"{{"schema_version":1,"generated_at":"2026-01-01T00:00:00Z","declaration_hash":"{hash}","signals":[{{"type_name":"Foo","kind_tag":"value_object","signal":"{signal}","found_type":true}}]}}"#,
+            r#"{{"schema_version":3,"generated_at":"2026-01-01T00:00:00Z","declaration_hash":"{hash}","implementation_input_hash":"{hash}","signals":[{{"type_name":"Foo","kind_tag":"value_object","signal":"{signal}","found_type":true}}]}}"#,
         )
     }
 
@@ -1704,7 +1716,10 @@ mod tests {
     fn test_check_impl_catalog_blue_signal_non_strict_passes() {
         let (_dir, signals_path) = setup_type_signals_git_repo("blue");
         let catalog_hash =
-            crate::tddd::type_signals_codec::declaration_hash(MINIMAL_CATALOGUE_JSON.as_bytes());
+            crate::tddd::type_signals_codec::declaration_hash(MINIMAL_CATALOGUE_JSON.as_bytes())
+                .as_digest()
+                .as_str()
+                .to_owned();
 
         let outcome = check_impl_catalog_from_signals_file(&signals_path, &catalog_hash, false);
 
@@ -1745,7 +1760,10 @@ mod tests {
     fn test_check_impl_catalog_yellow_strict_returns_error() {
         let (_dir, signals_path) = setup_type_signals_git_repo("yellow");
         let catalog_hash =
-            crate::tddd::type_signals_codec::declaration_hash(MINIMAL_CATALOGUE_JSON.as_bytes());
+            crate::tddd::type_signals_codec::declaration_hash(MINIMAL_CATALOGUE_JSON.as_bytes())
+                .as_digest()
+                .as_str()
+                .to_owned();
 
         let outcome = check_impl_catalog_from_signals_file(&signals_path, &catalog_hash, true);
 

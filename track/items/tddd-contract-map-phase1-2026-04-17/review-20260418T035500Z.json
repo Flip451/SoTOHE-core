@@ -116,14 +116,14 @@
             {
               "message": "`sanitize_id` is not injective over the allowed `LayerId` space: valid ids such as `my-gateway` and `my_gateway` both collapse to `my_gateway`, so `subgraph`/node IDs can collide and unrelated layers can merge in the Mermaid output.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
               "line": 156,
               "category": "correctness"
             },
             {
               "message": "Edges are resolved by bare short name (`type_index: BTreeMap<String, ...>`) with first-wins semantics, so when the same type/trait name exists in multiple layers the renderer can point a method/impl edge at the wrong node or skip a legitimate cross-layer edge as a self-edge.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/contract_map_render.rs",
+              "file": "libs/domain/src/tddd/contract_map_render.rs",
               "line": 83,
               "category": "correctness"
             }
@@ -387,14 +387,14 @@
             {
               "message": "`parse_may_depend_on()` rereads `architecture-rules.json` with plain `read_to_string` instead of going back through `reject_symlinks_below`, so the file is only symlink-checked once. That violates the module's \"all reads are guarded\" invariant and leaves a TOCTOU window between the binding load and the dependency parse.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
               "line": 172,
               "category": "security"
             },
             {
               "message": "`topological_sort()` drops every dependency that is not in `enabled_ids`, but `load_all_catalogues()` documents that an unknown `may_depend_on` target must fail. As written, a typo or missing crate in `may_depend_on` is treated the same as a dependency on a disabled layer, so bad rules files can slip through and the layer order is computed from incomplete graph data.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
               "line": 239,
               "category": "correctness"
             }
@@ -431,7 +431,7 @@
             {
               "message": "`topological_sort()` treats any dependency that is not present in `enabled_ids` as if it were a disabled layer and drops it. That means a typo or missing crate in `may_depend_on` is accepted instead of failing closed, even though `load_all_catalogues()` documents unknown targets as an error. The loader can therefore compute an order from incomplete graph data and hide bad `architecture-rules.json` input.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
               "line": 241,
               "category": "correctness"
             }
@@ -446,7 +446,7 @@
             {
               "message": "On a genuine miss for `architecture-rules.json`, this turns the existing legacy fallback into `Io(NotFound)`, so `load_all_catalogues()` now fails on pre-multilayer tracks even though `load_tddd_layers_from_path()` intentionally returns the synthetic domain binding for the same case.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
               "line": 178,
               "category": "correctness"
             }
@@ -461,7 +461,7 @@
             {
               "message": "`topological_sort()` does not preserve input order for all ties. Nodes that become ready from different predecessors are appended in predecessor-processing order, so a valid DAG like `enabled_ids = [\"B\", \"A\", \"C\", \"D\"]` with deps `B -> D` and `A -> C` is emitted as `[\"B\", \"A\", \"D\", \"C\"]`. That violates the documented stable tie-order guarantee and can reorder dependency groups in the rendered map.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
               "line": 291,
               "category": "correctness"
             }
@@ -476,7 +476,7 @@
             {
               "message": "`parse_may_depend_on` accepts malformed `architecture-rules.json` entries instead of failing closed: it overwrites duplicate `crate` keys with `BTreeMap::insert` and does not reject empty dependency strings. Because `load_all_catalogues` uses this map to compute ordering, a bad rules file can silently change the returned layer order instead of surfacing an `ArchRulesParse` error, which diverges from the stricter validation already enforced by the existing architecture-rules parser.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_bulk_loader.rs",
               "line": 206,
               "category": "correctness"
             }
@@ -798,14 +798,14 @@
             {
               "message": "T003 in `verification.md` still expects `libs/infrastructure/src/tddd/contract_map_render.rs`, but the ADR/spec moved `render_contract_map` to `libs/domain/src/tddd/contract_map_render.rs`. As written, this checklist would fail a correct domain implementation.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
               "line": 29,
               "category": "consistency"
             },
             {
               "message": "T004 in `verification.md` incorrectly treats `ContractMapRenderOptions` as a newtype. The ADR/spec define it as a multi-field `value_object`; only `LayerId` and `ContractMapContent` are the newtypes.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
               "line": 39,
               "category": "consistency"
             }
@@ -1154,7 +1154,7 @@
             {
               "message": "T002 の要約で「合計 8 tests が pass」としていますが、同じ差分で追加されている `libs/infrastructure/src/tddd/catalogue_bulk_loader.rs` のテストは 7 個しかありません（happy path / missing catalogue / symlink reject / cycle detect / deps-outside-enabled / tie-order / visibility）。件数が 1 つ多く、実際の検証内容と食い違っています。",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
               "line": 27,
               "category": "factual error"
             }
@@ -1322,14 +1322,14 @@
             {
               "message": "The coverage summary says `parse_kind_filter` / `parse_layer_filter` each have 6-7 tests, but `apps/cli/src/commands/track/tddd/contract_map.rs` only defines 4 `test_parse_layer_filter_*` cases. That makes the test-count claim factually wrong.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
               "line": 83,
               "category": "factual error"
             },
             {
               "message": "The result table still contains a stale `| T006 | Pending |` row immediately after the new implemented T006 row, so T006 is reported as both implemented and pending in the same table.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
+              "file": "track/items/tddd-contract-map-phase1-2026-04-17/verification.md",
               "line": 133,
               "category": "contradiction"
             }
@@ -1462,7 +1462,7 @@
             {
               "message": "The affected-type list is wrong: it includes `LayerId`, but `libs/domain/src/tddd/layer_id.rs` is now a plain `pub struct`, not a nutype-backed alias, and it omits `TrackBranch`, which is still a `nutype` in `libs/domain/src/ids.rs`. The TODO should enumerate the actual nutype-backed catalogued types, otherwise the harness-hardening fix will target the wrong set.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/strategy/TODO.md",
+              "file": "knowledge/strategy/TODO.md",
               "line": 610,
               "category": "factual error"
             }

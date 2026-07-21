@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "c762b4d990d98fe32503abc3274a25615d5661196ab1c5c66b9879d00b56d933",
+  "signals": [
+    {
+      "type_name": "CapabilityExecRequest",
+      "signal": "blue",
+      "entry_hash": "91e1a8663d89f53b9876c8b993184d8d1c43dee33ec1af3329309e6c91b2a8ed"
+    },
+    {
+      "type_name": "CapabilityInputValidationError",
+      "signal": "blue",
+      "entry_hash": "c141ab3a00338ce2d21900fcfd94deb32916bfb74c70f1a9ea5ce31ed0e8db12"
+    },
+    {
+      "type_name": "TimeoutSeconds",
+      "signal": "blue",
+      "entry_hash": "0eb4d8930d5005a3642f09fcf876809ae5677d25ff3f5db87ce77bd2b42eedb3"
+    }
+  ]
+}

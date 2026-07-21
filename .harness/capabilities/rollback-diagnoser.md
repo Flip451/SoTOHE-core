@@ -63,9 +63,7 @@ the upstream artifacts is incorrect by construction.
 
 The judgment is **purely LLM-semantic**. There is no regex / keyword / file-path / finding-message
 rule table, and there must not be one — the SoT chain is too rich to be captured by surface
-patterns. Refer to the rejected alternatives in
-`knowledge/adr/2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md` for the precedent
-argument.
+patterns.
 
 Traverse the SoT hierarchy **top-down** (ADR → spec → catalogue → impl-plan → source) and
 identify the most upstream phase where the root cause of the finding originates. The hierarchy
@@ -80,7 +78,7 @@ Pick exactly one of the following five classes for `routing_target`:
 |--------|---------|------------------|
 | `adr` | An architectural decision needed to ground the finding is absent from any ADR, or an existing ADR's decision is ambiguous enough to admit the finding as a permitted interpretation. | The finding references a principle (e.g., hexagonal purity, layer placement) that no ADR explicitly decides; or the spec elements citing the relevant ADR all carry `informal_grounds[]` rather than `adr_refs[]`. |
 | `spec` | The ADR decides the question, but Phase 1 spec.json did not capture the decision as an actionable acceptance criterion / constraint / in-scope element. | An ADR D-anchor exists for the topic, but no spec element cites it (or the spec element is too vague to drive implementation). |
-| `type` | The spec captures the decision correctly, but the per-layer `<layer>-types.json` catalogue has an architectural defect (wrong layer placement, missing entry, wrong `role`, wrong `action`, wrong shape, conflict with `architecture-rules.json`). | A spec acceptance criterion grounds a type concept, but no catalogue entry exists for it, or the entry sits in the wrong layer, or its `role` violates `prefer-type-safe-abstractions.md` / `hexagonal-architecture.md`. |
+| `type` | The spec captures the decision correctly, but the per-layer `<layer>-types.json` catalogue has an architectural defect (wrong layer placement, missing entry, wrong `role`, wrong `action`, wrong shape, conflict with `architecture-rules.json`). | A spec acceptance criterion grounds a type concept, but no catalogue entry exists for it, or the entry sits in the wrong layer, or its `role` violates `prefer-type-safe-abstractions.md` / `type-designer-kind-selection.md` R1. |
 | `impl_plan` | The ADR, spec, and catalogue all correctly express the design, but the Phase 3 impl-plan task list does not describe the implementation work that would close the finding. | A finding targets a behavior that no `impl-plan.json` task description mentions, or a task's `attributed_entries` map misses an entry whose change is required. |
 | `impl` | The entire design chain (ADR → spec → catalogue → impl-plan) is consistent, and the finding is a pure source-side contract violation. | A test fails, a method signature drift, an obviously incorrect branch in source — design documents do not need editing; the source itself must be fixed. |
 
@@ -115,7 +113,7 @@ no surrounding prose, no markdown framing.
 | field | type | meaning |
 |-------|------|---------|
 | `routing_target` | enum string — one of `adr` / `spec` / `type` / `impl_plan` / `impl` | The phase the orchestrator should rollback to. |
-| `reason` | non-empty string (Japanese for human-readable diagnostic, English identifiers in code references) | Which signal / finding / artifact inspection led to this routing. Cite specific element ids (e.g., spec `AC-04`, catalogue entry `usecase:PreReviewGateInteractor`, ADR `D-anchor`). |
+| `reason` | non-empty string (Japanese for human-readable diagnostic, English identifiers in code references) | Which signal / finding / artifact inspection led to this routing. Cite specific element ids (e.g., spec `<acceptance-criterion-id>`, catalogue entry `usecase:PreReviewGateInteractor`, ADR `D-anchor`). |
 | `recommended_next_action` | non-empty string (Japanese) | The concrete next step the orchestrator should take (e.g., "adr-editor で `D-anchor` を改訂し ... を明示する", "type-designer で `usecase-types.json` の `X` エントリを `action: add` で追加", "T-XXX の description に Y を追加して /track:impl-plan を再走", "apps/cli/src/foo.rs の Z 関数を修正"). |
 
 All three fields are required on every invocation. Empty `reason` or `recommended_next_action`
@@ -128,7 +126,7 @@ is a contract violation.
 | output | structured routing decision (`routing_target` / `reason` / `recommended_next_action`) | edits to existing ADR markdown | `spec.json` + `spec.md` | `<layer>-types.json` + rendered views | `impl-plan.json` + `task-coverage.json` |
 | phase | back-and-forth (any phase from impl onward) | back-and-forth (ADR-side) | Phase 1 | Phase 2 | Phase 3 |
 | input | diagnostic text + full SoT chain (read-only) | downstream signal 🔴 + current ADR | ADR + convention | spec.json + ADR + convention | spec.json + type catalogue + ADR |
-| typical trigger | `/track:diagnose` (orchestrator invocation) | spec → ADR 🔴 / `/track:adr2pr` D9 escalation | `/track:spec-design` | `/track:type-design` | `/track:impl-plan` |
+| typical trigger | `/track:diagnose` (orchestrator invocation) | spec → ADR 🔴 escalation during `/track:adr2pr` | `/track:spec-design` | `/track:type-design` | `/track:impl-plan` |
 
 If the briefing asks for:
 
@@ -139,7 +137,8 @@ If the briefing asks for:
 - Source code editing → stop and return `routing_target: "impl"` so the orchestrator dispatches
   a source-edit task
 
-This capability **never** edits any artifact or invokes any writer subagent — it is diagnose-only.
+This capability **never** edits any artifact, runs `bin/sotp track transition`, or invokes any
+writer subagent — it is diagnose-only and has no task-state transition authority.
 
 ## Contract
 

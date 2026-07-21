@@ -1,10 +1,15 @@
 # Type Catalogue Review: Severity Policy
 
 The reviewer's role is **type-design soundness review** of the per-layer type
-catalogues `track/items/<track-id>/<layer>-types.json` (Phase 2 SSoT) and the
-integrated mermaid view `contract-map.md`. The catalogue is the *interface
-contract* of each layer — it declares which types / traits / functions are added
-or modified, and how they relate to spec elements (`spec_refs[]`).
+catalogues `track/items/<track-id>/<layer>-types.json` (Phase 2 SSoT). The
+catalogue is the *interface contract* of each layer — it declares which types /
+traits / functions are added or modified, and how they relate to spec elements
+(`spec_refs[]`).
+
+Generated rendered views such as `contract-map.md` and `*-types.md` are
+read-only human reference outputs. They are not review targets and not fix
+targets for this scope; report catalogue JSON issues, not view-only or renderer
+issues.
 
 This briefing layers **two reading lenses**:
 
@@ -30,18 +35,86 @@ spec_refs/role/action mismatch.
 ### SoT integrity findings
 
 - **role / kind mismatch**: a struct / enum / trait whose declared `role`
-  (DomainEntity / ValueObject / Port / PrimaryAdapter / SecondaryAdapter / etc.)
+  (`Entity` / `ValueObject` / `SpecificationPort` / `SecondaryPort` /
+  `PrimaryAdapter` / `SecondaryAdapter` / etc.)
   does not match the `kind` discriminator or the layer the entry lives in
-	  (e.g., a port placed in domain instead of usecase). Cite
-	  `knowledge/conventions/hexagonal-architecture.md` §Port Placement Rules.
+	  (e.g., a review-execution `SecondaryPort` placed in domain instead of
+	  usecase). Cite
+  `knowledge/conventions/type-designer-kind-selection.md` R1.
 - **action incoherent with the diff**: an entry declared `action: add` that
   references a type already present in the rustdoc baseline, or `action: modify`
   on a method whose signature is identical to baseline — the catalogue's action
   declaration should match the actual change being introduced.
+  Use the rustdoc baseline / impl-catalog signal semantics for this judgement,
+  not the previous committed catalogue JSON or a prior review diff. If
+  `bin/sotp signal calc-impl-catalog` accepts `action: add` because the item is
+  absent from the rustdoc baseline, do not report it merely because the entry
+  existed in an earlier catalogue revision.
 - **spec_refs missing or off-topic**: an entry whose `spec_refs[]` is empty
   (Chain2 would flag this 🔴) — call it out if it's load-bearing, OR an entry
   whose `spec_refs[].anchor` cites a spec element whose intent is plainly
   unrelated to the type's purpose at the narrative level.
+- **upstream restatement**: an entry whose `docs` / `intent` field restates
+  an upstream ADR's or spec.json's design rationale or behaviour contract in
+  prose. Flag the restatement itself regardless of whether an anchor cite
+  (`AC-NN` / `IN-NN` / `CN-NN` / spec element id) accompanies it — the field
+  must reference upstream behaviour by anchor cite, not reproduce it. Cite
+  `knowledge/conventions/no-upstream-restatement.md`.
+
+### Cross-layer contract findings
+
+- **unconstructible error variant (dead vocabulary)**: an ErrorType variant
+  whose payload no declared layer can actually construct — e.g. a variant
+  carrying data (a resolved value, an "actual" comparand) that neither the
+  declaring layer nor any caller in the declared call chain possesses at the
+  failure point. Cite the variant and walk the missing data's origin.
+- **mirror chain divergence**: enums or field lists documented as conversion
+  mirrors across layers (CLI value-enum → driver select-enum → core enum, or
+  parallel command/input field sets) whose variant-name sets or field
+  names/ordering diverge without a documented language-level constraint
+  (reserved word at the flag surface). Cite both entry keys and the diverging
+  members.
+- **enforcement-owner contradiction**: a fail-closed rule whose enforcement is
+  claimed by different layers in different entries' docs ("rejected upstream"
+  in one, "validated here" in another), or claimed by no layer at all. The
+  catalogue must name exactly one owner and the owner must be able to construct
+  its rejection data.
+- **lossy boundary downgrade**: an upper-layer report or error that reduces
+  structured lower-layer detail (a list of typed values) to a count or joined
+  string without a documented justification, when the sibling read path carries
+  the full values.
+- **missing companion modify**: the track's ADR / spec commits to changing an
+  existing baseline public type, but no `action: modify` entry declares the
+  post-change shape — the change would land as an undeclared API mutation
+  caught only at implementation time.
+
+### API shape findings
+
+- **per-method error imprecision**: a method whose declared error type forces
+  callers to handle variants that operation can structurally never produce
+  (e.g. an `init`-style method returning a shared error enum containing
+  parse-failure variants when it parses nothing). A shared error enum is
+  acceptable; flag when the gap is large and the entry docs neither list the
+  producible subset nor justify the breadth. Cite the method and the
+  unreachable variants.
+- **ownership signature smell**: a read-only operation taking `String` /
+  `Vec<T>` / `PathBuf` by value where a borrow suffices; an owned return that
+  clones what a borrow could expose; `&mut self` on a method whose docs
+  describe a read. Judge from the declared receiver / params / returns.
+- **state-shape smell**: `Option<Option<T>>`; `Result<Option<T>, E>` where
+  `None` and `Err` overlap in meaning; a bool + `Option<T>` pair encoding a
+  tri-state that a dedicated enum would make unrepresentable-wrong. Cite the
+  field or signature and name the illegal state the current shape admits.
+- **sync/async color mismatch**: a port whose method set implies external I/O
+  (filesystem, network, database naming or failure vocabulary) declared fully
+  synchronous without the entry docs acknowledging the choice — or the
+  reverse, `is_async` on pure computation. Early color errors force rework at
+  the adapter.
+- **public enum evolution ambiguity**: a public enum that downstream projects
+  are expected to `match` on, where the entry does not indicate whether the
+  variant set is intentionally closed (exhaustive matching desired) or
+  extension-tolerant (`#[non_exhaustive]` intent). Flag only for enums on a
+  template-consumer-facing surface.
 
 ### SOLID findings
 
@@ -66,7 +139,7 @@ spec_refs/role/action mismatch.
 - **Dependency Inversion violation in catalogue placement**: a usecase or
   domain entry whose declared dependencies (via `params[]` / return types /
 	  associated types) point at a concrete infrastructure type instead of a port.
-	  Cite `knowledge/conventions/hexagonal-architecture.md` §Layer Dependencies.
+	  Cite `architecture-rules.json`.
 
 ### CQRS findings
 

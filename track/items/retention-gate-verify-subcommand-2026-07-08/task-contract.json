@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "track_id": "retention-gate-verify-subcommand-2026-07-08",
+  "entries": {
+    "T001": [
+      { "layer": "infrastructure", "entry_key": "infrastructure::verify::retention_gate::verify" }
+    ],
+    "T002": [
+      { "layer": "usecase", "entry_key": "VerifyInteractor" },
+      { "layer": "usecase", "entry_key": "VerifyOutcome" },
+      { "layer": "usecase", "entry_key": "VerifyPortError" },
+      { "layer": "usecase", "entry_key": "VerifyPort" },
+      { "layer": "usecase", "entry_key": "VerifyService" },
+      { "layer": "infrastructure", "entry_key": "FsVerifyAdapter" }
+    ],
+    "T003": [
+      { "layer": "cli_driver", "entry_key": "VerifyDriver" },
+      { "layer": "cli_driver", "entry_key": "VerifyInput" },
+      { "layer": "cli", "entry_key": "CatalogueSpecRefsArgs" },
+      { "layer": "cli", "entry_key": "PlanArtifactRefsArgs" },
+      { "layer": "cli", "entry_key": "SpecVerifyArgs" },
+      { "layer": "cli", "entry_key": "VerifyArgs" },
+      { "layer": "cli", "entry_key": "VerifyCommand" }
+    ],
+    "T004": []
+  }
+}

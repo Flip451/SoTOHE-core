@@ -1,0 +1,419 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "d3ee36c8b3fb55f5b67601509f5d2870447aee02dbf3c3e8cd4564575ff88989",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`adr-baseline check-review`（review 入口）の ADR 状態に基づく block 条件を「track 主対象 ADR の init 刻印が ledger に存在すること」の確認のみに縮小する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "ADR-baseline review の入口を、主対象 ADR の init 刻印が ledger に存在することを確認する gate に縮小し、Phase 0 の無刻印レビュー・修正ループを規範どおりに収束可能にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "5ace3126d1613bba6ce8df072255a5b5c4dfb656b01c068fed3f9ab4b4e7c87d",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`adr-baseline check-review`（review 入口）の ADR 状態に基づく block 条件を「track 主対象 ADR の init 刻印が ledger に存在すること」の確認のみに縮小する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "adr-baseline check-review を、非空 ledger、init record、およびその init baseline 複製の存在を検査する review 入口 gate として扱い、記録済み ledger 複製の整合検証は維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "fec3f81a89b8c81025d452d4c1b7cedcde23e60f61b01b9bbbc772f47a7b5da7",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`adr-baseline check-review`（review 入口）の ADR 状態に基づく block 条件を「track 主対象 ADR の init 刻印が ledger に存在すること」の確認のみに縮小する。現在文と最新 baseline の byte 照合は review 入口では行わず"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "review 中に init baseline と現行 ADR が乖離していても、init 刻印の存在を満たす限り review 入口を通過できるようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "c805ad477da13967e72f6b7da3f9a6a45e1ff39ab0694d937715b69747e7d5d1",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review / plan / adr2pr の workflow SSoT を、`knowledge/conventions/pre-track-adr-authoring.md` の裁定権規範に追随させる。追随範囲は、同規範が要求する守護者判定の配線と判定出力のレビューへの還流、および Phase 0 user 承認エスカレーションの carve-out を各 workflow に反映することに限る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "D2 に従い、review / plan / adr2pr の workflow SSoT に、track 内 ADR 編集ごとの adr-diagnoser 判定と、その保全代案または修正不要理由を所見の発生元へ還流する手順を反映する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "be9eaf6444088fbe3a0bb3c6826c4d2627dcaab5a64c95153a51b2ab35698f9b",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 0 ループが規範どおり成立する — init 刻印との乖離（レビュー中の draft 状態）は review を block せず、無刻印のまま zero_findings まで収束できる。編集を伴って収束した場合は、user 承認 → ループで修正した decision の front-matter `user_decision_ref` へ承認 ref を追記 → 既存の escalation kind で刻印"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "plan / adr2pr の workflow SSoT に、Phase 0 で zero_findings 後の user 承認エスカレーションを自律実行の明示的な例外として扱う carve-out を反映する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "c5acf4c64caaf5fba21a108ee4fa9b5168ea9e5a9d6a6eade718204eb7254004",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "専用の承認 kind は導入しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "snapshot kind への専用の承認 kind の追加、または check-commit に承認記録を必須化すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "a88c99ec0fc4b2ecdeff9f2436f8640c6a6bfd4ea7eb10cdb29f1bd91c38a0d0",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現在文と最新 baseline の byte 照合は review 入口では行わず、その発火点は従来どおり commit gate（`check-commit`）と track-aware CI に限る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "check-commit または track-aware CI における、記録済み ADR と最新 baseline の byte 照合および fail-closed な無断改変検出を変更すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "3cd0c973ee94d5e4ce36488e1cc74527115c2fb51b538a59106d66c3bd3edd24",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ledger 検証（記録済み複製の整合確認）は現行のまま維持する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "ADR-baseline ledger の形式、累積記録の扱い、または escalation snapshot の既存経路を変更すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "1600d1ccd5ee6257a3b2d665d194900ffef4dc91f563e532e42bfec47abaebab",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`adr-baseline check-review`（review 入口）の ADR 状態に基づく block 条件を「track 主対象 ADR の init 刻印が ledger に存在すること」の確認のみに縮小する。現在文と最新 baseline の byte 照合は review 入口では行わず、その発火点は従来どおり commit gate（`check-commit`）と track-aware CI に限る。ledger 検証（記録済み複製の整合確認）は現行のまま維持する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "adr_user signal 評価、signal-gates の strictness、または spec が cite する ADR の coverage 検査を変更すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "673cbd8ed6afb369d22d90e4ac98e7790b045634a2b4eceec2c4ceb05390f5bc",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`adr-baseline check-review`（review 入口）の ADR 状態に基づく block 条件を「track 主対象 ADR の init 刻印が ledger に存在すること」の確認のみに縮小する。現在文と最新 baseline の byte 照合は review 入口では行わず、その発火点は従来どおり commit gate（`check-commit`）と track-aware CI に限る。ledger 検証（記録済み複製の整合確認）は現行のまま維持する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "review 入口から除く ADR 状態の block 条件は現行 ADR と最新 baseline の byte 不一致だけとし、init designation の欠落と記録済み ledger 複製の不整合は review 前に fail-closed とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "7812150b55702dd7cccb816e51f749840393fd73cafd238bb674c4f2f39b2e33",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Phase 0 ループが規範どおり成立する」—「無刻印のまま zero_findings まで収束できる。編集を伴って収束した場合は、user 承認 → ループで修正した decision の front-matter `user_decision_ref` へ承認 ref を追記 → 既存の escalation kind で刻印」および「編集がなければ init 記録がそのまま承認文面なので刻印しない。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "Phase 0 のレビュー・修正ループ中は ledger に中間刻印を追加せず、編集を伴って収束した場合だけ user 承認 ref を対象 decision に記録して既存 escalation 経路で刻印する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "14403d783f4de586206f4543409d9c1af8b50a6b3f0d3aaf362df0c4b4a9a4db",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "編集がなければ init 記録がそのまま承認文面なので刻印しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "編集を伴わずに Phase 0 が user 承認へ収束した場合は、init 記録を承認文面として維持し追加刻印を行わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "4757905ecabc74f4fb0571d44a6c0785e3f9ac27a8c0816fbc5288ff0bc7f947",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`adr-baseline check-review`（review 入口）の ADR 状態に基づく block 条件を「track 主対象 ADR の init 刻印が ledger に存在すること」の確認のみに縮小する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "adr-baseline check-review は、ledger が欠落または空、init record がない、または init record が指す baseline 複製がない場合に review 開始前に失敗する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "6d71fe10763a355fadd9e7c0dec2fb3faa0ba42cbd4ff4b7008cc1b0e01d347e",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`adr-baseline check-review`（review 入口）の ADR 状態に基づく block 条件を「track 主対象 ADR の init 刻印が ledger に存在すること」の確認のみに縮小する。現在文と最新 baseline の byte 照合は review 入口では行わず、その発火点は従来どおり commit gate（`check-commit`）と track-aware CI に限る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "有効な init record とその複製を持つ track では、現行 ADR が最新 baseline と byte 不一致でも adr-baseline check-review がその不一致を理由に失敗せず、reviewer または fixer が review を開始できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "c059839aa65d6d23e2f7a6714578548855f13257dfa5c90485e9b7204794f533",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現在文と最新 baseline の byte 照合は review 入口では行わず、その発火点は従来どおり commit gate（`check-commit`）と track-aware CI に限る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "check-commit と track-aware CI は、記録済み ADR の現行文面と最新 baseline の byte 不一致を従来どおり fail-closed で検出し、spec が cite する ADR の coverage 検査も維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ed14d2f2dbec7023bb95604fdf6bda31831211ccef01843c9f62edc8bd1d670b",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`adr-baseline check-review`（review 入口）の ADR 状態に基づく block 条件を「track 主対象 ADR の init 刻印が ledger に存在すること」の確認のみに縮小する。現在文と最新 baseline の byte 照合は review 入口では行わず、その発火点は従来どおり commit gate（`check-commit`）と track-aware CI に限る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "review workflow は review 入口を init designation の早期検出として記述し、review 中の byte 不一致を ADR-baseline recovery route へ送らない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "7d898dd9555d9e5030fb8583f84a9a804cd3f81e7e8473b3db945afd08f325ce",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "review / plan / adr2pr の workflow SSoT を、`knowledge/conventions/pre-track-adr-authoring.md` の裁定権規範に追随させる。追随範囲は、同規範が要求する守護者判定の配線と判定出力のレビューへの還流、および Phase 0 user 承認エスカレーションの carve-out を各 workflow に反映することに限る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "D2 に従い、review、plan、および adr2pr の workflow SSoT は、ADR 編集の直後に adr-diagnoser の決定保存判定を実施し、決定破壊の verdict が示す保全代案または修正不要理由を所見の発生元へ返す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "6b7e10a5c0070a8b9d73e16ab7971d6683b5903f9e86fe615839fefbd62020ad",
+      "evidence_hash": "c85f5ca8409454ddcc1bd6b46965250e6efa8726e3be3464cae16d85d49c116d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Phase 0 ループが規範どおり成立する」 — init 刻印との乖離（レビュー中の draft 状態）は review を block せず、無刻印のまま zero_findings まで収束できる。編集を伴って収束した場合は、user 承認 → ループで修正した decision の front-matter `user_decision_ref` へ承認 ref を追記 → 既存の escalation kind で刻印"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "plan と adr2pr の workflow SSoT は、Phase 0 の zero_findings 後に user 承認エスカレーションを実行でき、その承認により ADR 文面が変わる場合は fresh review から再収束させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md",
+          "decision_id": "D1"
+        }
+      }
+    }
+  ]
+}

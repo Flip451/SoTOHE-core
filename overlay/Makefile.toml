@@ -1,0 +1,387 @@
+extend = "Makefile.host.toml"
+
+[config]
+skip_core_tasks = true
+default_to_workspace = false
+
+# ---------------------------------------------------------------------------
+# Setup
+# ---------------------------------------------------------------------------
+
+[tasks.bootstrap]
+description = "[gate] Install pinned auxiliary tools and sotp, then run host-first CI"
+script_runner = "@shell"
+script = ['''
+set -e
+echo "=== Bootstrap: development environment setup ==="
+
+echo ""
+echo "--- Step 1/7: Check prerequisites ---"
+if ! command -v cargo >/dev/null 2>&1; then
+  echo "[FAIL] cargo not found. Install Rust: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh"
+  exit 1
+fi
+echo "[OK] cargo available"
+
+echo ""
+echo "--- Step 2/7: Install pinned auxiliary tools ---"
+cargo make install-aux-tools
+
+echo ""
+echo "--- Step 3/7: Install sotp CLI binary (pinned tag) ---"
+if [ -x bin/sotp ] && bin/sotp --help >/dev/null 2>&1; then
+  echo "[OK] bin/sotp already present (transplanted by sotp template export); skipping install-sotp"
+else
+  cargo make install-sotp
+  echo "[OK] bin/sotp installed"
+fi
+
+echo ""
+echo "--- Step 4/7: Provision Codex runtime link ---"
+bin/sotp codex-runtime provision --project-root .
+echo "[OK] Codex runtime link provisioned"
+
+echo ""
+echo "--- Step 5/7: Configure git hooks path ---"
+if [ "$(git config --local core.hooksPath 2>/dev/null || true)" = ".githooks" ]; then
+  echo "[OK] core.hooksPath already set"
+else
+  git config --local core.hooksPath .githooks
+  echo "[OK] core.hooksPath set to .githooks"
+fi
+chmod +x .githooks/reference-transaction .githooks/pre-push 2>/dev/null || true
+
+echo ""
+echo "--- Step 6/7: Run CI ---"
+cargo make ci
+echo "[OK] CI passed"
+
+echo ""
+echo "--- Step 7/7: Configure git notes fetch refspec ---"
+if git remote get-url origin >/dev/null 2>&1; then
+  if git config --get-all remote.origin.fetch | grep -q 'refs/notes'; then
+    echo "[OK] git notes refspec already configured"
+  else
+    git config --add remote.origin.fetch "+refs/notes/*:refs/notes/*"
+    echo "[OK] git notes refspec added to origin"
+  fi
+else
+  echo "[SKIP] no origin remote found; git notes refspec not configured"
+fi
+
+echo ""
+echo "=== Bootstrap complete ==="
+''']
+
+[tasks.install-aux-tools]
+description = "[host] Install pinned cargo-nextest and cargo-deny with locked dependencies"
+script_runner = "@shell"
+script = ['''
+set -e
+cargo install --locked cargo-nextest --version 0.9.129
+cargo install --locked cargo-deny --version 0.19.0
+''']
+
+[tasks.install-sotp]
+description = "[host] Install the pinned sotp CLI from its git tag into bin/sotp (tag SSoT: .harness/config/sotp-version.json)"
+script_runner = "@shell"
+script = ['''
+set -e
+PIN=".harness/config/sotp-version.json"
+if [ ! -f "$PIN" ]; then
+  echo "[ERROR] sotp version pin not found: $PIN" >&2
+  exit 1
+fi
+if ! command -v jq >/dev/null 2>&1; then
+  echo "[ERROR] jq not found. Install jq so install-sotp can read $PIN." >&2
+  exit 1
+fi
+GIT_URL="$(jq -r '.git_url' "$PIN")"
+TAG="$(jq -r '.tag' "$PIN")"
+CRATE="$(jq -r '.crate' "$PIN")"
+BINARY="$(jq -r '.binary' "$PIN")"
+PIN_METADATA=".cargo-install/sotp-install.json"
+echo "Installing $CRATE ($BINARY) from $GIT_URL @ $TAG ..."
+if [ -x ".cargo-install/bin/$BINARY" ] && [ -f "$PIN_METADATA" ] && jq -e \
+  --arg git_url "$GIT_URL" \
+  --arg tag "$TAG" \
+  --arg crate "$CRATE" \
+  --arg binary "$BINARY" \
+  '.git_url == $git_url and .tag == $tag and .crate == $crate and .binary == $binary' \
+  "$PIN_METADATA" >/dev/null 2>&1; then
+  echo "[OK] reusing cached $BINARY from $TAG"
+else
+  if ! command -v protoc >/dev/null 2>&1; then
+    echo "[ERROR] protoc not found. Install the Protocol Buffers compiler before building sotp from source." >&2
+    exit 1
+  fi
+  cargo install "$CRATE" --git "$GIT_URL" --tag "$TAG" --locked --force --root .cargo-install
+  jq -n \
+    --arg git_url "$GIT_URL" \
+    --arg tag "$TAG" \
+    --arg crate "$CRATE" \
+    --arg binary "$BINARY" \
+    '{git_url: $git_url, tag: $tag, crate: $crate, binary: $binary}' > "$PIN_METADATA"
+fi
+mkdir -p bin
+cp ".cargo-install/bin/$BINARY" bin/sotp
+if bin/sotp --help >/dev/null 2>&1; then
+  echo "[OK] bin/sotp installed from $TAG"
+else
+  echo "[ERROR] installed bin/sotp cannot execute on this system." >&2
+  rm -f bin/sotp
+  exit 1
+fi
+''']
+
+# ---------------------------------------------------------------------------
+# Host-side verification gates
+# ---------------------------------------------------------------------------
+
+[tasks.check-layers]
+description = "[gate] Check architectural layer dependencies"
+command = "bin/sotp"
+args = ["verify", "layers"]
+
+[tasks.verify-arch-docs]
+description = "[gate] Verify workspace architecture docs are in sync"
+command = "bin/sotp"
+args = ["verify", "arch-docs"]
+
+[tasks.verify-doc-links]
+description = "[gate] Verify local Markdown links resolve to existing files"
+command = "bin/sotp"
+args = ["verify", "doc-links"]
+
+[tasks.verify-track-metadata]
+description = "[gate] Verify track views consistency: metadata.json schema/task graph/status plus plan.md and registry.md sync"
+command = "bin/sotp"
+args = ["track", "views", "validate", "--project-root", "."]
+
+[tasks.verify-hooks-path]
+description = "[gate] Verify local Git config core.hooksPath points at .githooks"
+command = "bin/sotp"
+args = ["verify", "hooks-path"]
+
+[tasks.verify-canonical-modules]
+description = "[gate] Verify no reimplementation of canonical module concerns"
+command = "bin/sotp"
+args = ["verify", "canonical-modules"]
+
+[tasks.verify-latest-track]
+description = "[gate] Verify latest track has spec.md (or spec.json) and plan.md"
+command = "bin/sotp"
+args = ["verify", "latest-track"]
+
+[tasks.verify-module-size]
+description = "[gate] Verify Rust source file sizes against module_limits"
+command = "bin/sotp"
+args = ["verify", "module-size"]
+
+[tasks.verify-domain-strings]
+description = "[gate] Verify no pub String fields in domain layer"
+command = "bin/sotp"
+args = ["verify", "domain-strings"]
+
+[tasks.verify-domain-purity]
+description = "[gate] Verify domain layer hexagonal purity"
+command = "bin/sotp"
+args = ["verify", "domain-purity"]
+
+[tasks.verify-usecase-purity]
+description = "[gate] Verify usecase layer hexagonal purity"
+command = "bin/sotp"
+args = ["verify", "usecase-purity"]
+
+[tasks.verify-view-freshness]
+description = "[gate] Verify plan.md is up-to-date with metadata.json"
+command = "bin/sotp"
+args = ["verify", "view-freshness"]
+
+[tasks.verify-plan-artifact-refs]
+description = "[gate] Verify plan artifact refs and task-coverage integrity"
+command = "bin/sotp"
+args = ["verify", "plan-artifact-refs"]
+
+[tasks.verify-adr-signals]
+description = "[gate] Verify ADR decision signal grounds across knowledge/adr/"
+command = "bin/sotp"
+args = ["signal", "check-adr-user", "--gate", "commit"]
+
+[tasks.verify-spec-states-current]
+private = true
+description = "[internal] Check the active track's spec-to-ADR signal gate"
+script_runner = "@shell"
+script = ['''
+BRANCH="$(git symbolic-ref --quiet --short HEAD 2>/dev/null || true)"
+TRACK_ID="${BRANCH#track/}"
+SPEC_JSON="track/items/${TRACK_ID}/spec.json"
+if [ ! -f "$SPEC_JSON" ]; then
+  echo "[SKIP] signal check-spec-adr: spec.json absent (Phase 0 / pre-Phase-1 track ${TRACK_ID})"
+  exit 0
+fi
+bin/sotp signal check-spec-adr --gate commit --spec-json "$SPEC_JSON"
+''']
+
+[tasks.signal-check-impl-catalog]
+private = true
+description = "[internal] Check the active track's implementation-to-catalogue signal gate"
+command = "bin/sotp"
+args = ["signal", "check-impl-catalog", "--gate", "commit"]
+
+[tasks.verify-catalogue-spec-refs]
+private = true
+description = "[internal] Verify active-track catalogue-to-spec references"
+command = "bin/sotp"
+args = ["verify", "catalogue-spec-refs"]
+
+[tasks.check-catalogue-spec-signals]
+private = true
+description = "[internal] Check the active track's catalogue-to-spec signal gate"
+command = "bin/sotp"
+args = ["signal", "check-catalog-spec", "--gate", "commit"]
+
+[tasks.task-contract-refresh-impl-catalog]
+private = true
+description = "[internal] Refresh implementation-catalogue signals before task-contract gates"
+command = "bin/sotp"
+args = ["signal", "calc-impl-catalog"]
+
+[tasks.task-contract-coverage]
+description = "[gate] Verify task-contract attribution completeness"
+dependencies = ["task-contract-refresh-impl-catalog"]
+command = "bin/sotp"
+args = ["task-contract", "coverage"]
+
+[tasks.task-contract-check]
+description = "[gate] Verify task-contract liveness"
+dependencies = ["task-contract-coverage"]
+command = "bin/sotp"
+args = ["task-contract", "check"]
+
+[tasks.task-contract-coverage-local]
+private = true
+description = "[internal] Verify task-contract attribution completeness without a nightly signal refresh for CI"
+command = "bin/sotp"
+args = ["task-contract", "coverage"]
+
+[tasks.task-contract-check-local]
+private = true
+description = "[internal] Verify task-contract liveness without a nightly signal refresh for CI"
+dependencies = ["task-contract-coverage-local"]
+command = "bin/sotp"
+args = ["task-contract", "check"]
+
+# ---------------------------------------------------------------------------
+# CI aggregates
+# ---------------------------------------------------------------------------
+
+[tasks.ci-rust]
+description = "[gate] Run Rust-only CI checks"
+dependencies = ["fmt-check", "clippy", "test", "deny", "check-layers", "verify-canonical-modules"]
+
+[tasks.ci]
+description = "[gate] Run repository-wide CI checks. Track-aware gates live in ci-track."
+dependencies = ["fmt-check", "clippy", "test", "test-doc", "deny", "check-layers", "verify-arch-docs", "verify-doc-links", "verify-track-metadata", "verify-hooks-path", "verify-canonical-modules", "verify-latest-track", "verify-module-size", "verify-domain-strings", "verify-domain-purity", "verify-usecase-purity", "verify-view-freshness", "verify-plan-artifact-refs", "verify-adr-signals"]
+
+[tasks.ci-track]
+description = "[gate] Run track-aware CI gates. Requires a track/<id> branch."
+dependencies = ["task-contract-check-local", "verify-spec-states-current", "signal-check-impl-catalog", "verify-catalogue-spec-refs", "check-catalogue-spec-signals"]
+
+# ---------------------------------------------------------------------------
+# Review and guarded commit
+# ---------------------------------------------------------------------------
+
+[tasks.track-active-gate]
+private = true
+description = "[gate] Refresh active-track signals, catalogue checks, and rendered views"
+script_runner = "@shell"
+script = ['''
+set -e
+bin/sotp signal calc-impl-catalog
+bin/sotp signal calc-catalog-spec
+bin/sotp catalogue-lint check-active-track
+bin/sotp catalog check
+bin/sotp track views sync
+''']
+
+[tasks.track-local-review]
+description = "[wrapper] Run task-contract gates, refresh track artifacts, then invoke one local reviewer round"
+dependencies = ["task-contract-check", "track-active-gate"]
+script_runner = "@shell"
+script = ['case "${1:-}" in --) shift ;; esac; bin/sotp review local "$@"']
+
+[tasks.track-local-review-fix]
+description = "[wrapper] Run task-contract gates, refresh track artifacts, then invoke the local review fixer"
+dependencies = ["task-contract-check", "track-active-gate"]
+script_runner = "@shell"
+script = ['case "${1:-}" in --) shift ;; esac; bin/sotp review fix-local "$@"']
+
+[tasks.track-local-dry-fix]
+description = "[wrapper] Launch the Codex dry-fix-lead fixer"
+script_runner = "@shell"
+script = ['case "${1:-}" in --) shift ;; esac; bin/sotp dry fix-local "$@"']
+
+[tasks.pr-audit-comment]
+description = "[wrapper] Post the adr2pr terminal audit comment: exactly one `gh pr comment --body-file <path>` on the current branch's PR. Validates argv — a single non-flag path that lives under the workspace-controlled tmp/pr-audit/ directory, is a regular non-symlink file, and resolves inside that directory — so edit/delete/repo-targeting submodes (--edit-last, --delete-last, --repo, ...) can never ride along and arbitrary files (e.g. local secrets) can never be posted. This wrapper is the only sanctioned autonomous `gh pr comment` route."
+script_runner = "@shell"
+script = ['''
+case "${1:-}" in --) shift ;; esac
+if [ "$#" -ne 1 ]; then
+  echo "usage: cargo make pr-audit-comment -- tmp/pr-audit/<body-file>" >&2
+  exit 2
+fi
+case "$1" in
+  -*) echo "error: argument must be a body-file path, not a flag: $1" >&2; exit 2 ;;
+esac
+case "$1" in
+  tmp/pr-audit/*) ;;
+  *) echo "error: body file must be a relative path under tmp/pr-audit/: $1" >&2; exit 2 ;;
+esac
+case "$1" in
+  *..*) echo "error: body file path must not contain '..': $1" >&2; exit 2 ;;
+esac
+if [ -L "$1" ]; then
+  echo "error: body file must not be a symlink: $1" >&2
+  exit 2
+fi
+if [ ! -f "$1" ]; then
+  echo "error: body file not found: $1" >&2
+  exit 2
+fi
+workspace=$(realpath .) || exit 2
+if [ -L tmp ] || [ -L tmp/pr-audit ]; then
+  echo "error: tmp/pr-audit and its tmp parent must not be symlinks" >&2
+  exit 2
+fi
+if [ ! -d tmp/pr-audit ]; then
+  echo "error: body file directory tmp/pr-audit/ not found" >&2
+  exit 2
+fi
+base="$workspace/tmp/pr-audit"
+abs=$(realpath "$1") || exit 2
+case "$abs" in
+  "$base"/*) ;;
+  *) echo "error: body file resolves outside tmp/pr-audit/: $abs" >&2; exit 2 ;;
+esac
+unset GH_REPO GH_HOST
+exec gh pr comment --body-file "$1"
+''']
+
+[tasks.track-commit-message]
+description = "[wrapper] Refresh active-track artifacts, run CI and approval gates (review, semantic refs, test-obligation, DRY), then commit from tmp/track-commit/commit-message.txt"
+dependencies = ["track-active-gate"]
+script_runner = "@shell"
+script = ['''
+bin/sotp git add-all && \
+cargo make ci && \
+cargo make ci-track && \
+bin/sotp review check-approved && \
+bin/sotp ref-verify run && \
+bin/sotp git add-all && \
+bin/sotp ref-verify check-approved && \
+bin/sotp test-obligation check && \
+bin/sotp dry check-approved && \
+bin/sotp git commit-from-file tmp/track-commit/commit-message.txt --cleanup && \
+bin/sotp track set-commit-hash
+''']

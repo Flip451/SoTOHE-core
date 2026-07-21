@@ -1,5 +1,6 @@
 use std::fmt;
 
+use crate::tddd::test_obligation::ids::DiagnosticMessage;
 use crate::{
     CommitHash, DomainError, ImplPlanDocument, NonEmptyString, PlanView, TaskId, TrackBranch,
     TrackId, TransitionError, ValidationError, branch_strategy::BranchStrategySnapshot,
@@ -328,8 +329,8 @@ impl TrackMetadata {
             let expected_prefix = format!("track/{}", id.as_ref());
             if b.as_ref() != expected_prefix {
                 return Err(DomainError::Validation(ValidationError::BranchIdMismatch {
-                    id: id.to_string(),
-                    branch: b.to_string(),
+                    id: DiagnosticMessage::try_new(id.to_string())?,
+                    branch: DiagnosticMessage::try_new(b.to_string())?,
                 }));
             }
         }
@@ -376,8 +377,8 @@ impl TrackMetadata {
             let expected_prefix = format!("track/{}", self.id.as_ref());
             if b.as_ref() != expected_prefix {
                 return Err(DomainError::Validation(ValidationError::BranchIdMismatch {
-                    id: self.id.to_string(),
-                    branch: b.to_string(),
+                    id: DiagnosticMessage::try_new(self.id.to_string())?,
+                    branch: DiagnosticMessage::try_new(b.to_string())?,
                 }));
             }
         }
@@ -457,7 +458,9 @@ pub(crate) fn validate_plan_invariants(
     let mut task_ids = HashSet::new();
     for task in tasks {
         if !task_ids.insert(task.id().clone()) {
-            return Err(ValidationError::DuplicateTaskId(task.id().to_string()));
+            return Err(ValidationError::DuplicateTaskId(DiagnosticMessage::try_new(
+                task.id().to_string(),
+            )?));
         }
     }
 
@@ -465,12 +468,16 @@ pub(crate) fn validate_plan_invariants(
     let mut task_ref_counts: HashMap<TaskId, usize> = HashMap::new();
     for section in plan.sections() {
         if !section_ids.insert(section.id().to_owned()) {
-            return Err(ValidationError::DuplicatePlanSectionId(section.id().to_owned()));
+            return Err(ValidationError::DuplicatePlanSectionId(DiagnosticMessage::try_new(
+                section.id().to_owned(),
+            )?));
         }
 
         for task_id in section.task_ids() {
             if !task_ids.contains(task_id) {
-                return Err(ValidationError::UnknownTaskReference(task_id.to_string()));
+                return Err(ValidationError::UnknownTaskReference(DiagnosticMessage::try_new(
+                    task_id.to_string(),
+                )?));
             }
             *task_ref_counts.entry(task_id.clone()).or_insert(0) += 1;
         }
@@ -478,9 +485,15 @@ pub(crate) fn validate_plan_invariants(
 
     for task in tasks {
         match task_ref_counts.get(task.id()) {
-            None => return Err(ValidationError::UnreferencedTask(task.id().to_string())),
+            None => {
+                return Err(ValidationError::UnreferencedTask(DiagnosticMessage::try_new(
+                    task.id().to_string(),
+                )?));
+            }
             Some(count) if *count > 1 => {
-                return Err(ValidationError::DuplicateTaskReference(task.id().to_string()));
+                return Err(ValidationError::DuplicateTaskReference(DiagnosticMessage::try_new(
+                    task.id().to_string(),
+                )?));
             }
             Some(_) => {}
         }

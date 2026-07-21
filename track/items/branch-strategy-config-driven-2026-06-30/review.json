@@ -648,14 +648,14 @@
             {
               "message": "`TrackDocumentV2` says the missing `branch_strategy_snapshot` field will fail parsing \"via serde deny_unknown_fields\", but that attribute only rejects unknown extra keys, not absent required fields. The artifact is misdescribing the mechanism that enforces CN-03; it should say the field is non-optional and missing data fails because the DTO requires it.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
               "line": 119,
               "category": "factual error"
             },
             {
               "message": "`task-coverage.json` omits `T015` from `IN-05`, even though `IN-05` explicitly includes the `.claude/commands/track/done.md` and `.claude/rules/07-dev-environment.md` updates that are implemented in `T015`. That leaves the coverage artifact internally inconsistent with the plan and can make the branch-switch rename scope look fully covered when part of it is not mapped.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/task-coverage.json",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/task-coverage.json",
               "line": 8,
               "category": "contradiction"
             }
@@ -822,9 +822,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Marking `TrackService::switch_base` as `has_default_impl: true` in [usecase-types.json](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json#L281) turns the new service API into an optional hook: a `TrackService` impl can now omit the override and still compile, with the failure only surfacing at runtime. That contradicts the surrounding plan in [plan.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/plan.md#L8), which treats `switch_base` as part of the compile-stable foundation for the branch-strategy flow.",
+              "message": "Marking `TrackService::switch_base` as `has_default_impl: true` in [usecase-types.json](track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json#L281) turns the new service API into an optional hook: a `TrackService` impl can now omit the override and still compile, with the failure only surfacing at runtime. That contradicts the surrounding plan in [plan.md](track/items/branch-strategy-config-driven-2026-06-30/plan.md#L8), which treats `switch_base` as part of the compile-stable foundation for the branch-strategy flow.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/usecase-types.json",
               "line": 281,
               "category": "contradiction"
             }
@@ -854,14 +854,14 @@
             {
               "message": "`TrackServiceImpl::switch_base` is specified to delegate upward to `TrackCompositionRoot::track_switch_base`, which inverts the dependency direction between the service/infrastructure layer and the CLI composition root. That creates a layer cycle and cannot be implemented as written; the composition root should call the service, not the other way around.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
               "line": 56,
               "category": "infeasibility"
             },
             {
               "message": "S7 says \"All changes are text replacements; no behavioral logic changes,\" but T015.5 explicitly removes the hardcoded merge-commit default and changes the omitted-method behavior of `bin/sotp pr wait-and-merge`. That is a behavioral change, so the section summary is inaccurate.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/plan.md",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/plan.md",
               "line": 71,
               "category": "contradiction"
             }
@@ -876,7 +876,7 @@
             {
               "message": "T011 is infeasible as written: it places the shared `switch-base` helper in `apps/cli-composition`, then requires `libs/infrastructure`'s `TrackServiceImpl::switch_base` to use that same helper. That forces an upward dependency from infrastructure into the composition-root crate and creates a layering cycle unless the helper is moved into a lower-level shared module.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/plan.md",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/plan.md",
               "line": 45,
               "category": "infeasibility"
             }
@@ -977,7 +977,7 @@
             {
               "message": "T011 makes `track_init` fail closed on `.harness/config/branch-strategy.json`, but that file is only introduced later in T012. As ordered, the init path is broken until the later section lands, so the plan needs an explicit dependency or T012 moved ahead of T011.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
               "line": 61,
               "category": "infeasibility"
             }
@@ -1043,7 +1043,7 @@
             {
               "message": "OS-07 is internally inconsistent: it is listed under `out_of_scope`, but its first sentence says the `review_v2/shared.rs` `build_v2_shared` / `resolve_diff_base` base-branch parameterization \"is within this track's scope\". That leaves the scope boundary for IN-04 ambiguous.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/spec.json",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json",
               "line": 281,
               "category": "contradiction"
             }
@@ -1058,7 +1058,7 @@
             {
               "message": "`GO-03` is attached to the wrong task set: it says the ADR 1328 layer-splitting cleanup is what `T006〜T008 (IN-04)` changes, but those tasks are the `git rev-parse main` fallback/fixture edits. The actual ADR 1328 split work is grouped under `S7` / `T016〜T023`, so this goal text mislabels the plan and makes the goal-to-task mapping internally inconsistent. `spec.md` repeats the same mismatch at line 13.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/spec.json",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/spec.json",
               "line": 40,
               "category": "factual error"
             }
@@ -1102,7 +1102,7 @@
             {
               "message": "`impl-plan.json` tells `FixpointResolveDriverInteractor` to change the process CWD itself around `dry_gate.resolve_dry_gate` (`set CWD to repo_root beforehand, restore ... afterward`). That puts process-global environment mutation into the usecase layer without any trait boundary, which conflicts with the repo’s layering rules and makes the new interactor depend on infrastructure concerns directly.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
               "line": 91,
               "category": "architecture"
             }
@@ -1169,14 +1169,14 @@
             {
               "message": "The new S7 work is described as an ordered chain in the briefing and task text (`T017 -> T018 -> T019 -> T020` and `T021 -> T022/T023`), but `impl-plan.json` does not encode any of those prerequisites with machine-readable dependency edges. Every new task record in the S7 block has only `id`/`description`/`status`, so the scheduler can still run the later cutover tasks before their setup tasks. That makes the plan unenforceable as written.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
               "line": 90,
               "category": "infeasibility"
             },
             {
               "message": "The S7 summary says, \"Every relocation in this section preserves existing CLI output text, exit codes, and test coverage; no behavior visible to users changes,\" but `T018` explicitly changes `FsFixpointWorkspaceContextAdapter` to fail closed and remove the previous branch-name fallback when `metadata.json` is missing or unreadable. If that path is reachable, the summary is false: the user-visible error/exit behavior does change.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/plan.md",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/plan.md",
               "line": 75,
               "category": "contradiction"
             }
@@ -1284,7 +1284,7 @@
             {
               "message": "T009-T015 are still marked `todo` here even though this integrated batch's plan artifacts already add the corresponding `cli_driver`/`cli`/`cli_composition` catalogue changes and the briefing says these S4/S5 items are part of the commit. `plan.md` mirrors the same stale state as 16/23 resolved, so the rendered plan is out of sync with the change set.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/impl-plan.json",
               "line": 50,
               "category": "contradiction"
             }
@@ -1361,14 +1361,14 @@
             {
               "message": "A symlinked `track/items/<id>` or `track/archive/<id>` directory is accepted here because `entry.path().is_dir()` follows symlinks, and the later `metadata.json` / `impl-plan.json` / `task-coverage.json` reads never re-check that the resolved path stays under `root`. A repo-controlled symlink can therefore escape the trusted root and feed external files into the render pipeline.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/snapshot.rs",
+              "file": "libs/infrastructure/src/track/render/snapshot.rs",
               "line": 306,
               "category": "symlink not rejected at boundary"
             },
             {
               "message": "`all_track_directories()` follows symlinked `track/items/<id>` / `track/archive/<id>` entries with `is_dir()`, and `load_track_metadata()` then reads `metadata.json` and `impl-plan.json` from that symlink target without a containment check. That lets the latest-track verifier select and parse data outside `root` if a track directory is replaced with a symlink.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
               "line": 103,
               "category": "symlink not rejected at boundary"
             }
@@ -1383,14 +1383,14 @@
             {
               "message": "Leaf symlinks are still followed when loading track state for latest-track/freshness checks. `latest_track.rs` reads `metadata.json` directly at line 254, `track/render/snapshot.rs` reads `impl-plan.json` directly at line 66, and `verify/view_freshness.rs` reads `metadata.json` directly at line 173. Those paths never do the same `symlink_metadata()` + reject step used elsewhere in the repo, so a symlinked file inside an otherwise real track directory can redirect these checks to content outside `track/items`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/latest_track.rs",
+              "file": "libs/infrastructure/src/verify/latest_track.rs",
               "line": 254,
               "category": "symlink not rejected at boundary"
             },
             {
               "message": "`sync_rendered_views` still accepts symlinked track inputs. `catalogue_path_exists()` explicitly counts symlinks as present, and the render path then reads `spec.json` at line 180 and `*-types.json` at line 325 with `read_to_string()`. That lets a symlink under `track/items/<id>` feed arbitrary outside JSON into generated views instead of enforcing real-file semantics.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/render/sync.rs",
+              "file": "libs/infrastructure/src/track/render/sync.rs",
               "line": 325,
               "category": "symlink not rejected at boundary"
             }
@@ -1405,7 +1405,7 @@
             {
               "message": "The new `metadata_path.is_file()` pre-check runs before `reject_symlinks_below`, so a dangling symlink or other non-regular-file `metadata.json` is treated as absent and silently skipped instead of being rejected at the boundary. That bypasses the fail-closed guard that follows and can hide corrupted track state.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/verify/view_freshness.rs",
+              "file": "libs/infrastructure/src/verify/view_freshness.rs",
               "line": 84,
               "category": "symlink not rejected at boundary"
             }
@@ -1512,14 +1512,14 @@
             {
               "message": "`resolve_context` canonicalizes `--items-dir` but never rejects a symlinked root before the trust check. That lets a symlinked `items_dir` be redirected to a different tree, which is contrary to the existing symlink-rejection pattern used for trust-rooted filesystem inputs. Reject the root symlink before canonicalizing it.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
+              "file": "libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
               "line": 113,
               "category": "symlink not rejected at boundary"
             },
             {
               "message": "`read_base_branch` reads `<canonical_items_dir>/<track_id>/metadata.json` with `std::fs::read_to_string` directly, so a symlinked `metadata.json` can redirect the load outside the track directory and feed an arbitrary base branch into fixpoint resolution. Existing infrastructure loaders reject symlinked metadata paths before reading; this one should too.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
+              "file": "libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
               "line": 72,
               "category": "symlink not rejected at boundary"
             }
@@ -1649,21 +1649,21 @@
             {
               "message": "`resolve_existing_dir_under_repo` canonicalizes the candidate path and checks containment, but it never rejects a symlinked leaf or ancestor before trusting the result. That means `FsDryRepoRootAdapter` and `FsDryCorpusFragmentsAdapter` can accept a symlinked `items_dir`/`workspace_root` root, unlike the existing fail-closed `--items-dir` validation pattern that rejects symlinks before canonicalization.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/dry_driver_shared.rs",
+              "file": "libs/infrastructure/src/dry_check/dry_driver_shared.rs",
               "line": 35,
               "category": "symlink not rejected at boundary"
             },
             {
               "message": "`FsDryWriteConfigLoaderAdapter` reads `.harness/config/dry-check.json` via `InfraDryCheckConfig::load` without the canonicalize + `reject_symlinks_below` guard used by the existing dry-check config loader. A symlinked config file will be followed and treated as trusted instead of being rejected at the boundary.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/dry_write_driver.rs",
+              "file": "libs/infrastructure/src/dry_check/dry_write_driver.rs",
               "line": 94,
               "category": "symlink not rejected at boundary"
             },
             {
               "message": "`read_manifest` uses `std::fs::read_to_string` on the persistent-index sidecar with no symlink check. `open_persistent_index_with_corpus` consults this file before deciding whether to rebuild or reuse the cache, so a symlinked `.manifest` can inject cache state and steer the index path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/dry_write_driver/manifest.rs",
+              "file": "libs/infrastructure/src/dry_check/dry_write_driver/manifest.rs",
               "line": 71,
               "category": "symlink not rejected at boundary"
             }
@@ -1824,7 +1824,7 @@
             {
               "message": "P1: `items_dir_abs.symlink_metadata()` runs before `canonicalize()`, so a missing `--items-dir` now returns `ItemsDirSymlinkCheckFailed` (`ENOENT` from `symlink_metadata`) instead of the contractually expected `ItemsDirInvalid`. That regresses a common invalid-input case and misroutes callers that rely on the invalid-directory branch.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
+              "file": "libs/infrastructure/src/track/fixpoint_resolve_driver.rs",
               "line": 145,
               "category": "correctness"
             }
@@ -2131,7 +2131,7 @@
             {
               "message": "Renaming the wrapper to `track-switch-base` breaks the shipped `/track:done` flow: `.claude/commands/track/done.md` still shells out to `cargo make track-switch-main`, so the command now points at a deleted task and will fail before it can switch branches. The README already advertises the new base-branch behavior, so the docs and executable surface are now out of sync.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/Makefile.toml",
+              "file": "Makefile.toml",
               "line": 616,
               "category": "command wiring breakage"
             }
@@ -2182,7 +2182,7 @@
             {
               "message": "Phase 0 is still described as `main (direct)` in the phase invocation table, and the writer-ownership table repeats the same assumption later in the file. That contradicts the updated `init` workflow and branch-strategy convention, which now require the configured base branch, so the authoritative workflow docs are internally inconsistent on repos whose base branch is not `main`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/.harness/workflows/track/plan.md",
+              "file": ".harness/workflows/track/plan.md",
               "line": 79,
               "category": "convention contradiction"
             }
@@ -2445,7 +2445,7 @@
             {
               "message": "P1: [libs/usecase/src/dry_check_approved_driver.rs#L221-L233] hardcodes `duration_ms` to `0` for every `GateEval` emission. The telemetry adapter writes this field directly, so `dry check-approved` now persists a zero duration instead of the elapsed time the branch previously recorded. That is an observable output regression, and the interactor needs the measurement supplied from the composition root (or another injected clock source) to preserve telemetry parity.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/dry_check_approved_driver.rs",
+              "file": "libs/usecase/src/dry_check_approved_driver.rs",
               "line": 221,
               "category": "output side-effect in usecase"
             }
@@ -2578,7 +2578,7 @@
             {
               "message": "The new happy-path test exercises `TrackCompositionRoot::fixpoint_resolve` directly and only asserts the returned `ExitCode`; it never captures stdout/stderr from `execute_fixpoint_resolve`, so a regression in the CLI wrapper's emit path would still pass. This leaves the only bin-layer behavior in this handler effectively untested.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/track/fixpoint_resolve.rs",
+              "file": "apps/cli/src/commands/track/fixpoint_resolve.rs",
               "line": 242,
               "category": "test coverage"
             }
@@ -2685,7 +2685,7 @@
             {
               "message": "Adding `metadata.json` here makes the supposed empty-diff approval test stop exercising the Approved path. `GitDiffGetter` includes untracked files, and this helper does not exclude `items/test-track/metadata.json`, so the new file becomes a diff in the implicit `Other` scope. The `check_approved_approved_path_exits_success_with_ok_message` case now covers the bypass/success path instead of the intended empty-diff Approved case.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/review/tests.rs",
+              "file": "apps/cli/src/commands/review/tests.rs",
               "line": 89,
               "category": "testing"
             }
@@ -2783,7 +2783,7 @@
             {
               "message": "`DryCheckServiceFactoryAdapter`'s docs still cite deleted paths under `apps/cli-composition/src/dry/` (`persistent_index.rs` and `manifest.rs`), and the nearby `RecordingDryTierTelemetryAdapter` entry repeats the same problem with `tier_telemetry.rs`. Those files were removed in this branch, so the catalogue now contains stale path references instead of current locations.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/infrastructure-types.json",
               "line": 345,
               "category": "dead-reference"
             }
@@ -2798,7 +2798,7 @@
             {
               "message": "`DryFixRunnerCompositionRoot` is a new load-bearing catalogue entry, but its `spec_refs` array is empty. That breaks the traceability requirement for the contract map: the entry cannot be tied back to any spec anchor, so Chain2 will not be able to verify why this type is present. Add a concrete spec reference or remove the entry from the catalogued surface.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/branch-strategy-config-driven-2026-06-30/cli_composition-types.json",
+              "file": "track/items/branch-strategy-config-driven-2026-06-30/cli_composition-types.json",
               "line": 894,
               "category": "SoT integrity"
             }
@@ -3029,9 +3029,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "This reads `metadata.json` through `infrastructure::track::codec::decode`, which hard-rejects every `schema_version != 6`. The promised fallback to `main` therefore never runs for existing v5 tracks/fixtures (for example `track/items/cli-composition-split-presentation-layer-2026-06-21/metadata.json`), so the new branch-strategy lookup will fail with `ConfigLoad` on older tracks instead of being backward-compatible. The same bug is duplicated in [review_v2/shared.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/review_v2/shared.rs#L208) and [track/fixpoint_resolve.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/fixpoint_resolve.rs#L318).",
+              "message": "This reads `metadata.json` through `infrastructure::track::codec::decode`, which hard-rejects every `schema_version != 6`. The promised fallback to `main` therefore never runs for existing v5 tracks/fixtures (for example `track/items/cli-composition-split-presentation-layer-2026-06-21/metadata.json`), so the new branch-strategy lookup will fail with `ConfigLoad` on older tracks instead of being backward-compatible. The same bug is duplicated in [review_v2/shared.rs](apps/cli-composition/src/review_v2/shared.rs#L208) and [track/fixpoint_resolve.rs](apps/cli-composition/src/track/fixpoint_resolve.rs#L318).",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 233,
               "category": "compatibility"
             }
@@ -3226,7 +3226,7 @@
             {
               "message": "`TrackCompositionRoot::fixpoint_resolve` still performs use-case work: it calls `dry_gate.resolve_dry_gate(...)` and later `interactor.resolve(&cmd)` instead of only assembling the `FixpointDryGateCommand` / `FixpointResolveCommand` data and returning a wired driver. That keeps invocation inside `cli_composition` and violates the composition-root boundary the scope brief calls for.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/track/fixpoint_resolve.rs",
+              "file": "apps/cli-composition/src/track/fixpoint_resolve.rs",
               "line": 282,
               "category": "invoke leak"
             }
@@ -3478,7 +3478,7 @@
             {
               "message": "This file still defines `DryDriverAdapter` inside `cli_composition` and implements `usecase::dry_driver::DryDriverPort` there. The scope policy treats port implementations as infrastructure responsibility, so this is an architecture-boundary violation rather than pure wiring.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry_driver_adapter.rs",
+              "file": "apps/cli-composition/src/dry_driver_adapter.rs",
               "line": 20,
               "category": "adapter defined here"
             }
@@ -3493,7 +3493,7 @@
             {
               "message": "This `cli_composition` module still defines a `DryDriverPort` implementation. Under the scope policy, port implementations belong in infrastructure, so keeping `DryDriverAdapter` here violates the pure-wiring boundary.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry_driver_adapter.rs",
+              "file": "apps/cli-composition/src/dry_driver_adapter.rs",
               "line": 43,
               "category": "adapter defined here"
             }

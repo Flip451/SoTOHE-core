@@ -29,6 +29,7 @@
 
 pub mod catalogue_impl_signals_ports;
 pub mod composite;
+pub mod deletions;
 pub mod document;
 pub mod entries;
 pub mod identifiers;
@@ -43,6 +44,8 @@ pub mod variants;
 
 pub use composite::{StructKind, StructShape, TypeKindV2, TypestateMarker, TypestateTransitions};
 
+pub use deletions::DeletionRecord;
+
 pub use document::{CatalogueDocument, CatalogueDocumentError};
 
 pub use entries::{
@@ -50,9 +53,9 @@ pub use entries::{
 };
 
 pub use identifiers::{
-    AssocConstName, CrateName, FieldName, FunctionName, FunctionPath, Identifier, IdentifierError,
-    InvariantName, MethodName, ModulePath, ParamName, RustExpression, RustExpressionError,
-    TraitName, TypeName, TypeRef, VariantName,
+    AssocConstName, CrateName, DocString, FieldName, FunctionName, FunctionPath, Identifier,
+    IdentifierError, InvariantName, MethodName, ModulePath, ParamName, RustExpression,
+    RustExpressionError, TraitName, TypeName, TypeRef, VariantName,
 };
 
 pub use methods::{
@@ -64,7 +67,7 @@ pub use roles::{
     InvariantPredicate, ItemAction, NonEmptyVec, SelfReceiver,
 };
 
-pub use traits::TraitImplDeclV2;
+pub use traits::{TraitImplDeclV2, TraitRefScope};
 
 pub use variants::{FieldDecl, VariantDecl, VariantPayload};
 
@@ -72,5 +75,4 @@ pub use catalogue_impl_signals_ports::{
     BaselineCaptureIoError, CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort,
     RustdocBaselineCapturePort, RustdocCratePort, RustdocCratePortError, TdddLayerBinding,
     TdddLayerBindingsError, TdddLayerBindingsPort, TrackStatusReadError, TrackStatusReaderPort,
-    TypeSignalsExecutionError, TypeSignalsExecutorPort,
 };

@@ -654,7 +654,7 @@
             {
               "message": "`evaluate_secondary_adapter` only checks `profile.get_type(name)` and never verifies `TypeKind::Struct`. That means a same-named enum/alias/type-alias could be classified as a valid `SecondaryAdapter` if the adapter declarations match, which violates the struct-only contract that the rest of the evaluator enforces for other struct-like kinds.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
+              "file": "libs/domain/src/tddd/signals.rs",
               "line": 350,
               "category": "logic"
             }
@@ -669,7 +669,7 @@
             {
               "message": "`evaluate_secondary_adapter` treats any entry returned by `profile.get_type(name)` as a valid adapter and never verifies `TypeKind::Struct`. A same-named enum or type alias could therefore be marked Blue as soon as its trait impls match, even though `SecondaryAdapter` is supposed to model a struct-only adapter.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs",
+              "file": "libs/domain/src/tddd/signals.rs",
               "line": 350,
               "category": "logic"
             }

@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "review-load-batch-findings-no-restatement-2026-07-03",
+  "title": "レビュー負荷軽減 — findings 全件報告と下流 artifact の再記述禁止",
+  "branch": "track/review-load-batch-findings-no-restatement-2026-07-03",
+  "created_at": "2026-07-03T16:25:38Z",
+  "updated_at": "2026-07-03T16:25:38Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "squash"
+  }
+}

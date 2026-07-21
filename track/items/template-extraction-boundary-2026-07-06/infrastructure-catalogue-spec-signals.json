@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "94a59f52dab1b14bd33ea8a6d2aeff406417e87591ab0e115cefba18bbde56f7",
+  "signals": [
+    {
+      "type_name": "FsTemplateBoundaryManifestAdapter",
+      "signal": "blue",
+      "entry_hash": "7a501a95ba99e19180c4702bf0a911801c97ede4c40ecc39795b505d8812a6c5"
+    },
+    {
+      "type_name": "FsTemplateExportAdapter",
+      "signal": "blue",
+      "entry_hash": "0ae3e672d2d350a4b16365fa63c5b69d08a2c8d73297839142095196ae0b3e20"
+    },
+    {
+      "type_name": "TemplateBoundaryManifestCodecError",
+      "signal": "blue",
+      "entry_hash": "a02de4bc70b003783d77a899a484cf4a8c8d59c8d8583118cd58dd448f6946ad"
+    },
+    {
+      "type_name": "TemplateBoundaryManifestDto",
+      "signal": "blue",
+      "entry_hash": "57c25f3995002620991cbeb5fa4bfedcabac1a5a98de4706e83d0afc5f63eb01"
+    },
+    {
+      "type_name": "TemplatePathClassificationDto",
+      "signal": "blue",
+      "entry_hash": "173d413db49510673257878f8cb7ebd2a6f594764261f57e8b74164f0e2ef20c"
+    },
+    {
+      "type_name": "TemplatePathEntryDto",
+      "signal": "blue",
+      "entry_hash": "a8190c7c3a27d8ee668be447692a9220be5c1879e0638f656de3f5d5f46a2bcc"
+    },
+    {
+      "type_name": "infrastructure::template_export::codec::decode_manifest",
+      "signal": "blue",
+      "entry_hash": "d8a4578d95853ed01caf7b659166bb7d0617c172a2e78efab1738e908b1a600f"
+    }
+  ]
+}

@@ -175,7 +175,7 @@ cat knowledge/conventions/impl-delegation-arch-guard.md
 
 - Domain types stay in `libs/domain/`
 - Infrastructure adapters stay in `libs/infrastructure/`
-- CLI composition stays in `apps/cli/`
+- CLI composition-root wiring stays in `apps/cli-composition/` (the `apps/cli` crate is the bin entry point only)
 - Do not move types between layers without explicit ADR authorization.
 
 ## Rules

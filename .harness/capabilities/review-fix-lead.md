@@ -42,6 +42,7 @@ an empty list or fails, make no edits and return `failed` with the reason.
 - Files outside the resolved boundary: do NOT modify. Return `blocked_cross_scope` with the
   out-of-scope file list so the orchestrator can re-partition.
 - Cross-scope edits are fail-closed: silent out-of-scope modifications are prohibited.
+- Do not run `bin/sotp track transition`; this capability has no task-state transition authority.
 
 ## Scope-specific severity policy
 
@@ -53,6 +54,28 @@ over-long review loops.
 Always read the policy file fresh — it may have been updated since the last review session. The
 CLI composer (`bin/sotp review local`) appends this section automatically for scopes configured
 in `.harness/config/review-scope.json`.
+
+## ADR baseline semantic freeze
+
+When a finding requires *any* edit to an ADR, never make that edit yourself. Under the two-box
+model (`knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権), the
+orchestrator routes every ADR change through adr-editor and adr-diagnoser: Phase 0 uses the
+in-place convergence or user-present hearing lane; after the Phase 0 adjudication boundary,
+semantic changes use the delta lane and proposed non-semantic changes use the
+apply-then-classify lane. Judge ADR completeness by whether it faithfully records the decision,
+not by whether a different design would be preferable. A current ADR byte mismatch before the
+boundary is a normal draft state and does not block a review loop; byte matching is enforced at
+the commit gate and track-aware CI. If the ADR-baseline review check blocks on its retained
+ledger-integrity conditions, stop the fixer and let the orchestrator use the sanctioned recovery
+route described by the review workflow.
+
+**Termination contract (guardian-lane handoff).** When a round records a finding whose fix
+requires an ADR edit, do not re-loop on it: apply any other in-scope fixes that do not touch an
+ADR, leave the ADR finding recorded on the round (`findings_remain`), and terminate immediately
+with `failed`, citing that finding as the reason. This `failed` is the deterministic handoff into
+the orchestrator's guardian lane
+(`.harness/workflows/track/review.md` Step 4), not a tooling error; continuing the loop in the
+hope that the reviewer withdraws the finding is prohibited.
 
 ## Internal pipeline
 
@@ -77,13 +100,21 @@ cargo make track-local-review -- --round-type {round_type} --group {scope} --bri
 
 Do NOT pass `--track-id`; the wrapper auto-resolves the active track from the current git branch.
 
+The reviewer subprocess legitimately runs for many minutes (`bin/sotp review local` allows it
+1800 seconds). When your provider's shell tool enforces a per-call timeout, set that timeout
+parameter to at least 1,920,000 ms for this invocation, including time for the cargo-make gates
+that run before the reviewer subprocess. Do not conclude reviewer failure from a shell-tool
+timeout shorter than that; a timed-out invocation kills the in-flight round and records nothing.
+
 ### Verdict parsing and confirmation
 
 After each reviewer invocation, parse the verdict from command output:
 
 - `zero_findings` → proceed to the canonical API confirmation step (mandatory before reporting
   `completed`).
-- `findings_remain` → proceed to the fix phase.
+- `findings_remain` → proceed to the fix phase. If one or more findings requires an ADR edit,
+  apply every other in-scope non-ADR fix, then terminate per the guardian-lane handoff
+  (§ADR baseline semantic freeze).
 - Error → return `failed`.
 
 **Canonical API confirmation (mandatory before reporting `completed`):**
@@ -139,9 +170,11 @@ Keep N small (1–3) to avoid context bloat.
 Before modifying any file, verify it belongs to the correct architecture layer per
 `knowledge/conventions/impl-delegation-arch-guard.md`:
 
-- Domain types stay in `libs/domain/`
+- Domain types and domain ports stay in `libs/domain/`
+- Usecase interactors and usecase ports stay in `libs/usecase/`
 - Infrastructure adapters stay in `libs/infrastructure/`
-- CLI composition stays in `apps/cli/`
+- CLI composition-root wiring stays in `apps/cli-composition/` (the `apps/cli` crate is the bin entry point only)
+- `apps/cli-driver` is the primary adapter layer
 - Do not move types between layers without explicit ADR authorization.
 
 ## Output contract
@@ -152,14 +185,14 @@ Return exactly one of the following statuses:
 |--------|---------|
 | `completed` | The assigned `round_type` returned `zero_findings`, confirmed via the canonical API (`bin/sotp review results --limit 1` shows `findings: zero_findings`). |
 | `blocked_cross_scope` | A fix requires modifying files outside this capability's scope. Include the list of out-of-scope files needed. |
-| `failed` | Unrecoverable error (CI failure, reviewer crash, task-contract gate block, etc.). Include error details. |
+| `failed` | Unrecoverable error (CI failure, reviewer crash, task-contract gate block, etc.), or the ADR guardian-lane handoff: an ADR finding requiring an ADR edit remains recorded under the semantic freeze (§ADR baseline semantic freeze). Include error details or the finding reference. |
 
 ## Boundary with other capabilities
 
 | aspect | review-fix-lead (this capability) | dry-fix-lead | rollback-diagnoser |
 |---|---|---|---|
 | output | fixes within one review scope + status report | source-code DRY refactors + status report | structured routing decision |
-| scope | single review scope, bounded to `bin/sotp review files --scope <scope>` result | whole workspace (DRY violations cross layers) | read-only |
+| scope | single review scope, bounded to `bin/sotp review files --scope <scope>` result | whole workspace (some DRY violations span layers) | read-only |
 | trigger | orchestrator assigns scope + `round_type` | orchestrator assigns track-id for DFP | orchestrator passes diagnostic text |
 | artifact written | source files within scope boundary | source files across workspace | none |
 | verdict source | `bin/sotp review results` (reads `review.json`) | `bin/sotp dry check-approved` (reads `dry-check.json`) | none |
@@ -181,3 +214,12 @@ If the briefing asks for:
 - Do not edit `<layer>-types.json` directly — the `type-designer` capability owns catalogue files.
 - Use `bin/sotp` (not `./bin/sotp` and not absolute paths) in all command references.
 - Use `cargo make` wrappers (e.g. `cargo make ci-rust`), not `*-local` tasks directly.
+
+## Session resume
+
+When dispatched as a resumed session (orchestrator opt-in continuation of the same track and
+capability), do not trust context carried over from the prior session: first check whether the
+upstream artifacts of this assignment (ADR, `spec.json`, type catalogues, `impl-plan.json`, the
+review briefing — as applicable) changed since that session, and re-read any that did before
+continuing. All execution flags are explicitly re-specified by the dispatcher on resume; a
+failed or expired resume falls back to a fresh session.

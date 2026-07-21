@@ -10,11 +10,19 @@ use domain::tddd::{SignalRegion, ThreeWayEvaluationReport, ThreeWaySignal};
 use rustdoc_types::Crate;
 
 use super::structural_eq::items_structurally_equal;
-use super::{build_function_identity_map, build_impl_identity_map, build_type_trait_identity_map};
+use super::{
+    RustdocTargetResolution, build_function_identity_map, build_impl_identity_map,
+    build_type_trait_identity_map,
+};
 use domain::tddd::ExtendedCrate;
 
 /// Runs Phase 2: evaluates S / D / C and produces a `ThreeWayEvaluationReport`.
-pub(super) fn phase2_evaluate(s: &ExtendedCrate, d: &Crate, c: &Crate) -> ThreeWayEvaluationReport {
+pub(super) fn phase2_evaluate(
+    s: &ExtendedCrate,
+    d: &Crate,
+    c: &Crate,
+    rustdoc_root: Option<&RustdocTargetResolution>,
+) -> ThreeWayEvaluationReport {
     let s_krate = s.krate();
 
     // Derive the crate name from C's root item so that rustdoc local-trait paths
@@ -25,7 +33,7 @@ pub(super) fn phase2_evaluate(s: &ExtendedCrate, d: &Crate, c: &Crate) -> ThreeW
     // Phase 2 uses short-name keys for types/traits, matching the `ThreeWaySignal`
     // domain contract (item_name = short name for types/traits; FunctionPath for functions).
     let s_types = build_type_trait_identity_map(s_krate);
-    let s_fns = build_function_identity_map(s_krate);
+    let s_fns = build_function_identity_map(s_krate, rustdoc_root);
 
     // S inherits B-seeded impl blocks whose trait paths are in rustdoc format
     // (`my_crate::MyTrait`). Pass `crate_name` so those are normalized to short
@@ -37,10 +45,10 @@ pub(super) fn phase2_evaluate(s: &ExtendedCrate, d: &Crate, c: &Crate) -> ThreeW
     // so B-side impls cannot shadow A-side impls for the same identity key.
     let s_impls = build_impl_identity_map(s_krate, crate_name);
     let d_types = build_type_trait_identity_map(d);
-    let d_fns = build_function_identity_map(d);
+    let d_fns = build_function_identity_map(d, rustdoc_root);
     let d_impls = build_impl_identity_map(d, crate_name);
     let c_types = build_type_trait_identity_map(c);
-    let c_fns = build_function_identity_map(c);
+    let c_fns = build_function_identity_map(c, rustdoc_root);
     let c_impls = build_impl_identity_map(c, crate_name);
 
     // Build a secondary lookup for C impls keyed by their generic-args-stripped form.

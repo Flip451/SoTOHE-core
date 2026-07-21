@@ -47,10 +47,14 @@
 //! - `tests`           — unit/integration tests (AC-08)
 
 use std::collections::BTreeMap;
+use std::path::{Path, PathBuf};
 
 use domain::tddd::ExtendedCrate;
+use domain::tddd::catalogue_v2::CrateName;
 use domain::tddd::{Phase1Error, SignalEvaluatorPort, ThreeWayEvaluationReport};
 use rustdoc_types::{Crate, Id, Item, ItemEnum, ItemKind};
+
+use crate::schema_export::{RustdocTargetResolution, resolve_rustdoc_root_name};
 
 // ---------------------------------------------------------------------------
 // Sub-modules
@@ -70,7 +74,7 @@ pub(super) mod structural_eq;
 #[cfg(test)]
 pub(super) mod tests;
 
-use phase1::phase1_build_s_and_d;
+use phase1::phase1_build_s_and_d_with_rustdoc_root;
 use phase2::phase2_evaluate;
 
 pub(super) use impl_identity::build_impl_identity_map;
@@ -78,10 +82,10 @@ pub(super) use impl_identity::build_impl_identity_map;
 pub(crate) use impl_identity::{is_compiler_internal_trait, normalize_impl_trait_path};
 
 // ---------------------------------------------------------------------------
-// SignalEvaluatorV2 — stateless secondary adapter
+// SignalEvaluatorV2 — secondary adapter
 // ---------------------------------------------------------------------------
 
-/// Stateless secondary adapter that implements [`SignalEvaluatorPort`].
+/// Secondary adapter that implements [`SignalEvaluatorPort`].
 ///
 /// Drives the two-phase evaluation: Phase 1 builds S (`ExtendedCrate`) + D
 /// (`rustdoc_types::Crate`) from the Catalogue-derived A and the Baseline B;
@@ -89,14 +93,31 @@ pub(crate) use impl_identity::{is_compiler_internal_trait, normalize_impl_trait_
 ///
 /// Construct with [`SignalEvaluatorV2::new`] and call
 /// [`SignalEvaluatorPort::evaluate`].
-#[derive(Debug, Clone, Default)]
-pub struct SignalEvaluatorV2;
+#[derive(Debug, Clone)]
+pub struct SignalEvaluatorV2 {
+    workspace_root: PathBuf,
+}
 
 impl SignalEvaluatorV2 {
-    /// Creates a new `SignalEvaluatorV2`.
+    /// Creates a new `SignalEvaluatorV2` rooted at the current working directory.
+    ///
+    /// Use [`Self::with_workspace_root`] when the caller already knows the
+    /// workspace root and may be invoked from another directory.
     #[must_use]
     pub fn new() -> Self {
-        Self
+        Self::with_workspace_root(PathBuf::from("."))
+    }
+
+    /// Creates a new `SignalEvaluatorV2` for an explicit workspace root.
+    #[must_use]
+    pub fn with_workspace_root(workspace_root: PathBuf) -> Self {
+        Self { workspace_root }
+    }
+}
+
+impl Default for SignalEvaluatorV2 {
+    fn default() -> Self {
+        Self::new()
     }
 }
 
@@ -107,7 +128,7 @@ impl SignalEvaluatorPort for SignalEvaluatorV2 {
         b: Crate,
         c: Crate,
     ) -> Result<ThreeWayEvaluationReport, Phase1Error> {
-        let engine = EvaluationEngine::new(a, b, c);
+        let engine = EvaluationEngine::new(a, b, c, &self.workspace_root);
         engine.run()
     }
 }
@@ -168,12 +189,9 @@ pub(super) fn build_type_trait_identity_map(krate: &Crate) -> BTreeMap<String, I
 /// Identity key: canonical `FunctionPath` = path segments joined by `"::"`, looked up
 /// from `Crate::paths`.
 ///
-/// For normal library/catalogue graphs the full path is preserved
-/// (`"cli::module::fn_name"` stays `"cli::module::fn_name"`). For the workspace's
-/// `cli` package, rustdoc for the `[[bin]]` target names the crate root after the binary
-/// (`"sotp::module::fn_name"`). That single bin-root alias is rewritten to the package
-/// crate root (`"cli::module::fn_name"`) so bin rustdoc entries still match catalogue
-/// `FunctionPath` keys without making every function identity rootless.
+/// For normal library/catalogue graphs the full path is preserved. For a bin-only
+/// package, a supplied [`RustdocTargetResolution`] rewrites the rustdoc binary-root segment
+/// to the package-root segment used by catalogue `FunctionPath` keys.
 ///
 /// Only **free** functions are included.  Associated methods (belonging to a
 /// `Trait` or `Impl` `items` list) are explicitly excluded even when they
@@ -188,7 +206,10 @@ pub(super) fn build_type_trait_identity_map(krate: &Crate) -> BTreeMap<String, I
 /// has no external-API consumer to hide them from; if the catalogue does not
 /// want to track such an item it must still declare a row for it so the
 /// trade-off is visible in source, not implicit in a framework filter.
-pub(super) fn build_function_identity_map(krate: &Crate) -> BTreeMap<String, Id> {
+pub(super) fn build_function_identity_map(
+    krate: &Crate,
+    rustdoc_root: Option<&RustdocTargetResolution>,
+) -> BTreeMap<String, Id> {
     use std::collections::HashSet;
     // Build the set of all method Ids that belong to a trait or impl's items list.
     // Functions in this set are associated methods, not free functions.
@@ -217,7 +238,7 @@ pub(super) fn build_function_identity_map(krate: &Crate) -> BTreeMap<String, Id>
             continue;
         }
         let Some(summary) = krate.paths.get(id) else { continue };
-        let identity_key = function_identity_key(&summary.path);
+        let identity_key = function_identity_key(&summary.path, rustdoc_root);
         if !identity_key.is_empty() {
             map.insert(identity_key, *id);
         }
@@ -225,24 +246,21 @@ pub(super) fn build_function_identity_map(krate: &Crate) -> BTreeMap<String, Id>
     map
 }
 
-fn function_identity_key(path: &[String]) -> String {
+fn function_identity_key(
+    path: &[String],
+    rustdoc_root: Option<&RustdocTargetResolution>,
+) -> String {
     let Some((root, rest)) = path.split_first() else {
         return String::new();
     };
+    let root = root.as_str();
     let mut segments = Vec::with_capacity(path.len());
-    segments.push(canonical_function_root_segment(root).to_owned());
+    let canonical_root = rustdoc_root
+        .filter(|translation| root == translation.rustdoc_root_name().as_str())
+        .map_or(root, |translation| translation.package_name().as_str());
+    segments.push(canonical_root.to_owned());
     segments.extend(rest.iter().cloned());
     segments.join("::")
-}
-
-fn canonical_function_root_segment(root: &str) -> &str {
-    match root {
-        // apps/cli is package `cli` with bin target `sotp`. rustdoc --bin uses
-        // the bin name as the root segment, while catalogues use the package
-        // crate name in FunctionPath keys.
-        "sotp" => "cli",
-        other => other,
-    }
 }
 
 /// Returns `true` if the item is a type (Struct/Enum/TypeAlias) or a Trait.
@@ -299,16 +317,60 @@ struct EvaluationEngine {
     a: ExtendedCrate,
     b: Crate,
     c: Crate,
+    workspace_root: PathBuf,
 }
 
 impl EvaluationEngine {
-    fn new(a: ExtendedCrate, b: Crate, c: Crate) -> Self {
-        Self { a, b, c }
+    fn new(a: ExtendedCrate, b: Crate, c: Crate, workspace_root: &Path) -> Self {
+        Self { a, b, c, workspace_root: workspace_root.to_path_buf() }
     }
 
     fn run(self) -> Result<ThreeWayEvaluationReport, Phase1Error> {
-        let (s, d) = phase1_build_s_and_d(self.a, &self.b)?;
-        let report = phase2_evaluate(&s, &d, &self.c);
+        let rustdoc_root =
+            resolve_function_rustdoc_root(&self.a, &self.b, &self.c, &self.workspace_root)?;
+        let (s, d) =
+            phase1_build_s_and_d_with_rustdoc_root(self.a, &self.b, rustdoc_root.as_ref())?;
+        let report = phase2_evaluate(&s, &d, &self.c, rustdoc_root.as_ref());
         Ok(report)
     }
+}
+
+/// Resolves a root translation only when rustdoc data differs from the
+/// catalogue package root. This preserves the zero-I/O path for ordinary
+/// library evaluations and performs one metadata lookup for a bin-root alias.
+fn resolve_function_rustdoc_root(
+    a: &ExtendedCrate,
+    b: &Crate,
+    c: &Crate,
+    workspace_root: &Path,
+) -> Result<Option<RustdocTargetResolution>, Phase1Error> {
+    let Some(package_root) = crate_root_name(a.krate()) else {
+        return Ok(None);
+    };
+    let rustdoc_roots: Vec<&str> = [b, c].into_iter().filter_map(crate_root_name).collect();
+    if rustdoc_roots.iter().all(|root| *root == package_root) {
+        return Ok(None);
+    }
+
+    let package_name = CrateName::new(package_root.to_owned()).map_err(|error| {
+        Phase1Error::rustdoc_root_resolution(format!(
+            "invalid package root `{package_root}`: {error}"
+        ))
+    })?;
+    let translation =
+        resolve_rustdoc_root_name(workspace_root, &package_name).map_err(|error| {
+            Phase1Error::rustdoc_root_resolution(format!(
+                "cannot resolve package `{package_root}` from {}: {error}",
+                workspace_root.display()
+            ))
+        })?;
+    if rustdoc_roots.iter().any(|root| *root == translation.rustdoc_root_name().as_str()) {
+        Ok(Some(translation))
+    } else {
+        Ok(None)
+    }
+}
+
+fn crate_root_name(krate: &Crate) -> Option<&str> {
+    krate.index.get(&krate.root).and_then(|item| item.name.as_deref())
 }

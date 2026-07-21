@@ -1,0 +1,312 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "VerifyDriver": {
+      "action": "reference",
+      "docs": "Primary adapter driver for the `verify` command family; its public constructor and `handle` signature are unchanged while the match gains retention-gate routing.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "Arc<dyn VerifyService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "VerifyInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "verify",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        }
+      ]
+    },
+    "VerifyInput": {
+      "action": "modify",
+      "docs": "Typed input enum for `VerifyDriver`; this track adds `RetentionGate { project_root }` for the maintainer retention verifier.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "LatestTrack",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ArchDocs",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Layers",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "HooksPath",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "SpecAttribution",
+            "payload": {
+              "fields": [
+                {
+                  "name": "spec_path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "SpecFrontmatter",
+            "payload": {
+              "fields": [
+                {
+                  "name": "spec_path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CanonicalModules",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ModuleSize",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DomainPurity",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DomainStrings",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UsecasePurity",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DocLinks",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ViewFreshness",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "SpecSignals",
+            "payload": {
+              "fields": [
+                {
+                  "name": "spec_path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "PlanArtifactRefs",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_dir",
+                  "ty": "Option<std::path::PathBuf>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CatalogueSpecRefs",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "items_dir",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "skip_stale",
+                  "ty": "bool"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "RetentionGate",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "verify",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/retention-gate-verify-subcommand-2026-07-08/spec.json"
+        }
+      ]
+    }
+  }
+}

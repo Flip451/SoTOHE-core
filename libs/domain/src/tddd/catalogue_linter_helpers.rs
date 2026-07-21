@@ -18,7 +18,7 @@ use crate::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
 
 /// Returns the `RoleKind` for a `TypeEntry`'s `DataRole`.
 pub(super) fn entry_role_kind(entry: &TypeEntry) -> RoleKind {
-    RoleKind::from_data_role(&entry.role)
+    RoleKind::from_data_role(entry.role())
 }
 
 /// Returns `true` when the `target` selector matches the given `RoleKind`.
@@ -44,9 +44,9 @@ pub(super) fn type_entries_for_target<'a>(
     catalogue: &'a CatalogueDocument,
     target: &RuleTarget,
 ) -> impl Iterator<Item = (&'a TypeName, &'a TypeEntry)> {
-    catalogue.types.iter().filter(move |(_name, entry)| {
-        entry.action != ItemAction::Delete
-            && entry.action != ItemAction::Reference
+    catalogue.types().iter().filter(move |(_name, entry)| {
+        entry.action() != ItemAction::Delete
+            && entry.action() != ItemAction::Reference
             && target_matches(target, entry_role_kind(entry))
     })
 }
@@ -67,10 +67,10 @@ pub(super) fn trait_entries_for_target<'a>(
     catalogue: &'a CatalogueDocument,
     target: &RuleTarget,
 ) -> impl Iterator<Item = (&'a TraitName, &'a TraitEntry)> {
-    catalogue.traits.iter().filter(move |(_name, entry)| {
-        entry.action != ItemAction::Delete
-            && entry.action != ItemAction::Reference
-            && target_matches(target, RoleKind::from_contract_role(&entry.role))
+    catalogue.traits().iter().filter(move |(_name, entry)| {
+        entry.action() != ItemAction::Delete
+            && entry.action() != ItemAction::Reference
+            && target_matches(target, RoleKind::from_contract_role(entry.role()))
     })
 }
 
@@ -88,10 +88,10 @@ pub(super) fn function_entries_for_target<'a>(
     catalogue: &'a CatalogueDocument,
     target: &RuleTarget,
 ) -> impl Iterator<Item = (&'a FunctionPath, &'a FunctionEntry)> {
-    catalogue.functions.iter().filter(move |(_path, entry)| {
-        entry.action != ItemAction::Delete
-            && entry.action != ItemAction::Reference
-            && target_matches(target, RoleKind::from_function_role(&entry.role))
+    catalogue.functions().iter().filter(move |(_path, entry)| {
+        entry.action() != ItemAction::Delete
+            && entry.action() != ItemAction::Reference
+            && target_matches(target, RoleKind::from_function_role(&entry.role()))
     })
 }
 
@@ -120,9 +120,9 @@ pub(super) fn collect_methods_for_type<'a>(
     let mut methods = Vec::new();
     let mut seen_names = std::collections::BTreeMap::new();
 
-    for method in entry.methods.iter().chain(
+    for method in entry.methods().iter().chain(
         catalogue
-            .inherent_impls
+            .inherent_impls()
             .iter()
             .filter(|impl_| impl_.type_name.as_str() == type_name)
             .flat_map(|impl_| impl_.methods.iter()),
@@ -216,13 +216,13 @@ pub(super) fn has_trait_impl(
     trait_name_prefix: &str,
 ) -> bool {
     let path_suffix = format!("::{trait_name_prefix}");
-    catalogue.trait_impls.iter().any(|ti| {
+    catalogue.trait_impls().iter().any(|ti| {
         // Exclude delete-action impl entries: a deleted impl does not count as present.
-        if ti.action == ItemAction::Delete {
+        if ti.action() == ItemAction::Delete {
             return false;
         }
-        let for_type = ti.for_type.as_str();
-        let trait_ref = ti.trait_ref.as_str();
+        let for_type = ti.for_type().as_str();
+        let trait_ref = ti.trait_ref().as_str();
         // Match `for_type` either exactly or as a generic self type (e.g. "Foo<T>").
         let for_type_matches = for_type == type_name
             || for_type.starts_with(&format!("{type_name}<"))

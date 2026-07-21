@@ -1120,7 +1120,7 @@
             {
               "message": "The Dogfooding Result round-count summary is factually wrong: the recorded review history in `review.json` has 50 final rounds for `plan-artifacts` and 2/2/3 finals for `harness-policy`/`infrastructure`/`cli`, so the `1 + 4 + 2 + 1 + 1` breakdown does not match the actual cumulative full-model round counts.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-prompt-injection-2026-04-18/verification.md",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/verification.md",
               "line": 90,
               "category": "factual error"
             }
@@ -1201,14 +1201,14 @@
             {
               "message": "`metadata.json` marks T008 as `done`, but the current review record still ends `plan-artifacts` with a final `findings_remain` round, so this task completion status is premature.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/metadata.json",
               "line": 168,
               "category": "factual error"
             },
             {
               "message": "`verification.md` says all scopes reached full-model `zero_findings`, but the current review record still ends `plan-artifacts` with a final `findings_remain` round, so this result summary is not accurate yet.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-prompt-injection-2026-04-18/verification.md",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/verification.md",
               "line": 95,
               "category": "factual error"
             }
@@ -1319,7 +1319,7 @@
             {
               "message": "S007 still describes `plan-artifacts.md` as containing a 5-category `What to report` section and a 4-category `What NOT to report` section, but the completed checklist and verification summary describe the final policy as 4 reportable categories and 7 non-reportable ones. That leaves the intended policy shape ambiguous for future readers.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/review-scope-prompt-injection-2026-04-18/plan.md",
+              "file": "track/items/review-scope-prompt-injection-2026-04-18/plan.md",
               "line": 68,
               "category": "contradiction"
             }

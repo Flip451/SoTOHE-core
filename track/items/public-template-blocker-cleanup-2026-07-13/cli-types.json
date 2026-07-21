@@ -1,0 +1,358 @@
+{
+  "crate_name": "cli",
+  "functions": {
+    "cli::commands::verify::parse_track_id": {
+      "action": "add",
+      "docs": "Clap-boundary track ID parser.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "value",
+          "ty": "&str"
+        }
+      ],
+      "returns": "Result<cli_driver::verify::TrackId, clap::Error>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-20",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "cli",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "VerifyCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "action": "reference",
+      "for_type": "VerifyCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "reference",
+      "for_type": "VerifyArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "action": "reference",
+      "for_type": "VerifyArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueSpecRefsArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueSpecRefsArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CatalogueSpecRefsArgs": {
+      "action": "modify",
+      "docs": "Clap boundary DTO whose complete bin-target rustdoc shape is declared for the track ID validation change.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "Option<cli_driver::verify::TrackId>"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "skip_stale",
+              "ty": "bool"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::verify",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-20",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "VerifyArgs": {
+      "action": "reference",
+      "docs": "Existing common clap arguments whose complete baseline-identical bin-target rustdoc shape is carried for command payload edges.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::verify",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    },
+    "VerifyCommand": {
+      "action": "modify",
+      "docs": "Clap verification command enum extended with version-tag, machine-path, and shipped-template-reference gates, each reusing the technical project-root argument DTO.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "LatestTrack",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "RetentionGate",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SotpVersionTag",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "MachinePaths",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "TemplateRefs",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ArchDocs",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Layers",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "HooksPath",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SpecAttribution",
+            "payload": {
+              "fields": [
+                "SpecVerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SpecFrontmatter",
+            "payload": {
+              "fields": [
+                "SpecVerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CanonicalModules",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ModuleSize",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DomainPurity",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DomainStrings",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UsecasePurity",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DocLinks",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ViewFreshness",
+            "payload": {
+              "fields": [
+                "VerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SpecSignals",
+            "payload": {
+              "fields": [
+                "SpecVerifyArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "PlanArtifactRefs",
+            "payload": {
+              "fields": [
+                "PlanArtifactRefsArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CatalogueSpecRefs",
+            "payload": {
+              "fields": [
+                "CatalogueSpecRefsArgs"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "items_dir",
+          "params": [],
+          "receiver": "&self",
+          "returns": "std::path::PathBuf"
+        }
+      ],
+      "module_path": "commands::verify",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/public-template-blocker-cleanup-2026-07-13/spec.json"
+        }
+      ]
+    }
+  }
+}

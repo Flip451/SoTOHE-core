@@ -464,12 +464,12 @@ where
         };
 
         // Step 3: freshness check — declaration_hash must match (CN-11).
-        if signals_doc.declaration_hash() != declaration_hash_from_catalogue {
+        if signals_doc.declaration_hash().as_digest().as_str() != declaration_hash_from_catalogue {
             outcome.merge(VerifyOutcome::from_findings(vec![VerifyFinding::error(format!(
                 "layer '{layer_id}': type-signals declaration_hash mismatch \
                  (recorded={}, current={}) — re-run `sotp signal calc-impl-catalog` \
                  and commit the refreshed evaluation result",
-                signals_doc.declaration_hash(),
+                signals_doc.declaration_hash().as_digest().as_str(),
                 declaration_hash_from_catalogue
             ))]));
             continue;
@@ -701,7 +701,13 @@ mod tests {
                 )
             })
             .collect();
-        TypeSignalsDocument::new(ts, ZERO_HASH, sigs)
+        let digest = domain::Sha256Digest::try_new(ZERO_HASH.to_owned()).unwrap();
+        TypeSignalsDocument::new(
+            ts,
+            domain::CatalogueDeclarationHash::new(digest.clone()),
+            domain::ImplementationInputHash::new(digest),
+            sigs,
+        )
     }
 
     /// Mock reader that returns pre-programmed outcomes for the two document types.
@@ -1873,21 +1879,23 @@ mod tests {
         let crate_name = CrateName::new("domain").unwrap();
         let layer = LayerId::try_new("domain").unwrap();
         let mut doc = CatalogueDocument::new(3, crate_name, layer);
-        doc.types.insert(
+        doc.insert_type(
             TypeName::new("TrackId").unwrap(),
-            TypeEntry {
-                action: ItemAction::Add,
-                role: DataRole::value_object(),
-                kind: TypeKindV2::Struct(StructKind::new(
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(
                     StructShape::Plain { fields: vec![], has_stripped_fields: false },
                     None,
                 )),
-                methods: vec![],
-                module_path: ModulePath::root(),
-                docs: None,
-                spec_refs: vec![],
-                informal_grounds: vec![],
-            },
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
         );
         doc
     }

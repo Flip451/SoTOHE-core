@@ -10,7 +10,7 @@
             {
               "message": "`extract_variant_payload_types()` is lossy for rustdoc variants with stripped payload fields: `Tuple(Vec<Option<Id>>)` drops `None` entries via `filter_map`, and `Struct { has_stripped_fields: true }` is ignored entirely. That means a variant with hidden/stripped fields is exported with a shorter `payload_types` list than the source actually has, silently corrupting the schema instead of failing closed.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
+              "file": "libs/infrastructure/src/schema_export.rs",
               "line": 442,
               "category": "correctness"
             }
@@ -23,14 +23,14 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The struct-variant branch in `extract_variant_payload_types()` still silently skips missing or non-`StructField` ids (`continue` at the end of the loop), so a malformed or unexpectedly pruned rustdoc entry can produce a truncated `payload_types` list without surfacing an error. That breaks the fail-closed behavior described in the comment and can export incomplete enum metadata. See [libs/infrastructure/src/schema_export.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs#L491).",
+              "message": "The struct-variant branch in `extract_variant_payload_types()` still silently skips missing or non-`StructField` ids (`continue` at the end of the loop), so a malformed or unexpectedly pruned rustdoc entry can produce a truncated `payload_types` list without surfacing an error. That breaks the fail-closed behavior described in the comment and can export incomplete enum metadata. See [libs/infrastructure/src/schema_export.rs](libs/infrastructure/src/schema_export.rs#L491).",
               "severity": "P1",
               "file": "libs/infrastructure/src/schema_export.rs",
               "line": 491,
               "category": "correctness"
             },
             {
-              "message": "The new variant DTOs still build `EnumVariantDeclaration` through infallible constructors on decode, so JSON can supply `\"name\": \"\"` and the codecs will accept it as an invalid domain value. The domain type already exposes `try_new()` for the non-empty-name invariant, so the boundary should reject empty variant names instead of normalizing them into the domain. See [libs/infrastructure/src/tddd/catalogue_codec.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs#L1047) and [libs/infrastructure/src/tddd/baseline_codec.rs](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs#L269).",
+              "message": "The new variant DTOs still build `EnumVariantDeclaration` through infallible constructors on decode, so JSON can supply `\"name\": \"\"` and the codecs will accept it as an invalid domain value. The domain type already exposes `try_new()` for the non-empty-name invariant, so the boundary should reject empty variant names instead of normalizing them into the domain. See [libs/infrastructure/src/tddd/catalogue_codec.rs](libs/infrastructure/src/tddd/catalogue_codec.rs#L1047) and [libs/infrastructure/src/tddd/baseline_codec.rs](libs/infrastructure/src/tddd/baseline_codec.rs#L269).",
               "severity": "P1",
               "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
               "line": 1047,
@@ -47,7 +47,7 @@
             {
               "message": "These fixtures still use the old `expected_variants: [\"A\", \"B\"]` shape. With the new `EnumVariantDeclarationDto` schema, serde fails before the custom `InvalidEntry` path, so `decode()` now returns `Json` and these assertions fail. The same issue appears again at lines 2782 and 3612.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/catalogue_codec.rs",
+              "file": "libs/infrastructure/src/tddd/catalogue_codec.rs",
               "line": 2506,
               "category": "tests"
             }
@@ -69,14 +69,14 @@
             {
               "message": "`extract_enum_variants()` silently skips enum variant entries when `krate.index` has no item or the item has no name. That turns a malformed/partial rustdoc export into an incomplete `SchemaExport` instead of failing closed, even though this helper already treats stripped payload fields as fatal. Public enums should not lose variants silently.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/schema_export.rs",
+              "file": "libs/infrastructure/src/schema_export.rs",
               "line": 433,
               "category": "correctness"
             },
             {
               "message": "`member_from_dto()` accepts `Variant { name, payload_types }` but never validates `payload_types` the way the other codecs do. A baseline JSON entry can therefore contain module-qualified payload types like `domain::Foo`, decode successfully, and then round-trip into an L1 baseline even though the rest of the infrastructure rejects `::` in type strings. Add the same validation before constructing `EnumVariantDeclaration`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/tddd/baseline_codec.rs",
+              "file": "libs/infrastructure/src/tddd/baseline_codec.rs",
               "line": 282,
               "category": "validation"
             }
@@ -354,14 +354,14 @@
             {
               "message": "The `MemberDeclaration` entry still says `expected_variants` are listed in pre-migration string form, but the regenerated artifact immediately below is already using object-form variants with `name` and `payload_types`. That prose now contradicts the schema this file is documenting.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/enum-variant-payload-schema-2026-05-02/domain-types.json",
+              "file": "track/items/enum-variant-payload-schema-2026-05-02/domain-types.json",
               "line": 37,
               "category": "contradiction"
             },
             {
               "message": "The `MemberDeclarationDto` description mixes the legacy and migrated Variant shapes (`Variant { name, payload_types: String } (old bare-name)`), which is internally inconsistent. If the old schema was a bare-name arm, this should be rewritten so the migration history matches the actual schema shape being described.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/enum-variant-payload-schema-2026-05-02/infrastructure-types.json",
+              "file": "track/items/enum-variant-payload-schema-2026-05-02/infrastructure-types.json",
               "line": 52,
               "category": "factual error"
             }
@@ -396,16 +396,16 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`domain-types.md` renders the `Signal` column as `—` for every row, but the source signal file still marks these entries as blue/yellow. For example, `EnumVariantDeclaration` is yellow and `render_contract_map` is yellow in `domain-type-signals.json`, while the rendered table at [domain-types.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/enum-variant-payload-schema-2026-05-02/domain-types.md:7) hides that state. This makes the generated view inconsistent with its own signal data.",
+              "message": "`domain-types.md` renders the `Signal` column as `—` for every row, but the source signal file still marks these entries as blue/yellow. For example, `EnumVariantDeclaration` is yellow and `render_contract_map` is yellow in `domain-type-signals.json`, while the rendered table at [domain-types.md](track/items/enum-variant-payload-schema-2026-05-02/domain-types.md:7) hides that state. This makes the generated view inconsistent with its own signal data.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/enum-variant-payload-schema-2026-05-02/domain-types.md",
+              "file": "track/items/enum-variant-payload-schema-2026-05-02/domain-types.md",
               "line": 7,
               "category": "contradiction"
             },
             {
-              "message": "`infrastructure-types.md` has the same mismatch: the rendered `Signal` column is `—` for `BaselineCodecError`, `MemberDeclarationDto`, and the renderer functions, but `infrastructure-type-signals.json` still marks the first two blue and the three free functions yellow. The rendered table at [infrastructure-types.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/enum-variant-payload-schema-2026-05-02/infrastructure-types.md:7) no longer matches the signal source.",
+              "message": "`infrastructure-types.md` has the same mismatch: the rendered `Signal` column is `—` for `BaselineCodecError`, `MemberDeclarationDto`, and the renderer functions, but `infrastructure-type-signals.json` still marks the first two blue and the three free functions yellow. The rendered table at [infrastructure-types.md](track/items/enum-variant-payload-schema-2026-05-02/infrastructure-types.md:7) no longer matches the signal source.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/enum-variant-payload-schema-2026-05-02/infrastructure-types.md",
+              "file": "track/items/enum-variant-payload-schema-2026-05-02/infrastructure-types.md",
               "line": 7,
               "category": "contradiction"
             }
@@ -579,7 +579,7 @@
             {
               "message": "`EnumVariantDeclaration::new` and `MemberDeclaration::variant` are unchecked pass-through constructors, so the new public enum-variant value object still allows invalid states in-memory (for example empty/whitespace names or payload strings that only get rejected later by codec validation). That weakens the new domain invariant, and there is no direct test coverage for the payload-bearing path to catch regressions.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
+              "file": "libs/domain/src/tddd/catalogue.rs",
               "line": 201,
               "category": "correctness"
             }
@@ -624,14 +624,14 @@
             {
               "message": "`EnumVariantDeclaration` still has a public unchecked constructor, and `MemberDeclaration::variant/unit_variant` both call it directly. That means callers can bypass the new validation entirely and still build `TypeDefinitionKind::{Enum,ErrorType}` entries with empty or malformed variant names, so the invariant is not actually enforced at the domain boundary.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
+              "file": "libs/domain/src/tddd/catalogue.rs",
               "line": 261,
               "category": "correctness"
             },
             {
               "message": "`try_new`'s identifier predicate accepts `_` as a valid variant name, but `_` is not a legal Rust enum variant identifier. As written, `EnumVariantDeclaration::try_new(\"_\", vec![])` will succeed and admit an impossible state.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
+              "file": "libs/domain/src/tddd/catalogue.rs",
               "line": 189,
               "category": "correctness"
             }
@@ -659,14 +659,14 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "P1: The new `payload_types` field is never validated in enum forward checks. `evaluate_enum` and `evaluate_error_type` collapse both spec and code to `name()` sets only, so `Foo(String)` and `Foo(u32)` still match as Blue. That means the payload-schema change is not actually enforced by the domain evaluator. See [signals.rs:439](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs#L439) and [signals.rs:534](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/signals.rs#L534).",
+              "message": "P1: The new `payload_types` field is never validated in enum forward checks. `evaluate_enum` and `evaluate_error_type` collapse both spec and code to `name()` sets only, so `Foo(String)` and `Foo(u32)` still match as Blue. That means the payload-schema change is not actually enforced by the domain evaluator. See [signals.rs:439](libs/domain/src/tddd/signals.rs#L439) and [signals.rs:534](libs/domain/src/tddd/signals.rs#L534).",
               "severity": "P1",
               "file": "libs/domain/src/tddd/signals.rs",
               "line": 439,
               "category": "correctness"
             },
             {
-              "message": "P1: The new invariant is still bypassable through public unchecked constructors. `EnumVariantDeclaration::new` is public, and `MemberDeclaration::variant` / `unit_variant` call it directly, so callers can still manufacture invalid variant names without ever hitting `try_new`. That leaves the domain type able to hold illegal states again. See [catalogue.rs:280](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs#L280) and [catalogue.rs:330](/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs#L330).",
+              "message": "P1: The new invariant is still bypassable through public unchecked constructors. `EnumVariantDeclaration::new` is public, and `MemberDeclaration::variant` / `unit_variant` call it directly, so callers can still manufacture invalid variant names without ever hitting `try_new`. That leaves the domain type able to hold illegal states again. See [catalogue.rs:280](libs/domain/src/tddd/catalogue.rs#L280) and [catalogue.rs:330](libs/domain/src/tddd/catalogue.rs#L330).",
               "severity": "P1",
               "file": "libs/domain/src/tddd/catalogue.rs",
               "line": 280,
@@ -698,14 +698,14 @@
             {
               "message": "P1: The new enum-variant validation is bypassable in the public API. `EnumVariantDeclaration::new` is unchecked, and both `MemberDeclaration::variant` / `unit_variant` call it directly, so callers can still construct illegal variant names or payload types and carry them into catalogue/baseline/rendering. That defeats the new invariant the patch is trying to enforce; the checked path needs to be the default or the unchecked path should not be public.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
+              "file": "libs/domain/src/tddd/catalogue.rs",
               "line": 290,
               "category": "correctness"
             },
             {
               "message": "P1: `RUST_KEYWORDS` is incomplete: `union` is a Rust keyword but is not listed, so `EnumVariantDeclaration::try_new(\"union\", vec![])` currently succeeds even though the name cannot be emitted as a normal enum variant. The checked constructor therefore still accepts an illegal state.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
+              "file": "libs/domain/src/tddd/catalogue.rs",
               "line": 188,
               "category": "correctness"
             }
@@ -720,14 +720,14 @@
             {
               "message": "P1: The new enum-variant invariant is still bypassable from the public API. `EnumVariantDeclaration::new` is unchecked, and `MemberDeclaration::variant` / `unit_variant` call it directly, so callers can still manufacture invalid variant names or payloads without ever hitting `try_new`. That leaves `TypeDefinitionKind::Enum` / `ErrorType` able to carry illegal states in-memory.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
+              "file": "libs/domain/src/tddd/catalogue.rs",
               "line": 291,
               "category": "validation"
             },
             {
               "message": "P1: `EnumVariantDeclaration::try_new` does not actually validate payload type strings beyond rejecting `::`. Empty or whitespace-only entries in `payload_types` still pass, even though they are not valid type names and will later be treated as real variant payloads. The checked constructor therefore still admits invalid enum metadata.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
+              "file": "libs/domain/src/tddd/catalogue.rs",
               "line": 283,
               "category": "validation"
             }
@@ -764,7 +764,7 @@
             {
               "message": "`MemberDeclaration::variant` and `unit_variant` still wrap `EnumVariantDeclaration::new`, which skips both name and payload validation. That means callers can still construct invalid enum variants and bypass the new `SpecValidationError` checks, so the domain model still admits illegal enum states.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/tddd/catalogue.rs",
+              "file": "libs/domain/src/tddd/catalogue.rs",
               "line": 347,
               "category": "architecture"
             }

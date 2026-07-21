@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "layer": "cli_composition",
+  "entries": [
+    {
+      "claim_hash": "b4b07518e709b93597f9fc22e3190399a16d1f85d30a76151ec9baf13f27ff34",
+      "evidence_hash": "491806b658f2c4affa709bb990673cd2262ebb156ded3b4d0b2fc7af13f4db0e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "top-level コマンド群 `sotp catalog` の新設。動詞は `init` / `add` / `import` / `cite` / `check` の 5 つ。UI 表記の綴りは `catalog`（米綴り）で統一する。既存機構の名称（`.harness/catalogue-lint/` や catalogue-spec-signals 等）の rename は含まない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b4b07518e709b93597f9fc22e3190399a16d1f85d30a76151ec9baf13f27ff34",
+      "evidence_hash": "207ca484bc05e6088f6df26ea2b4b0132a47e5415faaa01226c4763184ebb4d8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track の解決と `--track-id` の扱い。track は省略時に現ブランチから自動解決する。`init` / `add` / `import` / `cite` は WRITE 操作なので、明示 `--track-id` は現在ブランチから導出した id と一致する場合だけ受理し、不一致または非 track ブランチでは fail-closed で停止する（cross-track override として扱わない）。`check` は読み取り専用のため、明示 `--track-id` を READ override として使える。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "track の解決と `--track-id` の扱い。track は省略時に現ブランチから自動解決する。`init` / `add` / `import` / `cite` は WRITE 操作なので、明示 `--track-id` は現在ブランチから導出した id と一致する場合だけ受理し、不一致または非 track ブランチでは fail-closed で停止する（cross-track override として扱わない）。`check` は読み取り専用のため、明示 `--track-id` を READ override として使える。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b4b07518e709b93597f9fc22e3190399a16d1f85d30a76151ec9baf13f27ff34",
+      "evidence_hash": "9fa838958978bcb533590e1c1e8ecd5237720811d692f876e2cd82520ff59206",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`sotp catalog {init,add,import,cite,check}` の 5 コマンドが CLI に存在する。UI 表記の綴りは `catalog`。既存機構の Rust 型名・ディレクトリ名（catalogue 綴り）は変更されていない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b4b07518e709b93597f9fc22e3190399a16d1f85d30a76151ec9baf13f27ff34",
+      "evidence_hash": "7bccbc50f813ec68acd4f618f3c0125ee188873d0f5a02588293d7344bcda8b1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "WRITE 操作（`init` / `add` / `import` / `cite`）で現在ブランチと一致しない `--track-id`、または非 track ブランチでの実行が fail-closed で停止する。READ 操作（`check`）では `--track-id` が現在ブランチと異なっても READ override として受理される。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/catalog-generation-annotation-2026-07-04/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "WRITE 操作（`init` / `add` / `import` / `cite`）で現在ブランチと一致しない `--track-id`、または非 track ブランチでの実行が fail-closed で停止する。READ 操作（`check`）では `--track-id` が現在ブランチと異なっても READ override として受理される。"
+        }
+      }
+    }
+  ]
+}

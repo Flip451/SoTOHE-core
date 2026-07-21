@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "track_id": "agent-dispatch-cost-reduction-2026-07-13",
+  "entries": {
+    "T001": [
+      {"layer": "usecase", "entry_key": "CapabilityExecError"},
+      {"layer": "usecase", "entry_key": "CapabilityName"},
+      {"layer": "usecase", "entry_key": "CapabilityProfile"},
+      {"layer": "usecase", "entry_key": "CapabilityProfilePort"},
+      {"layer": "usecase", "entry_key": "ModelName"},
+      {"layer": "usecase", "entry_key": "ProviderName"},
+      {"layer": "usecase", "entry_key": "ReasoningEffort"}
+    ],
+    "T002": [
+      {"layer": "usecase", "entry_key": "ReviewFixRunner"},
+      {"layer": "usecase", "entry_key": "RunReviewFixError"},
+      {"layer": "usecase", "entry_key": "SubagentDispatchInstruction"},
+      {"layer": "usecase", "entry_key": "SubagentName"},
+      {"layer": "usecase", "entry_key": "ReviewService"},
+      {"layer": "usecase", "entry_key": "RunReviewFixCommand"},
+      {"layer": "usecase", "entry_key": "ReviewRunFixInput"},
+      {"layer": "cli_driver", "entry_key": "ReviewFixDriver"},
+      {"layer": "cli_driver", "entry_key": "ReviewInput"},
+      {"layer": "infrastructure", "entry_key": "AgentProfiles"},
+      {"layer": "infrastructure", "entry_key": "AgentProfilesCapabilityAdapter"},
+      {"layer": "infrastructure", "entry_key": "AgentProfilesError"},
+      {"layer": "infrastructure", "entry_key": "CapabilityConfigDto"},
+      {"layer": "infrastructure", "entry_key": "ExecutionModeDto"},
+      {"layer": "infrastructure", "entry_key": "ModelNameDto"},
+      {"layer": "infrastructure", "entry_key": "ProviderNameDto"},
+      {"layer": "infrastructure", "entry_key": "ReasoningEffortDto"},
+      {"layer": "infrastructure", "entry_key": "ResolvedExecution"},
+      {"layer": "infrastructure", "entry_key": "CodexReviewFixRunner"},
+      {"layer": "infrastructure", "entry_key": "RoundType"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::ref_verify::process_runner::build_claude_ref_verifier_args"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::ref_verify::process_runner::build_gemini_ref_verifier_args"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::ref_verify::process_runner::build_codex_ref_verifier_args"},
+      {"layer": "cli_composition", "entry_key": "ReviewCompositionRoot"}
+    ],
+    "T003": [
+      {"layer": "domain", "entry_key": "RoundType"},
+      {"layer": "domain", "entry_key": "ScopeName"},
+      {"layer": "domain", "entry_key": "TrackId"},
+      {"layer": "usecase", "entry_key": "ProviderSessionCacheEntry"},
+      {"layer": "usecase", "entry_key": "ProviderSessionCacheError"},
+      {"layer": "usecase", "entry_key": "ProviderSessionCacheKey"},
+      {"layer": "usecase", "entry_key": "ProviderSessionId"},
+      {"layer": "usecase", "entry_key": "ProviderSessionCachePort"},
+      {"layer": "usecase", "entry_key": "ReviewerPrompt"},
+      {"layer": "usecase", "entry_key": "TargetArtifactPath"},
+      {"layer": "usecase", "entry_key": "TargetArtifactSet"},
+      {"layer": "infrastructure", "entry_key": "FsProviderSessionCacheAdapter"}
+    ],
+    "T004": [
+      {"layer": "usecase", "entry_key": "Reviewer"},
+      {"layer": "infrastructure", "entry_key": "ClaudeReviewer"},
+      {"layer": "infrastructure", "entry_key": "CodexReviewer"},
+      {"layer": "cli", "entry_key": "ReviewCommand"},
+      {"layer": "cli", "entry_key": "cli::commands::review::execute"},
+      {"layer": "cli_composition", "entry_key": "ReviewCompositionRoot"}
+    ],
+    "T005": [
+      {"layer": "domain", "entry_key": "CatalogueDeclarationHash"},
+      {"layer": "domain", "entry_key": "ImplementationInputHash"},
+      {"layer": "domain", "entry_key": "LayerId"},
+      {"layer": "domain", "entry_key": "Sha256Digest"},
+      {"layer": "domain", "entry_key": "Sha256DigestError"},
+      {"layer": "domain", "entry_key": "TrackBranch"},
+      {"layer": "domain", "entry_key": "TypeSignalsDocument"},
+      {"layer": "domain", "entry_key": "TypeSignalsLoadResult"},
+      {"layer": "domain", "entry_key": "TypeSignalsReuseDecision"},
+      {"layer": "domain", "entry_key": "TypeSignalsSchemaVersion"},
+      {"layer": "domain", "entry_key": "TypeSignalsSchemaVersionError"},
+      {"layer": "domain", "entry_key": "domain::tddd::type_signals_doc::decide_type_signals_reuse"}
+    ],
+    "T011": [
+      {"layer": "usecase", "entry_key": "TypeSignalsExecutorPort"},
+      {"layer": "usecase", "entry_key": "TypeSignalsExecutionError"},
+      {"layer": "usecase", "entry_key": "TypeSignalsInteractor"},
+      {"layer": "usecase", "entry_key": "TypeSignalsRequest"},
+      {"layer": "usecase", "entry_key": "TypeSignalsError"},
+      {"layer": "usecase", "entry_key": "DiagnosticText"},
+      {"layer": "usecase", "entry_key": "TypeSignalsService"}
+    ],
+    "T018": [
+      {"layer": "infrastructure", "entry_key": "EvaluateSignalsError"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"}
+    ],
+    "T013": [
+      {"layer": "domain", "entry_key": "TypeSignalsExecutorPort"},
+      {"layer": "domain", "entry_key": "TypeSignalsExecutionError"},
+      {"layer": "infrastructure", "entry_key": "TypeSignalsCodecError"},
+      {"layer": "infrastructure", "entry_key": "TypeSignalsExecutorAdapter"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_codec::declaration_hash"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_codec::decode"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::tddd::type_signals_codec::encode"},
+      {"layer": "cli_composition", "entry_key": "SignalCompositionRoot"}
+    ],
+    "T014": [
+      {"layer": "domain", "entry_key": "SchemaExporter"},
+      {"layer": "usecase", "entry_key": "SchemaExporterPort"},
+      {"layer": "infrastructure", "entry_key": "RustdocSchemaExporter"}
+    ],
+    "T015": [
+      {"layer": "infrastructure", "entry_key": "infrastructure::verify::catalogue_spec_signals::compute_catalogue_declaration_hash"},
+      {"layer": "infrastructure", "entry_key": "LoadCatalogueSpecSignalsForViewError"}
+    ],
+    "T007": [
+      {"layer": "usecase", "entry_key": "CapabilityDispatchOutcome"},
+      {"layer": "usecase", "entry_key": "CapabilityDispatchRequest"},
+      {"layer": "usecase", "entry_key": "CapabilityExecRequest"},
+      {"layer": "usecase", "entry_key": "CapabilityProviderPort"},
+      {"layer": "usecase", "entry_key": "CapabilityFailureDetail"},
+      {"layer": "usecase", "entry_key": "CapabilityFilePath"},
+      {"layer": "usecase", "entry_key": "CapabilityInputValidationError"},
+      {"layer": "usecase", "entry_key": "CapabilityResumeRequest"},
+      {"layer": "usecase", "entry_key": "TimeoutSeconds"},
+      {"layer": "infrastructure", "entry_key": "ClaudeCapabilityAdapter"},
+      {"layer": "infrastructure", "entry_key": "CodexCapabilityAdapter"}
+    ],
+    "T008": [
+      {"layer": "cli_driver", "entry_key": "CapabilityDriver"},
+      {"layer": "cli_driver", "entry_key": "CapabilityExecDriverInput"},
+      {"layer": "cli_driver", "entry_key": "CapabilityResumeArg"},
+      {"layer": "cli_driver", "entry_key": "TargetArtifactPathArg"},
+      {"layer": "cli", "entry_key": "CapabilityCommand"},
+      {"layer": "cli", "entry_key": "CapabilityExecArgs"},
+      {"layer": "cli", "entry_key": "cli::commands::capability::execute"},
+      {"layer": "cli", "entry_key": "cli::commands::capability::into_driver_input"},
+      {"layer": "cli_composition", "entry_key": "CapabilityCompositionRoot"}
+    ],
+    "T009": [],
+    "T019": [
+      {
+        "layer": "domain",
+        "entry_key": "EdgeOwnership"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "TestObligation"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "ObligationsDocument"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "TestBindingsDocument"
+      },
+      {
+        "layer": "domain",
+        "entry_key": "WaiverCacheEntry"
+      }
+    ]
+  }
+}

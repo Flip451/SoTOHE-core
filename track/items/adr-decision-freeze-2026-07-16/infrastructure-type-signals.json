@@ -1,0 +1,70 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-17T01:54:11Z",
+  "declaration_hash": "12d6ab9fb1970d85a20eafefae7ebd3412da44f04b6d1f4944c04e15e71e5f63",
+  "implementation_input_hash": "867230fc3b95f597f3f7034728fd0de1575556459e4455b696f818f31f7510c8",
+  "signals": [
+    {
+      "type_name": "AdrBaselineCodecError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineLedgerRecordDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Deserialize",
+        "Eq",
+        "PartialEq",
+        "Serialize"
+      ]
+    },
+    {
+      "type_name": "FsAdrBaselineStore",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "AdrBaselineStorePort",
+        "AdrBaselineStoreReadPort",
+        "Clone",
+        "Debug",
+        "From<PathBuf>"
+      ]
+    },
+    {
+      "type_name": "FsGitAdrBaselineSource",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "AdrBaselineSourcePort",
+        "Clone",
+        "Debug",
+        "From<PathBuf>"
+      ]
+    },
+    {
+      "type_name": "infrastructure::adr_baseline::decode_ledger_line",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::adr_baseline::encode_ledger_entry",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

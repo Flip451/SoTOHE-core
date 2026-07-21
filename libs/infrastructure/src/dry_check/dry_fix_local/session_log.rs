@@ -1,5 +1,5 @@
 use std::ffi::OsString;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 pub(super) fn dry_fix_redaction_values(safe_env: &[(OsString, OsString)]) -> Vec<(String, String)> {
     let mut values = safe_env
@@ -26,23 +26,6 @@ pub(super) fn redact_dry_fix_sensitive_text(text: &str, redactions: &[(String, S
         redacted = redacted.replace(secret, &placeholder);
     }
     redacted
-}
-
-pub(super) fn write_dry_fix_log(
-    log_path: &Path,
-    bin: &OsString,
-    status: &str,
-    stdout: &str,
-    stderr: &str,
-) {
-    let content = format!(
-        "bin: {}\nstatus: {}\n--- stdout ---\n{}\n--- stderr ---\n{}",
-        bin.to_string_lossy(),
-        status,
-        stdout,
-        stderr
-    );
-    let _ = std::fs::write(log_path, content);
 }
 
 /// Deletes the Codex fixer session log file on drop unless told to keep it.

@@ -11,13 +11,13 @@ Rules for using Rust nightly as a dev-only tool while keeping crates on stable.
 
 ## Rules
 
-- Crate code must compile and pass tests on **stable** Rust (MSRV 1.85). Nightly is never required for `cargo build` or `cargo test`
+- Crate code must compile and pass tests on **stable** Rust (MSRV 1.91). Nightly is never required for `cargo build` or `cargo test`
 - Nightly is used **only** for `cargo +nightly rustdoc -- -Z unstable-options --output-format json`
 - When nightly is not installed, the command must return `SchemaExportError::NightlyNotFound` (fail-closed). It must not panic or silently degrade
 - `rustdoc-types` crate version must match the rustdoc JSON format version produced by the pinned nightly. Document the expected nightly version in this file when pinned
-- Tests that require nightly must be marked `#[ignore]` with a comment explaining the nightly dependency. A separate `cargo make test-nightly` task will run them (future)
+- Tests that require nightly must be marked `#[ignore]` with a comment explaining the nightly dependency. Add an explicit CI path only when nightly coverage is adopted.
 - Do not add `rust-toolchain.toml` with `channel = "nightly"` — this would force nightly for all developers
-- Docker images: nightly installation in the tools container is optional. `export-schema` is primarily a host-side dev tool
+- `export-schema` is primarily a host-side dev tool; nightly is not part of the default toolchain
 
 ## Examples
 
@@ -27,7 +27,7 @@ Rules for using Rust nightly as a dev-only tool while keeping crates on stable.
 
 ## Exceptions
 
-- None currently. If a nightly-only feature is needed in production code, it requires an ADR and tech-stack.md update
+- None currently. If a nightly-only feature is needed in production code, it requires an ADR
 
 ## Review Checklist
 
@@ -38,6 +38,5 @@ Rules for using Rust nightly as a dev-only tool while keeping crates on stable.
 
 ## Related Documents
 
-- `track/tech-stack.md` — Dev-only Tooling (nightly) section
-- `knowledge/conventions/hexagonal-architecture.md` — rustdoc JSON parsing stays in infrastructure layer
-- `track/items/bridge01-export-schema-2026-04-06/spec.json` — BRIDGE-01 spec
+- `architecture-rules.json` — rustdoc JSON parsing stays in the permitted infrastructure layer
+- `knowledge/adr/README.md` — rustdoc_types-based TDDD TypeGraph を含む設計判断の索引

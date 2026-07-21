@@ -130,7 +130,9 @@ mod tests {
     use crate::ConfidenceSignal;
     use crate::Timestamp;
     use crate::tddd::catalogue::TypeSignal;
-    use crate::tddd::type_signals_doc::TypeSignalsDocument;
+    use crate::tddd::type_signals_doc::{
+        CatalogueDeclarationHash, ImplementationInputHash, Sha256Digest, TypeSignalsDocument,
+    };
 
     fn ts() -> Timestamp {
         Timestamp::new("2026-05-08T00:00:00Z").unwrap()
@@ -141,7 +143,16 @@ mod tests {
     }
 
     fn make_doc(signals: Vec<TypeSignal>) -> TypeSignalsDocument {
-        TypeSignalsDocument::new(ts(), "deadbeef", signals)
+        let digest = Sha256Digest::try_new(
+            "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa".to_owned(),
+        )
+        .unwrap();
+        TypeSignalsDocument::new(
+            ts(),
+            CatalogueDeclarationHash::new(digest.clone()),
+            ImplementationInputHash::new(digest),
+            signals,
+        )
     }
 
     #[test]

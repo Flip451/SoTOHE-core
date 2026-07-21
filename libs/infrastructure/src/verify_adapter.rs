@@ -3,6 +3,7 @@
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use usecase::TrackId;
 use usecase::verify::{VerifyOutcome, VerifyPort, VerifyPortError};
 
 use crate::verify::VerifyOutcome as InfraVerifyOutcome;
@@ -237,7 +238,7 @@ fn resolve_ci_verify_track_id_with_reader(
 }
 
 fn resolve_active_track_dir() -> Option<PathBuf> {
-    use crate::git_cli::GitRepository as _;
+    // GitRepository trait was removed in T008; SystemGitRepo methods are now inherent.
     use usecase::track_resolution::{ActiveTrackResolveInteractor, ActiveTrackResolveService as _};
     let repo = crate::git_cli::SystemGitRepo::discover().ok()?;
     let repo_root = repo.root().to_path_buf();
@@ -254,31 +255,20 @@ fn resolve_active_track_dir() -> Option<PathBuf> {
 /// Filesystem-backed adapter implementing [`VerifyPort`].
 ///
 /// Delegates each method to the appropriate `infrastructure::verify::*` submodule.
-#[derive(Debug, Default)]
-pub struct FsVerifyAdapter;
+#[derive(Debug)]
+pub struct FsVerifyAdapter {
+    machine_home_dir: Option<PathBuf>,
+}
 
 impl FsVerifyAdapter {
     /// Create a new `FsVerifyAdapter`.
     #[must_use]
-    pub fn new() -> Self {
-        Self
+    pub fn new(machine_home_dir: Option<PathBuf>) -> Self {
+        Self { machine_home_dir }
     }
 }
 
 impl VerifyPort for FsVerifyAdapter {
-    fn verify_tech_stack(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
-        if let Some(outcome) =
-            reject_symlinked_trusted_root("verify tech stack readiness", project_root)
-        {
-            return Ok(outcome);
-        }
-
-        Ok(render_outcome(
-            "verify tech stack readiness",
-            &crate::verify::tech_stack::verify(project_root),
-        ))
-    }
-
     fn verify_latest_track(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
         if let Some(outcome) =
             reject_symlinked_trusted_root("verify latest track files", project_root)
@@ -289,6 +279,56 @@ impl VerifyPort for FsVerifyAdapter {
         Ok(render_outcome(
             "verify latest track files",
             &crate::verify::latest_track::verify(project_root),
+        ))
+    }
+
+    fn verify_retention_gate(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
+        if let Some(outcome) = reject_symlinked_trusted_root("verify retention gate", project_root)
+        {
+            return Ok(outcome);
+        }
+
+        Ok(render_outcome(
+            "verify retention gate",
+            &crate::verify::retention_gate::verify(project_root),
+        ))
+    }
+
+    fn verify_sotp_version_tag(
+        &self,
+        project_root: &Path,
+    ) -> Result<VerifyOutcome, VerifyPortError> {
+        if let Some(outcome) =
+            reject_symlinked_trusted_root("verify sotp version tag", project_root)
+        {
+            return Ok(outcome);
+        }
+
+        Ok(render_outcome(
+            "verify sotp version tag",
+            &crate::verify::sotp_version_tag::verify(project_root),
+        ))
+    }
+
+    fn verify_machine_paths(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
+        if let Some(outcome) = reject_symlinked_trusted_root("verify machine paths", project_root) {
+            return Ok(outcome);
+        }
+
+        Ok(render_outcome(
+            "verify machine paths",
+            &crate::verify::machine_paths::verify(project_root, self.machine_home_dir.as_deref()),
+        ))
+    }
+
+    fn verify_template_refs(&self, project_root: &Path) -> Result<VerifyOutcome, VerifyPortError> {
+        if let Some(outcome) = reject_symlinked_trusted_root("verify template refs", project_root) {
+            return Ok(outcome);
+        }
+
+        Ok(render_outcome(
+            "verify template refs",
+            &crate::verify::template_refs::verify(project_root),
         ))
     }
 
@@ -482,7 +522,7 @@ impl VerifyPort for FsVerifyAdapter {
 
     fn verify_catalogue_spec_refs(
         &self,
-        track_id: Option<&str>,
+        track_id: Option<&TrackId>,
         items_dir: &Path,
         workspace_root: &Path,
         skip_stale: bool,
@@ -525,7 +565,7 @@ impl VerifyPort for FsVerifyAdapter {
         }
 
         let resolved_id: String = match track_id {
-            Some(id) => id.to_owned(),
+            Some(id) => id.as_ref().to_owned(),
             None => {
                 // Resolve from git (already checked above that we're on a track branch).
                 match resolve_ci_verify_track_id_from_root(workspace_root) {
@@ -588,17 +628,52 @@ impl VerifyPort for FsVerifyAdapter {
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::FsVerifyAdapter;
+    use usecase::TrackId;
     use usecase::verify::VerifyPort as _;
+
+    fn write_file(root: &std::path::Path, rel: &str, content: &str) {
+        let path = root.join(rel);
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).unwrap();
+        }
+        std::fs::write(path, content).unwrap();
+    }
+
+    #[test]
+    fn test_verify_retention_gate_clean_surface_returns_success() {
+        let root = tempfile::tempdir().unwrap();
+        write_file(root.path(), "README.md", "# Clean\n");
+
+        let outcome = FsVerifyAdapter::new(None).verify_retention_gate(root.path()).unwrap();
+
+        assert_eq!(outcome.exit_code, 0);
+        let stdout = outcome.stdout.unwrap_or_default();
+        assert!(stdout.contains("--- verify retention gate PASSED ---"), "{stdout}");
+    }
+
+    #[test]
+    fn test_verify_retention_gate_violation_returns_failure() {
+        let root = tempfile::tempdir().unwrap();
+        let kebab = ["tech", "stack"].join("-");
+        let token = format!("verify-{kebab}");
+        write_file(root.path(), "README.md", &format!("{token}\n"));
+
+        let outcome = FsVerifyAdapter::new(None).verify_retention_gate(root.path()).unwrap();
+
+        assert_eq!(outcome.exit_code, 1);
+        let stdout = outcome.stdout.unwrap_or_default();
+        assert!(stdout.contains("--- verify retention gate FAILED ---"), "{stdout}");
+    }
 
     #[cfg(unix)]
     #[test]
-    fn test_verify_tech_stack_rejects_symlinked_project_root() {
+    fn test_verify_latest_track_rejects_symlinked_project_root() {
         let real_root = tempfile::tempdir().unwrap();
         let link_parent = tempfile::tempdir().unwrap();
         let root_link = link_parent.path().join("workspace-link");
         std::os::unix::fs::symlink(real_root.path(), &root_link).unwrap();
 
-        let outcome = FsVerifyAdapter::new().verify_tech_stack(&root_link).unwrap();
+        let outcome = FsVerifyAdapter::new(None).verify_latest_track(&root_link).unwrap();
 
         assert_eq!(outcome.exit_code, 1);
         let stderr = outcome.stderr.unwrap_or_default();
@@ -617,7 +692,7 @@ mod tests {
         std::fs::write(&spec_md, "# Spec\n").unwrap();
         std::os::unix::fs::symlink(&target, &spec_json).unwrap();
 
-        let outcome = FsVerifyAdapter::new().verify_spec_attribution(&spec_md).unwrap();
+        let outcome = FsVerifyAdapter::new(None).verify_spec_attribution(&spec_md).unwrap();
 
         assert_eq!(outcome.exit_code, 1);
         let stderr = outcome.stderr.unwrap_or_default();
@@ -636,7 +711,7 @@ mod tests {
         std::fs::write(&spec_md, "# Spec\n").unwrap();
         std::os::unix::fs::symlink(&target, &spec_json).unwrap();
 
-        let outcome = FsVerifyAdapter::new().verify_spec_frontmatter(&spec_md).unwrap();
+        let outcome = FsVerifyAdapter::new(None).verify_spec_frontmatter(&spec_md).unwrap();
 
         assert_eq!(outcome.exit_code, 1);
         let stderr = outcome.stderr.unwrap_or_default();
@@ -653,7 +728,7 @@ mod tests {
         std::fs::write(&target, "---\nversion: \"1.0\"\n---\n# Spec\n").unwrap();
         std::os::unix::fs::symlink(&target, &spec_md).unwrap();
 
-        let outcome = FsVerifyAdapter::new().verify_spec_frontmatter(&spec_md).unwrap();
+        let outcome = FsVerifyAdapter::new(None).verify_spec_frontmatter(&spec_md).unwrap();
 
         assert_eq!(outcome.exit_code, 1);
         let stderr = outcome.stderr.unwrap_or_default();
@@ -672,7 +747,7 @@ mod tests {
         std::fs::write(&spec_md, "# Spec\n").unwrap();
         std::os::unix::fs::symlink(&target, &spec_json).unwrap();
 
-        let outcome = FsVerifyAdapter::new().verify_spec_signals(&spec_md).unwrap();
+        let outcome = FsVerifyAdapter::new(None).verify_spec_signals(&spec_md).unwrap();
 
         assert_eq!(outcome.exit_code, 1);
         let stderr = outcome.stderr.unwrap_or_default();
@@ -690,13 +765,47 @@ mod tests {
         std::os::unix::fs::symlink(&real_track, &track_link).unwrap();
 
         let items_dir = track_link.join("items");
-        let outcome = FsVerifyAdapter::new()
-            .verify_catalogue_spec_refs(Some("some-track"), &items_dir, workspace.path(), false)
+        let track_id = TrackId::try_new("some-track".to_owned()).unwrap();
+        let outcome = FsVerifyAdapter::new(None)
+            .verify_catalogue_spec_refs(Some(&track_id), &items_dir, workspace.path(), false)
             .unwrap();
 
         assert_eq!(outcome.exit_code, 1);
         let stderr = outcome.stderr.unwrap_or_default();
         assert!(stderr.contains("items_dir rejected before verification"), "{stderr}");
         assert!(stderr.contains("refusing to follow symlink"), "{stderr}");
+    }
+
+    #[test]
+    fn test_verify_sotp_version_tag_missing_pin_returns_failure() {
+        let root = tempfile::tempdir().unwrap();
+
+        let outcome = FsVerifyAdapter::new(None).verify_sotp_version_tag(root.path()).unwrap();
+
+        assert_eq!(outcome.exit_code, 1);
+        let stdout = outcome.stdout.unwrap_or_default();
+        assert!(stdout.contains("verify sotp version tag FAILED"), "{stdout}");
+    }
+
+    #[test]
+    fn test_verify_machine_paths_missing_machine_home_returns_failure() {
+        let root = tempfile::tempdir().unwrap();
+
+        let outcome = FsVerifyAdapter::new(None).verify_machine_paths(root.path()).unwrap();
+
+        assert_eq!(outcome.exit_code, 1);
+        let stdout = outcome.stdout.unwrap_or_default();
+        assert!(stdout.contains("machine home directory must be explicitly supplied"), "{stdout}");
+    }
+
+    #[test]
+    fn test_verify_template_refs_missing_manifest_returns_failure() {
+        let root = tempfile::tempdir().unwrap();
+
+        let outcome = FsVerifyAdapter::new(None).verify_template_refs(root.path()).unwrap();
+
+        assert_eq!(outcome.exit_code, 1);
+        let stdout = outcome.stdout.unwrap_or_default();
+        assert!(stdout.contains("verify template refs FAILED"), "{stdout}");
     }
 }

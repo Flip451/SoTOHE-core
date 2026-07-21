@@ -6,7 +6,7 @@ use std::process::ExitCode;
 use clap::{Args, Subcommand};
 use cli_composition::GitCompositionRoot;
 
-use crate::commands::outcome_to_exit;
+use crate::commands::driver_outcome_to_exit;
 
 #[derive(Debug, Subcommand)]
 pub enum GitCommand {
@@ -18,8 +18,8 @@ pub enum GitCommand {
     CommitFromFile(CommitFromFileArgs),
     /// Attach a git note using the contents of a file.
     NoteFromFile(FileArgs),
-    /// Switch to a branch and pull latest changes.
-    SwitchAndPull(SwitchAndPullArgs),
+    /// Fast-forward pull the current branch (`git pull --ff-only`).
+    Sync,
     /// Unstage paths (remove from git index without discarding worktree changes).
     Unstage(UnstageArgs),
 }
@@ -41,11 +41,6 @@ pub struct CommitFromFileArgs {
 }
 
 #[derive(Debug, Args)]
-pub struct SwitchAndPullArgs {
-    pub branch: String,
-}
-
-#[derive(Debug, Args)]
 pub struct UnstageArgs {
     /// Paths to unstage (repo-relative).
     #[arg(required = true)]
@@ -54,20 +49,24 @@ pub struct UnstageArgs {
 
 pub fn execute(cmd: GitCommand) -> ExitCode {
     let app = GitCompositionRoot::new();
-    match cmd {
-        GitCommand::AddAll => outcome_to_exit(app.git_add_all()),
+    let driver = app.git_driver();
+    let input = match cmd {
+        GitCommand::AddAll => cli_driver::git::GitInput::AddAll,
         GitCommand::AddFromFile(args) => {
-            outcome_to_exit(app.git_add_from_file(args.path, args.cleanup))
+            cli_driver::git::GitInput::AddFromFile { path: args.path, cleanup: args.cleanup }
         }
-        GitCommand::CommitFromFile(args) => {
-            outcome_to_exit(app.git_commit_from_file(args.path, args.cleanup, args.track_dir))
-        }
+        GitCommand::CommitFromFile(args) => cli_driver::git::GitInput::CommitFromFile {
+            path: args.path,
+            cleanup: args.cleanup,
+            track_dir: args.track_dir,
+        },
         GitCommand::NoteFromFile(args) => {
-            outcome_to_exit(app.git_note_from_file(args.path, args.cleanup))
+            cli_driver::git::GitInput::NoteFromFile { path: args.path, cleanup: args.cleanup }
         }
-        GitCommand::SwitchAndPull(args) => outcome_to_exit(app.git_switch_and_pull(args.branch)),
-        GitCommand::Unstage(args) => outcome_to_exit(app.git_unstage(args.paths)),
-    }
+        GitCommand::Sync => cli_driver::git::GitInput::Sync,
+        GitCommand::Unstage(args) => cli_driver::git::GitInput::Unstage { paths: args.paths },
+    };
+    driver_outcome_to_exit(driver.handle(input))
 }
 
 #[cfg(test)]
@@ -78,7 +77,7 @@ mod tests {
     use std::process::{Command, ExitCode};
     use std::sync::{Mutex, OnceLock};
 
-    use infrastructure::git_cli::{GitRepository, resolve_repo_path};
+    use infrastructure::git_cli::resolve_repo_path;
 
     // Private helpers re-exported from cli-composition for test access.
     // These are kept here so existing integration-level tests continue to work.
@@ -403,31 +402,16 @@ mod tests {
         assert!(worktree.contains("a.txt"), "a.txt worktree change should be preserved");
     }
 
-    #[test]
-    fn switch_and_pull_uses_repo_root_from_nested_directory() {
-        let _lock = cwd_lock().lock().unwrap();
-        let dir = init_repo();
-        fs::write(dir.path().join("tracked.txt"), "base\n").unwrap();
-        run_git(dir.path(), &["add", "tracked.txt"]);
-        run_git(dir.path(), &["commit", "-m", "initial"]);
-        run_git(dir.path(), &["checkout", "-b", "feature"]);
-
-        let nested = dir.path().join("nested");
-        fs::create_dir_all(&nested).unwrap();
-        let _guard = CurrentDirGuard::change_to(&nested);
-
-        // No remote/upstream is configured, so `git pull --ff-only` exits non-zero.
-        // switch-and-pull must still report success: the branch switch itself
-        // succeeded and a failed pull is only a warning. This pins the non-fatal
-        // pull behavior so a future change cannot silently make it fatal.
-        assert_eq!(
-            super::execute(super::GitCommand::SwitchAndPull(super::SwitchAndPullArgs {
-                branch: "main".to_owned(),
-            })),
-            ExitCode::SUCCESS
-        );
-        assert_eq!(repo().current_branch().unwrap().as_deref(), Some("main"));
-    }
+    /// The former `switch_and_pull_uses_repo_root_from_nested_directory` test
+    /// was deleted along with the `SwitchAndPull` variant. `git sync` now runs
+    /// `git pull --ff-only` on the current branch and, when no upstream is
+    /// configured, fails with a typed
+    /// `GitWorkflowError::SyncUpstreamNotSet` — the "warn on missing upstream"
+    /// behavior lives in `TrackGitInteractor::switch_to_base` and is exercised
+    /// by the usecase mock-port tests (T003).
+    ///
+    /// Sync itself is exercised as an infrastructure integration test in
+    /// `libs/infrastructure/src/git_cli/workflow_adapter.rs::tests` (T004).
 
     #[test]
     fn load_stage_paths_accepts_unique_repo_relative_paths() {

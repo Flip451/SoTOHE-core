@@ -1,0 +1,353 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::adr_baseline::decode_ledger_line": {
+      "action": "add",
+      "docs": "ADR baseline ledger-line decoder; the input str is opaque serialized JSON text and produces Json or Domain codec errors.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "line",
+          "ty": "&str"
+        }
+      ],
+      "returns": "Result<domain::adr_baseline::AdrBaselineLedgerEntry, AdrBaselineCodecError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "infrastructure::adr_baseline::encode_ledger_entry": {
+      "action": "add",
+      "docs": "ADR baseline ledger-line encoder; the returned String is opaque serialized JSON text and produces Json codec errors.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "entry",
+          "ty": "&domain::adr_baseline::AdrBaselineLedgerEntry"
+        }
+      ],
+      "returns": "Result<String, AdrBaselineCodecError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "AdrBaselineLedgerRecordDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineLedgerRecordDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineLedgerRecordDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineLedgerRecordDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineLedgerRecordDto",
+      "trait_ref": "serde::Serialize"
+    },
+    {
+      "for_type": "AdrBaselineLedgerRecordDto",
+      "trait_ref": "serde::Deserialize"
+    },
+    {
+      "for_type": "AdrBaselineCodecError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineCodecError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "AdrBaselineCodecError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "FsAdrBaselineStore",
+      "trait_ref": "usecase::adr_baseline::AdrBaselineStorePort"
+    },
+    {
+      "for_type": "FsAdrBaselineStore",
+      "trait_ref": "usecase::adr_baseline::AdrBaselineStoreReadPort"
+    },
+    {
+      "for_type": "FsAdrBaselineStore",
+      "trait_ref": "core::convert::From<std::path::PathBuf>"
+    },
+    {
+      "for_type": "FsAdrBaselineStore",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "FsAdrBaselineStore",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "FsGitAdrBaselineSource",
+      "trait_ref": "usecase::adr_baseline::AdrBaselineSourcePort"
+    },
+    {
+      "for_type": "FsGitAdrBaselineSource",
+      "trait_ref": "core::convert::From<std::path::PathBuf>"
+    },
+    {
+      "for_type": "FsGitAdrBaselineSource",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "FsGitAdrBaselineSource",
+      "trait_ref": "core::clone::Clone"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "AdrBaselineCodecError": {
+      "action": "add",
+      "docs": "ADR ledger codec failures; decode produces Json or Domain, while encode produces Json only.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Json",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Domain",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineLedgerRecordDto": {
+      "action": "add",
+      "docs": "Serde DTO for one ADR baseline ledger entry.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "source",
+              "ty": "domain::adr_baseline::AdrSourceFileName"
+            },
+            {
+              "name": "hash",
+              "ty": "domain::ContentHash"
+            },
+            {
+              "name": "kind",
+              "ty": "domain::adr_baseline::AdrBaselineKind"
+            },
+            {
+              "name": "reason",
+              "ty": "Option<domain::NonEmptyString>"
+            },
+            {
+              "name": "timestamp",
+              "ty": "domain::Timestamp"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "FsAdrBaselineStore": {
+      "action": "add",
+      "docs": "Filesystem ADR baseline persistence adapter consuming caller-supplied snapshot time.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    },
+    "FsGitAdrBaselineSource": {
+      "action": "add",
+      "docs": "Filesystem and Git ADR source-read adapter.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/adr-decision-freeze-2026-07-16/spec.json"
+        }
+      ]
+    }
+  }
+}

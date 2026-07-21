@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "9092e183f847b83daa03368f8d0b7e4bd20ee88b450042305a5c60b2e99a489e",
+  "signals": [
+    {
+      "type_name": "CatalogActionArg",
+      "signal": "blue",
+      "entry_hash": "1a2b276ac905050f8d6659548ae8eb6898a7d5fa9574ba9081e9f8fcc45726ba"
+    },
+    {
+      "type_name": "CatalogAddArgs",
+      "signal": "blue",
+      "entry_hash": "fc3b94755f002317a5022bf62adba97fde39d41e7a094f114d5c6180069f74ca"
+    },
+    {
+      "type_name": "CatalogCheckArgs",
+      "signal": "blue",
+      "entry_hash": "23bc0e355b6a1100d0eced2a6d4c4ae19eb4056c945d2745d14ebc681bbc93e3"
+    },
+    {
+      "type_name": "CatalogCiteArgs",
+      "signal": "blue",
+      "entry_hash": "1e190b746e98eb1146254bf4e7b1ad875ff0b31207ebae3b66158cb7fcaab8fa"
+    },
+    {
+      "type_name": "CatalogCommand",
+      "signal": "blue",
+      "entry_hash": "4b3766e862d2663e277156f57f12af6e7533b5398218527aac9cbfbbe6528353"
+    },
+    {
+      "type_name": "CatalogImportArgs",
+      "signal": "blue",
+      "entry_hash": "478c646361b893e008524818da02f9cbee25d8c03356897860bba83290aea628"
+    },
+    {
+      "type_name": "CatalogInitArgs",
+      "signal": "blue",
+      "entry_hash": "eb07285130e20c7d118ef1935f3825d73b3286a3c430aad3130f6d4528547e88"
+    },
+    {
+      "type_name": "CatalogKindArg",
+      "signal": "blue",
+      "entry_hash": "d4bf32edb2f9d699fd5cb43d713e78a7576ab779d43c5d189373631fafc6924d"
+    },
+    {
+      "type_name": "CliCommand",
+      "signal": "blue",
+      "entry_hash": "0c9ceb253833db9db847752a21e10afc60589851572ac82e810baa6bd05e9cd9"
+    },
+    {
+      "type_name": "cli::commands::catalog::action_to_select",
+      "signal": "blue",
+      "entry_hash": "85e4833d828efcdcd256d54d915f5145ea4a401e28ebdbff6f4924483e12f1f3"
+    },
+    {
+      "type_name": "cli::commands::catalog::dispatch",
+      "signal": "blue",
+      "entry_hash": "cb71a78f5f51912643afb607b4f153f3ecd2f86bc07140966ead66e877caf74c"
+    },
+    {
+      "type_name": "cli::commands::catalog::execute",
+      "signal": "blue",
+      "entry_hash": "a278c8dc0908019822b4a203993983c5686fa4dcd44e3b0747cff66a203b46e6"
+    },
+    {
+      "type_name": "cli::commands::catalog::execute_add",
+      "signal": "blue",
+      "entry_hash": "085df6ffa71f837fe3eeb13ee46d31985f11b76169ac51895a09886dd16e3242"
+    },
+    {
+      "type_name": "cli::commands::catalog::execute_check",
+      "signal": "blue",
+      "entry_hash": "b1a766aabb026ce1978f3d46b7372def85cc6c3bc318703074879adee1b96b7f"
+    },
+    {
+      "type_name": "cli::commands::catalog::execute_cite",
+      "signal": "blue",
+      "entry_hash": "b9404853a2a328d2e0de42897778c63f26e828808d96849706d277949284959b"
+    },
+    {
+      "type_name": "cli::commands::catalog::execute_import",
+      "signal": "blue",
+      "entry_hash": "42bffa06b365e2e2d67c6cee68788a439769f0778cfb15f39bbd6107e61ab414"
+    },
+    {
+      "type_name": "cli::commands::catalog::execute_init",
+      "signal": "blue",
+      "entry_hash": "73b452d9d1c6102778a08b18b322263a7ad82797bf498364e8ef4aad89950220"
+    },
+    {
+      "type_name": "cli::commands::catalog::kind_to_select",
+      "signal": "blue",
+      "entry_hash": "0d5789866600b01d7c5dffc1bf362658aa16d5e046b222d0a8ae4d0981ef3f57"
+    },
+    {
+      "type_name": "cli::commands::catalog::resolve_for_read",
+      "signal": "blue",
+      "entry_hash": "a36c02a8a0270f9bd539bef574203f617b0c8bedd89fb02c9f49d150da229791"
+    },
+    {
+      "type_name": "cli::commands::catalog::resolve_for_write",
+      "signal": "blue",
+      "entry_hash": "14dc3d418dcf6671c69f9837aab399bcee5d448cd8f7dff9318c7a1948da7590"
+    }
+  ]
+}

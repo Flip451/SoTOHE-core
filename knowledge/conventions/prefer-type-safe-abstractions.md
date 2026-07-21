@@ -182,5 +182,5 @@ domain 層の型安全性を永続化の都合で妥協しない（ヘキサゴ�
 ## Decision Reference
 
 - `knowledge/conventions/typed-deserialization.md`: serde を使った型安全なデシリアライズ
-- `knowledge/conventions/hexagonal-architecture.md`: ヘキサゴナルアーキテクチャにおける型の配置
+- `knowledge/conventions/type-designer-kind-selection.md` R1: 型の role × layer 配置
 - `knowledge/conventions/coding-principles.md`: Error handling / naming / module size / no-panics の規約

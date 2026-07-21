@@ -1,0 +1,478 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "capability exec: profile 駆動の汎用 capability dispatch コマンド",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "`bin/sotp capability exec <capability-name> --host <provider> --briefing-file <path>` を、自由形式の成果物を orchestrator が消費する capability の単一かつ profile 駆動の dispatch 入口として提供する。呼び出し可能な capability、provider、model、実行経路は profile と provider-native adapter 定義から解決し、capability 名ごとの専用 runner を増設しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D10"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "入力、profile、adapter 定義、および provider の不整合を dispatch 前に fail-closed で止め、契約を保持できる場合だけ in-host 委譲または subprocess 実行へ進める。これにより provider routing、model、権限、briefing 規律、および capability 定義への適合を一貫して保証する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D6"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D7"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D10"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "orphan 化した `sotp plan codex-local` とその参照面を同一 track で撤去し、固定返却スキーマを持つ既存の専用 pipeline は新しい汎用 command に合流させず維持する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D8"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D9"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "`capability exec` command と、capability 名、必須の `--host`、必須の `--briefing-file` から成る共通の dispatch interface を追加する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "実行結果と in-host 委譲指示を、呼び出し側が機械判別できる判別子付きの出力として返す。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D7"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "dispatch 対象を profile の capability entry から解決し、`execution_mode: orchestrator-output` の entry だけを通す。存在しない capability、`typed-pipeline`、execution_mode の欠如、または未知の execution_mode は subprocess を起動せず reject する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D9"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "profile から provider と単一の model を解決し、claude と codex の provider arm だけを provider-generic な入口から dispatch する。未対応または未知の provider、model 欠如、または provider-native adapter 定義との model 不一致は dispatch 前に reject する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D5"
+          },
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D10"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "provider ごとの adapter 定義を、capability 定義への適合と実行権限の権威として扱う。codex は skill の sandbox 宣言を subprocess の sandbox 制約へ反映し、未宣言時は read-only とする。claude は agent 定義の `tools:` と profile と一致する `model:` の存在を preflight し、欠如または不一致を reject する。CLI と profile に権限を緩和または重複宣言する経路を設けない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D3"
+          },
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D10"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "briefing file と固定 discipline template を分岐判定より前に読み込み、通常ファイル性、読み取り可能性、UTF-8、非空内容を検証する。検証済み briefing と discipline を subprocess prompt に合成し、in-host 委譲では briefing path と読み込み済み discipline 本文の両方を必須 payload として返す。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D6"
+          },
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D7"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "`--host` を runtime の呼び出し元 provider の必須自己申告として扱う。claude==claude かつ全 preflight が通る場合だけ subprocess を起動しない in-host 委譲指示を返し、codex==codex と cross-provider の場合は adapter による subprocess dispatch を実行する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D7"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "subprocess dispatch では provider-native adapter を使う。claude は検証済み agent 定義を `claude -p --agent <name>` で、codex は存在確認済み skill を明示的な `$<name>` mention と profile model で起動する。native adapter の非対話適合を確認できない場合や定義が欠ける場合に、raw definition の prompt 注入などへ fallback しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D5"
+          },
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D10"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "`sotp plan codex-local` の CLI、driver、usecase、infrastructure adapter と、それを正規経路として示す規約・command・設定・skill の参照を撤去し、writer capability への案内を `capability exec` の経路へ差し替える。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D8"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OUT-01",
+        "text": "`review local`、dry 系、ref-verify、および obligation・waiver verifier のように固定返却スキーマを機械側が消費する typed-pipeline を `capability exec` へ合流させない。これらの既存 command、出力契約、auto-record、gate は維持する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D9"
+          }
+        ]
+      },
+      {
+        "id": "OUT-02",
+        "text": "gemini または将来の provider を dispatch 対応にしない。provider-native adapter registry、権限宣言の enforcement、非対話 invocation contract が未定義の provider は、対応済みとして扱わず reject する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D10"
+          }
+        ]
+      },
+      {
+        "id": "OUT-03",
+        "text": "fast/final tier または CLI での model 選択を `capability exec` に追加しない。profile model を持たない capability は本 command の対象にせず reject する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "OUT-04",
+        "text": "権限を profile の provider 中立 field や `--sandbox` のような CLI flag で宣言・緩和する仕組みを導入しない。権限は provider ごとの adapter 定義に留める。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+            "anchor": "D3"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "dispatch は fail-closed とする。必須引数、briefing、discipline template、profile entry、execution mode、provider、model、adapter definition、adapter preflight のいずれかが無効・欠如・不一致なら、in-host 委譲指示も subprocess 起動も行わず非成功で終了する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D6"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D7"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D10"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "profile は capability の universe、routing、model、execution mode の唯一の権威とし、adapter 定義は capability への適合と provider 固有権限の唯一の権威とする。capability 名の whitelist、個別 runner、model fallback、または profile と adapter の暗黙優先によってこの分担を迂回しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D10"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "すべての dispatch 分岐で、検証済みの briefing と同一の discipline を適用する。discipline の政策文面は Rust に複製せず固定 template から読み込み、native adapter を使えないときに raw definition を prompt 又は system prompt へ注入する代替経路を設けない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D6"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D10"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "新 command の導入と `plan codex-local` の撤去によって、profile が routing する writer capability の正規 dispatch 経路が存在しない状態を作らない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D8"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "有効な `orchestrator-output` capability、`--host`、非空の briefing file を与えると、`sotp capability exec` が profile から provider と model を解決して dispatch outcome を返す。profile に新しい有効 entry を追加した場合に capability 名ごとの CLI 実装を追加せず同じ解決規則で扱われ、profile に存在しない名前は非成功で reject されることを検証する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "`typed-pipeline`、execution_mode 欠如、未知の execution_mode、model 欠如、未対応又は未知の provider、未対応 provider の adapter registry 不在を与えた場合、command が非成功で終了し、in-host 委譲も provider subprocess も発生しないことを検証する。`capability exec reviewer` のような typed-pipeline の拒否が capability 名の個別判定に依存しないことも確認する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D9"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "`--host` 又は `--briefing-file` が欠ける場合、briefing path が通常の読み取り可能な UTF-8 非空 file でない場合、又は固定 discipline template が欠如・読取不能・UTF-8 不正・空白のみの場合、command が分岐判定より前に非成功で終了することを検証する。この失敗時に subprocess 起動又は in-host 委譲指示が出ないことも確認する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D6"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "claude adapter definition の `tools:` 又は `model:` が欠ける、又は agent model が profile model と一致しない場合に、in-host と subprocess のどちらも非成功で reject することを検証する。codex skill が存在しない場合、又は provider-native adapter の非対話起動契約を確認できない場合にも非成功で reject し、raw definition の prompt 注入へ fallback しないことを確認する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D10"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "有効な claude==claude dispatch は provider subprocess を起動せず、capability 名、briefing path、検証済み discipline 本文を含む判別可能な in-host 委譲指示を返すことを検証する。有効な codex==codex dispatch は profile model と skill の sandbox 宣言を適用した subprocess dispatch となり、cross-provider dispatch も各 provider adapter で subprocess dispatch となることを確認する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D6"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "subprocess dispatch が claude では検証済み agent を `claude -p --agent <name>` で、codex では profile model と明示的な `$<name>` skill mention を用いて起動することを検証する。いずれの provider subprocess に渡す prompt にも、検証済み briefing path から変換した instruction と、読み込み・検証済みの固定 discipline template 本文の両方が含まれることを確認する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D6"
+        },
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D10"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "`sotp plan codex-local` が CLI の command 一覧から除去され、実行しても成功しないことを検証する。旧 planner の CLI・driver・usecase・infrastructure stack が残らず、D8 で列挙された規約、command、設定、rule、skill の live reference surfaces が `capability exec` を案内していることを確認する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D8"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "`review local`、dry、ref-verify、obligation・waiver verifier の既存専用 pipeline が `capability exec` の出力契約へ移行せず、従来の固定返却スキーマを機械消費する command と gate が引き続き利用可能であることを検証する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D9"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "codex skill の sandbox 未宣言時は read-only が適用され、CLI 引数による権限緩和はできないことを検証する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-12-0510-capability-exec-unified-dispatch.md",
+          "anchor": "D3"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/enforce-by-mechanism.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "No Panics in Library Code"
+    },
+    {
+      "file": "knowledge/conventions/hexagonal-architecture.md",
+      "anchor": "Layer Dependencies"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    },
+    {
+      "file": "knowledge/conventions/shell-parsing.md",
+      "anchor": "Single Parser Rule"
+    }
+  ],
+  "signals": {
+    "blue": 29,
+    "yellow": 0,
+    "red": 0
+  }
+}

@@ -11,4 +11,7 @@ Responsibilities:
 Boundaries:
 - Do not bypass review wrappers.
 - Do not make unrelated refactors.
+- On a resumed session (orchestrator opt-in continuation), follow the "Session resume" section
+  of the capability SSoT: check whether upstream artifacts changed since the prior session and
+  re-read any that did before continuing.
 """

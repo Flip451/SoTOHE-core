@@ -275,7 +275,7 @@ commit gate で chain ③（impl-catalog）を `strict` にすると、TDDD の�
 
 ### D7: `ChainIdentity` / `SoTChain` / `LiveSoTChain` / `PersistedSoTChainGate` / `LoadablePersistedChain` trait による chain 契約の型化
 
-§5 で示した calc / check / freshness の共通形を Rust trait として明示化し、新 chain 追加時の "うっかり忘れ" と、chain ② で実際に起きたような **inline 重複実装による腐敗** を構造的に防ぐ。**Strictness は `bool` ではなく `domain::Strictness` enum を貫通させる**（型レベルで反転変換 silent failure を排除する; § Enum-first / `knowledge/conventions/prefer-type-safe-abstractions.md`）。**ハイブリッド配置**: 純粋なゲート契約（gate function 群）は `libs/domain/src/chain.rs` に残し、I/O ポート契約（calc / load / freshness）は `libs/usecase/src/chain/traits.rs` に置く（§ Port Placement / `knowledge/conventions/hexagonal-architecture.md` — port abstraction は usecase 配置とする）。これにより orphan rule も満たした上で blanket impl を usecase 側で安全に提供できる:
+§5 で示した calc / check / freshness の共通形を Rust trait として明示化し、新 chain 追加時の "うっかり忘れ" と、chain ② で実際に起きたような **inline 重複実装による腐敗** を構造的に防ぐ。**Strictness は `bool` ではなく `domain::Strictness` enum を貫通させる**（型レベルで反転変換 silent failure を排除する; § Enum-first / `knowledge/conventions/prefer-type-safe-abstractions.md`）。**ハイブリッド配置**: 純粋なゲート契約（gate function 群）は `libs/domain/src/chain.rs` に残し、I/O ポート契約（calc / load / freshness）は `libs/usecase/src/chain/traits.rs` に置く（§ Port Placement / `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） — port abstraction は usecase 配置とする）。これにより orphan rule も満たした上で blanket impl を usecase 側で安全に提供できる:
 
 ```rust
 // ---- domain layer (pure gate contracts only) ----
@@ -540,7 +540,7 @@ config も `signal` 名前空間も導入せず、現状の `track` / `verify` �
 
 per-layer 反復（`for LAYER in domain usecase infrastructure; do ... done`）と SHA-256 ハッシュ計算を CLI コマンドファイルまたは `Makefile.toml` タスクに残す選択肢（実装コストを最小化するために adapter 層にロジックを書く）。
 
-却下理由: per-layer 列挙はビジネス知識（レイヤーセットは `architecture-rules.json` が定義する domain invariant）であり、adapter / 顧客カスタマイズ可能なサーフェス（Makefile・CLI コマンドファイル）に置くとヘキサゴナルアーキテクチャの境界（`knowledge/conventions/hexagonal-architecture.md`）に違反する。Makefile はビルド・実行の orchestration ツールであって、domain 知識を encode する場所ではない。同様に、CLI コマンドファイルが 30 LOC を超えてループやパス構築を含むと、adapter が use case を模倣した二重実装となり、D7 が防ごうとする「inline 重複実装による腐敗」を CLI 側で再発させる。adapter から per-layer ロジックを排除し usecase に集約することで、レイヤーセットの変更が 1 か所（domain の定数 / architecture-rules.json の読み取り箇所）で完結し、CLI・Makefile の変更不要で伝播する。
+却下理由: per-layer 列挙はビジネス知識（レイヤーセットは `architecture-rules.json` が定義する domain invariant）であり、adapter / 顧客カスタマイズ可能なサーフェス（Makefile・CLI コマンドファイル）に置くとヘキサゴナルアーキテクチャの境界（`knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`））に違反する。Makefile はビルド・実行の orchestration ツールであって、domain 知識を encode する場所ではない。同様に、CLI コマンドファイルが 30 LOC を超えてループやパス構築を含むと、adapter が use case を模倣した二重実装となり、D7 が防ごうとする「inline 重複実装による腐敗」を CLI 側で再発させる。adapter から per-layer ロジックを排除し usecase に集約することで、レイヤーセットの変更が 1 か所（domain の定数 / architecture-rules.json の読み取り箇所）で完結し、CLI・Makefile の変更不要で伝播する。
 
 ## Consequences
 
@@ -572,7 +572,7 @@ per-layer 反復（`for LAYER in domain usecase infrastructure; do ... done`）�
 - strictness が現在の 2 値（strict / interim）では表現できないというフィードバックが来たとき
 - fail-closed の既定 strict が TDDD 以外のワークフローでも過剰に厳しいというフィードバックが蓄積したとき
 - merge gate の strict モード判定を Rust の型システムで保証する（config を読まない設計に戻す）価値が生じたとき
-- `knowledge/conventions/hexagonal-architecture.md` が adapter 層でのループ保持を許容するよう改訂されたとき（D8 の根拠が失われる）
+- `knowledge/conventions/hexagonal-architecture.md`（廃止 — 現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1。経緯: `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md`） が adapter 層でのループ保持を許容するよう改訂されたとき（D8 の根拠が失われる）。同 convention の廃止後の後継観測条件は `knowledge/adr/2026-07-17-0247-docs-architecture-ssot-realignment.md` §Reassess When に記録されている（現行 SSoT: `architecture-rules.json` / `knowledge/conventions/type-designer-kind-selection.md` R1）。
 - `signal` 名前空間に引数必須（argful）の動詞が追加され、呼び出し側がレイヤー名を渡さざるを得ない設計上の理由が生じたとき（D8-1 の「argless dispatch」前提が崩れる）
 
 ## Related ADRs

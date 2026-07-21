@@ -13,13 +13,13 @@ Every requirement, constraint, and acceptance criterion in `spec.md` must carry 
 
 | Tag | Meaning | Signal | Example |
 |-----|---------|--------|---------|
-| `[source: <document> §<section>]` | Explicit reference to a document, section, or external standard | Blue | `[source: PRD §3.2]`, `[source: track/tech-stack.md]` |
+| `[source: <document> §<section>]` | Explicit reference to a document, section, or external standard | Blue | `[source: PRD §3.2]`, `[source: knowledge/adr/<adr-id>.md#<decision-id>]` |
 | `[source: convention — <file>]` | Established project convention with specific file reference | Blue | `[source: convention — knowledge/conventions/security.md]` |
 | `[source: feedback — <context>]` | User feedback or correction (undocumented, not persisted) | Yellow | `[source: feedback — Rust-first policy]` |
 | `[source: inference — <reason>]` | Inferred from context, conventions, or common practice; not explicitly stated | Yellow | `[source: inference — security best practice]` |
 | `[source: discussion]` | Agreed upon in team discussion or user conversation | Yellow | `[source: discussion]` |
 
-**Blue sources** reference persistent, version-controlled files (ADR, convention document, PRD, tech-stack, etc).
+**Blue sources** reference persistent, version-controlled files (ADR, convention document, PRD, etc).
 **Yellow sources** lack persistent documentation; they capture intent without an artifact.
 
 ### Strict gate semantics
@@ -27,7 +27,8 @@ Every requirement, constraint, and acceptance criterion in `spec.md` must carry 
 The merge gate (invoked via `sotp pr wait-and-merge`) blocks merge when any
 requirement still has a Yellow source. CI runs in interim mode and surfaces
 Yellow as a `VerifyFinding::warning` (visible in `cargo make ci` output) without
-blocking development iteration — see ADR `knowledge/adr/2026-04-12-1200-strict-spec-signal-gate-v2.md` §D8.
+blocking development iteration. This keeps development feedback visible while reserving the
+strict Blue-only requirement for the merge gate.
 
 ### Upgrading Yellow to Blue
 
@@ -35,7 +36,7 @@ To unblock merge, promote each Yellow requirement to Blue:
 
 1. **Create persistent documentation**: Write an ADR (`knowledge/adr/<date>-<hhmm>-<slug>.md`) or convention (`knowledge/conventions/<topic>.md`) that records the decision.
 2. **Reference the new document**: Update the spec requirement's `sources` array to point at the new ADR/convention via a `document` or `convention` source.
-3. **Re-run signal evaluation**: `cargo make track-signals <track-id>` recomputes signals; previously-Yellow items should now be Blue.
+3. **Re-run signal evaluation**: run the signal command required by the active track workflow; previously-Yellow items should then become Blue.
 
 This workflow is the structural incentive created by the strict signal gate:
 design decisions accumulate as persistent artifacts rather than undocumented
@@ -50,7 +51,7 @@ Tags appear inline at the end of the requirement statement:
 
 - New logic must be implemented in Rust, not Python [source: feedback — Rust-first policy]
 - TDD workflow is mandatory [source: convention — knowledge/conventions/testing.md]
-- Input validation uses domain types [source: track/tech-stack.md §Architecture]
+- Input validation uses domain types [source: knowledge/conventions/prefer-type-safe-abstractions.md]
 ```
 
 For acceptance criteria:

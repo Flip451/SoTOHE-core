@@ -27,7 +27,7 @@ Report findings ONLY for the following categories:
   §No Panics in Library Code.
 - **port misplaced**: a trait that abstracts an infrastructure capability
   (git hash, two-phase commit, HTTP client) placed in domain instead of
-  usecase. Cite `hexagonal-architecture.md` §Port Placement Rules.
+  usecase. Cite `type-designer-kind-selection.md` R1.
 - **purity violation**: `std::fs::*`, `std::net::*`, `std::process::*`,
   `std::io::*`, `std::env::*`, `chrono::Utc::now()`, `std::time::SystemTime`,
   `std::time::Instant`, `println!` / `eprintln!` reaching domain (these are
@@ -36,7 +36,7 @@ Report findings ONLY for the following categories:
 - **broken invariant in newtype constructor**: a `try_new` / `new` that
   accepts inputs the type's documented invariant says it should reject (e.g.,
   empty string for a Newtype documented as "non-empty"), or accepts inputs
-  silently when fail-closed is required (cite CN-04 patterns).
+  silently when fail-closed validation is required.
 
 ## What NOT to report
 

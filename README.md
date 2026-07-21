@@ -2,7 +2,9 @@
 
 **S**ource **o**f **T**ruth **O**riented **H**arness **E**ngine
 
-AI エージェントによる仕様駆動開発 (SDD) を管理する Rust 製 CLI テンプレート。
+AI エージェントによる仕様駆動開発 (SDD) を管理する Rust 製 CLI テンプレート。SoT（真実の源泉）指向のRust開発向けハーネスの核となるCLIを提供する。
+
+想定する使い手は Rust で中〜大規模プロジェクトを開発するチーム — 仕様・設計・実装の乖離が起きやすく、真実の源泉が散在する問題を抱えている現場に向く。中核機能は track ワークフロー管理 CLI、メタデータ駆動の状態遷移エンジン、CI 連携バリデーションの 3 つ（GUI / Web ダッシュボードは提供しない）。
 
 ## 価値：SoT Chain とは何か
 
@@ -49,36 +51,51 @@ ADR (恒久的)
 
 SoTOHE はすべての作業を **track** で管理する。1 track = 1 機能追加・1 バグ修正・1 リファクタリング相当で、`仕様 → 型契約 → 実装 → レビュー → コミット & マージ` が独立したファイルとして保存される。各 track は専用ブランチ `track/<track-id>` 上で進む。
 
-track 作業には `/adr:add <slug>` で ADR を作り `/track:adr2pr` で PR まで進める、という正規フローがある。
+track 作業には `/adr:add <slug>` で ADR を作り
+`/track:adr2pr` で PR まで進める、という正規フローがある。feature 名と主 ADR の引数は任意で、省略した値は会話文脈から解決して user が 1 回確認する（明示指定時はその値が優先される）。`/track:init` は orchestrator が選んだ主 ADR の逐語 baseline を記録し、以後 review・commit・track-aware CI はその baseline とのバイト照合を行う。
 
 ## 前提条件
 
 このテンプレートを使うには以下が必要:
 
-- **Docker + docker compose** — CI と開発用サービスはコンテナ内で実行される
-- **Rust toolchain + cargo-make** — host で `cargo make bootstrap` を実行し、`bootstrap` 内で `bin/sotp` をビルドする
+- **Rust toolchain + cargo-make** — `rust-toolchain.toml` が Rust / rustfmt / clippy を固定する。host で `cargo make bootstrap` を実行する
+- **Docker（任意）** — 既定の品質ゲートと CI は host toolchain で実行する。隔離環境を選ぶ場合だけ `Makefile.toml` の extend 参照先を `Makefile.docker.toml` に切り替える
+- **`bin/sotp` の入手** — 以下 2 経路のいずれか (詳細は「はじめ方」参照)
+  - a. SoTOHE-core を clone → `sotp template export` を実行すると、出力ツリーに `bin/sotp` が移植された状態で完結する (タグ非依存、初回導入向け)
+  - b. 更新時 / 別ホスト再導入時は `.harness/config/sotp-version.json` の固定タグから `cargo install` で導入する
 - **Claude Code** — 主操作面。`/track:*` コマンドの入口
 - **Codex CLI** — 既定 profile (`default`) のレビュー担当 (`reviewer`)
 - **Gemini CLI** — 既定 profile (`default`) のリサーチ担当 (`researcher`)
 
 補足:
 
-- Linux で uid/gid が `1000:1000` 以外なら `HOST_UID=$(id -u)` / `HOST_GID=$(id -g)` を export してから compose wrapper を使う
 - capability の担当者は `.harness/config/agent-profiles.json` で切り替えられる
+- 出力ツリー内 `bin/sotp` を git 管理するかどうか (ignore / track) は利用者側の判断領域であり、本テンプレートは強制しない
+- プレビルトバイナリ配布 (GitHub Releases) は現時点では実施していない (将来検討)
 
 ## はじめ方
 
 ### 初回セットアップ
 
+以下は `sotp template export` で生成された出力ツリーでの初回セットアップ手順である。まず `cargo-make` を host に導入し、固定 toolchain 上で bootstrap を実行する。
+
+出力ツリーでの `bin/sotp` 入手には 2 経路がある。デフォルトの分岐条件はテンプレート利用者が意識せず自動で選ばれる (出力ツリーの `cargo make bootstrap` Step 3 で判定される):
+
+- **経路 a (初回導入 / タグ非依存)**: SoTOHE-core を clone → build して `sotp template export` を出力ツリーに実行すると、実行中の自バイナリが出力ツリーの `bin/sotp` に移植される (実行権限保持のコピー)。出力ツリーで `cargo make bootstrap` を実行すると、Step 3 は `bin/sotp` が既に存在することを検出し、`install-sotp` を呼ばずに完結する。公開リポジトリに sotp タグが 1 本もなくてもこの経路は成立する。
+- **経路 b (更新 / 別ホスト再導入)**: 出力ツリーに `bin/sotp` が存在しない (または起動に失敗する) 場合、Step 3 は `cargo make install-sotp` を呼び、`.harness/config/sotp-version.json` の固定タグから `cargo install --git ... --tag ... --locked` で `bin/sotp` を導入する。別ホストへの再導入や sotp バージョンの更新はこの経路で行う。
+
 ```bash
-# ターミナルで:
-cargo make bootstrap      # Docker イメージビルド + CI 一括
+# 出力ツリーのターミナルで:
+cargo install --locked cargo-make --version 0.37.24
+cargo make bootstrap      # pinned auxiliary tools + bin/sotp 入手 (経路 a/b を自動判定) + host CI
 ```
 
 ```text
 # Claude Code チャットで:
 /track:catchup            # 環境確認 + プロジェクト状態把握
 ```
+
+出力ツリーで `bin/sotp` を明示的に (再) 導入したい場合 (経路 b を強制したい場合など) は、bootstrap 前に `cargo make install-sotp` を単独で実行できる。移植バイナリはビルドしたホスト固有 (glibc / OS ABI 依存) なので、別ホストで動かない場合は経路 b で再導入する。
 
 ### 機能を開発する（正規フロー）
 
@@ -91,10 +108,10 @@ cargo make bootstrap      # Docker イメージビルド + CI 一括
 2. ADR をベースに track 初期化から PR レビューまで進める（merge はしない）
 
    ```text
-   /track:adr2pr
+   /track:adr2pr [<feature>] [--primary-adr <filename>.md]
    ```
 
-   このコマンドは `/track:init` → ADR baseline の `/track:review` / `/track:commit` → `/track:spec-design` / `/track:type-design` / `/track:impl-plan` → 計画 artifact の review / commit → `/track:full-cycle` → `/track:pr-review` を順に実行し、PR を開いた状態で停止する。
+   引数は両方とも任意で、省略した値は会話文脈から解決され、`/track:init` へ渡す前に user が 1 回確認する（候補が複数なら選択を、候補がなければ値の直接指定を求める）。明示指定時はその値が優先される。このコマンドは `/track:init`（主 ADR を designation する init baseline 記録を含む）→ ADR baseline の `/track:review` / `/track:commit` → `/track:spec-design` / `/track:type-design` / `/track:impl-plan` → 計画 artifact の review / commit → `/track:full-cycle` → `/track:pr-review` を順に実行し、PR を開いた状態で停止する。baseline 不一致や必要な刻印の欠落は review、commit、PR CI で block される。
 
 ### コマンドを個別に使う場合
 
@@ -108,6 +125,13 @@ cargo make bootstrap      # Docker イメージビルド + CI 一括
 /track:merge <pr>             # CI 通過後に PR をマージ
 /track:done                   # 設定された base branch に戻り完了サマリー
 ```
+
+個別に review を起動する際、orchestrator は Phase 0 で init snapshot を刻印することで primary ADR source を
+designation し、その ledger init record 自体が唯一の designation record になる。review wrapper は active track の
+その init record 群が 1 件以上あることを要求した後、記録済みの全 ledger copy と全 recorded ADR の最新 baseline
+との byte match を検証する。`spec.json` が cite した ADR の coverage は commit gate で別途検証する。直接の
+`bin/sotp adr-baseline check-review` 呼び出しだけは `--primary-source <file>.md` を明示 override に使える。
+baseline は手で編集せず、必要な snapshot / restore は `bin/sotp adr-baseline` の専用コマンドを使う。
 
 `/track:status` はどの段階でも呼べる。
 

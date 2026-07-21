@@ -16,11 +16,10 @@ separate caller decision.
 ## Inputs
 
 - **Current branch** — must match `track/<id>`. If not, stop and report.
-- **`pr-reviewer` provider** — read from `.harness/config/agent-profiles.json`
-  (`capabilities.pr-reviewer`). The provider must support structured PR review output (the
-  current structured provider set is `codex`). If the configured provider is not in the
-  structured set, fail with a clear error and direct the caller to use the `review` workflow
-  instead.
+- **`pr-reviewer` provider** — `sotp pr review-cycle` resolves
+  `capabilities.pr-reviewer` internally from `.harness/config/agent-profiles.json` and
+  fail-closes unless it supports structured PR review output (currently `codex`). On that
+  failure, direct the caller to use the `review` workflow instead.
 - **Local-review provider** — does NOT affect this workflow. Setting `reviewer.provider: claude`
   for local review leaves PR-based review on the `pr-reviewer` provider unchanged.
 - **`gh` CLI** — must be authenticated.
@@ -34,20 +33,19 @@ separate caller decision.
 
 **Step 0: Resolve context**
 
-Resolve the current track from the current git branch (`track/<id>`). Read `metadata.json`
-to confirm track status. Read `.harness/config/agent-profiles.json` to verify the `pr-reviewer`
-provider supports structured output. If the `pr-reviewer` provider is not in the structured
-provider set, fail with a clear error message.
+Resolve the current track from the current git branch (`track/<id>`) and read `metadata.json`
+to confirm track status. `sotp pr review-cycle` performs the `pr-reviewer` structured-output
+preflight internally; surface its fail-closed error if it rejects the configured provider.
 
 **Step 1: Push and ensure PR**
 
-Run the following wrappers in sequence:
+Run the following commands in sequence:
 
 ```
-cargo make track-pr-push
+bin/sotp pr push
 ```
 
-> `track-pr-push` does NOT enforce task completion. Push is allowed with unresolved tasks.
+> `bin/sotp pr push` does NOT enforce task completion. Push is allowed with unresolved tasks.
 > Task completion is only enforced at merge time.
 
 Then:
@@ -63,7 +61,7 @@ This creates a new PR or reuses an existing one for this track branch.
 Run the full cycle which handles trigger, poll, and parse:
 
 ```
-cargo make track-pr-review
+bin/sotp pr review-cycle
 ```
 
 This executes `sotp pr review-cycle`, which:
@@ -79,7 +77,7 @@ This executes `sotp pr review-cycle`, which:
 
 **Step 3: Handle results — continue until explicit zero-findings signal**
 
-After `cargo make track-pr-review` completes, apply the following loop:
+After `bin/sotp pr review-cycle` completes, apply the following loop:
 
 - If the reviewer **signalled zero findings** (👍 reaction or a "no major issues" comment):
   machine PASS. Report success to the caller and recommend the `merge` workflow once ready.

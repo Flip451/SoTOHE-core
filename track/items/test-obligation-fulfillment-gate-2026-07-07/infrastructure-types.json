@@ -1,0 +1,2748 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::test_obligation::fulfillment_verifier::fulfillment_verifier_fingerprint": {
+      "action": "add",
+      "docs": "Computes the fingerprint of the fulfillment judging-prompt preamble; see IN-09 / CN-04.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [],
+      "returns": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "infrastructure::test_obligation::waiver_verifier::waiver_verifier_fingerprint": {
+      "action": "add",
+      "docs": "Computes the fingerprint of the waiver judging-prompt preamble; see IN-09 / CN-04.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [],
+      "returns": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "JsonTestObligationRulesLoader",
+      "trait_ref": "domain::tddd::test_obligation::ports::TestObligationRulesLoaderPort"
+    },
+    {
+      "for_type": "JsonObligationsCodec",
+      "trait_ref": "domain::tddd::test_obligation::ports::ObligationsArtifactPort"
+    },
+    {
+      "for_type": "JsonTestBindingsCodec",
+      "trait_ref": "domain::tddd::test_obligation::ports::TestBindingsArtifactPort"
+    },
+    {
+      "for_type": "JsonObligationFulfillmentCacheCodec",
+      "trait_ref": "domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort"
+    },
+    {
+      "for_type": "JsonWaiverCacheCodec",
+      "trait_ref": "domain::tddd::test_obligation::ports::WaiverCachePort"
+    },
+    {
+      "for_type": "SynTestSourceScanner",
+      "trait_ref": "domain::tddd::test_obligation::ports::TestSourceScannerPort"
+    },
+    {
+      "for_type": "ObligationFulfillmentVerifierAdapter",
+      "trait_ref": "domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort"
+    },
+    {
+      "for_type": "WaiverVerifierAdapter",
+      "trait_ref": "domain::tddd::test_obligation::ports::WaiverVerifierPort"
+    },
+    {
+      "action": "add",
+      "for_type": "FailingObligationFulfillmentVerifier",
+      "trait_ref": "domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort"
+    },
+    {
+      "action": "add",
+      "for_type": "FailingObligationFulfillmentVerifier",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "FailingObligationFulfillmentVerifier",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "FailingWaiverVerifier",
+      "trait_ref": "domain::tddd::test_obligation::ports::WaiverVerifierPort"
+    },
+    {
+      "action": "add",
+      "for_type": "FailingWaiverVerifier",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "FailingWaiverVerifier",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "FsSpecDocumentLoader",
+      "trait_ref": "domain::spec_document_loader_port::SpecDocumentLoaderPort"
+    },
+    {
+      "action": "add",
+      "for_type": "FsSpecDocumentLoader",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "FsSpecDocumentLoader",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ContractRoleKey",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ContractRoleKey",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ContractRoleKey",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ContractRoleKey",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "DataRoleKey",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "DataRoleKey",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "DataRoleKey",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "DataRoleKey",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "FulfillmentFailCategoryDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "FulfillmentFailCategoryDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "FulfillmentFailCategoryDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "FulfillmentFailCategoryDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "FunctionRoleKey",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "FunctionRoleKey",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "FunctionRoleKey",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "FunctionRoleKey",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheDocumentDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheDocumentDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheDocumentDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheDocumentDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentVerdictDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentVerdictDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentVerdictDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentVerdictDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationsDocumentDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationsDocumentDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationsDocumentDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationsDocumentDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "PatternKey",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "PatternKey",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "PatternKey",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "PatternKey",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "RoleObligationRulesDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "RoleObligationRulesDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "RoleObligationRulesDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "RoleObligationRulesDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingRecordDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingRecordDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingRecordDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingRecordDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingsDocumentDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingsDocumentDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingsDocumentDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingsDocumentDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestLocationDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestLocationDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestLocationDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestLocationDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationAnchorIdDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationAnchorIdDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationAnchorIdDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationAnchorIdDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEdgeIdDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEdgeIdDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEdgeIdDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEdgeIdDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationIdDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationIdDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationIdDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationIdDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationKindDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationKindDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationKindDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationKindDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationPerAxisDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationPerAxisDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationPerAxisDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationPerAxisDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRuleDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRuleDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRuleDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRuleDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRulesDocumentDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRulesDocumentDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRulesDocumentDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRulesDocumentDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheDocumentDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheDocumentDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheDocumentDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheDocumentDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheEntryDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheEntryDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheEntryDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheEntryDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverVerdictDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverVerdictDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverVerdictDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverVerdictDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationPerAxisDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRuleDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "RoleObligationRulesDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationRulesDocumentDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "JsonTestObligationRulesLoader",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "JsonTestObligationRulesLoader",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationsDocumentDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationsDocumentDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationIdDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationIdDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationAnchorIdDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationAnchorIdDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationKindDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationKindDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingsDocumentDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingsDocumentDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingRecordDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "TestBindingRecordDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "TestLocationDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "TestLocationDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEdgeIdDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "TestObligationEdgeIdDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheDocumentDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheDocumentDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentVerdictDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentVerdictDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "FulfillmentFailCategoryDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "FulfillmentFailCategoryDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheDocumentDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheDocumentDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheEntryDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverCacheEntryDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverVerdictDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverVerdictDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "CatalogueEntryRefDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CatalogueEntryRefDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CatalogueEntryRefDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CatalogueEntryRefDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "CatalogueEntryRefDto",
+      "trait_ref": "serde_core::ser::Serialize"
+    },
+    {
+      "action": "add",
+      "for_type": "CatalogueEntryRefDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "action": "add",
+      "for_type": "JsonObligationsCodec",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "JsonObligationsCodec",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "JsonTestBindingsCodec",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "JsonTestBindingsCodec",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "JsonObligationFulfillmentCacheCodec",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "JsonObligationFulfillmentCacheCodec",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "JsonWaiverCacheCodec",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "JsonWaiverCacheCodec",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentEscalationDriver",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentEscalationDriver",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ObligationFulfillmentEscalationDriver",
+      "trait_ref": "usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::ObligationFulfillmentPair, domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey, domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError>"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverEscalationDriver",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverEscalationDriver",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "WaiverEscalationDriver",
+      "trait_ref": "usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::WaiverPair, domain::tddd::test_obligation::verdict::WaiverCacheKey, domain::tddd::test_obligation::verdict::WaiverVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError>"
+    },
+    {
+      "action": "add",
+      "for_type": "Sha256ContentHasher",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "Sha256ContentHasher",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "Sha256ContentHasher",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "add",
+      "for_type": "Sha256ContentHasher",
+      "trait_ref": "usecase::test_obligation::hasher::ContentHasherPort"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CatalogueEntryRefDto": {
+      "action": "add",
+      "docs": "Semantic-verify catalogue-entry DTO publicized for its cache codec; see IN-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Projects CatalogueEntryRef through the semantic-verify section-key wire vocabulary; see IN-05.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_domain",
+          "params": [
+            {
+              "name": "entry",
+              "ty": "&domain::tddd::semantic_verify::CatalogueEntryRef"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "docs": "Reconstructs through the semantic-verify section-key wire vocabulary. Only ValidationError::EmptyString is reachable from CatalogueEntryKey::try_new; the shared ValidationError return type matches the domain constructor boundary.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_domain",
+          "params": [],
+          "receiver": "self",
+          "returns": "Result<domain::tddd::semantic_verify::CatalogueEntryRef, domain::ValidationError>",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "tddd::semantic_verify_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ContractRoleKey": {
+      "action": "add",
+      "docs": "Serde-map key DTO for domain ContractRole; see IN-03 / CN-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "SecondaryPort",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SpecificationPort",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Repository",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ApplicationService",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation::rules_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "DataRoleKey": {
+      "action": "add",
+      "docs": "Serde-map key DTO for domain DataRole; see IN-03 / CN-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ValueObject",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Entity",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "AggregateRoot",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DomainService",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "UseCase",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EventPolicy",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DomainEvent",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Specification",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Factory",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Interactor",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Command",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Query",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Dto",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ErrorType",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SecondaryAdapter",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CompositionRoot",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "PrimaryAdapter",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation::rules_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "FailingObligationFulfillmentVerifier": {
+      "action": "add",
+      "docs": "Fail-closed ObligationFulfillmentVerifierPort adapter for configuration-load failures. See IN-09 / AC-07 / CN-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "message",
+              "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_message",
+          "params": [
+            {
+              "name": "message",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::fulfillment_verifier",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "FailingWaiverVerifier": {
+      "action": "add",
+      "docs": "Fail-closed WaiverVerifierPort adapter for configuration-load failures. See IN-09 / AC-07 / CN-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "message",
+              "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_message",
+          "params": [
+            {
+              "name": "message",
+              "ty": "&str"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::waiver_verifier",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "FsSpecDocumentLoader": {
+      "action": "add",
+      "docs": "Filesystem SpecDocumentLoaderPort adapter for parsed spec.json, anchored at the discovered workspace root. See IN-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Construct a filesystem spec document loader; workspace_root anchors relative spec paths and trusted_root is the containment constraint.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "trusted_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "spec::document_loader",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "FulfillmentFailCategoryDto": {
+      "action": "add",
+      "docs": "Serde DTO for FulfillmentFailCategory; see IN-12 / AC-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Contradiction",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Substitution",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CentralUnverified",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation::fulfillment_cache_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-12",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "FunctionRoleKey": {
+      "action": "add",
+      "docs": "Serde-map key DTO for domain FunctionRole; see IN-03 / CN-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "UseCaseFunction",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "FreeFunction",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation::rules_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "JsonObligationFulfillmentCacheCodec": {
+      "action": "add",
+      "docs": "JSON codec adapter for ObligationFulfillmentCachePort; see IN-09 / AC-06 / CN-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::fulfillment_cache_codec",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "JsonObligationsCodec": {
+      "action": "add",
+      "docs": "JSON codec adapter for ObligationsArtifactPort; see IN-05 / IN-07 / AC-03.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::obligations_codec",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "JsonTestBindingsCodec": {
+      "action": "add",
+      "docs": "JSON codec adapter for TestBindingsArtifactPort; see IN-06 / AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::bindings_codec",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "JsonTestObligationRulesLoader": {
+      "action": "add",
+      "docs": "JSON loader adapter for TestObligationRulesLoaderPort; see IN-02 / IN-04 / AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "config_path",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "trusted_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::rules_codec",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "JsonWaiverCacheCodec": {
+      "action": "add",
+      "docs": "JSON codec adapter for WaiverCachePort; see IN-09 / AC-06 / CN-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::waiver_cache_codec",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationFulfillmentCacheDocumentDto": {
+      "action": "add",
+      "docs": "Serde DTO for ObligationFulfillmentCacheDocument; see IN-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation::fulfillment_cache_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationFulfillmentCacheEntryDto": {
+      "action": "add",
+      "docs": "Serde DTO for ObligationFulfillmentCacheEntry; see IN-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation::fulfillment_cache_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationFulfillmentEscalationDriver": {
+      "action": "add",
+      "docs": "Concrete SemanticEscalationDriverPort impl for the obligation-fulfillment verifier lane. See IN-01 / AC-15 / OS-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Wire the concrete fulfillment escalation driver over the injected verifier port and probe config.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "verifier",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentVerifierPort + Send + Sync>"
+            },
+            {
+              "name": "probe_config",
+              "ty": "usecase::semantic_verdict_core::probe::SemanticCalibrationProbeConfig"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "test_obligation::fulfillment_escalation_driver",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "OS-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationFulfillmentVerdictDto": {
+      "action": "add",
+      "docs": "Serde DTO for ObligationFulfillmentVerdict; see IN-09 / AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fulfilled",
+            "payload": {
+              "fields": [
+                {
+                  "name": "citation",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Fail",
+            "payload": {
+              "fields": [
+                {
+                  "name": "category",
+                  "ty": "FulfillmentFailCategoryDto"
+                },
+                {
+                  "name": "reason",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Pending",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation::fulfillment_cache_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationFulfillmentVerifierAdapter": {
+      "action": "add",
+      "docs": "Capability adapter for ObligationFulfillmentVerifierPort; see IN-09 / IN-11 / AC-07 / CN-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "agent_profile",
+              "ty": "infrastructure::agent_profiles::AgentProfiles"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::fulfillment_verifier",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-11",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationsCodecError": {
+      "action": "add",
+      "docs": "Infrastructure-local alias for ArtifactCodecError used by JsonObligationsCodec; see IN-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "type_alias",
+        "target": "domain::tddd::test_obligation::errors::ArtifactCodecError"
+      },
+      "methods": [],
+      "module_path": "test_obligation::obligations_codec",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "ObligationsDocumentDto": {
+      "action": "add",
+      "docs": "Serde DTO for ObligationsDocument; see IN-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_domain",
+          "params": [
+            {
+              "name": "doc",
+              "ty": "&domain::tddd::test_obligation::obligations::ObligationsDocument"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_domain",
+          "params": [],
+          "receiver": "self",
+          "returns": "Result<domain::tddd::test_obligation::obligations::ObligationsDocument, ObligationsCodecError>"
+        }
+      ],
+      "module_path": "test_obligation::obligations_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "PatternKey": {
+      "action": "add",
+      "docs": "Serde-map key DTO for TestObligationPatternKind; see IN-03 / CN-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Typestate",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation::rules_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "RoleObligationRulesDto": {
+      "action": "add",
+      "docs": "Serde DTO for RoleObligationRules; see IN-02 / CN-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation::rules_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "Sha256ContentHasher": {
+      "action": "add",
+      "docs": "Concrete ContentHasherPort impl over sha2. See IN-09 / AC-06 / CN-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Construct a Sha256 backed content hasher.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "test_obligation::sha256_content_hasher",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "SynTestSourceScanner": {
+      "action": "add",
+      "docs": "Syn-based adapter for TestSourceScannerPort; see IN-06 / IN-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::source_scanner",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestBindingRecordDto": {
+      "action": "add",
+      "docs": "Serde DTO for TestBindingRecord; see IN-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Fulfillment",
+            "payload": {
+              "fields": [
+                {
+                  "name": "obligation_id",
+                  "ty": "TestObligationIdDto"
+                },
+                {
+                  "name": "tests",
+                  "ty": "Vec<TestLocationDto>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Waiver",
+            "payload": {
+              "fields": [
+                {
+                  "name": "edge_id",
+                  "ty": "TestObligationEdgeIdDto"
+                },
+                {
+                  "name": "reason",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "VoluntaryBinding",
+            "payload": {
+              "fields": [
+                {
+                  "name": "edge_id",
+                  "ty": "TestObligationEdgeIdDto"
+                },
+                {
+                  "name": "tests",
+                  "ty": "Vec<TestLocationDto>"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation::bindings_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestBindingsCodecError": {
+      "action": "add",
+      "docs": "Infrastructure-local alias for ArtifactCodecError used by JsonTestBindingsCodec; see IN-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "type_alias",
+        "target": "domain::tddd::test_obligation::errors::ArtifactCodecError"
+      },
+      "methods": [],
+      "module_path": "test_obligation::bindings_codec",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestBindingsDocumentDto": {
+      "action": "add",
+      "docs": "Serde DTO for TestBindingsDocument; see IN-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_domain",
+          "params": [
+            {
+              "name": "doc",
+              "ty": "&domain::tddd::test_obligation::binding::TestBindingsDocument"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_domain",
+          "params": [],
+          "receiver": "self",
+          "returns": "Result<domain::tddd::test_obligation::binding::TestBindingsDocument, TestBindingsCodecError>"
+        }
+      ],
+      "module_path": "test_obligation::bindings_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestLocationDto": {
+      "action": "add",
+      "docs": "Serde DTO for TestLocation; see IN-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation::bindings_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationAnchorIdDto": {
+      "action": "add",
+      "docs": "Serde DTO for TestObligationAnchorId; see IN-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation::obligations_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationDto": {
+      "action": "add",
+      "docs": "Serde DTO for TestObligation; see IN-05.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation::obligations_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationEdgeIdDto": {
+      "action": "add",
+      "docs": "Serde DTO for TestObligationEdgeId; see IN-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation::bindings_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationIdDto": {
+      "action": "add",
+      "docs": "Serde DTO for TestObligationId; see IN-05 / CN-01.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation::obligations_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationKindDto": {
+      "action": "add",
+      "docs": "Serde DTO for TestObligationKind; see IN-05 / CN-10.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Boundary",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvariantPreservation",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EventEmission",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "LogicResult",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "PredicateBothBranches",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ConstructionResult",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Result",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Reaction",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Transition",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Contract",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ContractConformance",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Logic",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation::obligations_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationPerAxisDto": {
+      "action": "add",
+      "docs": "Serde DTO for TestObligationPerAxis; see IN-02 / CN-10.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Invariant",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Method",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Handles",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ReactsTo",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Transition",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TraitMethod",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Entry",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Emits",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TraitImpl",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation::rules_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationRuleDto": {
+      "action": "add",
+      "docs": "Serde DTO for TestObligationRule; see IN-02 / CN-10.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation::rules_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-10",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "TestObligationRulesDocumentDto": {
+      "action": "add",
+      "docs": "Serde DTO for TestObligationRulesDocument; see IN-02 / IN-03 / CN-05 / AC-01.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_domain",
+          "params": [],
+          "receiver": "self",
+          "returns": "Result<domain::tddd::test_obligation::rules::TestObligationRulesDocument, domain::tddd::test_obligation::errors::TestObligationRulesLoadError>"
+        }
+      ],
+      "module_path": "test_obligation::rules_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "WaiverCacheDocumentDto": {
+      "action": "add",
+      "docs": "Serde DTO for WaiverCacheDocument; see IN-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation::waiver_cache_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "WaiverCacheEntryDto": {
+      "action": "add",
+      "docs": "Serde DTO for WaiverCacheEntry; see IN-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation::waiver_cache_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "WaiverEscalationDriver": {
+      "action": "add",
+      "docs": "Concrete SemanticEscalationDriverPort impl for the waiver verifier lane. See IN-01 / AC-15 / OS-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Wire the concrete waiver escalation driver over the injected verifier port and probe config.",
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "verifier",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverVerifierPort + Send + Sync>"
+            },
+            {
+              "name": "probe_config",
+              "ty": "usecase::semantic_verdict_core::probe::SemanticCalibrationProbeConfig"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "test_obligation::waiver_escalation_driver",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-15",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "OS-02",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "WaiverVerdictDto": {
+      "action": "add",
+      "docs": "Serde DTO for WaiverVerdict; see IN-09 / AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Waived",
+            "payload": {
+              "fields": [
+                {
+                  "name": "citation",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Fail",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "String"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Pending",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "test_obligation::waiver_cache_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    },
+    "WaiverVerifierAdapter": {
+      "action": "add",
+      "docs": "Capability adapter for WaiverVerifierPort; see IN-09 / IN-11 / AC-07 / CN-08.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "agent_profile",
+              "ty": "infrastructure::agent_profiles::AgentProfiles"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::waiver_verifier",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-09",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "IN-11",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        },
+        {
+          "anchor": "CN-08",
+          "file": "track/items/test-obligation-fulfillment-gate-2026-07-07/spec.json"
+        }
+      ]
+    }
+  }
+}

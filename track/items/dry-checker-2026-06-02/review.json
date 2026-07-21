@@ -144,7 +144,7 @@
             {
               "message": "The growing-k loop in T004/T005 can terminate too early: stopping when the current query returns only already-verified above-threshold candidates does not prove that lower-ranked unverified above-threshold pairs do not exist beyond the current `k`. As written, the plan can miss genuine DRY violations and make the gate incorrectly pass.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/plan.md",
+              "file": "track/items/dry-checker-2026-06-02/plan.md",
               "line": 39,
               "category": "infeasibility"
             }
@@ -159,14 +159,14 @@
             {
               "message": "P1 infeasibility: the plan parses `--threshold` in the CLI tasks, but the usecase APIs that receive the CLI data do not carry any threshold parameter (`DryCheckService.run_dry_check(diff_fragments)` and `DryCheckApprovalService.check_approved(diff_fragments)`). As written, the parsed threshold has nowhere to flow into the threshold-boundary loop, so the CLI contract and the service signatures are inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/plan.md",
+              "file": "track/items/dry-checker-2026-06-02/plan.md",
               "line": 54,
               "category": "infeasibility"
             },
             {
               "message": "P1 infeasibility: T004/T005 require rebuilding a whole-codebase index on every DRY check, but the plan only supplies `diff_fragments` to the use case and only resolves changed-file paths through `DiffGetter` in the CLI tasks. There is no task or port that provides the full workspace fragment corpus needed to embed and insert all existing code, so the index-rebuild step cannot actually be implemented from the listed dependencies.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/plan.md",
+              "file": "track/items/dry-checker-2026-06-02/plan.md",
               "line": 39,
               "category": "infeasibility"
             }
@@ -276,9 +276,9 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "[track/items/dry-checker-2026-06-02/plan.md](/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/plan.md#L49) maps every non-zero Codex subprocess failure to `DryCheckAgentError::IllegalOutput`, but the declared error taxonomy in T003 explicitly distinguishes `UserAbort`, `AgentAbort`, and `Timeout`. That makes the dedicated variants unreachable and loses the adapter behavior already used by the reviewer implementation.",
+              "message": "[track/items/dry-checker-2026-06-02/plan.md](track/items/dry-checker-2026-06-02/plan.md#L49) maps every non-zero Codex subprocess failure to `DryCheckAgentError::IllegalOutput`, but the declared error taxonomy in T003 explicitly distinguishes `UserAbort`, `AgentAbort`, and `Timeout`. That makes the dedicated variants unreachable and loses the adapter behavior already used by the reviewer implementation.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/plan.md",
+              "file": "track/items/dry-checker-2026-06-02/plan.md",
               "line": 49,
               "category": "factual error (semantic)"
             }
@@ -293,7 +293,7 @@
             {
               "message": "`DiffGetError` is being reused from `usecase::review_v2` in the dry-check usecase (`plan.md` line 33), but CN-01 explicitly requires the DRY gate and review gate to stay loosely coupled and not share interfaces. This makes the dry-check usecase depend on the review_v2 interface surface, which is a cross-gate coupling violation rather than an isolated dry-check type.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/plan.md",
+              "file": "track/items/dry-checker-2026-06-02/plan.md",
               "line": 33,
               "category": "contradiction"
             }
@@ -381,14 +381,14 @@
             {
               "message": "DryCheckWriter defines an `init()` bootstrap method, but the write-path plan never calls it: T007/T009 go straight from diff-base resolution to `run_dry_check`, and T002 only describes appending to an existing envelope. As written, a fresh track has no defined way to create the initial `dry-check.json`, so the first dry-check run is infeasible unless `append_record` silently creates the file, which the plan never says.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/domain-types.md",
+              "file": "track/items/dry-checker-2026-06-02/domain-types.md",
               "line": 34,
               "category": "infeasibility"
             },
             {
               "message": "`DryCheckInteractor` is documented as using `DryCheckDiffSource`, but the CLI layer already resolves `diff_fragments` with `GitDryCheckDiffGetter` and passes them into `run_dry_check`. That makes diff acquisition owned by both layers at once and leaves the injected diff-source dependency contradictory/redundant, so the write-path boundary is internally inconsistent.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/usecase-types.json",
+              "file": "track/items/dry-checker-2026-06-02/usecase-types.json",
               "line": 133,
               "category": "contradiction"
             }
@@ -425,7 +425,7 @@
             {
               "message": "`DryCheckResults` is documented as if each record still had a `hash_pair` field, but the rest of the plan artifacts define the record identity as (`changed_path`, `candidate_path`) and explicitly say there is no `hash_pair` field. That makes the usecase catalogue inconsistent with the spec/plan and would mislead implementation of the read path.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/usecase-types.json",
+              "file": "track/items/dry-checker-2026-06-02/usecase-types.json",
               "line": 234,
               "category": "factual error"
             }
@@ -455,7 +455,7 @@
             {
               "message": "IN-06/T004/T005 describe an order-independent cache using a normalized path-pair key plus stored `(changed_hash, candidate_hash)`, but the invalidation check still compares the current `changed_path` against `changed_hash` and `candidate_path` against `candidate_hash`. When the same logical pair is later seen with the roles swapped, those hashes belong to the opposite paths, so the cache will revalidate or misclassify unchanged pairs instead of reusing the verdict. The design needs to keep the stored path association or normalize the stored hashes by path order.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/plan.md",
+              "file": "track/items/dry-checker-2026-06-02/plan.md",
               "line": 42,
               "category": "infeasibility"
             }
@@ -780,7 +780,7 @@
             {
               "message": "`FsDryCheckStore` is specified to stamp records with `Timestamp::new(infrastructure::timestamp_now())`, but `timestamp_now()` already returns `Result<domain::Timestamp, ValidationError>` in `libs/infrastructure/src/lib.rs:34`, so this composition is type-invalid and cannot be implemented as written. The same wording is repeated in `track/items/dry-checker-2026-06-02/domain-types.json:322`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/track/items/dry-checker-2026-06-02/plan.md",
+              "file": "track/items/dry-checker-2026-06-02/plan.md",
               "line": 32,
               "category": "factual error"
             }
@@ -1139,7 +1139,7 @@
             {
               "message": "`build_diff_and_corpus_fragments` compares `extract_code_fragments` output directly against repo-relative hunk paths, but it never normalizes `source_path` into repo-relative form before the `changed_paths` filter / `fragments_overlapping_hunks` call. If `--workspace-root` is absolute or otherwise not already repo-relative, this can make `candidate_fragments` empty and cause `write`/`check-approved` to miss the diff scope silently.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 196,
               "category": "correctness"
             }
@@ -1176,14 +1176,14 @@
             {
               "message": "`build_diff_and_corpus_fragments` strips `workspace_root` from fragment paths and then compares the result to repo-relative git hunk paths. That only works when `workspace_root` is exactly the repository root; any valid subdirectory root makes `candidate_fragments` incomplete/empty, so `sotp dry write` and `sotp dry check-approved` can silently miss changed fragments. The paths need to be normalized against the git root, or non-root workspaces must be rejected.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 217,
               "category": "correctness"
             },
             {
               "message": "The three `dry_*` entry points accept `items_dir` as-is and never verify that the resulting track directory stays under the discovered repository root before constructing `FsDryCheckStore` / `FsDryCheckCommitHashStore`. Because the infrastructure guard only rejects symlinks, an absolute path or `..`-escaped `items_dir` can make `sotp dry` read and write `dry-check.json` outside the repository tree.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 338,
               "category": "security"
             }
@@ -1198,7 +1198,7 @@
             {
               "message": "`input.track_id` is joined directly onto `items_dir_abs` in all three `dry_*` entry points, so a malicious `--track-id` value like `../outside` or an absolute path can escape the repository root and make `dry_write` / `dry_results` / `dry_check_approved` read or write `dry-check.json` outside the repo tree. `items_dir` is validated, but `track_id` itself is not.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 370,
               "category": "security"
             }
@@ -1213,7 +1213,7 @@
             {
               "message": "The new public command methods `dry_write` and `dry_check_approved` are not exercised directly by any success-path or failure-path tests. The current tests only cover helper functions and manually constructed `CommandOutcome` values, so regressions in adapter wiring, path validation, or verdict-to-exit mapping would not be caught. Add direct tests for both public APIs.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 362,
               "category": "tests"
             }
@@ -1228,14 +1228,14 @@
             {
               "message": "`dry_write` rejects a missing `track_id` directory before it reaches `FsDryCheckStore`, and `dry_check_approved` repeats the same guard later in this file. That breaks the intended first-run behavior: `FsDryCheckStore::append_record` already creates parent directories on demand, and `read_doc()` treats a missing `dry-check.json` as empty history. As written, a new track cannot be written without pre-creating the directory, and the gate cannot run against an empty history.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 401,
               "category": "correctness"
             },
             {
               "message": "The write summary only reports `findings.len()` plus per-finding details. The brief requires stdout to include both `pairs checked` and `records appended`, but those counts are never computed or printed here, so callers cannot tell how much of the diff was processed or persisted.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 452,
               "category": "correctness"
             }
@@ -1279,7 +1279,7 @@
             {
               "message": "The new fresh-index tests never reach `create_ephemeral_index_dir()` or `LanceDbSemanticIndexAdapter::new()`: they all pass `base_commit: Some(\"not-a-hash\")`, so `resolve_dry_diff_base()` fails first. As written, these tests only revalidate the existing base-commit error path and leave the new ephemeral-index behavior in both `dry_write` and `dry_check_approved` untested.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 1346,
               "category": "test coverage"
             }
@@ -1315,21 +1315,21 @@
             {
               "message": "`dry_fix_spawn_and_collect` streams child stderr straight to the parent terminal and persists it verbatim in the session log. Because `dry_fix_build_safe_env` passes through `OPENAI_API_KEY`, `OPENAI_ORG_ID`, `OPENAI_BASE_URL`, and `CODEX_API_KEY`, any nested Codex diagnostic that prints env/config data will leak secrets into `stderr` and `tmp/reviewer-runtime/*.log`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 1156,
               "category": "security"
             },
             {
               "message": "`dry_run_fix_local` only trims `--track-id` and checks it for emptiness, then `build_dry_fix_prompt` inserts it directly into the prompt. A value containing newlines or markdown can inject instructions into the nested fixer; validate or escape `track_id` before building the prompt.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 712,
               "category": "security"
             },
             {
               "message": "The new public entry points `CliApp::dry_run_fix_local` and `CliApp::make_track_local_dry_fix` have no direct happy-path or error-path tests in this scope. That leaves provider resolution, smoke-test failures, env sanitization, and sentinel handling unguarded from regressions.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 702,
               "category": "testing"
             }
@@ -1344,14 +1344,14 @@
             {
               "message": "`run_dry_fix_codex()` performs the `CODEX_BIN --version` smoke test before building the scrubbed environment, so that subprocess runs with the caller's full credential-bearing env (`OPENAI_*`, SSH, HOME, etc.). A custom or compromised `CODEX_BIN` can read/exfiltrate those secrets before the isolation boundary is applied. The version check needs the same sanitized env as the real fixer invocation, or it should not execute an untrusted binary here.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 771,
               "category": "security"
             },
             {
               "message": "`build_dry_fix_invocation()` grants write access only to `codex_home`, but `dry_fix_build_safe_env()` sets `HOME` to the separately created `safe_home`. If `sandbox_workspace_write.writable_roots` is an allow-list, the fixer cannot write to the HOME directory it is explicitly told to use, so Codex session/config writes will fail. Include `safe_home` in the writable roots or move HOME under an already-writable root.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 1047,
               "category": "correctness"
             }
@@ -1366,14 +1366,14 @@
             {
               "message": "`dry_fix_redaction_values` only redacts `OPENAI_API_KEY` and `CODEX_API_KEY`, so `OPENAI_ORG_ID` and `OPENAI_BASE_URL` can still be echoed to stderr and persisted in `tmp/reviewer-runtime/*.log`. Because the replacement pass is also applied in insertion order, overlapping secrets can be only partially redacted.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 741,
               "category": "security"
             },
             {
               "message": "`resolve_codex_bin()` falls back to bare `codex`, but both the version smoke-test and the real spawn run under `env_clear()`. On asdf-managed installs, the shim loses the bootstrap state it needs to locate the real binary, so `sotp dry fix-local` can fail even when Codex is installed unless the caller pre-populates `CODEX_BIN`. The public entry point should not depend on the Makefile wrapper for this.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 821,
               "category": "correctness"
             }
@@ -1403,14 +1403,14 @@
             {
               "message": "`dry.rs` now contains about 1,390 lines of production code before the test module starts, which exceeds the repo's 700-line cap for production modules. This security-sensitive env/sandbox logic is too large to review and maintain safely in one file.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 1393,
               "category": "architecture"
             },
             {
               "message": "`dry_fix_spawn_and_collect` writes the session log only after both collector threads join successfully. If either collector panics or returns an I/O error, the function returns before `write_dry_fix_log`, so the failure path loses the only diagnostic artifact. The review-fix runner writes the log first and then surfaces collector errors.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs",
+              "file": "apps/cli-composition/src/dry.rs",
               "line": 1255,
               "category": "error handling"
             }
@@ -1544,14 +1544,14 @@
             {
               "message": "The new `--filter` parser only has positive-path coverage. There is no test that an invalid value is rejected, so a future `ValueEnum` change could silently accept or mis-handle an unsupported filter token on this public CLI surface.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/commands/dry.rs",
+              "file": "apps/cli/src/commands/dry.rs",
               "line": 127,
               "category": "test coverage gap"
             },
             {
               "message": "The `CliCommand::Dry` dispatch arm is not covered by any test. If this match arm is dropped or misrouted later, `sotp dry` would stop working even though the parser-focused tests in `dry.rs` would still pass.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli/src/main.rs",
+              "file": "apps/cli/src/main.rs",
               "line": 111,
               "category": "test coverage gap"
             }
@@ -1781,7 +1781,7 @@
             {
               "message": "`fragment_ref_from_code_fragment` converts `CodeFragment::source_path` directly into `FilePath`, but `FilePath::new` rejects absolute paths. In the dry-check pipeline, fragments are built from workspace scans and semantic-index reads using absolute paths, so any real `Violation` verdict will fail here with `DryCheckAgentError::Unexpected` instead of producing a `DryCheckFinding`.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/codex_dry_checker.rs",
+              "file": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
               "line": 227,
               "category": "correctness"
             }
@@ -1796,7 +1796,7 @@
             {
               "message": "`source_path` is converted with `to_string_lossy()` before building `FilePath`, which can silently change the fragment identity for non-UTF-8 paths and keeps OS-native separators (for example, backslashes on Windows). That means `FragmentRef` can be lossy or platform-specific instead of representing the real repo-relative path, leading to identifier collisions or mismatches. Reject non-UTF-8 paths here and canonicalize to a stable repo-relative form instead.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/codex_dry_checker.rs",
+              "file": "libs/infrastructure/src/dry_check/codex_dry_checker.rs",
               "line": 227,
               "category": "correctness"
             }
@@ -1865,7 +1865,7 @@
             {
               "message": "`fragment_path_matches_hunk_path()` accepts any path whose suffix matches the repo-relative hunk path, so `/repo/tests/src/a.rs` will incorrectly match a diff hunk for `src/a.rs`. That can pull unrelated fragments into `fragments_overlapping_hunks()` and break the intended CN-04 hunk scoping.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/domain/src/dry_check.rs",
+              "file": "libs/domain/src/dry_check.rs",
               "line": 821,
               "category": "correctness"
             }
@@ -1982,7 +1982,7 @@
             {
               "message": "`above_threshold_candidates` is appended across successive growing-`k` searches without any seen-pair deduplication, so the same unresolved pair can be counted multiple times when the search window expands. That inflates `Blocked { unresolved_pair_count }` and violates the distinct-pair count contract.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/dry_check/approval_interactor.rs",
+              "file": "libs/usecase/src/dry_check/approval_interactor.rs",
               "line": 138,
               "category": "correctness"
             }
@@ -1997,7 +1997,7 @@
             {
               "message": "The public `check_approved` API has success and reader-failure coverage, but it does not test the `Embedding`/`Index` error branches (`map_err(DryCheckCycleError::Embedding/Index)` in the method body). That leaves regressions in those required error paths unguarded.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/usecase/src/dry_check/approval_interactor.rs",
+              "file": "libs/usecase/src/dry_check/approval_interactor.rs",
               "line": 397,
               "category": "testing"
             }
@@ -2035,16 +2035,16 @@
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`sotp dry results` is documented as if the per-record field list is complete, but the CLI actually prints `score`, `threshold`, and `base` as well (`/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs:521-545`). The workflow doc is stale/inaccurate here.",
+              "message": "`sotp dry results` is documented as if the per-record field list is complete, but the CLI actually prints `score`, `threshold`, and `base` as well (`apps/cli-composition/src/dry.rs:521-545`). The workflow doc is stale/inaccurate here.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/dry-check-workflow.md",
+              "file": "knowledge/conventions/dry-check-workflow.md",
               "line": 91,
               "category": "correctness"
             },
             {
-              "message": "The diff-base section documents only `Ok(Some)`, `Ok(None)`, and `Err(Format)`, but `resolve_dry_diff_base()` also absorbs other store failures (`Io`, `SymlinkDetected`) and falls back to `main` with a warning (`/home/flip451/individual/t-rust/templates/SoTOHE-core/apps/cli-composition/src/dry.rs:123-144`, `/home/flip451/individual/t-rust/templates/SoTOHE-core/libs/infrastructure/src/dry_check/commit_hash_store.rs:22-36`). The workflow doc understates the actual failure behavior.",
+              "message": "The diff-base section documents only `Ok(Some)`, `Ok(None)`, and `Err(Format)`, but `resolve_dry_diff_base()` also absorbs other store failures (`Io`, `SymlinkDetected`) and falls back to `main` with a warning (`apps/cli-composition/src/dry.rs:123-144`, `libs/infrastructure/src/dry_check/commit_hash_store.rs:22-36`). The workflow doc understates the actual failure behavior.",
               "severity": "P1",
-              "file": "/home/flip451/individual/t-rust/templates/SoTOHE-core/knowledge/conventions/dry-check-workflow.md",
+              "file": "knowledge/conventions/dry-check-workflow.md",
               "line": 129,
               "category": "correctness"
             }
