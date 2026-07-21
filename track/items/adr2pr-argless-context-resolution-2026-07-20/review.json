@@ -1,6 +1,38 @@
 {
   "schema_version": 2,
   "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82d6e50f7d2ecd82e82d925b9643a4288ac4fa480bfed05750bfa824b434ac71",
+          "at": "2026-07-20T15:22:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:82d6e50f7d2ecd82e82d925b9643a4288ac4fa480bfed05750bfa824b434ac71",
+          "at": "2026-07-20T15:25:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b3c8f9f867cf40e89ba565c70fa73e3146d1852e7a166c457e07ce52430c1fb",
+          "at": "2026-07-21T01:41:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b3c8f9f867cf40e89ba565c70fa73e3146d1852e7a166c457e07ce52430c1fb",
+          "at": "2026-07-21T01:42:50Z"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -83,43 +115,21 @@
         }
       ]
     },
-    "spec": {
+    "types": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:17f17f5d3db661609fb2575b52d17f428dde877a0e7b1de195e0640cf8f2a4c2",
-          "at": "2026-07-20T16:03:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`No Panics in Library Code` applies to Rust production code, but this spec’s declared implementation surface is workflow/provider documentation with intentionally empty type catalogues. The citation is self-evidently off-topic and falsely suggests an in-scope Rust implementation constraint; remove it from `related_conventions`.",
-              "severity": "P1",
-              "file": "track/items/adr2pr-argless-context-resolution-2026-07-20/spec.json",
-              "line": 217,
-              "category": "broken cross-reference at narrative level"
-            },
-            {
-              "message": "`Prefer Type-Safe Abstractions` governs code/type design, while this docs-only feature intentionally has no catalogue entries or typed implementation surface. This unrelated citation can misdirect downstream planning toward out-of-scope type work; remove it from `related_conventions`.",
-              "severity": "P1",
-              "file": "track/items/adr2pr-argless-context-resolution-2026-07-20/spec.json",
-              "line": 221,
-              "category": "broken cross-reference at narrative level"
-            }
-          ],
-          "hash": "rvw1:sha256:17f17f5d3db661609fb2575b52d17f428dde877a0e7b1de195e0640cf8f2a4c2",
-          "at": "2026-07-20T16:07:05Z"
+          "hash": "rvw1:sha256:9f6c3f4c2b6b868bc7020a47f6fa14750fd514081d03fb0adc4eb064ee8a5b25",
+          "at": "2026-07-20T16:03:18Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4155913b86112747d45ea45f4709de142a5bb27e76d81552219203f7d619be49",
-          "at": "2026-07-20T16:09:04Z"
+          "hash": "rvw1:sha256:9f6c3f4c2b6b868bc7020a47f6fa14750fd514081d03fb0adc4eb064ee8a5b25",
+          "at": "2026-07-20T16:05:57Z"
         }
       ]
     },
@@ -195,56 +205,75 @@
           "findings": [],
           "hash": "rvw1:sha256:2fc669ad62feac14abf867e2a790b374151aae11f231182d095756c10408c7d5",
           "at": "2026-07-21T01:43:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 still documents `bin/sotp track baseline-graph <id> [--layers <layer_id>]`, but the current CLI accepts only `--track-id <id>` and `--layers <layer_ids>`; the documented positional invocation is rejected, breaking the mandatory reconnaissance pipeline.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 103,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:0789c7cce4cb3b7c25dc51187b2b123bb06b1717ef65f43cc60720693be7e079",
+          "at": "2026-07-21T01:51:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d893ef56c5ce7ac8b603bb047a23c7c325cc3f0979a8b16b2dd1043997f98c4f",
+          "at": "2026-07-21T01:52:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d893ef56c5ce7ac8b603bb047a23c7c325cc3f0979a8b16b2dd1043997f98c4f",
+          "at": "2026-07-21T01:56:53Z"
         }
       ]
     },
-    "types": {
+    "spec": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9f6c3f4c2b6b868bc7020a47f6fa14750fd514081d03fb0adc4eb064ee8a5b25",
-          "at": "2026-07-20T16:03:18Z"
+          "hash": "rvw1:sha256:17f17f5d3db661609fb2575b52d17f428dde877a0e7b1de195e0640cf8f2a4c2",
+          "at": "2026-07-20T16:03:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`No Panics in Library Code` applies to Rust production code, but this spec’s declared implementation surface is workflow/provider documentation with intentionally empty type catalogues. The citation is self-evidently off-topic and falsely suggests an in-scope Rust implementation constraint; remove it from `related_conventions`.",
+              "severity": "P1",
+              "file": "track/items/adr2pr-argless-context-resolution-2026-07-20/spec.json",
+              "line": 217,
+              "category": "broken cross-reference at narrative level"
+            },
+            {
+              "message": "`Prefer Type-Safe Abstractions` governs code/type design, while this docs-only feature intentionally has no catalogue entries or typed implementation surface. This unrelated citation can misdirect downstream planning toward out-of-scope type work; remove it from `related_conventions`.",
+              "severity": "P1",
+              "file": "track/items/adr2pr-argless-context-resolution-2026-07-20/spec.json",
+              "line": 221,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:17f17f5d3db661609fb2575b52d17f428dde877a0e7b1de195e0640cf8f2a4c2",
+          "at": "2026-07-20T16:07:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9f6c3f4c2b6b868bc7020a47f6fa14750fd514081d03fb0adc4eb064ee8a5b25",
-          "at": "2026-07-20T16:05:57Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:82d6e50f7d2ecd82e82d925b9643a4288ac4fa480bfed05750bfa824b434ac71",
-          "at": "2026-07-20T15:22:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:82d6e50f7d2ecd82e82d925b9643a4288ac4fa480bfed05750bfa824b434ac71",
-          "at": "2026-07-20T15:25:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7b3c8f9f867cf40e89ba565c70fa73e3146d1852e7a166c457e07ce52430c1fb",
-          "at": "2026-07-21T01:41:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7b3c8f9f867cf40e89ba565c70fa73e3146d1852e7a166c457e07ce52430c1fb",
-          "at": "2026-07-21T01:42:50Z"
+          "hash": "rvw1:sha256:4155913b86112747d45ea45f4709de142a5bb27e76d81552219203f7d619be49",
+          "at": "2026-07-20T16:09:04Z"
         }
       ]
     }

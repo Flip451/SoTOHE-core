@@ -91,13 +91,13 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
 
 1. **Capture baseline** of the source state at track start:
    ```
-   bin/sotp track baseline-capture <id> [--layer <layer_id>]
+   bin/sotp track baseline-capture --track-id <id> [--layer <layer_id>]
    ```
    `baseline-capture` is **first-write-wins**: on the first invocation for this track it snapshots the workspace state so subsequent phases can compute `add` / `modify` / `reference` / `delete` against it; on later invocations it leaves the existing baseline untouched (no re-capture). The action semantics depend on this — running the command at incremental sessions is safe (it just no-ops), but the baseline is **the snapshot from the track's first capture**, not the current code state.
 
 2. **Render the baseline graph (Reality View)** — depth=1 overview + depth=2 detail in one command:
    ```
-   bin/sotp track baseline-graph <id> [--layers <layer_id>]
+   bin/sotp track baseline-graph --track-id <id> [--layers <layer_ids>]
    ```
    `baseline-graph` (Reality View) renders both depths from the rustdoc baseline in a **single** invocation: depth=1 overview to `track/items/<id>/<layer>-graph-d1/index.md` and depth=2 cluster detail to `track/items/<id>/<layer>-graph-d2/<cluster>.md`. Cluster = top-level module (fixed) — there is no `--cluster-depth` flag. Requires the baselines captured in step 1. (`--layers` takes a comma-separated id list; omit it to render every `tddd.enabled` layer.)
 
@@ -178,7 +178,7 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
 
 10. **Render the contract-map view** (catalogue-driven, runs after the catalogue and signals are stable):
     ```
-    bin/sotp track contract-map <id> [--layers <layer_id>]
+    bin/sotp track contract-map --track-id <id> [--layers <layer_ids>]
     ```
 
 11. **Refresh tracked rendered views via `sync_rendered_views`**:
