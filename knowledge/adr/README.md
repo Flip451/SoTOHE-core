@@ -21,7 +21,7 @@ decisions: []
 ---
 adr_id: "<YYYY-MM-DD-HHMM>-<slug>"
 decisions:
-  - id: decision-1
+  - id: D1
     user_decision_ref: "chat_segment:<session>:<date>"
     status: proposed
 ---
