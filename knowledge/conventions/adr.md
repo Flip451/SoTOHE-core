@@ -35,7 +35,7 @@ top-level key は以下 2 つのみ (`deny_unknown_fields`):
 
 | field | type | 必須条件 | 意味 |
 |---|---|---|---|
-| `id` | non-empty string | 必須 | decision 識別子（例: `decision-1`; grandfathered legacy では `<file-stem>_grandfathered` 等）。同一 ADR 内で unique であれば良い。 |
+| `id` | non-empty string | 必須 | decision 識別子（例: `D1`; grandfathered legacy では `<file-stem>_grandfathered` 等）。同一 ADR 内で unique であれば良い。本文の decision 見出しラベル（`### D1: …` の `D1`）と一致させるのが慣行で、spec.json の `adr_refs[].anchor` はこの front-matter `id` を参照する。 |
 | `user_decision_ref` | string | optional | ユーザー明示承認の参照 (chat segment ref, approval marker 等)。値が non-null **かつ `review_finding_ref` 未設定**のとき 🔵 Blue。空文字 / 空白のみは domain newtype 構築時に reject される (fail-closed)。 |
 | `review_finding_ref` | string | optional | review process で発見された根拠の参照。値が non-null なら **`user_decision_ref` の有無に関わらず** 🟡 Yellow。review 由来の未昇格根拠が残る状態は注意色に留め、`user_decision_ref` で silently 🔵 に格上げされない。空文字 / 空白のみは domain newtype 構築時に reject される (fail-closed)。 |
 | `candidate_selection` | string | optional | `## Rejected Alternatives` で評価した候補からの選択 (例: `"from:[A,B,C,D,E] chose:A"`)。 |
@@ -107,10 +107,10 @@ dispatch の実体は `parse_adr_frontmatter`(`libs/infrastructure/src/adr_decis
 ---
 adr_id: "<YYYY-MM-DD-HHMM>-example"
 decisions:
-  - id: decision-1
+  - id: D1
     user_decision_ref: "chat_segment:session-XXX:2026-04-27"
     status: accepted
-  - id: decision-2
+  - id: D2
     review_finding_ref: "RF-12"
     status: proposed
 ---

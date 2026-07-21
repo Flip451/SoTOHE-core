@@ -1,0 +1,511 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "cbd2749e17ca289baac3cdd767703f97d415e41fedd4abe41b47a5b9ba982f8c",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[A,B,optional-args-context-resolution] chose:optional-args-context-resolution"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "`/track:adr2pr` の起動時に feature 名と primary ADR を再入力せずに済むよう、会話文脈から両方を解決できる呼び出し契約を提供する。明示的な `<feature>` と `--primary-adr` は任意入力として維持し、指定時には文脈解決より優先する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-1"
+        }
+      }
+    },
+    {
+      "claim_hash": "bf7815d34e88201e51883388c6d899a502be1eb3a9aed24f90f157086ff7aa5e",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[C,D,confirm-then-proceed] chose:confirm-then-proceed"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "自動解決による track 初期化の誤選択を防ぐため、解決結果を user が確認または選択してから `/track:init` に渡す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-2"
+        }
+      }
+    },
+    {
+      "claim_hash": "bf7815d34e88201e51883388c6d899a502be1eb3a9aed24f90f157086ff7aa5e",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[E,candidate-selection-prompt] chose:candidate-selection-prompt"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "自動解決による track 初期化の誤選択を防ぐため、解決結果を user が確認または選択してから `/track:init` に渡す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-3"
+        }
+      }
+    },
+    {
+      "claim_hash": "50652bbaae8a665aa1fee96bef26e3393aa85f86daee4710577e74c4f6d8ee7e",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[A,B,optional-args-context-resolution] chose:optional-args-context-resolution"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`/track:adr2pr` workflow SSoT の入力契約を、引数なしで起動可能かつ `<feature>` / `--primary-adr` を任意入力として受け付ける形に更新する。両方またはいずれかの明示入力がある場合は、その値を文脈解決より優先する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-1"
+        }
+      }
+    },
+    {
+      "claim_hash": "b61b8f1154fda35944cabba8917c7f8a8da4fa2b14a07d29ccbf8698646b9743",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[C,D,confirm-then-proceed] chose:confirm-then-proceed"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "明示入力で不足している feature 名または primary ADR を会話文脈から解決し、解決された feature 名と primary ADR の組を user に 1 回確認してから `/track:init` へ渡す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-2"
+        }
+      }
+    },
+    {
+      "claim_hash": "ce4568c7e7788c397fcb640c4d03f90cb5ebb36c26220827d8be7b58b1e3e4ce",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[E,candidate-selection-prompt] chose:candidate-selection-prompt"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "会話文脈からの解決候補が複数ある場合または候補がない場合に、候補 ADR と feature 名を user に提示し、選択を受けてから処理を続行する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-3"
+        }
+      }
+    },
+    {
+      "claim_hash": "c88a1b8a8221c3eb5fd95829d05b59f039079e51047ade58b4b4defe89d9da08",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[A,B,optional-args-context-resolution] chose:optional-args-context-resolution"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "workflow SSoT と Claude / Codex provider adapter の呼び出し案内を同じ任意引数・文脈解決・確認 / 選択の契約に揃える。`/track:init` には、解決と user 確認後の feature 名および primary ADR を明示的に渡す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-1"
+        }
+      }
+    },
+    {
+      "claim_hash": "c88a1b8a8221c3eb5fd95829d05b59f039079e51047ade58b4b4defe89d9da08",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[C,D,confirm-then-proceed] chose:confirm-then-proceed"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "workflow SSoT と Claude / Codex provider adapter の呼び出し案内を同じ任意引数・文脈解決・確認 / 選択の契約に揃える。`/track:init` には、解決と user 確認後の feature 名および primary ADR を明示的に渡す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-2"
+        }
+      }
+    },
+    {
+      "claim_hash": "0583543d933c784c419ba936ff15abc7fe0a1bc1c74be0ebe40188cab76d3418",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[C,D,confirm-then-proceed] chose:confirm-then-proceed"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "`/track:init` 自体の必須入力および初期化手順の変更。`/track:adr2pr` は解決済みかつ user 確認済みの feature 名と primary ADR を明示的に渡す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-2"
+        }
+      }
+    },
+    {
+      "claim_hash": "3a8ab443d1c5ac84ba13c56de0c46433cfe55d97935923daae4e772109c60ffe",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[C,D,confirm-then-proceed] chose:confirm-then-proceed"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "会話文脈を使わずに最新の未着手 ADR などの機械的規則だけで候補を自動選択すること、および候補が曖昧なときに選択を求めず停止すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-2"
+        }
+      }
+    },
+    {
+      "claim_hash": "3a8ab443d1c5ac84ba13c56de0c46433cfe55d97935923daae4e772109c60ffe",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[E,candidate-selection-prompt] chose:candidate-selection-prompt"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "会話文脈を使わずに最新の未着手 ADR などの機械的規則だけで候補を自動選択すること、および候補が曖昧なときに選択を求めず停止すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-3"
+        }
+      }
+    },
+    {
+      "claim_hash": "9117625aa6e6737855069586d99a048bd5a6f1ce9bf57ae24dfd5de411a11584",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[A,B,optional-args-context-resolution] chose:optional-args-context-resolution"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "明示的な `<feature>` または `--primary-adr` が supplied の場合は、対応する値について会話文脈からの推定より常に優先する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-1"
+        }
+      }
+    },
+    {
+      "claim_hash": "64524eda603be13e7b739dc1bb8cbd8bc5acdf6e220623da09c06e2f1e0cbeb2",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[C,D,confirm-then-proceed] chose:confirm-then-proceed"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "一意に解決できた場合でも、`/track:init` の前に解決結果を user にちょうど 1 回確認する。確認なしで初期化へ進行しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-2"
+        }
+      }
+    },
+    {
+      "claim_hash": "99e54f4dd6c2eca88f737bad02b410ba7c753e82535e7c785c6f364afa7ccfd2",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[E,candidate-selection-prompt] chose:candidate-selection-prompt"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "候補が複数またはゼロで一意に解決できない場合は、user の選択を得るまで `/track:init` へ進めない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-3"
+        }
+      }
+    },
+    {
+      "claim_hash": "3435b9d05840fd597c0d1aa4734dca1b8ad133de11db35032f8b221012d276ef",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[A,B,optional-args-context-resolution] chose:optional-args-context-resolution"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`/track:adr2pr` を引数なしで起動したとき、会話文脈から一意に feature 名と primary ADR を解決できれば、その組を user に確認してから track 初期化へ進める。既存の `<feature> --primary-adr <file>.md` 形式も有効で、明示値が解決値より優先される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-1"
+        }
+      }
+    },
+    {
+      "claim_hash": "3435b9d05840fd597c0d1aa4734dca1b8ad133de11db35032f8b221012d276ef",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[C,D,confirm-then-proceed] chose:confirm-then-proceed"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "`/track:adr2pr` を引数なしで起動したとき、会話文脈から一意に feature 名と primary ADR を解決できれば、その組を user に確認してから track 初期化へ進める。既存の `<feature> --primary-adr <file>.md` 形式も有効で、明示値が解決値より優先される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-2"
+        }
+      }
+    },
+    {
+      "claim_hash": "f53422061b1c764d98d52dd7e6974fdb18b3962f8e3b656af7d863138ff6b5cb",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[A,B,optional-args-context-resolution] chose:optional-args-context-resolution"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "feature 名または primary ADR の片方だけが明示されたとき、明示値を維持したまま不足値だけを会話文脈から解決し、完成した組を user に 1 回確認してから `/track:init` へ明示的に渡す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-1"
+        }
+      }
+    },
+    {
+      "claim_hash": "f53422061b1c764d98d52dd7e6974fdb18b3962f8e3b656af7d863138ff6b5cb",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[C,D,confirm-then-proceed] chose:confirm-then-proceed"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "feature 名または primary ADR の片方だけが明示されたとき、明示値を維持したまま不足値だけを会話文脈から解決し、完成した組を user に 1 回確認してから `/track:init` へ明示的に渡す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-2"
+        }
+      }
+    },
+    {
+      "claim_hash": "5965ea179ef66f6332b63d0e972116f38355acaf5200029478ec3c7da77607f9",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[E,candidate-selection-prompt] chose:candidate-selection-prompt"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "会話文脈に複数候補または候補なしがある場合、候補 ADR と feature 名を user に提示して選択を求める。選択を得た後にのみ、選択された組で track 初期化へ進める。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-3"
+        }
+      }
+    },
+    {
+      "claim_hash": "458ba0a9163b53b968c59db263044442bc71247ca69d04d5f529ebfc31d05e11",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[A,B,optional-args-context-resolution] chose:optional-args-context-resolution"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "workflow SSoT と対象の Claude / Codex adapter が、任意引数、明示値優先、会話文脈からの解決、1 回の確認、および曖昧時の候補選択を矛盾なく案内する。`/track:init` の入力は解決済みの明示値のままである。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-1"
+        }
+      }
+    },
+    {
+      "claim_hash": "458ba0a9163b53b968c59db263044442bc71247ca69d04d5f529ebfc31d05e11",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[C,D,confirm-then-proceed] chose:confirm-then-proceed"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "workflow SSoT と対象の Claude / Codex adapter が、任意引数、明示値優先、会話文脈からの解決、1 回の確認、および曖昧時の候補選択を矛盾なく案内する。`/track:init` の入力は解決済みの明示値のままである。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-2"
+        }
+      }
+    },
+    {
+      "claim_hash": "458ba0a9163b53b968c59db263044442bc71247ca69d04d5f529ebfc31d05e11",
+      "evidence_hash": "64fc5189d18b19a0eecec7ec4d8c86150e7e84af5a86e9a8e39994998e085ad2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "candidate_selection: from:[E,candidate-selection-prompt] chose:candidate-selection-prompt"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "workflow SSoT と対象の Claude / Codex adapter が、任意引数、明示値優先、会話文脈からの解決、1 回の確認、および曖昧時の候補選択を矛盾なく案内する。`/track:init` の入力は解決済みの明示値のままである。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-20-1508-adr2pr-argless-context-resolution.md",
+          "decision_id": "decision-3"
+        }
+      }
+    }
+  ]
+}

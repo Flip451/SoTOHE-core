@@ -21,7 +21,7 @@ decisions: []
 ---
 adr_id: "<YYYY-MM-DD-HHMM>-<slug>"
 decisions:
-  - id: decision-1
+  - id: D1
     user_decision_ref: "chat_segment:<session>:<date>"
     status: proposed
 ---
@@ -149,6 +149,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [impl 段階の構造的不整合検出時のフェーズ遷移診断スキル](2026-06-26-0503-adr2pr-back-and-forth-skill-definition.md) | Proposed | 2026-06-26 |
 | [タスク単位の契約履行 pre-review ゲート — Phase 3 attribution artifact と impl_catalog 信号の binary 再利用](2026-06-27-0852-pre-review-task-contract-conformance-gate.md) | Accepted | 2026-06-27 |
 | [remote sync 専用コマンドの新設と git 操作の hexagonal 是正 — switch と pull の分離、意味論 port への全面移管](2026-07-04-0155-git-sync-dedicated-command.md) | Proposed | 2026-07-04 |
+| [/track:adr2pr の呼び出し型を引数指定から文脈自動解決に戻す](2026-07-20-1508-adr2pr-argless-context-resolution.md) | Proposed | 2026-07-20 |
 
 ### ADR 運用
 
