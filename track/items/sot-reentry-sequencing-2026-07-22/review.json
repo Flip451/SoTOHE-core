@@ -1,24 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13e9d659250f657ffe620b73aafc0cd00206955f9b9cfdab4b693e9fc354de20",
-          "at": "2026-07-22T04:42:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13e9d659250f657ffe620b73aafc0cd00206955f9b9cfdab4b693e9fc354de20",
-          "at": "2026-07-22T04:48:42Z"
-        }
-      ]
-    },
     "adr": {
       "rounds": [
         {
@@ -37,43 +19,21 @@
         }
       ]
     },
-    "spec": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
-          "at": "2026-07-22T04:26:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-08 cites `knowledge/conventions/README.md` to justify indexing the new document there, but that README explicitly excludes template-wide workflows from `knowledge/conventions/`. The cited convention therefore contradicts rather than grounds this scope item, leaving downstream work directed to a location whose governing convention disallows this artifact class.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 110,
-              "category": "broken cross-reference at narrative level"
-            },
-            {
-              "message": "`no-upstream-restatement.md` limits its scope to impl-plan descriptions and type-catalogue documentation, while explicitly exempting `spec.json` and workflow documents. It therefore cannot ground IN-01/CN-01's SSoT-reference rule for a new workflow convention; its `convention_refs` and `related_conventions` entries are off-topic.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 34,
-              "category": "broken cross-reference at narrative level"
-            }
-          ],
-          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
-          "at": "2026-07-22T04:29:39Z"
+          "hash": "rvw1:sha256:13e9d659250f657ffe620b73aafc0cd00206955f9b9cfdab4b693e9fc354de20",
+          "at": "2026-07-22T04:42:06Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:87c60a3d9298c8daf642b794cda5bd633e155cd958ab3344a9ba21b6087aa4b5",
-          "at": "2026-07-22T04:31:29Z"
+          "hash": "rvw1:sha256:13e9d659250f657ffe620b73aafc0cd00206955f9b9cfdab4b693e9fc354de20",
+          "at": "2026-07-22T04:48:42Z"
         }
       ]
     },
@@ -185,6 +145,60 @@
           "findings": [],
           "hash": "rvw1:sha256:e014889bd9e35e157a7f4c9a1b6077f6cc40e8d382acd4ae13b9ce88780d06a4",
           "at": "2026-07-22T04:44:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7cb7bc88607283c15904465a4000f8c39c9148bd8635c9f120490e028eb7b4b",
+          "at": "2026-07-22T04:52:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7cb7bc88607283c15904465a4000f8c39c9148bd8635c9f120490e028eb7b4b",
+          "at": "2026-07-22T04:54:26Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
+          "at": "2026-07-22T04:26:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-08 cites `knowledge/conventions/README.md` to justify indexing the new document there, but that README explicitly excludes template-wide workflows from `knowledge/conventions/`. The cited convention therefore contradicts rather than grounds this scope item, leaving downstream work directed to a location whose governing convention disallows this artifact class.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 110,
+              "category": "broken cross-reference at narrative level"
+            },
+            {
+              "message": "`no-upstream-restatement.md` limits its scope to impl-plan descriptions and type-catalogue documentation, while explicitly exempting `spec.json` and workflow documents. It therefore cannot ground IN-01/CN-01's SSoT-reference rule for a new workflow convention; its `convention_refs` and `related_conventions` entries are off-topic.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 34,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
+          "at": "2026-07-22T04:29:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87c60a3d9298c8daf642b794cda5bd633e155cd958ab3344a9ba21b6087aa4b5",
+          "at": "2026-07-22T04:31:29Z"
         }
       ]
     },
