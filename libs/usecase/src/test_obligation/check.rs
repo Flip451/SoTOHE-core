@@ -1,25 +1,10 @@
-//! `bin/sotp test-obligation check` — pure-read totality + drift gate.
+//! Pure-read totality and drift gate for `bin/sotp test-obligation check`.
 //!
-//! [`CheckTestObligationsInteractor`] deterministically verifies (IN-08): the
-//! decision-table config loads and validates (fail-closed on malformed /
-//! role-incomplete `.harness/config/test-obligation-rules.json` so `check`
-//! cannot silently pass on stale obligations / bindings / caches — IN-08),
-//! every derived obligation is bound and its tests exist (`missing` /
-//! `orphaned` existence drift — IN-13), every ref edge resolves to a fulfilled
-//! / waived verdict (totality — CN-02), and every resolving verdict is fresh
-//! against the current three-hash key and verifier-prompt fingerprint
-//! (`spec_changed` / `decl_changed` / `test_changed` / `reason_changed` freshness
-//! drift — CN-04 / AC-04). A mismatched or absent fingerprint is treated as a
-//! missing verdict. Scope is
-//! resolved by artifact existence (IN-14 / AC-10): both absent passes with zero
-//! pairs, a half-materialised scope is fail-closed. Uncited `AC` / `CN` spec
-//! elements are surfaced as findings (IN-16 / AC-13). The gate never recomputes
-//! freshness from source alone — recovery is `evaluate`'s job (CN-04).
+//! [`CheckTestObligationsInteractor`] validates the rules configuration,
+//! enrollment scope, derived obligations, bindings, citations, and freshness.
+//! It never derives or repairs artifacts; `evaluate` handles recovery.
 
-// `ObligationCheckError` carries unboxed non-empty payloads (`NonEmptyDrifts` /
-// `NonEmptyEdgeIds`) per the catalogue contract, which makes the `Err` variant
-// large. Boxing would diverge from the declared type shape, so the size is
-// accepted here rather than boxed.
+// The catalogue contract requires unboxed non-empty error payloads.
 #![allow(clippy::result_large_err)]
 
 use std::path::PathBuf;
@@ -27,7 +12,9 @@ use std::sync::Arc;
 
 use domain::TaskStatusKind;
 use domain::TrackId;
-use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort;
+use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
+    CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort,
+};
 use domain::tddd::test_obligation::binding::{
     TestBindingRecord, TestBindingsDocument, TestLocation,
 };
@@ -137,6 +124,19 @@ impl CheckTestObligationsInteractor {
         Ok(catalogues)
     }
 
+    fn has_catalogue(
+        &self,
+        cmd: &CheckTestObligationsCommand,
+    ) -> Result<bool, ObligationCheckError> {
+        cmd.input.catalogue_paths().iter().try_fold(false, |exists, path| {
+            match self.catalogue_reader.load(path) {
+                Ok(_) => Ok(true),
+                Err(CatalogueDocumentLoaderError::NotFound { .. }) => Ok(exists),
+                Err(error) => Err(ObligationCheckError::CatalogueLoad(error)),
+            }
+        })
+    }
+
     /// Loads the parsed spec elements for the uncited-finding computation.
     fn spec_elements(&self, track_id: &TrackId) -> Result<Vec<SpecElement>, ObligationCheckError> {
         let spec_path = PathBuf::from(format!("track/items/{}/spec.json", track_id.as_ref()));
@@ -169,9 +169,12 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
             .load(cmd.input.track_id())
             .map_err(ObligationCheckError::ArtifactCodec)?;
 
-        // Existence-based scope resolution (IN-14 / AC-10).
+        // Catalogue-bearing tracks require enrollment; catalogue-free tracks are empty.
         let (obligations, bindings) = match (obligations, bindings) {
-            (None, None) => return Ok(CheckTestObligationsOutcome::new_empty_scope(Vec::new())),
+            (None, None) if !self.has_catalogue(cmd)? => {
+                return Ok(CheckTestObligationsOutcome::new_empty_scope(Vec::new()));
+            }
+            (None, None) => return Err(ObligationCheckError::ObligationsAbsent),
             (Some(_), None) => return Err(ObligationCheckError::BindingsAbsent),
             (None, Some(_)) => return Err(ObligationCheckError::ObligationsAbsent),
             (Some(obligations), Some(bindings)) => (obligations, bindings),

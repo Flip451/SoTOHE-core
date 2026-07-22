@@ -1145,12 +1145,45 @@ fn command() -> CheckTestObligationsCommand {
 // ---------------------------------------------------------------------------
 
 #[test]
-fn test_empty_scope_passes_without_materialized_catalogue_or_spec() {
-    // AC-10 / IN-14: both artifacts absent → zero pairs pass by artifact
-    // existence alone, even before spec/catalogues are materialized.
+fn test_check_catalogue_absent_artifacts_absent_passes_empty_scope() {
+    // AC-03: a catalogue-free track remains an empty scope without loading
+    // the spec or materializing obligation artifacts.
     let outcome = empty_scope_interactor_without_readers().execute(&command()).unwrap();
     assert!(outcome.resolved_edges().is_empty());
     assert!(outcome.uncited_findings().is_empty());
+}
+
+#[test]
+fn test_check_catalogue_present_artifacts_absent_fails_closed() {
+    // AC-02: finding a catalogue prevents missing enrollment artifacts from
+    // being treated as a zero-pair scope.
+    let result = interactor(None, None, None, None).execute(&command());
+
+    assert!(matches!(result, Err(ObligationCheckError::ObligationsAbsent)));
+}
+
+#[test]
+fn test_check_catalogue_present_empty_artifacts_passes_verified_scope() {
+    // AC-02 / CN-03: present artifacts with a zero derivation are distinct
+    // from absent artifacts and therefore proceed through the check gate.
+    let empty_catalogue = CatalogueDocument::new(
+        5,
+        CrateName::new("domain").unwrap(),
+        LayerId::try_new("domain").unwrap(),
+    );
+    let outcome = interactor_with_rules_and_catalogue(
+        Some(ObligationsDocument::new(track(), vec![])),
+        Some(TestBindingsDocument::new(track(), vec![])),
+        None,
+        None,
+        empty_rules_doc(),
+        empty_catalogue,
+        Arc::new(StubScanner),
+    )
+    .execute(&command())
+    .unwrap();
+
+    assert!(outcome.resolved_edges().is_empty());
 }
 
 #[test]
@@ -2570,11 +2603,12 @@ fn test_missing_bound_test_source_with_fresh_cache_is_missing_drift() {
 #[test]
 fn test_runs_regardless_of_branch() {
     // `check` is pure-read (IN-08) and has no active-branch guard, unlike the
-    // write-side derive / evaluate commands: an empty scope passes on any branch.
+    // write-side derive / evaluate commands: a catalogue-free empty scope passes
+    // on any branch.
     let cmd = CheckTestObligationsCommand::new(TestObligationCatalogueCommandInput::new(
         track(),
         "main".to_owned(),
-        vec![PathBuf::from("domain-types.json")],
+        Vec::new(),
     ));
     let outcome = interactor(None, None, None, None).execute(&cmd).unwrap();
     assert!(outcome.resolved_edges().is_empty());
