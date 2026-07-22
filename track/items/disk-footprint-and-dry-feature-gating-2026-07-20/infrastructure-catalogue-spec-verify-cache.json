@@ -243,11 +243,11 @@
       }
     },
     {
-      "claim_hash": "962cf990bdf883b6f330263d6de2efecf935504b0a13f5277a60325272714e9e",
-      "evidence_hash": "f5b89939a169f61a6798b1161eca5f65a6f2cec18c29bf0afd67c598130ff19d",
+      "claim_hash": "9470b5922de4ff5656cc007fc77acb30ebe0a33fc53b1bac7d624b0cc2cd7ce8",
+      "evidence_hash": "9eb56ccc4a22d6c65503aa00a86a6abb62b32e5c61f9da8d80a63b0e3faf0744",
       "verdict": {
         "kind": "pass",
-        "citation": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+        "citation": "実装は feature 配下に保持し、feature 有効ビルドではこれらを再び利用可能にする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -261,41 +261,17 @@
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
-          "element_id": "IN-02",
-          "text_label": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+          "element_id": "IN-06",
+          "text_label": "semantic-dup 実装の型、adapter、入力 DTO は、`semantic-dup` feature 無効の既定ビルドの公開 surface から除外する。実装は feature 配下に保持し、feature 有効ビルドではこれらを再び利用可能にする。track の型カタログはこの既定 surface を基準とする。"
         }
       }
     },
     {
-      "claim_hash": "962cf990bdf883b6f330263d6de2efecf935504b0a13f5277a60325272714e9e",
-      "evidence_hash": "7a32b1cdf6ebfc97a72932aa505aaac5e00710898dea2cefd6e249476af2b603",
+      "claim_hash": "c0d89f0acbab575d3abd23a9fc7c1e2ced5d11e1910a40f8b36f79fd70b9526b",
+      "evidence_hash": "9eb56ccc4a22d6c65503aa00a86a6abb62b32e5c61f9da8d80a63b0e3faf0744",
       "verdict": {
         "kind": "pass",
-        "citation": "feature 無効でビルドした binary から dry 系コマンドを実行すると、feature 無効であることが分かるメッセージを出して非成功終了する。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
-          "section_key": "types",
-          "entry_key": "FsDryCorpusMetaAdapter"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-02",
-          "text_label": "feature 無効でビルドした binary から dry 系コマンドを実行すると、feature 無効であることが分かるメッセージを出して非成功終了する。コマンドを黙って省略または代替動作させない。"
-        }
-      }
-    },
-    {
-      "claim_hash": "e47a16904a52b0661c0cfbdd2b72149c725adee236e41404b1eca5873735948f",
-      "evidence_hash": "f5b89939a169f61a6798b1161eca5f65a6f2cec18c29bf0afd67c598130ff19d",
-      "verdict": {
-        "kind": "pass",
-        "citation": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+        "citation": "semantic-dup 実装の型、adapter、入力 DTO は、`semantic-dup` feature 無効の既定ビルドの公開 surface から除外する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -309,32 +285,8 @@
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
-          "element_id": "IN-02",
-          "text_label": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
-        }
-      }
-    },
-    {
-      "claim_hash": "e47a16904a52b0661c0cfbdd2b72149c725adee236e41404b1eca5873735948f",
-      "evidence_hash": "7a32b1cdf6ebfc97a72932aa505aaac5e00710898dea2cefd6e249476af2b603",
-      "verdict": {
-        "kind": "pass",
-        "citation": "feature 無効であることが分かるメッセージを出して非成功終了する。コマンドを黙って省略または代替動作させない。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
-          "section_key": "types",
-          "entry_key": "FsDryCorpusRootManifestAdapter"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-02",
-          "text_label": "feature 無効でビルドした binary から dry 系コマンドを実行すると、feature 無効であることが分かるメッセージを出して非成功終了する。コマンドを黙って省略または代替動作させない。"
+          "element_id": "IN-06",
+          "text_label": "semantic-dup 実装の型、adapter、入力 DTO は、`semantic-dup` feature 無効の既定ビルドの公開 surface から除外する。実装は feature 配下に保持し、feature 有効ビルドではこれらを再び利用可能にする。track の型カタログはこの既定 surface を基準とする。"
         }
       }
     },
@@ -603,11 +555,11 @@
       }
     },
     {
-      "claim_hash": "e47a16904a52b0661c0cfbdd2b72149c725adee236e41404b1eca5873735948f",
-      "evidence_hash": "f5b89939a169f61a6798b1161eca5f65a6f2cec18c29bf0afd67c598130ff19d",
+      "claim_hash": "c0d89f0acbab575d3abd23a9fc7c1e2ced5d11e1910a40f8b36f79fd70b9526b",
+      "evidence_hash": "9eb56ccc4a22d6c65503aa00a86a6abb62b32e5c61f9da8d80a63b0e3faf0744",
       "verdict": {
         "kind": "pass",
-        "citation": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+        "citation": "semantic-dup 実装の型、adapter、入力 DTO は、`semantic-dup` feature 無効の既定ビルドの公開 surface から除外する。実装は feature 配下に保持し、feature 有効ビルドではこれらを再び利用可能にする。track の型カタログはこの既定 surface を基準とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -621,32 +573,8 @@
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
-          "element_id": "IN-02",
-          "text_label": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
-        }
-      }
-    },
-    {
-      "claim_hash": "e47a16904a52b0661c0cfbdd2b72149c725adee236e41404b1eca5873735948f",
-      "evidence_hash": "7a32b1cdf6ebfc97a72932aa505aaac5e00710898dea2cefd6e249476af2b603",
-      "verdict": {
-        "kind": "pass",
-        "citation": "feature 無効であることが分かるメッセージを出して非成功終了する。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
-          "section_key": "types",
-          "entry_key": "RecordingDryTierTelemetryAdapter"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-02",
-          "text_label": "feature 無効でビルドした binary から dry 系コマンドを実行すると、feature 無効であることが分かるメッセージを出して非成功終了する。コマンドを黙って省略または代替動作させない。"
+          "element_id": "IN-06",
+          "text_label": "semantic-dup 実装の型、adapter、入力 DTO は、`semantic-dup` feature 無効の既定ビルドの公開 surface から除外する。実装は feature 配下に保持し、feature 有効ビルドではこれらを再び利用可能にする。track の型カタログはこの既定 surface を基準とする。"
         }
       }
     },

@@ -6,11 +6,7 @@
       "informal_grounds": [],
       "spec_refs": [
         {
-          "anchor": "IN-02",
-          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
-        },
-        {
-          "anchor": "AC-02",
+          "anchor": "IN-07",
           "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
         }
       ]
@@ -71,7 +67,7 @@
     },
     "cli::commands::semantic_dup_feature_gate::semantic_dup_feature_disabled_exit": {
       "action": "add",
-      "docs": "`semantic-dup` feature-disabled command-family response helper.",
+      "docs": "Feature-disabled CLI response helper.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -622,13 +618,25 @@
     },
     "SemanticDupCommandFamily": {
       "action": "add",
-      "docs": "CLI command-family selector consumed by the shared semantic-dup feature-gate helper.",
+      "docs": "Feature-gated CLI command selector; name() supplies a presentation-only label.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
         "variants": [
           {
-            "name": "Dry",
+            "name": "DryWrite",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DryResults",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DryFixLocal",
             "payload": {
               "kind": "unit"
             }

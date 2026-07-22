@@ -9,7 +9,7 @@
     },
     {
       "id": "T002",
-      "description": "`apps/cli-composition/Cargo.toml`、`apps/cli-composition/src/{lib.rs,semantic_dup/**}`、`apps/cli/{Cargo.toml,src/{main.rs,commands/{dry.rs,semantic_dup.rs}}}` に `semantic-dup` feature 伝播と feature-off command dispatch を実装し、両 build 構成の command coverage を追加する。IN-01, IN-02, CN-01, CN-02, AC-01, AC-02。",
+      "description": "`apps/cli-composition/Cargo.toml`、`apps/cli-composition/src/{lib.rs,semantic_dup/**}`、`apps/cli/{Cargo.toml,src/{main.rs,commands/{dry.rs,semantic_dup.rs}}}` に `semantic-dup` feature 伝播と、gate 評価点以外の feature-off dry command dispatch を実装し、両 build 構成の command coverage を追加する。check-approved gate 評価点の enabled 優先分岐は T006 が担う。IN-01, IN-02, CN-01, CN-02, AC-01, AC-02。",
       "status": "done",
       "commit_hash": "b5d9cf49a22a8f175b626c73105260bcc66a0255"
     },
@@ -30,12 +30,17 @@
       "description": "maintenance の分割 migration として、`apps/cli-driver/src/maintenance.rs` の旧 `MaintenanceDriver`/`MaintenanceInput` を `MaintenanceCommandDriver`/`MaintenanceCommandInput` と `MaintenanceQueryDriver`/`MaintenanceQueryInput` に置換する。`apps/cli/src/commands/maintenance.rs` と `apps/cli/src/main.rs` の CLI command 定義・dispatch を各 driver/input family へ追随させ、`apps/cli-composition/src/maintenance.rs` を両 driver を返す wire-only 構成へ移行する。旧2型を除去し、command/query の各実行経路を検証する。IN-05, AC-06。",
       "status": "done",
       "commit_hash": "b5d9cf49a22a8f175b626c73105260bcc66a0255"
+    },
+    {
+      "id": "T006",
+      "description": "`libs/usecase/src/dry_check_approved_driver.rs` の gate interactor、`apps/cli-driver/src/dry.rs` の専用 CLI driver、`apps/cli-composition/src/dry_gate.rs` の composition root、`apps/cli/src/commands/dry.rs` の check-approved dispatch を実装し、旧 `execute_dry_check_approved` を除去する。AC-07 の feature-off 両分岐に対する command coverage を追加する。IN-07, AC-07。",
+      "status": "done"
     }
   ],
   "plan": {
     "summary": [
       "GO-01 → T001, T002",
-      "GO-02 → T002",
+      "GO-02 → T002, T006",
       "GO-03 → T003, T005",
       "GO-04 → T004"
     ],
@@ -70,6 +75,16 @@
         ],
         "task_ids": [
           "T004"
+        ]
+      },
+      {
+        "id": "S4",
+        "title": "Enabled-first DRY gate evaluation",
+        "description": [
+          "T006 で `libs/usecase/src/dry_check_approved_driver.rs`、`apps/cli-driver/src/dry.rs`、`apps/cli-composition/src/dry_gate.rs`、`apps/cli/src/commands/dry.rs` の check-approved gate evaluation path と AC-07 の feature-off 両分岐 command coverage を追加・接続する。IN-07, AC-07。"
+        ],
+        "task_ids": [
+          "T006"
         ]
       }
     ]

@@ -2,10 +2,14 @@
 
 use std::process::ExitCode;
 
-/// Command families whose implementation is compiled behind `semantic-dup`.
+/// Feature-gated commands whose implementation is compiled behind `semantic-dup`.
 pub enum SemanticDupCommandFamily {
-    /// The DRY command family.
-    Dry,
+    /// The `sotp dry write` command.
+    DryWrite,
+    /// The `sotp dry results` command.
+    DryResults,
+    /// The `sotp dry fix-local` command.
+    DryFixLocal,
     /// The semantic duplicate inspection command family.
     SemanticDuplicate,
 }
@@ -13,7 +17,9 @@ pub enum SemanticDupCommandFamily {
 impl SemanticDupCommandFamily {
     fn name(&self) -> &'static str {
         match self {
-            Self::Dry => "dry",
+            Self::DryWrite => "dry write",
+            Self::DryResults => "dry results",
+            Self::DryFixLocal => "dry fix-local",
             Self::SemanticDuplicate => "semantic duplicate",
         }
     }
@@ -35,14 +41,22 @@ mod tests {
     use super::{SemanticDupCommandFamily, semantic_dup_feature_disabled_exit};
 
     #[test]
-    fn test_feature_disabled_command_families_return_failure() {
-        assert_eq!(
-            semantic_dup_feature_disabled_exit(SemanticDupCommandFamily::Dry),
-            ExitCode::FAILURE
-        );
-        assert_eq!(
-            semantic_dup_feature_disabled_exit(SemanticDupCommandFamily::SemanticDuplicate),
-            ExitCode::FAILURE
-        );
+    fn test_feature_disabled_command_selectors_have_presentation_labels() {
+        assert_eq!(SemanticDupCommandFamily::DryWrite.name(), "dry write");
+        assert_eq!(SemanticDupCommandFamily::DryResults.name(), "dry results");
+        assert_eq!(SemanticDupCommandFamily::DryFixLocal.name(), "dry fix-local");
+        assert_eq!(SemanticDupCommandFamily::SemanticDuplicate.name(), "semantic duplicate");
+    }
+
+    #[test]
+    fn test_feature_disabled_command_selectors_return_failure() {
+        for selector in [
+            SemanticDupCommandFamily::DryWrite,
+            SemanticDupCommandFamily::DryResults,
+            SemanticDupCommandFamily::DryFixLocal,
+            SemanticDupCommandFamily::SemanticDuplicate,
+        ] {
+            assert_eq!(semantic_dup_feature_disabled_exit(selector), ExitCode::FAILURE);
+        }
     }
 }

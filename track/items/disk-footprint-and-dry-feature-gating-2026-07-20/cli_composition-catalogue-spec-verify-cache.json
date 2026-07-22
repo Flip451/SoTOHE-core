@@ -3,6 +3,54 @@
   "layer": "cli_composition",
   "entries": [
     {
+      "claim_hash": "b3b7e47a70a077d6554db328d9567baee6e08c677a15f9c85bfe1abf5829969c",
+      "evidence_hash": "5903a14197da673cbc502bf73bb7f730ca2372dcac9e7ee543bdeea9494dd9b8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合のみ feature 無効を明示して fail-closed にする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "FeatureDisabledDryGateCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "DRY gate の評価点では feature 判定より先に `enabled` を評価し、`enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合のみ feature 無効を明示して fail-closed にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b3b7e47a70a077d6554db328d9567baee6e08c677a15f9c85bfe1abf5829969c",
+      "evidence_hash": "c16c1b6e3d3e96c93eff53a09a4dff94ff4d58d5415e8dd8b4ba5573becad1f9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "DRY gate の評価点では、feature 無効 binary であっても `enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合だけ feature 無効を明示する非成功終了となる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "FeatureDisabledDryGateCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "DRY gate の評価点では、feature 無効 binary であっても `enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合だけ feature 無効を明示する非成功終了となる。"
+        }
+      }
+    },
+    {
       "claim_hash": "9022f0f80a692de37346c007d777bb13074c18116006b6e9f176c600d2433ffa",
       "evidence_hash": "fd94042ae81181f55b5029747ca1cbcd6b399ed6a0658817f5acaeb866b594f6",
       "verdict": {
@@ -76,10 +124,10 @@
     },
     {
       "claim_hash": "3c11d885f2a291fdc8e3baa8bf3796cad7dba932e007f9b74daf41842d66706e",
-      "evidence_hash": "f5b89939a169f61a6798b1161eca5f65a6f2cec18c29bf0afd67c598130ff19d",
+      "evidence_hash": "a13c008c83d879512b209f34dc4a3ba825706f1fb0c6ee7334a638e64f7478db",
       "verdict": {
         "kind": "pass",
-        "citation": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+        "citation": "gate 評価点以外の dry 系実行コマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -94,7 +142,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-02",
-          "text_label": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+          "text_label": "`semantic-dup` feature 無効でビルドした binary において、gate 評価点以外の dry 系実行コマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
         }
       }
     },
@@ -172,10 +220,10 @@
     },
     {
       "claim_hash": "abcb6fb56cf5af35f6e66c47ccae6bc9fc87c6f77188fc8f672e57a4ec0bd204",
-      "evidence_hash": "f5b89939a169f61a6798b1161eca5f65a6f2cec18c29bf0afd67c598130ff19d",
+      "evidence_hash": "a13c008c83d879512b209f34dc4a3ba825706f1fb0c6ee7334a638e64f7478db",
       "verdict": {
         "kind": "pass",
-        "citation": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+        "citation": "gate 評価点以外の dry 系実行コマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -190,16 +238,16 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-02",
-          "text_label": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+          "text_label": "`semantic-dup` feature 無効でビルドした binary において、gate 評価点以外の dry 系実行コマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
         }
       }
     },
     {
       "claim_hash": "abcb6fb56cf5af35f6e66c47ccae6bc9fc87c6f77188fc8f672e57a4ec0bd204",
-      "evidence_hash": "7a32b1cdf6ebfc97a72932aa505aaac5e00710898dea2cefd6e249476af2b603",
+      "evidence_hash": "0aac954c39de17b8d3e6b8b89f3be336e51e46c8286ddd7b5e86557779ab2bfd",
       "verdict": {
         "kind": "pass",
-        "citation": "feature 無効でビルドした binary から dry 系コマンドを実行すると、feature 無効であることが分かるメッセージを出して非成功終了する。コマンドを黙って省略または代替動作させない。"
+        "citation": "feature 無効でビルドした binary から gate 評価点以外の dry 系実行コマンドを実行すると、feature 無効であることが分かるメッセージを出して非成功終了する。コマンドを黙って省略または代替動作させない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -214,7 +262,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-02",
-          "text_label": "feature 無効でビルドした binary から dry 系コマンドを実行すると、feature 無効であることが分かるメッセージを出して非成功終了する。コマンドを黙って省略または代替動作させない。"
+          "text_label": "feature 無効でビルドした binary から gate 評価点以外の dry 系実行コマンドを実行すると、feature 無効であることが分かるメッセージを出して非成功終了する。コマンドを黙って省略または代替動作させない。"
         }
       }
     },
@@ -244,10 +292,10 @@
     },
     {
       "claim_hash": "1892181d56e0fabad0cb52cef11e5dbaa9a21c6806dda97bbf49c0d7871e25f2",
-      "evidence_hash": "f5b89939a169f61a6798b1161eca5f65a6f2cec18c29bf0afd67c598130ff19d",
+      "evidence_hash": "a13c008c83d879512b209f34dc4a3ba825706f1fb0c6ee7334a638e64f7478db",
       "verdict": {
         "kind": "pass",
-        "citation": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+        "citation": "`semantic-dup` feature 無効でビルドした binary において、gate 評価点以外の dry 系実行コマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -262,7 +310,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-02",
-          "text_label": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+          "text_label": "`semantic-dup` feature 無効でビルドした binary において、gate 評価点以外の dry 系実行コマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
         }
       }
     }

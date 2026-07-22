@@ -11,6 +11,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
+| FeatureDisabledDryGateDriver | primary_adapter | add | — | 🔵 | 🔵 |
 | MaintenanceCommandDriver | primary_adapter | add | — | 🔵 | 🔵 |
 | MaintenanceQueryDriver | primary_adapter | add | — | 🔵 | 🔵 |
 

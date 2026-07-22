@@ -26,6 +26,7 @@
 |------|------|--------|---------|--------|----------|
 | DiskMaintenanceCommandService | application_service | add | fn execute_command(&self, command: DiskMaintenanceCommand) -> Result<DiskMaintenanceCommandResponse, DiskMaintenanceError> | 🔵 | 🔵 |
 | DiskMaintenanceQueryService | application_service | add | fn plan_cleanup(&self, query: CleanupPlanQuery) -> Result<CleanupPlanResponse, DiskMaintenanceError> | 🔵 | 🔵 |
+| DryCheckApprovedDriverService | application_service | reference | fn dry_check_approved(&self, input: DryCheckApprovedDriverInput) -> DryCheckApprovedOutcome | 🔵 | 🔵 |
 
 ## Interactors
 
@@ -33,6 +34,7 @@
 |------|------|--------|---------|--------|----------|
 | DiskMaintenanceCommandInteractor | interactor | add | — | 🔵 | 🔵 |
 | DiskMaintenanceQueryInteractor | interactor | add | — | 🔵 | 🔵 |
+| FeatureDisabledDryGateInteractor | interactor | add | — | 🔵 | 🔵 |
 
 ## DTOs
 

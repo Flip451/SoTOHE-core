@@ -15,11 +15,15 @@
     },
     {
       "id": "GO-02",
-      "text": "`semantic-dup` feature 無効の binary における dry 系コマンドを、feature 無効であることを明示する fail-closed エラー終了とする。",
+      "text": "`semantic-dup` feature 無効の binary における dry 系入口を、dry 系実行コマンドでは feature 無効を明示する fail-closed エラー終了とし、DRY gate の評価点では `enabled` を先に評価する規則に従わせる。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
           "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-22-1541-dry-gate-evaluation-feature-off-precedence.md",
+          "anchor": "D1"
         }
       ]
     },
@@ -58,7 +62,7 @@
       },
       {
         "id": "IN-02",
-        "text": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。",
+        "text": "`semantic-dup` feature 無効でビルドした binary において、gate 評価点以外の dry 系実行コマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
@@ -102,6 +106,16 @@
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "DRY gate の評価点では feature 判定より先に `enabled` を評価し、`enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合のみ feature 無効を明示して fail-closed にする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-22-1541-dry-gate-evaluation-feature-off-precedence.md",
             "anchor": "D1"
           }
         ]
@@ -157,11 +171,15 @@
     },
     {
       "id": "CN-02",
-      "text": "feature 無効 binary の dry 系コマンドは silent skip または自動 fallback を行わない。",
+      "text": "feature 無効 binary の gate 評価点以外の dry 系実行コマンドは silent skip または自動 fallback を行わない。DRY gate の評価点は `enabled` を先に評価する IN-07 の規則に従う。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
           "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-22-1541-dry-gate-evaluation-feature-off-precedence.md",
+          "anchor": "D1"
         }
       ]
     },
@@ -199,7 +217,7 @@
     },
     {
       "id": "AC-02",
-      "text": "feature 無効でビルドした binary から dry 系コマンドを実行すると、feature 無効であることが分かるメッセージを出して非成功終了する。コマンドを黙って省略または代替動作させない。",
+      "text": "feature 無効でビルドした binary から gate 評価点以外の dry 系実行コマンドを実行すると、feature 無効であることが分かるメッセージを出して非成功終了する。コマンドを黙って省略または代替動作させない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md",
@@ -246,6 +264,16 @@
           "anchor": "D4"
         }
       ]
+    },
+    {
+      "id": "AC-07",
+      "text": "DRY gate の評価点では、feature 無効 binary であっても `enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合だけ feature 無効を明示する非成功終了となる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-22-1541-dry-gate-evaluation-feature-off-precedence.md",
+          "anchor": "D1"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -267,7 +295,7 @@
     }
   ],
   "signals": {
-    "blue": 23,
+    "blue": 25,
     "yellow": 0,
     "red": 0
   }

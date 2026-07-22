@@ -435,6 +435,54 @@
       }
     },
     {
+      "claim_hash": "2d952d9f65681a998be069ccc47cab213561b6548607449279a8cc8593c5c663",
+      "evidence_hash": "5903a14197da673cbc502bf73bb7f730ca2372dcac9e7ee543bdeea9494dd9b8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合のみ feature 無効を明示して fail-closed にする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "FeatureDisabledDryGateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "DRY gate の評価点では feature 判定より先に `enabled` を評価し、`enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合のみ feature 無効を明示して fail-closed にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2d952d9f65681a998be069ccc47cab213561b6548607449279a8cc8593c5c663",
+      "evidence_hash": "c16c1b6e3d3e96c93eff53a09a4dff94ff4d58d5415e8dd8b4ba5573becad1f9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 無効 binary であっても `enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合だけ feature 無効を明示する非成功終了となる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "FeatureDisabledDryGateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "DRY gate の評価点では、feature 無効 binary であっても `enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合だけ feature 無効を明示する非成功終了となる。"
+        }
+      }
+    },
+    {
       "claim_hash": "4e2241c50d32042125fed1768931842bf72c0404a4b12995740fbef426184c5e",
       "evidence_hash": "432380eb93c60222854fd2f38664996bf1089f1c456ea55ca69a3394e994f38e",
       "verdict": {
@@ -767,6 +815,54 @@
           "section": "acceptance_criteria",
           "element_id": "AC-06",
           "text_label": "各 maintenance primary driver は単一の offered application-service contract だけを保持し、入力 variant による service 選択、service factory の保持、request ごとの runtime service 選択を行わない。command 系と query 系は別々の driver・別々の input family であり、それぞれの注入済み application service を invoke して結果を render する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f170cb88eaeb3ec5775fe254e22138f282853d5ff28a96325ca309b9baf49bf2",
+      "evidence_hash": "5903a14197da673cbc502bf73bb7f730ca2372dcac9e7ee543bdeea9494dd9b8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "DRY gate の評価点では feature 判定より先に `enabled` を評価し、`enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合のみ feature 無効を明示して fail-closed にする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "DryCheckApprovedDriverService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "DRY gate の評価点では feature 判定より先に `enabled` を評価し、`enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合のみ feature 無効を明示して fail-closed にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f170cb88eaeb3ec5775fe254e22138f282853d5ff28a96325ca309b9baf49bf2",
+      "evidence_hash": "c16c1b6e3d3e96c93eff53a09a4dff94ff4d58d5415e8dd8b4ba5573becad1f9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "DRY gate の評価点では、feature 無効 binary であっても `enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合だけ feature 無効を明示する非成功終了となる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "DryCheckApprovedDriverService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "DRY gate の評価点では、feature 無効 binary であっても `enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合だけ feature 無効を明示する非成功終了となる。"
         }
       }
     }

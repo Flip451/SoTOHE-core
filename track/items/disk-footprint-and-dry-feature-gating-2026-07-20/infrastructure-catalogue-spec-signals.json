@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "dfe9838fe05b55b8830efa6925811a3667f58481a60587722b5b0a2ec55f4932",
+  "catalogue_declaration_hash": "6f59bc4b7b8df9d9a3f37878703761ee58834c64ea3622368d3f01ab9e0fe3cf",
   "signals": [
     {
       "type_name": "FsDiskMaintenanceAdapter",
@@ -35,12 +35,12 @@
     {
       "type_name": "FsDryCorpusMetaAdapter",
       "signal": "blue",
-      "entry_hash": "962cf990bdf883b6f330263d6de2efecf935504b0a13f5277a60325272714e9e"
+      "entry_hash": "9470b5922de4ff5656cc007fc77acb30ebe0a33fc53b1bac7d624b0cc2cd7ce8"
     },
     {
       "type_name": "FsDryCorpusRootManifestAdapter",
       "signal": "blue",
-      "entry_hash": "e47a16904a52b0661c0cfbdd2b72149c725adee236e41404b1eca5873735948f"
+      "entry_hash": "c0d89f0acbab575d3abd23a9fc7c1e2ced5d11e1910a40f8b36f79fd70b9526b"
     },
     {
       "type_name": "FsDryWriteConfigLoaderAdapter",
@@ -75,7 +75,7 @@
     {
       "type_name": "RecordingDryTierTelemetryAdapter",
       "signal": "blue",
-      "entry_hash": "e47a16904a52b0661c0cfbdd2b72149c725adee236e41404b1eca5873735948f"
+      "entry_hash": "c0d89f0acbab575d3abd23a9fc7c1e2ced5d11e1910a40f8b36f79fd70b9526b"
     },
     {
       "type_name": "infrastructure::semantic_dup::extractor::extract_code_fragments",

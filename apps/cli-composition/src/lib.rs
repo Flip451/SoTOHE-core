@@ -20,6 +20,7 @@ mod demo;
 mod domain;
 #[cfg(feature = "semantic-dup")]
 pub mod dry;
+mod dry_gate;
 pub mod error;
 mod file;
 mod git;
@@ -86,6 +87,7 @@ pub use demo::DemoCompositionRoot;
 pub use domain::DomainCompositionRoot;
 #[cfg(feature = "semantic-dup")]
 pub use dry::DryCompositionRoot;
+pub use dry_gate::FeatureDisabledDryGateCompositionRoot;
 pub use file::FileCompositionRoot;
 pub use git::GitCompositionRoot;
 pub use guard::GuardCompositionRoot;

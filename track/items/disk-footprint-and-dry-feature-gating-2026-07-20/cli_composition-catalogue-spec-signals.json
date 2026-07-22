@@ -1,7 +1,12 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "8b3a0ad34f8a205160a16aa5bb8f5c10ad7d09babe4982af73d24f61b822b1b7",
+  "catalogue_declaration_hash": "cfcfc484a8faaa321f2833c66c56125a4e2f6fb7e3ad0d7d682a69d25adc3fc1",
   "signals": [
+    {
+      "type_name": "FeatureDisabledDryGateCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "b3b7e47a70a077d6554db328d9567baee6e08c677a15f9c85bfe1abf5829969c"
+    },
     {
       "type_name": "MaintenanceCompositionRoot",
       "signal": "blue",

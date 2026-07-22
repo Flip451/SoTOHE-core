@@ -167,11 +167,7 @@
       "module_path": "dry_check::corpus_meta",
       "spec_refs": [
         {
-          "anchor": "IN-02",
-          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
-        },
-        {
-          "anchor": "AC-02",
+          "anchor": "IN-06",
           "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
         }
       ]
@@ -182,11 +178,7 @@
       "module_path": "dry_check::dry_write_driver",
       "spec_refs": [
         {
-          "anchor": "IN-02",
-          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
-        },
-        {
-          "anchor": "AC-02",
+          "anchor": "IN-06",
           "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
         }
       ]
@@ -283,11 +275,7 @@
       "module_path": "dry_check::dry_write_driver",
       "spec_refs": [
         {
-          "anchor": "IN-02",
-          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
-        },
-        {
-          "anchor": "AC-02",
+          "anchor": "IN-06",
           "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
         }
       ]

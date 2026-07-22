@@ -1,9 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-22T13:26:50Z",
-  "declaration_hash": "d3e996e4bc7aff78fb70e135ef77b111ea92a02d6b5b300ddd01ea66c3127912",
-  "implementation_input_hash": "ef264a4bc8238d23070245145a8cec1f958842d58e4df303db9c6276e658f5ef",
+  "generated_at": "2026-07-22T16:53:38Z",
+  "declaration_hash": "6fde7f1109736c9064d2269fdc2bfbd8f3372565a34b6fcbfcce75b850751c4c",
+  "implementation_input_hash": "f9aee151518483c8342154bf1c185635e67cc5ffc3c179002cac8048424a2335",
   "signals": [
+    {
+      "type_name": "FeatureDisabledDryGateDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
     {
       "type_name": "MaintenanceCommandDriver",
       "kind_tag": "primary_adapter",

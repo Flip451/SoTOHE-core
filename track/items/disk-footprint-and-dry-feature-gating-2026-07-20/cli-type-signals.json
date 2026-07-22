@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-22T13:26:51Z",
-  "declaration_hash": "5a7dd5c1ef131533d0ebe36262e2819102c83cf98258fc9f26b086ee2495ce4e",
-  "implementation_input_hash": "224c4242363dc0a67cbfd3eb6d503d18fb2a77af182ecc609a17ffc3a0ced39d",
+  "generated_at": "2026-07-22T17:01:31Z",
+  "declaration_hash": "8c08ed02bdce0f0e9384ed2f65ac600d457a8cabd405e05836de993dea94b700",
+  "implementation_input_hash": "23a34ae232824143fee66a664ec96cbcae6717605bb05f660168e6cbd6841b5b",
   "signals": [
     {
       "type_name": "CleanupArgs",

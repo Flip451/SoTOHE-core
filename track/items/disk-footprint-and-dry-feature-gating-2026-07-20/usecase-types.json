@@ -1,7 +1,405 @@
 {
-  "schema_version": 5,
   "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "message",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "DiskMaintenanceError"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "port",
+              "ty": "std::sync::Arc<dyn DiskMaintenanceCommandPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "DiskMaintenanceCommandInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "port",
+              "ty": "std::sync::Arc<dyn DiskMaintenanceQueryPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "DiskMaintenanceQueryInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "repo_root",
+              "ty": "std::sync::Arc<dyn DryRepoRootPort>"
+            },
+            {
+              "name": "config_loader",
+              "ty": "std::sync::Arc<dyn DryCheckConfigLoaderPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "FeatureDisabledDryGateInteractor"
+    }
+  ],
   "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "DiskMaintenanceError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "DiskMaintenanceError",
+      "trait_ref": "core::convert::From<domain::disk_maintenance::DiskMaintenanceValidationError>"
+    },
+    {
+      "for_type": "DiskMaintenanceError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "DiskMaintenanceError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "DiskMaintenanceCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "DiskMaintenanceCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "DiskMaintenanceCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "DiskMaintenanceCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "DiskMaintenanceCommandResponse",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "DiskMaintenanceCommandResponse",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "DiskMaintenanceCommandResponse",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "DiskMaintenanceCommandResponse",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CleanupPlanQuery",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CleanupPlanQuery",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CleanupPlanQuery",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CleanupPlanQuery",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CleanupPlanResponse",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CleanupPlanResponse",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CleanupPlanResponse",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CleanupPlanResponse",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "DiskMaintenanceCommandInteractor",
+      "trait_ref": "DiskMaintenanceCommandService"
+    },
+    {
+      "for_type": "DiskMaintenanceQueryInteractor",
+      "trait_ref": "DiskMaintenanceQueryService"
+    },
+    {
+      "for_type": "FeatureDisabledDryGateInteractor",
+      "trait_ref": "DryCheckApprovedDriverService"
+    }
+  ],
+  "traits": {
+    "DiskMaintenanceCommandPort": {
+      "action": "add",
+      "docs": "Synchronous disk-maintenance command capability.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "configure_sccache",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::disk_maintenance::CacheSize, DiskMaintenanceError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "apply_cleanup",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::disk_maintenance::CleanupScopeSet, DiskMaintenanceError>"
+        }
+      ],
+      "module_path": "disk_maintenance",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "DiskMaintenanceCommandService": {
+      "action": "add",
+      "docs": "Application service dedicated to filesystem-mutating maintenance commands; configure and apply share one command boundary while planning remains a separate query.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute_command",
+          "params": [
+            {
+              "name": "command",
+              "ty": "DiskMaintenanceCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<DiskMaintenanceCommandResponse, DiskMaintenanceError>"
+        }
+      ],
+      "module_path": "disk_maintenance",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "DiskMaintenanceQueryPort": {
+      "action": "add",
+      "docs": "Synchronous disk-maintenance query capability.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "plan_cleanup",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::disk_maintenance::CleanupScopeSet, DiskMaintenanceError>"
+        }
+      ],
+      "module_path": "disk_maintenance",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "DiskMaintenanceQueryService": {
+      "action": "add",
+      "docs": "Application service dedicated to the non-mutating cleanup-plan query, keeping read intent independent from maintenance commands.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "plan_cleanup",
+          "params": [
+            {
+              "name": "query",
+              "ty": "CleanupPlanQuery"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<CleanupPlanResponse, DiskMaintenanceError>"
+        }
+      ],
+      "module_path": "disk_maintenance",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "DryCheckApprovedDriverService": {
+      "action": "reference",
+      "docs": "Existing check-approved application service reused unchanged by the feature-off gate interactor.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "dry_check_approved",
+          "params": [
+            {
+              "name": "input",
+              "ty": "DryCheckApprovedDriverInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "DryCheckApprovedOutcome"
+        }
+      ],
+      "module_path": "dry_check_approved_driver",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
   "types": {
     "CleanupPlanQuery": {
       "action": "add",
@@ -275,341 +673,34 @@
           "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
         }
       ]
-    }
-  },
-  "traits": {
-    "DiskMaintenanceCommandPort": {
+    },
+    "FeatureDisabledDryGateInteractor": {
       "action": "add",
-      "docs": "Synchronous disk-maintenance command capability.",
+      "docs": "Feature-off DRY gate interactor.",
       "informal_grounds": [],
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "configure_sccache",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "receiver": "&self",
-          "returns": "Result<domain::disk_maintenance::CacheSize, DiskMaintenanceError>"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "apply_cleanup",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "std::path::PathBuf"
-            }
-          ],
-          "receiver": "&self",
-          "returns": "Result<domain::disk_maintenance::CleanupScopeSet, DiskMaintenanceError>"
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
         }
-      ],
-      "module_path": "disk_maintenance",
+      },
+      "methods": [],
+      "module_path": "dry_check_approved_driver",
       "role": {
-        "SecondaryPort": {}
+        "Interactor": {}
       },
       "spec_refs": [
         {
-          "anchor": "IN-03",
+          "anchor": "IN-07",
           "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
         },
         {
-          "anchor": "AC-03",
-          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
-        },
-        {
-          "anchor": "AC-04",
+          "anchor": "AC-07",
           "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
         }
-      ],
-      "supertrait_bounds": [
-        "Send",
-        "Sync"
-      ]
-    },
-    "DiskMaintenanceCommandService": {
-      "action": "add",
-      "docs": "Application service dedicated to filesystem-mutating maintenance commands; configure and apply share one command boundary while planning remains a separate query.",
-      "informal_grounds": [],
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "execute_command",
-          "params": [
-            {
-              "name": "command",
-              "ty": "DiskMaintenanceCommand"
-            }
-          ],
-          "receiver": "&self",
-          "returns": "Result<DiskMaintenanceCommandResponse, DiskMaintenanceError>"
-        }
-      ],
-      "module_path": "disk_maintenance",
-      "role": {
-        "ApplicationService": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-03",
-          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
-        },
-        {
-          "anchor": "AC-03",
-          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
-        },
-        {
-          "anchor": "AC-04",
-          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
-        },
-        {
-          "anchor": "IN-05",
-          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
-        },
-        {
-          "anchor": "AC-06",
-          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
-        }
-      ],
-      "supertrait_bounds": [
-        "Send",
-        "Sync"
-      ]
-    },
-    "DiskMaintenanceQueryPort": {
-      "action": "add",
-      "docs": "Synchronous disk-maintenance query capability.",
-      "informal_grounds": [],
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "plan_cleanup",
-          "params": [
-            {
-              "name": "project_root",
-              "ty": "&std::path::Path"
-            }
-          ],
-          "receiver": "&self",
-          "returns": "Result<domain::disk_maintenance::CleanupScopeSet, DiskMaintenanceError>"
-        }
-      ],
-      "module_path": "disk_maintenance",
-      "role": {
-        "SecondaryPort": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-03",
-          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
-        },
-        {
-          "anchor": "AC-03",
-          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
-        }
-      ],
-      "supertrait_bounds": [
-        "Send",
-        "Sync"
-      ]
-    },
-    "DiskMaintenanceQueryService": {
-      "action": "add",
-      "docs": "Application service dedicated to the non-mutating cleanup-plan query, keeping read intent independent from maintenance commands.",
-      "informal_grounds": [],
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "plan_cleanup",
-          "params": [
-            {
-              "name": "query",
-              "ty": "CleanupPlanQuery"
-            }
-          ],
-          "receiver": "&self",
-          "returns": "Result<CleanupPlanResponse, DiskMaintenanceError>"
-        }
-      ],
-      "module_path": "disk_maintenance",
-      "role": {
-        "ApplicationService": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-03",
-          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
-        },
-        {
-          "anchor": "AC-03",
-          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
-        },
-        {
-          "anchor": "IN-05",
-          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
-        },
-        {
-          "anchor": "AC-06",
-          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
-        }
-      ],
-      "supertrait_bounds": [
-        "Send",
-        "Sync"
       ]
     }
-  },
-  "functions": {},
-  "inherent_impls": [
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "message",
-              "ty": "impl Into<String>"
-            }
-          ],
-          "returns": "Self"
-        }
-      ],
-      "type_name": "DiskMaintenanceError"
-    },
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "port",
-              "ty": "std::sync::Arc<dyn DiskMaintenanceCommandPort>"
-            }
-          ],
-          "returns": "Self"
-        }
-      ],
-      "type_name": "DiskMaintenanceCommandInteractor"
-    },
-    {
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "port",
-              "ty": "std::sync::Arc<dyn DiskMaintenanceQueryPort>"
-            }
-          ],
-          "returns": "Self"
-        }
-      ],
-      "type_name": "DiskMaintenanceQueryInteractor"
-    }
-  ],
-  "trait_impls": [
-    {
-      "for_type": "DiskMaintenanceError",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "DiskMaintenanceError",
-      "trait_ref": "core::convert::From<domain::disk_maintenance::DiskMaintenanceValidationError>"
-    },
-    {
-      "for_type": "DiskMaintenanceError",
-      "trait_ref": "core::fmt::Display"
-    },
-    {
-      "for_type": "DiskMaintenanceError",
-      "trait_ref": "core::error::Error"
-    },
-    {
-      "for_type": "DiskMaintenanceCommand",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "DiskMaintenanceCommand",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "DiskMaintenanceCommand",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "DiskMaintenanceCommand",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "DiskMaintenanceCommandResponse",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "DiskMaintenanceCommandResponse",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "DiskMaintenanceCommandResponse",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "DiskMaintenanceCommandResponse",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "CleanupPlanQuery",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "CleanupPlanQuery",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "CleanupPlanQuery",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "CleanupPlanQuery",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "CleanupPlanResponse",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "CleanupPlanResponse",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "CleanupPlanResponse",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "CleanupPlanResponse",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "DiskMaintenanceCommandInteractor",
-      "trait_ref": "DiskMaintenanceCommandService"
-    },
-    {
-      "for_type": "DiskMaintenanceQueryInteractor",
-      "trait_ref": "DiskMaintenanceQueryService"
-    }
-  ]
+  }
 }

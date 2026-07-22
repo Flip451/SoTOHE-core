@@ -6,7 +6,7 @@
 |------|------|--------|---------|--------|----------|
 | CliCommand | enum | modify | Arch, AdrBaseline, Conventions, Domain, Guard, Hook, Maintenance, Track, Git, Pr, Capability, Review, File, Verify, FindSimilar, DupIndex, DupCheck, Telemetry, Dry, RefVerify, TestObligation, Signal, TaskContract, Catalog, CatalogueLint, Template, CodexRuntime | 🔵 | 🔵 |
 | MaintenanceCommand | enum | add | ConfigureSccache, Cleanup | 🔵 | 🔵 |
-| SemanticDupCommandFamily | enum | add | Dry, SemanticDuplicate | 🔵 | 🔵 |
+| SemanticDupCommandFamily | enum | add | DryWrite, DryResults, DryFixLocal, SemanticDuplicate | 🔵 | 🔵 |
 | VerdictFilterArg | enum | modify | All, NotAViolation, Accepted, Violation | 🔵 | 🔵 |
 
 ## DTOs

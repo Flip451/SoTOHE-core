@@ -99,15 +99,7 @@
         },
         {
           "layer": "cli",
-          "entry_key": "SemanticDupCommandFamily"
-        },
-        {
-          "layer": "cli",
           "entry_key": "VerdictFilterArg"
-        },
-        {
-          "layer": "cli",
-          "entry_key": "cli::commands::dry::execute_dry_check_approved"
         },
         {
           "layer": "cli",
@@ -124,8 +116,34 @@
         {
           "layer": "cli",
           "entry_key": "cli::commands::semantic_dup_feature_gate::semantic_dup_feature_disabled_exit"
+        },
+        {
+          "layer": "cli",
+          "entry_key": "SemanticDupCommandFamily"
         }
       ],
+    "T006": [
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckApprovedDriverService"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "FeatureDisabledDryGateInteractor"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "FeatureDisabledDryGateDriver"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "FeatureDisabledDryGateCompositionRoot"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::dry::execute_dry_check_approved"
+      }
+    ],
     "T003": [
         {
           "layer": "domain",

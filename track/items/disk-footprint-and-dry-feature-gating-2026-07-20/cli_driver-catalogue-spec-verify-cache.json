@@ -3,6 +3,54 @@
   "layer": "cli_driver",
   "entries": [
     {
+      "claim_hash": "0cdc12f5769ff498d34aa535fe334d021deacd04bbd22a2b05d0afe81c0ecf69",
+      "evidence_hash": "5903a14197da673cbc502bf73bb7f730ca2372dcac9e7ee543bdeea9494dd9b8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "enabled: true` かつ feature 無効の場合のみ feature 無効を明示して fail-closed にする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "FeatureDisabledDryGateDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "DRY gate の評価点では feature 判定より先に `enabled` を評価し、`enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合のみ feature 無効を明示して fail-closed にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0cdc12f5769ff498d34aa535fe334d021deacd04bbd22a2b05d0afe81c0ecf69",
+      "evidence_hash": "c16c1b6e3d3e96c93eff53a09a4dff94ff4d58d5415e8dd8b4ba5573becad1f9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 無効 binary であっても `enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合だけ feature 無効を明示する非成功終了となる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "FeatureDisabledDryGateDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "DRY gate の評価点では、feature 無効 binary であっても `enabled: false` なら semantic-dup 機能を実行せず通過し、`enabled: true` かつ feature 無効の場合だけ feature 無効を明示する非成功終了となる。"
+        }
+      }
+    },
+    {
       "claim_hash": "82d8c88797a278f7d49d187dd363f24234954de2cb7e925db73693bc50108dbd",
       "evidence_hash": "fd94042ae81181f55b5029747ca1cbcd6b399ed6a0658817f5acaeb866b594f6",
       "verdict": {

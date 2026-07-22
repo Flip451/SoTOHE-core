@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "8f14ee7600fc37c753c370db1eb7a73d1c7a8193ad029d23656bfd228229819c",
+  "catalogue_declaration_hash": "bcc5b862e56b7f601030c0752e0f4816da287289afd8dde76f83781bf0c8e469",
   "signals": [
     {
       "type_name": "CleanupPlanQuery",
@@ -38,6 +38,11 @@
       "entry_hash": "9de07b775121c44ab46f380baaa8a90b4fbd980a49cc1f933f0ca5b56fe68d4d"
     },
     {
+      "type_name": "FeatureDisabledDryGateInteractor",
+      "signal": "blue",
+      "entry_hash": "2d952d9f65681a998be069ccc47cab213561b6548607449279a8cc8593c5c663"
+    },
+    {
       "type_name": "DiskMaintenanceCommandPort",
       "signal": "blue",
       "entry_hash": "4e2241c50d32042125fed1768931842bf72c0404a4b12995740fbef426184c5e"
@@ -56,6 +61,11 @@
       "type_name": "DiskMaintenanceQueryService",
       "signal": "blue",
       "entry_hash": "2b565f9f99510776c51d91a83e88cd7fcb63b1d8a0396e3a8665979a7568c967"
+    },
+    {
+      "type_name": "DryCheckApprovedDriverService",
+      "signal": "blue",
+      "entry_hash": "f170cb88eaeb3ec5775fe254e22138f282853d5ff28a96325ca309b9baf49bf2"
     }
   ]
 }

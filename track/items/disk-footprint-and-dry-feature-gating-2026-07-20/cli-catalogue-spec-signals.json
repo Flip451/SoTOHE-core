@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "5a7dd5c1ef131533d0ebe36262e2819102c83cf98258fc9f26b086ee2495ce4e",
+  "catalogue_declaration_hash": "8c08ed02bdce0f0e9384ed2f65ac600d457a8cabd405e05836de993dea94b700",
   "signals": [
     {
       "type_name": "CleanupArgs",
@@ -25,7 +25,7 @@
     {
       "type_name": "SemanticDupCommandFamily",
       "signal": "blue",
-      "entry_hash": "98efe6f4a88e344a0a1ed725e7f8c99050f55f5f1e6c513ea812a22bb388e887"
+      "entry_hash": "f5a7bce075f08fcee03f6c7d5b3aa41bfd954adea5d43496581a25ce550e54b2"
     },
     {
       "type_name": "VerdictFilterArg",
@@ -40,12 +40,12 @@
     {
       "type_name": "cli::commands::semantic_dup_feature_gate::semantic_dup_feature_disabled_exit",
       "signal": "blue",
-      "entry_hash": "28e8bc0e6a955749bfd57d4511a33c822ae750a2739a6a4eddf3cf7b35dd67fd"
+      "entry_hash": "8c216778701fb4e507b6c2a99d4fd0d9def1eaf41e8e31aa2b8cef44862263b0"
     },
     {
       "type_name": "cli::commands::dry::execute_dry_check_approved",
       "signal": "blue",
-      "entry_hash": "bf9a432cad22d7a5590634e50acf9587a3f0b68e0c7f074bf05835807a483df1"
+      "entry_hash": "01e865d55e2290e23aba67b2ec0782e5f279eb0a0f59888d3d6383e3e8971f92"
     },
     {
       "type_name": "cli::commands::dry::execute_dry_fix_local",

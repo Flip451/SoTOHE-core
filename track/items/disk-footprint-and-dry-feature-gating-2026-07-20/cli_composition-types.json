@@ -29,6 +29,26 @@
         }
       ],
       "type_name": "MaintenanceCompositionRoot"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::dry::FeatureDisabledDryGateDriver"
+        }
+      ],
+      "type_name": "FeatureDisabledDryGateCompositionRoot"
     }
   ],
   "layer": "cli_composition",
@@ -85,6 +105,32 @@
       "spec_refs": [
         {
           "anchor": "IN-06",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "FeatureDisabledDryGateCompositionRoot": {
+      "action": "add",
+      "docs": "Feature-off composition root that wires the lightweight check-approved interactor from the existing repository-root and dry-check-config adapters.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "dry_gate",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-07",
           "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
         }
       ]
