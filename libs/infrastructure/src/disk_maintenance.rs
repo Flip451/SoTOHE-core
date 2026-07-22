@@ -1,7 +1,7 @@
 //! Filesystem adapter for configurable disk maintenance.
 
-use std::ffi::OsStr;
-use std::fs::{self, File};
+use std::ffi::{CString, OsStr};
+use std::fs::File;
 use std::io::{Error, ErrorKind, Read, Write};
 use std::mem::MaybeUninit;
 use std::path::{Path, PathBuf};
@@ -12,9 +12,8 @@ use usecase::disk_maintenance::{
     DiskMaintenanceCommandPort, DiskMaintenanceError, DiskMaintenanceQueryPort,
 };
 
-use crate::track::symlink_guard::{reject_symlinks_below, reject_symlinks_up_to_root};
-
 const MAX_DISK_MAINTENANCE_CONFIG_BYTES: u64 = 1024 * 1024;
+const DIRECTORY_ENTRY_BUFFER_BYTES: usize = 8192;
 
 /// Disk-maintenance filesystem adapter.
 #[derive(Debug, Default)]
@@ -41,52 +40,11 @@ impl FsDiskMaintenanceAdapter {
         Self
     }
 
-    fn config_path(project_root: &Path) -> Result<PathBuf, DiskMaintenanceError> {
-        let metadata = project_root.symlink_metadata().map_err(|error| {
-            DiskMaintenanceError::new(format!(
-                "cannot inspect project root {}: {error}",
-                project_root.display()
-            ))
-        })?;
-        if metadata.file_type().is_symlink() || !metadata.is_dir() {
-            return Err(DiskMaintenanceError::new(format!(
-                "project root is not a directory: {}",
-                project_root.display()
-            )));
-        }
-        let path = project_root.join(".harness/config/disk-maintenance.toml");
-        Self::reject_symlinks(&path, project_root, "disk-maintenance configuration")?;
-        Ok(path)
+    fn config_path(project_root: &Path) -> PathBuf {
+        project_root.join(".harness/config/disk-maintenance.toml")
     }
 
-    fn reject_symlinks(
-        path: &Path,
-        project_root: &Path,
-        label: &str,
-    ) -> Result<bool, DiskMaintenanceError> {
-        reject_symlinks_up_to_root(project_root).map_err(|error| {
-            DiskMaintenanceError::new(format!(
-                "refusing to use {label} {}: {error}",
-                path.display()
-            ))
-        })?;
-        reject_symlinks_below(path, project_root).map_err(|error| {
-            DiskMaintenanceError::new(format!(
-                "refusing to use {label} {}: {error}",
-                path.display()
-            ))
-        })
-    }
-
-    fn read_config_file(path: &Path) -> Result<String, std::io::Error> {
-        let metadata = path.symlink_metadata()?;
-        if !metadata.file_type().is_file() {
-            return Err(Error::new(
-                ErrorKind::InvalidInput,
-                format!("{} is not a regular file", path.display()),
-            ));
-        }
-        let file = fs::File::open(path)?;
+    fn read_config_file(file: File, path: &Path) -> Result<String, std::io::Error> {
         let opened_metadata = file.metadata()?;
         if !opened_metadata.is_file() {
             return Err(Error::new(
@@ -119,10 +77,15 @@ impl FsDiskMaintenanceAdapter {
         Ok(content)
     }
 
-    fn load_config(project_root: &Path) -> Result<DiskMaintenanceConfig, DiskMaintenanceError> {
-        let path = Self::config_path(project_root)?;
-        let raw = Self::read_config_file(&path).map_err(|error| {
-            DiskMaintenanceError::new(format!("cannot read {}: {error}", path.display()))
+    fn load_config(
+        project_root: &Path,
+        project_directory: &File,
+    ) -> Result<DiskMaintenanceConfig, DiskMaintenanceError> {
+        let path = Self::config_path(project_root);
+        let raw = Self::open_config_file(project_directory, &path).and_then(|file| {
+            Self::read_config_file(file, &path).map_err(|error| {
+                DiskMaintenanceError::new(format!("cannot read {}: {error}", path.display()))
+            })
         })?;
         let file: DiskMaintenanceFile = toml::from_str(&raw).map_err(|error| {
             DiskMaintenanceError::new(format!("invalid {}: {error}", path.display()))
@@ -133,6 +96,30 @@ impl FsDiskMaintenanceAdapter {
             scopes.push(CleanupScope::try_new(scope)?);
         }
         Ok(DiskMaintenanceConfig::new(max_cache_size, CleanupScopeSet::try_new(scopes)?))
+    }
+
+    fn open_config_file(
+        project_directory: &File,
+        path: &Path,
+    ) -> Result<File, DiskMaintenanceError> {
+        let harness = Self::open_directory_at_nofollow(project_directory, OsStr::new(".harness"))
+            .map_err(|error| {
+            DiskMaintenanceError::new(format!("cannot open {}: {error}", path.display()))
+        })?;
+        let config =
+            Self::open_directory_at_nofollow(&harness, OsStr::new("config")).map_err(|error| {
+                DiskMaintenanceError::new(format!("cannot open {}: {error}", path.display()))
+            })?;
+        rustix::fs::openat(
+            &config,
+            OsStr::new("disk-maintenance.toml"),
+            rustix::fs::OFlags::RDONLY | rustix::fs::OFlags::NOFOLLOW | rustix::fs::OFlags::CLOEXEC,
+            rustix::fs::Mode::empty(),
+        )
+        .map(File::from)
+        .map_err(|error| {
+            DiskMaintenanceError::new(format!("cannot read {}: {error}", path.display()))
+        })
     }
 
     fn cleanup_root(
@@ -157,6 +144,36 @@ impl FsDiskMaintenanceAdapter {
         )
         .map(File::from)
         .map_err(Into::into)
+    }
+
+    fn open_project_directory_nofollow(project_root: &Path) -> Result<File, std::io::Error> {
+        let directory = if project_root.is_absolute() {
+            Self::open_directory_nofollow(Path::new("/"))?
+        } else {
+            Self::open_directory_nofollow(Path::new("."))?
+        };
+        Self::open_directory_components_nofollow(directory, project_root.components())
+    }
+
+    fn open_directory_components_nofollow(
+        mut directory: File,
+        components: std::path::Components<'_>,
+    ) -> Result<File, std::io::Error> {
+        for component in components {
+            let name = match component {
+                std::path::Component::RootDir | std::path::Component::CurDir => continue,
+                std::path::Component::Normal(name) => name,
+                std::path::Component::ParentDir => OsStr::new(".."),
+                std::path::Component::Prefix(_) => {
+                    return Err(Error::new(
+                        ErrorKind::InvalidInput,
+                        "unsupported project root path prefix",
+                    ));
+                }
+            };
+            directory = Self::open_directory_at_nofollow(&directory, name)?;
+        }
+        Ok(directory)
     }
 
     fn open_directory_at_nofollow(parent: &File, name: &OsStr) -> Result<File, std::io::Error> {
@@ -188,15 +205,14 @@ impl FsDiskMaintenanceAdapter {
     }
 
     fn open_cleanup_root(
-        project_root: &Path,
+        project_directory: &File,
         scope: &CleanupScope,
         root: &Path,
     ) -> Result<File, DiskMaintenanceError> {
-        Self::reject_symlinks(project_root, project_root, "cleanup root")?;
-        let mut directory = Self::open_directory_nofollow(project_root).map_err(|error| {
+        let mut directory = project_directory.try_clone().map_err(|error| {
             DiskMaintenanceError::new(format!(
-                "cannot open cleanup project root {}: {error}",
-                project_root.display()
+                "cannot retain cleanup root {}: {error}",
+                root.display()
             ))
         })?;
 
@@ -214,33 +230,111 @@ impl FsDiskMaintenanceAdapter {
         Ok(directory)
     }
 
-    fn empty_open_directory(directory: &File, root: &Path) -> Result<(), DiskMaintenanceError> {
-        let mut buffer = [MaybeUninit::uninit(); 8192];
+    fn read_directory_entry_batch(
+        directory: &File,
+        root: &Path,
+    ) -> Result<Option<Vec<CString>>, DiskMaintenanceError> {
+        let mut buffer = [MaybeUninit::uninit(); DIRECTORY_ENTRY_BUFFER_BYTES];
         let mut entries = rustix::fs::RawDir::new(directory, &mut buffer);
-        while let Some(entry) = entries.next() {
-            let entry = entry.map_err(|error| {
-                DiskMaintenanceError::new(format!(
-                    "cannot read cleanup root {}: {error}",
-                    root.display()
-                ))
-            })?;
+        let mut names = Vec::new();
+        let Some(entry) = entries.next() else {
+            return Ok(None);
+        };
+        let mut entry = entry.map_err(|error| {
+            DiskMaintenanceError::new(format!(
+                "cannot read cleanup root {}: {error}",
+                root.display()
+            ))
+        })?;
+        loop {
             let name = entry.file_name();
             if matches!(name.to_bytes(), b"." | b"..") {
-                continue;
+                // Skip directory self and parent entries.
+            } else {
+                names.push(name.to_owned());
             }
+            if entries.is_buffer_empty() {
+                return Ok(Some(names));
+            }
+            entry = entries
+                .next()
+                .ok_or_else(|| {
+                    DiskMaintenanceError::new(format!(
+                        "cannot read cleanup root {}: incomplete directory entry batch",
+                        root.display()
+                    ))
+                })?
+                .map_err(|error| {
+                    DiskMaintenanceError::new(format!(
+                        "cannot read cleanup root {}: {error}",
+                        root.display()
+                    ))
+                })?;
+        }
+    }
 
-            let entry_metadata =
-                rustix::fs::statat(directory, name, rustix::fs::AtFlags::SYMLINK_NOFOLLOW)
+    fn empty_open_directory(directory: File, root: &Path) -> Result<(), DiskMaintenanceError> {
+        struct DirectoryFrame {
+            directory: File,
+            entries: Vec<CString>,
+            next_entry: usize,
+            parent_entry: Option<CString>,
+        }
+
+        let mut frames = vec![DirectoryFrame {
+            entries: Vec::new(),
+            directory,
+            next_entry: 0,
+            parent_entry: None,
+        }];
+        while let Some(frame) = frames.last_mut() {
+            if frame.next_entry == frame.entries.len() {
+                if let Some(entries) = Self::read_directory_entry_batch(&frame.directory, root)? {
+                    frame.entries = entries;
+                    frame.next_entry = 0;
+                    continue;
+                }
+                let completed = frames.pop().ok_or_else(|| {
+                    DiskMaintenanceError::new("cleanup traversal lost its current directory")
+                })?;
+                if let Some(parent_entry) = completed.parent_entry {
+                    let parent = frames.last().ok_or_else(|| {
+                        DiskMaintenanceError::new("cleanup traversal lost a parent directory")
+                    })?;
+                    rustix::fs::unlinkat(
+                        &parent.directory,
+                        parent_entry.as_c_str(),
+                        rustix::fs::AtFlags::REMOVEDIR,
+                    )
                     .map_err(|error| {
                         DiskMaintenanceError::new(format!(
-                            "cannot inspect cleanup entry below {}: {error}",
+                            "cannot remove cleanup directory below {}: {error}",
                             root.display()
                         ))
                     })?;
+                }
+                continue;
+            }
+            let name = frame.entries.get(frame.next_entry).cloned().ok_or_else(|| {
+                DiskMaintenanceError::new("cleanup traversal lost its current directory entry")
+            })?;
+            frame.next_entry = frame.next_entry.saturating_add(1);
+
+            let entry_metadata = rustix::fs::statat(
+                &frame.directory,
+                name.as_c_str(),
+                rustix::fs::AtFlags::SYMLINK_NOFOLLOW,
+            )
+            .map_err(|error| {
+                DiskMaintenanceError::new(format!(
+                    "cannot inspect cleanup entry below {}: {error}",
+                    root.display()
+                ))
+            })?;
             if rustix::fs::FileType::from_raw_mode(entry_metadata.st_mode).is_dir() {
                 let child = rustix::fs::openat(
-                    directory,
-                    name,
+                    &frame.directory,
+                    name.as_c_str(),
                     rustix::fs::OFlags::RDONLY
                         | rustix::fs::OFlags::DIRECTORY
                         | rustix::fs::OFlags::NOFOLLOW
@@ -254,36 +348,36 @@ impl FsDiskMaintenanceAdapter {
                         root.display()
                     ))
                 })?;
-                Self::empty_open_directory(&child, root)?;
-                rustix::fs::unlinkat(directory, name, rustix::fs::AtFlags::REMOVEDIR).map_err(
-                    |error| {
-                        DiskMaintenanceError::new(format!(
-                            "cannot remove cleanup directory below {}: {error}",
-                            root.display()
-                        ))
-                    },
-                )?;
+                frames.push(DirectoryFrame {
+                    entries: Vec::new(),
+                    directory: child,
+                    next_entry: 0,
+                    parent_entry: Some(name),
+                });
             } else {
-                rustix::fs::unlinkat(directory, name, rustix::fs::AtFlags::empty()).map_err(
-                    |error| {
-                        DiskMaintenanceError::new(format!(
-                            "cannot remove cleanup entry below {}: {error}",
-                            root.display()
-                        ))
-                    },
-                )?;
+                rustix::fs::unlinkat(
+                    &frame.directory,
+                    name.as_c_str(),
+                    rustix::fs::AtFlags::empty(),
+                )
+                .map_err(|error| {
+                    DiskMaintenanceError::new(format!(
+                        "cannot remove cleanup entry below {}: {error}",
+                        root.display()
+                    ))
+                })?;
             }
         }
         Ok(())
     }
 
     fn empty_directory(
-        project_root: &Path,
+        project_directory: &File,
         scope: &CleanupScope,
         root: &Path,
     ) -> Result<(), DiskMaintenanceError> {
-        let directory = Self::open_cleanup_root(project_root, scope, root)?;
-        Self::empty_open_directory(&directory, root)
+        let directory = Self::open_cleanup_root(project_directory, scope, root)?;
+        Self::empty_open_directory(directory, root)
     }
 
     fn open_sccache_environment_file(
@@ -328,21 +422,28 @@ impl FsDiskMaintenanceAdapter {
 
 impl DiskMaintenanceQueryPort for FsDiskMaintenanceAdapter {
     fn plan_cleanup(&self, project_root: &Path) -> Result<CleanupScopeSet, DiskMaintenanceError> {
-        Ok(Self::load_config(project_root)?.cleanup_scopes().clone())
+        let project_directory =
+            Self::open_project_directory_nofollow(project_root).map_err(|error| {
+                DiskMaintenanceError::new(format!(
+                    "cannot open project root {}: {error}",
+                    project_root.display()
+                ))
+            })?;
+        Ok(Self::load_config(project_root, &project_directory)?.cleanup_scopes().clone())
     }
 }
 
 impl DiskMaintenanceCommandPort for FsDiskMaintenanceAdapter {
     fn configure_sccache(&self, project_root: &Path) -> Result<CacheSize, DiskMaintenanceError> {
-        let config = Self::load_config(project_root)?;
         let cache_dir = project_root.join(".cache");
-        Self::reject_symlinks(&cache_dir, project_root, "sccache cache directory")?;
-        let project_directory = Self::open_directory_nofollow(project_root).map_err(|error| {
-            DiskMaintenanceError::new(format!(
-                "cannot open sccache project root {}: {error}",
-                project_root.display()
-            ))
-        })?;
+        let project_directory =
+            Self::open_project_directory_nofollow(project_root).map_err(|error| {
+                DiskMaintenanceError::new(format!(
+                    "cannot open sccache project root {}: {error}",
+                    project_root.display()
+                ))
+            })?;
+        let config = Self::load_config(project_root, &project_directory)?;
         let cache_directory = Self::open_or_create_directory_at(
             &project_directory,
             OsStr::new(".cache"),
@@ -370,10 +471,17 @@ impl DiskMaintenanceCommandPort for FsDiskMaintenanceAdapter {
         &self,
         project_root: PathBuf,
     ) -> Result<CleanupScopeSet, DiskMaintenanceError> {
-        let config = Self::load_config(&project_root)?;
+        let project_directory =
+            Self::open_project_directory_nofollow(&project_root).map_err(|error| {
+                DiskMaintenanceError::new(format!(
+                    "cannot open cleanup project root {}: {error}",
+                    project_root.display()
+                ))
+            })?;
+        let config = Self::load_config(&project_root, &project_directory)?;
         for scope in config.cleanup_scopes().as_slice() {
             let root = Self::cleanup_root(&project_root, scope)?;
-            Self::empty_directory(&project_root, scope, &root)?;
+            Self::empty_directory(&project_directory, scope, &root)?;
         }
         Ok(config.cleanup_scopes().clone())
     }
@@ -382,6 +490,7 @@ impl DiskMaintenanceCommandPort for FsDiskMaintenanceAdapter {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
 
     fn write_config(root: &Path, scopes: &str) -> std::io::Result<()> {
         let config = root.join(".harness/config");
@@ -545,7 +654,7 @@ mod tests {
         fs::rename(&cleanup_root, &original_root)?;
         std::os::unix::fs::symlink(outside.path(), &cleanup_root)?;
 
-        FsDiskMaintenanceAdapter::empty_open_directory(&opened_root, &cleanup_root)?;
+        FsDiskMaintenanceAdapter::empty_open_directory(opened_root, &cleanup_root)?;
 
         assert!(fs::read_dir(&original_root)?.next().is_none());
         assert_eq!(fs::read_to_string(sentinel)?, "unchanged");
@@ -579,6 +688,69 @@ mod tests {
 
         assert_eq!(fs::read_to_string(&original_environment_path)?, "updated");
         assert_eq!(fs::read_to_string(sentinel)?, "unchanged");
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_descriptor_root_ancestor_swap_preserves_external_sccache_file()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let root = tempfile::tempdir()?;
+        let outside = tempfile::tempdir()?;
+        let ancestor = root.path().join("ancestor");
+        let project = ancestor.join("project");
+        fs::create_dir_all(&project)?;
+        let sentinel = outside.path().join(".cache/sccache.env");
+        fs::create_dir_all(sentinel.parent().ok_or("sentinel has no parent")?)?;
+        fs::write(&sentinel, "unchanged")?;
+
+        let retained_ancestor = FsDiskMaintenanceAdapter::open_directory_nofollow(&ancestor)?;
+        let original_ancestor = root.path().join("ancestor-before-swap");
+        fs::rename(&ancestor, &original_ancestor)?;
+        std::os::unix::fs::symlink(outside.path(), &ancestor)?;
+
+        let project_directory = FsDiskMaintenanceAdapter::open_directory_components_nofollow(
+            retained_ancestor,
+            Path::new("project").components(),
+        )?;
+        let cache_directory = FsDiskMaintenanceAdapter::open_or_create_directory_at(
+            &project_directory,
+            OsStr::new(".cache"),
+        )?;
+        let mut environment_file = FsDiskMaintenanceAdapter::open_sccache_environment_file(
+            &cache_directory,
+            &project.join(".cache/sccache.env"),
+        )?;
+        environment_file.write_all(b"updated")?;
+
+        assert_eq!(
+            fs::read_to_string(original_ancestor.join("project/.cache/sccache.env"))?,
+            "updated"
+        );
+        assert_eq!(fs::read_to_string(sentinel)?, "unchanged");
+        Ok(())
+    }
+
+    #[test]
+    fn test_apply_cleanup_deep_tree_completes_without_stack_overflow()
+    -> Result<(), Box<dyn std::error::Error>> {
+        const DEPTH: usize = 1024;
+
+        let root = tempfile::tempdir()?;
+        write_config(root.path(), "\"target\"")?;
+        let target = root.path().join("target");
+        let mut nested = target.clone();
+        fs::create_dir_all(&nested)?;
+        for _ in 0..DEPTH {
+            nested.push("d");
+            fs::create_dir(&nested)?;
+        }
+        fs::write(nested.join("artifact"), "remove")?;
+
+        FsDiskMaintenanceAdapter::new().apply_cleanup(root.path().to_path_buf())?;
+
+        assert!(target.is_dir());
+        assert!(fs::read_dir(target)?.next().is_none());
         Ok(())
     }
 }
