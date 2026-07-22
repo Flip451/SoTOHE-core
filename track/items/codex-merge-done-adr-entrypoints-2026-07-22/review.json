@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4f4ae6db5fb1c31958e36174b0ccbb6cbf08c657590da902021b5b946ee4966",
+          "at": "2026-07-22T11:55:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4f4ae6db5fb1c31958e36174b0ccbb6cbf08c657590da902021b5b946ee4966",
+          "at": "2026-07-22T11:59:02Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -31,6 +49,85 @@
           "findings": [],
           "hash": "rvw1:sha256:5765cee3f2c0779110473aa3cbab6fd1821b8c0299e3a774a2a840655f2ace8c",
           "at": "2026-07-22T12:58:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8829d9d8c6c28c0c62607c61da580255c643a5845c7ffaa0caff8209ebc458bd",
+          "at": "2026-07-22T13:25:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8829d9d8c6c28c0c62607c61da580255c643a5845c7ffaa0caff8209ebc458bd",
+          "at": "2026-07-22T13:28:02Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:614cc55b3aef537d37da740768c44eda181a92c053341f7977d46a24e54c6079",
+          "at": "2026-07-22T12:24:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-02 requires all three skills to retain workflow authority in `.harness`, but the declared in-scope work only adds files under `.agents/skills/`. In particular, `adr-add` currently has no provider-independent workflow SSoT under `.harness/workflows/`, so satisfying this acceptance criterion necessarily requires work outside the declared scope.",
+              "severity": "P1",
+              "file": "track/items/codex-merge-done-adr-entrypoints-2026-07-22/spec.json",
+              "line": 116,
+              "category": "scope / acceptance_criteria contradiction"
+            },
+            {
+              "message": "The related-convention list includes conventions that do not apply to this documentation-only adapter track: `responsibility-boundary.md` governs CI/verifier enforcement, while `language-policy.md#Rust First`, `coding-principles.md`, and `prefer-type-safe-abstractions.md` govern implementation code. These off-topic inputs can misdirect downstream planning despite the track intentionally having no code/type work.",
+              "severity": "P1",
+              "file": "track/items/codex-merge-done-adr-entrypoints-2026-07-22/spec.json",
+              "line": 147,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:614cc55b3aef537d37da740768c44eda181a92c053341f7977d46a24e54c6079",
+          "at": "2026-07-22T12:28:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:215e13927caaa9ed4045f426ab632243cbb6565132d20de5e5bca41df74ebfa9",
+          "at": "2026-07-22T12:31:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:215e13927caaa9ed4045f426ab632243cbb6565132d20de5e5bca41df74ebfa9",
+          "at": "2026-07-22T12:31:19Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c3d7f4e4e010fd6b9e53150bcc0c6d9244aeeb8dc4f0dac9de708fd4a7e77df",
+          "at": "2026-07-22T12:24:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c3d7f4e4e010fd6b9e53150bcc0c6d9244aeeb8dc4f0dac9de708fd4a7e77df",
+          "at": "2026-07-22T12:26:18Z"
         }
       ]
     },
@@ -142,89 +239,6 @@
           "findings": [],
           "hash": "rvw1:sha256:58b2c215a84c6576ab602d0e857361a5d9f7cc36ba39dde2bfd911abf07db3f8",
           "at": "2026-07-22T13:07:22Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b4f4ae6db5fb1c31958e36174b0ccbb6cbf08c657590da902021b5b946ee4966",
-          "at": "2026-07-22T11:55:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b4f4ae6db5fb1c31958e36174b0ccbb6cbf08c657590da902021b5b946ee4966",
-          "at": "2026-07-22T11:59:02Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:614cc55b3aef537d37da740768c44eda181a92c053341f7977d46a24e54c6079",
-          "at": "2026-07-22T12:24:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-02 requires all three skills to retain workflow authority in `.harness`, but the declared in-scope work only adds files under `.agents/skills/`. In particular, `adr-add` currently has no provider-independent workflow SSoT under `.harness/workflows/`, so satisfying this acceptance criterion necessarily requires work outside the declared scope.",
-              "severity": "P1",
-              "file": "track/items/codex-merge-done-adr-entrypoints-2026-07-22/spec.json",
-              "line": 116,
-              "category": "scope / acceptance_criteria contradiction"
-            },
-            {
-              "message": "The related-convention list includes conventions that do not apply to this documentation-only adapter track: `responsibility-boundary.md` governs CI/verifier enforcement, while `language-policy.md#Rust First`, `coding-principles.md`, and `prefer-type-safe-abstractions.md` govern implementation code. These off-topic inputs can misdirect downstream planning despite the track intentionally having no code/type work.",
-              "severity": "P1",
-              "file": "track/items/codex-merge-done-adr-entrypoints-2026-07-22/spec.json",
-              "line": 147,
-              "category": "broken cross-reference at narrative level"
-            }
-          ],
-          "hash": "rvw1:sha256:614cc55b3aef537d37da740768c44eda181a92c053341f7977d46a24e54c6079",
-          "at": "2026-07-22T12:28:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:215e13927caaa9ed4045f426ab632243cbb6565132d20de5e5bca41df74ebfa9",
-          "at": "2026-07-22T12:31:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:215e13927caaa9ed4045f426ab632243cbb6565132d20de5e5bca41df74ebfa9",
-          "at": "2026-07-22T12:31:19Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8c3d7f4e4e010fd6b9e53150bcc0c6d9244aeeb8dc4f0dac9de708fd4a7e77df",
-          "at": "2026-07-22T12:24:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8c3d7f4e4e010fd6b9e53150bcc0c6d9244aeeb8dc4f0dac9de708fd4a7e77df",
-          "at": "2026-07-22T12:26:18Z"
         }
       ]
     }
