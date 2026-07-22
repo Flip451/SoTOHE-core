@@ -19,6 +19,39 @@
         }
       ]
     },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e960652d241bcf789b44fdec9d859db8019448cff71b43634943a73011b4a622",
+          "at": "2026-07-22T12:54:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "YAML front matter は本文より前に必須（同ファイル 68 行目および `knowledge/conventions/adr.md`）なので、適合する ADR の 1 行目は `---` となり、見出しを 1 行目に置くことはできません。この検証条件のままでは、正しく生成したすべての新規 ADR が失敗するか、front matter を省略した不正な ADR を促します。見出しが front matter の直後にあることを検証してください。",
+              "severity": "P1",
+              "file": ".harness/workflows/adr/add.md",
+              "line": 78,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e960652d241bcf789b44fdec9d859db8019448cff71b43634943a73011b4a622",
+          "at": "2026-07-22T12:56:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5765cee3f2c0779110473aa3cbab6fd1821b8c0299e3a774a2a840655f2ace8c",
+          "at": "2026-07-22T12:58:26Z"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -99,6 +132,20 @@
           "findings": [],
           "hash": "rvw1:sha256:982ff6dee178fcd5996a39f45cd01d635891ea2d1cd56b140294cd804383b922",
           "at": "2026-07-22T12:36:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d4e5c3875ba8e48b58a3f6936df414b9fc63a8daefd4d4811b06c7b2c270c19",
+          "at": "2026-07-22T12:53:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d4e5c3875ba8e48b58a3f6936df414b9fc63a8daefd4d4811b06c7b2c270c19",
+          "at": "2026-07-22T13:00:10Z"
         }
       ]
     },
