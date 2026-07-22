@@ -125,6 +125,10 @@ Choose (a) when the ground is track-specific behaviour the ADR must persist; (b)
 - If information beyond the briefing is needed, note it in `## Open Questions` rather than probing silently via exploration.
 - If the ADR is missing, ambiguous, or contradicts the briefing, report it as an open question — never paper over the gap by inventing decisions.
 
+## Re-entry prerequisite (sequencing discipline)
+
+Per `knowledge/conventions/sot-reentry-sequencing.md`, a re-entry dispatch of this capability requires the convergence of its direct upstream only — the ADR (`adr_user` chain: reference signal per `.harness/config/signal-gates.json` and adr-scope review `zero_findings`; semantic verification is not required for the `adr_user` chain). If the briefing shows this prerequisite unmet, do not start authoring: return the briefing to the orchestrator stating the unmet prerequisite. If mid-work you discover the ADR itself needs editing, stop immediately and return to the orchestrator (immediate bounce-back; no deferred-fix continuation).
+
 ## Rules
 
 - Use `Read`, `Grep`, `Glob`, `WebFetch`, `WebSearch` for exploration; `Write` / `Edit` for `spec.json` only; `Bash` only for `bin/sotp` CLI (`calc-spec-adr` persists signal counts; `track views sync` regenerates `spec.md`)
