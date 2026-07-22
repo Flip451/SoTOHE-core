@@ -279,10 +279,10 @@
     },
     {
       "claim_hash": "6c2427bccc85891cdfc0e2a53ccc5664a1b399b74108ebe2e57495cf525d69dc",
-      "evidence_hash": "158fb34cccbb3917bc4bec4b4da2f81bfdd8405dcd14915f787ac6b4a8b9315d",
+      "evidence_hash": "9e6c6c20e1e69a19b0b71ba45f9dd7736ac3bd33b8fe3bfdc09c0292be770a0c",
       "verdict": {
         "kind": "pass",
-        "citation": "ADR 収束は、次の両方が成立したときに限り成立する。\n\n1. `adr_user` の参照信号が `.harness/config/signal-gates.json` の当該 chain × gate 指定を満たす。\n2. ADR scope review が `zero_findings` で完了している。"
+        "citation": "ADR 収束は、次の両方が成立したときに限り成立する。\n\n1. `adr_user` の参照信号が `.harness/config/signal-gates.json` の当該 chain × gate 指定を満たす。\n2. ADR scope review が `zero_findings` で完了している。\n\nこの除外は `adr_user` chain の ADR 収束だけに限定する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -302,7 +302,7 @@
     },
     {
       "claim_hash": "b721d367eb0379756193a36fc5641892710d40e08b97c464b63eff4df0883647",
-      "evidence_hash": "a9b38e13f76a35746cd49d16f68409c140f4fc39147ea7f37a2a8fe5a446a29d",
+      "evidence_hash": "294d15dd7d9e0b07e5f2b3384f8796fe7a6779859aa88ff965cb9b9b10aca35e",
       "verdict": {
         "kind": "pass",
         "citation": "上流収束の意味論検証要素は、当該上流 chain に関係する `ref-verify` 指摘がすべて解消されていることだけを問う。"
@@ -371,10 +371,10 @@
     },
     {
       "claim_hash": "feeec740f6ecd5dd7c886c13d27ceac36b2a773784deea8af8b526d3bb9d39b5",
-      "evidence_hash": "ddbbdba6a472ab55ddebea34d8a6df18645c3b37595e9688e10f9b47e70aae77",
+      "evidence_hash": "d1d3e9af2d55685d2554f715385dd6f8a6811072e7903e6ff182cbe4282eea16",
       "verdict": {
         "kind": "pass",
-        "citation": "この変更が「収束を失効させない」とは、SoT 再入の sequencing 規律において上流フェーズへの rollback と下流作業の停止を要求しないことだけを意味する。\n\nD5 の例外は、この hash-based commit gate の review refresh を免除しない。"
+        "citation": "この変更が「収束を失効させない」とは、SoT 再入の sequencing 規律において上流フェーズへの rollback と下流作業の停止を要求しないことだけを意味する。task ステータス遷移によって `impl-plan.json` の hash が変わった場合、`.harness/workflows/track/full-cycle.md` の lifecycle tail に従い、commit 前に current hash を対象とする impl-plan scope の final `zero_findings` review を改めて完了しなければならない。D5 の例外は、この hash-based commit gate の review refresh を免除しない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -555,10 +555,10 @@
     },
     {
       "claim_hash": "8590a172813e00f70df8a78a9bdfa240f93ef8e0e41e664119776f40cb2a66e0",
-      "evidence_hash": "ddbbdba6a472ab55ddebea34d8a6df18645c3b37595e9688e10f9b47e70aae77",
+      "evidence_hash": "d1d3e9af2d55685d2554f715385dd6f8a6811072e7903e6ff182cbe4282eea16",
       "verdict": {
         "kind": "pass",
-        "citation": "この変更が「収束を失効させない」とは、SoT 再入の sequencing 規律において上流フェーズへの rollback と下流作業の停止を要求しないことだけを意味する。」「task ステータス遷移によって `impl-plan.json` の hash が変わった場合、`.harness/workflows/track/full-cycle.md` の lifecycle tail に従い、commit 前に current hash を対象とする impl-plan scope の final `zero_findings` review を改めて完了しなければならない。」「D5 の例外は、この hash-based commit gate の review refresh を免除しない。」"
+        "citation": "レビュー収束後の `impl-plan.json` に許容する変更種別は、従来どおり `bin/sotp track transition` による task ステータス遷移だけとする。\\n\\nこの変更が「収束を失効させない」とは、SoT 再入の sequencing 規律において上流フェーズへの rollback と下流作業の停止を要求しないことだけを意味する。\\n\\ntask ステータス遷移によって `impl-plan.json` の hash が変わった場合、`.harness/workflows/track/full-cycle.md` の lifecycle tail に従い、commit 前に current hash を対象とする impl-plan scope の final `zero_findings` review を改めて完了しなければならない。\\n\\nD5 の例外は、この hash-based commit gate の review refresh を免除しない。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -670,10 +670,10 @@
     },
     {
       "claim_hash": "4627ef4da445ba32eac3b9d945e5d7cfb7789367006996e0ed109c8e0447d673",
-      "evidence_hash": "158fb34cccbb3917bc4bec4b4da2f81bfdd8405dcd14915f787ac6b4a8b9315d",
+      "evidence_hash": "9e6c6c20e1e69a19b0b71ba45f9dd7736ac3bd33b8fe3bfdc09c0292be770a0c",
       "verdict": {
         "kind": "pass",
-        "citation": "ADR 収束は、次の両方が成立したときに限り成立する。"
+        "citation": "ADR 収束（`adr_user` chain）には、D2 の意味論検証（ref-verify）要素を要求しない。ADR 収束は、次の両方が成立したときに限り成立する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -693,10 +693,10 @@
     },
     {
       "claim_hash": "82b62c73b1a47c6e9836433381428bd0b9f2da8963f53fe1766db3b56bf870aa",
-      "evidence_hash": "a9b38e13f76a35746cd49d16f68409c140f4fc39147ea7f37a2a8fe5a446a29d",
+      "evidence_hash": "294d15dd7d9e0b07e5f2b3384f8796fe7a6779859aa88ff965cb9b9b10aca35e",
       "verdict": {
         "kind": "pass",
-        "citation": "上流収束の意味論検証要素は、当該上流 chain に関係する `ref-verify` 指摘がすべて解消されていることだけを問う。 他 chain の指摘、および直後の下流 writer 再実行で再生成される stale な下流成果物に起因する pair 列挙失敗は、当該上流 chain の指摘ではないため上流収束の判定に関与しない。 `bin/sotp ref-verify results --chain 1` のような chain 限定の読み出しを用いる。 `bin/sotp ref-verify run` は pair を列挙可能になり次第実行し、通常は上流修正後に即時実行し、他 chain の列挙失敗で中断した場合は下流 writer が成果物を再生成した直後に full run を実行する。"
+        "citation": "上流収束の意味論検証要素は、当該上流 chain に関係する `ref-verify` 指摘がすべて解消されていることだけを問う。他 chain の指摘、および直後の下流 writer 再実行で再生成される stale な下流成果物に起因する pair 列挙失敗は、当該上流 chain の指摘ではないため上流収束の判定に関与しない。"
       },
       "claim_origin": {
         "kind": "spec_element",
