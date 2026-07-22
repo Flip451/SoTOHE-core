@@ -130,11 +130,15 @@
       },
       {
         "id": "OUT-02",
-        "text": "impl-plan task status transition 以外の上流 SoT 編集を収束失効の例外として追加・一般化しない。",
+        "text": "`bin/sotp track transition` による impl-plan task status transition の例外を、再入 sequencing における rollback と下流停止の不要化に限定する。他の上流 SoT 編集への例外拡張・一般化、および task status transition 後の commit 前 current hash を対象とする impl-plan scope final `zero_findings` review refresh の免除は行わない。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
             "anchor": "D5"
+          },
+          {
+            "file": "knowledge/adr/2026-07-22-0633-impl-plan-transition-review-refresh.md",
+            "anchor": "D1"
           }
         ]
       }
@@ -219,11 +223,15 @@
     },
     {
       "id": "AC-04",
-      "text": "impl-plan の `bin/sotp track transition` による task status transition だけは review 収束を失効させない明示例外として記述され、他の SoT へ同種の例外を拡張しない。",
+      "text": "impl-plan の `bin/sotp track transition` による task status transition だけは、再入 sequencing における上流 rollback と下流作業停止を要求しない明示例外として記述される。ただし、この例外は hash-based commit gate の review refresh を免除せず、task status transition 後は commit 前に current hash を対象とする impl-plan scope の final `zero_findings` review を改めて完了する。ほかの SoT へ同種の例外を拡張しない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
           "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-07-22-0633-impl-plan-transition-review-refresh.md",
+          "anchor": "D1"
         }
       ]
     },

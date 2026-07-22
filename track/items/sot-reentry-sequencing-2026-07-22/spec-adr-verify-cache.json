@@ -347,18 +347,18 @@
       }
     },
     {
-      "claim_hash": "bb1c3e7d6d1e1396d19fbcfba06056ac131c982888f6954cef7991523bda1719",
+      "claim_hash": "feeec740f6ecd5dd7c886c13d27ceac36b2a773784deea8af8b526d3bb9d39b5",
       "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
-        "citation": "この例外を他の SoT へ一般化しない。"
+        "citation": "`impl-plan.json` のみ、review 収束後も `bin/sotp track transition` による task ステータス遷移を許容し、これは収束を失効させない。それ以外の impl-plan 変更は D4 に従い失効・再収束を要する。この例外を他の SoT へ一般化しない。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "out_of_scope",
           "element_id": "OUT-02",
-          "text_label": "impl-plan task status transition 以外の上流 SoT 編集を収束失効の例外として追加・一般化しない。"
+          "text_label": "`bin/sotp track transition` による impl-plan task status transition の例外を、再入 sequencing における rollback と下流停止の不要化に限定する。他の上流 SoT 編集への例外拡張・一般化、および task status transition 後の commit 前 current hash を対象とする impl-plan scope final `zero_findings` review refresh の免除は行わない。"
         }
       },
       "evidence_origin": {
@@ -366,6 +366,29 @@
         "data": {
           "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
           "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "feeec740f6ecd5dd7c886c13d27ceac36b2a773784deea8af8b526d3bb9d39b5",
+      "evidence_hash": "ddbbdba6a472ab55ddebea34d8a6df18645c3b37595e9688e10f9b47e70aae77",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この変更が「収束を失効させない」とは、SoT 再入の sequencing 規律において上流フェーズへの rollback と下流作業の停止を要求しないことだけを意味する。\n\nD5 の例外は、この hash-based commit gate の review refresh を免除しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "`bin/sotp track transition` による impl-plan task status transition の例外を、再入 sequencing における rollback と下流停止の不要化に限定する。他の上流 SoT 編集への例外拡張・一般化、および task status transition 後の commit 前 current hash を対象とする impl-plan scope final `zero_findings` review refresh の免除は行わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0633-impl-plan-transition-review-refresh.md",
+          "decision_id": "D1"
         }
       }
     },
@@ -531,7 +554,7 @@
       }
     },
     {
-      "claim_hash": "0ce83ca30135befa8f5a354e0e9a13087b038a3d3dce23b50bb1d4fb0dd8bf32",
+      "claim_hash": "8590a172813e00f70df8a78a9bdfa240f93ef8e0e41e664119776f40cb2a66e0",
       "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
@@ -542,7 +565,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-04",
-          "text_label": "impl-plan の `bin/sotp track transition` による task status transition だけは review 収束を失効させない明示例外として記述され、他の SoT へ同種の例外を拡張しない。"
+          "text_label": "impl-plan の `bin/sotp track transition` による task status transition だけは、再入 sequencing における上流 rollback と下流作業停止を要求しない明示例外として記述される。ただし、この例外は hash-based commit gate の review refresh を免除せず、task status transition 後は commit 前に current hash を対象とする impl-plan scope の final `zero_findings` review を改めて完了する。ほかの SoT へ同種の例外を拡張しない。"
         }
       },
       "evidence_origin": {
@@ -550,6 +573,29 @@
         "data": {
           "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
           "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "8590a172813e00f70df8a78a9bdfa240f93ef8e0e41e664119776f40cb2a66e0",
+      "evidence_hash": "ddbbdba6a472ab55ddebea34d8a6df18645c3b37595e9688e10f9b47e70aae77",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この変更が「収束を失効させない」とは、SoT 再入の sequencing 規律において上流フェーズへの rollback と下流作業の停止を要求しないことだけを意味する。」「task ステータス遷移によって `impl-plan.json` の hash が変わった場合、`.harness/workflows/track/full-cycle.md` の lifecycle tail に従い、commit 前に current hash を対象とする impl-plan scope の final `zero_findings` review を改めて完了しなければならない。」「D5 の例外は、この hash-based commit gate の review refresh を免除しない。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "impl-plan の `bin/sotp track transition` による task status transition だけは、再入 sequencing における上流 rollback と下流作業停止を要求しない明示例外として記述される。ただし、この例外は hash-based commit gate の review refresh を免除せず、task status transition 後は commit 前に current hash を対象とする impl-plan scope の final `zero_findings` review を改めて完了する。ほかの SoT へ同種の例外を拡張しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0633-impl-plan-transition-review-refresh.md",
+          "decision_id": "D1"
         }
       }
     },

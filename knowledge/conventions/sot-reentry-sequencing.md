@@ -33,7 +33,7 @@ SoT Chain の back-and-forth において、どの SoT へ回帰するかのル�
 - 下流作業中に、収束済み上流 SoT への編集の必要性が発見された時点で、下流作業を中断して上流へ戻る。回帰先が自明でなければ diagnose ルート (`/track:diagnose`) を経由する。
 - 「後でまとめて直す」「変更の有無を判定して続行する」は禁止する — 収束の有効性判定という裁量を挟まない。
 - 上流 SoT への編集は適用された時点で当該フェーズの収束を即座に失効させる。再収束 (上記 3 要素) まで、その下流のフェーズは再開禁止。
-- **唯一の例外**: `impl-plan.json` は review 収束後も `bin/sotp track transition` による task ステータス遷移のみ許容され、これは収束を失効させない。それ以外の impl-plan 変更は通常どおり失効・再収束を要する。この例外を他の SoT へ一般化しない。
+- **唯一の例外**: `impl-plan.json` は review 収束後も `bin/sotp track transition` による task ステータス遷移のみ許容される。この例外は本規律 (順次処理) 上のものに限る — 遷移は上流 rollback も下流停止も要求しない。ただし hash ベースの commit gate が要求する impl-plan final `zero_findings` review refresh (`.harness/workflows/track/full-cycle.md` の lifecycle tail) は引き続き必須であり、本例外はそれを免除しない。それ以外の impl-plan 変更は通常どおり失効・再収束を要する。この例外を他の SoT へ一般化しない。
 
 ## 役割分担
 

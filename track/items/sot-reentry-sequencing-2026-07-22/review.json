@@ -1,296 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13e9d659250f657ffe620b73aafc0cd00206955f9b9cfdab4b693e9fc354de20",
-          "at": "2026-07-22T04:42:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13e9d659250f657ffe620b73aafc0cd00206955f9b9cfdab4b693e9fc354de20",
-          "at": "2026-07-22T04:48:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 3 states that every re-entry is gated only by the direct upstream's convergence evidence, but the cited convention defines an additional prerequisite for implementation re-entry: impl-plan scope review convergence (except task-status transitions). This can authorize `impl` dispatch without the required impl-plan review evidence; explicitly preserve that phase-specific prerequisite in the dispatch rule.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/diagnose.md",
-              "line": 124,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f6b1c9827c9771a9059f439a6d40bad30b5735d651689cfb679d6e88c0a2b7dd",
-          "at": "2026-07-22T05:21:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e1ddf755077a585b34b6dda57d8e113ae13ac3d40891720c499e9af86572c2e6",
-          "at": "2026-07-22T05:23:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`before each re-entry dispatch below` は全分岐に掛かるため、直上流 prerequisite が存在しない `adr` 分岐にも収束証跡を要求します。また `impl` 分岐は line 140 で `no writer subagent` とされており、証跡を `writer briefing` に渡せません。引用先 convention は prerequisite を spec-design/type-design/impl-plan/implementation のみに定義し、ADR 側を適用外としているため、対象分岐を明示的に限定し、直接実行する `impl` では orchestrator 自身が確認する形に分けてください。",
-              "severity": "P1",
-              "file": ".harness/workflows/track/diagnose.md",
-              "line": 122,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:e1ddf755077a585b34b6dda57d8e113ae13ac3d40891720c499e9af86572c2e6",
-          "at": "2026-07-22T05:27:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a21c4facf5f5e63ccf316f4836dcc308b59f6882eb661d809594d4a691d65f8f",
-          "at": "2026-07-22T05:28:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f38996ee3da0518edc01389618a14f0b06dd5b05ec07c85a3c3a883761d95255",
-          "at": "2026-07-22T06:14:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`adr_user` では意味論検証を要求しないと line 17 で定義した一方、このチェック項目はすべての上流 SoT に対して `信号 / ref-verify / review` の3要素を無条件に要求しています。ADR 編集後の spec-design 再入で、存在しない ADR 側 ref-verify を待つ解釈になり得るため、`adr_user` の除外を明記するか「適用可能な収束要素」に修正してください。",
-              "severity": "P1",
-              "file": "knowledge/conventions/sot-reentry-sequencing.md",
-              "line": 58,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:f38996ee3da0518edc01389618a14f0b06dd5b05ec07c85a3c3a883761d95255",
-          "at": "2026-07-22T06:19:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3cf3e02d5aa96ba86256d50742073a56f67954c6d37720d185707f8ca2d07a26",
-          "at": "2026-07-22T06:23:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3cf3e02d5aa96ba86256d50742073a56f67954c6d37720d185707f8ca2d07a26",
-          "at": "2026-07-22T06:23:31Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7428d2753ed320e4f29b21db70ea6ec3cb763f132dce3fc0e008f04e529e3a76",
-          "at": "2026-07-22T04:26:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7428d2753ed320e4f29b21db70ea6ec3cb763f132dce3fc0e008f04e529e3a76",
-          "at": "2026-07-22T04:29:07Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1982c15e9974b92a645574f4c58db1c8256db0a1102e400a478aa520b61c3f78",
-          "at": "2026-07-22T04:05:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1982c15e9974b92a645574f4c58db1c8256db0a1102e400a478aa520b61c3f78",
-          "at": "2026-07-22T04:08:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:defaef8c1d6ff0244e92326e5cfa54944c5def5fbdcf71f7fbcc4c814aabcc4b",
-          "at": "2026-07-22T06:13:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:defaef8c1d6ff0244e92326e5cfa54944c5def5fbdcf71f7fbcc4c814aabcc4b",
-          "at": "2026-07-22T06:17:20Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
-          "at": "2026-07-22T04:26:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-08 cites `knowledge/conventions/README.md` to justify indexing the new document there, but that README explicitly excludes template-wide workflows from `knowledge/conventions/`. The cited convention therefore contradicts rather than grounds this scope item, leaving downstream work directed to a location whose governing convention disallows this artifact class.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 110,
-              "category": "broken cross-reference at narrative level"
-            },
-            {
-              "message": "`no-upstream-restatement.md` limits its scope to impl-plan descriptions and type-catalogue documentation, while explicitly exempting `spec.json` and workflow documents. It therefore cannot ground IN-01/CN-01's SSoT-reference rule for a new workflow convention; its `convention_refs` and `related_conventions` entries are off-topic.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 34,
-              "category": "broken cross-reference at narrative level"
-            }
-          ],
-          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
-          "at": "2026-07-22T04:29:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87c60a3d9298c8daf642b794cda5bd633e155cd958ab3344a9ba21b6087aa4b5",
-          "at": "2026-07-22T04:31:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e05cf504ae60ffc977faeb92d995552795f380dcad3d7fe1cb85efafe49decb8",
-          "at": "2026-07-22T05:05:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 は D1 を含む順次処理規律の一貫した定着を求め、IN-02 は `diagnose.md` に dispatch 前の三要素・直上流チェックと収束証跡の引き渡しを要求しています。しかし AC-01〜AC-04 は convention または writer capability の内容だけを検査し、AC-05 は `diagnose.md` を許容差分へ加えるだけでその要求内容を検証しません。そのため orchestrator-side のチェックと証跡引き渡しが欠けたままでも全 AC を満たせ、GO-01 の完了を決定的に証明できません。",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 220,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:e05cf504ae60ffc977faeb92d995552795f380dcad3d7fe1cb85efafe49decb8",
-          "at": "2026-07-22T05:09:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9bb41305fdb53e4cfac00ec3fa5d198460089c186cf608c61b87f3c1145dc1df",
-          "at": "2026-07-22T05:13:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:084a60859369138c32f8b575594aa86d196369c1fd767ee0f5d3b6a723ad27f6",
-          "at": "2026-07-22T05:34:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-05 states that the implementation diff is limited to five capability documents, but IN-07 explicitly requires a change to the rollback-diagnoser capability contract and the current diff includes that file. This makes the acceptance criterion contradict the stated in-scope work and cannot be satisfied by the current implementation.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 228,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:4ce5282aec615985c6b14b1ddbbaf83e03c1874490311c91a5947bfbd27fc495",
-          "at": "2026-07-22T06:13:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-01 still defines phase convergence unconditionally as the three-element combination including ref-verify, without stating the admitted D1 exemption for the `adr_user` chain. As written, it conflicts with the ADR refinement that ADR convergence requires only signal plus ADR review.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 61,
-              "category": "scope / acceptance_criteria contradiction"
-            },
-            {
-              "message": "AC-01 requires every phase convergence determination to include the applicable ref-verify scope, but does not state that `adr_user`/ADR convergence is exempt. This leaves the acceptance contract requiring the unsatisfiable ADR-side ref-verify prerequisite that delta D1 explicitly removes.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 205,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:9d51d304cca2cc4c82d5b0d88962dc2bd01323a0d76d3e044b762192aaf25961",
-          "at": "2026-07-22T06:14:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9fed8c9af23f342e2fb2c4c3b13509b5d5ca98789a653f272fe6ece7cf6250cc",
-          "at": "2026-07-22T06:16:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-06（および対応する IN-02）は「各再入 writer dispatch 前」に ref-verify scope の確認を要求しており、spec-design 再入でも ref-verify を要求する契約として読めます。これは IN-01 / AC-01 が定める `adr_user` の二要素収束と矛盾します。`adr_user` では ref-verify を確認せず、その他の chain にのみ三要素確認を要求することを dispatch 契約にも明示してください。",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 238,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:9fed8c9af23f342e2fb2c4c3b13509b5d5ca98789a653f272fe6ece7cf6250cc",
-          "at": "2026-07-22T06:19:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ccd532916cac1dfc091f54d37ba88d6bbfe0af28135269be3d231f3ad58a6516",
-          "at": "2026-07-22T06:21:27Z"
-        }
-      ]
-    },
     "impl-plan": {
       "rounds": [
         {
@@ -456,6 +166,338 @@
           "findings": [],
           "hash": "rvw1:sha256:ee22cc91faa3eea03cb8cd5797f90bd6e0514aa7bfe384867f6739d2348a5e19",
           "at": "2026-07-22T05:39:16Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1982c15e9974b92a645574f4c58db1c8256db0a1102e400a478aa520b61c3f78",
+          "at": "2026-07-22T04:05:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1982c15e9974b92a645574f4c58db1c8256db0a1102e400a478aa520b61c3f78",
+          "at": "2026-07-22T04:08:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:defaef8c1d6ff0244e92326e5cfa54944c5def5fbdcf71f7fbcc4c814aabcc4b",
+          "at": "2026-07-22T06:13:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:defaef8c1d6ff0244e92326e5cfa54944c5def5fbdcf71f7fbcc4c814aabcc4b",
+          "at": "2026-07-22T06:17:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42d55f4287f17d7c9d569c4810ff89a76286c81af6b81bdfe72bedd0ea68cb38",
+          "at": "2026-07-22T06:41:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42d55f4287f17d7c9d569c4810ff89a76286c81af6b81bdfe72bedd0ea68cb38",
+          "at": "2026-07-22T06:44:45Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13e9d659250f657ffe620b73aafc0cd00206955f9b9cfdab4b693e9fc354de20",
+          "at": "2026-07-22T04:42:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13e9d659250f657ffe620b73aafc0cd00206955f9b9cfdab4b693e9fc354de20",
+          "at": "2026-07-22T04:48:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 states that every re-entry is gated only by the direct upstream's convergence evidence, but the cited convention defines an additional prerequisite for implementation re-entry: impl-plan scope review convergence (except task-status transitions). This can authorize `impl` dispatch without the required impl-plan review evidence; explicitly preserve that phase-specific prerequisite in the dispatch rule.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/diagnose.md",
+              "line": 124,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f6b1c9827c9771a9059f439a6d40bad30b5735d651689cfb679d6e88c0a2b7dd",
+          "at": "2026-07-22T05:21:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1ddf755077a585b34b6dda57d8e113ae13ac3d40891720c499e9af86572c2e6",
+          "at": "2026-07-22T05:23:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`before each re-entry dispatch below` は全分岐に掛かるため、直上流 prerequisite が存在しない `adr` 分岐にも収束証跡を要求します。また `impl` 分岐は line 140 で `no writer subagent` とされており、証跡を `writer briefing` に渡せません。引用先 convention は prerequisite を spec-design/type-design/impl-plan/implementation のみに定義し、ADR 側を適用外としているため、対象分岐を明示的に限定し、直接実行する `impl` では orchestrator 自身が確認する形に分けてください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/diagnose.md",
+              "line": 122,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e1ddf755077a585b34b6dda57d8e113ae13ac3d40891720c499e9af86572c2e6",
+          "at": "2026-07-22T05:27:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a21c4facf5f5e63ccf316f4836dcc308b59f6882eb661d809594d4a691d65f8f",
+          "at": "2026-07-22T05:28:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f38996ee3da0518edc01389618a14f0b06dd5b05ec07c85a3c3a883761d95255",
+          "at": "2026-07-22T06:14:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`adr_user` では意味論検証を要求しないと line 17 で定義した一方、このチェック項目はすべての上流 SoT に対して `信号 / ref-verify / review` の3要素を無条件に要求しています。ADR 編集後の spec-design 再入で、存在しない ADR 側 ref-verify を待つ解釈になり得るため、`adr_user` の除外を明記するか「適用可能な収束要素」に修正してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/sot-reentry-sequencing.md",
+              "line": 58,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f38996ee3da0518edc01389618a14f0b06dd5b05ec07c85a3c3a883761d95255",
+          "at": "2026-07-22T06:19:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3cf3e02d5aa96ba86256d50742073a56f67954c6d37720d185707f8ca2d07a26",
+          "at": "2026-07-22T06:23:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3cf3e02d5aa96ba86256d50742073a56f67954c6d37720d185707f8ca2d07a26",
+          "at": "2026-07-22T06:23:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:981e907a2a403a7c578f991610e2fda06e5625fe1c747d61f2845eb5fd76765a",
+          "at": "2026-07-22T06:41:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:981e907a2a403a7c578f991610e2fda06e5625fe1c747d61f2845eb5fd76765a",
+          "at": "2026-07-22T06:44:35Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
+          "at": "2026-07-22T04:26:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-08 cites `knowledge/conventions/README.md` to justify indexing the new document there, but that README explicitly excludes template-wide workflows from `knowledge/conventions/`. The cited convention therefore contradicts rather than grounds this scope item, leaving downstream work directed to a location whose governing convention disallows this artifact class.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 110,
+              "category": "broken cross-reference at narrative level"
+            },
+            {
+              "message": "`no-upstream-restatement.md` limits its scope to impl-plan descriptions and type-catalogue documentation, while explicitly exempting `spec.json` and workflow documents. It therefore cannot ground IN-01/CN-01's SSoT-reference rule for a new workflow convention; its `convention_refs` and `related_conventions` entries are off-topic.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 34,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
+          "at": "2026-07-22T04:29:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87c60a3d9298c8daf642b794cda5bd633e155cd958ab3344a9ba21b6087aa4b5",
+          "at": "2026-07-22T04:31:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e05cf504ae60ffc977faeb92d995552795f380dcad3d7fe1cb85efafe49decb8",
+          "at": "2026-07-22T05:05:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 は D1 を含む順次処理規律の一貫した定着を求め、IN-02 は `diagnose.md` に dispatch 前の三要素・直上流チェックと収束証跡の引き渡しを要求しています。しかし AC-01〜AC-04 は convention または writer capability の内容だけを検査し、AC-05 は `diagnose.md` を許容差分へ加えるだけでその要求内容を検証しません。そのため orchestrator-side のチェックと証跡引き渡しが欠けたままでも全 AC を満たせ、GO-01 の完了を決定的に証明できません。",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 220,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:e05cf504ae60ffc977faeb92d995552795f380dcad3d7fe1cb85efafe49decb8",
+          "at": "2026-07-22T05:09:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bb41305fdb53e4cfac00ec3fa5d198460089c186cf608c61b87f3c1145dc1df",
+          "at": "2026-07-22T05:13:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:084a60859369138c32f8b575594aa86d196369c1fd767ee0f5d3b6a723ad27f6",
+          "at": "2026-07-22T05:34:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 states that the implementation diff is limited to five capability documents, but IN-07 explicitly requires a change to the rollback-diagnoser capability contract and the current diff includes that file. This makes the acceptance criterion contradict the stated in-scope work and cannot be satisfied by the current implementation.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 228,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4ce5282aec615985c6b14b1ddbbaf83e03c1874490311c91a5947bfbd27fc495",
+          "at": "2026-07-22T06:13:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-01 still defines phase convergence unconditionally as the three-element combination including ref-verify, without stating the admitted D1 exemption for the `adr_user` chain. As written, it conflicts with the ADR refinement that ADR convergence requires only signal plus ADR review.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 61,
+              "category": "scope / acceptance_criteria contradiction"
+            },
+            {
+              "message": "AC-01 requires every phase convergence determination to include the applicable ref-verify scope, but does not state that `adr_user`/ADR convergence is exempt. This leaves the acceptance contract requiring the unsatisfiable ADR-side ref-verify prerequisite that delta D1 explicitly removes.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 205,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9d51d304cca2cc4c82d5b0d88962dc2bd01323a0d76d3e044b762192aaf25961",
+          "at": "2026-07-22T06:14:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9fed8c9af23f342e2fb2c4c3b13509b5d5ca98789a653f272fe6ece7cf6250cc",
+          "at": "2026-07-22T06:16:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06（および対応する IN-02）は「各再入 writer dispatch 前」に ref-verify scope の確認を要求しており、spec-design 再入でも ref-verify を要求する契約として読めます。これは IN-01 / AC-01 が定める `adr_user` の二要素収束と矛盾します。`adr_user` では ref-verify を確認せず、その他の chain にのみ三要素確認を要求することを dispatch 契約にも明示してください。",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 238,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9fed8c9af23f342e2fb2c4c3b13509b5d5ca98789a653f272fe6ece7cf6250cc",
+          "at": "2026-07-22T06:19:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccd532916cac1dfc091f54d37ba88d6bbfe0af28135269be3d231f3ad58a6516",
+          "at": "2026-07-22T06:21:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49b293bfa9845a41c2593096d6b0aa933123adb14d6feeaae4f8740d6094efc6",
+          "at": "2026-07-22T06:41:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49b293bfa9845a41c2593096d6b0aa933123adb14d6feeaae4f8740d6094efc6",
+          "at": "2026-07-22T06:44:12Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7428d2753ed320e4f29b21db70ea6ec3cb763f132dce3fc0e008f04e529e3a76",
+          "at": "2026-07-22T04:26:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7428d2753ed320e4f29b21db70ea6ec3cb763f132dce3fc0e008f04e529e3a76",
+          "at": "2026-07-22T04:29:07Z"
         }
       ]
     }
