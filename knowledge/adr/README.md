@@ -221,6 +221,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [外部 agent 呼び出しのコスト削減](2026-07-13-2217-agent-dispatch-cost-reduction.md) | Proposed | 2026-07-13 |
 | [codex reviewer runtime の bootstrap 解決リンク（resolve & link）配備](2026-07-18-1359-codex-resolve-and-link-provisioning.md) | Proposed | 2026-07-18 |
 | [.claude/agents の description に capability exec 経由を明記する](2026-07-21-1522-agent-md-capability-exec-routing.md) | Proposed | 2026-07-21 |
+| [Codex 正規入口の整備](2026-07-22-1149-codex-merge-done-adr-entrypoints.md) | Proposed | 2026-07-22 |
 
 ### テスト・CI ツーリング
 

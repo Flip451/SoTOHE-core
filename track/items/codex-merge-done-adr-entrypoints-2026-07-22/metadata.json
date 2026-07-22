@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "codex-merge-done-adr-entrypoints-2026-07-22",
+  "title": "Codex 正規入口の整備 — track-merge / track-done / adr-add skill 新設",
+  "branch": "track/codex-merge-done-adr-entrypoints-2026-07-22",
+  "created_at": "2026-07-22T11:53:18Z",
+  "updated_at": "2026-07-22T11:53:18Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}
