@@ -1,7 +1,9 @@
 //! Filesystem adapter for configurable disk maintenance.
 
-use std::fs;
-use std::io::{Error, ErrorKind, Read};
+use std::ffi::OsStr;
+use std::fs::{self, File};
+use std::io::{Error, ErrorKind, Read, Write};
+use std::mem::MaybeUninit;
 use std::path::{Path, PathBuf};
 
 use domain::disk_maintenance::{CacheSize, CleanupScope, CleanupScopeSet, DiskMaintenanceConfig};
@@ -144,33 +146,183 @@ impl FsDiskMaintenanceAdapter {
         Ok(root)
     }
 
-    fn empty_directory(project_root: &Path, root: &Path) -> Result<(), DiskMaintenanceError> {
-        Self::reject_symlinks(root, project_root, "cleanup root")?;
-        fs::create_dir_all(root).map_err(|error| {
-            DiskMaintenanceError::new(format!("cannot create {}: {error}", root.display()))
+    fn open_directory_nofollow(path: &Path) -> Result<File, std::io::Error> {
+        rustix::fs::open(
+            path,
+            rustix::fs::OFlags::RDONLY
+                | rustix::fs::OFlags::DIRECTORY
+                | rustix::fs::OFlags::NOFOLLOW
+                | rustix::fs::OFlags::CLOEXEC,
+            rustix::fs::Mode::empty(),
+        )
+        .map(File::from)
+        .map_err(Into::into)
+    }
+
+    fn open_directory_at_nofollow(parent: &File, name: &OsStr) -> Result<File, std::io::Error> {
+        rustix::fs::openat(
+            parent,
+            name,
+            rustix::fs::OFlags::RDONLY
+                | rustix::fs::OFlags::DIRECTORY
+                | rustix::fs::OFlags::NOFOLLOW
+                | rustix::fs::OFlags::CLOEXEC,
+            rustix::fs::Mode::empty(),
+        )
+        .map(File::from)
+        .map_err(Into::into)
+    }
+
+    fn open_or_create_directory_at(parent: &File, name: &OsStr) -> Result<File, std::io::Error> {
+        match Self::open_directory_at_nofollow(parent, name) {
+            Ok(directory) => Ok(directory),
+            Err(error) if error.kind() == ErrorKind::NotFound => {
+                match rustix::fs::mkdirat(parent, name, rustix::fs::Mode::from_raw_mode(0o700)) {
+                    Ok(()) | Err(rustix::io::Errno::EXIST) => {}
+                    Err(error) => return Err(error.into()),
+                }
+                Self::open_directory_at_nofollow(parent, name)
+            }
+            Err(error) => Err(error),
+        }
+    }
+
+    fn open_cleanup_root(
+        project_root: &Path,
+        scope: &CleanupScope,
+        root: &Path,
+    ) -> Result<File, DiskMaintenanceError> {
+        Self::reject_symlinks(project_root, project_root, "cleanup root")?;
+        let mut directory = Self::open_directory_nofollow(project_root).map_err(|error| {
+            DiskMaintenanceError::new(format!(
+                "cannot open cleanup project root {}: {error}",
+                project_root.display()
+            ))
         })?;
-        Self::reject_symlinks(root, project_root, "cleanup root")?;
-        for entry in fs::read_dir(root).map_err(|error| {
-            DiskMaintenanceError::new(format!("cannot read {}: {error}", root.display()))
-        })? {
+
+        for component in scope.as_path().components() {
+            let std::path::Component::Normal(name) = component else {
+                return Err(DiskMaintenanceError::new("cleanup scope escapes project root"));
+            };
+            directory = Self::open_or_create_directory_at(&directory, name).map_err(|error| {
+                DiskMaintenanceError::new(format!(
+                    "cannot open cleanup root {}: {error}",
+                    root.display()
+                ))
+            })?;
+        }
+        Ok(directory)
+    }
+
+    fn empty_open_directory(directory: &File, root: &Path) -> Result<(), DiskMaintenanceError> {
+        let mut buffer = [MaybeUninit::uninit(); 8192];
+        let mut entries = rustix::fs::RawDir::new(directory, &mut buffer);
+        while let Some(entry) = entries.next() {
             let entry = entry.map_err(|error| {
-                DiskMaintenanceError::new(format!("cannot read cleanup entry: {error}"))
+                DiskMaintenanceError::new(format!(
+                    "cannot read cleanup root {}: {error}",
+                    root.display()
+                ))
             })?;
-            let path = entry.path();
-            let kind = entry.file_type().map_err(|error| {
-                DiskMaintenanceError::new(format!("cannot inspect {}: {error}", path.display()))
-            })?;
-            if kind.is_dir() && !kind.is_symlink() {
-                fs::remove_dir_all(&path).map_err(|error| {
-                    DiskMaintenanceError::new(format!("cannot remove {}: {error}", path.display()))
+            let name = entry.file_name();
+            if matches!(name.to_bytes(), b"." | b"..") {
+                continue;
+            }
+
+            let entry_metadata =
+                rustix::fs::statat(directory, name, rustix::fs::AtFlags::SYMLINK_NOFOLLOW)
+                    .map_err(|error| {
+                        DiskMaintenanceError::new(format!(
+                            "cannot inspect cleanup entry below {}: {error}",
+                            root.display()
+                        ))
+                    })?;
+            if rustix::fs::FileType::from_raw_mode(entry_metadata.st_mode).is_dir() {
+                let child = rustix::fs::openat(
+                    directory,
+                    name,
+                    rustix::fs::OFlags::RDONLY
+                        | rustix::fs::OFlags::DIRECTORY
+                        | rustix::fs::OFlags::NOFOLLOW
+                        | rustix::fs::OFlags::CLOEXEC,
+                    rustix::fs::Mode::empty(),
+                )
+                .map(File::from)
+                .map_err(|error| {
+                    DiskMaintenanceError::new(format!(
+                        "cannot open cleanup directory below {}: {error}",
+                        root.display()
+                    ))
                 })?;
+                Self::empty_open_directory(&child, root)?;
+                rustix::fs::unlinkat(directory, name, rustix::fs::AtFlags::REMOVEDIR).map_err(
+                    |error| {
+                        DiskMaintenanceError::new(format!(
+                            "cannot remove cleanup directory below {}: {error}",
+                            root.display()
+                        ))
+                    },
+                )?;
             } else {
-                fs::remove_file(&path).map_err(|error| {
-                    DiskMaintenanceError::new(format!("cannot remove {}: {error}", path.display()))
-                })?;
+                rustix::fs::unlinkat(directory, name, rustix::fs::AtFlags::empty()).map_err(
+                    |error| {
+                        DiskMaintenanceError::new(format!(
+                            "cannot remove cleanup entry below {}: {error}",
+                            root.display()
+                        ))
+                    },
+                )?;
             }
         }
         Ok(())
+    }
+
+    fn empty_directory(
+        project_root: &Path,
+        scope: &CleanupScope,
+        root: &Path,
+    ) -> Result<(), DiskMaintenanceError> {
+        let directory = Self::open_cleanup_root(project_root, scope, root)?;
+        Self::empty_open_directory(&directory, root)
+    }
+
+    fn open_sccache_environment_file(
+        cache_directory: &File,
+        environment_path: &Path,
+    ) -> Result<File, DiskMaintenanceError> {
+        let file = rustix::fs::openat(
+            cache_directory,
+            OsStr::new("sccache.env"),
+            rustix::fs::OFlags::WRONLY
+                | rustix::fs::OFlags::CREATE
+                | rustix::fs::OFlags::NOFOLLOW
+                | rustix::fs::OFlags::NONBLOCK
+                | rustix::fs::OFlags::CLOEXEC,
+            rustix::fs::Mode::from_raw_mode(0o600),
+        )
+        .map(File::from)
+        .map_err(|error| {
+            DiskMaintenanceError::new(format!(
+                "cannot open {}: {error}",
+                environment_path.display()
+            ))
+        })?;
+        if !file
+            .metadata()
+            .map_err(|error| {
+                DiskMaintenanceError::new(format!(
+                    "cannot inspect {}: {error}",
+                    environment_path.display()
+                ))
+            })?
+            .is_file()
+        {
+            return Err(DiskMaintenanceError::new(format!(
+                "{} is not a regular file",
+                environment_path.display()
+            )));
+        }
+        Ok(file)
     }
 }
 
@@ -185,13 +337,29 @@ impl DiskMaintenanceCommandPort for FsDiskMaintenanceAdapter {
         let config = Self::load_config(project_root)?;
         let cache_dir = project_root.join(".cache");
         Self::reject_symlinks(&cache_dir, project_root, "sccache cache directory")?;
-        fs::create_dir_all(&cache_dir).map_err(|error| {
-            DiskMaintenanceError::new(format!("cannot create {}: {error}", cache_dir.display()))
+        let project_directory = Self::open_directory_nofollow(project_root).map_err(|error| {
+            DiskMaintenanceError::new(format!(
+                "cannot open sccache project root {}: {error}",
+                project_root.display()
+            ))
         })?;
-        Self::reject_symlinks(&cache_dir, project_root, "sccache cache directory")?;
+        let cache_directory = Self::open_or_create_directory_at(
+            &project_directory,
+            OsStr::new(".cache"),
+        )
+        .map_err(|error| {
+            DiskMaintenanceError::new(format!("cannot open {}: {error}", cache_dir.display()))
+        })?;
         let env_path = cache_dir.join("sccache.env");
-        Self::reject_symlinks(&env_path, project_root, "sccache environment file")?;
-        fs::write(&env_path, format!("SCCACHE_CACHE_SIZE={}\n", config.max_cache_size().as_str()))
+        let mut environment_file =
+            Self::open_sccache_environment_file(&cache_directory, &env_path)?;
+        environment_file.set_len(0).map_err(|error| {
+            DiskMaintenanceError::new(format!("cannot truncate {}: {error}", env_path.display()))
+        })?;
+        environment_file
+            .write_all(
+                format!("SCCACHE_CACHE_SIZE={}\n", config.max_cache_size().as_str()).as_bytes(),
+            )
             .map_err(|error| {
                 DiskMaintenanceError::new(format!("cannot write {}: {error}", env_path.display()))
             })?;
@@ -204,7 +372,8 @@ impl DiskMaintenanceCommandPort for FsDiskMaintenanceAdapter {
     ) -> Result<CleanupScopeSet, DiskMaintenanceError> {
         let config = Self::load_config(&project_root)?;
         for scope in config.cleanup_scopes().as_slice() {
-            Self::empty_directory(&project_root, &Self::cleanup_root(&project_root, scope)?)?;
+            let root = Self::cleanup_root(&project_root, scope)?;
+            Self::empty_directory(&project_root, scope, &root)?;
         }
         Ok(config.cleanup_scopes().clone())
     }
@@ -355,6 +524,60 @@ mod tests {
         std::os::unix::fs::symlink(outside.path(), root.path().join("target"))?;
 
         assert!(FsDiskMaintenanceAdapter::new().apply_cleanup(root.path().to_path_buf()).is_err());
+        assert_eq!(fs::read_to_string(sentinel)?, "unchanged");
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_empty_open_directory_path_swap_preserves_external_contents()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let root = tempfile::tempdir()?;
+        let outside = tempfile::tempdir()?;
+        let cleanup_root = root.path().join("target");
+        fs::create_dir_all(&cleanup_root)?;
+        fs::write(cleanup_root.join("inside"), "remove")?;
+        let sentinel = outside.path().join("sentinel");
+        fs::write(&sentinel, "unchanged")?;
+
+        let opened_root = FsDiskMaintenanceAdapter::open_directory_nofollow(&cleanup_root)?;
+        let original_root = root.path().join("target-before-swap");
+        fs::rename(&cleanup_root, &original_root)?;
+        std::os::unix::fs::symlink(outside.path(), &cleanup_root)?;
+
+        FsDiskMaintenanceAdapter::empty_open_directory(&opened_root, &cleanup_root)?;
+
+        assert!(fs::read_dir(&original_root)?.next().is_none());
+        assert_eq!(fs::read_to_string(sentinel)?, "unchanged");
+        Ok(())
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_opened_sccache_environment_file_path_swap_preserves_external_file()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let root = tempfile::tempdir()?;
+        let outside = tempfile::tempdir()?;
+        let cache_root = root.path().join(".cache");
+        fs::create_dir_all(&cache_root)?;
+        let environment_path = cache_root.join("sccache.env");
+        fs::write(&environment_path, "old")?;
+        let sentinel = outside.path().join("sccache.env");
+        fs::write(&sentinel, "unchanged")?;
+
+        let cache_directory = FsDiskMaintenanceAdapter::open_directory_nofollow(&cache_root)?;
+        let mut environment_file = FsDiskMaintenanceAdapter::open_sccache_environment_file(
+            &cache_directory,
+            &environment_path,
+        )?;
+        let original_environment_path = cache_root.join("sccache-before-swap.env");
+        fs::rename(&environment_path, &original_environment_path)?;
+        std::os::unix::fs::symlink(&sentinel, &environment_path)?;
+
+        environment_file.set_len(0)?;
+        environment_file.write_all(b"updated")?;
+
+        assert_eq!(fs::read_to_string(&original_environment_path)?, "updated");
         assert_eq!(fs::read_to_string(sentinel)?, "unchanged");
         Ok(())
     }
