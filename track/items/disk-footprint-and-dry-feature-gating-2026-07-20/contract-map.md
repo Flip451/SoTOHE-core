@@ -29,20 +29,416 @@ classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
 classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
 subgraph domain["domain"]
   direction TB
+  subgraph domain_domain_module_disk_maintenance["domain::disk_maintenance"]
+    direction TB
+  subgraph T23_domain_domain_CacheSize["disk_maintenance::CacheSize"]
+    direction TB
+    T23_domain_domain_CacheSize__self[CacheSize]
+    T23_domain_domain_CacheSize_try_new([try_new])
+    T23_domain_domain_CacheSize_as_str([as_str])
+  end
+  subgraph T34_domain_domain_CleanupExecutionMode["disk_maintenance::CleanupExecutionMode"]
+    direction TB
+    T34_domain_domain_CleanupExecutionMode__self[CleanupExecutionMode]
+    T34_domain_domain_CleanupExecutionMode_DryRun[DryRun]
+    T34_domain_domain_CleanupExecutionMode_Apply[Apply]
+  end
+  subgraph T26_domain_domain_CleanupScope["disk_maintenance::CleanupScope"]
+    direction TB
+    T26_domain_domain_CleanupScope__self[CleanupScope]
+    T26_domain_domain_CleanupScope_try_new([try_new])
+    T26_domain_domain_CleanupScope_as_path([as_path])
+  end
+  subgraph T29_domain_domain_CleanupScopeSet["disk_maintenance::CleanupScopeSet"]
+    direction TB
+    T29_domain_domain_CleanupScopeSet__self[CleanupScopeSet]
+    T29_domain_domain_CleanupScopeSet_try_new([try_new])
+    T29_domain_domain_CleanupScopeSet_as_slice([as_slice])
+  end
+  subgraph T35_domain_domain_DiskMaintenanceConfig["disk_maintenance::DiskMaintenanceConfig"]
+    direction TB
+    T35_domain_domain_DiskMaintenanceConfig__self[DiskMaintenanceConfig]
+    T35_domain_domain_DiskMaintenanceConfig_new([new])
+    T35_domain_domain_DiskMaintenanceConfig_max_cache_size([max_cache_size])
+    T35_domain_domain_DiskMaintenanceConfig_cleanup_scopes([cleanup_scopes])
+  end
+  subgraph T44_domain_domain_DiskMaintenanceOperationDetail["disk_maintenance::DiskMaintenanceOperationDetail"]
+    direction TB
+    T44_domain_domain_DiskMaintenanceOperationDetail__self[DiskMaintenanceOperationDetail]
+    T44_domain_domain_DiskMaintenanceOperationDetail_new([new])
+    T44_domain_domain_DiskMaintenanceOperationDetail_as_str([as_str])
+  end
+  subgraph T44_domain_domain_DiskMaintenanceValidationError["disk_maintenance::DiskMaintenanceValidationError"]
+    direction TB
+    T44_domain_domain_DiskMaintenanceValidationError__self[DiskMaintenanceValidationError]
+    T44_domain_domain_DiskMaintenanceValidationError_InvalidCacheSize[InvalidCacheSize]
+    T44_domain_domain_DiskMaintenanceValidationError_InvalidCleanupScope[InvalidCleanupScope]
+    T44_domain_domain_DiskMaintenanceValidationError_EmptyCleanupScopes[EmptyCleanupScopes]
+    T44_domain_domain_DiskMaintenanceValidationError_DuplicateCleanupScope[DuplicateCleanupScope]
+  end
+  subgraph T41_domain_domain_InvalidDiskMaintenanceInput["disk_maintenance::InvalidDiskMaintenanceInput"]
+    direction TB
+    T41_domain_domain_InvalidDiskMaintenanceInput__self[InvalidDiskMaintenanceInput]
+    T41_domain_domain_InvalidDiskMaintenanceInput_new([new])
+    T41_domain_domain_InvalidDiskMaintenanceInput_as_str([as_str])
+  end
+  end
 end
 subgraph usecase["usecase"]
   direction TB
+  subgraph usecase_usecase_module_disk_maintenance["usecase::disk_maintenance"]
+    direction TB
+  subgraph T32_usecase_usecase_CleanupPlanQuery["disk_maintenance::CleanupPlanQuery"]
+    direction TB
+    T32_usecase_usecase_CleanupPlanQuery__self[CleanupPlanQuery]
+  end
+  subgraph T35_usecase_usecase_CleanupPlanResponse["disk_maintenance::CleanupPlanResponse"]
+    direction TB
+    T35_usecase_usecase_CleanupPlanResponse__self[CleanupPlanResponse]
+  end
+  subgraph T38_usecase_usecase_DiskMaintenanceCommand["disk_maintenance::DiskMaintenanceCommand"]
+    direction TB
+    T38_usecase_usecase_DiskMaintenanceCommand__self[DiskMaintenanceCommand]
+    T38_usecase_usecase_DiskMaintenanceCommand_ConfigureSccache[ConfigureSccache]
+    T38_usecase_usecase_DiskMaintenanceCommand_ApplyCleanup[ApplyCleanup]
+  end
+  subgraph T48_usecase_usecase_DiskMaintenanceCommandInteractor["disk_maintenance::DiskMaintenanceCommandInteractor"]
+    direction TB
+    T48_usecase_usecase_DiskMaintenanceCommandInteractor__self[DiskMaintenanceCommandInteractor]
+    T48_usecase_usecase_DiskMaintenanceCommandInteractor_new([new])
+  end
+  subgraph T46_usecase_usecase_DiskMaintenanceCommandResponse["disk_maintenance::DiskMaintenanceCommandResponse"]
+    direction TB
+    T46_usecase_usecase_DiskMaintenanceCommandResponse__self[DiskMaintenanceCommandResponse]
+    T46_usecase_usecase_DiskMaintenanceCommandResponse_SccacheConfigured[SccacheConfigured]
+    T46_usecase_usecase_DiskMaintenanceCommandResponse_CleanupApplied[CleanupApplied]
+  end
+  subgraph T36_usecase_usecase_DiskMaintenanceError["disk_maintenance::DiskMaintenanceError"]
+    direction TB
+    T36_usecase_usecase_DiskMaintenanceError__self[DiskMaintenanceError]
+    T36_usecase_usecase_DiskMaintenanceError_Validation[Validation]
+    T36_usecase_usecase_DiskMaintenanceError_Operation[Operation]
+    T36_usecase_usecase_DiskMaintenanceError_new([new])
+  end
+  subgraph T46_usecase_usecase_DiskMaintenanceQueryInteractor["disk_maintenance::DiskMaintenanceQueryInteractor"]
+    direction TB
+    T46_usecase_usecase_DiskMaintenanceQueryInteractor__self[DiskMaintenanceQueryInteractor]
+    T46_usecase_usecase_DiskMaintenanceQueryInteractor_new([new])
+  end
+  subgraph R42_usecase_usecase_DiskMaintenanceCommandPort["disk_maintenance::DiskMaintenanceCommandPort"]
+    direction TB
+    R42_usecase_usecase_DiskMaintenanceCommandPort__self[DiskMaintenanceCommandPort]
+    R42_usecase_usecase_DiskMaintenanceCommandPort_configure_sccache([configure_sccache])
+    R42_usecase_usecase_DiskMaintenanceCommandPort_apply_cleanup([apply_cleanup])
+  end
+  subgraph R45_usecase_usecase_DiskMaintenanceCommandService["disk_maintenance::DiskMaintenanceCommandService"]
+    direction TB
+    R45_usecase_usecase_DiskMaintenanceCommandService__self[DiskMaintenanceCommandService]
+    R45_usecase_usecase_DiskMaintenanceCommandService_execute_command([execute_command])
+  end
+  subgraph R40_usecase_usecase_DiskMaintenanceQueryPort["disk_maintenance::DiskMaintenanceQueryPort"]
+    direction TB
+    R40_usecase_usecase_DiskMaintenanceQueryPort__self[DiskMaintenanceQueryPort]
+    R40_usecase_usecase_DiskMaintenanceQueryPort_plan_cleanup([plan_cleanup])
+  end
+  subgraph R43_usecase_usecase_DiskMaintenanceQueryService["disk_maintenance::DiskMaintenanceQueryService"]
+    direction TB
+    R43_usecase_usecase_DiskMaintenanceQueryService__self[DiskMaintenanceQueryService]
+    R43_usecase_usecase_DiskMaintenanceQueryService_plan_cleanup([plan_cleanup])
+  end
+  end
 end
 subgraph infrastructure["infrastructure"]
   direction TB
+  subgraph infrastructure_infrastructure_module_disk_maintenance["infrastructure::disk_maintenance"]
+    direction TB
+  subgraph T54_infrastructure_infrastructure_FsDiskMaintenanceAdapter["disk_maintenance::FsDiskMaintenanceAdapter"]
+    direction TB
+    T54_infrastructure_infrastructure_FsDiskMaintenanceAdapter__self[FsDiskMaintenanceAdapter]
+    T54_infrastructure_infrastructure_FsDiskMaintenanceAdapter_new([new])
+  end
+  end
 end
 subgraph cli_driver["cli_driver"]
   direction TB
+  subgraph cli_driver_cli_driver_module_maintenance["cli_driver::maintenance"]
+    direction TB
+  subgraph T46_cli_driver_cli_driver_MaintenanceCommandDriver["maintenance::MaintenanceCommandDriver"]
+    direction TB
+    T46_cli_driver_cli_driver_MaintenanceCommandDriver__self[MaintenanceCommandDriver]
+    T46_cli_driver_cli_driver_MaintenanceCommandDriver_new([new])
+    T46_cli_driver_cli_driver_MaintenanceCommandDriver_handle([handle])
+  end
+  subgraph T45_cli_driver_cli_driver_MaintenanceCommandInput["maintenance::MaintenanceCommandInput"]
+    direction TB
+    T45_cli_driver_cli_driver_MaintenanceCommandInput__self[MaintenanceCommandInput]
+    T45_cli_driver_cli_driver_MaintenanceCommandInput_ConfigureSccache[ConfigureSccache]
+    T45_cli_driver_cli_driver_MaintenanceCommandInput_ApplyCleanup[ApplyCleanup]
+  end
+  subgraph T44_cli_driver_cli_driver_MaintenanceQueryDriver["maintenance::MaintenanceQueryDriver"]
+    direction TB
+    T44_cli_driver_cli_driver_MaintenanceQueryDriver__self[MaintenanceQueryDriver]
+    T44_cli_driver_cli_driver_MaintenanceQueryDriver_new([new])
+    T44_cli_driver_cli_driver_MaintenanceQueryDriver_handle([handle])
+  end
+  subgraph T43_cli_driver_cli_driver_MaintenanceQueryInput["maintenance::MaintenanceQueryInput"]
+    direction TB
+    T43_cli_driver_cli_driver_MaintenanceQueryInput__self[MaintenanceQueryInput]
+    T43_cli_driver_cli_driver_MaintenanceQueryInput_PlanCleanup[PlanCleanup]
+  end
+  end
 end
 subgraph cli_composition["cli_composition"]
   direction TB
+  subgraph cli_composition_cli_composition_module_maintenance["cli_composition::maintenance"]
+    direction TB
+  subgraph T58_cli_composition_cli_composition_MaintenanceCompositionRoot["maintenance::MaintenanceCompositionRoot"]
+    direction TB
+    T58_cli_composition_cli_composition_MaintenanceCompositionRoot__self[MaintenanceCompositionRoot]
+    T58_cli_composition_cli_composition_MaintenanceCompositionRoot_new([new])
+    T58_cli_composition_cli_composition_MaintenanceCompositionRoot_maintenance_command_driver([maintenance_command_driver])
+    T58_cli_composition_cli_composition_MaintenanceCompositionRoot_maintenance_query_driver([maintenance_query_driver])
+  end
+  end
 end
 subgraph cli["cli"]
   direction TB
+  subgraph T18_cli_cli_CliCommand["CliCommand"]
+    direction TB
+    T18_cli_cli_CliCommand__self[CliCommand]
+    T18_cli_cli_CliCommand_Arch[Arch]
+    T18_cli_cli_CliCommand_AdrBaseline[AdrBaseline]
+    T18_cli_cli_CliCommand_Conventions[Conventions]
+    T18_cli_cli_CliCommand_Domain[Domain]
+    T18_cli_cli_CliCommand_Guard[Guard]
+    T18_cli_cli_CliCommand_Hook[Hook]
+    T18_cli_cli_CliCommand_Maintenance[Maintenance]
+    T18_cli_cli_CliCommand_Track[Track]
+    T18_cli_cli_CliCommand_Git[Git]
+    T18_cli_cli_CliCommand_Pr[Pr]
+    T18_cli_cli_CliCommand_Capability[Capability]
+    T18_cli_cli_CliCommand_Review[Review]
+    T18_cli_cli_CliCommand_File[File]
+    T18_cli_cli_CliCommand_Verify[Verify]
+    T18_cli_cli_CliCommand_FindSimilar[FindSimilar]
+    T18_cli_cli_CliCommand_DupIndex[DupIndex]
+    T18_cli_cli_CliCommand_DupCheck[DupCheck]
+    T18_cli_cli_CliCommand_Telemetry[Telemetry]
+    T18_cli_cli_CliCommand_Dry[Dry]
+    T18_cli_cli_CliCommand_RefVerify[RefVerify]
+    T18_cli_cli_CliCommand_TestObligation[TestObligation]
+    T18_cli_cli_CliCommand_Signal[Signal]
+    T18_cli_cli_CliCommand_TaskContract[TaskContract]
+    T18_cli_cli_CliCommand_Catalog[Catalog]
+    T18_cli_cli_CliCommand_CatalogueLint[CatalogueLint]
+    T18_cli_cli_CliCommand_Template[Template]
+    T18_cli_cli_CliCommand_CodexRuntime[CodexRuntime]
+  end
+  subgraph cli_cli_module_commands["cli::commands"]
+    direction TB
+  subgraph T19_cli_cli_CleanupArgs["commands::maintenance::CleanupArgs"]
+    direction TB
+    T19_cli_cli_CleanupArgs__self[CleanupArgs]
+  end
+  subgraph T26_cli_cli_MaintenanceCommand["commands::maintenance::MaintenanceCommand"]
+    direction TB
+    T26_cli_cli_MaintenanceCommand__self[MaintenanceCommand]
+    T26_cli_cli_MaintenanceCommand_ConfigureSccache[ConfigureSccache]
+    T26_cli_cli_MaintenanceCommand_Cleanup[Cleanup]
+  end
+  subgraph T23_cli_cli_ProjectRootArgs["commands::maintenance::ProjectRootArgs"]
+    direction TB
+    T23_cli_cli_ProjectRootArgs__self[ProjectRootArgs]
+  end
+  subgraph T32_cli_cli_SemanticDupCommandFamily["commands::semantic_dup_feature_gate::SemanticDupCommandFamily"]
+    direction TB
+    T32_cli_cli_SemanticDupCommandFamily__self[SemanticDupCommandFamily]
+    T32_cli_cli_SemanticDupCommandFamily_Dry[Dry]
+    T32_cli_cli_SemanticDupCommandFamily_SemanticDuplicate[SemanticDuplicate]
+    T32_cli_cli_SemanticDupCommandFamily_name([name])
+  end
+  subgraph T24_cli_cli_VerdictFilterArg["commands::dry::VerdictFilterArg"]
+    direction TB
+    T24_cli_cli_VerdictFilterArg__self[VerdictFilterArg]
+    T24_cli_cli_VerdictFilterArg_All[All]
+    T24_cli_cli_VerdictFilterArg_NotAViolation[NotAViolation]
+    T24_cli_cli_VerdictFilterArg_Accepted[Accepted]
+    T24_cli_cli_VerdictFilterArg_Violation[Violation]
+  end
+  F43_cli_cli_cli__commands__maintenance__execute[[execute]]
+  F84_cli_cli_cli__commands__semantic_dup_feature_gate__semantic_dup_feature_disabled_exit[[semantic_dup_feature_disabled_exit]]
+  end
 end
+T23_domain_domain_CacheSize_try_new --> T44_domain_domain_DiskMaintenanceValidationError__self
+T23_domain_domain_CacheSize_try_new --> T23_domain_domain_CacheSize__self
+T26_domain_domain_CleanupScope_try_new --> T44_domain_domain_DiskMaintenanceValidationError__self
+T26_domain_domain_CleanupScope_try_new --> T26_domain_domain_CleanupScope__self
+T29_domain_domain_CleanupScopeSet_try_new --o T26_domain_domain_CleanupScope__self
+T29_domain_domain_CleanupScopeSet_try_new --> T44_domain_domain_DiskMaintenanceValidationError__self
+T29_domain_domain_CleanupScopeSet_try_new --> T29_domain_domain_CleanupScopeSet__self
+T29_domain_domain_CleanupScopeSet_as_slice --> T26_domain_domain_CleanupScope__self
+T35_domain_domain_DiskMaintenanceConfig_new --o T23_domain_domain_CacheSize__self
+T35_domain_domain_DiskMaintenanceConfig_new --o T29_domain_domain_CleanupScopeSet__self
+T35_domain_domain_DiskMaintenanceConfig_new --> T35_domain_domain_DiskMaintenanceConfig__self
+T35_domain_domain_DiskMaintenanceConfig_max_cache_size --> T23_domain_domain_CacheSize__self
+T35_domain_domain_DiskMaintenanceConfig_cleanup_scopes --> T29_domain_domain_CleanupScopeSet__self
+T44_domain_domain_DiskMaintenanceOperationDetail_new --> T44_domain_domain_DiskMaintenanceOperationDetail__self
+T44_domain_domain_DiskMaintenanceValidationError_InvalidCacheSize --o T41_domain_domain_InvalidDiskMaintenanceInput__self
+T44_domain_domain_DiskMaintenanceValidationError_InvalidCleanupScope --o T41_domain_domain_InvalidDiskMaintenanceInput__self
+T44_domain_domain_DiskMaintenanceValidationError_DuplicateCleanupScope --o T26_domain_domain_CleanupScope__self
+T41_domain_domain_InvalidDiskMaintenanceInput_new --> T41_domain_domain_InvalidDiskMaintenanceInput__self
+T35_usecase_usecase_CleanupPlanResponse__self --o|scopes| T29_domain_domain_CleanupScopeSet__self
+T48_usecase_usecase_DiskMaintenanceCommandInteractor_new --o R42_usecase_usecase_DiskMaintenanceCommandPort__self
+T48_usecase_usecase_DiskMaintenanceCommandInteractor_new --> T48_usecase_usecase_DiskMaintenanceCommandInteractor__self
+T46_usecase_usecase_DiskMaintenanceCommandResponse_SccacheConfigured --o T23_domain_domain_CacheSize__self
+T46_usecase_usecase_DiskMaintenanceCommandResponse_CleanupApplied --o T29_domain_domain_CleanupScopeSet__self
+T36_usecase_usecase_DiskMaintenanceError_Validation --o T44_domain_domain_DiskMaintenanceValidationError__self
+T36_usecase_usecase_DiskMaintenanceError_Operation --o T44_domain_domain_DiskMaintenanceOperationDetail__self
+T36_usecase_usecase_DiskMaintenanceError_new --> T36_usecase_usecase_DiskMaintenanceError__self
+T46_usecase_usecase_DiskMaintenanceQueryInteractor_new --o R40_usecase_usecase_DiskMaintenanceQueryPort__self
+T46_usecase_usecase_DiskMaintenanceQueryInteractor_new --> T46_usecase_usecase_DiskMaintenanceQueryInteractor__self
+R42_usecase_usecase_DiskMaintenanceCommandPort_configure_sccache --> T36_usecase_usecase_DiskMaintenanceError__self
+R42_usecase_usecase_DiskMaintenanceCommandPort_configure_sccache --> T23_domain_domain_CacheSize__self
+R42_usecase_usecase_DiskMaintenanceCommandPort_apply_cleanup --> T36_usecase_usecase_DiskMaintenanceError__self
+R42_usecase_usecase_DiskMaintenanceCommandPort_apply_cleanup --> T29_domain_domain_CleanupScopeSet__self
+R45_usecase_usecase_DiskMaintenanceCommandService_execute_command --o T38_usecase_usecase_DiskMaintenanceCommand__self
+R45_usecase_usecase_DiskMaintenanceCommandService_execute_command --> T46_usecase_usecase_DiskMaintenanceCommandResponse__self
+R45_usecase_usecase_DiskMaintenanceCommandService_execute_command --> T36_usecase_usecase_DiskMaintenanceError__self
+R40_usecase_usecase_DiskMaintenanceQueryPort_plan_cleanup --> T36_usecase_usecase_DiskMaintenanceError__self
+R40_usecase_usecase_DiskMaintenanceQueryPort_plan_cleanup --> T29_domain_domain_CleanupScopeSet__self
+R43_usecase_usecase_DiskMaintenanceQueryService_plan_cleanup --o T32_usecase_usecase_CleanupPlanQuery__self
+R43_usecase_usecase_DiskMaintenanceQueryService_plan_cleanup --> T35_usecase_usecase_CleanupPlanResponse__self
+R43_usecase_usecase_DiskMaintenanceQueryService_plan_cleanup --> T36_usecase_usecase_DiskMaintenanceError__self
+T48_usecase_usecase_DiskMaintenanceCommandInteractor__self -.impl.-> R45_usecase_usecase_DiskMaintenanceCommandService__self
+T46_usecase_usecase_DiskMaintenanceQueryInteractor__self -.impl.-> R43_usecase_usecase_DiskMaintenanceQueryService__self
+T54_infrastructure_infrastructure_FsDiskMaintenanceAdapter_new --> T54_infrastructure_infrastructure_FsDiskMaintenanceAdapter__self
+T54_infrastructure_infrastructure_FsDiskMaintenanceAdapter__self -.impl.-> R42_usecase_usecase_DiskMaintenanceCommandPort__self
+T54_infrastructure_infrastructure_FsDiskMaintenanceAdapter__self -.impl.-> R40_usecase_usecase_DiskMaintenanceQueryPort__self
+T46_cli_driver_cli_driver_MaintenanceCommandDriver_new --o R45_usecase_usecase_DiskMaintenanceCommandService__self
+T46_cli_driver_cli_driver_MaintenanceCommandDriver_new --> T46_cli_driver_cli_driver_MaintenanceCommandDriver__self
+T46_cli_driver_cli_driver_MaintenanceCommandDriver_handle --o T45_cli_driver_cli_driver_MaintenanceCommandInput__self
+T44_cli_driver_cli_driver_MaintenanceQueryDriver_new --o R43_usecase_usecase_DiskMaintenanceQueryService__self
+T44_cli_driver_cli_driver_MaintenanceQueryDriver_new --> T44_cli_driver_cli_driver_MaintenanceQueryDriver__self
+T44_cli_driver_cli_driver_MaintenanceQueryDriver_handle --o T43_cli_driver_cli_driver_MaintenanceQueryInput__self
+T58_cli_composition_cli_composition_MaintenanceCompositionRoot_new --> T58_cli_composition_cli_composition_MaintenanceCompositionRoot__self
+T58_cli_composition_cli_composition_MaintenanceCompositionRoot_maintenance_command_driver --> T46_cli_driver_cli_driver_MaintenanceCommandDriver__self
+T58_cli_composition_cli_composition_MaintenanceCompositionRoot_maintenance_query_driver --> T44_cli_driver_cli_driver_MaintenanceQueryDriver__self
+T18_cli_cli_CliCommand_Maintenance --o|cmd| T26_cli_cli_MaintenanceCommand__self
+T19_cli_cli_CleanupArgs__self --o|project_root| T23_cli_cli_ProjectRootArgs__self
+T26_cli_cli_MaintenanceCommand_ConfigureSccache --o T23_cli_cli_ProjectRootArgs__self
+T26_cli_cli_MaintenanceCommand_Cleanup --o T19_cli_cli_CleanupArgs__self
+F43_cli_cli_cli__commands__maintenance__execute --o T26_cli_cli_MaintenanceCommand__self
+F84_cli_cli_cli__commands__semantic_dup_feature_gate__semantic_dup_feature_disabled_exit --o T32_cli_cli_SemanticDupCommandFamily__self
+class T23_domain_domain_CacheSize_try_new method_node
+class T23_domain_domain_CacheSize_as_str method_node
+class T23_domain_domain_CacheSize__self value_object
+class T34_domain_domain_CleanupExecutionMode_DryRun variant_node
+class T34_domain_domain_CleanupExecutionMode_Apply variant_node
+class T34_domain_domain_CleanupExecutionMode__self value_object
+class T26_domain_domain_CleanupScope_try_new method_node
+class T26_domain_domain_CleanupScope_as_path method_node
+class T26_domain_domain_CleanupScope__self value_object
+class T29_domain_domain_CleanupScopeSet_try_new method_node
+class T29_domain_domain_CleanupScopeSet_as_slice method_node
+class T29_domain_domain_CleanupScopeSet__self value_object
+class T35_domain_domain_DiskMaintenanceConfig_new method_node
+class T35_domain_domain_DiskMaintenanceConfig_max_cache_size method_node
+class T35_domain_domain_DiskMaintenanceConfig_cleanup_scopes method_node
+class T35_domain_domain_DiskMaintenanceConfig__self value_object
+class T44_domain_domain_DiskMaintenanceOperationDetail_new method_node
+class T44_domain_domain_DiskMaintenanceOperationDetail_as_str method_node
+class T44_domain_domain_DiskMaintenanceOperationDetail__self value_object
+class T44_domain_domain_DiskMaintenanceValidationError_InvalidCacheSize variant_node
+class T44_domain_domain_DiskMaintenanceValidationError_InvalidCleanupScope variant_node
+class T44_domain_domain_DiskMaintenanceValidationError_EmptyCleanupScopes variant_node
+class T44_domain_domain_DiskMaintenanceValidationError_DuplicateCleanupScope variant_node
+class T44_domain_domain_DiskMaintenanceValidationError__self error_type
+class T41_domain_domain_InvalidDiskMaintenanceInput_new method_node
+class T41_domain_domain_InvalidDiskMaintenanceInput_as_str method_node
+class T41_domain_domain_InvalidDiskMaintenanceInput__self value_object
+class T32_usecase_usecase_CleanupPlanQuery__self query
+class T35_usecase_usecase_CleanupPlanResponse__self dto
+class T38_usecase_usecase_DiskMaintenanceCommand_ConfigureSccache variant_node
+class T38_usecase_usecase_DiskMaintenanceCommand_ApplyCleanup variant_node
+class T38_usecase_usecase_DiskMaintenanceCommand__self command
+class T48_usecase_usecase_DiskMaintenanceCommandInteractor_new method_node
+class T48_usecase_usecase_DiskMaintenanceCommandInteractor__self interactor
+class T46_usecase_usecase_DiskMaintenanceCommandResponse_SccacheConfigured variant_node
+class T46_usecase_usecase_DiskMaintenanceCommandResponse_CleanupApplied variant_node
+class T46_usecase_usecase_DiskMaintenanceCommandResponse__self dto
+class T36_usecase_usecase_DiskMaintenanceError_Validation variant_node
+class T36_usecase_usecase_DiskMaintenanceError_Operation variant_node
+class T36_usecase_usecase_DiskMaintenanceError_new method_node
+class T36_usecase_usecase_DiskMaintenanceError__self error_type
+class T46_usecase_usecase_DiskMaintenanceQueryInteractor_new method_node
+class T46_usecase_usecase_DiskMaintenanceQueryInteractor__self interactor
+class R42_usecase_usecase_DiskMaintenanceCommandPort_configure_sccache method_node
+class R42_usecase_usecase_DiskMaintenanceCommandPort_apply_cleanup method_node
+class R42_usecase_usecase_DiskMaintenanceCommandPort__self secondary_port
+class R45_usecase_usecase_DiskMaintenanceCommandService_execute_command method_node
+class R45_usecase_usecase_DiskMaintenanceCommandService__self app_service
+class R40_usecase_usecase_DiskMaintenanceQueryPort_plan_cleanup method_node
+class R40_usecase_usecase_DiskMaintenanceQueryPort__self secondary_port
+class R43_usecase_usecase_DiskMaintenanceQueryService_plan_cleanup method_node
+class R43_usecase_usecase_DiskMaintenanceQueryService__self app_service
+class T54_infrastructure_infrastructure_FsDiskMaintenanceAdapter_new method_node
+class T54_infrastructure_infrastructure_FsDiskMaintenanceAdapter__self secondary_adapter
+class T46_cli_driver_cli_driver_MaintenanceCommandDriver_new method_node
+class T46_cli_driver_cli_driver_MaintenanceCommandDriver_handle method_node
+class T45_cli_driver_cli_driver_MaintenanceCommandInput_ConfigureSccache variant_node
+class T45_cli_driver_cli_driver_MaintenanceCommandInput_ApplyCleanup variant_node
+class T45_cli_driver_cli_driver_MaintenanceCommandInput__self dto
+class T44_cli_driver_cli_driver_MaintenanceQueryDriver_new method_node
+class T44_cli_driver_cli_driver_MaintenanceQueryDriver_handle method_node
+class T43_cli_driver_cli_driver_MaintenanceQueryInput_PlanCleanup variant_node
+class T43_cli_driver_cli_driver_MaintenanceQueryInput__self dto
+class T58_cli_composition_cli_composition_MaintenanceCompositionRoot_new method_node
+class T58_cli_composition_cli_composition_MaintenanceCompositionRoot_maintenance_command_driver method_node
+class T58_cli_composition_cli_composition_MaintenanceCompositionRoot_maintenance_query_driver method_node
+class T18_cli_cli_CliCommand_Arch variant_node
+class T18_cli_cli_CliCommand_AdrBaseline variant_node
+class T18_cli_cli_CliCommand_Conventions variant_node
+class T18_cli_cli_CliCommand_Domain variant_node
+class T18_cli_cli_CliCommand_Guard variant_node
+class T18_cli_cli_CliCommand_Hook variant_node
+class T18_cli_cli_CliCommand_Maintenance variant_node
+class T18_cli_cli_CliCommand_Track variant_node
+class T18_cli_cli_CliCommand_Git variant_node
+class T18_cli_cli_CliCommand_Pr variant_node
+class T18_cli_cli_CliCommand_Capability variant_node
+class T18_cli_cli_CliCommand_Review variant_node
+class T18_cli_cli_CliCommand_File variant_node
+class T18_cli_cli_CliCommand_Verify variant_node
+class T18_cli_cli_CliCommand_FindSimilar variant_node
+class T18_cli_cli_CliCommand_DupIndex variant_node
+class T18_cli_cli_CliCommand_DupCheck variant_node
+class T18_cli_cli_CliCommand_Telemetry variant_node
+class T18_cli_cli_CliCommand_Dry variant_node
+class T18_cli_cli_CliCommand_RefVerify variant_node
+class T18_cli_cli_CliCommand_TestObligation variant_node
+class T18_cli_cli_CliCommand_Signal variant_node
+class T18_cli_cli_CliCommand_TaskContract variant_node
+class T18_cli_cli_CliCommand_Catalog variant_node
+class T18_cli_cli_CliCommand_CatalogueLint variant_node
+class T18_cli_cli_CliCommand_Template variant_node
+class T18_cli_cli_CliCommand_CodexRuntime variant_node
+class T18_cli_cli_CliCommand__self dto
+class T19_cli_cli_CleanupArgs__self dto
+class T26_cli_cli_MaintenanceCommand_ConfigureSccache variant_node
+class T26_cli_cli_MaintenanceCommand_Cleanup variant_node
+class T26_cli_cli_MaintenanceCommand__self dto
+class T23_cli_cli_ProjectRootArgs__self dto
+class T32_cli_cli_SemanticDupCommandFamily_Dry variant_node
+class T32_cli_cli_SemanticDupCommandFamily_SemanticDuplicate variant_node
+class T32_cli_cli_SemanticDupCommandFamily_name method_node
+class T32_cli_cli_SemanticDupCommandFamily__self dto
+class T24_cli_cli_VerdictFilterArg_All variant_node
+class T24_cli_cli_VerdictFilterArg_NotAViolation variant_node
+class T24_cli_cli_VerdictFilterArg_Accepted variant_node
+class T24_cli_cli_VerdictFilterArg_Violation variant_node
+class T24_cli_cli_VerdictFilterArg__self dto
+class F43_cli_cli_cli__commands__maintenance__execute free_function
+class F43_cli_cli_cli__commands__maintenance__execute function_node
+class F84_cli_cli_cli__commands__semantic_dup_feature_gate__semantic_dup_feature_disabled_exit free_function
+class F84_cli_cli_cli__commands__semantic_dup_feature_gate__semantic_dup_feature_disabled_exit function_node
 ```

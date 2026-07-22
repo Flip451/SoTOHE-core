@@ -1,7 +1,110 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-21T01:52:49Z",
-  "declaration_hash": "13b2812e7d20c49659aa60475c46bc175c9a37692430e6cb0e4c6fad98ac92d8",
-  "implementation_input_hash": "00be805a825c646ad05034ff907c3347e897fabceecc4acb1db77c33fd436787",
-  "signals": []
+  "generated_at": "2026-07-22T13:26:49Z",
+  "declaration_hash": "8f14ee7600fc37c753c370db1eb7a73d1c7a8193ad029d23656bfd228229819c",
+  "implementation_input_hash": "b00956ca5be6c9b5c864c670c88e8eae71ec9293c001295fc5cd44f68fea72da",
+  "signals": [
+    {
+      "type_name": "CleanupPlanQuery",
+      "kind_tag": "query",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CleanupPlanResponse",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "DiskMaintenanceCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "DiskMaintenanceCommandInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DiskMaintenanceCommandService"
+      ]
+    },
+    {
+      "type_name": "DiskMaintenanceCommandPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DiskMaintenanceCommandResponse",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "DiskMaintenanceCommandService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DiskMaintenanceError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error",
+        "From<DiskMaintenanceValidationError>"
+      ]
+    },
+    {
+      "type_name": "DiskMaintenanceQueryInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DiskMaintenanceQueryService"
+      ]
+    },
+    {
+      "type_name": "DiskMaintenanceQueryPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DiskMaintenanceQueryService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
 }

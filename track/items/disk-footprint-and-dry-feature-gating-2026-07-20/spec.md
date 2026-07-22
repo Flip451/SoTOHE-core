@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 20, yellow: 0, red: 0 }
+signals: { blue: 23, yellow: 0, red: 0 }
 ---
 
 # ビルド成果物によるディスク圧迫の解消と dry gate 重量依存の feature flag 化
@@ -20,6 +20,8 @@ signals: { blue: 20, yellow: 0, red: 0 }
 - [IN-02] `semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。 [adr: knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md#D2] [tasks: T002]
 - [IN-03] sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。上限値と掃除対象範囲は `.harness/config/` 配下の既定値を持つ設定ファイルで利用者が変更できる。 [adr: knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md#D3] [tasks: T003]
 - [IN-04] リポジトリ CI の clippy と test を `semantic-dup` feature 有効で実行し、feature gate 内コードを継続して compile・検証する。一方で sotp binary の既定ビルドは軽量な feature 無効のままとする。 [adr: knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md#D4] [tasks: T004]
+- [IN-05] すべての maintenance primary driver は単一の offered application-service contract のみを注入され、入力 variant による service 選択、service factory の保持、request ごとの runtime service 選択を行わない。maintenance の command 系と query 系は別 driver・別 input family に分割し、それぞれ単一の注入済み application service を invoke して結果を render する。 [adr: knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md#D4] [tasks: T005]
+- [IN-06] semantic-dup 実装の型、adapter、入力 DTO は、`semantic-dup` feature 無効の既定ビルドの公開 surface から除外する。実装は feature 配下に保持し、feature 有効ビルドではこれらを再び利用可能にする。track の型カタログはこの既定 surface を基準とする。 [adr: knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md#D1] [tasks: T001, T002]
 
 ### Out of Scope
 - [OS-01] semantic-dup 機能を別 binary または別 crate に分離すること。 [adr: knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md#D1]
@@ -38,6 +40,7 @@ signals: { blue: 20, yellow: 0, red: 0 }
 - [ ] [AC-03] 設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。 [adr: knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md#D3] [tasks: T003]
 - [ ] [AC-04] キャッシュ上限と掃除対象範囲には設定ファイル内の既定値があり、利用者は同設定ファイルを通じて環境に応じた値へ変更できる。 [adr: knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md#D3] [tasks: T003]
 - [ ] [AC-05] CI の clippy と test は `semantic-dup` feature を有効にして実行され、通常の sotp binary ビルドは feature 無効の軽量構成を既定とする。 [adr: knowledge/adr/2026-07-20-1608-disk-footprint-and-dry-feature-gating.md#D4] [tasks: T004]
+- [ ] [AC-06] 各 maintenance primary driver は単一の offered application-service contract だけを保持し、入力 variant による service 選択、service factory の保持、request ごとの runtime service 選択を行わない。command 系と query 系は別々の driver・別々の input family であり、それぞれの注入済み application service を invoke して結果を render する。 [adr: knowledge/adr/2026-06-21-1328-cli-composition-split-presentation-layer.md#D4] [tasks: T005]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/enforce-by-mechanism.md#Rules
@@ -48,5 +51,5 @@ signals: { blue: 20, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 20  🟡 0  🔴 0
+🔵 23  🟡 0  🔴 0
 

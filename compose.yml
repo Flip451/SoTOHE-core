@@ -10,6 +10,9 @@ services:
       - .:/workspace
       - ./.git:/workspace/.git:ro
       - ${SCCACHE_HOST_DIR:-./.cache/sccache}:/workspace/.cache/sccache
+    env_file:
+      - path: ./.cache/sccache.env
+        required: false
     tmpfs:
       - /workspace/private:size=1m
       - /workspace/config/secrets:size=1m

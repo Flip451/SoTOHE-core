@@ -18,10 +18,13 @@ pub mod file;
 pub mod git;
 pub mod guard;
 pub mod hook;
+pub mod maintenance;
 pub mod pr;
 pub mod ref_verify;
 pub mod review;
 pub mod semantic_dup;
+#[cfg(not(feature = "semantic-dup"))]
+pub mod semantic_dup_feature_gate;
 pub mod signal;
 pub mod task_contract;
 pub mod telemetry;

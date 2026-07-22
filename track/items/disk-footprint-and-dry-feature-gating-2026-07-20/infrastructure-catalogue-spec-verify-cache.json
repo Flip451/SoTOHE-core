@@ -3,6 +3,78 @@
   "layer": "infrastructure",
   "entries": [
     {
+      "claim_hash": "10ad84bfcb5349bbd435874440d987df9b965929dab2cf6489b74a51124590b6",
+      "evidence_hash": "432380eb93c60222854fd2f38664996bf1089f1c456ea55ca69a3394e994f38e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsDiskMaintenanceAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。上限値と掃除対象範囲は `.harness/config/` 配下の既定値を持つ設定ファイルで利用者が変更できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "10ad84bfcb5349bbd435874440d987df9b965929dab2cf6489b74a51124590b6",
+      "evidence_hash": "e04faadc2c92ed6cc3c4a76c04db5f58cebc10d461b93b98c0aecb7f06fce8a7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsDiskMaintenanceAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "10ad84bfcb5349bbd435874440d987df9b965929dab2cf6489b74a51124590b6",
+      "evidence_hash": "0365ca8a4ddac5400fdb42414c933da84e463118b6bd8883c674e296a1d5f5c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "キャッシュ上限と掃除対象範囲には設定ファイル内の既定値があり、利用者は同設定ファイルを通じて環境に応じた値へ変更できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsDiskMaintenanceAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "キャッシュ上限と掃除対象範囲には設定ファイル内の既定値があり、利用者は同設定ファイルを通じて環境に応じた値へ変更できる。"
+        }
+      }
+    },
+    {
       "claim_hash": "025525a0c1e178f3b12882335dd2bcf125161eb261cd87846f2835f14cc39157",
       "evidence_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
       "verdict": {
@@ -51,6 +123,54 @@
       }
     },
     {
+      "claim_hash": "5c5a1da309c6c2905087fde313c3d5bd9911be9dde6983e895bed7a69f75c1cd",
+      "evidence_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "DryCheckServiceFactoryAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8dffbb19146fa7df786573d1cd8fe656382700f5c29cdbe0a8bc9bd89df52c6e",
+      "evidence_hash": "9eb56ccc4a22d6c65503aa00a86a6abb62b32e5c61f9da8d80a63b0e3faf0744",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実装は feature 配下に保持し、feature 有効ビルドではこれらを再び利用可能にする。track の型カタログはこの既定 surface を基準とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ExtractError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "semantic-dup 実装の型、adapter、入力 DTO は、`semantic-dup` feature 無効の既定ビルドの公開 surface から除外する。実装は feature 配下に保持し、feature 有効ビルドではこれらを再び利用可能にする。track の型カタログはこの既定 surface を基準とする。"
+        }
+      }
+    },
+    {
       "claim_hash": "c4310c5b4ff59e95be6ea25156ddaf55a2f5d2949439183fc9cafc807b268d1c",
       "evidence_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
       "verdict": {
@@ -95,6 +215,150 @@
           "section": "acceptance_criteria",
           "element_id": "AC-01",
           "text_label": "既定 feature のビルドでは semantic-dup の重量依存が compile / link されず、`semantic-dup` feature を有効にしたビルドでは semantic-dup 機能を含む。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5c5a1da309c6c2905087fde313c3d5bd9911be9dde6983e895bed7a69f75c1cd",
+      "evidence_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsDryCorpusFragmentsAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "962cf990bdf883b6f330263d6de2efecf935504b0a13f5277a60325272714e9e",
+      "evidence_hash": "f5b89939a169f61a6798b1161eca5f65a6f2cec18c29bf0afd67c598130ff19d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsDryCorpusMetaAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "962cf990bdf883b6f330263d6de2efecf935504b0a13f5277a60325272714e9e",
+      "evidence_hash": "7a32b1cdf6ebfc97a72932aa505aaac5e00710898dea2cefd6e249476af2b603",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 無効でビルドした binary から dry 系コマンドを実行すると、feature 無効であることが分かるメッセージを出して非成功終了する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsDryCorpusMetaAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "feature 無効でビルドした binary から dry 系コマンドを実行すると、feature 無効であることが分かるメッセージを出して非成功終了する。コマンドを黙って省略または代替動作させない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e47a16904a52b0661c0cfbdd2b72149c725adee236e41404b1eca5873735948f",
+      "evidence_hash": "f5b89939a169f61a6798b1161eca5f65a6f2cec18c29bf0afd67c598130ff19d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsDryCorpusRootManifestAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e47a16904a52b0661c0cfbdd2b72149c725adee236e41404b1eca5873735948f",
+      "evidence_hash": "7a32b1cdf6ebfc97a72932aa505aaac5e00710898dea2cefd6e249476af2b603",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 無効であることが分かるメッセージを出して非成功終了する。コマンドを黙って省略または代替動作させない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsDryCorpusRootManifestAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "feature 無効でビルドした binary から dry 系コマンドを実行すると、feature 無効であることが分かるメッセージを出して非成功終了する。コマンドを黙って省略または代替動作させない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5c5a1da309c6c2905087fde313c3d5bd9911be9dde6983e895bed7a69f75c1cd",
+      "evidence_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsDryWriteConfigLoaderAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
         }
       }
     },
@@ -339,6 +603,54 @@
       }
     },
     {
+      "claim_hash": "e47a16904a52b0661c0cfbdd2b72149c725adee236e41404b1eca5873735948f",
+      "evidence_hash": "f5b89939a169f61a6798b1161eca5f65a6f2cec18c29bf0afd67c598130ff19d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RecordingDryTierTelemetryAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`semantic-dup` feature 無効でビルドした binary において、dry 系サブコマンドを利用可能な導線として登録したまま、feature 無効を明示するエラーで fail-closed に終了させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e47a16904a52b0661c0cfbdd2b72149c725adee236e41404b1eca5873735948f",
+      "evidence_hash": "7a32b1cdf6ebfc97a72932aa505aaac5e00710898dea2cefd6e249476af2b603",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 無効であることが分かるメッセージを出して非成功終了する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RecordingDryTierTelemetryAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "feature 無効でビルドした binary から dry 系コマンドを実行すると、feature 無効であることが分かるメッセージを出して非成功終了する。コマンドを黙って省略または代替動作させない。"
+        }
+      }
+    },
+    {
       "claim_hash": "61a0285a81e28d3902495caaae956e6011a0c7492bf8902ec64f806ddab40ba3",
       "evidence_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
       "verdict": {
@@ -375,6 +687,30 @@
           "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
           "section_key": "functions",
           "entry_key": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "61a0285a81e28d3902495caaae956e6011a0c7492bf8902ec64f806ddab40ba3",
+      "evidence_hash": "5fcfdae13bb87be33ccdffc9b1d3780b3e933c981580653a747d82f0f265d510",
+      "verdict": {
+        "kind": "pass",
+        "citation": "infrastructure の semantic-dup 実装が使用する重量依存を optional dependency とし、`semantic-dup` cargo feature の配下に置く。既定ビルドは当該依存を compile / link しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path"
         }
       },
       "evidence_origin": {

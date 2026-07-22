@@ -1,7 +1,95 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-21T01:53:01Z",
-  "declaration_hash": "a37dc03aacd2f1bf2a071561c0012c9023c6ced85febf0eb530df5b6feb60d7d",
-  "implementation_input_hash": "9ebbdce5e5b46cd9aaaca42aa1d5a67d4893d70125a29a8562723b3673f9616d",
-  "signals": []
+  "generated_at": "2026-07-22T13:26:51Z",
+  "declaration_hash": "5a7dd5c1ef131533d0ebe36262e2819102c83cf98258fc9f26b086ee2495ce4e",
+  "implementation_input_hash": "224c4242363dc0a67cbfd3eb6d503d18fb2a77af182ecc609a17ffc3a0ced39d",
+  "signals": [
+    {
+      "type_name": "CleanupArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Args",
+        "Debug",
+        "FromArgMatches"
+      ]
+    },
+    {
+      "type_name": "CliCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "MaintenanceCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "FromArgMatches",
+        "Subcommand"
+      ]
+    },
+    {
+      "type_name": "ProjectRootArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Args",
+        "Debug",
+        "FromArgMatches"
+      ]
+    },
+    {
+      "type_name": "SemanticDupCommandFamily",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "VerdictFilterArg",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::maintenance::execute",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::semantic_dup_feature_gate::semantic_dup_feature_disabled_exit",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::dry::execute_dry_check_approved",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "cli::commands::dry::execute_dry_fix_local",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "cli::commands::dry::execute_dry_results",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "cli::commands::dry::execute_dry_write",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    }
+  ]
 }

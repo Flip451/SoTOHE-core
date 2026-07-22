@@ -12,10 +12,17 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand, ValueEnum};
+#[cfg(feature = "semantic-dup")]
 use cli_composition::DryCompositionRoot;
+#[cfg(feature = "semantic-dup")]
 use cli_driver::dry::DryInput;
 
+#[cfg(feature = "semantic-dup")]
 use crate::commands::driver_outcome_to_exit;
+#[cfg(not(feature = "semantic-dup"))]
+use crate::commands::semantic_dup_feature_gate::{
+    SemanticDupCommandFamily, semantic_dup_feature_disabled_exit,
+};
 
 // ── sotp dry ──────────────────────────────────────────────────────────────────
 
@@ -84,6 +91,7 @@ pub struct DryWriteArgs {
 }
 
 /// Execute `sotp dry write`.
+#[cfg(feature = "semantic-dup")]
 pub fn execute_dry_write(args: DryWriteArgs) -> ExitCode {
     driver_outcome_to_exit(DryCompositionRoot::new().dry_driver().handle(DryInput::Write {
         track_id: args.track_id,
@@ -118,6 +126,7 @@ pub enum VerdictFilterArg {
 
 impl VerdictFilterArg {
     /// Convert to the canonical string expected by `DryResultsInput.filter`.
+    #[cfg(feature = "semantic-dup")]
     pub fn as_filter_str(self) -> &'static str {
         match self {
             VerdictFilterArg::All => "all",
@@ -147,6 +156,7 @@ pub struct DryResultsArgs {
 /// Execute `sotp dry results`.
 ///
 /// INFORMATIONAL — always exits 0 on successful read.
+#[cfg(feature = "semantic-dup")]
 pub fn execute_dry_results(args: DryResultsArgs) -> ExitCode {
     driver_outcome_to_exit(DryCompositionRoot::new().dry_driver().handle(DryInput::Results {
         track_id: args.track_id,
@@ -191,6 +201,7 @@ pub struct DryCheckApprovedArgs {
 /// telemetry emit call are a bin-layer (thin-bin I/O) responsibility, not a
 /// `cli_driver` one: `cli_driver::dry::DryDriver` stays a pure invoke+render
 /// controller.
+#[cfg(feature = "semantic-dup")]
 pub fn execute_dry_check_approved(args: DryCheckApprovedArgs) -> ExitCode {
     use cli_composition::telemetry_wiring::{emit_gate_eval, resolve_telemetry_writer};
     use std::time::Instant;
@@ -251,6 +262,7 @@ pub struct DryFixLocalArgs {
 /// `sotp dry write` → fix → `sotp dry check-approved` loop until
 /// the DRY gate passes, the loop is exhausted, or a tooling error occurs.
 /// Emits exactly one of: `completed`, `blocked`, or `failed`.
+#[cfg(feature = "semantic-dup")]
 pub fn execute_dry_fix_local(args: DryFixLocalArgs) -> ExitCode {
     driver_outcome_to_exit(DryCompositionRoot::new().dry_driver().handle(DryInput::FixLocal {
         track_id: args.track_id,
@@ -263,11 +275,20 @@ pub fn execute_dry_fix_local(args: DryFixLocalArgs) -> ExitCode {
 
 /// Execute `sotp dry <subcommand>`.
 pub fn execute(cmd: DryCommand) -> ExitCode {
-    match cmd {
-        DryCommand::Write(args) => execute_dry_write(args),
-        DryCommand::Results(args) => execute_dry_results(args),
-        DryCommand::CheckApproved(args) => execute_dry_check_approved(args),
-        DryCommand::FixLocal(args) => execute_dry_fix_local(args),
+    #[cfg(not(feature = "semantic-dup"))]
+    {
+        let _ = cmd;
+        semantic_dup_feature_disabled_exit(SemanticDupCommandFamily::Dry)
+    }
+
+    #[cfg(feature = "semantic-dup")]
+    {
+        match cmd {
+            DryCommand::Write(args) => execute_dry_write(args),
+            DryCommand::Results(args) => execute_dry_results(args),
+            DryCommand::CheckApproved(args) => execute_dry_check_approved(args),
+            DryCommand::FixLocal(args) => execute_dry_fix_local(args),
+        }
     }
 }
 
@@ -477,6 +498,7 @@ mod tests {
     // that used to cover `DryGateEvalTelemetryAdapter`.
 
     #[test]
+    #[cfg(feature = "semantic-dup")]
     fn test_execute_dry_check_approved_emits_gate_eval_telemetry_on_track_branch() {
         use crate::commands::track::test_support::{process_env_lock, run_in_dir, seed_repo};
 
@@ -519,6 +541,7 @@ mod tests {
     // ── VerdictFilterArg → filter string conversion ───────────────────────────
 
     #[test]
+    #[cfg(feature = "semantic-dup")]
     fn test_verdict_filter_arg_converts_to_filter_string() {
         assert_eq!(VerdictFilterArg::All.as_filter_str(), "all");
         assert_eq!(VerdictFilterArg::NotAViolation.as_filter_str(), "not-a-violation");
@@ -597,6 +620,7 @@ mod tests {
     /// and produces the expected downstream filter string.  This covers all four
     /// variants end-to-end through clap parsing + `as_filter_str()`.
     #[test]
+    #[cfg(feature = "semantic-dup")]
     fn test_dry_results_filter_all_valid_tokens_round_trip() {
         let cases: &[(&str, VerdictFilterArg, &str)] = &[
             ("all", VerdictFilterArg::All, "all"),

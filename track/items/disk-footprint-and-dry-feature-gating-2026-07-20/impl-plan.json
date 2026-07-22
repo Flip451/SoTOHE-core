@@ -4,33 +4,34 @@
     {
       "id": "T001",
       "description": "`libs/infrastructure/Cargo.toml` の `semantic-dup` feature と重量依存の宣言、`libs/infrastructure/src/{lib.rs,semantic_dup/**}` の公開 API、ならびに `dry_check/{dry_write_driver.rs,corpus_meta.rs,dry_write_driver/{fragments.rs,manifest.rs,persistent_index.rs}}` と `track/fixpoint_resolve_driver.rs` の consumer を cfg gate または feature-off 実装へ切り替え、feature-on/off build coverage を追加する。IN-01, CN-01, AC-01。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T002",
       "description": "`apps/cli-composition/Cargo.toml`、`apps/cli-composition/src/{lib.rs,semantic_dup/**}`、`apps/cli/{Cargo.toml,src/{main.rs,commands/{dry.rs,semantic_dup.rs}}}` に `semantic-dup` feature 伝播と feature-off command dispatch を実装し、両 build 構成の command coverage を追加する。IN-01, IN-02, CN-01, CN-02, AC-01, AC-02。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T003",
-      "description": "新規 `.harness/config/disk-maintenance.toml` と `Makefile.toml` に sccache 上限・cleanup scope の設定読取および maintenance task を追加し、設定値の検証を追加する。IN-03, CN-03, AC-03, AC-04。",
-      "status": "todo",
-      "commit_hash": null
+      "description": "新規 `.harness/config/disk-maintenance.toml` と `Makefile.toml`、domain/usecase の disk-maintenance、`FsDiskMaintenanceAdapter` を実装し、設定読取・検証、sccache 上限設定、target/.cache cleanup の dry-run/apply 実行を追加する。IN-03, CN-03, AC-03, AC-04。",
+      "status": "done"
     },
     {
       "id": "T004",
       "description": "`.github/workflows/ci.yml` と `Makefile.toml` の clippy/test CI entry points、および `build-sotp` を更新し、feature-on CI と default feature-off binary build の checks を追加する。IN-04, CN-04, AC-05。",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
+    },
+    {
+      "id": "T005",
+      "description": "maintenance の分割 migration として、`apps/cli-driver/src/maintenance.rs` の旧 `MaintenanceDriver`/`MaintenanceInput` を `MaintenanceCommandDriver`/`MaintenanceCommandInput` と `MaintenanceQueryDriver`/`MaintenanceQueryInput` に置換する。`apps/cli/src/commands/maintenance.rs` と `apps/cli/src/main.rs` の CLI command 定義・dispatch を各 driver/input family へ追随させ、`apps/cli-composition/src/maintenance.rs` を両 driver を返す wire-only 構成へ移行する。旧2型を除去し、command/query の各実行経路を検証する。IN-05, AC-06。",
+      "status": "done"
     }
   ],
   "plan": {
     "summary": [
       "GO-01 → T001, T002",
       "GO-02 → T002",
-      "GO-03 → T003",
+      "GO-03 → T003, T005",
       "GO-04 → T004"
     ],
     "sections": [
@@ -49,10 +50,11 @@
         "id": "S2",
         "title": "Configurable disk maintenance",
         "description": [
-          "新規 `.harness/config/disk-maintenance.toml` と `Makefile.toml` の設定読取・maintenance task を T003 で追加する。IN-03, CN-03, AC-03, AC-04。"
+          "新規 `.harness/config/disk-maintenance.toml` と `Makefile.toml` の設定読取・maintenance task を T003 で追加済みとする。IN-03, CN-03, AC-03, AC-04。T005 で `apps/cli-driver/src/maintenance.rs` を command/query driver・input family へ移行し、`apps/cli/src/commands/maintenance.rs`・`apps/cli/src/main.rs` の CLI dispatch と `apps/cli-composition/src/maintenance.rs` の両 driver wiring を追随させて旧 driver/input を除去する。IN-05, AC-06。"
         ],
         "task_ids": [
-          "T003"
+          "T003",
+          "T005"
         ]
       },
       {

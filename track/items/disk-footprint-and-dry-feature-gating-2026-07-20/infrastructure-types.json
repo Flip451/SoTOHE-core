@@ -20,10 +20,52 @@
           "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
         }
       ]
+    },
+    "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
     }
   },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "FsDiskMaintenanceAdapter"
+    }
+  ],
   "layer": "infrastructure",
   "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "FsDiskMaintenanceAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "FsDiskMaintenanceAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "FsDiskMaintenanceAdapter",
+      "trait_ref": "usecase::disk_maintenance::DiskMaintenanceCommandPort"
+    },
+    {
+      "for_type": "FsDiskMaintenanceAdapter",
+      "trait_ref": "usecase::disk_maintenance::DiskMaintenanceQueryPort"
+    }
+  ],
   "traits": {},
   "types": {
     "CodeFragmentExtractorAdapter": {
@@ -41,6 +83,28 @@
         }
       ]
     },
+    "DryCheckServiceFactoryAdapter": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "dry_check::dry_write_driver",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "ExtractError": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "semantic_dup::extractor",
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
     "FastEmbedAdapter": {
       "action": "delete",
       "informal_grounds": [],
@@ -52,6 +116,88 @@
         },
         {
           "anchor": "AC-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "FsDiskMaintenanceAdapter": {
+      "action": "add",
+      "docs": "Disk-maintenance filesystem adapter.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "disk_maintenance",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "FsDryCorpusFragmentsAdapter": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "dry_check::dry_write_driver",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "FsDryCorpusMetaAdapter": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "dry_check::corpus_meta",
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "FsDryCorpusRootManifestAdapter": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "dry_check::dry_write_driver",
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "FsDryWriteConfigLoaderAdapter": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "dry_check::dry_write_driver",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
           "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
         }
       ]
@@ -127,6 +273,21 @@
         },
         {
           "anchor": "AC-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "RecordingDryTierTelemetryAdapter": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "dry_check::dry_write_driver",
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-02",
           "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
         }
       ]

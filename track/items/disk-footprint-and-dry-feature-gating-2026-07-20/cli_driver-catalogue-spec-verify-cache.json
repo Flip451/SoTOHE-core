@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "layer": "cli_driver",
+  "entries": [
+    {
+      "claim_hash": "82d8c88797a278f7d49d187dd363f24234954de2cb7e925db73693bc50108dbd",
+      "evidence_hash": "fd94042ae81181f55b5029747ca1cbcd6b399ed6a0658817f5acaeb866b594f6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "すべての maintenance primary driver は単一の offered application-service contract のみを注入され、入力 variant による service 選択、service factory の保持、request ごとの runtime service 選択を行わない。maintenance の command 系と query 系は別 driver・別 input family に分割し、それぞれ単一の注入済み application service を invoke して結果を render する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "MaintenanceCommandDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "すべての maintenance primary driver は単一の offered application-service contract のみを注入され、入力 variant による service 選択、service factory の保持、request ごとの runtime service 選択を行わない。maintenance の command 系と query 系は別 driver・別 input family に分割し、それぞれ単一の注入済み application service を invoke して結果を render する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "82d8c88797a278f7d49d187dd363f24234954de2cb7e925db73693bc50108dbd",
+      "evidence_hash": "3b22f3320109f3ca3a79ad8b2729d4d49c89ff641e78f431cb4481537b11e14f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 maintenance primary driver は単一の offered application-service contract だけを保持し、入力 variant による service 選択、service factory の保持、request ごとの runtime service 選択を行わない。command 系と query 系は別々の driver・別々の input family であり、それぞれの注入済み application service を invoke して結果を render する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "MaintenanceCommandDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "各 maintenance primary driver は単一の offered application-service contract だけを保持し、入力 variant による service 選択、service factory の保持、request ごとの runtime service 選択を行わない。command 系と query 系は別々の driver・別々の input family であり、それぞれの注入済み application service を invoke して結果を render する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7787de55f3df42c028b99a0c353565ea2ebff31ea73ad2145278cc91b85b9dc9",
+      "evidence_hash": "fd94042ae81181f55b5029747ca1cbcd6b399ed6a0658817f5acaeb866b594f6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "maintenance の command 系と query 系は別 driver・別 input family に分割し、それぞれ単一の注入済み application service を invoke して結果を render する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "MaintenanceCommandInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "すべての maintenance primary driver は単一の offered application-service contract のみを注入され、入力 variant による service 選択、service factory の保持、request ごとの runtime service 選択を行わない。maintenance の command 系と query 系は別 driver・別 input family に分割し、それぞれ単一の注入済み application service を invoke して結果を render する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7787de55f3df42c028b99a0c353565ea2ebff31ea73ad2145278cc91b85b9dc9",
+      "evidence_hash": "3b22f3320109f3ca3a79ad8b2729d4d49c89ff641e78f431cb4481537b11e14f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "command 系と query 系は別々の driver・別々の input family であり、それぞれの注入済み application service を invoke して結果を render する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "MaintenanceCommandInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "各 maintenance primary driver は単一の offered application-service contract だけを保持し、入力 variant による service 選択、service factory の保持、request ごとの runtime service 選択を行わない。command 系と query 系は別々の driver・別々の input family であり、それぞれの注入済み application service を invoke して結果を render する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "776393ad8c410bc52f76d6d409088e2dad24e2ec3ff8df20ab2d7f69ec8e1759",
+      "evidence_hash": "fd94042ae81181f55b5029747ca1cbcd6b399ed6a0658817f5acaeb866b594f6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "すべての maintenance primary driver は単一の offered application-service contract のみを注入され、入力 variant による service 選択、service factory の保持、request ごとの runtime service 選択を行わない。maintenance の command 系と query 系は別 driver・別 input family に分割し、それぞれ単一の注入済み application service を invoke して結果を render する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "MaintenanceQueryDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "すべての maintenance primary driver は単一の offered application-service contract のみを注入され、入力 variant による service 選択、service factory の保持、request ごとの runtime service 選択を行わない。maintenance の command 系と query 系は別 driver・別 input family に分割し、それぞれ単一の注入済み application service を invoke して結果を render する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "776393ad8c410bc52f76d6d409088e2dad24e2ec3ff8df20ab2d7f69ec8e1759",
+      "evidence_hash": "3b22f3320109f3ca3a79ad8b2729d4d49c89ff641e78f431cb4481537b11e14f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 maintenance primary driver は単一の offered application-service contract だけを保持し、入力 variant による service 選択、service factory の保持、request ごとの runtime service 選択を行わない。command 系と query 系は別々の driver・別々の input family であり、それぞれの注入済み application service を invoke して結果を render する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "MaintenanceQueryDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "各 maintenance primary driver は単一の offered application-service contract だけを保持し、入力 variant による service 選択、service factory の保持、request ごとの runtime service 選択を行わない。command 系と query 系は別々の driver・別々の input family であり、それぞれの注入済み application service を invoke して結果を render する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e5ee1a366b7b2fe4d2b4be8eeabde04c830dc7d79f5d3cd7b67bccfa02db8ef4",
+      "evidence_hash": "fd94042ae81181f55b5029747ca1cbcd6b399ed6a0658817f5acaeb866b594f6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "maintenance の command 系と query 系は別 driver・別 input family に分割し、それぞれ単一の注入済み application service を invoke して結果を render する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "MaintenanceQueryInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "すべての maintenance primary driver は単一の offered application-service contract のみを注入され、入力 variant による service 選択、service factory の保持、request ごとの runtime service 選択を行わない。maintenance の command 系と query 系は別 driver・別 input family に分割し、それぞれ単一の注入済み application service を invoke して結果を render する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e5ee1a366b7b2fe4d2b4be8eeabde04c830dc7d79f5d3cd7b67bccfa02db8ef4",
+      "evidence_hash": "3b22f3320109f3ca3a79ad8b2729d4d49c89ff641e78f431cb4481537b11e14f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "command 系と query 系は別々の driver・別々の input family であり、それぞれの注入済み application service を invoke して結果を render する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "MaintenanceQueryInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "各 maintenance primary driver は単一の offered application-service contract だけを保持し、入力 variant による service 選択、service factory の保持、request ごとの runtime service 選択を行わない。command 系と query 系は別々の driver・別々の input family であり、それぞれの注入済み application service を invoke して結果を render する。"
+        }
+      }
+    }
+  ]
+}

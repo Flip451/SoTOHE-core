@@ -1,5 +1,26 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "d78dd1aba3148b227f3c009e165a097f37132b396d02844f22f2898cf794a5b2",
-  "signals": []
+  "catalogue_declaration_hash": "d3e996e4bc7aff78fb70e135ef77b111ea92a02d6b5b300ddd01ea66c3127912",
+  "signals": [
+    {
+      "type_name": "MaintenanceCommandDriver",
+      "signal": "blue",
+      "entry_hash": "82d8c88797a278f7d49d187dd363f24234954de2cb7e925db73693bc50108dbd"
+    },
+    {
+      "type_name": "MaintenanceCommandInput",
+      "signal": "blue",
+      "entry_hash": "7787de55f3df42c028b99a0c353565ea2ebff31ea73ad2145278cc91b85b9dc9"
+    },
+    {
+      "type_name": "MaintenanceQueryDriver",
+      "signal": "blue",
+      "entry_hash": "776393ad8c410bc52f76d6d409088e2dad24e2ec3ff8df20ab2d7f69ec8e1759"
+    },
+    {
+      "type_name": "MaintenanceQueryInput",
+      "signal": "blue",
+      "entry_hash": "e5ee1a366b7b2fe4d2b4be8eeabde04c830dc7d79f5d3cd7b67bccfa02db8ef4"
+    }
+  ]
 }

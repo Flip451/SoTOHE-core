@@ -1,6 +1,466 @@
 {
   "schema_version": 2,
   "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_config` directly uses `read_to_string` on a path built from `project_root` without rejecting symlinked ancestors or the config file itself. A symlinked `.harness`, `config`, or TOML file can redirect configuration reads outside the project root.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/disk_maintenance.rs",
+              "line": 49,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`configure_sccache` creates `.cache` and writes `sccache.env` without any symlink-boundary checks. A symlinked `.cache` directory or `sccache.env` file can cause the adapter to overwrite data outside `project_root`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/disk_maintenance.rs",
+              "line": 115,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`apply_cleanup` passes each joined cleanup root to `empty_directory` without rejecting symlinked project-root ancestors or the cleanup root itself. `create_dir_all`/`read_dir` can therefore operate through a symlink and remove contents from an external directory.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/disk_maintenance.rs",
+              "line": 78,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The configuration loader uses unbounded `std::fs::read_to_string`, so a sufficiently large or continuously supplied configuration file is read without a size limit. The disk-maintenance boundary should use a bounded reader and fail closed when the configured limit is exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/disk_maintenance.rs",
+              "line": 49,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:f1b2b671ccc9bff99ee95138ebbe1b326ac46b6d4ba97e4e7e5a8ead642b41ac",
+          "at": "2026-07-22T11:57:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_config` reads a path derived from `project_root` without rejecting symlinked ancestors or the config file itself. A symlinked `.harness`, `config`, or TOML file can redirect configuration reads outside the project root.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/disk_maintenance.rs",
+              "line": 49,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`configure_sccache` writes `.cache/sccache.env` without symlink-boundary checks. A symlinked `.cache` directory or `sccache.env` file can cause the adapter to overwrite data outside `project_root`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/disk_maintenance.rs",
+              "line": 115,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`apply_cleanup` passes joined cleanup roots to `empty_directory` without rejecting symlinked project-root ancestors or cleanup roots. `create_dir_all`/`read_dir` can operate through a symlink and remove contents from an external directory.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/disk_maintenance.rs",
+              "line": 78,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The configuration loader uses unbounded `std::fs::read_to_string`, so arbitrarily large configuration input is read without a size limit. Use a bounded reader and fail closed when the limit is exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/disk_maintenance.rs",
+              "line": 49,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:4b75fedbdab3a704352562e0d06ea695996c7dea102809726eb5d8ed6f1e4bd7",
+          "at": "2026-07-22T13:00:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b75fedbdab3a704352562e0d06ea695996c7dea102809726eb5d8ed6f1e4bd7",
+          "at": "2026-07-22T13:02:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b75fedbdab3a704352562e0d06ea695996c7dea102809726eb5d8ed6f1e4bd7",
+          "at": "2026-07-22T13:07:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b2198eae865cbbe932610aa9794638df3f83abdbf61e9be38519d2c54057fee0",
+          "at": "2026-07-22T14:06:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b2198eae865cbbe932610aa9794638df3f83abdbf61e9be38519d2c54057fee0",
+          "at": "2026-07-22T14:08:29Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1112ebef71f1076f314c8e722846d25700bdb3be73ad1431f1ad6d2641ff3613",
+          "at": "2026-07-21T02:09:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1112ebef71f1076f314c8e722846d25700bdb3be73ad1431f1ad6d2641ff3613",
+          "at": "2026-07-21T02:12:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:079aa98edcd569bc4c1d920da1b0d1c93acb4ce2061ac9006fa184b77453bf01",
+          "at": "2026-07-22T13:00:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:079aa98edcd569bc4c1d920da1b0d1c93acb4ce2061ac9006fa184b77453bf01",
+          "at": "2026-07-22T13:02:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd88b4148f65bf127b83560a57adf0d6ae500480f8ae8ff211d44a0815e4721f",
+          "at": "2026-07-22T13:51:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd88b4148f65bf127b83560a57adf0d6ae500480f8ae8ff211d44a0815e4721f",
+          "at": "2026-07-22T13:52:46Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31a3633e8ba35f9b43860dbc46bf6eb22a2f72cbcf11e3a9e7a2d217de66c29e",
+          "at": "2026-07-22T11:56:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31a3633e8ba35f9b43860dbc46bf6eb22a2f72cbcf11e3a9e7a2d217de66c29e",
+          "at": "2026-07-22T11:58:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c88ec28d64b0eb35f5a339bb38d6ab8853f4e4c66d0189b308ff5d2dc2513b6",
+          "at": "2026-07-22T13:00:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c88ec28d64b0eb35f5a339bb38d6ab8853f4e4c66d0189b308ff5d2dc2513b6",
+          "at": "2026-07-22T13:01:55Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:191cd290bb49ba986d8f7d51aad8a1d5a17bf7bd4514cdbd652e48cb38c09cbf",
+          "at": "2026-07-21T02:09:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli_composition::DupIndexBuildInput` is a lightweight DTO containing only two `PathBuf` fields, yet it is the sole input DTO marked `delete`; the sibling semantic-dup input DTOs remain. `IN-01` only grounds gating infrastructure's heavyweight dependencies and does not justify removing this DTO, contradicting the briefing's explicit statement that input DTOs remain outside the catalogue. Remove this tombstone.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_composition-types.json",
+              "line": 24,
+              "category": "SoT integrity: action/spec_refs mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:191cd290bb49ba986d8f7d51aad8a1d5a17bf7bd4514cdbd652e48cb38c09cbf",
+          "at": "2026-07-21T02:15:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca3f956456dd47d59fc0e0fb063af3f6ce3062030a8ddff6ef5ea950ee600c16",
+          "at": "2026-07-21T02:24:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d846a64bb3d5d7ff7cee78b1fa62ff8ba9c3e2e37f87aecb4bc0175da6366120",
+          "at": "2026-07-22T11:58:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`MaintenanceDriver` explicitly owns both `DiskMaintenanceCommandService` and `DiskMaintenanceQueryService` and selects between them in `handle`. This gives one primary adapter responsibility for two independently changing CQRS flows. Split the command and cleanup-plan paths into separate one-service primary adapters and corresponding inputs.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_driver-types.json",
+              "line": 8,
+              "category": "Single Responsibility violation"
+            },
+            {
+              "message": "The docs for `cli::commands::semantic_dup_feature_gate::semantic_dup_feature_disabled_exit` reproduce AC-02/CN-02’s behavioral contract—an explicit disabled-feature diagnostic and non-success exit—rather than relying on the existing anchors. Reduce the docs to a local target/operation phrase per `no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli-types.json",
+              "line": 66,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:d846a64bb3d5d7ff7cee78b1fa62ff8ba9c3e2e37f87aecb4bc0175da6366120",
+          "at": "2026-07-22T12:11:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:59f016b2b51a8b611581497798183e04eb3f6f411f3a70e5d0c978fa3fe33117",
+          "at": "2026-07-22T12:31:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`MaintenanceDriver` and `MaintenanceInput` still declare the prohibited combined adapter/input as `action: add` while citing IN-03, AC-03, and AC-04. Those anchors now require one service per driver and separate command/query input families, whereas these entries explicitly retain two services and a combined mode. Transitional intent does not make these references coherent; remove both entries when the source migration lands before approving the catalogue.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_driver-types.json",
+              "line": 241,
+              "category": "spec_refs missing or off-topic"
+            },
+            {
+              "message": "The docs for `cli::commands::maintenance::execute` reproduce the amended IN-03/AC-03/AC-04 routing contract by stating that intents are dispatched to distinct command/query drivers. Reduce this to a local identifying phrase and rely on the existing anchors.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli-types.json",
+              "line": 46,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`MaintenanceCompositionRoot` restates the upstream command/query separation and single-service-primary-adapter contract in prose. Use a short local noun phrase for the composition root and leave those behavioral requirements to IN-03/AC-03/AC-04.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_composition-types.json",
+              "line": 105,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `MaintenanceCommandDriver` and `MaintenanceQueryDriver` repeat AC-03's one-service/invoke/render contract, while `MaintenanceCommandInput` and `MaintenanceQueryInput` repeat AC-04's input-family separation. Replace these behavioral sentences with short local type-purpose phrases and rely on the cited anchors.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_driver-types.json",
+              "line": 156,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:59f016b2b51a8b611581497798183e04eb3f6f411f3a70e5d0c978fa3fe33117",
+          "at": "2026-07-22T12:36:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:272235ce585c6de1d569ba858ddbd9a2c8f3297c09561c3046ee3e3bbdee71f1",
+          "at": "2026-07-22T13:00:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:272235ce585c6de1d569ba858ddbd9a2c8f3297c09561c3046ee3e3bbdee71f1",
+          "at": "2026-07-22T13:03:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8a8d58cac4c2121472605079d120c4bf63defcb6b2abe6a1e30caf9ea6745d0",
+          "at": "2026-07-22T13:52:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8a8d58cac4c2121472605079d120c4bf63defcb6b2abe6a1e30caf9ea6745d0",
+          "at": "2026-07-22T13:54:42Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68c5d043a1c49b390ede19ba9875c29e2000ed2f407eb400a54945b2a10e0509",
+          "at": "2026-07-20T16:34:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68c5d043a1c49b390ede19ba9875c29e2000ed2f407eb400a54945b2a10e0509",
+          "at": "2026-07-20T16:37:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbce46cbd7d9888425e53eba356cff36fbacf550be9d227a0785735b65bd5a3c",
+          "at": "2026-07-21T02:09:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbce46cbd7d9888425e53eba356cff36fbacf550be9d227a0785735b65bd5a3c",
+          "at": "2026-07-21T02:11:06Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1cea47e15789460a696c12167af4ad8eb17bb6fe853f57b80eb9b161a920ddb",
+          "at": "2026-07-22T11:56:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1cea47e15789460a696c12167af4ad8eb17bb6fe853f57b80eb9b161a920ddb",
+          "at": "2026-07-22T11:59:16Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:908b42059292197ee0d980a76b509ed431049c4c78ecc61ee0cdbcbf737aab42",
+          "at": "2026-07-22T11:57:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This generated env file becomes a second source of truth for the cache limit. Compose and CI read this hard-coded value directly, while the supported user override lives in `.harness/config/disk-maintenance.toml`; nothing in this scope verifies they remain synchronized, and CI starts Compose without regenerating the file. A later config-only override can therefore pass CI while CI still uses the stale committed limit, and normal preparation can stage generated cache state via `git add-all`. Keep the limit single-sourced: generate and ignore this file in every execution path (including CI), or add a fail-closed synchronization gate.",
+              "severity": "P1",
+              "file": ".cache/sccache.env",
+              "line": 1,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:908b42059292197ee0d980a76b509ed431049c4c78ecc61ee0cdbcbf737aab42",
+          "at": "2026-07-22T11:59:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3d6309997f361c8eff2cf590074224ec277a6e75076098d8fb90edbd0bc31554",
+          "at": "2026-07-22T13:00:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This step invokes `cargo make` on the bare `ubuntu-latest` host before the tools image is built, but the workflow never installs `cargo-make` or the repository's pinned Rust toolchain; `cargo-make` is installed only inside the Docker image. A clean GitHub runner will therefore fail here (or use an incompatible ambient Rust installation) before reaching Buildx. Keep the directory-only host preparation here and generate the env file after loading the tools image, or explicitly install/pin the required host tooling first.",
+              "severity": "P1",
+              "file": ".github/workflows/ci.yml",
+              "line": 75,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3d6309997f361c8eff2cf590074224ec277a6e75076098d8fb90edbd0bc31554",
+          "at": "2026-07-22T13:02:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77bb9584d431cd3e8e26780b9ac51c4da3c1582ab0014e97edafa18c89f8e57d",
+          "at": "2026-07-22T13:04:48Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:09f2aad607c9c59203d53fb01aee01d2e6da8d25e230b47036a55e4033fe9d8a",
+          "at": "2026-07-22T11:56:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`MaintenanceDriver::handle` dispatches `DryRun` to `query_service` while the other runtime input variants invoke `command_service`. This newly introduced primary adapter therefore selects between separate interactors, violating the cli_driver requirement that a Driver delegate to one use-case service. Move the command/query selection behind a single use-case application service or expose separate one-service Drivers.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/maintenance.rs",
+              "line": 54,
+              "category": "handle not delegating to single use case"
+            }
+          ],
+          "hash": "rvw1:sha256:09f2aad607c9c59203d53fb01aee01d2e6da8d25e230b47036a55e4033fe9d8a",
+          "at": "2026-07-22T11:58:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28725e040af1de0f6bc48e0eab88ca3d7d4d345b1b87209d64b832042aec0bf7",
+          "at": "2026-07-22T13:00:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:28725e040af1de0f6bc48e0eab88ca3d7d4d345b1b87209d64b832042aec0bf7",
+          "at": "2026-07-22T13:01:29Z"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -130,38 +590,107 @@
           "findings": [],
           "hash": "rvw1:sha256:a9d78fe20c3a0ad1e1b1bca8496787852e9c9189e4ad30084e63bf7cbeab9da8",
           "at": "2026-07-21T02:26:42Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68c5d043a1c49b390ede19ba9875c29e2000ed2f407eb400a54945b2a10e0509",
-          "at": "2026-07-20T16:34:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68c5d043a1c49b390ede19ba9875c29e2000ed2f407eb400a54945b2a10e0509",
-          "at": "2026-07-20T16:37:14Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cbce46cbd7d9888425e53eba356cff36fbacf550be9d227a0785735b65bd5a3c",
-          "at": "2026-07-21T02:09:05Z"
+          "hash": "rvw1:sha256:657bdd27009f61b8432f95c9dcfc703774b1821a12a393c9098ef24f7ad4b809",
+          "at": "2026-07-22T11:57:01Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cbce46cbd7d9888425e53eba356cff36fbacf550be9d227a0785735b65bd5a3c",
-          "at": "2026-07-21T02:11:06Z"
+          "hash": "rvw1:sha256:657bdd27009f61b8432f95c9dcfc703774b1821a12a393c9098ef24f7ad4b809",
+          "at": "2026-07-22T11:58:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 の説明は `MaintenanceDriver`/`MaintenanceInput`、CLI の `MaintenanceCommand`/`CleanupArgs`/`ProjectRootArgs`、`MaintenanceCompositionRoot` を実装すると明記している一方、task-contract.json ではこれらの全エントリを T005 に帰属させている。T003 の説明から移管対象を除くか、帰属を整合させる必要がある。",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/impl-plan.json",
+              "line": 16,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:805ffebf4adb8d0014b1d9b52455c3d2d464e5182d7b47c43424fcbdb9634468",
+          "at": "2026-07-22T12:31:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:649c421041925c752bffdf4d0fa8ad044aeb52d4e523e3cd5879263a4e7c3c35",
+          "at": "2026-07-22T12:33:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 identifies only layer-level roles (`cli_driver`, CLI dispatch, and `cli_composition`) plus the legacy types being removed; it does not name the target files or the new `MaintenanceCommandDriver`/`MaintenanceCommandInput` and `MaintenanceQueryDriver`/`MaintenanceQueryInput` symbols. An executor must therefore invent the migration boundary despite the task-contract listing the intended entries. Name the concrete maintenance modules/files and replacement symbols in the task description.",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/impl-plan.json",
+              "line": 26,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:649c421041925c752bffdf4d0fa8ad044aeb52d4e523e3cd5879263a4e7c3c35",
+          "at": "2026-07-22T12:35:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e7cfe6bc4c932e8a737cf55b16a6c615cf87c418df17050e36a7b56a8c839b7",
+          "at": "2026-07-22T12:36:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a66072af0c849aa80e5e607d650647edb392ee4892c1df21aabd56287d1f1c7d",
+          "at": "2026-07-22T13:00:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a66072af0c849aa80e5e607d650647edb392ee4892c1df21aabd56287d1f1c7d",
+          "at": "2026-07-22T13:02:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 の migration は IN-05/AC-06 の新設境界が対象なのに、`task-coverage.json` と T005 の説明へ IN-03/CN-03/AC-03/AC-04 まで割り当て続けている。今回の ref-verify 収束方針は IN-03/AC-03/AC-04 を T003（D3）専用へ戻すことなので、T005 の旧仕様アンカーを除去し、IN-05/AC-06 の migration 検証だけに限定すべきである。",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/task-coverage.json",
+              "line": 10,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:9f3445eceb32b11dc05f8a5eb845e175b933f9b4abfaef02d52268657d5d67a2",
+          "at": "2026-07-22T13:51:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bd461abec7044c093709e2a799648defaecfe7d1bc923a0a1b14d8cf8c294f80",
+          "at": "2026-07-22T13:53:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bd461abec7044c093709e2a799648defaecfe7d1bc923a0a1b14d8cf8c294f80",
+          "at": "2026-07-22T13:55:03Z"
         }
       ]
     },
@@ -180,57 +709,167 @@
           "findings": [],
           "hash": "rvw1:sha256:e7d389e2091dd4a7073f3207016f04724ac1f22471809d5c691982ea2f3dc2ec",
           "at": "2026-07-21T02:12:48Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`prepare-local-cache-dirs` invokes `cargo run` without clearing `RUSTC_WRAPPER`; this bootstrap command can itself run through sccache before `configure-sccache` has established the current configuration, leaving the first cache-generating workload outside the intended initialization/propagation path. Run it with `RUSTC_WRAPPER=` as required by the briefing’s bootstrap wiring.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 20,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:c4d02fcabb052f4b205afaf0cccb07ec9192ff84eb503f17298487296aa7db0e",
+          "at": "2026-07-22T11:57:05Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:191cd290bb49ba986d8f7d51aad8a1d5a17bf7bd4514cdbd652e48cb38c09cbf",
-          "at": "2026-07-21T02:09:47Z"
+          "hash": "rvw1:sha256:a95d9beb87406fc7b15a1f9adadca35078f885e2f6253870352f18789289e0eb",
+          "at": "2026-07-22T13:00:41Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`cli_composition::DupIndexBuildInput` is a lightweight DTO containing only two `PathBuf` fields, yet it is the sole input DTO marked `delete`; the sibling semantic-dup input DTOs remain. `IN-01` only grounds gating infrastructure's heavyweight dependencies and does not justify removing this DTO, contradicting the briefing's explicit statement that input DTOs remain outside the catalogue. Remove this tombstone.",
+              "message": "The maintenance task cleans the default `target/` and then immediately invokes `cargo run` again. Because the first cleanup removes the CLI binary and Cargo fingerprints, the configure step recompiles the CLI and repopulates `target/`, so the task finishes with build artifacts it promised to remove. Run configuration without rebuilding inside a cleanup scope, for example via a preserved/prebuilt executable.",
               "severity": "P1",
-              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/cli_composition-types.json",
-              "line": 24,
-              "category": "SoT integrity: action/spec_refs mismatch"
+              "file": "Makefile.toml",
+              "line": 29,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "Replacing `--all-features` with only `--features semantic-dup` drops existing CI coverage for independent features such as `cli_composition/test-support` and `infrastructure/test-helpers`; tests guarded by `#[cfg(feature = \"test-support\")]` are now skipped. Preserve `--all-features`—which already enables semantic-dup—or explicitly include every previously covered feature.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 199,
+              "category": "command wiring breakage"
             }
           ],
-          "hash": "rvw1:sha256:191cd290bb49ba986d8f7d51aad8a1d5a17bf7bd4514cdbd652e48cb38c09cbf",
-          "at": "2026-07-21T02:15:11Z"
+          "hash": "rvw1:sha256:a95d9beb87406fc7b15a1f9adadca35078f885e2f6253870352f18789289e0eb",
+          "at": "2026-07-22T13:04:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`mktemp` creates the destination file without execute permission, and plain `cp` overwrites its contents while retaining that existing mode. Consequently the first `\"$CLI_BIN\"` invocation fails with `Permission denied`, so `cargo make maintenance` never performs cleanup. Copy into a previously nonexistent path or install the binary with an explicit executable mode.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 32,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The temporary executable is placed under `${TMPDIR}` without ensuring that location is outside the configured cleanup roots. With a repository-local `TMPDIR` such as `.cache/tmp` or `target/tmp`, the cleanup invocation deletes its own copied executable, and the subsequent configure invocation fails because the path no longer exists. Place the survivor binary in a validated location excluded from cleanup.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 28,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:592269132387b9142a3d43788e57423c2b092d4bb5657708779721cf6027f8c6",
+          "at": "2026-07-22T13:07:26Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ca3f956456dd47d59fc0e0fb063af3f6ce3062030a8ddff6ef5ea950ee600c16",
-          "at": "2026-07-21T02:24:24Z"
+          "hash": "rvw1:sha256:563f3de51ac5e296a26738ba71d8f91e2ed6144c967364c35ca99102a0f17095",
+          "at": "2026-07-22T13:09:23Z"
         }
       ]
     },
-    "spec": {
+    "cli": {
       "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`maintenance.rs` imports `CleanupExecutionMode` directly from `usecase` in production code. This violates the CLI dependency boundary: application types must be exposed through `cli_driver` (or the composition root), with the bin limited to parsing, typed driver input construction, and dispatch. Re-export the mode from `cli_driver` or make it part of a CLI-driver-owned input type.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/maintenance.rs",
+              "line": 9,
+              "category": "usecase/domain import in production"
+            }
+          ],
+          "hash": "rvw1:sha256:2fb60a9de801ce65899f10f836dac85b91d14b3262316ced113ad9373d6bc908",
+          "at": "2026-07-22T11:57:05Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1112ebef71f1076f314c8e722846d25700bdb3be73ad1431f1ad6d2641ff3613",
-          "at": "2026-07-21T02:09:16Z"
+          "hash": "rvw1:sha256:aaf704dd00171469326ee559e94ff6a82dd57b81223ff2164dbbf51effaffefb",
+          "at": "2026-07-22T13:00:47Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1112ebef71f1076f314c8e722846d25700bdb3be73ad1431f1ad6d2641ff3613",
-          "at": "2026-07-21T02:12:00Z"
+          "hash": "rvw1:sha256:aaf704dd00171469326ee559e94ff6a82dd57b81223ff2164dbbf51effaffefb",
+          "at": "2026-07-22T13:03:05Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CleanupScope::try_new` accepts `target/.` (and similar `CurDir` aliases) and preserves the uncanonicalized `PathBuf`; `CleanupScopeSet::try_new` therefore treats `target` and `target/.` as distinct even though they address the same cleanup target. This violates the documented duplicate-free invariant and can cause the same directory to be processed twice.",
+              "severity": "P1",
+              "file": "libs/domain/src/disk_maintenance.rs",
+              "line": 49,
+              "category": "broken invariant in newtype constructor"
+            }
+          ],
+          "hash": "rvw1:sha256:649a3432c36db91d7ef118a1ddf0487ca6066734b1fe07a883310fd2598c8fed",
+          "at": "2026-07-22T11:57:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b586c8246acf98eaec0a23ef480da5ea5fcb7adcbf8347785131de6650b8cd7c",
+          "at": "2026-07-22T12:03:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CleanupScope::try_new(\"src\")` や `CleanupScope::try_new(\".git\")` が成功します。IN-03/AC-03 は掃除範囲を `target/` と `.cache/` に限定していますが、後続処理は受理されたディレクトリの内容を削除するため、設定ミスでソースや Git メタデータを消失できます。先頭 component を `target` または `.cache` に限定し、その他は fail-closed で拒否してください。",
+              "severity": "P0",
+              "file": "libs/domain/src/disk_maintenance.rs",
+              "line": 53,
+              "category": "broken invariant in newtype constructor"
+            },
+            {
+              "message": "`trimmed.len()` はバイト長なので、末尾が複数バイト文字の入力（例: `\"10Ｇ\"`）では `len - 1` が UTF-8 境界にならず `split_at` が panic します。任意の不正設定値は `InvalidCacheSize` に変換すべきであり、これは `coding-principles.md` §No Panics in Library Code に違反します。`split_at_checked` または安全な ASCII suffix 解析を使用してください。",
+              "severity": "P0",
+              "file": "libs/domain/src/disk_maintenance.rs",
+              "line": 20,
+              "category": "panic-able production code"
+            }
+          ],
+          "hash": "rvw1:sha256:b586c8246acf98eaec0a23ef480da5ea5fcb7adcbf8347785131de6650b8cd7c",
+          "at": "2026-07-22T12:06:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c01bbd5b8d9bf78759a86b1c9b8d7776dc22f07895b93f0ba9c1d39131a6a45",
+          "at": "2026-07-22T12:11:23Z"
         }
       ]
     }

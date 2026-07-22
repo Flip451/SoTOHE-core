@@ -9,6 +9,7 @@ publish.workspace = true
 workspace = true
 
 [features]
+semantic-dup = ["infrastructure/semantic-dup"]
 # Compiles test-only composition seams. It is intentionally off by default so
 # these helpers never appear in the production rustdoc surface.
 test-support = ["infrastructure/test-helpers"]

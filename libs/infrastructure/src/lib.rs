@@ -15,6 +15,7 @@ pub mod codex_common;
 pub mod codex_runtime;
 pub mod conventions;
 pub mod demo;
+pub mod disk_maintenance;
 pub mod dry_check;
 pub mod file_port;
 pub mod gh_cli;
@@ -30,6 +31,7 @@ pub mod schema_export;
 pub mod schema_export_codec;
 #[cfg(test)]
 mod schema_export_tests;
+#[cfg(feature = "semantic-dup")]
 pub mod semantic_dup;
 pub mod shell;
 pub mod signal_layer_reader;
@@ -46,8 +48,11 @@ pub use dry_check::noop_approval::NoOpDryApprovalService;
 pub use dry_check::recording_agent::RecordingDryAgent;
 pub use git_cli::workflow_adapter::FsGitWorkflowAdapter;
 pub use pr_review::SystemSleepAdapter;
+#[cfg(feature = "semantic-dup")]
 pub use semantic_dup::fragment_extractor_adapter::CodeFragmentExtractorAdapter;
+#[cfg(feature = "semantic-dup")]
 pub use semantic_dup::noop_adapter::NoopSemanticIndexPort;
+#[cfg(feature = "semantic-dup")]
 pub use semantic_dup::null_insert_proxy::NullInsertIndexProxy;
 pub use telemetry::archived_track::{
     FsArchivedTelemetryFactoryAdapter, FsArchivedTrackTelemetryAdapter,

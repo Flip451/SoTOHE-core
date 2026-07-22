@@ -16,7 +16,23 @@ TARGET_DIR="target"
 if [ -n "${WORKER_ID:-}" ]; then
   TARGET_DIR="target-${WORKER_ID}"
 fi
-mkdir -p "$TARGET_DIR" .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home
+mkdir -p "$TARGET_DIR" .cache/cargo/registry .cache/cargo/git .cache/sccache .cache/home .cache/pytest
+RUSTC_WRAPPER= cargo run --quiet -p cli -- maintenance configure-sccache --project-root .
+''']
+
+[tasks.maintenance]
+description = "[wrapper] Clean configured build artifacts, then restore the configured sccache limit"
+script_runner = "@shell"
+script = ['''
+set -e
+CLI_BIN="$(mktemp /tmp/sotp-maintenance.XXXXXX)"
+trap 'rm -f "$CLI_BIN"' EXIT
+TARGET_DIR="${CARGO_TARGET_DIR:-target}"
+cargo build --locked -p cli
+cp "$TARGET_DIR/debug/sotp" "$CLI_BIN"
+chmod 700 "$CLI_BIN"
+"$CLI_BIN" maintenance cleanup --project-root . --apply
+"$CLI_BIN" maintenance configure-sccache --project-root .
 ''']
 
 [tasks.help]
@@ -105,11 +121,11 @@ echo "=== Bootstrap complete ==="
 ''']
 
 [tasks.build-sotp]
-description = "[host] Build sotp CLI binary and install to bin/sotp (with runtime verification)"
+description = "[host] Build default feature-off sotp CLI binary and install to bin/sotp (with runtime verification)"
 script_runner = "@shell"
 script = ['''
 TARGET_DIR="${CARGO_TARGET_DIR:-target}"
-cargo build -p cli --release && mkdir -p bin && cp "$TARGET_DIR/release/sotp" bin/sotp.tmp || exit 1
+cargo build --locked -p cli --release --no-default-features && mkdir -p bin && cp "$TARGET_DIR/release/sotp" bin/sotp.tmp || exit 1
 # Post-build verification: ensure the NEW binary is actually executable on this system.
 # Verify BEFORE replacing the old binary so a glibc mismatch doesn't destroy the working install.
 if bin/sotp.tmp --help >/dev/null 2>&1; then
@@ -177,20 +193,20 @@ args = ["fmt", "--all", "--", "--check"]
 
 [tasks.clippy-local]
 private = true
-description = "[internal] Run clippy with warnings denied"
+description = "[internal] Run clippy with all features (including semantic-dup) and warnings denied"
 command = "cargo"
 args = ["clippy", "--locked", "--all-targets", "--all-features", "--", "-D", "warnings"]
 
 [tasks.test-local]
 private = true
-description = "[internal] Run tests with nextest"
+description = "[internal] Run tests with all features (including semantic-dup) via nextest"
 env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
 args = ["nextest", "run", "--locked", "--all-targets", "--all-features", "--no-tests=warn"]
 
 [tasks.test-doc-local]
 private = true
-description = "[internal] Run documentation tests"
+description = "[internal] Run documentation tests with all features (including semantic-dup)"
 env = { SOTP_TELEMETRY = "0" }
 command = "cargo"
 args = ["test", "--locked", "--doc", "--all-features"]
@@ -207,6 +223,12 @@ private = true
 description = "[internal] Run cargo check"
 command = "cargo"
 args = ["check", "--locked", "--all-targets", "--all-features"]
+
+[tasks.build-sotp-default-local]
+private = true
+description = "[internal] Build the sotp binary with default features disabled"
+command = "cargo"
+args = ["build", "--locked", "--release", "-p", "cli", "--no-default-features"]
 
 [tasks.deny-local]
 private = true
@@ -467,13 +489,13 @@ fi
 
 [tasks.ci-rust-local]
 private = true
-description = "[internal] Run Rust-only CI checks (fmt + clippy + test + deny + check-layers + canonical-modules)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "check-layers-local", "verify-canonical-modules-local"]
+description = "[internal] Run Rust-only CI checks (fmt + semantic-dup clippy/test + default feature-off binary + deny + check-layers + canonical-modules)"
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "build-sotp-default-local", "deny-local", "check-layers-local", "verify-canonical-modules-local"]
 
 [tasks.ci-local]
 private = true
-description = "[internal] Run local repo-wide CI checks. Track-aware gates live in ci-track-local."
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-retention-gate-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-machine-paths-local", "verify-template-refs-local", "template-export-smoke-local"]
+description = "[internal] Run repo-wide CI checks with semantic-dup clippy/test and a default feature-off binary build. Track-aware gates live in ci-track-local."
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "build-sotp-default-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-retention-gate-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-machine-paths-local", "verify-template-refs-local", "template-export-smoke-local"]
 
 [tasks.ci-track-local]
 private = true
@@ -482,11 +504,11 @@ dependencies = ["task-contract-coverage-local", "task-contract-check-local", "ad
 
 [tasks.ci-rust-container]
 description = "[gate] Run Rust-only CI checks inside a pre-existing container (no docker compose)"
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "deny-local", "check-layers-local", "verify-canonical-modules-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "build-sotp-default-local", "deny-local", "check-layers-local", "verify-canonical-modules-local"]
 
 [tasks.ci-container]
 description = "[gate] Run repo-wide CI checks inside a pre-existing container (no docker compose). Track-aware gates that require an active track/<id> branch are in ci-track-container."
-dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-retention-gate-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-machine-paths-local", "verify-template-refs-local", "template-export-smoke-local"]
+dependencies = ["fmt-check-local", "clippy-local", "test-local", "test-doc-local", "build-sotp-default-local", "deny-local", "check-layers-local", "verify-arch-docs-local", "verify-doc-links-local", "verify-plan-progress-local", "verify-track-metadata-local", "verify-track-registry-local", "verify-hooks-path-local", "verify-canonical-modules-local", "verify-latest-track-local", "verify-retention-gate-local", "verify-module-size-local", "verify-domain-strings-local", "verify-domain-purity-local", "verify-usecase-purity-local", "verify-view-freshness-local", "verify-plan-artifact-refs-local", "verify-adr-signals-local", "verify-machine-paths-local", "verify-template-refs-local", "template-export-smoke-local"]
 
 [tasks.ci-track-container]
 description = "[gate] Track-aware CI gates that require a track/<id> branch context (task-contract coverage + check liveness + ADR-baseline freeze + spec/catalogue/impl signal chains + test-obligation check). Skip on base branch / non-track CI runs."

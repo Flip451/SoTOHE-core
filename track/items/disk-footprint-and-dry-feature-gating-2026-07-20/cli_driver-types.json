@@ -1,8 +1,247 @@
 {
   "crate_name": "cli_driver",
   "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "command_service",
+              "ty": "std::sync::Arc<dyn usecase::disk_maintenance::DiskMaintenanceCommandService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "MaintenanceCommandInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "crate::render::CommandOutcome"
+        }
+      ],
+      "type_name": "MaintenanceCommandDriver"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "query_service",
+              "ty": "std::sync::Arc<dyn usecase::disk_maintenance::DiskMaintenanceQueryService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "MaintenanceQueryInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "crate::render::CommandOutcome"
+        }
+      ],
+      "type_name": "MaintenanceQueryDriver"
+    }
+  ],
   "layer": "cli_driver",
   "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "MaintenanceCommandInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "MaintenanceCommandInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "MaintenanceCommandInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "MaintenanceCommandInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "MaintenanceQueryInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "MaintenanceQueryInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "MaintenanceQueryInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "MaintenanceQueryInput",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
   "traits": {},
-  "types": {}
+  "types": {
+    "MaintenanceCommandDriver": {
+      "action": "add",
+      "docs": "Disk-maintenance command primary adapter.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "maintenance",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "MaintenanceCommandInput": {
+      "action": "add",
+      "docs": "Disk-maintenance command input family.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ConfigureSccache",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ApplyCleanup",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "maintenance",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "MaintenanceQueryDriver": {
+      "action": "add",
+      "docs": "Disk-maintenance query primary adapter.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "maintenance",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "MaintenanceQueryInput": {
+      "action": "add",
+      "docs": "Disk-maintenance query input family.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "PlanCleanup",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "maintenance",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    }
+  }
 }

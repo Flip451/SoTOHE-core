@@ -1,8 +1,44 @@
 {
   "crate_name": "cli_composition",
   "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "maintenance_command_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::maintenance::MaintenanceCommandDriver"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "maintenance_query_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::maintenance::MaintenanceQueryDriver"
+        }
+      ],
+      "type_name": "MaintenanceCompositionRoot"
+    }
+  ],
   "layer": "cli_composition",
   "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "MaintenanceCompositionRoot",
+      "trait_ref": "core::default::Default"
+    }
+  ],
   "traits": {},
   "types": {
     "DryCompositionRoot": {
@@ -16,6 +52,80 @@
         },
         {
           "anchor": "IN-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "DupCheckInput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "semantic_dup::check",
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "DupIndexBuildInput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "semantic_dup::build",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "DupIndexMeasureQualityInput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "semantic_dup::measure_quality",
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "FindSimilarInput": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "semantic_dup::find_similar",
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "MaintenanceCompositionRoot": {
+      "action": "add",
+      "docs": "Disk-maintenance composition root.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "maintenance",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-06",
           "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
         }
       ]

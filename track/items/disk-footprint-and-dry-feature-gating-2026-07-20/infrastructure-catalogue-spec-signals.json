@@ -1,16 +1,51 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "86ae97e75fcb15df607ae50a096d68f26c1f5fa6dcd101ff8806acbfa25da834",
+  "catalogue_declaration_hash": "dfe9838fe05b55b8830efa6925811a3667f58481a60587722b5b0a2ec55f4932",
   "signals": [
+    {
+      "type_name": "FsDiskMaintenanceAdapter",
+      "signal": "blue",
+      "entry_hash": "10ad84bfcb5349bbd435874440d987df9b965929dab2cf6489b74a51124590b6"
+    },
     {
       "type_name": "CodeFragmentExtractorAdapter",
       "signal": "blue",
       "entry_hash": "025525a0c1e178f3b12882335dd2bcf125161eb261cd87846f2835f14cc39157"
     },
     {
+      "type_name": "DryCheckServiceFactoryAdapter",
+      "signal": "blue",
+      "entry_hash": "5c5a1da309c6c2905087fde313c3d5bd9911be9dde6983e895bed7a69f75c1cd"
+    },
+    {
+      "type_name": "ExtractError",
+      "signal": "blue",
+      "entry_hash": "8dffbb19146fa7df786573d1cd8fe656382700f5c29cdbe0a8bc9bd89df52c6e"
+    },
+    {
       "type_name": "FastEmbedAdapter",
       "signal": "blue",
       "entry_hash": "c4310c5b4ff59e95be6ea25156ddaf55a2f5d2949439183fc9cafc807b268d1c"
+    },
+    {
+      "type_name": "FsDryCorpusFragmentsAdapter",
+      "signal": "blue",
+      "entry_hash": "5c5a1da309c6c2905087fde313c3d5bd9911be9dde6983e895bed7a69f75c1cd"
+    },
+    {
+      "type_name": "FsDryCorpusMetaAdapter",
+      "signal": "blue",
+      "entry_hash": "962cf990bdf883b6f330263d6de2efecf935504b0a13f5277a60325272714e9e"
+    },
+    {
+      "type_name": "FsDryCorpusRootManifestAdapter",
+      "signal": "blue",
+      "entry_hash": "e47a16904a52b0661c0cfbdd2b72149c725adee236e41404b1eca5873735948f"
+    },
+    {
+      "type_name": "FsDryWriteConfigLoaderAdapter",
+      "signal": "blue",
+      "entry_hash": "5c5a1da309c6c2905087fde313c3d5bd9911be9dde6983e895bed7a69f75c1cd"
     },
     {
       "type_name": "LanceDbSemanticIndexAdapter",
@@ -38,12 +73,22 @@
       "entry_hash": "3491a1831e448f8f82e74708166b782b4357cac6a3d06ebbc36b17a4146d84a8"
     },
     {
+      "type_name": "RecordingDryTierTelemetryAdapter",
+      "signal": "blue",
+      "entry_hash": "e47a16904a52b0661c0cfbdd2b72149c725adee236e41404b1eca5873735948f"
+    },
+    {
       "type_name": "infrastructure::semantic_dup::extractor::extract_code_fragments",
       "signal": "blue",
       "entry_hash": "61a0285a81e28d3902495caaae956e6011a0c7492bf8902ec64f806ddab40ba3"
     },
     {
       "type_name": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock",
+      "signal": "blue",
+      "entry_hash": "61a0285a81e28d3902495caaae956e6011a0c7492bf8902ec64f806ddab40ba3"
+    },
+    {
+      "type_name": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path",
       "signal": "blue",
       "entry_hash": "61a0285a81e28d3902495caaae956e6011a0c7492bf8902ec64f806ddab40ba3"
     }
