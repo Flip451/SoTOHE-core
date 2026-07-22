@@ -126,6 +126,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [型カタログ作成の「生成 + 注釈」への移行 — 意図入力スキャフォールディング API](2026-07-02-1345-catalogue-generation-annotation.md) | — | 2026-07-02 |
 | [テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成](2026-07-02-0359-test-obligation-and-fulfillment-gate.md) | Proposed | 2026-07-02 |
 | [テスト義務ゲートにおける skipped task status レーン](2026-07-11-0802-test-obligation-skipped-status-lane.md) | Proposed | 2026-07-11 |
+| [テスト義務ゲートへの登録を機構化し、成果物不在による空振り合格を廃する](2026-07-23-0240-test-obligation-enrollment-mechanization.md) | Proposed | 2026-07-23 |
 | [contract-map renderer: `dyn Trait` return/param edge の解決](2026-07-13-0308-contract-map-dyn-trait-return-edge.md) | Proposed | 2026-07-13 |
 
 ### トラック・ワークフロー

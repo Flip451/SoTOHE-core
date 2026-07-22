@@ -71,15 +71,18 @@ Parallelism rules:
   commands and full CI for the integration phase or a single worker to avoid build lock contention.
   To isolate a single test: `cargo nextest run <test_name>` inside the tools container.
 
-**Step 4: Test-obligation binding artifacts (when applicable)**
+**Step 4: Test-obligation binding increments**
 
-When the track materializes the test-obligation gate, run the `obligation-fulfillment`
-workflow (`.harness/workflows/track/obligation-fulfillment.md`) — it owns the derive →
-author → totality → evaluate → repair loop, including the split between implementer-side
-authoring and orchestrator-side `evaluate`. Per-record authoring discipline lives in the
-`implementer` capability contract (`.harness/capabilities/implementer.md`). This workflow
-only requires that the gate is passing before implementation is reported complete once
-obligation artifacts exist.
+Enrollment is not decided here: `obligations.json` and `test-bindings.json` are
+materialized by the `type-design` workflow's mandatory terminal derive step (ADR
+2026-07-23-0240 D1), and `bin/sotp test-obligation check` applies the artifact-presence
+policy in ADR 2026-07-23-0240 D2. This step is limited to incremental binding authoring
+against those already-enrolled obligations: run the `obligation-fulfillment` workflow
+(`.harness/workflows/track/obligation-fulfillment.md`) — it owns the author → totality →
+evaluate → repair loop, including the split between implementer-side authoring and
+orchestrator-side `evaluate`. Per-record authoring discipline lives in the `implementer`
+capability contract (`.harness/capabilities/implementer.md`). The gate must be passing
+before implementation is reported complete.
 
 **Step 5: CI validation**
 
@@ -110,7 +113,7 @@ backfills the commit hash only after the batch commit. If work remains blocked, 
 | Step | Gate | Verdict |
 |------|------|---------|
 | 1 | Active `track/<id>` branch found | OK / stop |
-| 4 | `bin/sotp test-obligation check` exits 0 once artifacts exist | pass / fail |
+| 4 | `bin/sotp test-obligation check` exits 0 | pass / fail |
 | 5 | `cargo make ci` exits 0 | pass / fail |
 
 ## Failure / recovery

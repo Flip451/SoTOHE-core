@@ -2,7 +2,9 @@
 
 > Provider-agnostic workflow SSoT for driving a track's test-obligation gate from derived
 > obligations to a green `check`. The `implement` workflow (Step 4) and the `full-cycle`
-> workflow delegate here when a track materializes the gate; the workflow may also be run
+> workflow delegate here for every track holding at least one TDDD catalogue — such a track
+> is already enrolled by the `type-design` workflow's mandatory terminal derive step
+> (ADR 2026-07-23-0240 D1); enrollment is never decided here. The workflow may also be run
 > standalone to close the gate on an existing track. Authoring rules for individual binding
 > records live in the `implementer` capability contract
 > (`.harness/capabilities/implementer.md` Step 3) — this workflow owns the ORCHESTRATION
@@ -31,20 +33,28 @@ launch constraints live in the provider adapters).
 ## Inputs
 
 - Current `track/<id>` branch.
-- `track/items/<id>/obligations.json` (created by Step 1 if absent) and the track's
-  catalogues + `spec.json` (triangulation sources).
+- `track/items/<id>/obligations.json` and a (possibly records-empty)
+  `test-bindings.json` — both materialized by the `type-design` workflow's terminal derive
+  step; their absence on a catalogue-bearing track is a fail-closed `check` failure, not a
+  state this workflow silently repairs — plus the track's catalogues + `spec.json`
+  (triangulation sources).
 - **Capability and verifier routing** — `bin/sotp capability exec` resolves the implementer
   profile internally from `.harness/config/agent-profiles.json`; `bin/sotp test-obligation
   evaluate` resolves its verifier profiles internally from the same routing SSoT.
 
 ## Sequence
 
-**Step 1: Derive.** `bin/sotp test-obligation derive` (active track branch required)
-materializes `obligations.json`. Never hand-edit it; re-run derive after upstream changes.
+**Step 1: Re-derive on upstream change.** `obligations.json` already exists (type-design
+terminal derive). Run `bin/sotp test-obligation derive` (active track branch required) again
+only when catalogues / spec / rules changed since the last derivation, so the obligations
+reflect the current upstream. Never hand-edit the artifact.
 
-**Step 2: Skeleton.** `bin/sotp test-obligation bindings-skeleton` prints a schema-pure
-draft (every obligation id as a `fulfillment` record with TODO test locations). Materialize
-it as `track/items/<id>/test-bindings.json`.
+**Step 2: Skeleton (first enrollment only).** The enrollment artifact already exists for a
+normal run. Do not regenerate or overwrite it: its existing fulfillment and waiver records
+are the batch's incremental authoring history. If a sanctioned recovery has created a missing
+bindings artifact, run `bin/sotp test-obligation bindings-skeleton` into a scratch file and
+use that schema-pure draft (every obligation id as a `fulfillment` record with TODO test
+locations) only as the initial authoring input; validate it before its first materialization.
 
 **Step 3: Author (implementer capability).** Delegate binding authoring to the `implementer`
 capability. Its contract owns the record forms, the canonical waiver shapes, and the
@@ -109,6 +119,10 @@ parallelism belongs inside `evaluate`, not in authoring.
 - **Corrupted `test-bindings.json`**: restore from the round backup (file-safety discipline).
   Last resort: regenerate via Step 2 and re-author — verdict caches survive and any pair
   whose content matches re-attaches without re-verification.
+- **Missing enrollment artifacts on a catalogue-bearing existing track**: stop before
+  authoring and route the track through the `type-design` workflow's mandatory terminal derive
+  step (or its sanctioned migration route). Do not create the artifacts ad hoc in this
+  workflow; after that route completes, resume this workflow with both artifacts present.
 - **Genuine upstream gaps** (obligation impossible to fulfill or waive honestly): route to
   the owning writer capability (catalogue → type-designer, spec → spec-designer, ADR →
   adr-editor) instead of forcing a binding.
