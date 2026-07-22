@@ -7,9 +7,9 @@ out to the runtime. **Mechanical purity verification** (syn-AST detection of
 banned imports / calls) is `sotp verify usecase-purity`; the reviewer
 focuses on what the AST scanner cannot catch.
 
-## What to report
+## Priority categories
 
-Report findings ONLY for the following categories:
+Violations of the role statement above are always reportable. The following priority categories focus the review and guide severity assessment; they are not an exhaustive list of reportable design deviations. The exclusions in **What NOT to report** still apply:
 
 - **purity violation by trait or generic**: a `T: Reader` bound that effectively
   forces an `std::io::Read` dependency the syn scanner cannot see (e.g., via

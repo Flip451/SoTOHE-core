@@ -11,9 +11,9 @@ The reviewer focuses on consistency drift — wiring that is internally
 plausible but breaks an established contract with the rest of the
 harness.
 
-## What to report
+## Priority categories
 
-Report findings ONLY for the following categories:
+Violations of the role statement above are always reportable. The following priority categories focus the review and guide severity assessment; they are not an exhaustive list of reportable design deviations. The exclusions in **What NOT to report** still apply:
 
 - **command wiring breakage**: a `.claude/commands/<x>.md` step that
   references another command (`/track:y`) whose surface has changed in

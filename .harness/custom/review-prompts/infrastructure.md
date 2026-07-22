@@ -6,9 +6,9 @@ and where external I/O actually happens (file system, processes, network,
 git, JSON / TOML / YAML codecs). The reviewer must catch issues that compile
 cleanly but break trust boundaries at runtime.
 
-## What to report
+## Priority categories
 
-Report findings ONLY for the following categories:
+Violations of the role statement above are always reportable. The following priority categories focus the review and guide severity assessment; they are not an exhaustive list of reportable design deviations. The exclusions in **What NOT to report** still apply:
 
 - **trusted-root violation**: a path-handling code path that resolves user
   / config input via `Path::join` / canonicalize WITHOUT verifying the

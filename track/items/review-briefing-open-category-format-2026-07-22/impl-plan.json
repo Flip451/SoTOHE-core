@@ -4,20 +4,17 @@
     {
       "id": "T001",
       "description": "Update `.harness/custom/review-prompts/domain.md`, `usecase.md`, `infrastructure.md`, `cli.md`, `cli_composition.md`, `cli_driver.md`, and `harness-policy.md`. IN-01/IN-02/IN-03/OUT-02/OUT-03/CN-01/CN-03/AC-01/AC-02.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T002",
-      "description": "Update `.harness/custom/review-prompts/adr.md`, `spec.md`, `types.md`, and `impl-plan.md`, and create `plan-artifacts.md` with the closed category format for factual inspection. IN-02/IN-03/IN-04/IN-05/OUT-01/OUT-02/CN-02/AC-02/AC-03/AC-04.",
-      "status": "todo",
-      "commit_hash": null
+      "description": "Individually adjudicate and update the existing `.harness/custom/review-prompts/adr.md`, `spec.md`, `types.md`, and `impl-plan.md`. IN-02/IN-03/IN-04/IN-05/OUT-01/OUT-02/CN-02/AC-02/AC-03/AC-04.",
+      "status": "done"
     },
     {
       "id": "T003",
       "description": "Add a briefing role-statement/category check to `.claude/rules/09-maintainer-checklist.md`. IN-06/AC-05.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     }
   ],
   "plan": {
@@ -41,7 +38,7 @@
         "id": "S2",
         "title": "Document-inspection and SoT-briefing boundary",
         "description": [
-          "Update `.harness/custom/review-prompts/adr.md`, `spec.md`, `types.md`, and `impl-plan.md`, and create `plan-artifacts.md` with the closed category format for factual inspection. IN-02/IN-03/IN-04/IN-05/OUT-01/OUT-02/CN-02/AC-02/AC-03/AC-04."
+          "Individually adjudicate and update the existing `.harness/custom/review-prompts/adr.md`, `spec.md`, `types.md`, and `impl-plan.md`. IN-02/IN-03/IN-04/IN-05/OUT-01/OUT-02/CN-02/AC-02/AC-03/AC-04."
         ],
         "task_ids": [
           "T002"

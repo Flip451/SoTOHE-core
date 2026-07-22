@@ -9,9 +9,9 @@ implementations. Wiring errors (port-adapter mismatch, double-instantiation, pan
 config load) are in scope; application-logic and presentation concerns always belong
 in `usecase` or `cli_driver`.
 
-## What to report
+## Priority categories
 
-Report findings ONLY for the following categories:
+Violations of the role statement above are always reportable. The following priority categories focus the review and guide severity assessment; they are not an exhaustive list of reportable design deviations. The exclusions in **What NOT to report** still apply:
 
 - **invoke leak**: a wiring function or module in `cli_composition` that directly
   calls a use-case interactor method (e.g., `.run(...)` / `.dispatch(...)` /
