@@ -55,6 +55,19 @@ Forbidden writes:
   appropriate writer workflow. Normal implementation tasks should route those changes back to
   the owning capability.
 
+## Re-entry prerequisite (sequencing discipline)
+
+Per `knowledge/conventions/sot-reentry-sequencing.md`, a (re-)dispatch of this capability
+requires the convergence of its direct upstream: the type catalogues (`catalog_spec` chain:
+reference signal per `.harness/config/signal-gates.json`, the applicable `bin/sotp ref-verify`
+scope, and types-scope review `zero_findings`) **and** impl-plan-scope review `zero_findings`
+(the sole tolerated post-convergence change is a task status transition via
+`bin/sotp track transition`). If the briefing shows a prerequisite unmet, do not start
+implementing: return the briefing to the orchestrator stating the unmet prerequisite. If
+mid-work you discover an upstream SoT needs editing, stop immediately and report `blocked`
+(immediate bounce-back; no deferred-fix continuation) — this refines the existing rule that
+upstream changes route back to the owning capability.
+
 ## Internal Pipeline
 
 ### Step 1 — Ground The Task

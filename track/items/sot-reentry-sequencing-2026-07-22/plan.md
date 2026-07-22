@@ -5,23 +5,23 @@
 
 GO-01: T1, T2, T3, T4.
 
-## Tasks (0/4 resolved)
+## Tasks (4/4 resolved)
 
 ### convention — Re-entry convention and discovery
 
 > Add the convention and regenerate its index entry. IN-01, IN-08.
 
-- [ ] **T1**: Add `knowledge/conventions/sot-reentry-sequencing.md` and regenerate its `knowledge/conventions/README.md` index entry. IN-01, IN-02, IN-03, IN-04, IN-08, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04, AC-05, OUT-01, OUT-02.
+- [x] **T1**: Add `knowledge/conventions/sot-reentry-sequencing.md` and regenerate its `knowledge/conventions/README.md` index entry. IN-01, IN-02, IN-03, IN-04, IN-08, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04, AC-05, OUT-01, OUT-02.
 
 ### writer-contracts — Writer capability re-entry contracts
 
 > Update the writer capability contracts in two reviewable batches. IN-05, IN-06, AC-02.
 
-- [ ] **T2**: Update `.harness/capabilities/spec-designer.md` and `.harness/capabilities/type-designer.md` with the required convention pointers and prerequisite checks. IN-02, IN-03, IN-05, IN-06, CN-02, CN-03, AC-02, AC-03, AC-05, OUT-01.
-- [ ] **T3**: Update `.harness/capabilities/impl-planner.md` and `.harness/capabilities/implementer.md` with the required convention pointers and prerequisite checks. IN-02, IN-03, IN-04, IN-05, IN-06, CN-02, CN-03, AC-02, AC-03, AC-05, OUT-01.
+- [x] **T2**: Update `.harness/capabilities/spec-designer.md` and `.harness/capabilities/type-designer.md` with the required convention pointers and prerequisite checks. IN-02, IN-03, IN-05, IN-06, CN-02, CN-03, AC-02, AC-03, AC-05, OUT-01.
+- [x] **T3**: Update `.harness/capabilities/impl-planner.md` and `.harness/capabilities/implementer.md` with the required convention pointers and prerequisite checks. IN-02, IN-03, IN-04, IN-05, IN-06, CN-02, CN-03, AC-02, AC-03, AC-05, OUT-01.
 
 ### diagnostic-boundary — Rollback diagnosis boundary
 
 > Update the rollback-diagnoser cross-reference pointer. IN-07.
 
-- [ ] **T4**: Update `.harness/capabilities/rollback-diagnoser.md` with the convention cross-reference pointer. IN-02, IN-07, CN-02, CN-03, AC-03, AC-05, OUT-01.
+- [x] **T4**: Update `.harness/capabilities/rollback-diagnoser.md` with the convention cross-reference pointer. IN-02, IN-07, CN-02, CN-03, AC-03, AC-05, OUT-01.

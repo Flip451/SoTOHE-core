@@ -459,6 +459,16 @@ Wire-format validity (role vocabulary membership, entry-name validity, function-
 - Do not spawn further agents (keep type-designer output deterministic).
 - If architectural clarification is needed (decisions not in the ADR), note it in `## Open Questions` and advise the orchestrator to consult the `adr-editor` agent rather than improvising.
 
+## Re-entry prerequisite (sequencing discipline)
+
+Per `knowledge/conventions/sot-reentry-sequencing.md`, a re-entry dispatch of this capability
+requires the convergence of its direct upstream only — the spec (`spec_adr` chain: reference
+signal per `.harness/config/signal-gates.json`, the applicable `bin/sotp ref-verify` scope,
+and spec-scope review `zero_findings`). If the briefing shows this prerequisite unmet, do not
+start catalogue work: return the briefing to the orchestrator stating the unmet prerequisite.
+If mid-work you discover `spec.json` (or further upstream) needs editing, stop immediately and
+return to the orchestrator (immediate bounce-back; no deferred-fix continuation).
+
 ## Rules
 
 - Use `Read`, `Grep`, `Glob` for exploring catalogues / baselines / code; `Edit` on `<layer>-types.json` only for annotation (`$todo` fill-in / post-generation adjustment — entry skeletons come from the `bin/sotp catalog` verbs, never from a hand-composed Write); `Bash` only for `bin/sotp` CLI (the `catalog` verbs, `bin/sotp signal check-catalog-spec` for step 12b) and `bin/sotp track views sync` (which generates plan.md, contract-map, and `<layer>-types.md` as side effects — signal JSON files are produced by `signal calc-catalog-spec` and `signal calc-impl-catalog`, not by `views sync`)
