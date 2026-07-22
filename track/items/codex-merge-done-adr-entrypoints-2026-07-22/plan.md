@@ -12,11 +12,11 @@ All Phase 2 catalogues are empty for this documentation-only track; no catalogue
 
 > Execute T001 and T002 to add their respective host adapters (IN-01/IN-02/AC-01/AC-02).
 
-- [x] **T001**: `.agents/skills/track-merge/SKILL.md`: add the Codex `$track-merge` host adapter (IN-01/OUT-01/OUT-02/CN-01/CN-02/AC-01/AC-02).
-- [x] **T002**: `.agents/skills/track-done/SKILL.md`: add the Codex `$track-done` host adapter (IN-02/OUT-01/OUT-02/CN-01/CN-02/AC-01/AC-02).
+- [x] **T001**: `.agents/skills/track-merge/SKILL.md`: add the Codex `$track-merge` host adapter (IN-01/OUT-01/OUT-02/CN-01/CN-02/AC-01/AC-02). (`439a204c5211ebc36651c9a3a43f82b388ef7831`)
+- [x] **T002**: `.agents/skills/track-done/SKILL.md`: add the Codex `$track-done` host adapter (IN-02/OUT-01/OUT-02/CN-01/CN-02/AC-01/AC-02). (`439a204c5211ebc36651c9a3a43f82b388ef7831`)
 
 ### S2 — Pre-track ADR entrypoint
 
 > Execute T003 to establish the provider-independent ADR-add workflow SSoT and add its thin Codex host adapter (IN-03/AC-01/AC-02).
 
-- [x] **T003**: `.harness/workflows/adr/add.md`: extract the provider-independent ADR-add workflow SSoT from the existing command behavior; `.agents/skills/adr-add/SKILL.md`: add the thin Codex `$adr-add` host adapter that references that SSoT (IN-03/OUT-01/CN-01/CN-02/AC-01/AC-02).
+- [x] **T003**: `.harness/workflows/adr/add.md`: extract the provider-independent ADR-add workflow SSoT from the existing command behavior; `.agents/skills/adr-add/SKILL.md`: add the thin Codex `$adr-add` host adapter that references that SSoT (IN-03/OUT-01/CN-01/CN-02/AC-01/AC-02). (`439a204c5211ebc36651c9a3a43f82b388ef7831`)
