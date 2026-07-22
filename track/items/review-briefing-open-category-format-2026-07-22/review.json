@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8af15eb4669244418926fb7db1c3e2823b35bfb75c3d7b48ee0e98284d37337d",
+          "at": "2026-07-22T16:21:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "この系譜は 7 本の briefing 新設と `plan-artifacts.md` 形式の踏襲を ADR 2026-06-18-1406 D6 に帰属させていますが、D6 が決めているのは `.harness/custom/**` の利用者所有・never-clobber 境界です。対象範囲と形式を決めたのはそれぞれ D3 と D4 であり、現状の引用は新 ADR の根拠系譜を誤って示します。D3–D4 を引用してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+              "line": 26,
+              "category": "broken narrative reference"
+            }
+          ],
+          "hash": "rvw1:sha256:8af15eb4669244418926fb7db1c3e2823b35bfb75c3d7b48ee0e98284d37337d",
+          "at": "2026-07-22T16:26:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5d23db896797d8108ef31762040f014e16db39e0d3bcb0082faf3a2be23c8b7",
+          "at": "2026-07-22T16:33:57Z"
+        }
+      ]
+    }
+  }
+}

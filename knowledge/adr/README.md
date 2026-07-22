@@ -254,3 +254,4 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [レイヤー別 reviewer briefing prompt の導入と review-prompts ディレクトリの再配置](2026-06-18-1406-review-prompts-relocation-per-layer-briefings.md) | — | 2026-06-18 |
 | [内容レビューの SoT 別スコープ化](2026-06-30-1549-per-sot-review-scope.md) | — | 2026-06-30 |
 | [レビュー負荷軽減 — findings 全件報告と下流 artifact の再記述禁止](2026-07-02-1600-review-load-batch-findings-no-restatement.md) | — | 2026-07-02 |
+| [レビュー指示書のカテゴリ閉列挙を半開形式へ改める](2026-07-23-0109-review-briefing-open-category-format.md) | Proposed | 2026-07-23 |
