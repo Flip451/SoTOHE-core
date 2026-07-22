@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "type-contract-pipeline-consistency-2026-07-23",
+  "title": "型契約パイプラインの規範と機構を実挙動に整合させる",
+  "branch": "track/type-contract-pipeline-consistency-2026-07-23",
+  "created_at": "2026-07-22T17:10:55Z",
+  "updated_at": "2026-07-22T17:10:55Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}
