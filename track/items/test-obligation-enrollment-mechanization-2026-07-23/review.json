@@ -1,0 +1,52 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 は既決 ADR 2026-07-02-0359 の D6 が定めた「obligations / test-bindings artifact が不在なら zero pairs で通過する」という existence-based scope を反転させています。それにもかかわらず本 ADR は「D15 の手前を閉じる補完」とだけ記載しており、既決決定の変更・supersede として明示していないため、ADR 間の決定が矛盾します。既決 D6 を変更するなら、その関係を明示的に記録してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+              "line": 44,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:8afb4e7ecb2a2d00a9d6913117636c58e2f137449b5eda8bc75028894509c23d",
+          "at": "2026-07-22T18:10:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:37c5e932b8759cc906991cdcebf54465cb5b96c3e58ecac676c9b9cdee787b24",
+          "at": "2026-07-22T18:14:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:37c5e932b8759cc906991cdcebf54465cb5b96c3e58ecac676c9b9cdee787b24",
+          "at": "2026-07-22T18:17:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa07cd273766a7ab174c5bb089f30b63262d174c19ccaf8ffe9f43e6931b9d84",
+          "at": "2026-07-22T18:23:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa07cd273766a7ab174c5bb089f30b63262d174c19ccaf8ffe9f43e6931b9d84",
+          "at": "2026-07-22T18:25:27Z"
+        }
+      ]
+    }
+  }
+}
