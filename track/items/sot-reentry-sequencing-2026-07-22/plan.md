@@ -26,10 +26,10 @@ GO-01: T1, T2, T3, T4, T5, T6, T7.
 
 - [x] **T4**: Update `.harness/capabilities/rollback-diagnoser.md` with the convention cross-reference pointer. IN-02, IN-07, CN-02, CN-03, AC-03, AC-05, OUT-01. (`b5cd26b760bc479e7d2cd89a930e80af0fc43377`)
 - [x] **T5**: Update `.harness/workflows/track/diagnose.md` Step 3 with the pre-dispatch convergence-evidence check. IN-02, AC-05, AC-06. (`6b3f712a543c552e3531befee6c874ab40505ef5`)
-- [x] **T6**: Update `.harness/workflows/track/plan.md` Phase 1 and Phase 2 back-and-forth loops with the required pre-re-dispatch confirmation. IN-02, IN-03, CN-02, CN-03, AC-05, AC-06.
+- [x] **T6**: Update `.harness/workflows/track/plan.md` Phase 1 and Phase 2 back-and-forth loops with the required pre-re-dispatch confirmation. IN-02, IN-03, CN-02, CN-03, AC-05, AC-06. (`c7754771f75ee698db257d16249839c793a535ff`)
 
 ### single-scope-review-reentry — Single-scope review re-entry lifecycle
 
 > Add the designated single-SoT-scope review re-entry round and align plan-loop references. IN-02, CN-02, CN-03, AC-05, AC-06.
 
-- [x] **T7**: Add the designated single-SoT-scope re-entry round in `.harness/workflows/track/review.md` and align the `.harness/workflows/track/plan.md` references. IN-02, CN-02, CN-03, AC-05, AC-06.
+- [x] **T7**: Add the designated single-SoT-scope re-entry round in `.harness/workflows/track/review.md` and align the `.harness/workflows/track/plan.md` references. IN-02, CN-02, CN-03, AC-05, AC-06. (`c7754771f75ee698db257d16249839c793a535ff`)
