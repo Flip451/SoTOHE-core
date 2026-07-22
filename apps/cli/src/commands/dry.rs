@@ -319,6 +319,13 @@ mod tests {
 
     use super::*;
 
+    #[cfg(not(feature = "semantic-dup"))]
+    use crate::commands::semantic_dup::{FindSimilarArgs, execute_find_similar};
+    #[cfg(not(feature = "semantic-dup"))]
+    use crate::commands::track::test_support::{
+        create_track_dir, process_env_lock, run_in_dir, seed_repo,
+    };
+
     // ── Arg-parsing wrapper ───────────────────────────────────────────────────
 
     /// Thin clap wrapper for unit testing argument parsing of `sotp dry <subcmd>`.
@@ -503,6 +510,115 @@ mod tests {
             }
             other => panic!("expected CheckApproved, got {other:?}"),
         }
+    }
+
+    #[cfg(not(feature = "semantic-dup"))]
+    fn assert_feature_disabled_command(run: impl FnOnce() -> std::process::ExitCode) {
+        let exit = run();
+        assert_eq!(exit, std::process::ExitCode::FAILURE);
+    }
+
+    #[cfg(not(feature = "semantic-dup"))]
+    #[test]
+    fn test_feature_disabled_execution_commands_fail_closed_with_actionable_message() {
+        let _guard = process_env_lock().lock().unwrap();
+
+        assert_feature_disabled_command(|| {
+            execute(DryCommand::Write(DryWriteArgs {
+                track_id: "test-track".to_owned(),
+                base_commit: None,
+                db_path: PathBuf::from(".semantic_index"),
+                threshold: None,
+                workspace_root: PathBuf::from("."),
+                items_dir: PathBuf::from("track/items"),
+                model: None,
+                capability_name: "dry-checker".to_owned(),
+            }))
+        });
+        assert_feature_disabled_command(|| {
+            execute(DryCommand::Results(DryResultsArgs {
+                track_id: "test-track".to_owned(),
+                filter: VerdictFilterArg::All,
+                items_dir: PathBuf::from("track/items"),
+            }))
+        });
+        assert_feature_disabled_command(|| {
+            execute(DryCommand::FixLocal(DryFixLocalArgs {
+                track_id: "test-track".to_owned(),
+                briefing_file: PathBuf::from("tmp/briefing.md"),
+                model: None,
+            }))
+        });
+        assert_feature_disabled_command(|| {
+            execute_find_similar(FindSimilarArgs {
+                fragment: Some("fn duplicate() {}".to_owned()),
+                file: None,
+                top_k: 5,
+                db_path: PathBuf::from(".semantic_index"),
+            })
+        });
+    }
+
+    #[cfg(not(feature = "semantic-dup"))]
+    fn write_feature_off_dry_config(root: &std::path::Path, enabled: bool) {
+        let config_dir = root.join(".harness/config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        std::fs::write(
+            config_dir.join("dry-check.json"),
+            format!(
+                r#"{{
+  "schema_version": 4,
+  "enabled": {enabled},
+  "threshold": 0.85,
+  "max_parallelism": 4,
+  "known_bad_injection_rate_percent": 10,
+  "known_bad_detection_threshold_percent": 90
+}}"#
+            ),
+        )
+        .unwrap();
+    }
+
+    #[cfg(not(feature = "semantic-dup"))]
+    #[test]
+    fn test_feature_disabled_dry_check_approved_succeeds_when_gate_is_disabled() {
+        let _guard = process_env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = "feature-off-dry-gate";
+        seed_repo(dir.path(), &format!("track/{track_id}"));
+        create_track_dir(dir.path(), track_id);
+        write_feature_off_dry_config(dir.path(), false);
+
+        let exit = run_in_dir(dir.path(), || {
+            execute(DryCommand::CheckApproved(DryCheckApprovedArgs {
+                track_id: Some(track_id.to_owned()),
+                base_commit: None,
+                items_dir: PathBuf::from("track/items"),
+            }))
+        });
+
+        assert_eq!(exit, std::process::ExitCode::SUCCESS);
+    }
+
+    #[cfg(not(feature = "semantic-dup"))]
+    #[test]
+    fn test_feature_disabled_dry_check_approved_fails_closed_when_gate_is_enabled() {
+        let _guard = process_env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = "feature-off-dry-gate";
+        seed_repo(dir.path(), &format!("track/{track_id}"));
+        create_track_dir(dir.path(), track_id);
+        write_feature_off_dry_config(dir.path(), true);
+
+        let exit = run_in_dir(dir.path(), || {
+            execute(DryCommand::CheckApproved(DryCheckApprovedArgs {
+                track_id: Some(track_id.to_owned()),
+                base_commit: None,
+                items_dir: PathBuf::from("track/items"),
+            }))
+        });
+
+        assert_eq!(exit, std::process::ExitCode::FAILURE);
     }
 
     // ── sotp dry check-approved: telemetry wiring (bin-level GateEval emit) ──

@@ -2,6 +2,15 @@
 
 use std::process::ExitCode;
 
+macro_rules! semantic_dup_feature_disabled_message {
+    ($command_family:expr) => {
+        format!(
+            "{} commands require the disabled `semantic-dup` feature; rebuild sotp with `--features semantic-dup`",
+            $command_family.name()
+        )
+    };
+}
+
 /// Feature-gated commands whose implementation is compiled behind `semantic-dup`.
 pub enum SemanticDupCommandFamily {
     /// The `sotp dry write` command.
@@ -27,10 +36,7 @@ impl SemanticDupCommandFamily {
 
 /// Print a clear feature-gate error and return a non-success exit code.
 pub fn semantic_dup_feature_disabled_exit(command_family: SemanticDupCommandFamily) -> ExitCode {
-    eprintln!(
-        "{} commands require the disabled `semantic-dup` feature; rebuild sotp with `--features semantic-dup`",
-        command_family.name()
-    );
+    eprintln!("{}", semantic_dup_feature_disabled_message!(command_family));
     ExitCode::FAILURE
 }
 
@@ -57,6 +63,23 @@ mod tests {
             SemanticDupCommandFamily::SemanticDuplicate,
         ] {
             assert_eq!(semantic_dup_feature_disabled_exit(selector), ExitCode::FAILURE);
+        }
+    }
+
+    #[test]
+    fn test_feature_disabled_command_selectors_render_actionable_messages() {
+        for (selector, expected_command) in [
+            (SemanticDupCommandFamily::DryWrite, "dry write"),
+            (SemanticDupCommandFamily::DryResults, "dry results"),
+            (SemanticDupCommandFamily::DryFixLocal, "dry fix-local"),
+            (SemanticDupCommandFamily::SemanticDuplicate, "semantic duplicate"),
+        ] {
+            assert_eq!(
+                semantic_dup_feature_disabled_message!(selector),
+                format!(
+                    "{expected_command} commands require the disabled `semantic-dup` feature; rebuild sotp with `--features semantic-dup`"
+                )
+            );
         }
     }
 }

@@ -1,67 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`maintenance.rs` imports `CleanupExecutionMode` directly from `usecase` in production code. This violates the CLI dependency boundary: application types must be exposed through `cli_driver` (or the composition root), with the bin limited to parsing, typed driver input construction, and dispatch. Re-export the mode from `cli_driver` or make it part of a CLI-driver-owned input type.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/maintenance.rs",
-              "line": 9,
-              "category": "usecase/domain import in production"
-            }
-          ],
-          "hash": "rvw1:sha256:2fb60a9de801ce65899f10f836dac85b91d14b3262316ced113ad9373d6bc908",
-          "at": "2026-07-22T11:57:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aaf704dd00171469326ee559e94ff6a82dd57b81223ff2164dbbf51effaffefb",
-          "at": "2026-07-22T13:00:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aaf704dd00171469326ee559e94ff6a82dd57b81223ff2164dbbf51effaffefb",
-          "at": "2026-07-22T13:03:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a16f664781ea9f4e715b80ffab3c9f53cbd8a11c2dc7b369617c9251d0fc73c",
-          "at": "2026-07-22T16:38:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a16f664781ea9f4e715b80ffab3c9f53cbd8a11c2dc7b369617c9251d0fc73c",
-          "at": "2026-07-22T16:41:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a61c66a30853d18497ecf9637173fce93f076f5e63bdb90ac65baeee884d99bf",
-          "at": "2026-07-22T17:07:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a61c66a30853d18497ecf9637173fce93f076f5e63bdb90ac65baeee884d99bf",
-          "at": "2026-07-22T17:08:59Z"
-        }
-      ]
-    },
     "cli_driver": {
       "rounds": [
         {
@@ -145,359 +84,6 @@
           "findings": [],
           "hash": "rvw1:sha256:4b1b5d5e0aaa38c54a34b7304d99d04a6e85e9bf6c1f9a1f81631d97121ca918",
           "at": "2026-07-22T16:43:25Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:908b42059292197ee0d980a76b509ed431049c4c78ecc61ee0cdbcbf737aab42",
-          "at": "2026-07-22T11:57:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This generated env file becomes a second source of truth for the cache limit. Compose and CI read this hard-coded value directly, while the supported user override lives in `.harness/config/disk-maintenance.toml`; nothing in this scope verifies they remain synchronized, and CI starts Compose without regenerating the file. A later config-only override can therefore pass CI while CI still uses the stale committed limit, and normal preparation can stage generated cache state via `git add-all`. Keep the limit single-sourced: generate and ignore this file in every execution path (including CI), or add a fail-closed synchronization gate.",
-              "severity": "P1",
-              "file": ".cache/sccache.env",
-              "line": 1,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:908b42059292197ee0d980a76b509ed431049c4c78ecc61ee0cdbcbf737aab42",
-          "at": "2026-07-22T11:59:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3d6309997f361c8eff2cf590074224ec277a6e75076098d8fb90edbd0bc31554",
-          "at": "2026-07-22T13:00:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This step invokes `cargo make` on the bare `ubuntu-latest` host before the tools image is built, but the workflow never installs `cargo-make` or the repository's pinned Rust toolchain; `cargo-make` is installed only inside the Docker image. A clean GitHub runner will therefore fail here (or use an incompatible ambient Rust installation) before reaching Buildx. Keep the directory-only host preparation here and generate the env file after loading the tools image, or explicitly install/pin the required host tooling first.",
-              "severity": "P1",
-              "file": ".github/workflows/ci.yml",
-              "line": 75,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3d6309997f361c8eff2cf590074224ec277a6e75076098d8fb90edbd0bc31554",
-          "at": "2026-07-22T13:02:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77bb9584d431cd3e8e26780b9ac51c4da3c1582ab0014e97edafa18c89f8e57d",
-          "at": "2026-07-22T13:04:48Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e7d389e2091dd4a7073f3207016f04724ac1f22471809d5c691982ea2f3dc2ec",
-          "at": "2026-07-21T02:09:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e7d389e2091dd4a7073f3207016f04724ac1f22471809d5c691982ea2f3dc2ec",
-          "at": "2026-07-21T02:12:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`prepare-local-cache-dirs` invokes `cargo run` without clearing `RUSTC_WRAPPER`; this bootstrap command can itself run through sccache before `configure-sccache` has established the current configuration, leaving the first cache-generating workload outside the intended initialization/propagation path. Run it with `RUSTC_WRAPPER=` as required by the briefing’s bootstrap wiring.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 20,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:c4d02fcabb052f4b205afaf0cccb07ec9192ff84eb503f17298487296aa7db0e",
-          "at": "2026-07-22T11:57:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a95d9beb87406fc7b15a1f9adadca35078f885e2f6253870352f18789289e0eb",
-          "at": "2026-07-22T13:00:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The maintenance task cleans the default `target/` and then immediately invokes `cargo run` again. Because the first cleanup removes the CLI binary and Cargo fingerprints, the configure step recompiles the CLI and repopulates `target/`, so the task finishes with build artifacts it promised to remove. Run configuration without rebuilding inside a cleanup scope, for example via a preserved/prebuilt executable.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 29,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "Replacing `--all-features` with only `--features semantic-dup` drops existing CI coverage for independent features such as `cli_composition/test-support` and `infrastructure/test-helpers`; tests guarded by `#[cfg(feature = \"test-support\")]` are now skipped. Preserve `--all-features`—which already enables semantic-dup—or explicitly include every previously covered feature.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 199,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:a95d9beb87406fc7b15a1f9adadca35078f885e2f6253870352f18789289e0eb",
-          "at": "2026-07-22T13:04:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`mktemp` creates the destination file without execute permission, and plain `cp` overwrites its contents while retaining that existing mode. Consequently the first `\"$CLI_BIN\"` invocation fails with `Permission denied`, so `cargo make maintenance` never performs cleanup. Copy into a previously nonexistent path or install the binary with an explicit executable mode.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 32,
-              "category": "command wiring breakage"
-            },
-            {
-              "message": "The temporary executable is placed under `${TMPDIR}` without ensuring that location is outside the configured cleanup roots. With a repository-local `TMPDIR` such as `.cache/tmp` or `target/tmp`, the cleanup invocation deletes its own copied executable, and the subsequent configure invocation fails because the path no longer exists. Place the survivor binary in a validated location excluded from cleanup.",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 28,
-              "category": "command wiring breakage"
-            }
-          ],
-          "hash": "rvw1:sha256:592269132387b9142a3d43788e57423c2b092d4bb5657708779721cf6027f8c6",
-          "at": "2026-07-22T13:07:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:563f3de51ac5e296a26738ba71d8f91e2ed6144c967364c35ca99102a0f17095",
-          "at": "2026-07-22T13:09:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:23da31b2df3751060debd944da25f49ddeef2eb51fc6573355788865ee94ffa0",
-          "at": "2026-07-22T17:32:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:23da31b2df3751060debd944da25f49ddeef2eb51fc6573355788865ee94ffa0",
-          "at": "2026-07-22T17:39:12Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`load_config` directly uses `read_to_string` on a path built from `project_root` without rejecting symlinked ancestors or the config file itself. A symlinked `.harness`, `config`, or TOML file can redirect configuration reads outside the project root.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/disk_maintenance.rs",
-              "line": 49,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`configure_sccache` creates `.cache` and writes `sccache.env` without any symlink-boundary checks. A symlinked `.cache` directory or `sccache.env` file can cause the adapter to overwrite data outside `project_root`.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/disk_maintenance.rs",
-              "line": 115,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`apply_cleanup` passes each joined cleanup root to `empty_directory` without rejecting symlinked project-root ancestors or the cleanup root itself. `create_dir_all`/`read_dir` can therefore operate through a symlink and remove contents from an external directory.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/disk_maintenance.rs",
-              "line": 78,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "The configuration loader uses unbounded `std::fs::read_to_string`, so a sufficiently large or continuously supplied configuration file is read without a size limit. The disk-maintenance boundary should use a bounded reader and fail closed when the configured limit is exceeded.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/disk_maintenance.rs",
-              "line": 49,
-              "category": "non-fail-closed config"
-            }
-          ],
-          "hash": "rvw1:sha256:f1b2b671ccc9bff99ee95138ebbe1b326ac46b6d4ba97e4e7e5a8ead642b41ac",
-          "at": "2026-07-22T11:57:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`load_config` reads a path derived from `project_root` without rejecting symlinked ancestors or the config file itself. A symlinked `.harness`, `config`, or TOML file can redirect configuration reads outside the project root.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/disk_maintenance.rs",
-              "line": 49,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`configure_sccache` writes `.cache/sccache.env` without symlink-boundary checks. A symlinked `.cache` directory or `sccache.env` file can cause the adapter to overwrite data outside `project_root`.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/disk_maintenance.rs",
-              "line": 115,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "`apply_cleanup` passes joined cleanup roots to `empty_directory` without rejecting symlinked project-root ancestors or cleanup roots. `create_dir_all`/`read_dir` can operate through a symlink and remove contents from an external directory.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/disk_maintenance.rs",
-              "line": 78,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "The configuration loader uses unbounded `std::fs::read_to_string`, so arbitrarily large configuration input is read without a size limit. Use a bounded reader and fail closed when the limit is exceeded.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/disk_maintenance.rs",
-              "line": 49,
-              "category": "non-fail-closed config"
-            }
-          ],
-          "hash": "rvw1:sha256:4b75fedbdab3a704352562e0d06ea695996c7dea102809726eb5d8ed6f1e4bd7",
-          "at": "2026-07-22T13:00:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4b75fedbdab3a704352562e0d06ea695996c7dea102809726eb5d8ed6f1e4bd7",
-          "at": "2026-07-22T13:02:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4b75fedbdab3a704352562e0d06ea695996c7dea102809726eb5d8ed6f1e4bd7",
-          "at": "2026-07-22T13:07:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b2198eae865cbbe932610aa9794638df3f83abdbf61e9be38519d2c54057fee0",
-          "at": "2026-07-22T14:06:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b2198eae865cbbe932610aa9794638df3f83abdbf61e9be38519d2c54057fee0",
-          "at": "2026-07-22T14:08:29Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68c5d043a1c49b390ede19ba9875c29e2000ed2f407eb400a54945b2a10e0509",
-          "at": "2026-07-20T16:34:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:68c5d043a1c49b390ede19ba9875c29e2000ed2f407eb400a54945b2a10e0509",
-          "at": "2026-07-20T16:37:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbce46cbd7d9888425e53eba356cff36fbacf550be9d227a0785735b65bd5a3c",
-          "at": "2026-07-21T02:09:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cbce46cbd7d9888425e53eba356cff36fbacf550be9d227a0785735b65bd5a3c",
-          "at": "2026-07-21T02:11:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "ADR に `## Reassess When` セクションがなく、決定を見直す具体的なトリガーが記録されていません。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-22-1541-dry-gate-evaluation-feature-off-precedence.md",
-              "line": 58,
-              "category": "missing reassessment trigger"
-            }
-          ],
-          "hash": "rvw1:sha256:9fabcf8ea9998f49254a615ee90a33ca9afde79a079bdf6507733d223b43a339",
-          "at": "2026-07-22T16:38:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dcca8320576a30e9b11510f9d6181a6888ab6250483e2b68043b63081b3aa3d7",
-          "at": "2026-07-22T16:44:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dcca8320576a30e9b11510f9d6181a6888ab6250483e2b68043b63081b3aa3d7",
-          "at": "2026-07-22T16:45:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a58b41d75f748e47bd0d36f529f2fbe7fbf26a7d3f37252ac31f8101dc07db93",
-          "at": "2026-07-22T17:31:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a58b41d75f748e47bd0d36f529f2fbe7fbf26a7d3f37252ac31f8101dc07db93",
-          "at": "2026-07-22T17:34:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4d9358d468e08a208b5ffb1bed4395cc2951d9ae9bd869f9e9a1db56f5e295fe",
-          "at": "2026-07-22T18:02:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4d9358d468e08a208b5ffb1bed4395cc2951d9ae9bd869f9e9a1db56f5e295fe",
-          "at": "2026-07-22T18:04:14Z"
         }
       ]
     },
@@ -902,6 +488,364 @@
         }
       ]
     },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`maintenance.rs` imports `CleanupExecutionMode` directly from `usecase` in production code. This violates the CLI dependency boundary: application types must be exposed through `cli_driver` (or the composition root), with the bin limited to parsing, typed driver input construction, and dispatch. Re-export the mode from `cli_driver` or make it part of a CLI-driver-owned input type.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/maintenance.rs",
+              "line": 9,
+              "category": "usecase/domain import in production"
+            }
+          ],
+          "hash": "rvw1:sha256:2fb60a9de801ce65899f10f836dac85b91d14b3262316ced113ad9373d6bc908",
+          "at": "2026-07-22T11:57:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aaf704dd00171469326ee559e94ff6a82dd57b81223ff2164dbbf51effaffefb",
+          "at": "2026-07-22T13:00:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aaf704dd00171469326ee559e94ff6a82dd57b81223ff2164dbbf51effaffefb",
+          "at": "2026-07-22T13:03:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a16f664781ea9f4e715b80ffab3c9f53cbd8a11c2dc7b369617c9251d0fc73c",
+          "at": "2026-07-22T16:38:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a16f664781ea9f4e715b80ffab3c9f53cbd8a11c2dc7b369617c9251d0fc73c",
+          "at": "2026-07-22T16:41:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a61c66a30853d18497ecf9637173fce93f076f5e63bdb90ac65baeee884d99bf",
+          "at": "2026-07-22T17:07:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a61c66a30853d18497ecf9637173fce93f076f5e63bdb90ac65baeee884d99bf",
+          "at": "2026-07-22T17:08:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31ecc950baa54ce1315228262e7586b662b1ee315c64931694ceaeab0cd7cb93",
+          "at": "2026-07-22T18:24:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31ecc950baa54ce1315228262e7586b662b1ee315c64931694ceaeab0cd7cb93",
+          "at": "2026-07-22T18:26:37Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_config` directly uses `read_to_string` on a path built from `project_root` without rejecting symlinked ancestors or the config file itself. A symlinked `.harness`, `config`, or TOML file can redirect configuration reads outside the project root.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/disk_maintenance.rs",
+              "line": 49,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`configure_sccache` creates `.cache` and writes `sccache.env` without any symlink-boundary checks. A symlinked `.cache` directory or `sccache.env` file can cause the adapter to overwrite data outside `project_root`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/disk_maintenance.rs",
+              "line": 115,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`apply_cleanup` passes each joined cleanup root to `empty_directory` without rejecting symlinked project-root ancestors or the cleanup root itself. `create_dir_all`/`read_dir` can therefore operate through a symlink and remove contents from an external directory.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/disk_maintenance.rs",
+              "line": 78,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The configuration loader uses unbounded `std::fs::read_to_string`, so a sufficiently large or continuously supplied configuration file is read without a size limit. The disk-maintenance boundary should use a bounded reader and fail closed when the configured limit is exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/disk_maintenance.rs",
+              "line": 49,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:f1b2b671ccc9bff99ee95138ebbe1b326ac46b6d4ba97e4e7e5a8ead642b41ac",
+          "at": "2026-07-22T11:57:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load_config` reads a path derived from `project_root` without rejecting symlinked ancestors or the config file itself. A symlinked `.harness`, `config`, or TOML file can redirect configuration reads outside the project root.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/disk_maintenance.rs",
+              "line": 49,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`configure_sccache` writes `.cache/sccache.env` without symlink-boundary checks. A symlinked `.cache` directory or `sccache.env` file can cause the adapter to overwrite data outside `project_root`.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/disk_maintenance.rs",
+              "line": 115,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "`apply_cleanup` passes joined cleanup roots to `empty_directory` without rejecting symlinked project-root ancestors or cleanup roots. `create_dir_all`/`read_dir` can operate through a symlink and remove contents from an external directory.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/disk_maintenance.rs",
+              "line": 78,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The configuration loader uses unbounded `std::fs::read_to_string`, so arbitrarily large configuration input is read without a size limit. Use a bounded reader and fail closed when the limit is exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/disk_maintenance.rs",
+              "line": 49,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:4b75fedbdab3a704352562e0d06ea695996c7dea102809726eb5d8ed6f1e4bd7",
+          "at": "2026-07-22T13:00:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b75fedbdab3a704352562e0d06ea695996c7dea102809726eb5d8ed6f1e4bd7",
+          "at": "2026-07-22T13:02:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4b75fedbdab3a704352562e0d06ea695996c7dea102809726eb5d8ed6f1e4bd7",
+          "at": "2026-07-22T13:07:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b2198eae865cbbe932610aa9794638df3f83abdbf61e9be38519d2c54057fee0",
+          "at": "2026-07-22T14:06:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b2198eae865cbbe932610aa9794638df3f83abdbf61e9be38519d2c54057fee0",
+          "at": "2026-07-22T14:08:29Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68c5d043a1c49b390ede19ba9875c29e2000ed2f407eb400a54945b2a10e0509",
+          "at": "2026-07-20T16:34:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68c5d043a1c49b390ede19ba9875c29e2000ed2f407eb400a54945b2a10e0509",
+          "at": "2026-07-20T16:37:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbce46cbd7d9888425e53eba356cff36fbacf550be9d227a0785735b65bd5a3c",
+          "at": "2026-07-21T02:09:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cbce46cbd7d9888425e53eba356cff36fbacf550be9d227a0785735b65bd5a3c",
+          "at": "2026-07-21T02:11:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR に `## Reassess When` セクションがなく、決定を見直す具体的なトリガーが記録されていません。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-22-1541-dry-gate-evaluation-feature-off-precedence.md",
+              "line": 58,
+              "category": "missing reassessment trigger"
+            }
+          ],
+          "hash": "rvw1:sha256:9fabcf8ea9998f49254a615ee90a33ca9afde79a079bdf6507733d223b43a339",
+          "at": "2026-07-22T16:38:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcca8320576a30e9b11510f9d6181a6888ab6250483e2b68043b63081b3aa3d7",
+          "at": "2026-07-22T16:44:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcca8320576a30e9b11510f9d6181a6888ab6250483e2b68043b63081b3aa3d7",
+          "at": "2026-07-22T16:45:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a58b41d75f748e47bd0d36f529f2fbe7fbf26a7d3f37252ac31f8101dc07db93",
+          "at": "2026-07-22T17:31:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a58b41d75f748e47bd0d36f529f2fbe7fbf26a7d3f37252ac31f8101dc07db93",
+          "at": "2026-07-22T17:34:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d9358d468e08a208b5ffb1bed4395cc2951d9ae9bd869f9e9a1db56f5e295fe",
+          "at": "2026-07-22T18:02:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d9358d468e08a208b5ffb1bed4395cc2951d9ae9bd869f9e9a1db56f5e295fe",
+          "at": "2026-07-22T18:04:14Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1112ebef71f1076f314c8e722846d25700bdb3be73ad1431f1ad6d2641ff3613",
+          "at": "2026-07-21T02:09:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1112ebef71f1076f314c8e722846d25700bdb3be73ad1431f1ad6d2641ff3613",
+          "at": "2026-07-21T02:12:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:079aa98edcd569bc4c1d920da1b0d1c93acb4ce2061ac9006fa184b77453bf01",
+          "at": "2026-07-22T13:00:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:079aa98edcd569bc4c1d920da1b0d1c93acb4ce2061ac9006fa184b77453bf01",
+          "at": "2026-07-22T13:02:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd88b4148f65bf127b83560a57adf0d6ae500480f8ae8ff211d44a0815e4721f",
+          "at": "2026-07-22T13:51:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd88b4148f65bf127b83560a57adf0d6ae500480f8ae8ff211d44a0815e4721f",
+          "at": "2026-07-22T13:52:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 は feature 無効 binary の「dry 系コマンド」全般を fail-closed と要求している一方、IN-07/AC-07 は gate 評価点を明示的に通過可能な例外として追加しています。AC-02 は gate 評価点を除外したため、GO-02 の広い意図を決定論的に検証する AC coverage が失われ、後続フェーズが適用範囲を誤解します。",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json",
+              "line": 18,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:b359c6c8e94ac6658b21f89a73b5b6934e0fc21060f87698a17b4850f081aafb",
+          "at": "2026-07-22T16:38:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 は feature 無効 binary の dry 系コマンドについて silent skip または自動 fallback を一律禁止していますが、新設された IN-07/AC-07 は DRY gate 評価点で `enabled: false` の場合に semantic-dup を実行せず通過することを要求しています。gate 評価点も dry 系入口に含まれるため、制約と新しい受入契約が矛盾し、後続フェーズがどちらを実装すべきか決定できません。",
+              "severity": "P1",
+              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json",
+              "line": 174,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:73c9f2ac297bb338ccba77f1a08c84c3ef7a98f0da326c4f148215def52e3843",
+          "at": "2026-07-22T16:40:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9aa3cbbde492d4025f94a2d6f0b4faa38a7297c156b91f31fe6d731e0b26cb7b",
+          "at": "2026-07-22T16:41:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9aa3cbbde492d4025f94a2d6f0b4faa38a7297c156b91f31fe6d731e0b26cb7b",
+          "at": "2026-07-22T16:44:33Z"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -954,6 +898,194 @@
           "findings": [],
           "hash": "rvw1:sha256:8c01bbd5b8d9bf78759a86b1c9b8d7776dc22f07895b93f0ba9c1d39131a6a45",
           "at": "2026-07-22T12:11:23Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7d389e2091dd4a7073f3207016f04724ac1f22471809d5c691982ea2f3dc2ec",
+          "at": "2026-07-21T02:09:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e7d389e2091dd4a7073f3207016f04724ac1f22471809d5c691982ea2f3dc2ec",
+          "at": "2026-07-21T02:12:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`prepare-local-cache-dirs` invokes `cargo run` without clearing `RUSTC_WRAPPER`; this bootstrap command can itself run through sccache before `configure-sccache` has established the current configuration, leaving the first cache-generating workload outside the intended initialization/propagation path. Run it with `RUSTC_WRAPPER=` as required by the briefing’s bootstrap wiring.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 20,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:c4d02fcabb052f4b205afaf0cccb07ec9192ff84eb503f17298487296aa7db0e",
+          "at": "2026-07-22T11:57:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a95d9beb87406fc7b15a1f9adadca35078f885e2f6253870352f18789289e0eb",
+          "at": "2026-07-22T13:00:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The maintenance task cleans the default `target/` and then immediately invokes `cargo run` again. Because the first cleanup removes the CLI binary and Cargo fingerprints, the configure step recompiles the CLI and repopulates `target/`, so the task finishes with build artifacts it promised to remove. Run configuration without rebuilding inside a cleanup scope, for example via a preserved/prebuilt executable.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 29,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "Replacing `--all-features` with only `--features semantic-dup` drops existing CI coverage for independent features such as `cli_composition/test-support` and `infrastructure/test-helpers`; tests guarded by `#[cfg(feature = \"test-support\")]` are now skipped. Preserve `--all-features`—which already enables semantic-dup—or explicitly include every previously covered feature.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 199,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:a95d9beb87406fc7b15a1f9adadca35078f885e2f6253870352f18789289e0eb",
+          "at": "2026-07-22T13:04:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`mktemp` creates the destination file without execute permission, and plain `cp` overwrites its contents while retaining that existing mode. Consequently the first `\"$CLI_BIN\"` invocation fails with `Permission denied`, so `cargo make maintenance` never performs cleanup. Copy into a previously nonexistent path or install the binary with an explicit executable mode.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 32,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The temporary executable is placed under `${TMPDIR}` without ensuring that location is outside the configured cleanup roots. With a repository-local `TMPDIR` such as `.cache/tmp` or `target/tmp`, the cleanup invocation deletes its own copied executable, and the subsequent configure invocation fails because the path no longer exists. Place the survivor binary in a validated location excluded from cleanup.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 28,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:592269132387b9142a3d43788e57423c2b092d4bb5657708779721cf6027f8c6",
+          "at": "2026-07-22T13:07:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:563f3de51ac5e296a26738ba71d8f91e2ed6144c967364c35ca99102a0f17095",
+          "at": "2026-07-22T13:09:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23da31b2df3751060debd944da25f49ddeef2eb51fc6573355788865ee94ffa0",
+          "at": "2026-07-22T17:32:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23da31b2df3751060debd944da25f49ddeef2eb51fc6573355788865ee94ffa0",
+          "at": "2026-07-22T17:39:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f9072693aa3d173463ca3cee33755ff7e6c205c0f98295d8d60055adf2b538a",
+          "at": "2026-07-22T18:24:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9f9072693aa3d173463ca3cee33755ff7e6c205c0f98295d8d60055adf2b538a",
+          "at": "2026-07-22T18:26:55Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:908b42059292197ee0d980a76b509ed431049c4c78ecc61ee0cdbcbf737aab42",
+          "at": "2026-07-22T11:57:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This generated env file becomes a second source of truth for the cache limit. Compose and CI read this hard-coded value directly, while the supported user override lives in `.harness/config/disk-maintenance.toml`; nothing in this scope verifies they remain synchronized, and CI starts Compose without regenerating the file. A later config-only override can therefore pass CI while CI still uses the stale committed limit, and normal preparation can stage generated cache state via `git add-all`. Keep the limit single-sourced: generate and ignore this file in every execution path (including CI), or add a fail-closed synchronization gate.",
+              "severity": "P1",
+              "file": ".cache/sccache.env",
+              "line": 1,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:908b42059292197ee0d980a76b509ed431049c4c78ecc61ee0cdbcbf737aab42",
+          "at": "2026-07-22T11:59:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3d6309997f361c8eff2cf590074224ec277a6e75076098d8fb90edbd0bc31554",
+          "at": "2026-07-22T13:00:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This step invokes `cargo make` on the bare `ubuntu-latest` host before the tools image is built, but the workflow never installs `cargo-make` or the repository's pinned Rust toolchain; `cargo-make` is installed only inside the Docker image. A clean GitHub runner will therefore fail here (or use an incompatible ambient Rust installation) before reaching Buildx. Keep the directory-only host preparation here and generate the env file after loading the tools image, or explicitly install/pin the required host tooling first.",
+              "severity": "P1",
+              "file": ".github/workflows/ci.yml",
+              "line": 75,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3d6309997f361c8eff2cf590074224ec277a6e75076098d8fb90edbd0bc31554",
+          "at": "2026-07-22T13:02:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77bb9584d431cd3e8e26780b9ac51c4da3c1582ab0014e97edafa18c89f8e57d",
+          "at": "2026-07-22T13:04:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46701e4d2be77b461f3c734408d6f6b0ad5bb47b399717c5b9a01d7f4aec95af",
+          "at": "2026-07-22T18:24:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46701e4d2be77b461f3c734408d6f6b0ad5bb47b399717c5b9a01d7f4aec95af",
+          "at": "2026-07-22T18:26:39Z"
         }
       ]
     },
@@ -1151,96 +1283,6 @@
           "findings": [],
           "hash": "rvw1:sha256:7fe7ed3133f2100536c3f128f2969fc311fc1038a01ba87b2fff86d4fad0ef8e",
           "at": "2026-07-22T17:09:34Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1112ebef71f1076f314c8e722846d25700bdb3be73ad1431f1ad6d2641ff3613",
-          "at": "2026-07-21T02:09:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1112ebef71f1076f314c8e722846d25700bdb3be73ad1431f1ad6d2641ff3613",
-          "at": "2026-07-21T02:12:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:079aa98edcd569bc4c1d920da1b0d1c93acb4ce2061ac9006fa184b77453bf01",
-          "at": "2026-07-22T13:00:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:079aa98edcd569bc4c1d920da1b0d1c93acb4ce2061ac9006fa184b77453bf01",
-          "at": "2026-07-22T13:02:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fd88b4148f65bf127b83560a57adf0d6ae500480f8ae8ff211d44a0815e4721f",
-          "at": "2026-07-22T13:51:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fd88b4148f65bf127b83560a57adf0d6ae500480f8ae8ff211d44a0815e4721f",
-          "at": "2026-07-22T13:52:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-02 は feature 無効 binary の「dry 系コマンド」全般を fail-closed と要求している一方、IN-07/AC-07 は gate 評価点を明示的に通過可能な例外として追加しています。AC-02 は gate 評価点を除外したため、GO-02 の広い意図を決定論的に検証する AC coverage が失われ、後続フェーズが適用範囲を誤解します。",
-              "severity": "P1",
-              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json",
-              "line": 18,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:b359c6c8e94ac6658b21f89a73b5b6934e0fc21060f87698a17b4850f081aafb",
-          "at": "2026-07-22T16:38:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CN-02 は feature 無効 binary の dry 系コマンドについて silent skip または自動 fallback を一律禁止していますが、新設された IN-07/AC-07 は DRY gate 評価点で `enabled: false` の場合に semantic-dup を実行せず通過することを要求しています。gate 評価点も dry 系入口に含まれるため、制約と新しい受入契約が矛盾し、後続フェーズがどちらを実装すべきか決定できません。",
-              "severity": "P1",
-              "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json",
-              "line": 174,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:73c9f2ac297bb338ccba77f1a08c84c3ef7a98f0da326c4f148215def52e3843",
-          "at": "2026-07-22T16:40:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9aa3cbbde492d4025f94a2d6f0b4faa38a7297c156b91f31fe6d731e0b26cb7b",
-          "at": "2026-07-22T16:41:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9aa3cbbde492d4025f94a2d6f0b4faa38a7297c156b91f31fe6d731e0b26cb7b",
-          "at": "2026-07-22T16:44:33Z"
         }
       ]
     }
