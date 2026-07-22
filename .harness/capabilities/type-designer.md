@@ -91,13 +91,13 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
 
 1. **Capture baseline** of the source state at track start:
    ```
-   bin/sotp track baseline-capture <id> [--layer <layer_id>]
+   bin/sotp track baseline-capture --track-id <id> [--layer <layer_id>]
    ```
    `baseline-capture` is **first-write-wins**: on the first invocation for this track it snapshots the workspace state so subsequent phases can compute `add` / `modify` / `reference` / `delete` against it; on later invocations it leaves the existing baseline untouched (no re-capture). The action semantics depend on this — running the command at incremental sessions is safe (it just no-ops), but the baseline is **the snapshot from the track's first capture**, not the current code state.
 
 2. **Render the baseline graph (Reality View)** — depth=1 overview + depth=2 detail in one command:
    ```
-   bin/sotp track baseline-graph <id> [--layers <layer_id>]
+   bin/sotp track baseline-graph --track-id <id> [--layers <layer_ids>]
    ```
    `baseline-graph` (Reality View) renders both depths from the rustdoc baseline in a **single** invocation: depth=1 overview to `track/items/<id>/<layer>-graph-d1/index.md` and depth=2 cluster detail to `track/items/<id>/<layer>-graph-d2/<cluster>.md`. Cluster = top-level module (fixed) — there is no `--cluster-depth` flag. Requires the baselines captured in step 1. (`--layers` takes a comma-separated id list; omit it to render every `tddd.enabled` layer.)
 
@@ -178,7 +178,7 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
 
 10. **Render the contract-map view** (catalogue-driven, runs after the catalogue and signals are stable):
     ```
-    bin/sotp track contract-map <id> [--layers <layer_id>]
+    bin/sotp track contract-map --track-id <id> [--layers <layer_ids>]
     ```
 
 11. **Refresh tracked rendered views via `sync_rendered_views`**:
@@ -458,6 +458,10 @@ Wire-format validity (role vocabulary membership, entry-name validity, function-
 - **Bash usage**: restricted to `bin/sotp` CLI invocations required by the internal pipeline (`bin/sotp catalog init` / `add` / `import` / `cite` / `check`, `bin/sotp track baseline-capture`, `bin/sotp track baseline-graph`, `bin/sotp track contract-map`, `bin/sotp signal calc-catalog-spec`, `bin/sotp signal calc-impl-catalog`, `bin/sotp track views sync`, `bin/sotp signal check-catalog-spec`). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
 - Do not spawn further agents (keep type-designer output deterministic).
 - If architectural clarification is needed (decisions not in the ADR), note it in `## Open Questions` and advise the orchestrator to consult the `adr-editor` agent rather than improvising.
+
+## Re-entry prerequisite (sequencing discipline)
+
+Per `knowledge/conventions/sot-reentry-sequencing.md`, a re-entry dispatch of this capability requires the convergence of its direct upstream only — the spec (`spec_adr` chain: reference signal per `.harness/config/signal-gates.json`, resolution of all Chain-①-relevant `bin/sotp ref-verify` findings, and spec-scope review `zero_findings`). Findings on other chains — including enumeration failures caused by this dispatch's own stale catalogues pending regeneration — do not participate in the spec-convergence judgment; the orchestrator confirms the known Chain ① state via a chain-scoped read (e.g. `bin/sotp ref-verify results --chain 1`) and runs the full verification as soon as enumeration is possible (right after this dispatch's regeneration when enumeration was aborting). If the briefing shows the prerequisite unmet, do not start catalogue work: return the briefing to the orchestrator stating the unmet prerequisite. If mid-work you discover `spec.json` (or further upstream) needs editing, stop immediately and return to the orchestrator (immediate bounce-back; no deferred-fix continuation).
 
 ## Rules
 

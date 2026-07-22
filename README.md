@@ -52,7 +52,7 @@ ADR (恒久的)
 SoTOHE はすべての作業を **track** で管理する。1 track = 1 機能追加・1 バグ修正・1 リファクタリング相当で、`仕様 → 型契約 → 実装 → レビュー → コミット & マージ` が独立したファイルとして保存される。各 track は専用ブランチ `track/<track-id>` 上で進む。
 
 track 作業には `/adr:add <slug>` で ADR を作り
-`/track:adr2pr <feature> --primary-adr <filename>.md` で PR まで進める、という正規フローがある。`/track:init` は orchestrator が選んだ主 ADR の逐語 baseline を記録し、以後 review・commit・track-aware CI はその baseline とのバイト照合を行う。
+`/track:adr2pr` で PR まで進める、という正規フローがある。feature 名と主 ADR の引数は任意で、省略した値は会話文脈から解決して user が 1 回確認する（明示指定時はその値が優先される）。`/track:init` は orchestrator が選んだ主 ADR の逐語 baseline を記録し、以後 review・commit・track-aware CI はその baseline とのバイト照合を行う。
 
 ## 前提条件
 
@@ -108,10 +108,10 @@ cargo make bootstrap      # pinned auxiliary tools + bin/sotp 入手 (経路 a/b
 2. ADR をベースに track 初期化から PR レビューまで進める（merge はしない）
 
    ```text
-   /track:adr2pr <feature> --primary-adr <filename>.md
+   /track:adr2pr [<feature>] [--primary-adr <filename>.md]
    ```
 
-   このコマンドは `/track:init`（主 ADR を designation する init baseline 記録を含む）→ ADR baseline の `/track:review` / `/track:commit` → `/track:spec-design` / `/track:type-design` / `/track:impl-plan` → 計画 artifact の review / commit → `/track:full-cycle` → `/track:pr-review` を順に実行し、PR を開いた状態で停止する。baseline 不一致や必要な刻印の欠落は review、commit、PR CI で block される。
+   引数は両方とも任意で、省略した値は会話文脈から解決され、`/track:init` へ渡す前に user が 1 回確認する（候補が複数なら選択を、候補がなければ値の直接指定を求める）。明示指定時はその値が優先される。このコマンドは `/track:init`（主 ADR を designation する init baseline 記録を含む）→ ADR baseline の `/track:review` / `/track:commit` → `/track:spec-design` / `/track:type-design` / `/track:impl-plan` → 計画 artifact の review / commit → `/track:full-cycle` → `/track:pr-review` を順に実行し、PR を開いた状態で停止する。baseline 不一致や必要な刻印の欠落は review、commit、PR CI で block される。
 
 ### コマンドを個別に使う場合
 

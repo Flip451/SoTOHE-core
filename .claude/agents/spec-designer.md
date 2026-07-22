@@ -13,6 +13,7 @@ tools:
   - WebSearch
 description: |
   Phase 1 writer for /track:spec-design. Authors the behavioral contract `spec.json` (goal / scope / constraints / acceptance_criteria) from the track's ADR and related conventions, writes it directly, renders `spec.md`, and evaluates the spec → ADR signal internally. Does NOT author architectural decisions (those live in the ADR) or type-level contracts (those are the type-designer's responsibility). Mirrors the `spec-designer` capability in `.harness/config/agent-profiles.json` and declares explicit Opus routing via frontmatter.
+  Invoke via `bin/sotp capability exec` — never directly through the Agent tool: direct Agent-tool invocation bypasses provider / model resolution, while `bin/sotp capability exec` is the canonical route that internally resolves them from `.harness/config/agent-profiles.json`.
 ---
 
 # Spec-Designer Agent

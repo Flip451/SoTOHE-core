@@ -1,0 +1,304 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "bc2dc4b78ab25f3b1fb53f2eee9b1c5630ce0de730e53d094e50c1e226e910a6",
+      "evidence_hash": "fc0349ab4fcd134cca568327fa2798599eef616e4fa047443d36c91b372f5b56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "codex 上で `$track-merge`、`$track-done`、`$adr-add` を呼び出せる正規の入口として、`.agents/skills/` 配下に `track-merge` / `track-done` / `adr-add` の 3 skill を新設する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "Codex ホストが SoTOHE ワークフローを、ADR の起草入口から PR merge 後の完了処理まで、正規の $ コマンドだけで実行できるようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-1149-codex-merge-done-adr-entrypoints.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ed48cd1a34d9dd89c491a6c3b5538361c9c0dd5b59112b7f092cc70217d0c976",
+      "evidence_hash": "fc0349ab4fcd134cca568327fa2798599eef616e4fa047443d36c91b372f5b56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "codex 上で `$track-merge`、`$track-done`、`$adr-add` を呼び出せる正規の入口として、`.agents/skills/` 配下に `track-merge` / `track-done` / `adr-add` の 3 skill を新設する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`.agents/skills/track-merge/` に `track-merge` skill を追加し、Codex から merge の正規入口を呼び出せるようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-1149-codex-merge-done-adr-entrypoints.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "c306cbe7ce49a9887df2c7957ffa4f840547c34c8af33191d586f23bf62b0cf0",
+      "evidence_hash": "fc0349ab4fcd134cca568327fa2798599eef616e4fa047443d36c91b372f5b56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "codex 上で `$track-merge`、`$track-done`、`$adr-add` を呼び出せる正規の入口として、`.agents/skills/` 配下に `track-merge` / `track-done` / `adr-add` の 3 skill を新設する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`.agents/skills/track-done/` に `track-done` skill を追加し、Codex から merge 後に configured base branch へ戻る完了処理の正規入口を呼び出せるようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-1149-codex-merge-done-adr-entrypoints.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "cc4f903dd01b66640041ffec7cff576f657533e9fc84c140d125947b960cb2f3",
+      "evidence_hash": "fc0349ab4fcd134cca568327fa2798599eef616e4fa047443d36c91b372f5b56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "codex 上で `$track-merge`、`$track-done`、`$adr-add` を呼び出せる正規の入口として、`.agents/skills/` 配下に `track-merge` / `track-done` / `adr-add` の 3 skill を新設する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "`.harness/workflows/` に `adr-add` の provider 非依存 workflow SSoT を整備し、`.agents/skills/adr-add/` にその SSoT を参照する `adr-add` skill を追加して、Codex から pre-track ADR を起草する正規入口を呼び出せるようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-1149-codex-merge-done-adr-entrypoints.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "8ceeb81e2ac2172e8aececb9167fa7c52e11e76a19efce34e2d7f79117817003",
+      "evidence_hash": "fc0349ab4fcd134cca568327fa2798599eef616e4fa047443d36c91b372f5b56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "codex 上で `$track-merge`、`$track-done`、`$adr-add` を呼び出せる正規の入口として、`.agents/skills/` 配下に `track-merge` / `track-done` / `adr-add` の 3 skill を新設する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "skill を追加せず、自然言語による merge、完了処理、または ADR 起草の依頼で正規入口を代替すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-1149-codex-merge-done-adr-entrypoints.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ab9575d02773d16e1ccb24318a9382598a5f7d6a67c38959e042b2694e590631",
+      "evidence_hash": "fc0349ab4fcd134cca568327fa2798599eef616e4fa047443d36c91b372f5b56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "codex 上で `$track-merge`、`$track-done`、`$adr-add` を呼び出せる正規の入口として、`.agents/skills/` 配下に `track-merge` / `track-done` / `adr-add` の 3 skill を新設する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "merge または done の自動化を `track-adr2pr` skill に組み込み、merge を明示的な user operation ではないものにすること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-1149-codex-merge-done-adr-entrypoints.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "9c3f5b6bb006544e1314f4481c84df638ec537dacfe8c4aa90af27e74bb084e3",
+      "evidence_hash": "fc0349ab4fcd134cca568327fa2798599eef616e4fa047443d36c91b372f5b56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "codex 上で `$track-merge`、`$track-done`、`$adr-add` を呼び出せる正規の入口として、`.agents/skills/` 配下に `track-merge` / `track-done` / `adr-add` の 3 skill を新設する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "追加する 3 skill は Codex host adapter に限定し、workflow logic を `.harness` 配下の source-of-truth surface から複製または分岐させてはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-1149-codex-merge-done-adr-entrypoints.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "204b83a560c075dff5cd6fef09b4f9b87aa60fb369289c77c1f9311ed51e779d",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "provider 非依存の workflow SSoT は `.harness/workflows/` 配下に配置する。track 系 workflow は `.harness/workflows/` に置き、Claude command と Codex skill はこの文書を参照する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "各 skill は対応する canonical command の invocation form、tool constraints、reporting boundary だけを host adapter として定め、provider 非依存の workflow logic は `.harness/workflows/` 配下の source-of-truth に置く。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "204b83a560c075dff5cd6fef09b4f9b87aa60fb369289c77c1f9311ed51e779d",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Claude command と Codex skill には workflow logic、状態遷移、gate 条件、失敗時の復旧手順を重複記述しない。provider 固有の呼び出し方法、ツール制約、報告形式だけを adapter 側に残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "各 skill は対応する canonical command の invocation form、tool constraints、reporting boundary だけを host adapter として定め、provider 非依存の workflow logic は `.harness/workflows/` 配下の source-of-truth に置く。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "204b83a560c075dff5cd6fef09b4f9b87aa60fb369289c77c1f9311ed51e779d",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "adapter に残せる provider 固有情報は、(1) 呼び出し面の名前と起動方法、(2) provider 固有 tool / 権限制約、(3) subagent / skill / command の起動形態、(4) provider ごとの報告形式に限る。step 番号、gate 条件、状態遷移、失敗時復旧手順、commit / PR までの全体 sequence は workflow SSoT 側に置く。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "各 skill は対応する canonical command の invocation form、tool constraints、reporting boundary だけを host adapter として定め、provider 非依存の workflow logic は `.harness/workflows/` 配下の source-of-truth に置く。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "71c4d7d2f07cfd58c9fac191f9ec02d4f14cf0e095b4c867677706fe60611252",
+      "evidence_hash": "fc0349ab4fcd134cca568327fa2798599eef616e4fa047443d36c91b372f5b56",
+      "verdict": {
+        "kind": "pass",
+        "citation": "codex 上で `$track-merge`、`$track-done`、`$adr-add` を呼び出せる正規の入口として、`.agents/skills/` 配下に `track-merge` / `track-done` / `adr-add` の 3 skill を新設する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "Codex で `$track-merge`、`$track-done`、`$adr-add` の 3 つが正規 skill としてそれぞれ利用可能であり、対応する workflow の入口として機能する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-1149-codex-merge-done-adr-entrypoints.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e14cfe89af27bbea9726610d0a04930c02143e444205eebf423f155a9516a63f",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "provider 非依存の workflow SSoT は `.harness/workflows/` 配下に配置する。track 系 workflow は `.harness/workflows/track/` に置き、Claude command と Codex skill はこの文書を参照する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "3 skill の各定義は薄い adapter に留まり、対応する provider 非依存 workflow SSoT が `.harness/workflows/` に存在して workflow behavior の権威を保持し、skill 本文には同じ workflow logic を重複して持たない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "e14cfe89af27bbea9726610d0a04930c02143e444205eebf423f155a9516a63f",
+      "evidence_hash": "d20d8abe1d3bbce519861103b68aa13ff5daec83ac7bd8a6dfe15689ba7c8dad",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Claude command と Codex skill には workflow logic、状態遷移、gate 条件、失敗時の復旧手順を重複記述しない。provider 固有の呼び出し方法、ツール制約、報告形式だけを adapter 側に残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "3 skill の各定義は薄い adapter に留まり、対応する provider 非依存 workflow SSoT が `.harness/workflows/` に存在して workflow behavior の権威を保持し、skill 本文には同じ workflow logic を重複して持たない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-06-30-0425-harness-workflow-ssot-adapters.md",
+          "decision_id": "D3"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "adr2pr-argless-context-resolution-2026-07-20",
+  "title": "/track:adr2pr の呼び出し型を引数指定から文脈自動解決に戻す",
+  "branch": "track/adr2pr-argless-context-resolution-2026-07-20",
+  "created_at": "2026-07-20T15:18:18Z",
+  "updated_at": "2026-07-20T15:18:18Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

@@ -15,6 +15,11 @@ or failure-recovery procedures here.
 
 - Triggered via `$track-adr2pr` in a Codex skill mention surface.
 - Can also be force-loaded with `codex exec` by referencing this skill file.
+- Feature name and primary ADR filename are optional at invocation: an explicitly supplied
+  value always takes precedence, and any missing value is resolved and user-confirmed per the
+  workflow SSoT's input-acquisition contract (conversation context resolution, one
+  confirmation of the completed pair, candidate selection when resolution is not unique)
+  before `$track-init` receives both values explicitly.
 
 ### (2) Sandbox constraint
 
@@ -48,7 +53,8 @@ or failure-recovery procedures here.
   approves may the post-approval stamp and the ADR-baseline commit proceed. The only other
   pause is inherited from the delegated `$track-pr-review` workflow: recording Accepted
   Deviations at its terminal state requires that workflow's explicit user approval. No other
-  step pauses for user confirmation.
+  step pauses for user confirmation; the invocation-time input acquisition (skill note 1)
+  happens before Step 1 begins and is outside this pause accounting.
 
 ### (5) Reporting format
 

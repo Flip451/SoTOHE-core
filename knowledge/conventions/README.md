@@ -76,6 +76,7 @@
 - `review-protocol.md`: Review Protocol Convention
 - `security.md`: Security Convention
 - `shell-parsing.md`: Shell Parsing Convention
+- `sot-reentry-sequencing.md`: SoT 再入の順次処理規律
 - `source-attribution.md`: Source Attribution Convention
 - `task-completion-flow.md`: Task Completion Flow
 - `tddd-product-correctness.md`: TDDD Product Correctness Convention

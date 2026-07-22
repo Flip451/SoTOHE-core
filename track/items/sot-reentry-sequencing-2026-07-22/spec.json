@@ -1,0 +1,318 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "SoT 再入の順次処理規律 — ルーティング後のフェーズ収束 Prerequisite",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "rollback-diagnoser により上流 SoT へ回帰した後、各下流 writer phase が直上流の再収束を待ってからのみ再開する順次処理規律を、track 運用文書に一貫して定着させる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "anchor": "D3"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "`knowledge/conventions/sot-reentry-sequencing.md` を追加し、phase 収束を参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings` の三要素として、既存 SSoT を参照して規定する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` と `.harness/workflows/track/plan.md` は routing 後または plan workflow の back-and-forth loop で上流 SoT を編集した後、各下流 writer を再 dispatch する前に、orchestrator が直上流 1 層について、参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡すことを規定する。`.harness/workflows/track/review.md` は同じ back-and-forth loop における、D1/D2 に基づく指定単一 SoT scope の再収束 round を公開する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "新 convention は、spec-design、type-design、impl-plan、implementation の再開時に、それぞれ ADR、spec、catalogue、または catalogue と impl-plan review という直上流の収束だけを prerequisite として確認する規則を定める。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "新 convention は、下流作業中に上流 SoT の編集必要性が判明した場合に下流を即時中断して上流へ戻し、上流の再収束まで再開を禁止する規則を定める。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "`spec-designer`、`type-designer`、`impl-planner`、`implementer` の capability contracts に、満たされない prerequisite を含む briefing を作業せず orchestrator へ返す規定と新 convention への pointer を加える。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "前記 writer capability contracts は、再開 prerequisite を各 phase の直上流 1 層だけの収束として明示する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "`rollback-diagnoser` capability contract に、回帰先の診断・勧告と、diagnosis 後に orchestrator が順次再入規律を適用する責務との境界を示す cross-reference pointer を加える。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "`knowledge/conventions/README.md` の convention index を、追加した SoT 再入規律 document が参照可能な状態へ再生成する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+            "anchor": "D6"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "merge-stage adjudication を待つ入庫済み delta の実装として、`knowledge/conventions/sot-reentry-sequencing.md` は `adr_user` chain の ADR 収束を参照 signal と ADR scope review の `zero_findings` の二要素として扱い、実装文書はこの限定的な意味論検証免除に従う。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-10",
+        "text": "merge-stage adjudication を待つ入庫済み delta の実装として、IN-09 の `adr_user` chain を除く上流収束の意味論検証は、当該上流 chain に関係する `ref-verify` 指摘が全て解消されていることだけを問う。実装文書は既知の当該 chain 指摘を `bin/sotp ref-verify results --chain 1` のような chain 限定読み出しで確認し、他 chain の指摘または stale な下流成果物による pair 列挙失敗を上流収束の未充足として扱わない。`bin/sotp ref-verify run` は pair を列挙可能になり次第、通常は上流修正後に即時、列挙 abort 時は下流 writer の再生成直後に実行し、後続 run で当該上流 chain の指摘が生じた場合は D4 に従って即時に上流へ突き返す。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-22-0817-deferred-upstream-semantic-verification.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OUT-01",
+        "text": "`.harness/config/signal-gates.json`、signal gate、CI、または `adr_user` 評価の実装・許容値を変更しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+            "anchor": "D6"
+          }
+        ]
+      },
+      {
+        "id": "OUT-02",
+        "text": "`bin/sotp track transition` による impl-plan task status transition の例外を、再入 sequencing における rollback と下流停止の不要化に限定する。他の上流 SoT 編集への例外拡張・一般化、および task status transition 後の commit 前 current hash を対象とする impl-plan scope final `zero_findings` review refresh の免除は行わない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+            "anchor": "D5"
+          },
+          {
+            "file": "knowledge/adr/2026-07-22-0633-impl-plan-transition-review-refresh.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "新 convention は signal の許容値や ref-verify scope の対応を複製せず、`.harness/config/signal-gates.json` と既存 ref-verify 定義をそれぞれの SSoT として参照する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "上流 SoT の編集が必要と判明した時点で下流作業を中断し、回帰先が自明でない場合は rollback-diagnoser を経由する。上流の再収束前に下流を継続または再開する裁量経路を設けない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "この track は prompt-level discipline と documentation + review による運用に留め、人工的な phase-state field、追加承認 ceremony、または新しい機械的 enforcement を導入しない。将来の mechanism 化は ADR の Reassess When に従って別途検討する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "anchor": "D6"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+          "anchor": "Rules"
+        },
+        {
+          "file": "knowledge/conventions/enforce-by-mechanism.md",
+          "anchor": "Rules"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "新 convention は、phase 収束を参照 signal、該当 `bin/sotp ref-verify` scope、該当 SoT scope review の `zero_findings` の三要素として扱う。各要素の具体的な許容値・対応表は既存 SSoT を参照する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "writer capability documents は spec-design、type-design、impl-plan、implementation の各再開時に、ADR、spec、catalogue、または catalogue と impl-plan review という ADR で定められた直上流 prerequisite だけを確認し、満たせない briefing を orchestrator へ返す。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "下流作業中に上流 SoT の編集必要性を発見した場合、capability document は即時中断と上流への return を指示し、上流の再収束まで下流を続行・再開させない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "impl-plan の `bin/sotp track transition` による task status transition だけは、再入 sequencing における上流 rollback と下流作業停止を要求しない明示例外として記述される。ただし、この例外は hash-based commit gate の review refresh を免除せず、task status transition 後は commit 前に current hash を対象とする impl-plan scope の final `zero_findings` review を改めて完了する。ほかの SoT へ同種の例外を拡張しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-07-22-0633-impl-plan-transition-review-refresh.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "実装差分は新 convention、`rollback-diagnoser`、`spec-designer`、`type-designer`、`impl-planner`、`implementer` の五つの capability documents、`.harness/workflows/track/diagnose.md`、`.harness/workflows/track/plan.md`、`.harness/workflows/track/review.md`、および再生成された conventions index に限定され、gate、CI、signal-gates configuration、`adr_user` evaluator に変更を含まない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、`.harness/workflows/track/plan.md` は back-and-forth loop で上流 SoT を編集した後かつ各下流 writer の再 dispatch 前に、orchestrator が直上流 1 層について、参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡す手順を明記する。`.harness/workflows/track/review.md` は、この back-and-forth loop で上流 scope を再収束させるため、指定された単一 SoT scope だけを対象に Step 3 の briefing と既存 provider-neutral dispatch wrapper を用いる fast→final review lifecycle を定義し、全 required scope を対象とする review wave を要求しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "merge-stage adjudication を待つ入庫済み delta の実装として、新 convention は `adr_user` chain の ADR 収束を参照 signal と ADR scope review の `zero_findings` の二要素として扱い、実装文書はこの限定的な意味論検証免除に従う。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "merge-stage adjudication を待つ入庫済み delta の実装文書は、IN-09 の `adr_user` chain を除く各上流 chain について、chain 限定読み出しで既知の `ref-verify` 指摘が全て解消済みであることを確認し、他 chain の指摘または stale な下流成果物による pair 列挙失敗だけでは上流収束を未充足にしない。`bin/sotp ref-verify run` は pair を列挙可能になり次第、通常は上流修正後に即時、列挙 abort 時は下流 writer の再生成直後に実行され、後続 run で当該上流 chain の指摘が生じた場合は D4 に従って即時に上流へ突き返す。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-22-0817-deferred-upstream-semantic-verification.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "In-track 意味変更の裁定権"
+    },
+    {
+      "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/enforce-by-mechanism.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/adr.md",
+      "anchor": "ADR vs Convention"
+    }
+  ],
+  "signals": {
+    "blue": 24,
+    "yellow": 0,
+    "red": 0
+  }
+}

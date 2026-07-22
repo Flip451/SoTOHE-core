@@ -16,10 +16,14 @@ proceed until this workflow completes with OK.
 ## Inputs
 
 - **Feature name** — a slug-ready phrase or descriptive string; the caller supplies this as the
-  primary argument. If absent, the caller must ask the user for a feature name and stop.
+  primary argument. A calling workflow may have resolved it from conversation context under its
+  own user-confirmed input contract, but it always arrives here as an explicit value. If
+  absent, the caller must ask the user for a feature name and stop.
 - **Primary ADR source filename** — the orchestrator supplies the direct Markdown filename under
   `knowledge/adr/` to create this track's Phase-0 init designation record. It is
-  context-dependent and must not be derived; after the stamp succeeds, the ledger init record is
+  context-dependent and must not be derived by this workflow; a calling workflow may have
+  resolved it from conversation context under its own user-confirmed input contract, but it
+  always arrives here as an explicit value. After the stamp succeeds, the ledger init record is
   the designation and no separate primary pointer is retained.
 - **Current branch = configured base branch** — the workflow requires the working tree to be on
   the branch named by `.harness/config/branch-strategy.json#base_branch` before branch creation.
