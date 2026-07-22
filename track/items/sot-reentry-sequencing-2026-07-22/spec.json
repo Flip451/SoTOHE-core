@@ -22,21 +22,17 @@
     "in_scope": [
       {
         "id": "IN-01",
-        "text": "`knowledge/conventions/sot-reentry-sequencing.md` を追加し、`adr_user` chain の ADR 収束は参照 signal と ADR scope review の `zero_findings` の二要素とし、それ以外の phase 収束は参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings` の三要素として、既存 SSoT を参照して規定する。",
+        "text": "`knowledge/conventions/sot-reentry-sequencing.md` を追加し、phase 収束を参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings` の三要素として、既存 SSoT を参照して規定する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
             "anchor": "D2"
-          },
-          {
-            "file": "knowledge/adr/2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md",
-            "anchor": "D1"
           }
         ]
       },
       {
         "id": "IN-02",
-        "text": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` と `.harness/workflows/track/plan.md` は routing 後または plan workflow の back-and-forth loop で上流 SoT を編集した後、各下流 writer を再 dispatch する前に、orchestrator が直上流 1 層について、`adr_user` chain の ADR 収束では参照 signal と ADR scope review の `zero_findings` を、それ以外の phase 収束では参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡すことを規定する。`.harness/workflows/track/review.md` は同じ back-and-forth loop における、D1/D2 に基づく指定単一 SoT scope の再収束 round を公開する。",
+        "text": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` と `.harness/workflows/track/plan.md` は routing 後または plan workflow の back-and-forth loop で上流 SoT を編集した後、各下流 writer を再 dispatch する前に、orchestrator が直上流 1 層について、参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡すことを規定する。`.harness/workflows/track/review.md` は同じ back-and-forth loop における、D1/D2 に基づく指定単一 SoT scope の再収束 round を公開する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
@@ -49,10 +45,6 @@
           {
             "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
             "anchor": "D3"
-          },
-          {
-            "file": "knowledge/adr/2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md",
-            "anchor": "D1"
           }
         ]
       },
@@ -113,6 +105,26 @@
           {
             "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
             "anchor": "D6"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "merge-stage adjudication を待つ入庫済み delta の実装として、`knowledge/conventions/sot-reentry-sequencing.md` は `adr_user` chain の ADR 収束を参照 signal と ADR scope review の `zero_findings` の二要素として扱い、実装文書はこの限定的な意味論検証免除に従う。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-10",
+        "text": "merge-stage adjudication を待つ入庫済み delta の実装として、意味論検証 surface が上流 chain を単独評価できず、直後の下流 writer 再実行による再生成待ちの下流成果物まで評価する場合に限り、実装文書は上流の参照 signal と scope review を満たして再 dispatch し、briefing に延期した意味論検証・対象上流 chain・再生成直後かつさらに下流へ進む前に実行する full `bin/sotp ref-verify run` を明記する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-22-0817-deferred-upstream-semantic-verification.md",
+            "anchor": "D1"
           }
         ]
       }
@@ -189,15 +201,11 @@
   "acceptance_criteria": [
     {
       "id": "AC-01",
-      "text": "新 convention は、`adr_user` chain の ADR 収束を参照 signal と ADR scope review の `zero_findings` の二要素として扱い、それ以外の phase 収束を参照 signal、該当 `bin/sotp ref-verify` scope、該当 SoT scope review の `zero_findings` の三要素として扱う。各要素の具体的な許容値・対応表は既存 SSoT を参照する。",
+      "text": "新 convention は、phase 収束を参照 signal、該当 `bin/sotp ref-verify` scope、該当 SoT scope review の `zero_findings` の三要素として扱う。各要素の具体的な許容値・対応表は既存 SSoT を参照する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
           "anchor": "D2"
-        },
-        {
-          "file": "knowledge/adr/2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md",
-          "anchor": "D1"
         }
       ]
     },
@@ -247,7 +255,7 @@
     },
     {
       "id": "AC-06",
-      "text": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、`.harness/workflows/track/plan.md` は back-and-forth loop で上流 SoT を編集した後かつ各下流 writer の再 dispatch 前に、orchestrator が直上流 1 層について、`adr_user` chain の ADR 収束では参照 signal と ADR scope review の `zero_findings` を、それ以外の phase 収束では参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡す手順を明記する。`.harness/workflows/track/review.md` は、この back-and-forth loop で上流 scope を再収束させるため、指定された単一 SoT scope だけを対象に Step 3 の briefing と既存 provider-neutral dispatch wrapper を用いる fast→final review lifecycle を定義し、全 required scope を対象とする review wave を要求しない。",
+      "text": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、`.harness/workflows/track/plan.md` は back-and-forth loop で上流 SoT を編集した後かつ各下流 writer の再 dispatch 前に、orchestrator が直上流 1 層について、参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡す手順を明記する。`.harness/workflows/track/review.md` は、この back-and-forth loop で上流 scope を再収束させるため、指定された単一 SoT scope だけを対象に Step 3 の briefing と既存 provider-neutral dispatch wrapper を用いる fast→final review lifecycle を定義し、全 required scope を対象とする review wave を要求しない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
@@ -260,9 +268,25 @@
         {
           "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
           "anchor": "D3"
-        },
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "merge-stage adjudication を待つ入庫済み delta の実装として、新 convention は `adr_user` chain の ADR 収束を参照 signal と ADR scope review の `zero_findings` の二要素として扱い、実装文書はこの限定的な意味論検証免除に従う。",
+      "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "merge-stage adjudication を待つ入庫済み delta の実装として、意味論検証 surface が上流 chain を単独評価できず、直後の下流 writer 再実行による再生成待ちの下流成果物まで評価する場合に限り、実装文書は上流の参照 signal と scope review を満たして再 dispatch し、briefing に延期した意味論検証・対象上流 chain・再生成直後かつさらに下流へ進む前に実行する full `bin/sotp ref-verify run` を明記する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-22-0817-deferred-upstream-semantic-verification.md",
           "anchor": "D1"
         }
       ]
@@ -287,7 +311,7 @@
     }
   ],
   "signals": {
-    "blue": 20,
+    "blue": 24,
     "yellow": 0,
     "red": 0
   }

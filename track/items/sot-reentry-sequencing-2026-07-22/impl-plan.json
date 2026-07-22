@@ -3,13 +3,13 @@
   "tasks": [
     {
       "id": "T1",
-      "description": "Add `knowledge/conventions/sot-reentry-sequencing.md` and regenerate its `knowledge/conventions/README.md` index entry. IN-01, IN-02, IN-03, IN-04, IN-08, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04, AC-05, OUT-01, OUT-02.",
+      "description": "Add `knowledge/conventions/sot-reentry-sequencing.md` and regenerate its `knowledge/conventions/README.md` index entry. IN-01, IN-02, IN-03, IN-04, IN-08, IN-09, IN-10, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04, AC-05, AC-07, AC-08, OUT-01, OUT-02.",
       "status": "done",
       "commit_hash": "b5cd26b760bc479e7d2cd89a930e80af0fc43377"
     },
     {
       "id": "T2",
-      "description": "Update `.harness/capabilities/spec-designer.md` and `.harness/capabilities/type-designer.md` with the required convention pointers and prerequisite checks. IN-02, IN-03, IN-05, IN-06, CN-02, CN-03, AC-02, AC-03, AC-05, OUT-01.",
+      "description": "Update `.harness/capabilities/spec-designer.md` and `.harness/capabilities/type-designer.md` with the required convention pointers, prerequisite checks, and deferred-verification briefing wording. IN-02, IN-03, IN-05, IN-06, IN-10, CN-02, CN-03, AC-02, AC-03, AC-05, AC-08, OUT-01.",
       "status": "done",
       "commit_hash": "b5cd26b760bc479e7d2cd89a930e80af0fc43377"
     },
@@ -33,7 +33,7 @@
     },
     {
       "id": "T6",
-      "description": "Update `.harness/workflows/track/plan.md` Phase 1 and Phase 2 back-and-forth loops with the required pre-re-dispatch confirmation. IN-02, IN-03, CN-02, CN-03, AC-05, AC-06.",
+      "description": "Update `.harness/workflows/track/plan.md` Phase 1 and Phase 2 back-and-forth loops with the required pre-re-dispatch confirmation and deferred-verification recording. IN-02, IN-03, IN-10, CN-02, CN-03, AC-05, AC-06, AC-08.",
       "status": "done",
       "commit_hash": "c7754771f75ee698db257d16249839c793a535ff"
     },
@@ -53,7 +53,7 @@
         "id": "convention",
         "title": "Re-entry convention and discovery",
         "description": [
-          "Add the convention and regenerate its index entry. IN-01, IN-08."
+          "Add `knowledge/conventions/sot-reentry-sequencing.md` and regenerate its `knowledge/conventions/README.md` index entry. IN-01, IN-08, IN-09, IN-10, AC-07, AC-08."
         ],
         "task_ids": [
           "T1"
@@ -63,7 +63,7 @@
         "id": "writer-contracts",
         "title": "Writer capability re-entry contracts",
         "description": [
-          "Update the writer capability contracts in two reviewable batches. IN-05, IN-06, AC-02."
+          "Update the writer capability contracts in two reviewable batches, including deferred-verification briefing wording where applicable. IN-05, IN-06, IN-10, AC-02, AC-08."
         ],
         "task_ids": [
           "T2",
@@ -74,7 +74,7 @@
         "id": "diagnostic-boundary",
         "title": "Rollback diagnosis and workflow re-entry dispatch",
         "description": [
-          "Update the rollback-diagnoser cross-reference plus diagnose and plan workflow re-entry briefing requirements. IN-02, IN-03, IN-07, AC-06."
+          "Update the rollback-diagnoser cross-reference plus diagnose and plan workflow re-entry briefing requirements, including deferred-verification recording. IN-02, IN-03, IN-07, IN-10, AC-06, AC-08."
         ],
         "task_ids": [
           "T4",
