@@ -1,0 +1,67 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T1",
+      "description": "Add `knowledge/conventions/sot-reentry-sequencing.md` and regenerate its `knowledge/conventions/README.md` index entry. IN-01, IN-02, IN-03, IN-04, IN-08, CN-01, CN-02, CN-03, AC-01, AC-03, AC-04, AC-05, OUT-01, OUT-02.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T2",
+      "description": "Update `.harness/capabilities/spec-designer.md` and `.harness/capabilities/type-designer.md` with the required convention pointers and prerequisite checks. IN-02, IN-03, IN-05, IN-06, CN-02, CN-03, AC-02, AC-03, AC-05, OUT-01.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T3",
+      "description": "Update `.harness/capabilities/impl-planner.md` and `.harness/capabilities/implementer.md` with the required convention pointers and prerequisite checks. IN-02, IN-03, IN-04, IN-05, IN-06, CN-02, CN-03, AC-02, AC-03, AC-05, OUT-01.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T4",
+      "description": "Update `.harness/capabilities/rollback-diagnoser.md` with the convention cross-reference pointer. IN-02, IN-07, CN-02, CN-03, AC-03, AC-05, OUT-01.",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "GO-01: T1, T2, T3, T4."
+    ],
+    "sections": [
+      {
+        "id": "convention",
+        "title": "Re-entry convention and discovery",
+        "description": [
+          "Add the convention and regenerate its index entry. IN-01, IN-08."
+        ],
+        "task_ids": [
+          "T1"
+        ]
+      },
+      {
+        "id": "writer-contracts",
+        "title": "Writer capability re-entry contracts",
+        "description": [
+          "Update the writer capability contracts in two reviewable batches. IN-05, IN-06, AC-02."
+        ],
+        "task_ids": [
+          "T2",
+          "T3"
+        ]
+      },
+      {
+        "id": "diagnostic-boundary",
+        "title": "Rollback diagnosis boundary",
+        "description": [
+          "Update the rollback-diagnoser cross-reference pointer. IN-07."
+        ],
+        "task_ids": [
+          "T4"
+        ]
+      }
+    ]
+  }
+}

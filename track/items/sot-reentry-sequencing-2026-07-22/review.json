@@ -18,6 +18,161 @@
           "at": "2026-07-22T04:08:39Z"
         }
       ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7428d2753ed320e4f29b21db70ea6ec3cb763f132dce3fc0e008f04e529e3a76",
+          "at": "2026-07-22T04:26:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7428d2753ed320e4f29b21db70ea6ec3cb763f132dce3fc0e008f04e529e3a76",
+          "at": "2026-07-22T04:29:07Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
+          "at": "2026-07-22T04:26:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-08 cites `knowledge/conventions/README.md` to justify indexing the new document there, but that README explicitly excludes template-wide workflows from `knowledge/conventions/`. The cited convention therefore contradicts rather than grounds this scope item, leaving downstream work directed to a location whose governing convention disallows this artifact class.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 110,
+              "category": "broken cross-reference at narrative level"
+            },
+            {
+              "message": "`no-upstream-restatement.md` limits its scope to impl-plan descriptions and type-catalogue documentation, while explicitly exempting `spec.json` and workflow documents. It therefore cannot ground IN-01/CN-01's SSoT-reference rule for a new workflow convention; its `convention_refs` and `related_conventions` entries are off-topic.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 34,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
+          "at": "2026-07-22T04:29:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87c60a3d9298c8daf642b794cda5bd633e155cd958ab3344a9ba21b6087aa4b5",
+          "at": "2026-07-22T04:31:29Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T1 description is non-executable because it lacks an upstream anchor cite (AC/IN/CN/spec element ID), despite naming an operation and target.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 5,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T2 description is non-executable because it lacks an upstream anchor cite (AC/IN/CN/spec element ID), despite naming an operation and target.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T3 description is non-executable because it lacks an upstream anchor cite (AC/IN/CN/spec element ID), despite naming an operation and target.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 19,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T4 description is non-executable because it lacks an upstream anchor cite (AC/IN/CN/spec element ID), despite naming an operation and target.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 26,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T1 restates upstream behavior contracts in prose (convergence, immediate upstream return, responsibility boundaries, and the impl-plan transition exception). Per no-upstream-restatement.md, the description should use only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 5,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T2 restates the upstream prerequisite and return behavior in prose (including use of only the immediate upstream artifact). Per no-upstream-restatement.md, the description should use only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T3 restates the upstream prerequisite and implementation-phase review contract in prose. Per no-upstream-restatement.md, the description should use only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 19,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T4 restates the upstream routing-versus-sequencing responsibility boundary in prose. Per no-upstream-restatement.md, the description should use only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 26,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:2ccff7f65fa55cf8bf9c9ac80798fa9017f417ff66fab2657ad06b2d5ab19b45",
+          "at": "2026-07-22T04:27:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8c3a47cd63381752397b5de256555aa09476c641ac59251b294d16ba60cbe44",
+          "at": "2026-07-22T04:28:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan` omits `summary`, leaving spec goal `GO-01` without goal-to-task traceability. Goals are intentionally absent from `task-coverage.json`, so record the mapping here, e.g. `GO-01: T1, T2, T3, T4.`",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 29,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:a8c3a47cd63381752397b5de256555aa09476c641ac59251b294d16ba60cbe44",
+          "at": "2026-07-22T04:31:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:342f262cdd1228a14456978b2bff46e9f8eaae3b96bdff180e2ed714d286f5f2",
+          "at": "2026-07-22T04:33:36Z"
+        }
+      ]
     }
   }
 }

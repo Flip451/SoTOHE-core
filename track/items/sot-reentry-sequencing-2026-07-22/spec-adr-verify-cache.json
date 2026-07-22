@@ -1,0 +1,465 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "b1bfa8fd10300e27a02b6f66f843e5c4a50a7aa001451bef033783058849fbe0",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本規律はルーティング後の降下順序の強制を担う。Prerequisite の充足確認と降下順序の遵守は dispatch する orchestrator の責務とし、各 writer capability は自分の Prerequisite が満たされていない briefing を受けた場合、作業せず orchestrator へ差し戻す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "rollback-diagnoser により上流 SoT へ回帰した後、各下流 writer phase が直上流の再収束を待ってからのみ再開する順次処理規律を、track 運用文書に一貫して定着させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "b1bfa8fd10300e27a02b6f66f843e5c4a50a7aa001451bef033783058849fbe0",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各フェーズは直上流 1 層のみを検査する。上流の上流の収束は直上流の収束が推移的に保証する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "rollback-diagnoser により上流 SoT へ回帰した後、各下流 writer phase が直上流の再収束を待ってからのみ再開する順次処理規律を、track 運用文書に一貫して定着させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "d7ab259d9679a9afb738a7850656334071ebe4f4ef37d1f84724f4ac41ad5c45",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "### D2: フェーズ収束の 3 要素定義\n\nフェーズ X が「収束している」とは、次のすべてが成立していること:\n\n1. **参照信号**: X の成果物を引用側（下流）とする chain の参照信号 — 参照の存在を機械評価した\n   🔵 / 🟡 / 🔴 — が、`.harness/config/signal-gates.json` の当該 chain × gate 指定\n   （interim / strict）を満たす。許容水準の SSoT は同設定ファイルであり、本規律は値を\n   再記述しない。\n2. **意味論検証**: `bin/sotp ref-verify` の該当 scope が通過している（参照先の内容と引用側の\n   記述の意味的整合。参照信号とは独立の検証で、scope と chain の対応は ref-verify 側の\n   定義に従う）。\n3. **レビュー**: 該当 SoT スコープの review が `zero_findings` で完了している。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`knowledge/conventions/sot-reentry-sequencing.md` を追加し、phase 収束を参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings` の三要素として、既存 SSoT を参照して規定する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "077a717ef11b671360b9e649710cf3c3cd23a87bbdff35ed5f9544e73fded186",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "回帰先の判定は rollback-diagnoser（勧告。orchestrator の override 余地も既存どおり）が担い、本規律はルーティング後の降下順序の強制を担う。Prerequisite の充足確認と降下順序の遵守は dispatch する orchestrator の責務とし、各 writer capability は自分の Prerequisite が満たされていない briefing を受けた場合、作業せず orchestrator へ差し戻す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`knowledge/conventions/sot-reentry-sequencing.md` は、rollback-diagnoser が回帰先を勧告し、orchestrator が routing 後の prerequisite 確認と降下順序を担い、writer capability が満たされない briefing を作業せず返す責務分離を規定する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "994b846bc462552c135b840afba1fc6531086013552fa2dedc9cb5e486478695",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各フェーズは直上流 1 層のみを検査する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "新 convention は、spec-design、type-design、impl-plan、implementation の再開時に、それぞれ ADR、spec、catalogue、または catalogue と impl-plan review という直上流の収束だけを prerequisite として確認する規則を定める。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "b6c54b4d6f8410409368085f1e3224c7a0527addd3ce0f65ecafc2bc12be6307",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "下流作業中に収束済み上流 SoT への編集の必要性が発見された時点で、下流作業を中断して上流へ戻る（ルーティングが自明でなければ diagnose 経由）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "新 convention は、下流作業中に上流 SoT の編集必要性が判明した場合に下流を即時中断して上流へ戻し、上流の再収束まで再開を禁止する規則を定める。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "328e9a6f01cdf0c20668996192413f673012047cccde1c39e7864d31b0563abf",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 writer capability は自分の Prerequisite が満たされていない briefing を受けた場合、作業せず orchestrator へ差し戻す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "`spec-designer`、`type-designer`、`impl-planner`、`implementer` の capability contracts に、満たされない prerequisite を含む briefing を作業せず orchestrator へ返す規定と新 convention への pointer を加える。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "066a19fef97618b4f0e0de46a3fc3fd377576d1157bcbb590f9a32e8dfec610c",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各フェーズは直上流 1 層のみを検査する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "前記 writer capability contracts は、再開 prerequisite を各 phase の直上流 1 層だけの収束として明示する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "b7ff2ffafb2a9e3073f572bc30648c0dcf304079657e33a781b786b50415db9b",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "回帰先の判定は rollback-diagnoser（勧告。orchestrator の override 余地も既存どおり）が担い、本規律はルーティング後の降下順序の強制を担う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "`rollback-diagnoser` capability contract に、回帰先の診断・勧告と、diagnosis 後に orchestrator が順次再入規律を適用する責務との境界を示す cross-reference pointer を加える。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "731ddffd998653b51e12e85419f354d57ff735ebc6df4be4d18204dcbcaf2252",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本規律は convention 文書と各 writer capability 文書への追記で運用する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-08",
+          "text_label": "`knowledge/conventions/README.md` の convention index を、追加した SoT 再入規律 document が参照可能な状態へ再生成する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "009ac7280e5a621edec161e833e1db83b2594d42dab9c98ead78e8e6c62c384b",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "gate / CI / `.harness/config/signal-gates.json` / `adr_user` 評価は変更しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "`.harness/config/signal-gates.json`、signal gate、CI、または `adr_user` 評価の実装・許容値を変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "bb1c3e7d6d1e1396d19fbcfba06056ac131c982888f6954cef7991523bda1719",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この例外を他の SoT へ一般化しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "impl-plan task status transition 以外の上流 SoT 編集を収束失効の例外として追加・一般化しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "46a71685bc01d1c8bbb8c34d4e2bbde12e02c756e0c9fde55fb4709e61d9e11b",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「許容水準の SSoT は同設定ファイルであり、本規律は値を再記述しない。」および「scope と chain の対応は ref-verify 側の定義に従う」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "新 convention は signal の許容値や ref-verify scope の対応を複製せず、`.harness/config/signal-gates.json` と既存 ref-verify 定義をそれぞれの SSoT として参照する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "ba58e9482a4038def223826a5a21998227617c669636c0c0760120097942f408",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "下流作業中に収束済み上流 SoT への編集の必要性が発見された時点で、下流作業を中断して上流へ戻る（ルーティングが自明でなければ diagnose 経由）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "上流 SoT の編集が必要と判明した時点で下流作業を中断し、回帰先が自明でない場合は rollback-diagnoser を経由する。上流の再収束前に下流を継続または再開する裁量経路を設けない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "e18ef2a499ed8a68da79ff434aa1233112aac9e2e74e63838f83c5579cc6cc03",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本規律は convention 文書と各 writer capability 文書への追記で運用する。gate / CI / `.harness/config/signal-gates.json` / `adr_user` 評価は変更しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "この track は prompt-level discipline と documentation + review による運用に留め、人工的な phase-state field、追加承認 ceremony、または新しい機械的 enforcement を導入しない。将来の mechanism 化は ADR の Reassess When に従って別途検討する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "1f887da561858d14d0380a5874eb839b1174c4674d871382f2d4485713fbcfc7",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "### D2: フェーズ収束の 3 要素定義\n\nフェーズ X が「収束している」とは、次のすべてが成立していること:\n\n1. **参照信号**: X の成果物を引用側（下流）とする chain の参照信号 — 参照の存在を機械評価した\n   🔵 / 🟡 / 🔴 — が、`.harness/config/signal-gates.json` の当該 chain × gate 指定\n   （interim / strict）を満たす。\n2. **意味論検証**: `bin/sotp ref-verify` の該当 scope が通過している（参照先の内容と引用側の\n   記述の意味的整合。参照信号とは独立の検証で、scope と chain の対応は ref-verify 側の\n   定義に従う）。\n3. **レビュー**: 該当 SoT スコープの review が `zero_findings` で完了している。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "新 convention は、phase 収束を参照 signal、該当 `bin/sotp ref-verify` scope、該当 SoT scope review の `zero_findings` の三要素として扱い、各要素の具体的な許容値・対応表は既存 SSoT を参照する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "fa044009e22b90b055689cb3618eacefc9901432131fae691ab333566329d4c7",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各フェーズは直上流 1 層のみを検査する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "writer capability documents は spec-design、type-design、impl-plan、implementation の各再開時に、ADR、spec、catalogue、または catalogue と impl-plan review という ADR で定められた直上流 prerequisite だけを確認し、満たせない briefing を orchestrator へ返す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "36608812a808a8bb2ba5746f6966087fafe32b9e342f1a27de8ab8c6bed5ffa2",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "下流作業中に収束済み上流 SoT への編集の必要性が発見された時点で、下流作業を中断して上流へ戻る"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "下流作業中に上流 SoT の編集必要性を発見した場合、capability document は即時中断と上流への return を指示し、上流の再収束まで下流を続行・再開させない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "0ce83ca30135befa8f5a354e0e9a13087b038a3d3dce23b50bb1d4fb0dd8bf32",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`impl-plan.json` のみ、review 収束後も `bin/sotp track transition` による task ステータス遷移を許容し、これは収束を失効させない。それ以外の impl-plan 変更は D4 に従い失効・再収束を要する。この例外を他の SoT へ一般化しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "impl-plan の `bin/sotp track transition` による task status transition だけは review 収束を失効させない明示例外として記述され、他の SoT へ同種の例外を拡張しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "b620044f79f714fd47fa33b87f0ea07ecee75da8f73e8969b62eaa6a13b5016e",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本規律は convention 文書と各 writer capability 文書への追記で運用する。gate / CI / `.harness/config/signal-gates.json` / `adr_user` 評価は変更しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "実装差分は新 convention、指定された五つの capability documents、および再生成された conventions index に限定され、gate、CI、signal-gates configuration、`adr_user` evaluator に変更を含まない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D6"
+        }
+      }
+    }
+  ]
+}
