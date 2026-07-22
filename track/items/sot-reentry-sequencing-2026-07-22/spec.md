@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 19, yellow: 0, red: 0 }
+signals: { blue: 20, yellow: 0, red: 0 }
 ---
 
 # SoT 再入の順次処理規律 — ルーティング後のフェーズ収束 Prerequisite
@@ -14,7 +14,7 @@ signals: { blue: 19, yellow: 0, red: 0 }
 
 ### In Scope
 - [IN-01] `knowledge/conventions/sot-reentry-sequencing.md` を追加し、phase 収束を参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings` の三要素として、既存 SSoT を参照して規定する。 [adr: knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md#D2] [tasks: T1]
-- [IN-02] `knowledge/conventions/sot-reentry-sequencing.md` は、rollback-diagnoser が回帰先を勧告し、orchestrator が routing 後の prerequisite 確認と降下順序を担い、writer capability が満たされない briefing を作業せず返す責務分離を規定する。 [adr: knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md#D1] [tasks: T1, T2, T3, T4]
+- [IN-02] `knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` と直上流 1 層を確認し、その収束証跡を writer briefing に渡すことを規定する。 [adr: knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md#D1, knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md#D2, knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md#D3] [tasks: T1, T2, T3, T4, T5]
 - [IN-03] 新 convention は、spec-design、type-design、impl-plan、implementation の再開時に、それぞれ ADR、spec、catalogue、または catalogue と impl-plan review という直上流の収束だけを prerequisite として確認する規則を定める。 [adr: knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md#D3] [tasks: T1, T2, T3]
 - [IN-04] 新 convention は、下流作業中に上流 SoT の編集必要性が判明した場合に下流を即時中断して上流へ戻し、上流の再収束まで再開を禁止する規則を定める。 [adr: knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md#D4] [tasks: T1, T2, T3]
 - [IN-05] `spec-designer`、`type-designer`、`impl-planner`、`implementer` の capability contracts に、満たされない prerequisite を含む briefing を作業せず orchestrator へ返す規定と新 convention への pointer を加える。 [adr: knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md#D1] [tasks: T2, T3]
@@ -36,7 +36,8 @@ signals: { blue: 19, yellow: 0, red: 0 }
 - [ ] [AC-02] writer capability documents は spec-design、type-design、impl-plan、implementation の各再開時に、ADR、spec、catalogue、または catalogue と impl-plan review という ADR で定められた直上流 prerequisite だけを確認し、満たせない briefing を orchestrator へ返す。 [adr: knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md#D3] [tasks: T2, T3]
 - [ ] [AC-03] 下流作業中に上流 SoT の編集必要性を発見した場合、capability document は即時中断と上流への return を指示し、上流の再収束まで下流を続行・再開させない。 [adr: knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md#D4] [tasks: T1, T2, T3, T4]
 - [ ] [AC-04] impl-plan の `bin/sotp track transition` による task status transition だけは review 収束を失効させない明示例外として記述され、他の SoT へ同種の例外を拡張しない。 [adr: knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md#D5] [tasks: T1]
-- [ ] [AC-05] 実装差分は新 convention、指定された五つの capability documents、および再生成された conventions index に限定され、gate、CI、signal-gates configuration、`adr_user` evaluator に変更を含まない。 [adr: knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md#D6] [tasks: T1, T2, T3, T4]
+- [ ] [AC-05] 実装差分は新 convention、指定された五つの capability documents、`.harness/workflows/track/diagnose.md`、および再生成された conventions index に限定され、gate、CI、signal-gates configuration、`adr_user` evaluator に変更を含まない。 [adr: knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md#D6] [tasks: T1, T2, T3, T4, T5]
+- [ ] [AC-06] `.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings`、および直上流 1 層を確認し、その収束証跡を writer briefing に渡す手順を明記する。 [adr: knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md#D1, knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md#D2, knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md#D3] [tasks: T5]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権
@@ -47,5 +48,5 @@ signals: { blue: 19, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 19  🟡 0  🔴 0
+🔵 20  🟡 0  🔴 0
 

@@ -71,7 +71,7 @@
       }
     },
     {
-      "claim_hash": "077a717ef11b671360b9e649710cf3c3cd23a87bbdff35ed5f9544e73fded186",
+      "claim_hash": "b21477e32759b8cc687ad85b13a12e30c386c1247cac0033ef3878237c1c3ac9",
       "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
       "verdict": {
         "kind": "pass",
@@ -82,7 +82,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-02",
-          "text_label": "`knowledge/conventions/sot-reentry-sequencing.md` は、rollback-diagnoser が回帰先を勧告し、orchestrator が routing 後の prerequisite 確認と降下順序を担い、writer capability が満たされない briefing を作業せず返す責務分離を規定する。"
+          "text_label": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` と直上流 1 層を確認し、その収束証跡を writer briefing に渡すことを規定する。"
         }
       },
       "evidence_origin": {
@@ -90,6 +90,52 @@
         "data": {
           "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
           "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "b21477e32759b8cc687ad85b13a12e30c386c1247cac0033ef3878237c1c3ac9",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "フェーズ X が「収束している」とは、次のすべてが成立していること:\n\n1. **参照信号**: X の成果物を引用側（下流）とする chain の参照信号 — 参照の存在を機械評価した 🔵 / 🟡 / 🔴 — が、`.harness/config/signal-gates.json` の当該 chain × gate 指定（interim / strict）を満たす。\n2. **意味論検証**: `bin/sotp ref-verify` の該当 scope が通過している（参照先の内容と引用側の記述の意味的整合。参照信号とは独立の検証で、scope と chain の対応は ref-verify 側の定義に従う）。\n3. **レビュー**: 該当 SoT スコープの review が `zero_findings` で完了している。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` と直上流 1 層を確認し、その収束証跡を writer briefing に渡すことを規定する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "b21477e32759b8cc687ad85b13a12e30c386c1247cac0033ef3878237c1c3ac9",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各フェーズは直上流 1 層のみを検査する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` と直上流 1 層を確認し、その収束証跡を writer briefing に渡すことを規定する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D3"
         }
       }
     },
@@ -439,7 +485,7 @@
       }
     },
     {
-      "claim_hash": "b620044f79f714fd47fa33b87f0ea07ecee75da8f73e8969b62eaa6a13b5016e",
+      "claim_hash": "7af87a084ae2bda6aede7557a329b73455532169ddbbde509a4cafa531ff2989",
       "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
       "verdict": {
         "kind": "pass",
@@ -450,7 +496,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "実装差分は新 convention、指定された五つの capability documents、および再生成された conventions index に限定され、gate、CI、signal-gates configuration、`adr_user` evaluator に変更を含まない。"
+          "text_label": "実装差分は新 convention、指定された五つの capability documents、`.harness/workflows/track/diagnose.md`、および再生成された conventions index に限定され、gate、CI、signal-gates configuration、`adr_user` evaluator に変更を含まない。"
         }
       },
       "evidence_origin": {
@@ -458,6 +504,75 @@
         "data": {
           "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
           "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "c452f2a6725a21dcd27524b32c9c842292cb223ddb7dfdf65505f0fc11583831",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「本規律はルーティング後の降下順序の強制を担う。Prerequisite の充足確認と降下順序の遵守は dispatch する orchestrator の責務」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings`、および直上流 1 層を確認し、その収束証跡を writer briefing に渡す手順を明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "c452f2a6725a21dcd27524b32c9c842292cb223ddb7dfdf65505f0fc11583831",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"フェーズ X が「収束している」とは、次のすべてが成立していること: ... 1. **参照信号** ... 2. **意味論検証**: `bin/sotp ref-verify` の該当 scope が通過している ... 3. **レビュー**: 該当 SoT スコープの review が `zero_findings` で完了している。\""
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings`、および直上流 1 層を確認し、その収束証跡を writer briefing に渡す手順を明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "c452f2a6725a21dcd27524b32c9c842292cb223ddb7dfdf65505f0fc11583831",
+      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「各フェーズは直上流 1 層のみを検査する。上流の上流の収束は直上流の収束が推移的に保証する」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings`、および直上流 1 層を確認し、その収束証跡を writer briefing に渡す手順を明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "decision_id": "D3"
         }
       }
     }

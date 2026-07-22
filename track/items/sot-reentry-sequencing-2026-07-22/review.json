@@ -19,24 +19,6 @@
         }
       ]
     },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13e9d659250f657ffe620b73aafc0cd00206955f9b9cfdab4b693e9fc354de20",
-          "at": "2026-07-22T04:42:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13e9d659250f657ffe620b73aafc0cd00206955f9b9cfdab4b693e9fc354de20",
-          "at": "2026-07-22T04:48:42Z"
-        }
-      ]
-    },
     "impl-plan": {
       "rounds": [
         {
@@ -159,6 +141,97 @@
           "findings": [],
           "hash": "rvw1:sha256:f7cb7bc88607283c15904465a4000f8c39c9148bd8635c9f120490e028eb7b4b",
           "at": "2026-07-22T04:54:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T5 description restates upstream behavior (“confirms direct-upstream convergence evidence after routing and before every re-entry writer dispatch, then includes that evidence in the writer briefing”) instead of using only target + operation + anchor cites. Shorten to the target file, operation, and IN-02/AC-05/AC-06 anchors; see `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 29,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:2137015484ce835460ef0e13cb9e5c6976b9b3bd9c73cb24a88d7b9964f14907",
+          "at": "2026-07-22T05:22:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e62a0f0c79e0cb27c0aca88c79fc3ff00384ef176f629cc3c9cafd40e7106427",
+          "at": "2026-07-22T05:23:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e62a0f0c79e0cb27c0aca88c79fc3ff00384ef176f629cc3c9cafd40e7106427",
+          "at": "2026-07-22T05:26:18Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13e9d659250f657ffe620b73aafc0cd00206955f9b9cfdab4b693e9fc354de20",
+          "at": "2026-07-22T04:42:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13e9d659250f657ffe620b73aafc0cd00206955f9b9cfdab4b693e9fc354de20",
+          "at": "2026-07-22T04:48:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 3 states that every re-entry is gated only by the direct upstream's convergence evidence, but the cited convention defines an additional prerequisite for implementation re-entry: impl-plan scope review convergence (except task-status transitions). This can authorize `impl` dispatch without the required impl-plan review evidence; explicitly preserve that phase-specific prerequisite in the dispatch rule.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/diagnose.md",
+              "line": 124,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f6b1c9827c9771a9059f439a6d40bad30b5735d651689cfb679d6e88c0a2b7dd",
+          "at": "2026-07-22T05:21:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e1ddf755077a585b34b6dda57d8e113ae13ac3d40891720c499e9af86572c2e6",
+          "at": "2026-07-22T05:23:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`before each re-entry dispatch below` は全分岐に掛かるため、直上流 prerequisite が存在しない `adr` 分岐にも収束証跡を要求します。また `impl` 分岐は line 140 で `no writer subagent` とされており、証跡を `writer briefing` に渡せません。引用先 convention は prerequisite を spec-design/type-design/impl-plan/implementation のみに定義し、ADR 側を適用外としているため、対象分岐を明示的に限定し、直接実行する `impl` では orchestrator 自身が確認する形に分けてください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/diagnose.md",
+              "line": 122,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:e1ddf755077a585b34b6dda57d8e113ae13ac3d40891720c499e9af86572c2e6",
+          "at": "2026-07-22T05:27:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a21c4facf5f5e63ccf316f4836dcc308b59f6882eb661d809594d4a691d65f8f",
+          "at": "2026-07-22T05:28:46Z"
         }
       ]
     },
@@ -199,6 +272,42 @@
           "findings": [],
           "hash": "rvw1:sha256:87c60a3d9298c8daf642b794cda5bd633e155cd958ab3344a9ba21b6087aa4b5",
           "at": "2026-07-22T04:31:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e05cf504ae60ffc977faeb92d995552795f380dcad3d7fe1cb85efafe49decb8",
+          "at": "2026-07-22T05:05:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 は D1 を含む順次処理規律の一貫した定着を求め、IN-02 は `diagnose.md` に dispatch 前の三要素・直上流チェックと収束証跡の引き渡しを要求しています。しかし AC-01〜AC-04 は convention または writer capability の内容だけを検査し、AC-05 は `diagnose.md` を許容差分へ加えるだけでその要求内容を検証しません。そのため orchestrator-side のチェックと証跡引き渡しが欠けたままでも全 AC を満たせ、GO-01 の完了を決定的に証明できません。",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 220,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:e05cf504ae60ffc977faeb92d995552795f380dcad3d7fe1cb85efafe49decb8",
+          "at": "2026-07-22T05:09:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bb41305fdb53e4cfac00ec3fa5d198460089c186cf608c61b87f3c1145dc1df",
+          "at": "2026-07-22T05:13:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:084a60859369138c32f8b575594aa86d196369c1fd767ee0f5d3b6a723ad27f6",
+          "at": "2026-07-22T05:34:44Z"
         }
       ]
     },

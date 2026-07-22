@@ -119,7 +119,13 @@ Other diagnostic input:
 **Step 3: Orchestrator dispatch (outside this workflow)**
 
 For a `rollback-diagnoser` routing decision, the calling orchestrator inspects `routing_target`
-and dispatches:
+and dispatches. Before each re-entry dispatch to a Phase 1--3 writer below (and before every
+subsequent descent step back down the chain), the orchestrator confirms the target phase's
+direct-upstream re-entry prerequisite and states that confirmed evidence in the writer briefing,
+per `knowledge/conventions/sot-reentry-sequencing.md`. A writer receiving a briefing whose
+prerequisite is unmet returns it without working. Before applying an `impl` source edit, the
+orchestrator itself confirms the implementation re-entry prerequisite prescribed by that
+convention. Dispatch targets:
 
 - `adr` → route by the Phase 0 adjudication boundary. Before closure, use the user-present
   new-ADR/hearing lane for a semantic need (or adr-editor's Phase 0 in-place convergence lane

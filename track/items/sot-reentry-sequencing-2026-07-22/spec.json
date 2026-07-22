@@ -32,11 +32,19 @@
       },
       {
         "id": "IN-02",
-        "text": "`knowledge/conventions/sot-reentry-sequencing.md` は、rollback-diagnoser が回帰先を勧告し、orchestrator が routing 後の prerequisite 確認と降下順序を担い、writer capability が満たされない briefing を作業せず返す責務分離を規定する。",
+        "text": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` と直上流 1 層を確認し、その収束証跡を writer briefing に渡すことを規定する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
             "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+            "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+            "anchor": "D3"
           }
         ]
       },
@@ -133,7 +141,7 @@
           "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
           "anchor": "D2"
         }
-        ]
+      ]
     },
     {
       "id": "CN-02",
@@ -209,11 +217,29 @@
     },
     {
       "id": "AC-05",
-      "text": "実装差分は新 convention、指定された五つの capability documents、および再生成された conventions index に限定され、gate、CI、signal-gates configuration、`adr_user` evaluator に変更を含まない。",
+      "text": "実装差分は新 convention、指定された五つの capability documents、`.harness/workflows/track/diagnose.md`、および再生成された conventions index に限定され、gate、CI、signal-gates configuration、`adr_user` evaluator に変更を含まない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
           "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings`、および直上流 1 層を確認し、その収束証跡を writer briefing に渡す手順を明記する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
+          "anchor": "D3"
         }
       ]
     }
@@ -237,7 +263,7 @@
     }
   ],
   "signals": {
-    "blue": 19,
+    "blue": 20,
     "yellow": 0,
     "red": 0
   }
