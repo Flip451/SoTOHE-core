@@ -120,7 +120,7 @@
       },
       {
         "id": "IN-10",
-        "text": "merge-stage adjudication を待つ入庫済み delta の実装として、意味論検証 surface が上流 chain を単独評価できず、直後の下流 writer 再実行による再生成待ちの下流成果物まで評価する場合に限り、実装文書は上流の参照 signal と scope review を満たして再 dispatch し、briefing に延期した意味論検証・対象上流 chain・再生成直後かつさらに下流へ進む前に実行する full `bin/sotp ref-verify run` を明記する。",
+        "text": "merge-stage adjudication を待つ入庫済み delta の実装として、IN-09 の `adr_user` chain を除く上流収束の意味論検証は、当該上流 chain に関係する `ref-verify` 指摘が全て解消されていることだけを問う。実装文書は既知の当該 chain 指摘を `bin/sotp ref-verify results --chain 1` のような chain 限定読み出しで確認し、他 chain の指摘または stale な下流成果物による pair 列挙失敗を上流収束の未充足として扱わない。`bin/sotp ref-verify run` は pair を列挙可能になり次第、通常は上流修正後に即時、列挙 abort 時は下流 writer の再生成直後に実行し、後続 run で当該上流 chain の指摘が生じた場合は D4 に従って即時に上流へ突き返す。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-22-0817-deferred-upstream-semantic-verification.md",
@@ -283,7 +283,7 @@
     },
     {
       "id": "AC-08",
-      "text": "merge-stage adjudication を待つ入庫済み delta の実装として、意味論検証 surface が上流 chain を単独評価できず、直後の下流 writer 再実行による再生成待ちの下流成果物まで評価する場合に限り、実装文書は上流の参照 signal と scope review を満たして再 dispatch し、briefing に延期した意味論検証・対象上流 chain・再生成直後かつさらに下流へ進む前に実行する full `bin/sotp ref-verify run` を明記する。",
+      "text": "merge-stage adjudication を待つ入庫済み delta の実装文書は、IN-09 の `adr_user` chain を除く各上流 chain について、chain 限定読み出しで既知の `ref-verify` 指摘が全て解消済みであることを確認し、他 chain の指摘または stale な下流成果物による pair 列挙失敗だけでは上流収束を未充足にしない。`bin/sotp ref-verify run` は pair を列挙可能になり次第、通常は上流修正後に即時、列挙 abort 時は下流 writer の再生成直後に実行され、後続 run で当該上流 chain の指摘が生じた場合は D4 に従って即時に上流へ突き返す。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-22-0817-deferred-upstream-semantic-verification.md",

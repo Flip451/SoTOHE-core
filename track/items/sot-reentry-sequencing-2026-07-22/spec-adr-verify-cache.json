@@ -301,18 +301,18 @@
       }
     },
     {
-      "claim_hash": "5e1b72e2d6263a19d3d6ad22a5363e765777697d97abd1d38bb62a5acdc6d99e",
-      "evidence_hash": "0cffbd982ceddb7d5e65e9f2e2e68a0de224b971625283336f73aa8b96d94c68",
+      "claim_hash": "b721d367eb0379756193a36fc5641892710d40e08b97c464b63eff4df0883647",
+      "evidence_hash": "a9b38e13f76a35746cd49d16f68409c140f4fc39147ea7f37a2a8fe5a446a29d",
       "verdict": {
         "kind": "pass",
-        "citation": "意味論検証 surface が上流収束に該当する chain を単独で評価できず、直後に再実行する下流 writer による再生成を待つ成果物の下流 chain まで存在ベースの scope 解決によって評価する場合に限り、上流収束の意味論検証要素をその下流成果物の再生成直後まで延期する。"
+        "citation": "上流収束の意味論検証要素は、当該上流 chain に関係する `ref-verify` 指摘がすべて解消されていることだけを問う。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
           "element_id": "IN-10",
-          "text_label": "merge-stage adjudication を待つ入庫済み delta の実装として、意味論検証 surface が上流 chain を単独評価できず、直後の下流 writer 再実行による再生成待ちの下流成果物まで評価する場合に限り、実装文書は上流の参照 signal と scope review を満たして再 dispatch し、briefing に延期した意味論検証・対象上流 chain・再生成直後かつさらに下流へ進む前に実行する full `bin/sotp ref-verify run` を明記する。"
+          "text_label": "merge-stage adjudication を待つ入庫済み delta の実装として、IN-09 の `adr_user` chain を除く上流収束の意味論検証は、当該上流 chain に関係する `ref-verify` 指摘が全て解消されていることだけを問う。実装文書は既知の当該 chain 指摘を `bin/sotp ref-verify results --chain 1` のような chain 限定読み出しで確認し、他 chain の指摘または stale な下流成果物による pair 列挙失敗を上流収束の未充足として扱わない。`bin/sotp ref-verify run` は pair を列挙可能になり次第、通常は上流修正後に即時、列挙 abort 時は下流 writer の再生成直後に実行し、後続 run で当該上流 chain の指摘が生じた場合は D4 に従って即時に上流へ突き返す。"
         }
       },
       "evidence_origin": {
@@ -692,18 +692,18 @@
       }
     },
     {
-      "claim_hash": "41254f41743086b1a6fd4390e7a8017868f2392b311c020a1f6f676d167f7632",
-      "evidence_hash": "0cffbd982ceddb7d5e65e9f2e2e68a0de224b971625283336f73aa8b96d94c68",
+      "claim_hash": "82b62c73b1a47c6e9836433381428bd0b9f2da8963f53fe1766db3b56bf870aa",
+      "evidence_hash": "a9b38e13f76a35746cd49d16f68409c140f4fc39147ea7f37a2a8fe5a446a29d",
       "verdict": {
         "kind": "pass",
-        "citation": "意味論検証 surface が上流収束に該当する chain を単独で評価できず、直後に再実行する下流 writer による再生成を待つ成果物の下流 chain まで存在ベースの scope 解決によって評価する場合に限り、上流収束の意味論検証要素をその下流成果物の再生成直後まで延期する。"
+        "citation": "上流収束の意味論検証要素は、当該上流 chain に関係する `ref-verify` 指摘がすべて解消されていることだけを問う。 他 chain の指摘、および直後の下流 writer 再実行で再生成される stale な下流成果物に起因する pair 列挙失敗は、当該上流 chain の指摘ではないため上流収束の判定に関与しない。 `bin/sotp ref-verify results --chain 1` のような chain 限定の読み出しを用いる。 `bin/sotp ref-verify run` は pair を列挙可能になり次第実行し、通常は上流修正後に即時実行し、他 chain の列挙失敗で中断した場合は下流 writer が成果物を再生成した直後に full run を実行する。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "merge-stage adjudication を待つ入庫済み delta の実装として、意味論検証 surface が上流 chain を単独評価できず、直後の下流 writer 再実行による再生成待ちの下流成果物まで評価する場合に限り、実装文書は上流の参照 signal と scope review を満たして再 dispatch し、briefing に延期した意味論検証・対象上流 chain・再生成直後かつさらに下流へ進む前に実行する full `bin/sotp ref-verify run` を明記する。"
+          "text_label": "merge-stage adjudication を待つ入庫済み delta の実装文書は、IN-09 の `adr_user` chain を除く各上流 chain について、chain 限定読み出しで既知の `ref-verify` 指摘が全て解消済みであることを確認し、他 chain の指摘または stale な下流成果物による pair 列挙失敗だけでは上流収束を未充足にしない。`bin/sotp ref-verify run` は pair を列挙可能になり次第、通常は上流修正後に即時、列挙 abort 時は下流 writer の再生成直後に実行され、後続 run で当該上流 chain の指摘が生じた場合は D4 に従って即時に上流へ突き返す。"
         }
       },
       "evidence_origin": {

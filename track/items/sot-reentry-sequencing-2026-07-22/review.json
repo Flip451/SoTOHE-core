@@ -1,272 +1,100 @@
 {
   "schema_version": 2,
   "scopes": {
-    "impl-plan": {
+    "adr": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T1 description is non-executable because it lacks an upstream anchor cite (AC/IN/CN/spec element ID), despite naming an operation and target.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
-              "line": 5,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T2 description is non-executable because it lacks an upstream anchor cite (AC/IN/CN/spec element ID), despite naming an operation and target.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
-              "line": 12,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T3 description is non-executable because it lacks an upstream anchor cite (AC/IN/CN/spec element ID), despite naming an operation and target.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
-              "line": 19,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T4 description is non-executable because it lacks an upstream anchor cite (AC/IN/CN/spec element ID), despite naming an operation and target.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
-              "line": 26,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T1 restates upstream behavior contracts in prose (convergence, immediate upstream return, responsibility boundaries, and the impl-plan transition exception). Per no-upstream-restatement.md, the description should use only target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
-              "line": 5,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T2 restates the upstream prerequisite and return behavior in prose (including use of only the immediate upstream artifact). Per no-upstream-restatement.md, the description should use only target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
-              "line": 12,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T3 restates the upstream prerequisite and implementation-phase review contract in prose. Per no-upstream-restatement.md, the description should use only target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
-              "line": 19,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T4 restates the upstream routing-versus-sequencing responsibility boundary in prose. Per no-upstream-restatement.md, the description should use only target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
-              "line": 26,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:2ccff7f65fa55cf8bf9c9ac80798fa9017f417ff66fab2657ad06b2d5ab19b45",
-          "at": "2026-07-22T04:27:21Z"
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1982c15e9974b92a645574f4c58db1c8256db0a1102e400a478aa520b61c3f78",
+          "at": "2026-07-22T04:05:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1982c15e9974b92a645574f4c58db1c8256db0a1102e400a478aa520b61c3f78",
+          "at": "2026-07-22T04:08:39Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a8c3a47cd63381752397b5de256555aa09476c641ac59251b294d16ba60cbe44",
-          "at": "2026-07-22T04:28:59Z"
+          "hash": "rvw1:sha256:defaef8c1d6ff0244e92326e5cfa54944c5def5fbdcf71f7fbcc4c814aabcc4b",
+          "at": "2026-07-22T06:13:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:defaef8c1d6ff0244e92326e5cfa54944c5def5fbdcf71f7fbcc4c814aabcc4b",
+          "at": "2026-07-22T06:17:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42d55f4287f17d7c9d569c4810ff89a76286c81af6b81bdfe72bedd0ea68cb38",
+          "at": "2026-07-22T06:41:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42d55f4287f17d7c9d569c4810ff89a76286c81af6b81bdfe72bedd0ea68cb38",
+          "at": "2026-07-22T06:44:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:65a1e8b48dd7f9404d5417d6ef8da5632b35e91c8805e0f0187949ae8cdccad5",
+          "at": "2026-07-22T08:27:49Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`plan` omits `summary`, leaving spec goal `GO-01` without goal-to-task traceability. Goals are intentionally absent from `task-coverage.json`, so record the mapping here, e.g. `GO-01: T1, T2, T3, T4.`",
+              "message": "D1 は意味論検証の完了前に下流 writer を再 dispatch し、再生成後に検証することを選択していますが、Alternative B は同じ「意味論検証を完了するために通常の再開条件より先に下流 writer を実行する」案を却下しています。却下理由は信号・review まで省略する無制約な実行を問題視している一方、見出しにはその限定がなく、採用案と却下案が一致して見えます。B を信号・review も満たさない無制約な先行実行へ限定するか、D1 がその制約付き派生であることを明記してください。",
               "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
-              "line": 29,
-              "category": "task-coverage gap"
+              "file": "knowledge/adr/2026-07-22-0817-deferred-upstream-semantic-verification.md",
+              "line": 42,
+              "category": "rejected alternative re-emerges in decisions"
             }
           ],
-          "hash": "rvw1:sha256:a8c3a47cd63381752397b5de256555aa09476c641ac59251b294d16ba60cbe44",
-          "at": "2026-07-22T04:31:57Z"
+          "hash": "rvw1:sha256:65a1e8b48dd7f9404d5417d6ef8da5632b35e91c8805e0f0187949ae8cdccad5",
+          "at": "2026-07-22T08:30:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:342f262cdd1228a14456978b2bff46e9f8eaae3b96bdff180e2ed714d286f5f2",
-          "at": "2026-07-22T04:33:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e014889bd9e35e157a7f4c9a1b6077f6cc40e8d382acd4ae13b9ce88780d06a4",
-          "at": "2026-07-22T04:41:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e014889bd9e35e157a7f4c9a1b6077f6cc40e8d382acd4ae13b9ce88780d06a4",
-          "at": "2026-07-22T04:44:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7cb7bc88607283c15904465a4000f8c39c9148bd8635c9f120490e028eb7b4b",
-          "at": "2026-07-22T04:52:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7cb7bc88607283c15904465a4000f8c39c9148bd8635c9f120490e028eb7b4b",
-          "at": "2026-07-22T04:54:26Z"
+          "hash": "rvw1:sha256:0f2d21aacc0c80ef5a70da9b1d1ff01c94a61a1b44e086c19cbc1c0b14d535db",
+          "at": "2026-07-22T08:34:20Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "T5 description restates upstream behavior (“confirms direct-upstream convergence evidence after routing and before every re-entry writer dispatch, then includes that evidence in the writer briefing”) instead of using only target + operation + anchor cites. Shorten to the target file, operation, and IN-02/AC-05/AC-06 anchors; see `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
-              "line": 29,
-              "category": "upstream restatement"
+              "message": "D1 contradicts the referenced D2/D4 convergence rules: it declares semantic verification satisfied from persisted `results --chain` data and explicitly treats inability to produce a fresh result as non-failure, even though D4 says any applied upstream edit immediately invalidates convergence and requires all three D2 elements—including current semantic verification—before downstream dispatch. This permits downstream work to proceed using stale verification evidence.",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-07-22-0817-deferred-upstream-semantic-verification.md",
+              "line": 42,
+              "category": "inconsistent decisions within the same ADR"
             }
           ],
-          "hash": "rvw1:sha256:2137015484ce835460ef0e13cb9e5c6976b9b3bd9c73cb24a88d7b9964f14907",
-          "at": "2026-07-22T05:22:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e62a0f0c79e0cb27c0aca88c79fc3ff00384ef176f629cc3c9cafd40e7106427",
-          "at": "2026-07-22T05:23:29Z"
+          "hash": "rvw1:sha256:ab927d4d5359376749ffd224fdb8e5fb32a5e30b457e02718b4a1b55585b36b4",
+          "at": "2026-07-22T10:30:01Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e62a0f0c79e0cb27c0aca88c79fc3ff00384ef176f629cc3c9cafd40e7106427",
-          "at": "2026-07-22T05:26:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ee22cc91faa3eea03cb8cd5797f90bd6e0514aa7bfe384867f6739d2348a5e19",
-          "at": "2026-07-22T05:36:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ee22cc91faa3eea03cb8cd5797f90bd6e0514aa7bfe384867f6739d2348a5e19",
-          "at": "2026-07-22T05:39:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T6 description restates the upstream behavior contract (“each downstream writer re-dispatch follows the edited direct upstream's required convergence evidence, including its scope review”) instead of limiting the description to target + operation + anchor cite. Remove the behavioral prose and retain the file/symbol, operation, and spec-element references.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
-              "line": 40,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:c1ee6ea65fa728a6f17457e4842a32d539e28d431485efed9801b34090a5e9d5",
-          "at": "2026-07-22T07:09:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce9095c5c333028654a54efb901a7735815345133a6ddb0933b66888ae606e40",
-          "at": "2026-07-22T07:11:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce9095c5c333028654a54efb901a7735815345133a6ddb0933b66888ae606e40",
-          "at": "2026-07-22T07:14:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T7 restates AC-06’s behavioral contract in prose: the single-scope fast-to-final lifecycle, Step 3 briefing reuse, provider-neutral wrapper reuse, and exclusion of the all-scope wave are all repeated here. Per `knowledge/conventions/no-upstream-restatement.md`, reduce this to target + operation + anchor cites and leave those behavioral details in the spec.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
-              "line": 41,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section `single-scope-review-reentry` again restates AC-06 by describing fast-to-final re-convergence and avoidance of the all-scope wave. Replace this sentence-level behavior with a concise target/operation phrase plus the existing anchor cites, as required by `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
-              "line": 87,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:a053649b52baafaace8694f8f58af1e93f5290e48f5727a6e80632afc1769a98",
-          "at": "2026-07-22T07:50:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c989f81025088e27793435081bca827717993a07e7bda5832dede61bdc200af8",
-          "at": "2026-07-22T07:53:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8953811561ef51dbed5461b3a58b861bab1bda8cc932d10d88eae7b98dcafe6d",
-          "at": "2026-07-22T07:57:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8953811561ef51dbed5461b3a58b861bab1bda8cc932d10d88eae7b98dcafe6d",
-          "at": "2026-07-22T07:59:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `convention` plan section description restates upstream behavior/rationale: “including the admitted `adr_user` two-element exemption and deferred-verification rule.” Keep the section description to target + operation + anchor cites; cite `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
-              "line": 57,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:7d6dd641cb4b44cd4fa4a8975e4a9254dd4d498f3f9a9d8404342e1dc202cc47",
-          "at": "2026-07-22T08:59:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4305d7262ee057c174d4ad7848607efe92217d1e8a272893b4c6454a7ff3a1f0",
-          "at": "2026-07-22T09:00:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4305d7262ee057c174d4ad7848607efe92217d1e8a272893b4c6454a7ff3a1f0",
-          "at": "2026-07-22T09:04:24Z"
+          "hash": "rvw1:sha256:ab927d4d5359376749ffd224fdb8e5fb32a5e30b457e02718b4a1b55585b36b4",
+          "at": "2026-07-22T10:33:40Z"
         }
       ]
     },
@@ -656,81 +484,53 @@
           "findings": [],
           "hash": "rvw1:sha256:46acffb78ecdc41c66e6e56fa97cc44d5d92dc52ad98e78857154a80d6a5f26d",
           "at": "2026-07-22T09:16:14Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1982c15e9974b92a645574f4c58db1c8256db0a1102e400a478aa520b61c3f78",
-          "at": "2026-07-22T04:05:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1982c15e9974b92a645574f4c58db1c8256db0a1102e400a478aa520b61c3f78",
-          "at": "2026-07-22T04:08:39Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:defaef8c1d6ff0244e92326e5cfa54944c5def5fbdcf71f7fbcc4c814aabcc4b",
-          "at": "2026-07-22T06:13:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:defaef8c1d6ff0244e92326e5cfa54944c5def5fbdcf71f7fbcc4c814aabcc4b",
-          "at": "2026-07-22T06:17:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:42d55f4287f17d7c9d569c4810ff89a76286c81af6b81bdfe72bedd0ea68cb38",
-          "at": "2026-07-22T06:41:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:42d55f4287f17d7c9d569c4810ff89a76286c81af6b81bdfe72bedd0ea68cb38",
-          "at": "2026-07-22T06:44:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:65a1e8b48dd7f9404d5417d6ef8da5632b35e91c8805e0f0187949ae8cdccad5",
-          "at": "2026-07-22T08:27:49Z"
+          "hash": "rvw1:sha256:80ce8521f29b244db22910d7d6d494b8d27e47820d426db5bc52aaea90cea39b",
+          "at": "2026-07-22T10:29:59Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "D1 は意味論検証の完了前に下流 writer を再 dispatch し、再生成後に検証することを選択していますが、Alternative B は同じ「意味論検証を完了するために通常の再開条件より先に下流 writer を実行する」案を却下しています。却下理由は信号・review まで省略する無制約な実行を問題視している一方、見出しにはその限定がなく、採用案と却下案が一致して見えます。B を信号・review も満たさない無制約な先行実行へ限定するか、D1 がその制約付き派生であることを明記してください。",
+              "message": "新しい chain-scoped 規則は意味論検証の chain 限定を「例外ではなく判定基準」と定義していますが、Purpose（5行目）は依然として「単独評価不能な意味論検証は下記の限定的な繰延に従う」と述べています。繰延規則は削除され、Exceptions でも唯一の例外は impl-plan の status transition とされているため、規約内で運用指示が矛盾しています。Purpose から繰延表現を除き、chain-scoped 判定へ同期してください。",
               "severity": "P1",
-              "file": "knowledge/adr/2026-07-22-0817-deferred-upstream-semantic-verification.md",
-              "line": 42,
-              "category": "rejected alternative re-emerges in decisions"
+              "file": "knowledge/conventions/sot-reentry-sequencing.md",
+              "line": 17,
+              "category": "convention contradiction"
             }
           ],
-          "hash": "rvw1:sha256:65a1e8b48dd7f9404d5417d6ef8da5632b35e91c8805e0f0187949ae8cdccad5",
-          "at": "2026-07-22T08:30:25Z"
+          "hash": "rvw1:sha256:80ce8521f29b244db22910d7d6d494b8d27e47820d426db5bc52aaea90cea39b",
+          "at": "2026-07-22T10:34:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0f2d21aacc0c80ef5a70da9b1d1ff01c94a61a1b44e086c19cbc1c0b14d535db",
-          "at": "2026-07-22T08:34:20Z"
+          "hash": "rvw1:sha256:e0975ed3f086083aa73a4368a3165f9f885f4ee2c4aa6234315ed8bbe6c30cc2",
+          "at": "2026-07-22T10:36:55Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7428d2753ed320e4f29b21db70ea6ec3cb763f132dce3fc0e008f04e529e3a76",
+          "at": "2026-07-22T04:26:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7428d2753ed320e4f29b21db70ea6ec3cb763f132dce3fc0e008f04e529e3a76",
+          "at": "2026-07-22T04:29:07Z"
         }
       ]
     },
@@ -959,24 +759,289 @@
           "findings": [],
           "hash": "rvw1:sha256:1a6c3058d4e77a124747738defc6c60a38104ece102e6ef4ff110bddc1bfb1c7",
           "at": "2026-07-22T08:47:44Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7428d2753ed320e4f29b21db70ea6ec3cb763f132dce3fc0e008f04e529e3a76",
-          "at": "2026-07-22T04:26:23Z"
+          "hash": "rvw1:sha256:2289617fa33675c9968ccbeb3ca1469f310df65ec91f7a9bfbc9b061b74b2769",
+          "at": "2026-07-22T10:30:00Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7428d2753ed320e4f29b21db70ea6ec3cb763f132dce3fc0e008f04e529e3a76",
-          "at": "2026-07-22T04:29:07Z"
+          "hash": "rvw1:sha256:2289617fa33675c9968ccbeb3ca1469f310df65ec91f7a9bfbc9b061b74b2769",
+          "at": "2026-07-22T10:32:11Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T1 description is non-executable because it lacks an upstream anchor cite (AC/IN/CN/spec element ID), despite naming an operation and target.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 5,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T2 description is non-executable because it lacks an upstream anchor cite (AC/IN/CN/spec element ID), despite naming an operation and target.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T3 description is non-executable because it lacks an upstream anchor cite (AC/IN/CN/spec element ID), despite naming an operation and target.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 19,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T4 description is non-executable because it lacks an upstream anchor cite (AC/IN/CN/spec element ID), despite naming an operation and target.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 26,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T1 restates upstream behavior contracts in prose (convergence, immediate upstream return, responsibility boundaries, and the impl-plan transition exception). Per no-upstream-restatement.md, the description should use only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 5,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T2 restates the upstream prerequisite and return behavior in prose (including use of only the immediate upstream artifact). Per no-upstream-restatement.md, the description should use only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T3 restates the upstream prerequisite and implementation-phase review contract in prose. Per no-upstream-restatement.md, the description should use only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 19,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T4 restates the upstream routing-versus-sequencing responsibility boundary in prose. Per no-upstream-restatement.md, the description should use only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 26,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:2ccff7f65fa55cf8bf9c9ac80798fa9017f417ff66fab2657ad06b2d5ab19b45",
+          "at": "2026-07-22T04:27:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a8c3a47cd63381752397b5de256555aa09476c641ac59251b294d16ba60cbe44",
+          "at": "2026-07-22T04:28:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan` omits `summary`, leaving spec goal `GO-01` without goal-to-task traceability. Goals are intentionally absent from `task-coverage.json`, so record the mapping here, e.g. `GO-01: T1, T2, T3, T4.`",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 29,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:a8c3a47cd63381752397b5de256555aa09476c641ac59251b294d16ba60cbe44",
+          "at": "2026-07-22T04:31:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:342f262cdd1228a14456978b2bff46e9f8eaae3b96bdff180e2ed714d286f5f2",
+          "at": "2026-07-22T04:33:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e014889bd9e35e157a7f4c9a1b6077f6cc40e8d382acd4ae13b9ce88780d06a4",
+          "at": "2026-07-22T04:41:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e014889bd9e35e157a7f4c9a1b6077f6cc40e8d382acd4ae13b9ce88780d06a4",
+          "at": "2026-07-22T04:44:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7cb7bc88607283c15904465a4000f8c39c9148bd8635c9f120490e028eb7b4b",
+          "at": "2026-07-22T04:52:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7cb7bc88607283c15904465a4000f8c39c9148bd8635c9f120490e028eb7b4b",
+          "at": "2026-07-22T04:54:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T5 description restates upstream behavior (“confirms direct-upstream convergence evidence after routing and before every re-entry writer dispatch, then includes that evidence in the writer briefing”) instead of using only target + operation + anchor cites. Shorten to the target file, operation, and IN-02/AC-05/AC-06 anchors; see `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 29,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:2137015484ce835460ef0e13cb9e5c6976b9b3bd9c73cb24a88d7b9964f14907",
+          "at": "2026-07-22T05:22:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e62a0f0c79e0cb27c0aca88c79fc3ff00384ef176f629cc3c9cafd40e7106427",
+          "at": "2026-07-22T05:23:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e62a0f0c79e0cb27c0aca88c79fc3ff00384ef176f629cc3c9cafd40e7106427",
+          "at": "2026-07-22T05:26:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee22cc91faa3eea03cb8cd5797f90bd6e0514aa7bfe384867f6739d2348a5e19",
+          "at": "2026-07-22T05:36:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee22cc91faa3eea03cb8cd5797f90bd6e0514aa7bfe384867f6739d2348a5e19",
+          "at": "2026-07-22T05:39:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T6 description restates the upstream behavior contract (“each downstream writer re-dispatch follows the edited direct upstream's required convergence evidence, including its scope review”) instead of limiting the description to target + operation + anchor cite. Remove the behavioral prose and retain the file/symbol, operation, and spec-element references.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 40,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:c1ee6ea65fa728a6f17457e4842a32d539e28d431485efed9801b34090a5e9d5",
+          "at": "2026-07-22T07:09:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce9095c5c333028654a54efb901a7735815345133a6ddb0933b66888ae606e40",
+          "at": "2026-07-22T07:11:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce9095c5c333028654a54efb901a7735815345133a6ddb0933b66888ae606e40",
+          "at": "2026-07-22T07:14:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T7 restates AC-06’s behavioral contract in prose: the single-scope fast-to-final lifecycle, Step 3 briefing reuse, provider-neutral wrapper reuse, and exclusion of the all-scope wave are all repeated here. Per `knowledge/conventions/no-upstream-restatement.md`, reduce this to target + operation + anchor cites and leave those behavioral details in the spec.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 41,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `single-scope-review-reentry` again restates AC-06 by describing fast-to-final re-convergence and avoidance of the all-scope wave. Replace this sentence-level behavior with a concise target/operation phrase plus the existing anchor cites, as required by `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 87,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:a053649b52baafaace8694f8f58af1e93f5290e48f5727a6e80632afc1769a98",
+          "at": "2026-07-22T07:50:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c989f81025088e27793435081bca827717993a07e7bda5832dede61bdc200af8",
+          "at": "2026-07-22T07:53:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8953811561ef51dbed5461b3a58b861bab1bda8cc932d10d88eae7b98dcafe6d",
+          "at": "2026-07-22T07:57:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8953811561ef51dbed5461b3a58b861bab1bda8cc932d10d88eae7b98dcafe6d",
+          "at": "2026-07-22T07:59:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `convention` plan section description restates upstream behavior/rationale: “including the admitted `adr_user` two-element exemption and deferred-verification rule.” Keep the section description to target + operation + anchor cites; cite `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 57,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:7d6dd641cb4b44cd4fa4a8975e4a9254dd4d498f3f9a9d8404342e1dc202cc47",
+          "at": "2026-07-22T08:59:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4305d7262ee057c174d4ad7848607efe92217d1e8a272893b4c6454a7ff3a1f0",
+          "at": "2026-07-22T09:00:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4305d7262ee057c174d4ad7848607efe92217d1e8a272893b4c6454a7ff3a1f0",
+          "at": "2026-07-22T09:04:24Z"
         }
       ]
     }
