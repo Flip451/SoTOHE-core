@@ -203,6 +203,51 @@ impl DryCheckApprovedDriverService for DryCheckApprovedDriverInteractor {
     }
 }
 
+// ── FeatureDisabledDryGateInteractor ─────────────────────────────────────────
+
+/// Lightweight `dry check-approved` service for binaries without `semantic-dup`.
+///
+/// It resolves the repository and reads the DRY configuration before deciding
+/// whether the omitted semantic-dup implementation is needed. A disabled gate
+/// therefore succeeds without constructing or invoking any semantic-dup
+/// component; an enabled gate fails closed with an actionable feature message.
+pub struct FeatureDisabledDryGateInteractor {
+    repo_root: Arc<dyn DryRepoRootPort>,
+    config_loader: Arc<dyn DryCheckConfigLoaderPort>,
+}
+
+impl FeatureDisabledDryGateInteractor {
+    /// Construct the lightweight feature-disabled gate interactor.
+    #[must_use]
+    pub fn new(
+        repo_root: Arc<dyn DryRepoRootPort>,
+        config_loader: Arc<dyn DryCheckConfigLoaderPort>,
+    ) -> Self {
+        Self { repo_root, config_loader }
+    }
+}
+
+impl DryCheckApprovedDriverService for FeatureDisabledDryGateInteractor {
+    fn dry_check_approved(&self, input: DryCheckApprovedDriverInput) -> DryCheckApprovedOutcome {
+        let workspace = match self.repo_root.resolve(&input.items_dir) {
+            Ok(workspace) => workspace,
+            Err(error) => return DryCheckApprovedOutcome::Failure { message: error.to_string() },
+        };
+        let (config, _) = match self.config_loader.load(&workspace.repo_root) {
+            Ok(config) => config,
+            Err(error) => return DryCheckApprovedOutcome::Failure { message: error.to_string() },
+        };
+
+        if !config.enabled {
+            return DryCheckApprovedOutcome::Approved;
+        }
+
+        DryCheckApprovedOutcome::Failure {
+            message: "dry check-approved requires the disabled `semantic-dup` feature while the DRY gate is enabled; rebuild sotp with `--features semantic-dup`".to_owned(),
+        }
+    }
+}
+
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
@@ -445,6 +490,15 @@ mod tests {
         )
     }
 
+    fn make_feature_disabled_interactor(enabled: bool) -> FeatureDisabledDryGateInteractor {
+        FeatureDisabledDryGateInteractor::new(
+            Arc::new(StubRepoRoot { result: Ok(make_workspace()) }),
+            Arc::new(StubConfigLoader {
+                result: Ok((test_dry_config(enabled), make_config_fingerprint())),
+            }),
+        )
+    }
+
     fn empty_pipeline_output() -> DryFragmentPipelineOutput {
         DryFragmentPipelineOutput {
             fragment_refs: BTreeSet::new(),
@@ -472,6 +526,26 @@ mod tests {
             matches!(outcome, DryCheckApprovedOutcome::Approved),
             "disabled config must short-circuit to Approved, got {outcome:?}"
         );
+    }
+
+    #[test]
+    fn feature_disabled_gate_disabled_config_returns_approved_without_semantic_work() {
+        let outcome = make_feature_disabled_interactor(false).dry_check_approved(make_input());
+
+        assert!(matches!(outcome, DryCheckApprovedOutcome::Approved));
+    }
+
+    #[test]
+    fn feature_disabled_gate_enabled_config_returns_actionable_failure() {
+        let outcome = make_feature_disabled_interactor(true).dry_check_approved(make_input());
+
+        match outcome {
+            DryCheckApprovedOutcome::Failure { message } => {
+                assert!(message.contains("semantic-dup"));
+                assert!(message.contains("enabled"));
+            }
+            other => panic!("enabled feature-off gate must fail closed, got {other:?}"),
+        }
     }
 
     // ── corpus_meta error absorbed into fallback ────────────────────────────

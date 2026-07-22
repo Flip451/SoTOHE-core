@@ -1,0 +1,729 @@
+{
+  "crate_name": "cli",
+  "functions": {
+    "cli::commands::dry::execute_dry_check_approved": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "cli::commands::dry::execute_dry_fix_local": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "cli::commands::dry::execute_dry_results": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "cli::commands::dry::execute_dry_write": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "cli::commands::maintenance::execute": {
+      "action": "add",
+      "docs": "Disk-maintenance CLI dispatcher.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "command",
+          "ty": "MaintenanceCommand"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "cli::commands::semantic_dup_feature_gate::semantic_dup_feature_disabled_exit": {
+      "action": "add",
+      "docs": "Feature-disabled CLI response helper.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "command_family",
+          "ty": "SemanticDupCommandFamily"
+        }
+      ],
+      "returns": "std::process::ExitCode",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "cli",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "CliCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "reference",
+      "for_type": "CliCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "action": "reference",
+      "for_type": "VerdictFilterArg",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "VerdictFilterArg",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "VerdictFilterArg",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "action": "reference",
+      "for_type": "VerdictFilterArg",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "VerdictFilterArg",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "VerdictFilterArg",
+      "trait_ref": "clap_builder::derive::ValueEnum"
+    },
+    {
+      "for_type": "MaintenanceCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "MaintenanceCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "for_type": "MaintenanceCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "for_type": "ProjectRootArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ProjectRootArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "for_type": "ProjectRootArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "for_type": "CleanupArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CleanupArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "for_type": "CleanupArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CleanupArgs": {
+      "action": "add",
+      "docs": "CLI arguments selecting the project root and syntactic `--apply` flag; dispatch maps the flag to either the query-only cleanup-plan input or the command-only apply-cleanup input.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "project_root",
+              "ty": "ProjectRootArgs"
+            },
+            {
+              "name": "apply",
+              "ty": "bool"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::maintenance",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "CliCommand": {
+      "action": "modify",
+      "docs": "Top-level CLI command enum extended with the configurable disk-maintenance command group.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Arch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "ArchCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "AdrBaseline",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "AdrBaselineCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Conventions",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "ConventionsCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Domain",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "DomainCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Guard",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "GuardCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Hook",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "HookCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Maintenance",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "MaintenanceCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Track",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TrackCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Git",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "GitCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Pr",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "PrCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Capability",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "CapabilityCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Review",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "ReviewCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "File",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "FileCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Verify",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "VerifyCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "FindSimilar",
+            "payload": {
+              "fields": [
+                "FindSimilarArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DupIndex",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "DupIndexCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DupCheck",
+            "payload": {
+              "fields": [
+                "DupCheckArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Telemetry",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TelemetryCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Dry",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "DryCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "RefVerify",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "RefVerifyCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TestObligation",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TestObligationSubcommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Signal",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "SignalCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TaskContract",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TaskContractCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Catalog",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "CatalogCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CatalogueLint",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "CatalogueLintCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Template",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "TemplateCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CodexRuntime",
+            "payload": {
+              "fields": [
+                {
+                  "name": "cmd",
+                  "ty": "CodexRuntimeCommand"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "MaintenanceCommand": {
+      "action": "add",
+      "docs": "CLI subcommands for applying the configured sccache limit and planning or applying cleanup.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ConfigureSccache",
+            "payload": {
+              "fields": [
+                "ProjectRootArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Cleanup",
+            "payload": {
+              "fields": [
+                "CleanupArgs"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::maintenance",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "ProjectRootArgs": {
+      "action": "add",
+      "docs": "Shared CLI argument identifying the repository root containing disk-maintenance configuration; PathBuf is an unconstrained technical filesystem location rather than a validated domain concept.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::maintenance",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "SemanticDupCommandFamily": {
+      "action": "add",
+      "docs": "Feature-gated CLI command selector; name() supplies a presentation-only label.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "DryWrite",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DryResults",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DryFixLocal",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SemanticDuplicate",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&'static str",
+          "where_predicates": []
+        }
+      ],
+      "module_path": "commands::semantic_dup_feature_gate",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "VerdictFilterArg": {
+      "action": "modify",
+      "docs": "DRY-results verdict filter argument retained for command registration while its semantic-dup conversion method is feature-gated.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "All",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "NotAViolation",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Accepted",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Violation",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::dry",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    }
+  }
+}

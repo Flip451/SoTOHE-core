@@ -1,0 +1,7 @@
+[cache]
+# Passed to sccache through `.cache/sccache.env`; change for the local disk budget.
+max_size = "10G"
+
+[cleanup]
+# The roots remain in place; `maintenance cleanup --apply` removes their contents only.
+scopes = ["target", ".cache"]

@@ -12,10 +12,20 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand, ValueEnum};
+#[cfg(feature = "semantic-dup")]
 use cli_composition::DryCompositionRoot;
+#[cfg(not(feature = "semantic-dup"))]
+use cli_composition::FeatureDisabledDryGateCompositionRoot;
+#[cfg(not(feature = "semantic-dup"))]
+use cli_driver::dry::DryCheckApprovedDriverInput;
+#[cfg(feature = "semantic-dup")]
 use cli_driver::dry::DryInput;
 
 use crate::commands::driver_outcome_to_exit;
+#[cfg(not(feature = "semantic-dup"))]
+use crate::commands::semantic_dup_feature_gate::{
+    SemanticDupCommandFamily, semantic_dup_feature_disabled_exit,
+};
 
 // ── sotp dry ──────────────────────────────────────────────────────────────────
 
@@ -84,6 +94,7 @@ pub struct DryWriteArgs {
 }
 
 /// Execute `sotp dry write`.
+#[cfg(feature = "semantic-dup")]
 pub fn execute_dry_write(args: DryWriteArgs) -> ExitCode {
     driver_outcome_to_exit(DryCompositionRoot::new().dry_driver().handle(DryInput::Write {
         track_id: args.track_id,
@@ -118,6 +129,7 @@ pub enum VerdictFilterArg {
 
 impl VerdictFilterArg {
     /// Convert to the canonical string expected by `DryResultsInput.filter`.
+    #[cfg(feature = "semantic-dup")]
     pub fn as_filter_str(self) -> &'static str {
         match self {
             VerdictFilterArg::All => "all",
@@ -147,6 +159,7 @@ pub struct DryResultsArgs {
 /// Execute `sotp dry results`.
 ///
 /// INFORMATIONAL — always exits 0 on successful read.
+#[cfg(feature = "semantic-dup")]
 pub fn execute_dry_results(args: DryResultsArgs) -> ExitCode {
     driver_outcome_to_exit(DryCompositionRoot::new().dry_driver().handle(DryInput::Results {
         track_id: args.track_id,
@@ -181,50 +194,6 @@ pub struct DryCheckApprovedArgs {
     pub items_dir: PathBuf,
 }
 
-/// Execute `sotp dry check-approved`.
-///
-/// Exits 0 on Approved; exits non-zero on Blocked.
-///
-/// Measures the driver call's wall-clock duration and emits a `GateEval`
-/// telemetry event for the `"dry"` gate — mirroring
-/// `main.rs::execute_verify_with_telemetry`. Timing measurement and the
-/// telemetry emit call are a bin-layer (thin-bin I/O) responsibility, not a
-/// `cli_driver` one: `cli_driver::dry::DryDriver` stays a pure invoke+render
-/// controller.
-pub fn execute_dry_check_approved(args: DryCheckApprovedArgs) -> ExitCode {
-    use cli_composition::telemetry_wiring::{emit_gate_eval, resolve_telemetry_writer};
-    use std::time::Instant;
-
-    // WRITE semantics: `--track-id A` on `track/B` fails BranchMismatch before
-    // any work (mirrors `resolve_track_id_for_write` usage in transition /
-    // views-sync / etc.). This guarantees telemetry is written under the same
-    // track the gate evaluates.
-    let track_id =
-        match crate::commands::track::resolve_track_id_for_write(args.track_id, &args.items_dir) {
-            Ok(id) => id,
-            Err(msg) => {
-                eprintln!("{msg}");
-                return ExitCode::FAILURE;
-            }
-        };
-
-    let telemetry = resolve_telemetry_writer(&args.items_dir);
-    let start = Instant::now();
-    let outcome = DryCompositionRoot::new().dry_driver().handle(DryInput::CheckApproved {
-        track_id,
-        base_commit: args.base_commit,
-        items_dir: args.items_dir,
-    });
-
-    if let Some((ref w, ref tid)) = telemetry {
-        let verdict_str = if outcome.exit_code == 0 { "ok" } else { "error" };
-        let reason_summary = outcome.stderr.as_deref().unwrap_or("").to_owned();
-        emit_gate_eval(w, tid, "dry", verdict_str, &reason_summary, start);
-    }
-
-    driver_outcome_to_exit(outcome)
-}
-
 // ── sotp dry fix-local ────────────────────────────────────────────────────────
 
 /// Arguments for `sotp dry fix-local`.
@@ -251,6 +220,7 @@ pub struct DryFixLocalArgs {
 /// `sotp dry write` → fix → `sotp dry check-approved` loop until
 /// the DRY gate passes, the loop is exhausted, or a tooling error occurs.
 /// Emits exactly one of: `completed`, `blocked`, or `failed`.
+#[cfg(feature = "semantic-dup")]
 pub fn execute_dry_fix_local(args: DryFixLocalArgs) -> ExitCode {
     driver_outcome_to_exit(DryCompositionRoot::new().dry_driver().handle(DryInput::FixLocal {
         track_id: args.track_id,
@@ -264,10 +234,79 @@ pub fn execute_dry_fix_local(args: DryFixLocalArgs) -> ExitCode {
 /// Execute `sotp dry <subcommand>`.
 pub fn execute(cmd: DryCommand) -> ExitCode {
     match cmd {
+        DryCommand::CheckApproved(args) => {
+            let track_id = match crate::commands::track::resolve_track_id_for_write(
+                args.track_id.clone(),
+                &args.items_dir,
+            ) {
+                Ok(id) => id,
+                Err(msg) => {
+                    eprintln!("{msg}");
+                    return ExitCode::FAILURE;
+                }
+            };
+
+            #[cfg(not(feature = "semantic-dup"))]
+            {
+                driver_outcome_to_exit(
+                    FeatureDisabledDryGateCompositionRoot::new().driver().handle(
+                        DryCheckApprovedDriverInput {
+                            track_id,
+                            base_commit: args.base_commit,
+                            items_dir: args.items_dir,
+                        },
+                    ),
+                )
+            }
+
+            #[cfg(feature = "semantic-dup")]
+            {
+                use cli_composition::telemetry_wiring::{emit_gate_eval, resolve_telemetry_writer};
+                use std::time::Instant;
+
+                let telemetry = resolve_telemetry_writer(&args.items_dir);
+                let start = Instant::now();
+                let outcome =
+                    DryCompositionRoot::new().dry_driver().handle(DryInput::CheckApproved {
+                        track_id,
+                        base_commit: args.base_commit,
+                        items_dir: args.items_dir,
+                    });
+
+                if let Some((ref writer, ref telemetry_track_id)) = telemetry {
+                    let verdict_str = if outcome.exit_code == 0 { "ok" } else { "error" };
+                    let reason_summary = outcome.stderr.as_deref().unwrap_or("").to_owned();
+                    emit_gate_eval(
+                        writer,
+                        telemetry_track_id,
+                        "dry",
+                        verdict_str,
+                        &reason_summary,
+                        start,
+                    );
+                }
+
+                driver_outcome_to_exit(outcome)
+            }
+        }
+        #[cfg(feature = "semantic-dup")]
         DryCommand::Write(args) => execute_dry_write(args),
+        #[cfg(feature = "semantic-dup")]
         DryCommand::Results(args) => execute_dry_results(args),
-        DryCommand::CheckApproved(args) => execute_dry_check_approved(args),
+        #[cfg(feature = "semantic-dup")]
         DryCommand::FixLocal(args) => execute_dry_fix_local(args),
+        #[cfg(not(feature = "semantic-dup"))]
+        DryCommand::Write(_) => {
+            semantic_dup_feature_disabled_exit(SemanticDupCommandFamily::DryWrite)
+        }
+        #[cfg(not(feature = "semantic-dup"))]
+        DryCommand::Results(_) => {
+            semantic_dup_feature_disabled_exit(SemanticDupCommandFamily::DryResults)
+        }
+        #[cfg(not(feature = "semantic-dup"))]
+        DryCommand::FixLocal(_) => {
+            semantic_dup_feature_disabled_exit(SemanticDupCommandFamily::DryFixLocal)
+        }
     }
 }
 
@@ -279,6 +318,13 @@ mod tests {
     use clap::Parser;
 
     use super::*;
+
+    #[cfg(not(feature = "semantic-dup"))]
+    use crate::commands::semantic_dup::{FindSimilarArgs, execute_find_similar};
+    #[cfg(not(feature = "semantic-dup"))]
+    use crate::commands::track::test_support::{
+        create_track_dir, process_env_lock, run_in_dir, seed_repo,
+    };
 
     // ── Arg-parsing wrapper ───────────────────────────────────────────────────
 
@@ -466,6 +512,115 @@ mod tests {
         }
     }
 
+    #[cfg(not(feature = "semantic-dup"))]
+    fn assert_feature_disabled_command(run: impl FnOnce() -> std::process::ExitCode) {
+        let exit = run();
+        assert_eq!(exit, std::process::ExitCode::FAILURE);
+    }
+
+    #[cfg(not(feature = "semantic-dup"))]
+    #[test]
+    fn test_feature_disabled_execution_commands_fail_closed_with_actionable_message() {
+        let _guard = process_env_lock().lock().unwrap();
+
+        assert_feature_disabled_command(|| {
+            execute(DryCommand::Write(DryWriteArgs {
+                track_id: "test-track".to_owned(),
+                base_commit: None,
+                db_path: PathBuf::from(".semantic_index"),
+                threshold: None,
+                workspace_root: PathBuf::from("."),
+                items_dir: PathBuf::from("track/items"),
+                model: None,
+                capability_name: "dry-checker".to_owned(),
+            }))
+        });
+        assert_feature_disabled_command(|| {
+            execute(DryCommand::Results(DryResultsArgs {
+                track_id: "test-track".to_owned(),
+                filter: VerdictFilterArg::All,
+                items_dir: PathBuf::from("track/items"),
+            }))
+        });
+        assert_feature_disabled_command(|| {
+            execute(DryCommand::FixLocal(DryFixLocalArgs {
+                track_id: "test-track".to_owned(),
+                briefing_file: PathBuf::from("tmp/briefing.md"),
+                model: None,
+            }))
+        });
+        assert_feature_disabled_command(|| {
+            execute_find_similar(FindSimilarArgs {
+                fragment: Some("fn duplicate() {}".to_owned()),
+                file: None,
+                top_k: 5,
+                db_path: PathBuf::from(".semantic_index"),
+            })
+        });
+    }
+
+    #[cfg(not(feature = "semantic-dup"))]
+    fn write_feature_off_dry_config(root: &std::path::Path, enabled: bool) {
+        let config_dir = root.join(".harness/config");
+        std::fs::create_dir_all(&config_dir).unwrap();
+        std::fs::write(
+            config_dir.join("dry-check.json"),
+            format!(
+                r#"{{
+  "schema_version": 4,
+  "enabled": {enabled},
+  "threshold": 0.85,
+  "max_parallelism": 4,
+  "known_bad_injection_rate_percent": 10,
+  "known_bad_detection_threshold_percent": 90
+}}"#
+            ),
+        )
+        .unwrap();
+    }
+
+    #[cfg(not(feature = "semantic-dup"))]
+    #[test]
+    fn test_feature_disabled_dry_check_approved_succeeds_when_gate_is_disabled() {
+        let _guard = process_env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = "feature-off-dry-gate";
+        seed_repo(dir.path(), &format!("track/{track_id}"));
+        create_track_dir(dir.path(), track_id);
+        write_feature_off_dry_config(dir.path(), false);
+
+        let exit = run_in_dir(dir.path(), || {
+            execute(DryCommand::CheckApproved(DryCheckApprovedArgs {
+                track_id: Some(track_id.to_owned()),
+                base_commit: None,
+                items_dir: PathBuf::from("track/items"),
+            }))
+        });
+
+        assert_eq!(exit, std::process::ExitCode::SUCCESS);
+    }
+
+    #[cfg(not(feature = "semantic-dup"))]
+    #[test]
+    fn test_feature_disabled_dry_check_approved_fails_closed_when_gate_is_enabled() {
+        let _guard = process_env_lock().lock().unwrap();
+        let dir = tempfile::tempdir().unwrap();
+        let track_id = "feature-off-dry-gate";
+        seed_repo(dir.path(), &format!("track/{track_id}"));
+        create_track_dir(dir.path(), track_id);
+        write_feature_off_dry_config(dir.path(), true);
+
+        let exit = run_in_dir(dir.path(), || {
+            execute(DryCommand::CheckApproved(DryCheckApprovedArgs {
+                track_id: Some(track_id.to_owned()),
+                base_commit: None,
+                items_dir: PathBuf::from("track/items"),
+            }))
+        });
+
+        assert_eq!(exit, std::process::ExitCode::FAILURE);
+    }
+
     // ── sotp dry check-approved: telemetry wiring (bin-level GateEval emit) ──
     //
     // Timing measurement and `GateEval` telemetry emission for `dry
@@ -477,6 +632,7 @@ mod tests {
     // that used to cover `DryGateEvalTelemetryAdapter`.
 
     #[test]
+    #[cfg(feature = "semantic-dup")]
     fn test_execute_dry_check_approved_emits_gate_eval_telemetry_on_track_branch() {
         use crate::commands::track::test_support::{process_env_lock, run_in_dir, seed_repo};
 
@@ -492,11 +648,11 @@ mod tests {
         // override it here so this test exercises the enabled path.
         temp_env::with_vars([("SOTP_TELEMETRY", Some("1")), ("SOTP_TELEMETRY_DIR", None)], || {
             run_in_dir(root, || {
-                execute_dry_check_approved(DryCheckApprovedArgs {
+                execute(DryCommand::CheckApproved(DryCheckApprovedArgs {
                     track_id: None,
                     base_commit: None,
                     items_dir: PathBuf::from("track/items"),
-                });
+                }));
             });
         });
 
@@ -519,6 +675,7 @@ mod tests {
     // ── VerdictFilterArg → filter string conversion ───────────────────────────
 
     #[test]
+    #[cfg(feature = "semantic-dup")]
     fn test_verdict_filter_arg_converts_to_filter_string() {
         assert_eq!(VerdictFilterArg::All.as_filter_str(), "all");
         assert_eq!(VerdictFilterArg::NotAViolation.as_filter_str(), "not-a-violation");
@@ -597,6 +754,7 @@ mod tests {
     /// and produces the expected downstream filter string.  This covers all four
     /// variants end-to-end through clap parsing + `as_filter_str()`.
     #[test]
+    #[cfg(feature = "semantic-dup")]
     fn test_dry_results_filter_all_valid_tokens_round_trip() {
         let cases: &[(&str, VerdictFilterArg, &str)] = &[
             ("all", VerdictFilterArg::All, "all"),

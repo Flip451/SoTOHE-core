@@ -18,15 +18,19 @@ mod codex_runtime;
 mod conventions;
 mod demo;
 mod domain;
+#[cfg(feature = "semantic-dup")]
 pub mod dry;
+mod dry_gate;
 pub mod error;
 mod file;
 mod git;
 mod guard;
 mod hook;
+mod maintenance;
 mod pr;
 mod ref_verify;
 pub mod review_v2;
+#[cfg(feature = "semantic-dup")]
 mod semantic_dup;
 pub mod signal;
 mod signal_layer_chain;
@@ -37,6 +41,7 @@ mod test_obligation;
 pub mod track;
 pub mod verify;
 
+#[cfg(feature = "semantic-dup")]
 pub(crate) mod semantic_dup_driver_adapter;
 
 /// Telemetry wiring for the composition root.
@@ -61,6 +66,7 @@ pub use review_v2::{
     ReviewResultsInput, ReviewRunClaudeInput, ReviewRunCodexInput, ReviewRunLocalInput,
     RunReviewFixLocalInput,
 };
+#[cfg(feature = "semantic-dup")]
 pub use semantic_dup::{
     DupCheckInput, DupIndexBuildInput, DupIndexMeasureQualityInput, FindSimilarInput,
 };
@@ -79,14 +85,18 @@ pub use codex_runtime::CodexRuntimeCompositionRoot;
 pub use conventions::ConventionsCompositionRoot;
 pub use demo::DemoCompositionRoot;
 pub use domain::DomainCompositionRoot;
+#[cfg(feature = "semantic-dup")]
 pub use dry::DryCompositionRoot;
+pub use dry_gate::FeatureDisabledDryGateCompositionRoot;
 pub use file::FileCompositionRoot;
 pub use git::GitCompositionRoot;
 pub use guard::GuardCompositionRoot;
 pub use hook::HookCompositionRoot;
+pub use maintenance::MaintenanceCompositionRoot;
 pub use pr::PrCompositionRoot;
 pub use ref_verify::RefVerifyCompositionRoot;
 pub use review_v2::ReviewCompositionRoot;
+#[cfg(feature = "semantic-dup")]
 pub use semantic_dup::SemanticDupCompositionRoot;
 pub use signal::SignalCompositionRoot;
 pub use task_contract::TaskContractCompositionRoot;

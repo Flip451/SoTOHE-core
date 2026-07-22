@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "disk-footprint-and-dry-feature-gating-2026-07-20",
+  "title": "ビルド成果物によるディスク圧迫の解消と dry gate 重量依存の feature flag 化",
+  "branch": "track/disk-footprint-and-dry-feature-gating-2026-07-20",
+  "created_at": "2026-07-20T16:23:59Z",
+  "updated_at": "2026-07-20T16:23:59Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

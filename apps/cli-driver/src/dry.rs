@@ -20,9 +20,10 @@ use std::path::PathBuf;
 use std::sync::Arc;
 
 use usecase::dry_check_approved_driver::DryCheckApprovedDriverService;
+pub use usecase::dry_driver::DryCheckApprovedDriverInput;
 use usecase::dry_driver::{
-    DryCheckApprovedDriverInput, DryCheckApprovedOutcome, DryDriverOutcome, DryDriverService,
-    DryFixLocalDriverInput, DryResultsDriverInput, DryWriteDriverInput, DryWriteOutcome,
+    DryCheckApprovedOutcome, DryDriverOutcome, DryDriverService, DryFixLocalDriverInput,
+    DryResultsDriverInput, DryWriteDriverInput, DryWriteOutcome,
 };
 use usecase::dry_results_driver::{
     DryResultsDriverService, DryResultsOutcome, DryResultsVerdictSummary,
@@ -207,6 +208,28 @@ impl DryDriver {
     }
 }
 
+/// Primary adapter for the feature-disabled `dry check-approved` gate path.
+///
+/// It owns exactly one application service and renders only the check-approved
+/// outcome, so no direct semantic-dup command can enter through this driver.
+pub struct FeatureDisabledDryGateDriver {
+    service: Arc<dyn DryCheckApprovedDriverService>,
+}
+
+impl FeatureDisabledDryGateDriver {
+    /// Construct a driver for the feature-disabled check-approved service.
+    #[must_use]
+    pub fn new(service: Arc<dyn DryCheckApprovedDriverService>) -> Self {
+        Self { service }
+    }
+
+    /// Evaluate and render the feature-disabled check-approved gate.
+    #[must_use]
+    pub fn handle(&self, input: DryCheckApprovedDriverInput) -> CommandOutcome {
+        render_dry_check_approved_outcome(self.service.dry_check_approved(input))
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Conversion helper
 // ---------------------------------------------------------------------------
@@ -325,6 +348,51 @@ mod tests {
     use usecase::dry_results_driver::DryResultsRecordSummary;
 
     use super::*;
+
+    struct StubCheckApprovedService {
+        outcome: DryCheckApprovedOutcome,
+    }
+
+    impl DryCheckApprovedDriverService for StubCheckApprovedService {
+        fn dry_check_approved(
+            &self,
+            _input: DryCheckApprovedDriverInput,
+        ) -> DryCheckApprovedOutcome {
+            self.outcome.clone()
+        }
+    }
+
+    #[test]
+    fn test_feature_disabled_gate_driver_renders_approved_as_success() {
+        let driver = FeatureDisabledDryGateDriver::new(Arc::new(StubCheckApprovedService {
+            outcome: DryCheckApprovedOutcome::Approved,
+        }));
+
+        let outcome = driver.handle(DryCheckApprovedDriverInput {
+            track_id: "test-track".to_owned(),
+            base_commit: None,
+            items_dir: PathBuf::from("track/items"),
+        });
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(outcome.stdout.is_some());
+    }
+
+    #[test]
+    fn test_feature_disabled_gate_driver_renders_failure_as_non_success() {
+        let driver = FeatureDisabledDryGateDriver::new(Arc::new(StubCheckApprovedService {
+            outcome: DryCheckApprovedOutcome::Failure { message: "feature disabled".to_owned() },
+        }));
+
+        let outcome = driver.handle(DryCheckApprovedDriverInput {
+            track_id: "test-track".to_owned(),
+            base_commit: None,
+            items_dir: PathBuf::from("track/items"),
+        });
+
+        assert_eq!(outcome.exit_code, 1);
+        assert_eq!(outcome.stderr.as_deref(), Some("feature disabled"));
+    }
 
     #[test]
     fn test_dry_write_outcome_reports_checked_and_appended_counts() {

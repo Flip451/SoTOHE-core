@@ -1,0 +1,534 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "104973c76d1824affcabf3e40b05063770f8799b40145b82e90cedc7c02f5538",
+      "evidence_hash": "432380eb93c60222854fd2f38664996bf1089f1c456ea55ca69a3394e994f38e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sccache のサイズ上限"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CacheSize"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。上限値と掃除対象範囲は `.harness/config/` 配下の既定値を持つ設定ファイルで利用者が変更できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "104973c76d1824affcabf3e40b05063770f8799b40145b82e90cedc7c02f5538",
+      "evidence_hash": "e04faadc2c92ed6cc3c4a76c04db5f58cebc10d461b93b98c0aecb7f06fce8a7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定された sccache サイズ上限が利用され"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CacheSize"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "104973c76d1824affcabf3e40b05063770f8799b40145b82e90cedc7c02f5538",
+      "evidence_hash": "0365ca8a4ddac5400fdb42414c933da84e463118b6bd8883c674e296a1d5f5c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "キャッシュ上限と掃除対象範囲には設定ファイル内の既定値があり、利用者は同設定ファイルを通じて環境に応じた値へ変更できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CacheSize"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "キャッシュ上限と掃除対象範囲には設定ファイル内の既定値があり、利用者は同設定ファイルを通じて環境に応じた値へ変更できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "acfade3844e477b2254260e5326d7d2f15c9f0648c87ec17711c380a25368552",
+      "evidence_hash": "432380eb93c60222854fd2f38664996bf1089f1c456ea55ca69a3394e994f38e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CleanupExecutionMode"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。上限値と掃除対象範囲は `.harness/config/` 配下の既定値を持つ設定ファイルで利用者が変更できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "acfade3844e477b2254260e5326d7d2f15c9f0648c87ec17711c380a25368552",
+      "evidence_hash": "e04faadc2c92ed6cc3c4a76c04db5f58cebc10d461b93b98c0aecb7f06fce8a7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CleanupExecutionMode"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6c7bfee4030a5f8f930ca4e2483f5ca9a39069cb8adde6132ef4ccefce750df6",
+      "evidence_hash": "432380eb93c60222854fd2f38664996bf1089f1c456ea55ca69a3394e994f38e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CleanupScope"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。上限値と掃除対象範囲は `.harness/config/` 配下の既定値を持つ設定ファイルで利用者が変更できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6c7bfee4030a5f8f930ca4e2483f5ca9a39069cb8adde6132ef4ccefce750df6",
+      "evidence_hash": "e04faadc2c92ed6cc3c4a76c04db5f58cebc10d461b93b98c0aecb7f06fce8a7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CleanupScope"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6c7bfee4030a5f8f930ca4e2483f5ca9a39069cb8adde6132ef4ccefce750df6",
+      "evidence_hash": "0365ca8a4ddac5400fdb42414c933da84e463118b6bd8883c674e296a1d5f5c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "キャッシュ上限と掃除対象範囲には設定ファイル内の既定値があり、利用者は同設定ファイルを通じて環境に応じた値へ変更できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CleanupScope"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "キャッシュ上限と掃除対象範囲には設定ファイル内の既定値があり、利用者は同設定ファイルを通じて環境に応じた値へ変更できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2a3b092241a3931827d647ceb18c06206fca59e4597ea0e51b8b1774e8b4f840",
+      "evidence_hash": "432380eb93c60222854fd2f38664996bf1089f1c456ea55ca69a3394e994f38e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CleanupScopeSet"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。上限値と掃除対象範囲は `.harness/config/` 配下の既定値を持つ設定ファイルで利用者が変更できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2a3b092241a3931827d647ceb18c06206fca59e4597ea0e51b8b1774e8b4f840",
+      "evidence_hash": "e04faadc2c92ed6cc3c4a76c04db5f58cebc10d461b93b98c0aecb7f06fce8a7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CleanupScopeSet"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2a3b092241a3931827d647ceb18c06206fca59e4597ea0e51b8b1774e8b4f840",
+      "evidence_hash": "0365ca8a4ddac5400fdb42414c933da84e463118b6bd8883c674e296a1d5f5c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "キャッシュ上限と掃除対象範囲には設定ファイル内の既定値があり、利用者は同設定ファイルを通じて環境に応じた値へ変更できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CleanupScopeSet"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "キャッシュ上限と掃除対象範囲には設定ファイル内の既定値があり、利用者は同設定ファイルを通じて環境に応じた値へ変更できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a66c55577789532128a910023545859f010c61a276206c189a0050d8f1fce8c5",
+      "evidence_hash": "432380eb93c60222854fd2f38664996bf1089f1c456ea55ca69a3394e994f38e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。上限値と掃除対象範囲は `.harness/config/` 配下の既定値を持つ設定ファイルで利用者が変更できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DiskMaintenanceConfig"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。上限値と掃除対象範囲は `.harness/config/` 配下の既定値を持つ設定ファイルで利用者が変更できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a66c55577789532128a910023545859f010c61a276206c189a0050d8f1fce8c5",
+      "evidence_hash": "e04faadc2c92ed6cc3c4a76c04db5f58cebc10d461b93b98c0aecb7f06fce8a7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DiskMaintenanceConfig"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a66c55577789532128a910023545859f010c61a276206c189a0050d8f1fce8c5",
+      "evidence_hash": "0365ca8a4ddac5400fdb42414c933da84e463118b6bd8883c674e296a1d5f5c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "キャッシュ上限と掃除対象範囲には設定ファイル内の既定値があり、利用者は同設定ファイルを通じて環境に応じた値へ変更できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DiskMaintenanceConfig"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "キャッシュ上限と掃除対象範囲には設定ファイル内の既定値があり、利用者は同設定ファイルを通じて環境に応じた値へ変更できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d66fad8c08c778aac6c6f44f66f564f78ba657bc0f48596e67465cdd56165974",
+      "evidence_hash": "432380eb93c60222854fd2f38664996bf1089f1c456ea55ca69a3394e994f38e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DiskMaintenanceOperationDetail"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。上限値と掃除対象範囲は `.harness/config/` 配下の既定値を持つ設定ファイルで利用者が変更できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d66fad8c08c778aac6c6f44f66f564f78ba657bc0f48596e67465cdd56165974",
+      "evidence_hash": "e04faadc2c92ed6cc3c4a76c04db5f58cebc10d461b93b98c0aecb7f06fce8a7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DiskMaintenanceOperationDetail"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ccbffac15f4538aa6da24b1f2b5f6d063da9b772402f3e2c35dd797cc2a8e524",
+      "evidence_hash": "432380eb93c60222854fd2f38664996bf1089f1c456ea55ca69a3394e994f38e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DiskMaintenanceValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。上限値と掃除対象範囲は `.harness/config/` 配下の既定値を持つ設定ファイルで利用者が変更できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ccbffac15f4538aa6da24b1f2b5f6d063da9b772402f3e2c35dd797cc2a8e524",
+      "evidence_hash": "e04faadc2c92ed6cc3c4a76c04db5f58cebc10d461b93b98c0aecb7f06fce8a7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DiskMaintenanceValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ccbffac15f4538aa6da24b1f2b5f6d063da9b772402f3e2c35dd797cc2a8e524",
+      "evidence_hash": "0365ca8a4ddac5400fdb42414c933da84e463118b6bd8883c674e296a1d5f5c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "キャッシュ上限と掃除対象範囲には設定ファイル内の既定値があり、利用者は同設定ファイルを通じて環境に応じた値へ変更できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "DiskMaintenanceValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "キャッシュ上限と掃除対象範囲には設定ファイル内の既定値があり、利用者は同設定ファイルを通じて環境に応じた値へ変更できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f41e10665ec670e83cc4f42b95ab62bc10dd23ef8d04ad4258185ab7bc488980",
+      "evidence_hash": "432380eb93c60222854fd2f38664996bf1089f1c456ea55ca69a3394e994f38e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "上限値と掃除対象範囲は `.harness/config/` 配下の既定値を持つ設定ファイルで利用者が変更できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "InvalidDiskMaintenanceInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "sccache のサイズ上限と、`target/` および `.cache/` を掃除するメンテナンスタスクを機構化する。上限値と掃除対象範囲は `.harness/config/` 配下の既定値を持つ設定ファイルで利用者が変更できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f41e10665ec670e83cc4f42b95ab62bc10dd23ef8d04ad4258185ab7bc488980",
+      "evidence_hash": "e04faadc2c92ed6cc3c4a76c04db5f58cebc10d461b93b98c0aecb7f06fce8a7",
+      "verdict": {
+        "kind": "pass",
+        "citation": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "InvalidDiskMaintenanceInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "設定された sccache サイズ上限が利用され、メンテナンスタスクが設定された範囲の `target/` と `.cache/` を掃除できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f41e10665ec670e83cc4f42b95ab62bc10dd23ef8d04ad4258185ab7bc488980",
+      "evidence_hash": "0365ca8a4ddac5400fdb42414c933da84e463118b6bd8883c674e296a1d5f5c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "キャッシュ上限と掃除対象範囲には設定ファイル内の既定値があり、利用者は同設定ファイルを通じて環境に応じた値へ変更できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/domain-types.json",
+          "section_key": "types",
+          "entry_key": "InvalidDiskMaintenanceInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "キャッシュ上限と掃除対象範囲には設定ファイル内の既定値があり、利用者は同設定ファイルを通じて環境に応じた値へ変更できる。"
+        }
+      }
+    }
+  ]
+}

@@ -151,6 +151,10 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [remote sync 専用コマンドの新設と git 操作の hexagonal 是正 — switch と pull の分離、意味論 port への全面移管](2026-07-04-0155-git-sync-dedicated-command.md) | Proposed | 2026-07-04 |
 | [/track:adr2pr の呼び出し型を引数指定から文脈自動解決に戻す](2026-07-20-1508-adr2pr-argless-context-resolution.md) | Proposed | 2026-07-20 |
 | [SoT 再入の順次処理規律 — ルーティング後のフェーズ収束 Prerequisite](2026-07-22-0400-sot-reentry-sequencing.md) | Proposed | 2026-07-22 |
+| [ADR 収束に対する ref-verify 要求の除外](2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md) | Proposed | 2026-07-22 |
+| [impl-plan task ステータス遷移後の review refresh](2026-07-22-0633-impl-plan-transition-review-refresh.md) | Proposed | 2026-07-22 |
+| [上流収束における意味論検証の chain scope 明確化](2026-07-22-0817-deferred-upstream-semantic-verification.md) | Proposed | 2026-07-22 |
+| [dry gate 評価点における設定無効と feature 無効の優先規則](2026-07-22-1541-dry-gate-evaluation-feature-off-precedence.md) | Proposed | 2026-07-22 |
 
 ### ADR 運用
 
@@ -235,6 +239,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [DRY ゲートを利用者設定で切り替え可能にし、既定を無効（opt-in）とする](2026-06-19-2335-dry-gate-configurable-default-off.md) | — | 2026-06-19 |
 | [長くなった CI の短縮 — ソースを変えずキャッシュ戦略のみ見直す](2026-06-01-0336-ci-shorten-cache-strategy-only.md) | — | 2026-06-01 |
 | [モジュールサイズ制限の厳格化と分割リファクタリング](2026-06-06-1609-enforce-module-size-limit-splitting.md) | Proposed | 2026-06-06 |
+| [ビルド成果物によるディスク圧迫の解消と dry gate 重量依存の feature flag 化](2026-07-20-1608-disk-footprint-and-dry-feature-gating.md) | Proposed | 2026-07-20 |
 
 ### DRY / リファクタ
 

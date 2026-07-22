@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "cfcfc484a8faaa321f2833c66c56125a4e2f6fb7e3ad0d7d682a69d25adc3fc1",
+  "signals": [
+    {
+      "type_name": "FeatureDisabledDryGateCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "b3b7e47a70a077d6554db328d9567baee6e08c677a15f9c85bfe1abf5829969c"
+    },
+    {
+      "type_name": "MaintenanceCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "9022f0f80a692de37346c007d777bb13074c18116006b6e9f176c600d2433ffa"
+    },
+    {
+      "type_name": "DryCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "3c11d885f2a291fdc8e3baa8bf3796cad7dba932e007f9b74daf41842d66706e"
+    },
+    {
+      "type_name": "DupCheckInput",
+      "signal": "blue",
+      "entry_hash": "52f99f42a890fd625eae445d9f8b3c0a64d03c0be34ec0811b74c5b88857dd7f"
+    },
+    {
+      "type_name": "DupIndexBuildInput",
+      "signal": "blue",
+      "entry_hash": "ee45e17bcd54830dcbfb69cc048b267af3fa46553d5516fce65d500fba617c23"
+    },
+    {
+      "type_name": "DupIndexMeasureQualityInput",
+      "signal": "blue",
+      "entry_hash": "4b02670bb6353278ad6fbf711f7efe8a386ae532fd1bd96722fcdb95f3b25d10"
+    },
+    {
+      "type_name": "FindSimilarInput",
+      "signal": "blue",
+      "entry_hash": "abcb6fb56cf5af35f6e66c47ccae6bc9fc87c6f77188fc8f672e57a4ec0bd204"
+    },
+    {
+      "type_name": "SemanticDupCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "1892181d56e0fabad0cb52cef11e5dbaa9a21c6806dda97bbf49c0d7871e25f2"
+    }
+  ]
+}

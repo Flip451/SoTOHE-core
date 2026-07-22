@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "bcc5b862e56b7f601030c0752e0f4816da287289afd8dde76f83781bf0c8e469",
+  "signals": [
+    {
+      "type_name": "CleanupPlanQuery",
+      "signal": "blue",
+      "entry_hash": "bd3be951377f0b789c2fb211087f1b3fc4a9c2fcf546a7cd0700f7efc678e292"
+    },
+    {
+      "type_name": "CleanupPlanResponse",
+      "signal": "blue",
+      "entry_hash": "4cab87a154a25e0bfdd3f8eaf78a1bf2acebd1382b0af935719b0b58b37f1542"
+    },
+    {
+      "type_name": "DiskMaintenanceCommand",
+      "signal": "blue",
+      "entry_hash": "0aab888dd2547c6f5f400b7feea8b1dd10e73071789747d4f1e4054757adb81d"
+    },
+    {
+      "type_name": "DiskMaintenanceCommandInteractor",
+      "signal": "blue",
+      "entry_hash": "f2a15bd4ddd4ef784f58777039b19cd4c43d216daeb5804c8e3f4fe4e6447a13"
+    },
+    {
+      "type_name": "DiskMaintenanceCommandResponse",
+      "signal": "blue",
+      "entry_hash": "72af226c3ffdbbf765070b92fb802a92ef326533f86394526f59fced82cc625e"
+    },
+    {
+      "type_name": "DiskMaintenanceError",
+      "signal": "blue",
+      "entry_hash": "56c2e0258c7e5ecea4569390f2738ed5995bb22594436463f630c77e6f200d39"
+    },
+    {
+      "type_name": "DiskMaintenanceQueryInteractor",
+      "signal": "blue",
+      "entry_hash": "9de07b775121c44ab46f380baaa8a90b4fbd980a49cc1f933f0ca5b56fe68d4d"
+    },
+    {
+      "type_name": "FeatureDisabledDryGateInteractor",
+      "signal": "blue",
+      "entry_hash": "2d952d9f65681a998be069ccc47cab213561b6548607449279a8cc8593c5c663"
+    },
+    {
+      "type_name": "DiskMaintenanceCommandPort",
+      "signal": "blue",
+      "entry_hash": "4e2241c50d32042125fed1768931842bf72c0404a4b12995740fbef426184c5e"
+    },
+    {
+      "type_name": "DiskMaintenanceCommandService",
+      "signal": "blue",
+      "entry_hash": "bb10eff4e3e15f584e08e3820c52d140cb4235e8abdb3a133217219c764fd32f"
+    },
+    {
+      "type_name": "DiskMaintenanceQueryPort",
+      "signal": "blue",
+      "entry_hash": "58f9d9fe9fd05b7b7a76ae0669ce5fb2e52aff29683bd15fb8ff9e5a1ae2feb3"
+    },
+    {
+      "type_name": "DiskMaintenanceQueryService",
+      "signal": "blue",
+      "entry_hash": "2b565f9f99510776c51d91a83e88cd7fcb63b1d8a0396e3a8665979a7568c967"
+    },
+    {
+      "type_name": "DryCheckApprovedDriverService",
+      "signal": "blue",
+      "entry_hash": "f170cb88eaeb3ec5775fe254e22138f282853d5ff28a96325ca309b9baf49bf2"
+    }
+  ]
+}

@@ -105,7 +105,4 @@ repomix-output.*
 .claude/settings.local.json
 
 # --- Local cached external reference guides (not version-controlled) ---
-.cache/external-guides/
-.cache/cargo/
-.cache/home/
-.cache/sccache/
+.cache/

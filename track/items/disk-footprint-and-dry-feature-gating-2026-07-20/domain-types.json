@@ -1,0 +1,613 @@
+{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "CacheSize": {
+      "action": "add",
+      "docs": "Validated positive sccache capacity; the private String stores only the normalized representation after try_new rejects invalid raw input.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "disk_maintenance",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "CleanupExecutionMode": {
+      "action": "add",
+      "docs": "Finite domain value selecting dry-run reporting or applied cleanup.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "DryRun",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Apply",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "disk_maintenance",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "CleanupScope": {
+      "action": "add",
+      "docs": "Validated cleanup scope.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "disk_maintenance",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "CleanupScopeSet": {
+      "action": "add",
+      "docs": "Non-empty collection value object that rejects duplicate validated cleanup scopes at construction.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "docs": "Returns only DiskMaintenanceValidationError::EmptyCleanupScopes or ::DuplicateCleanupScope from the shared maintenance validation error set.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "scopes",
+              "ty": "Vec<CleanupScope>"
+            }
+          ],
+          "returns": "Result<Self, DiskMaintenanceValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_slice",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[CleanupScope]"
+        }
+      ],
+      "module_path": "disk_maintenance",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "DiskMaintenanceConfig": {
+      "action": "add",
+      "docs": "Immutable maintenance configuration that infallibly aggregates a validated cache size and a CleanupScopeSet whose constructor already guarantees non-empty distinct cleanup scopes.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "disk_maintenance",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "DiskMaintenanceOperationDetail": {
+      "action": "add",
+      "docs": "Lossless user-safe operational-boundary detail; the private String is intentionally unconstrained opaque diagnostic text rather than a domain identifier.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "disk_maintenance",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "DiskMaintenanceValidationError": {
+      "action": "add",
+      "docs": "Validation failures for maintenance values; typed lossless input preserves rejected external text, while duplicate scopes retain the validated CleanupScope.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidCacheSize",
+            "payload": {
+              "fields": [
+                "InvalidDiskMaintenanceInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "InvalidCleanupScope",
+            "payload": {
+              "fields": [
+                "InvalidDiskMaintenanceInput"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "EmptyCleanupScopes",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DuplicateCleanupScope",
+            "payload": {
+              "fields": [
+                "CleanupScope"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "disk_maintenance",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    },
+    "InvalidDiskMaintenanceInput": {
+      "action": "add",
+      "docs": "Lossless rejected configuration input; the private String intentionally accepts any original text, including empty input, so validation diagnostics retain the supplied evidence.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "disk_maintenance",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/disk-footprint-and-dry-feature-gating-2026-07-20/spec.json"
+        }
+      ]
+    }
+  },
+  "traits": {},
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "docs": "Returns only DiskMaintenanceValidationError::InvalidCacheSize from the shared maintenance validation error set.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, DiskMaintenanceValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "CacheSize"
+    },
+    {
+      "methods": [
+        {
+          "docs": "Returns only DiskMaintenanceValidationError::InvalidCleanupScope from the shared maintenance validation error set.",
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, DiskMaintenanceValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&std::path::Path"
+        }
+      ],
+      "type_name": "CleanupScope"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "max_cache_size",
+              "ty": "CacheSize"
+            },
+            {
+              "name": "cleanup_scopes",
+              "ty": "CleanupScopeSet"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "max_cache_size",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CacheSize"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "cleanup_scopes",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CleanupScopeSet"
+        }
+      ],
+      "type_name": "DiskMaintenanceConfig"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "InvalidDiskMaintenanceInput"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "DiskMaintenanceOperationDetail"
+    }
+  ],
+  "trait_impls": [
+    {
+      "for_type": "CacheSize",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CacheSize",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CacheSize",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CacheSize",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "CacheSize",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CleanupScope",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CleanupScope",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CleanupScope",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CleanupScope",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "CleanupScope",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "DiskMaintenanceConfig",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "DiskMaintenanceConfig",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "DiskMaintenanceConfig",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "DiskMaintenanceConfig",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "DiskMaintenanceValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "DiskMaintenanceValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "DiskMaintenanceValidationError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "DiskMaintenanceValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "DiskMaintenanceValidationError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CleanupExecutionMode",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CleanupExecutionMode",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "CleanupExecutionMode",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CleanupExecutionMode",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CleanupExecutionMode",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "InvalidDiskMaintenanceInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "InvalidDiskMaintenanceInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "InvalidDiskMaintenanceInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "InvalidDiskMaintenanceInput",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "InvalidDiskMaintenanceInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "DiskMaintenanceOperationDetail",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "DiskMaintenanceOperationDetail",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "DiskMaintenanceOperationDetail",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "DiskMaintenanceOperationDetail",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "DiskMaintenanceOperationDetail",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CleanupScopeSet",
+      "trait_ref": "Debug"
+    },
+    {
+      "for_type": "CleanupScopeSet",
+      "trait_ref": "Clone"
+    },
+    {
+      "for_type": "CleanupScopeSet",
+      "trait_ref": "PartialEq"
+    },
+    {
+      "for_type": "CleanupScopeSet",
+      "trait_ref": "Eq"
+    }
+  ]
+}

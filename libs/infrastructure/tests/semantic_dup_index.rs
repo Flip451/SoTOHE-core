@@ -4,6 +4,7 @@
 //! fragments via a temporary directory — no network access, no real embedding
 //! model.  Synthetic embedding vectors are used throughout.
 
+#![cfg(feature = "semantic-dup")]
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::indexing_slicing, clippy::panic)]
 
 use std::path::PathBuf;

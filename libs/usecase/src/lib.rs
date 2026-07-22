@@ -29,6 +29,7 @@ pub mod contract_map_workflow;
 pub mod conventions;
 pub mod d4_orchestration;
 pub mod demo;
+pub mod disk_maintenance;
 pub mod dry_check;
 pub mod dry_check_approved_driver;
 pub mod dry_driver;
