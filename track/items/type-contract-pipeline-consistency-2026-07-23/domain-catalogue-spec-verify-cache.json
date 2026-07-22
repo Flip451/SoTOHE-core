@@ -1,0 +1,510 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "00156c7cb500737cd95d3b8d3f146e57f6fd12eba520001bc3344e0d29062b33",
+      "evidence_hash": "082cadc0f5c4206116ca2fc28629063788660a7fe2420a14bfe541e0283c2e88",
+      "verdict": {
+        "kind": "pass",
+        "citation": "domain 配置の ValueObject に domain 層内からの inbound 参照がないことを、catalogue lint の cross-entry 検査として検出する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLinterRule"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "domain 配置の ValueObject に domain 層内からの inbound 参照がないことを、catalogue lint の cross-entry 検査として検出する。add・reference・modify のいずれの action も検査対象とし、接触した既存の誤配置には移設または正当な domain 消費者の同一 track 内での宣言を要求する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "00156c7cb500737cd95d3b8d3f146e57f6fd12eba520001bc3344e0d29062b33",
+      "evidence_hash": "cf116210361598ab5f99c2d78d84cbbccea6d7936db36561a329accfe4700a94",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue lint は domain 内 inbound 参照がゼロの domain ValueObject を action の種別にかかわらずエラーとして報告し、接触した誤配置に移設または同一 track での正当な domain 消費者の宣言を要求する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLinterRule"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "catalogue lint は domain 内 inbound 参照がゼロの domain ValueObject を action の種別にかかわらずエラーとして報告し、接触した誤配置に移設または同一 track での正当な domain 消費者の宣言を要求する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "950c9e81784e7709061e5d1bfc4460ca8a308b11c3fa320a3855c1213107d9c5",
+      "evidence_hash": "082cadc0f5c4206116ca2fc28629063788660a7fe2420a14bfe541e0283c2e88",
+      "verdict": {
+        "kind": "pass",
+        "citation": "domain 配置の ValueObject に domain 層内からの inbound 参照がないことを、catalogue lint の cross-entry 検査として検出する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLinterRuleKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "domain 配置の ValueObject に domain 層内からの inbound 参照がないことを、catalogue lint の cross-entry 検査として検出する。add・reference・modify のいずれの action も検査対象とし、接触した既存の誤配置には移設または正当な domain 消費者の同一 track 内での宣言を要求する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "950c9e81784e7709061e5d1bfc4460ca8a308b11c3fa320a3855c1213107d9c5",
+      "evidence_hash": "cf116210361598ab5f99c2d78d84cbbccea6d7936db36561a329accfe4700a94",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue lint は domain 内 inbound 参照がゼロの domain ValueObject を action の種別にかかわらずエラーとして報告し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLinterRuleKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "catalogue lint は domain 内 inbound 参照がゼロの domain ValueObject を action の種別にかかわらずエラーとして報告し、接触した誤配置に移設または同一 track での正当な domain 消費者の宣言を要求する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "950c9e81784e7709061e5d1bfc4460ca8a308b11c3fa320a3855c1213107d9c5",
+      "evidence_hash": "b19c9c654a4b11bc936dd1ff4016ab696fc9412eb1be04396726aa5d9d5cf106",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D2 の判定は contract-map renderer が構築する参照グラフと同じ情報源に基づく cross-entry 検査として実現する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueLinterRuleKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "D2 の判定は contract-map renderer が構築する参照グラフと同じ情報源に基づく cross-entry 検査として実現する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f75a3223c938eb2d906064cf998c9976ca69ef26fa3329e475e93a2d87c72c16",
+      "evidence_hash": "4ed93cfdce6bd73e8fda12c3ebd477c124985d07aeb4821707a3538c62423811",
+      "verdict": {
+        "kind": "pass",
+        "citation": "contract-map style 設定が DataRole・ContractRole・FunctionRole の全値に対応する classDef を持つことを必須にし、renderer が未定義 role を検出した場合は既定スタイルへの無言のフォールバックではなく警告を出す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ContractMapContent"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "contract-map style 設定が DataRole・ContractRole・FunctionRole の全値に対応する classDef を持つことを必須にし、renderer が未定義 role を検出した場合は既定スタイルへの無言のフォールバックではなく警告を出す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f75a3223c938eb2d906064cf998c9976ca69ef26fa3329e475e93a2d87c72c16",
+      "evidence_hash": "2f89bf9c5eec34fe6e8ca2c18f1b1d9f35858a21e83a81bf9bb2a9984908d0b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "contract-map style 設定は全 DataRole・ContractRole・FunctionRole の classDef を備え、renderer は未定義 role を検出すると警告を出して利用者が無スタイル描画を認識できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ContractMapContent"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "contract-map style 設定は全 DataRole・ContractRole・FunctionRole の classDef を備え、renderer は未定義 role を検出すると警告を出して利用者が無スタイル描画を認識できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b280c3cc5c7a7c7f722bf568a0b2287032a494968ba06745b9dce79d74478fe6",
+      "evidence_hash": "4ed93cfdce6bd73e8fda12c3ebd477c124985d07aeb4821707a3538c62423811",
+      "verdict": {
+        "kind": "pass",
+        "citation": "contract-map style 設定が DataRole・ContractRole・FunctionRole の全値に対応する classDef を持つことを必須にし、renderer が未定義 role を検出した場合は既定スタイルへの無言のフォールバックではなく警告を出す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ContractMapRenderResult"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "contract-map style 設定が DataRole・ContractRole・FunctionRole の全値に対応する classDef を持つことを必須にし、renderer が未定義 role を検出した場合は既定スタイルへの無言のフォールバックではなく警告を出す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b280c3cc5c7a7c7f722bf568a0b2287032a494968ba06745b9dce79d74478fe6",
+      "evidence_hash": "2f89bf9c5eec34fe6e8ca2c18f1b1d9f35858a21e83a81bf9bb2a9984908d0b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "contract-map style 設定は全 DataRole・ContractRole・FunctionRole の classDef を備え、renderer は未定義 role を検出すると警告を出して利用者が無スタイル描画を認識できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ContractMapRenderResult"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "contract-map style 設定は全 DataRole・ContractRole・FunctionRole の classDef を備え、renderer は未定義 role を検出すると警告を出して利用者が無スタイル描画を認識できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b280c3cc5c7a7c7f722bf568a0b2287032a494968ba06745b9dce79d74478fe6",
+      "evidence_hash": "58e63376e8bed3ed378c23d37a8d721ea70f5455db5d139007dabe33b4e60a0b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "role 集合が将来拡張された場合にも style 完全性検査で欠落を検出できるよう、role 値と classDef の対応を網羅的に検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ContractMapRenderResult"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "role 集合が将来拡張された場合にも style 完全性検査で欠落を検出できるよう、role 値と classDef の対応を網羅的に検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d7ec1f16ae17d4cef39f57d74885606419ee8a6e18df23110e98a58e55900936",
+      "evidence_hash": "4ed93cfdce6bd73e8fda12c3ebd477c124985d07aeb4821707a3538c62423811",
+      "verdict": {
+        "kind": "pass",
+        "citation": "renderer が未定義 role を検出した場合は既定スタイルへの無言のフォールバックではなく警告を出す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ContractMapRenderWarning"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "contract-map style 設定が DataRole・ContractRole・FunctionRole の全値に対応する classDef を持つことを必須にし、renderer が未定義 role を検出した場合は既定スタイルへの無言のフォールバックではなく警告を出す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d7ec1f16ae17d4cef39f57d74885606419ee8a6e18df23110e98a58e55900936",
+      "evidence_hash": "2f89bf9c5eec34fe6e8ca2c18f1b1d9f35858a21e83a81bf9bb2a9984908d0b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "renderer は未定義 role を検出すると警告を出して利用者が無スタイル描画を認識できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ContractMapRenderWarning"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "contract-map style 設定は全 DataRole・ContractRole・FunctionRole の classDef を備え、renderer は未定義 role を検出すると警告を出して利用者が無スタイル描画を認識できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d7ec1f16ae17d4cef39f57d74885606419ee8a6e18df23110e98a58e55900936",
+      "evidence_hash": "58e63376e8bed3ed378c23d37a8d721ea70f5455db5d139007dabe33b4e60a0b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "role 集合が将来拡張された場合にも style 完全性検査で欠落を検出できるよう、role 値と classDef の対応を網羅的に検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ContractMapRenderWarning"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "role 集合が将来拡張された場合にも style 完全性検査で欠落を検出できるよう、role 値と classDef の対応を網羅的に検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "596afdf7fc0a120006703359498a2dd95af53dc0dacf817d50cb193d305b8e70",
+      "evidence_hash": "4ed93cfdce6bd73e8fda12c3ebd477c124985d07aeb4821707a3538c62423811",
+      "verdict": {
+        "kind": "pass",
+        "citation": "contract-map style 設定が DataRole・ContractRole・FunctionRole の全値に対応する classDef を持つことを必須にし、renderer が未定義 role を検出した場合は既定スタイルへの無言のフォールバックではなく警告を出す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "types",
+          "entry_key": "RoleKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "contract-map style 設定が DataRole・ContractRole・FunctionRole の全値に対応する classDef を持つことを必須にし、renderer が未定義 role を検出した場合は既定スタイルへの無言のフォールバックではなく警告を出す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "596afdf7fc0a120006703359498a2dd95af53dc0dacf817d50cb193d305b8e70",
+      "evidence_hash": "2f89bf9c5eec34fe6e8ca2c18f1b1d9f35858a21e83a81bf9bb2a9984908d0b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "contract-map style 設定は全 DataRole・ContractRole・FunctionRole の classDef を備え、renderer は未定義 role を検出すると警告を出して利用者が無スタイル描画を認識できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "types",
+          "entry_key": "RoleKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "contract-map style 設定は全 DataRole・ContractRole・FunctionRole の classDef を備え、renderer は未定義 role を検出すると警告を出して利用者が無スタイル描画を認識できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "596afdf7fc0a120006703359498a2dd95af53dc0dacf817d50cb193d305b8e70",
+      "evidence_hash": "58e63376e8bed3ed378c23d37a8d721ea70f5455db5d139007dabe33b4e60a0b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "role 集合が将来拡張された場合にも style 完全性検査で欠落を検出できるよう、role 値と classDef の対応を網羅的に検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "types",
+          "entry_key": "RoleKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "role 集合が将来拡張された場合にも style 完全性検査で欠落を検出できるよう、role 値と classDef の対応を網羅的に検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "60f51d71fa6cbfdd1b160c15a369e381829129017c6e37761ecc37dc3f73d013",
+      "evidence_hash": "4ed93cfdce6bd73e8fda12c3ebd477c124985d07aeb4821707a3538c62423811",
+      "verdict": {
+        "kind": "pass",
+        "citation": "contract-map style 設定が DataRole・ContractRole・FunctionRole の全値に対応する classDef を持つことを必須にし、renderer が未定義 role を検出した場合は既定スタイルへの無言のフォールバックではなく警告を出す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "ContractMapRenderer"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "contract-map style 設定が DataRole・ContractRole・FunctionRole の全値に対応する classDef を持つことを必須にし、renderer が未定義 role を検出した場合は既定スタイルへの無言のフォールバックではなく警告を出す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "60f51d71fa6cbfdd1b160c15a369e381829129017c6e37761ecc37dc3f73d013",
+      "evidence_hash": "2f89bf9c5eec34fe6e8ca2c18f1b1d9f35858a21e83a81bf9bb2a9984908d0b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "contract-map style 設定は全 DataRole・ContractRole・FunctionRole の classDef を備え、renderer は未定義 role を検出すると警告を出して利用者が無スタイル描画を認識できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "ContractMapRenderer"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "contract-map style 設定は全 DataRole・ContractRole・FunctionRole の classDef を備え、renderer は未定義 role を検出すると警告を出して利用者が無スタイル描画を認識できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "60f51d71fa6cbfdd1b160c15a369e381829129017c6e37761ecc37dc3f73d013",
+      "evidence_hash": "58e63376e8bed3ed378c23d37a8d721ea70f5455db5d139007dabe33b4e60a0b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "role 値と classDef の対応を網羅的に検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "ContractMapRenderer"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "role 集合が将来拡張された場合にも style 完全性検査で欠落を検出できるよう、role 値と classDef の対応を網羅的に検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ef727e9e00a9e6aea22b17bd123841066380d275aeadb9264e3d938ffe09defd",
+      "evidence_hash": "082cadc0f5c4206116ca2fc28629063788660a7fe2420a14bfe541e0283c2e88",
+      "verdict": {
+        "kind": "pass",
+        "citation": "domain 配置の ValueObject に domain 層内からの inbound 参照がないことを、catalogue lint の cross-entry 検査として検出する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "domain 配置の ValueObject に domain 層内からの inbound 参照がないことを、catalogue lint の cross-entry 検査として検出する。add・reference・modify のいずれの action も検査対象とし、接触した既存の誤配置には移設または正当な domain 消費者の同一 track 内での宣言を要求する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ef727e9e00a9e6aea22b17bd123841066380d275aeadb9264e3d938ffe09defd",
+      "evidence_hash": "cf116210361598ab5f99c2d78d84cbbccea6d7936db36561a329accfe4700a94",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue lint は domain 内 inbound 参照がゼロの domain ValueObject を action の種別にかかわらずエラーとして報告し、接触した誤配置に移設または同一 track での正当な domain 消費者の宣言を要求する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "catalogue lint は domain 内 inbound 参照がゼロの domain ValueObject を action の種別にかかわらずエラーとして報告し、接触した誤配置に移設または同一 track での正当な domain 消費者の宣言を要求する。"
+        }
+      }
+    }
+  ]
+}

@@ -1,6 +1,284 @@
 {
   "schema_version": 2,
   "scopes": {
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 restates upstream behavior and rationale (domain ValueObject inbound use, usecase fallback, scope exclusions, and no waiver) instead of limiting the task description to target + operation + anchor cite. Remove the prose restatement and cite the relevant spec elements.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 restates the upstream behavior contract, including action coverage, graph source, error semantics, remediation, waiver policy, and test scenarios. Replace this with target/operation plus spec or catalogue anchors.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates the empty-layer acceptance behavior and rationale in prose. Reduce it to target/operation plus the applicable spec anchors.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 restates the upstream contract-map style and warning behavior, propagation requirements, and test contract. Replace the prose restatement with target/operation plus spec or catalogue anchors.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The plan section descriptions restate upstream behavior contracts: S1 repeats the cross-entry lint requirement, S2 repeats empty-layer generation semantics, and S3 repeats exhaustive styling and warning propagation. Plan sections should summarize task grouping without reproducing upstream rationale or behavior prose.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/impl-plan.json",
+              "line": 35,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:5ffff487d3b397d8dea7b5a761682ce660da56dddf44ce469cf8e9caa84af347",
+          "at": "2026-07-22T18:04:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:938e73098224df496bea878882e4cbff71b36de7f782bca6a97a08003d793fca",
+          "at": "2026-07-22T18:06:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.summary` は ADR D1–D4 と作業順しか記述しておらず、`GO-01` をどの task が担うか示していません。goal は `task-coverage.json` で表現できないため、このままでは Phase 3 に goal-to-task traceability がありません。`GO-01 → T001–T004` のような明示的な対応を summary に追加してください。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/impl-plan.json",
+              "line": 31,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T003 は「capability contract、generator documentation、implementation、regression coverage」という広い対象分類しか示しておらず、変更対象の file / symbol を特定していません。IN-03/CN-03/AC-03 は挙動を定めますが実装境界は定めないため、実行者が対象を探索・推測する必要があります。capability ファイルと具体的な generator 実装・文書・テスト対象を明記してください。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/impl-plan.json",
+              "line": 18,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "AC-02 の唯一の担当である T002 には検証または regression-test の工程がありません。AC-02 は action 種別をまたぐ検出とエラー報告を要求するため、実装だけでは acceptance mapping が実行可能になりません。対象 evaluator/configuration の happy/error regression coverage を T002 に含めてください。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/task-coverage.json",
+              "line": 22,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "AC-04 の唯一の担当である T004 には、全 role の style 完全性と未定義 role warning を検証する工程がありません。style configuration と renderer の両方について、網羅性および warning の regression coverage を T004 に明記してください。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/task-coverage.json",
+              "line": 24,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:938e73098224df496bea878882e4cbff71b36de7f782bca6a97a08003d793fca",
+          "at": "2026-07-22T18:12:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 の「each must report the zero-inbound domain ValueObject violation, while a declared domain consumer must pass」は IN-02/AC-02 の挙動契約を文章で再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、対象・操作と「AC-02 の regression coverage」のような anchor cite だけにしてください。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 の「an enabled layer with zero public items writes its d1 overview, exits successfully, and does not materialize d2」は IN-03/CN-03/AC-03 の挙動契約を再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、具体的なテスト対象と AC-03 の cite のみにしてください。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 の「enumerates every DataRole, ContractRole, and FunctionRole style and that returns UndefinedRoleStyle when a configured role is absent」は CN-04/AC-04 の期待挙動を再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、対象・regression coverage の追加操作・anchor cite だけにしてください。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:53a4d94678fdd8d7b7bce7ad524114c6bb3bdad425d6e02eb6363acd2a2c7cd5",
+          "at": "2026-07-22T18:15:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004 は `action: modify` の catalogue entry `RoleKind` に帰属していますが、task description の変更対象は `contract_map_renderer.rs`、`contract_map_workflow.rs`、renderer adapter、style config のみで、`RoleKind` の定義元 `libs/domain/src/tddd/catalogue_linter_role.rs` または同 symbol を含みません。この帰属を実行可能にするため、T004 の対象に `RoleKind` の変更を明記してください。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/task-contract.json",
+              "line": 17,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:2df2fdd8858f28da012250922853ca75c25e0aaef47ba87f8257324362f84f47",
+          "at": "2026-07-22T18:17:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:35b0ee477d44fad4f3508925a9b4a55266bd67f3182cc0695ecbb0fcb770d657",
+          "at": "2026-07-22T18:19:17Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b40779acf796828aa701f6e3061e08270ae4532449d67952d40668aad96ff85",
+          "at": "2026-07-22T18:03:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b40779acf796828aa701f6e3061e08270ae4532449d67952d40668aad96ff85",
+          "at": "2026-07-22T18:05:44Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::LintRuleKind` の `docs` が、usecase 配置を選ぶ理由と payload の serde/domain 値オブジェクト方針を散文で再記述しています。下流カタログでは変更対象・操作・アンカー参照に限定してください。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/usecase-types.json",
+              "line": 62,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::RenderContractMapOutput` の `docs` が、DTO の配置理由、usize を許容する理由、warnings の型方針を再記述しています。これらは upstream の設計理由・契約であり、docs はアンカー参照に留めるべきです。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/usecase-types.json",
+              "line": 135,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`domain::ContractMapContent` の `docs` が、Mermaid text を opaque presentation value として扱う R9 例外の理由と受け渡し挙動を再記述しています。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 370,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`domain::RoleKind` の `docs` が、exhaustive enum と presentation-only label の設計意図を再記述しています。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 524,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:14ab07e1f505d8d15214fe2e722cb4c6080f2c1278aa822cf323842a2dfde9ea",
+          "at": "2026-07-22T18:04:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0475f6ea5f262f2c88fca06f26eefdb3b271ee0b22a42445d22610c98bbee1af",
+          "at": "2026-07-22T18:10:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint` is declared `action: modify`, but its generic bound, parameters, return type, and syncness are identical to the rustdoc baseline; D2 changes only its body. `modify` requires a structural contract delta, so this entry should be omitted or represented as structurally unchanged.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 5,
+              "category": "SoT integrity/action incoherent with diff"
+            },
+            {
+              "message": "`domain::CatalogueLinterRule` is declared `action: modify`, although its fields, methods, and impl surface are baseline-identical; only constructor behavior changes to accommodate the modified rule-kind enum. This is not a structural type-contract modification, so the entry should be omitted or represented as structurally unchanged.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 286,
+              "category": "SoT integrity/action incoherent with diff"
+            }
+          ],
+          "hash": "rvw1:sha256:0475f6ea5f262f2c88fca06f26eefdb3b271ee0b22a42445d22610c98bbee1af",
+          "at": "2026-07-22T18:15:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Catalogue methods use `Self` in return types despite the project convention requiring concrete type names. Replace `Self` with `ContractMapRenderResult` in `new` and `Result<ContractMapRenderResult, CatalogueLinterRuleError>` as applicable.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 79,
+              "category": "API shape"
+            },
+            {
+              "message": "`CatalogueLinterRule::new` declares `Result<Self, CatalogueLinterRuleError>`; the return type must use the concrete `CatalogueLinterRule` name.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 312,
+              "category": "API shape"
+            },
+            {
+              "message": "`ContractMapContent::new` declares `Self`; the return type must use the concrete `ContractMapContent` name.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 530,
+              "category": "API shape"
+            },
+            {
+              "message": "`RoleKind::from_data_role`, `from_contract_role`, `from_function_role`, and `all` use `Self` in return types. Use concrete `RoleKind` / `&[RoleKind]` types per the catalogue convention.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 787,
+              "category": "API shape"
+            }
+          ],
+          "hash": "rvw1:sha256:f1b7c585895b77aae353a56eb15897973febf587e8462fca6a80e0e42f9d2c7f",
+          "at": "2026-07-22T18:20:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ac30160778ecf6b66caf72f741aba28c23ec58276b60fb1ad34491cd046bb2e",
+          "at": "2026-07-22T18:28:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ac30160778ecf6b66caf72f741aba28c23ec58276b60fb1ad34491cd046bb2e",
+          "at": "2026-07-22T18:31:25Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {

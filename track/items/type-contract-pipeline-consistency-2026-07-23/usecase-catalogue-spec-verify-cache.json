@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "5931ee372cd4c9e16918b20fb36e486f02d8011618163bb63182518b8c68beac",
+      "evidence_hash": "082cadc0f5c4206116ca2fc28629063788660a7fe2420a14bfe541e0283c2e88",
+      "verdict": {
+        "kind": "pass",
+        "citation": "domain 配置の ValueObject に domain 層内からの inbound 参照がないことを、catalogue lint の cross-entry 検査として検出する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "LintRuleKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "domain 配置の ValueObject に domain 層内からの inbound 参照がないことを、catalogue lint の cross-entry 検査として検出する。add・reference・modify のいずれの action も検査対象とし、接触した既存の誤配置には移設または正当な domain 消費者の同一 track 内での宣言を要求する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5931ee372cd4c9e16918b20fb36e486f02d8011618163bb63182518b8c68beac",
+      "evidence_hash": "cf116210361598ab5f99c2d78d84cbbccea6d7936db36561a329accfe4700a94",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue lint は domain 内 inbound 参照がゼロの domain ValueObject を action の種別にかかわらずエラーとして報告し、接触した誤配置に移設または同一 track での正当な domain 消費者の宣言を要求する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "LintRuleKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "catalogue lint は domain 内 inbound 参照がゼロの domain ValueObject を action の種別にかかわらずエラーとして報告し、接触した誤配置に移設または同一 track での正当な domain 消費者の宣言を要求する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5931ee372cd4c9e16918b20fb36e486f02d8011618163bb63182518b8c68beac",
+      "evidence_hash": "3638189b8985b6e7dd88d2ade4284899f726da2752a0d6edf43a5a51d7a40f42",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 境界型が domain 型を公開面に出すことの可否や公開面規律は扱わない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "LintRuleKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "usecase 境界型が domain 型を公開面に出すことの可否や公開面規律は扱わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3b1998348bb4629f0157f4590bba93616f2a844945c01a1e1de7ec0334e35194",
+      "evidence_hash": "4ed93cfdce6bd73e8fda12c3ebd477c124985d07aeb4821707a3538c62423811",
+      "verdict": {
+        "kind": "pass",
+        "citation": "renderer が未定義 role を検出した場合は既定スタイルへの無言のフォールバックではなく警告を出す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "RenderContractMapOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "contract-map style 設定が DataRole・ContractRole・FunctionRole の全値に対応する classDef を持つことを必須にし、renderer が未定義 role を検出した場合は既定スタイルへの無言のフォールバックではなく警告を出す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3b1998348bb4629f0157f4590bba93616f2a844945c01a1e1de7ec0334e35194",
+      "evidence_hash": "2f89bf9c5eec34fe6e8ca2c18f1b1d9f35858a21e83a81bf9bb2a9984908d0b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "renderer は未定義 role を検出すると警告を出して利用者が無スタイル描画を認識できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "RenderContractMapOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "contract-map style 設定は全 DataRole・ContractRole・FunctionRole の classDef を備え、renderer は未定義 role を検出すると警告を出して利用者が無スタイル描画を認識できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3b1998348bb4629f0157f4590bba93616f2a844945c01a1e1de7ec0334e35194",
+      "evidence_hash": "58e63376e8bed3ed378c23d37a8d721ea70f5455db5d139007dabe33b4e60a0b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "role 集合が将来拡張された場合にも style 完全性検査で欠落を検出できるよう、role 値と classDef の対応を網羅的に検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "RenderContractMapOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "role 集合が将来拡張された場合にも style 完全性検査で欠落を検出できるよう、role 値と classDef の対応を網羅的に検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "3b1998348bb4629f0157f4590bba93616f2a844945c01a1e1de7ec0334e35194",
+      "evidence_hash": "3638189b8985b6e7dd88d2ade4284899f726da2752a0d6edf43a5a51d7a40f42",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase 境界型が domain 型を公開面に出すことの可否や公開面規律は扱わない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "RenderContractMapOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "usecase 境界型が domain 型を公開面に出すことの可否や公開面規律は扱わない。"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "track_id": "type-contract-pipeline-consistency-2026-07-23",
+  "entries": {
+    "T001": [],
+    "T002": [
+      { "layer": "domain", "entry_key": "CatalogueLinterRule" },
+      { "layer": "domain", "entry_key": "CatalogueLinterRuleKind" },
+      { "layer": "domain", "entry_key": "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint" },
+      { "layer": "usecase", "entry_key": "LintRuleKind" }
+    ],
+    "T003": [],
+    "T004": [
+      { "layer": "domain", "entry_key": "ContractMapContent" },
+      { "layer": "domain", "entry_key": "ContractMapRenderResult" },
+      { "layer": "domain", "entry_key": "ContractMapRenderWarning" },
+      { "layer": "domain", "entry_key": "RoleKind" },
+      { "layer": "domain", "entry_key": "ContractMapRenderer" },
+      { "layer": "usecase", "entry_key": "RenderContractMapOutput" }
+    ]
+  }
+}
