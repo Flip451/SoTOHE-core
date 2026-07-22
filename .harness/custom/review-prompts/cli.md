@@ -9,9 +9,9 @@ perform direct I/O for application purposes, or import from `usecase`/`domain`
 directly. Cite `architecture-rules.json` and `type-designer-kind-selection.md` R1 when
 reporting a boundary violation.
 
-## What to report
+## Priority categories
 
-Report findings ONLY for the following categories:
+Violations of the role statement above are always reportable. The following priority categories focus the review and guide severity assessment; they are not an exhaustive list of reportable design deviations. The exclusions in **What NOT to report** still apply:
 
 - **business logic in bin**: a calculation, branching decision, domain
   transformation, or multi-step orchestration in `src/main.rs` or a

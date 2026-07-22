@@ -18,6 +18,8 @@ Always consider:
   - `sotp verify` subcommands (Rust CLI, replaces deleted `scripts/verify_*.py`)
   - `.claude/settings.json` (Rust hook entries: `skill-compliance`, `block-direct-git-ops`, `block-test-file-deletion` — dispatched via `bin/sotp hook dispatch ...`)
 
+When revising a reviewer briefing, verify that every event prohibited by its role statement has a reporting route: a reportable category, or, for a half-open briefing, an explicit rule that role-statement violations are always reportable.
+
 When changing workspace architecture, synchronize this same live architecture-document set:
 
 - `CLAUDE.md`, `AGENTS.md`, this checklist, and `.claude/skills/architecture-customizer/SKILL.md`

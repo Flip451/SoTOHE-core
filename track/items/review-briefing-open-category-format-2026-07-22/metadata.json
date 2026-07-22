@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "review-briefing-open-category-format-2026-07-22",
+  "title": "レビュー指示書のカテゴリ閉列挙を半開形式へ改める",
+  "branch": "track/review-briefing-open-category-format-2026-07-22",
+  "created_at": "2026-07-22T16:19:34Z",
+  "updated_at": "2026-07-22T16:19:34Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

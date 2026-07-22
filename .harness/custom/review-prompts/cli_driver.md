@@ -6,9 +6,9 @@ interactors, translates typed `Input` enums into use-case commands, invokes exac
 one interactor per request, and renders the result into a `CommandOutcome`. DI belongs
 in `cli_composition`, not here. Both invoke and render live in the same layer.
 
-## What to report
+## Priority categories
 
-Report findings ONLY for the following categories:
+Violations of the role statement above are always reportable. The following priority categories focus the review and guide severity assessment; they are not an exhaustive list of reportable design deviations. The exclusions in **What NOT to report** still apply:
 
 - **adapter performs DI**: a Driver constructor that calls `Arc::new(...)` /
   instantiates adapters / constructs use-case interactors itself, rather than

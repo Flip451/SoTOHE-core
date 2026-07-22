@@ -1,0 +1,312 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8af15eb4669244418926fb7db1c3e2823b35bfb75c3d7b48ee0e98284d37337d",
+          "at": "2026-07-22T16:21:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "この系譜は 7 本の briefing 新設と `plan-artifacts.md` 形式の踏襲を ADR 2026-06-18-1406 D6 に帰属させていますが、D6 が決めているのは `.harness/custom/**` の利用者所有・never-clobber 境界です。対象範囲と形式を決めたのはそれぞれ D3 と D4 であり、現状の引用は新 ADR の根拠系譜を誤って示します。D3–D4 を引用してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+              "line": 26,
+              "category": "broken narrative reference"
+            }
+          ],
+          "hash": "rvw1:sha256:8af15eb4669244418926fb7db1c3e2823b35bfb75c3d7b48ee0e98284d37337d",
+          "at": "2026-07-22T16:26:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5d23db896797d8108ef31762040f014e16db39e0d3bcb0082faf3a2be23c8b7",
+          "at": "2026-07-22T16:33:57Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72e66b25099889a1ca5f4b9f53cd42f0893a609de0b6de989d009a1860503ae7",
+          "at": "2026-07-22T16:55:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72e66b25099889a1ca5f4b9f53cd42f0893a609de0b6de989d009a1860503ae7",
+          "at": "2026-07-22T16:57:41Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is not fully executable: it does not enumerate the seven target briefing file paths or symbols; an executor must invent the file boundary.",
+              "severity": "P1",
+              "file": "track/items/review-briefing-open-category-format-2026-07-22/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003 is not fully executable: it names a maintainer-checklist check but omits the target checklist file/path or symbol.",
+              "severity": "P1",
+              "file": "track/items/review-briefing-open-category-format-2026-07-22/impl-plan.json",
+              "line": 24,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001 restates upstream behavior/design rationale in prose ('make role-statement violations reportable, retain the existing categories as priority categories, and preserve What NOT to report') instead of using only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/review-briefing-open-category-format-2026-07-22/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 restates upstream behavior/design rationale in prose ('retain plan-artifacts.md and all document-inspection noise controls in their closed form') instead of using only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/review-briefing-open-category-format-2026-07-22/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The S1 section description repeats the upstream contract ('without weakening their existing non-reportable boundaries') rather than stating only the implementation target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/review-briefing-open-category-format-2026-07-22/impl-plan.json",
+              "line": 35,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The S2 section description repeats the upstream closure/boundary behavior ('preserve the closed plan-artifacts document-inspection briefing') rather than stating only the implementation target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/review-briefing-open-category-format-2026-07-22/impl-plan.json",
+              "line": 45,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The S3 section description repeats the upstream behavioral contract ('guard against a role-statement prohibition that lacks applicable reportability guidance') rather than stating only the implementation target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/review-briefing-open-category-format-2026-07-22/impl-plan.json",
+              "line": 53,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:8a181ca3e25493ec348d7cf67bbadd6a031b78842e08230e45bf4961b1531683",
+          "at": "2026-07-22T16:55:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `plan.summary` GO-01 entry restates upstream behavior/design rationale ('while preserving the closed document-inspection boundary and noise controls') instead of limiting the plan section to executable traceability.",
+              "severity": "P1",
+              "file": "track/items/review-briefing-open-category-format-2026-07-22/impl-plan.json",
+              "line": 32,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The `plan.summary` GO-02 entry restates the upstream behavioral contract ('detects role-statement/category contradictions') instead of limiting the plan section to executable traceability.",
+              "severity": "P1",
+              "file": "track/items/review-briefing-open-category-format-2026-07-22/impl-plan.json",
+              "line": 33,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:09e310eb6718128ee850d73204ade630584275c544b975a1e9250c0bc11b7b80",
+          "at": "2026-07-22T16:57:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:575b6594d739f37f3d3d33a818d2ba301c46a57a5ab02bd3d3a9b753ff262f0c",
+          "at": "2026-07-22T16:57:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-03 requires preserving `What NOT to report` in every reviewer briefing, but its coverage lists only T001, which targets the seven code-layer prompts. T002 owns the remaining ADR/spec/types/impl-plan prompts and already carries AC-02/OUT-02, so add T002 to IN-03 and its task/section anchor lists.",
+              "severity": "P1",
+              "file": "track/items/review-briefing-open-category-format-2026-07-22/task-coverage.json",
+              "line": 11,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T002 (repeated by S2) says to update `.harness/custom/review-prompts/plan-artifacts.md`, but that file was deleted and neither exists in the current tree nor is created by another task. The executor must invent whether to resurrect or omit it; remove the dead target or explicitly define a creation operation supported by the upstream scope.",
+              "severity": "P1",
+              "file": "track/items/review-briefing-open-category-format-2026-07-22/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:575b6594d739f37f3d3d33a818d2ba301c46a57a5ab02bd3d3a9b753ff262f0c",
+          "at": "2026-07-22T17:02:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:510aee1ce09dee7c32e3785de541fc61aba56fba62e5d28629839e858d7794a6",
+          "at": "2026-07-22T17:05:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 and section S2 restate upstream behavior/decision prose (\"using the defect-class closure criterion\", \"retaining closed enumeration...\", and \"do not create a plan-artifacts briefing\"). Keep only target + operation + anchor cites in the executable task/section description, per no-upstream-restatement policy.",
+              "severity": "P1",
+              "file": "track/items/review-briefing-open-category-format-2026-07-22/impl-plan.json",
+              "line": 11,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 repeats the same upstream behavior/decision prose in its description; remove the rationale/contract restatement while retaining the concrete targets, operation, and anchor cites.",
+              "severity": "P1",
+              "file": "track/items/review-briefing-open-category-format-2026-07-22/impl-plan.json",
+              "line": 41,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:b4a5571291912db1b4ab311639971ab5f53ab45ac66aa58da3ce637daa777540",
+          "at": "2026-07-22T17:13:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fea2f954325bd8f36fc6c36d8c1d8bc742b5a85847bd1b638fa300f082c95794",
+          "at": "2026-07-22T17:15:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fea2f954325bd8f36fc6c36d8c1d8bc742b5a85847bd1b638fa300f082c95794",
+          "at": "2026-07-22T17:18:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3dfa447756b46d717ed2b35234d620828fba09ee451570bebf416960f0f8f1a8",
+          "at": "2026-07-22T17:21:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3dfa447756b46d717ed2b35234d620828fba09ee451570bebf416960f0f8f1a8",
+          "at": "2026-07-22T17:24:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:135a92c6eb249fda2a6d93e8d98d10b904585da5ed9108f1aad5a0faf0ade387",
+          "at": "2026-07-22T17:28:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:135a92c6eb249fda2a6d93e8d98d10b904585da5ed9108f1aad5a0faf0ade387",
+          "at": "2026-07-22T17:31:12Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-03 の「文書検査系の既存のノイズ抑制動作を変えない」は、spec 内で確認手順や判定可能な条件が定義されておらず、文書内容の目視だけでは決定的に検証できないため、受入条件として非観測可能です。",
+              "severity": "P1",
+              "file": "track/items/review-briefing-open-category-format-2026-07-22/spec.json",
+              "line": 174,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:ddd8195c8cb4b28f49dfc11e898002a8a6ba6b48a2f600318033bec2cf440ad0",
+          "at": "2026-07-22T16:55:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19f54c326d125405692ae7b7e88095ed09d43970a771534b3ace2f9a87973c6c",
+          "at": "2026-07-22T16:56:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CN-02 leaves “whether the defect classes are closed under enumeration” undefined, while IN-05/AC-04 neither prescribe the result for each SoT briefing nor provide an objective classification procedure. Downstream work must therefore invent whether ADR/spec/types/impl-plan should be closed or semi-open, and AC-04 cannot deterministically pass or fail.",
+              "severity": "P1",
+              "file": "track/items/review-briefing-open-category-format-2026-07-22/spec.json",
+              "line": 144,
+              "category": "constraint vague or untestable"
+            },
+            {
+              "message": "The related-convention citations to `coding-principles.md` / “No Panics in Library Code” and `prefer-type-safe-abstractions.md` / “Rule” govern Rust production code and type design, not this docs-only change to reviewer-briefing category semantics. They are narratively off-topic grounding for the spec.",
+              "severity": "P1",
+              "file": "track/items/review-briefing-open-category-format-2026-07-22/spec.json",
+              "line": 233,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:19f54c326d125405692ae7b7e88095ed09d43970a771534b3ace2f9a87973c6c",
+          "at": "2026-07-22T17:00:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e8758ea0f27034fe5a5b2b864112050ea3405f00c364fffb7260e3026a8a3e44",
+          "at": "2026-07-22T17:02:57Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fd641e0eafd37c94525d32a6b38b878b319546c00313c94478c5cbadad04de2",
+          "at": "2026-07-22T17:21:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4fd641e0eafd37c94525d32a6b38b878b319546c00313c94478c5cbadad04de2",
+          "at": "2026-07-22T17:25:17Z"
+        }
+      ]
+    }
+  }
+}
