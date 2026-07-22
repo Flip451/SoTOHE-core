@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 embeds operational gate wiring and a detailed two-regression repair procedure (lines 67–73), including CI placement, exclusions, and exact command edits. These implementation/workflow details obscure the decision and belong in the relevant workflow or capability SSoT; retain only the decision to add the two invariant checks and defer execution details.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+              "line": 67,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:5ba00d905041cae692d8023d4d1f9ab7206bfe3e836d159ac5976b1c48fc551c",
+          "at": "2026-07-22T17:57:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6bb538ccf188c83b9404f921724ceaa6542629bd3dc2727b65f6597dd3daeee",
+          "at": "2026-07-22T18:01:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 states that the shipped rules surface contains only the dev-environment, orchestration, and guardrails equivalents, but then permits `language` to be replaced by a neutral overlay, which would ship a fourth rule. The `exclude or overlay` branch also leaves downstream work to choose between materially different exported surfaces. Record one outcome, or qualify the “only” constraint so both statements agree.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+              "line": 56,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:d6bb538ccf188c83b9404f921724ceaa6542629bd3dc2727b65f6597dd3daeee",
+          "at": "2026-07-22T18:05:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 は ADR 2026-07-16-1438 の D1/D2 に対する強制機構を新設するとしていますが、検査1は D1 が採録面に含める capabilities・briefings・githooks・CI・utility adapters を検査せず、検査2も `cargo run -p cli` を禁じるだけです。そのため、欠落中の `adr-baseline-check-review` を単発 `bin/sotp` wrapper として exported Makefile に追加すれば両検査を通過しつつ D2 の直呼び原則に違反でき、「参照欠落クラスを止める」「現存 regression の修復を強制する」という本文の結論と矛盾します。検査対象を既決の採録面全体と直呼び原則に合わせるか、強制対象の主張を実際の検査範囲へ狭める必要があります。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+              "line": 65,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:c935f8f54e132894f9ef64a856220b558ccef6f35eb91ec2f012de87c076eb3f",
+          "at": "2026-07-22T18:12:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 は索引再生成を「export 時実行」でもよいとしていますが、既決 ADR `2026-07-06-1717-template-extraction-boundary.md` D4 は export を copy + overlay のみに固定し、Rejected E で programmatic transform を明示的に退けています。この拒否を扱わず export-time rewrite を許すと境界方式の決定が競合します。bootstrap 組み込みに限定するか、既決 D4/E を明示的に refinement/supersession してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+              "line": 43,
+              "category": "rejected alternative re-emerges in decisions"
+            }
+          ],
+          "hash": "rvw1:sha256:ff41265fdfe5f73f6ea42b0daa745408d8f157a2342bd4a865ee82e1b7a1cef5",
+          "at": "2026-07-22T18:20:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:88445bf87cda6c1a1b1666bd34ddaac8f6b5526a92f77253d83e9f41bce90e7c",
+          "at": "2026-07-22T18:25:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 does not record a single decision for `language`: it leaves both exclusion and replacement with a neutral overlay as permitted outcomes. Choose one shipping policy so downstream work has an unambiguous target.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+              "line": 58,
+              "category": "decision not actually recorded"
+            }
+          ],
+          "hash": "rvw1:sha256:88445bf87cda6c1a1b1666bd34ddaac8f6b5526a92f77253d83e9f41bce90e7c",
+          "at": "2026-07-22T18:34:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23b27e22335e712bf2d191defd996af1763f062c2f2b42101ee346e34ae42521",
+          "at": "2026-07-22T18:40:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23b27e22335e712bf2d191defd996af1763f062c2f2b42101ee346e34ae42521",
+          "at": "2026-07-22T18:43:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 embeds operational gate wiring and implementation-placement constraints (smoke-gate integration, export-tree inspection, maintainer-CI boundary, exclusion from `sotp verify`, and repair sequencing) rather than recording only the decision to detect the two divergence classes. This detail obscures the decision and belongs in the workflow/convention or specification layer; delegate those mechanics explicitly and retain the two detection decisions.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+              "line": 70,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:23b27e22335e712bf2d191defd996af1763f062c2f2b42101ee346e34ae42521",
+          "at": "2026-07-22T18:45:02Z"
+        }
+      ]
+    }
+  }
+}
