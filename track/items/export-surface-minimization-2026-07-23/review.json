@@ -1,6 +1,503 @@
 {
   "schema_version": 2,
   "scopes": {
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 task description is non-executable: it names the bootstrap concept but does not identify the target file or symbol to modify.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 14,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001 description contains upstream/design restatement beyond target + operation + anchor: “retaining fail-closed detection for an unclassified addition and the copy-plus-overlay export boundary.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 5,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description contains upstream/design restatement beyond target + operation + anchor: “without adding content transformation to template export.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 14,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 description contains upstream/design restatement beyond target + operation + anchor: “under the existing scaffold policy” and the detailed divergence behavior.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 26,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The export-boundary section description restates the upstream boundary rationale and behavior instead of only identifying executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 41,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The consumer-instructions section description restates the intended consumer-surface behavior and coherence rationale instead of only identifying executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 50,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The scaffold-smoke section description restates the upstream workflow/Makefile divergence and permanent-detection rationale instead of only identifying executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 59,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:dd5f138c58a9675721bf30a9c941c87e072c8e4bd32a44bccc23942b74889412",
+          "at": "2026-07-22T19:22:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description includes upstream/design restatement: “retaining fail-closed detection for an unclassified addition and the copy-plus-overlay export boundary.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 5,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 is non-executable because it does not identify the target file or symbol for bootstrap index regeneration.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 14,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T002 description includes upstream/design restatement: “without adding content transformation to template export.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 14,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 description restates the upstream exported-surface behavior: “Reduce the exported `.claude/skills` surface to `architecture-customizer`” and names excluded sources rather than limiting the plan text to target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 23,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 description restates the upstream rules-surface contract, including the final unnumbered paths and neutral overlay, rather than limiting the plan text to target, operation, and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 26,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 description includes upstream/design restatement: “under the existing scaffold policy” and the detailed divergence behavior.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 29,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 description includes upstream/design restatement: “without adding a new verify command or imposing provider choices on consumers.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 32,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `export-boundary` restates upstream boundary rationale and behavior instead of only identifying executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 41,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `consumer-instructions` restates upstream consumer-surface behavior and rationale instead of only identifying executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 50,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `scaffold-smoke` restates upstream workflow/Makefile divergence and permanent-detection rationale instead of only identifying executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 59,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:333b90b8ab708171d9950a46cbe041f6b4bfe8c506f6cdb9d39c24be6beee54b",
+          "at": "2026-07-22T19:24:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 is non-executable because it does not identify the target file or symbol for bootstrap index regeneration.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 14,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001 description contains upstream/design restatement beyond target, operation, and anchor: “retaining fail-closed detection for an unclassified addition and the copy-plus-overlay export boundary.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 5,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description contains upstream/design restatement: “without adding content transformation to template export.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 14,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 description contains upstream/design restatement: “under the existing scaffold policy.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 29,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 description contains upstream/design restatement: “without adding a new verify command or imposing provider choices on consumers.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 32,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `export-boundary` restates upstream boundary rationale and behavior instead of only identifying executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 41,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `consumer-instructions` restates upstream consumer-surface behavior and rationale instead of only identifying executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 50,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `scaffold-smoke` restates upstream workflow/Makefile divergence and permanent-detection rationale instead of only identifying executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 59,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:7f21ea89b3e1b3e89a0b5b12f2057c6a18f92b3096a3a6c5e988fb510fcf5f08",
+          "at": "2026-07-22T19:26:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 is non-executable because it does not identify the target file or symbol for bootstrap index regeneration.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 14,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001 description contains upstream/design restatement beyond target, operation, and anchor: “retaining fail-closed detection for an unclassified addition and the copy-plus-overlay export boundary.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 5,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description contains upstream/design restatement: “without adding content transformation to template export.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 14,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 description contains upstream/design restatement: “under the existing scaffold policy.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 29,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 description contains upstream/design restatement: “without adding a new verify command or imposing provider choices on consumers.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 32,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `export-boundary` restates upstream boundary rationale and behavior instead of only identifying executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 41,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `consumer-instructions` restates upstream consumer-surface behavior and rationale instead of only identifying executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 50,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `scaffold-smoke` restates upstream workflow/Makefile divergence and permanent-detection rationale instead of only identifying executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 59,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:354dbd55636a90cd0ddeda3a791b9f6fc1f61799c85dab653094af84ed271980",
+          "at": "2026-07-22T19:31:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 is non-executable because it does not identify the target file or symbol for bootstrap index regeneration.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 14,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001 description contains upstream/design restatement beyond target, operation, and anchor: “retaining fail-closed detection for an unclassified addition and the copy-plus-overlay export boundary.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 5,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description contains upstream/design restatement: “without adding content transformation to template export.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 14,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 description contains upstream/design restatement: “under the existing scaffold policy.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 29,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T006 description contains upstream/design restatement: “without adding a new verify command or imposing provider choices on consumers.”",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 32,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `export-boundary` restates upstream boundary rationale and behavior instead of only identifying executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 41,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `consumer-instructions` restates upstream consumer-surface behavior and rationale instead of only identifying executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 50,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `scaffold-smoke` restates upstream workflow/Makefile divergence and permanent-detection rationale instead of only identifying executable scope and anchors.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 59,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:354dbd55636a90cd0ddeda3a791b9f6fc1f61799c85dab653094af84ed271980",
+          "at": "2026-07-22T19:32:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:51a0d8200b8c5022370442fa7373c5fdaac43bdf417671ca43ae78dda6f64339",
+          "at": "2026-07-22T19:34:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.summary` groups T001–T006 but never records explicit GO-01/GO-02-to-task mappings. Goal traceability belongs specifically in this field; add GO-01 → T001–T004 and GO-02 → T005–T006.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 43,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T004 is the sole carrier for IN-04/AC-04, but it only renames source rule files and references. It names no target or operation for creating the neutral language overlay or excluding `maintainer-checklist` from the shipped rules, so implementing it literally leaves required behavior uncovered.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 24,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "AC-01, AC-02, AC-03, and AC-04 map only to T001–T004, whose descriptions contain mutations but no validation step. The plan therefore does not verify convention fail-closed/index behavior, the exported skill set, or the final shipped rules/reference set. Add focused validation steps and map these criteria to them.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/task-coverage.json",
+              "line": 22,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:51a0d8200b8c5022370442fa7373c5fdaac43bdf417671ca43ae78dda6f64339",
+          "at": "2026-07-22T19:38:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001’s clause “verify that the complete classification passes while an unclassified convention fails before export” restates AC-01’s expected behavior. Replace it with a named validation target and operation plus the anchor, as required by `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002’s clause “verify that an exported scaffold contains only included conventions and regenerates its index without an export-body transformation” restates AC-02’s behavior contract. Name the validation target/operation and rely on the existing anchors instead.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003’s clause “verify the exported skill set contains only architecture-customizer and no stale mapping remains” restates AC-03. Per `knowledge/conventions/no-upstream-restatement.md`, express this as a validation target plus operation and anchor only.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004’s clause “verify the exported rules and references match the final unnumbered path set with no old paths” restates AC-04’s expected result. Replace the result prose with a concrete validation target/operation and retain the anchor citation.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:dfe2193e8c2520a0944c3d5a818eedafda03256cba6d6d9042e454bdc6367727",
+          "at": "2026-07-22T19:41:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:45f10649f5713d4dd86548496345b14548b96cb55b2b886ac0b521b1dc9ff247",
+          "at": "2026-07-22T19:45:22Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c616718b1a15a87e7507c5517119b8655d7fffc6e0acf7806fcdd17b42ec575",
+          "at": "2026-07-22T19:22:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c616718b1a15a87e7507c5517119b8655d7fffc6e0acf7806fcdd17b42ec575",
+          "at": "2026-07-22T19:25:09Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`related_conventions` cites `coding-principles.md#No Panics in Library Code`, which is unrelated to this export-surface behavioral contract.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/spec.json",
+              "line": 293,
+              "category": "broken cross-reference at narrative level"
+            },
+            {
+              "message": "`related_conventions` cites `prefer-type-safe-abstractions.md#Rule`, which is unrelated to the export/Makefile divergence behavior specified here.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/spec.json",
+              "line": 297,
+              "category": "broken cross-reference at narrative level"
+            },
+            {
+              "message": "`related_conventions` cites `pre-track-adr-authoring.md#Rules`, which is unrelated to this export-surface behavioral contract.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/spec.json",
+              "line": 313,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:15e6c59728a188887f09635706fb4a1479db8591a494443e0d90aee38f0db786",
+          "at": "2026-07-22T19:22:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e04c07e8dba2379e46b62d3f9090310480e7d4525976b94449131f119ff1930",
+          "at": "2026-07-22T19:23:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 の conventions 最小化を証明する acceptance criterion がありません。AC-01 は全ファイルが include / exclude のどちらかに分類されること、AC-02 は export がその分類に従うことしか要求しないため、全 convention を include にしても両方を満たし、GO-01 に反する出荷面が受理されます。",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/spec.json",
+              "line": 8,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "AC-07 は「現存 regression 2 件」の片方を workspace CLI の cargo run 流出としていますが、引用先 ADR の D4 で修復対象になっている実在の二件目は scaffold の ci-track における `bin/sotp adr-baseline check-commit` の欠落です。cargo run 流出は恒常検査する将来の乖離クラスであり、現存 regression ではありません。このままでは IN-06 の修復範囲に反して commit 側 byte 照合が欠落したままでも AC 群を満たせます。",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/spec.json",
+              "line": 274,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5e04c07e8dba2379e46b62d3f9090310480e7d4525976b94449131f119ff1930",
+          "at": "2026-07-22T19:26:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6b53da1a774926c4777302c9351f21bd0669a53a55a6578faa6927849085e7c",
+          "at": "2026-07-22T19:28:36Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
