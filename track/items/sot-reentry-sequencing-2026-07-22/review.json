@@ -1,6 +1,238 @@
 {
   "schema_version": 2,
   "scopes": {
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
+          "at": "2026-07-22T04:26:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-08 cites `knowledge/conventions/README.md` to justify indexing the new document there, but that README explicitly excludes template-wide workflows from `knowledge/conventions/`. The cited convention therefore contradicts rather than grounds this scope item, leaving downstream work directed to a location whose governing convention disallows this artifact class.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 110,
+              "category": "broken cross-reference at narrative level"
+            },
+            {
+              "message": "`no-upstream-restatement.md` limits its scope to impl-plan descriptions and type-catalogue documentation, while explicitly exempting `spec.json` and workflow documents. It therefore cannot ground IN-01/CN-01's SSoT-reference rule for a new workflow convention; its `convention_refs` and `related_conventions` entries are off-topic.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 34,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
+          "at": "2026-07-22T04:29:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87c60a3d9298c8daf642b794cda5bd633e155cd958ab3344a9ba21b6087aa4b5",
+          "at": "2026-07-22T04:31:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e05cf504ae60ffc977faeb92d995552795f380dcad3d7fe1cb85efafe49decb8",
+          "at": "2026-07-22T05:05:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 は D1 を含む順次処理規律の一貫した定着を求め、IN-02 は `diagnose.md` に dispatch 前の三要素・直上流チェックと収束証跡の引き渡しを要求しています。しかし AC-01〜AC-04 は convention または writer capability の内容だけを検査し、AC-05 は `diagnose.md` を許容差分へ加えるだけでその要求内容を検証しません。そのため orchestrator-side のチェックと証跡引き渡しが欠けたままでも全 AC を満たせ、GO-01 の完了を決定的に証明できません。",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 220,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:e05cf504ae60ffc977faeb92d995552795f380dcad3d7fe1cb85efafe49decb8",
+          "at": "2026-07-22T05:09:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bb41305fdb53e4cfac00ec3fa5d198460089c186cf608c61b87f3c1145dc1df",
+          "at": "2026-07-22T05:13:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:084a60859369138c32f8b575594aa86d196369c1fd767ee0f5d3b6a723ad27f6",
+          "at": "2026-07-22T05:34:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-05 states that the implementation diff is limited to five capability documents, but IN-07 explicitly requires a change to the rollback-diagnoser capability contract and the current diff includes that file. This makes the acceptance criterion contradict the stated in-scope work and cannot be satisfied by the current implementation.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 228,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4ce5282aec615985c6b14b1ddbbaf83e03c1874490311c91a5947bfbd27fc495",
+          "at": "2026-07-22T06:13:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-01 still defines phase convergence unconditionally as the three-element combination including ref-verify, without stating the admitted D1 exemption for the `adr_user` chain. As written, it conflicts with the ADR refinement that ADR convergence requires only signal plus ADR review.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 61,
+              "category": "scope / acceptance_criteria contradiction"
+            },
+            {
+              "message": "AC-01 requires every phase convergence determination to include the applicable ref-verify scope, but does not state that `adr_user`/ADR convergence is exempt. This leaves the acceptance contract requiring the unsatisfiable ADR-side ref-verify prerequisite that delta D1 explicitly removes.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 205,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9d51d304cca2cc4c82d5b0d88962dc2bd01323a0d76d3e044b762192aaf25961",
+          "at": "2026-07-22T06:14:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9fed8c9af23f342e2fb2c4c3b13509b5d5ca98789a653f272fe6ece7cf6250cc",
+          "at": "2026-07-22T06:16:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06（および対応する IN-02）は「各再入 writer dispatch 前」に ref-verify scope の確認を要求しており、spec-design 再入でも ref-verify を要求する契約として読めます。これは IN-01 / AC-01 が定める `adr_user` の二要素収束と矛盾します。`adr_user` では ref-verify を確認せず、その他の chain にのみ三要素確認を要求することを dispatch 契約にも明示してください。",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 238,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9fed8c9af23f342e2fb2c4c3b13509b5d5ca98789a653f272fe6ece7cf6250cc",
+          "at": "2026-07-22T06:19:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ccd532916cac1dfc091f54d37ba88d6bbfe0af28135269be3d231f3ad58a6516",
+          "at": "2026-07-22T06:21:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49b293bfa9845a41c2593096d6b0aa933123adb14d6feeaae4f8740d6094efc6",
+          "at": "2026-07-22T06:41:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49b293bfa9845a41c2593096d6b0aa933123adb14d6feeaae4f8740d6094efc6",
+          "at": "2026-07-22T06:44:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ac41f27f5823ebbe02f86747d8dac6835af64afcab3af8fb071f1cdec057064",
+          "at": "2026-07-22T06:55:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-02 で `.harness/workflows/track/plan.md` の back-and-forth loop に再収束確認と証跡引き渡しを要求しているが、AC-06 は `diagnose.md` の経路しか検証せず、AC-05 は `plan.md` を許容差分へ加えるだけで内容を検証しない。このため plan workflow が再収束確認なしで下流 writer を再 dispatch しても全 AC を満たせてしまい、GO-01 の順次処理規律を決定的に証明できない。",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 39,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:9ac41f27f5823ebbe02f86747d8dac6835af64afcab3af8fb071f1cdec057064",
+          "at": "2026-07-22T06:58:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:04135f9387379af46385f7f84feb510a40cceef169e3954fb4c6194f1a666e34",
+          "at": "2026-07-22T07:04:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06 requires defining a fast→final single-scope review lifecycle in `.harness/workflows/track/review.md`, but no `IN-NN` in `scope.in_scope` declares changing that workflow; this acceptance criterion therefore requires behavior outside the declared in-scope set.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 250,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:fd550a9f892c6cf0e9ce612558d0a46151aad0e6b06a9f146ed2e9557b2cef89",
+          "at": "2026-07-22T07:39:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b21fa7362da9fa44a69f0c938b2927ae132e02be0a73b919b725bf603f86e88",
+          "at": "2026-07-22T07:41:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b21fa7362da9fa44a69f0c938b2927ae132e02be0a73b919b725bf603f86e88",
+          "at": "2026-07-22T07:43:19Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7428d2753ed320e4f29b21db70ea6ec3cb763f132dce3fc0e008f04e529e3a76",
+          "at": "2026-07-22T04:26:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7428d2753ed320e4f29b21db70ea6ec3cb763f132dce3fc0e008f04e529e3a76",
+          "at": "2026-07-22T04:29:07Z"
+        }
+      ]
+    },
     "impl-plan": {
       "rounds": [
         {
@@ -166,6 +398,64 @@
           "findings": [],
           "hash": "rvw1:sha256:ee22cc91faa3eea03cb8cd5797f90bd6e0514aa7bfe384867f6739d2348a5e19",
           "at": "2026-07-22T05:39:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T6 description restates the upstream behavior contract (“each downstream writer re-dispatch follows the edited direct upstream's required convergence evidence, including its scope review”) instead of limiting the description to target + operation + anchor cite. Remove the behavioral prose and retain the file/symbol, operation, and spec-element references.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 40,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:c1ee6ea65fa728a6f17457e4842a32d539e28d431485efed9801b34090a5e9d5",
+          "at": "2026-07-22T07:09:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce9095c5c333028654a54efb901a7735815345133a6ddb0933b66888ae606e40",
+          "at": "2026-07-22T07:11:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce9095c5c333028654a54efb901a7735815345133a6ddb0933b66888ae606e40",
+          "at": "2026-07-22T07:14:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T7 restates AC-06’s behavioral contract in prose: the single-scope fast-to-final lifecycle, Step 3 briefing reuse, provider-neutral wrapper reuse, and exclusion of the all-scope wave are all repeated here. Per `knowledge/conventions/no-upstream-restatement.md`, reduce this to target + operation + anchor cites and leave those behavioral details in the spec.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 41,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `single-scope-review-reentry` again restates AC-06 by describing fast-to-final re-convergence and avoidance of the all-scope wave. Replace this sentence-level behavior with a concise target/operation phrase plus the existing anchor cites, as required by `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/impl-plan.json",
+              "line": 87,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:a053649b52baafaace8694f8f58af1e93f5290e48f5727a6e80632afc1769a98",
+          "at": "2026-07-22T07:50:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c989f81025088e27793435081bca827717993a07e7bda5832dede61bdc200af8",
+          "at": "2026-07-22T07:53:01Z"
         }
       ]
     },
@@ -324,180 +614,188 @@
           "findings": [],
           "hash": "rvw1:sha256:981e907a2a403a7c578f991610e2fda06e5625fe1c747d61f2845eb5fd76765a",
           "at": "2026-07-22T06:44:35Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 2 の spec 再収束手順が、`sot-reentry-sequencing.md` の spec convergence 要件である `bin/sotp ref-verify` の成功を明示的に要求していません。spec を編集した後は、review が `zero_findings` でも意味論検証未実施のまま `type-design` を再開できるため、参照信号・意味論検証・review の全要素を確認してから再ディスパッチする必要があります。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 176,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9d067f3eba94fc075c193f65fd4b028e078bbcb74b3eaf7f8a5228691b3a5de2",
+          "at": "2026-07-22T07:09:20Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
-          "at": "2026-07-22T04:26:19Z"
+          "hash": "rvw1:sha256:000399965cfcb63ff4bfd7595d0ac919333f9cf22b93b1d69fd4f179a082d632",
+          "at": "2026-07-22T07:10:33Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "IN-08 cites `knowledge/conventions/README.md` to justify indexing the new document there, but that README explicitly excludes template-wide workflows from `knowledge/conventions/`. The cited convention therefore contradicts rather than grounds this scope item, leaving downstream work directed to a location whose governing convention disallows this artifact class.",
+              "message": "Phase 1 の途中で、全体向けの `review` workflow を ADR scope 限定として呼び出しています。しかし review workflow と両 adapter に scope 引数はなく、全 required scope の final `zero_findings` と full CI を要求します。この時点では spec は次の `spec-design` まで意図的に 🔴 のままなので、既知の未収束 spec までレビューされ、最終 CI も通過できません。下流を含めない、正式な scope 限定レビュー経路が必要です。",
               "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 110,
-              "category": "broken cross-reference at narrative level"
+              "file": ".harness/workflows/track/plan.md",
+              "line": 158,
+              "category": "command wiring breakage"
             },
             {
-              "message": "`no-upstream-restatement.md` limits its scope to impl-plan descriptions and type-catalogue documentation, while explicitly exempting `spec.json` and workflow documents. It therefore cannot ground IN-01/CN-01's SSoT-reference rule for a new workflow convention; its `convention_refs` and `related_conventions` entries are off-topic.",
+              "message": "Phase 2 でも scope 指定を受け付けない `review` workflow を spec-only として呼び出しています。この時点では catalogue が 🔴 のまま次の `type-design` を待っているため、review workflow は stale な types scope も対象にし、full CI の catalogue gate で完了不能になります。spec scope だけを収束させる正式な経路を配線してください。",
               "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 34,
-              "category": "broken cross-reference at narrative level"
-            }
-          ],
-          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
-          "at": "2026-07-22T04:29:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:87c60a3d9298c8daf642b794cda5bd633e155cd958ab3344a9ba21b6087aa4b5",
-          "at": "2026-07-22T04:31:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e05cf504ae60ffc977faeb92d995552795f380dcad3d7fe1cb85efafe49decb8",
-          "at": "2026-07-22T05:05:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 は D1 を含む順次処理規律の一貫した定着を求め、IN-02 は `diagnose.md` に dispatch 前の三要素・直上流チェックと収束証跡の引き渡しを要求しています。しかし AC-01〜AC-04 は convention または writer capability の内容だけを検査し、AC-05 は `diagnose.md` を許容差分へ加えるだけでその要求内容を検証しません。そのため orchestrator-side のチェックと証跡引き渡しが欠けたままでも全 AC を満たせ、GO-01 の完了を決定的に証明できません。",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 220,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:e05cf504ae60ffc977faeb92d995552795f380dcad3d7fe1cb85efafe49decb8",
-          "at": "2026-07-22T05:09:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9bb41305fdb53e4cfac00ec3fa5d198460089c186cf608c61b87f3c1145dc1df",
-          "at": "2026-07-22T05:13:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:084a60859369138c32f8b575594aa86d196369c1fd767ee0f5d3b6a723ad27f6",
-          "at": "2026-07-22T05:34:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-05 states that the implementation diff is limited to five capability documents, but IN-07 explicitly requires a change to the rollback-diagnoser capability contract and the current diff includes that file. This makes the acceptance criterion contradict the stated in-scope work and cannot be satisfied by the current implementation.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 228,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:4ce5282aec615985c6b14b1ddbbaf83e03c1874490311c91a5947bfbd27fc495",
-          "at": "2026-07-22T06:13:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-01 still defines phase convergence unconditionally as the three-element combination including ref-verify, without stating the admitted D1 exemption for the `adr_user` chain. As written, it conflicts with the ADR refinement that ADR convergence requires only signal plus ADR review.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 61,
-              "category": "scope / acceptance_criteria contradiction"
+              "file": ".harness/workflows/track/plan.md",
+              "line": 176,
+              "category": "command wiring breakage"
             },
             {
-              "message": "AC-01 requires every phase convergence determination to include the applicable ref-verify scope, but does not state that `adr_user`/ADR convergence is exempt. This leaves the acceptance contract requiring the unsatisfiable ADR-side ref-verify prerequisite that delta D1 explicitly removes.",
+              "message": "追加された ADR 再収束は admission 経路だけを対象にしていますが、直後の step e も input-box ADR を編集・restamp します。`sot-reentry-sequencing.md` は impl-plan の status 遷移以外の全 upstream edit で収束が失効すると定めているため、この経路にも `adr_user` signal と ADR scope review の再収束を要求してから `spec-design` を再開する必要があります。",
               "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 205,
-              "category": "scope / acceptance_criteria contradiction"
+              "file": ".harness/workflows/track/plan.md",
+              "line": 159,
+              "category": "convention contradiction"
             }
           ],
-          "hash": "rvw1:sha256:9d51d304cca2cc4c82d5b0d88962dc2bd01323a0d76d3e044b762192aaf25961",
-          "at": "2026-07-22T06:14:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9fed8c9af23f342e2fb2c4c3b13509b5d5ca98789a653f272fe6ece7cf6250cc",
-          "at": "2026-07-22T06:16:14Z"
+          "hash": "rvw1:sha256:000399965cfcb63ff4bfd7595d0ac919333f9cf22b93b1d69fd4f179a082d632",
+          "at": "2026-07-22T07:15:25Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "AC-06（および対応する IN-02）は「各再入 writer dispatch 前」に ref-verify scope の確認を要求しており、spec-design 再入でも ref-verify を要求する契約として読めます。これは IN-01 / AC-01 が定める `adr_user` の二要素収束と矛盾します。`adr_user` では ref-verify を確認せず、その他の chain にのみ三要素確認を要求することを dispatch 契約にも明示してください。",
+              "message": "新しい scope-local loop は review の Steps 3–5 だけを実行するため、ADR 収束に必要な `adr_user` signal を確認しません。`track-local-review-fix` の依存処理も impl/catalog signals の更新だけで、`check-adr-user` は実行しません。そのため admission または retained restamp 後の ADR が signal gate 未確認のまま `spec-design` に再 dispatch され、`sot-reentry-sequencing.md` の収束条件を満たせません。",
               "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 238,
-              "category": "scope / acceptance_criteria contradiction"
+              "file": ".harness/workflows/track/plan.md",
+              "line": 158,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "spec の signal と `ref-verify` を review-fix loop より先に確認していますが、その loop は spec scope の finding を修正して `spec.json` を変更できます。review wrapper は修正後に `spec_adr` signal や `ref-verify` を再実行しないため、final `zero_findings` 時点の spec に対して先の検証結果が stale になり得ます。review 内の修正後にも signal と semantic verification を再収束させるループが必要です。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 174,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "plan SSoT は review workflow の Steps 3–5 を scope-local subroutine として新たに直接実行させますが、plan の Claude/Codex adapter にはこの invocation surface がありません。特に Claude で `track-local-review-fix` が返す exit 64 / `SUBAGENT_DISPATCH_REQUIRED` の処理は review adapter にしか定義されず、`/track:review` 自体は引数なしの全体 workflow なので代用できません。scope-local review を正式な sub-workflow/adapter surface として配線する必要があります。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 158,
+              "category": "adapter-SSoT synchronization"
             }
           ],
-          "hash": "rvw1:sha256:9fed8c9af23f342e2fb2c4c3b13509b5d5ca98789a653f272fe6ece7cf6250cc",
-          "at": "2026-07-22T06:19:15Z"
+          "hash": "rvw1:sha256:5d994e02f94a2365f3e2b26a7237092888a7f839a0a4a61985e391ad451be8cf",
+          "at": "2026-07-22T07:20:45Z"
         },
         {
           "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ccd532916cac1dfc091f54d37ba88d6bbfe0af28135269be3d231f3ad58a6516",
-          "at": "2026-07-22T06:21:27Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "参照先の review workflow は Steps 3–5 を scope-local subworkflow として定義していません。Step 4 は全 required scope を単一 wave で起動することを必須とし、review adapter も引数なしの全体 workflow しか公開していません。このため ADR/spec だけを対象にするという新しい呼び出しは実行可能な surface がなく、Claude 固有の exit 64 / subagent dispatch 処理も plan adapter から利用できません。正式な scope-local workflow と adapter surface が必要です。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 158,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "Steps 3–5 の review-fix loop は ADR review verdict しか保証せず、`adr_user` signal を確認しません。wrapper の依存処理も impl/catalog signals の更新のみです。そのため admission または non-semantic restamp 後の ADR が signal gate 未確認のまま `spec-design` に再 dispatch され、`sot-reentry-sequencing.md` が要求する ADR 収束を満たせません。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 158,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "spec の signal と `ref-verify` を review-fix loop より先に確認していますが、その loop は finding 修正として `spec.json` を変更できます。修正後に `spec_adr` signal と `ref-verify` は再実行されないため、final `zero_findings` でも現在の spec に対する検証結果が stale になり得ます。review 内の修正後にも三つの収束要素を再確認する必要があります。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 174,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5d994e02f94a2365f3e2b26a7237092888a7f839a0a4a61985e391ad451be8cf",
+          "at": "2026-07-22T07:23:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 再収束のために標準の all-required-scopes review を起動すると、ADR だけでなく未再収束の downstream spec scope も同じ wave で review/fix されます。これは `sot-reentry-sequencing.md` の「再開 prerequisite は直上流 1 層だけを検査し、下流作業は上流再収束まで中断する」という規則に反します。ここでは ADR scope だけを収束させる正式な経路が必要です。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 158,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "spec 再収束でも all-required-scopes review を使うため、まだ stale/🔴 である types scope の review-fix が spec scope と並列に開始されます。type-design は spec 収束後まで再開禁止であり、直上流だけを検査する規約にも反するため、stale catalogue の finding で review 全体がブロックされる循環も生じます。spec scope のみを収束させてから `type-design` を再開してください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 174,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:3f818bd51cbf29541a963d0257cbc82f32b720a8e2fc3893d0f5bb9dccc2b014",
+          "at": "2026-07-22T07:27:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-review-fix` を scope-local workflow の代わりに直接呼んでいますが、実際の surface は `--briefing-file` と具体的な `--round-type` を必須とします。追加箇所は `...` のままで per-scope briefing の生成も規定せず、plan adapter には Claude route の exit 64 / `SUBAGENT_DISPATCH_REQUIRED` 処理もありません。このままでは scoped round を provider 横断で起動できないため、完全な引数・briefing 手順・adapter dispatch を持つ正式な scoped-review surface が必要です。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 158,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "ADR scope で fixer を直接呼ぶことで、review workflow の ADR guardian repair lane を迂回しています。ADR edit が必要な finding では `review-fix-lead` は契約上 `failed` で終了し、記録された finding を orchestrator が adr-editor/adr-diagnoser へ渡す必要がありますが、このループは単に再実行するとしか定めていません。そのため通常の ADR finding で final `zero_findings` に到達できません。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 158,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:7ec21340a9f0a68500e8b68d46dd9c42a2bc4f634a3f3a39f052ab3f600a7d3f",
+          "at": "2026-07-22T07:31:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`review.md` は provider-neutral な「per-scope lifecycle」を独立した呼び出し surface として公開していません。既存 `/track:review` は引数なしで、Step 4 は全 required scope の単一 wave を必須とし、plan の Claude/Codex adapter にも scope 指定 review の起動方法はありません。そのため line 158 と 174 は、利用可能な direct fixer と all-scope workflow の両方を禁止しつつ、実在しない sub-workflow を要求しており実行不能です。正式な scoped-review workflow/command と対応 adapter を配線する必要があります。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 158,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:b71193d039d829cd45691d9d466b9751824622384727723bddbd04b00487c556",
+          "at": "2026-07-22T07:33:27Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:49b293bfa9845a41c2593096d6b0aa933123adb14d6feeaae4f8740d6094efc6",
-          "at": "2026-07-22T06:41:04Z"
+          "hash": "rvw1:sha256:58bb5252c0bcf61e38cdc9492907d9b47de2214d2a155b65cc829ebf4deb7cd4",
+          "at": "2026-07-22T07:48:54Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:49b293bfa9845a41c2593096d6b0aa933123adb14d6feeaae4f8740d6094efc6",
-          "at": "2026-07-22T06:44:12Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7428d2753ed320e4f29b21db70ea6ec3cb763f132dce3fc0e008f04e529e3a76",
-          "at": "2026-07-22T04:26:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7428d2753ed320e4f29b21db70ea6ec3cb763f132dce3fc0e008f04e529e3a76",
-          "at": "2026-07-22T04:29:07Z"
+          "hash": "rvw1:sha256:58bb5252c0bcf61e38cdc9492907d9b47de2214d2a155b65cc829ebf4deb7cd4",
+          "at": "2026-07-22T07:52:52Z"
         }
       ]
     }

@@ -36,7 +36,7 @@
       },
       {
         "id": "IN-02",
-        "text": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が直上流 1 層について、`adr_user` chain の ADR 収束では参照 signal と ADR scope review の `zero_findings` を、それ以外の phase 収束では参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡すことを規定する。",
+        "text": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` と `.harness/workflows/track/plan.md` は routing 後または plan workflow の back-and-forth loop で上流 SoT を編集した後、各下流 writer を再 dispatch する前に、orchestrator が直上流 1 層について、`adr_user` chain の ADR 収束では参照 signal と ADR scope review の `zero_findings` を、それ以外の phase 収束では参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡すことを規定する。`.harness/workflows/track/review.md` は同じ back-and-forth loop における、D1/D2 に基づく指定単一 SoT scope の再収束 round を公開する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
@@ -237,7 +237,7 @@
     },
     {
       "id": "AC-05",
-      "text": "実装差分は新 convention、`rollback-diagnoser`、`spec-designer`、`type-designer`、`impl-planner`、`implementer` の五つの capability documents、`.harness/workflows/track/diagnose.md`、および再生成された conventions index に限定され、gate、CI、signal-gates configuration、`adr_user` evaluator に変更を含まない。",
+      "text": "実装差分は新 convention、`rollback-diagnoser`、`spec-designer`、`type-designer`、`impl-planner`、`implementer` の五つの capability documents、`.harness/workflows/track/diagnose.md`、`.harness/workflows/track/plan.md`、`.harness/workflows/track/review.md`、および再生成された conventions index に限定され、gate、CI、signal-gates configuration、`adr_user` evaluator に変更を含まない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
@@ -247,7 +247,7 @@
     },
     {
       "id": "AC-06",
-      "text": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が直上流 1 層について、`adr_user` chain の ADR 収束では参照 signal と ADR scope review の `zero_findings` を、それ以外の phase 収束では参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡す手順を明記する。",
+      "text": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、`.harness/workflows/track/plan.md` は back-and-forth loop で上流 SoT を編集した後かつ各下流 writer の再 dispatch 前に、orchestrator が直上流 1 層について、`adr_user` chain の ADR 収束では参照 signal と ADR scope review の `zero_findings` を、それ以外の phase 収束では参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡す手順を明記する。`.harness/workflows/track/review.md` は、この back-and-forth loop で上流 scope を再収束させるため、指定された単一 SoT scope だけを対象に Step 3 の briefing と既存 provider-neutral dispatch wrapper を用いる fast→final review lifecycle を定義し、全 required scope を対象とする review wave を要求しない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",

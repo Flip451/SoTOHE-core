@@ -30,11 +30,21 @@
       "description": "Update `.harness/workflows/track/diagnose.md` Step 3 with the pre-dispatch convergence-evidence check. IN-02, AC-05, AC-06.",
       "status": "done",
       "commit_hash": "6b3f712a543c552e3531befee6c874ab40505ef5"
+    },
+    {
+      "id": "T6",
+      "description": "Update `.harness/workflows/track/plan.md` Phase 1 and Phase 2 back-and-forth loops with the required pre-re-dispatch confirmation. IN-02, IN-03, CN-02, CN-03, AC-05, AC-06.",
+      "status": "done"
+    },
+    {
+      "id": "T7",
+      "description": "Add the designated single-SoT-scope re-entry round in `.harness/workflows/track/review.md` and align the `.harness/workflows/track/plan.md` references. IN-02, CN-02, CN-03, AC-05, AC-06.",
+      "status": "done"
     }
   ],
   "plan": {
     "summary": [
-      "GO-01: T1, T2, T3, T4, T5."
+      "GO-01: T1, T2, T3, T4, T5, T6, T7."
     ],
     "sections": [
       {
@@ -60,13 +70,24 @@
       },
       {
         "id": "diagnostic-boundary",
-        "title": "Rollback diagnosis and re-entry dispatch",
+        "title": "Rollback diagnosis and workflow re-entry dispatch",
         "description": [
-          "Update the rollback-diagnoser cross-reference and the diagnose workflow's re-entry briefing requirement. IN-02, IN-07, AC-06."
+          "Update the rollback-diagnoser cross-reference plus diagnose and plan workflow re-entry briefing requirements. IN-02, IN-03, IN-07, AC-06."
         ],
         "task_ids": [
           "T4",
-          "T5"
+          "T5",
+          "T6"
+        ]
+      },
+      {
+        "id": "single-scope-review-reentry",
+        "title": "Single-scope review re-entry lifecycle",
+        "description": [
+          "Add the designated single-SoT-scope review re-entry round and align plan-loop references. IN-02, CN-02, CN-03, AC-05, AC-06."
+        ],
+        "task_ids": [
+          "T7"
         ]
       }
     ]
