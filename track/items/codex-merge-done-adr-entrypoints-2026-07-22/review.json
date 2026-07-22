@@ -18,6 +18,154 @@
           "at": "2026-07-22T11:59:02Z"
         }
       ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description includes upstream workflow/design prose beyond target + operation + anchor: “mirroring the established command surface while delegating canonical workflow behavior to its `.harness` source of truth.” Remove the restatement; cite the relevant anchors only. See `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/codex-merge-done-adr-entrypoints-2026-07-22/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description restates behavioral contract in “post-merge return to the configured base branch” and “keeping merge an explicit user operation,” plus workflow delegation prose. Reduce it to target + operation + anchor cite. See `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/codex-merge-done-adr-entrypoints-2026-07-22/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 description includes upstream boundary/workflow prose: “with only canonical invocation, tool constraints, and reporting boundary; retain workflow behavior in its `.harness` source of truth.” Reduce it to target + operation + anchor cite. See `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/codex-merge-done-adr-entrypoints-2026-07-22/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 description restates implementation behavior and authority: “separate thin adapters for the explicit merge and post-merge completion operations; preserve `.harness` as the workflow authority.” Section descriptions should summarize executable grouping without restating upstream behavior. See `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/codex-merge-done-adr-entrypoints-2026-07-22/impl-plan.json",
+              "line": 33,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 description restates upstream design rationale/behavior: “thin Codex adapter for canonical pre-track ADR authoring without duplicating provider-independent workflow logic.” Remove the restatement from the section description. See `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/codex-merge-done-adr-entrypoints-2026-07-22/impl-plan.json",
+              "line": 44,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:ba1ffedd0db58283b0f83aa2c9f33c13442429b1334f55fb9d76821d61cbe2ac",
+          "at": "2026-07-22T12:24:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd3935c796ba0baa4cb9ebd2d34d40faad7e9911e8b914bc5dab6dfb5a7c085d",
+          "at": "2026-07-22T12:26:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd3935c796ba0baa4cb9ebd2d34d40faad7e9911e8b914bc5dab6dfb5a7c085d",
+          "at": "2026-07-22T12:30:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 does not actually cover IN-03/CN-02/AC-02: those elements require creating a provider-independent ADR-add workflow SSoT under `.harness/workflows/`, but T003 targets only `.agents/skills/adr-add/SKILL.md`. All tasks could therefore finish with the required SSoT still absent. Add the workflow target and creation operation to T003, or introduce an earlier task and update the coverage mappings.",
+              "severity": "P1",
+              "file": "track/items/codex-merge-done-adr-entrypoints-2026-07-22/impl-plan.json",
+              "line": 18,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:cd3935c796ba0baa4cb9ebd2d34d40faad7e9911e8b914bc5dab6dfb5a7c085d",
+          "at": "2026-07-22T12:33:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:982ff6dee178fcd5996a39f45cd01d635891ea2d1cd56b140294cd804383b922",
+          "at": "2026-07-22T12:36:20Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:614cc55b3aef537d37da740768c44eda181a92c053341f7977d46a24e54c6079",
+          "at": "2026-07-22T12:24:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-02 requires all three skills to retain workflow authority in `.harness`, but the declared in-scope work only adds files under `.agents/skills/`. In particular, `adr-add` currently has no provider-independent workflow SSoT under `.harness/workflows/`, so satisfying this acceptance criterion necessarily requires work outside the declared scope.",
+              "severity": "P1",
+              "file": "track/items/codex-merge-done-adr-entrypoints-2026-07-22/spec.json",
+              "line": 116,
+              "category": "scope / acceptance_criteria contradiction"
+            },
+            {
+              "message": "The related-convention list includes conventions that do not apply to this documentation-only adapter track: `responsibility-boundary.md` governs CI/verifier enforcement, while `language-policy.md#Rust First`, `coding-principles.md`, and `prefer-type-safe-abstractions.md` govern implementation code. These off-topic inputs can misdirect downstream planning despite the track intentionally having no code/type work.",
+              "severity": "P1",
+              "file": "track/items/codex-merge-done-adr-entrypoints-2026-07-22/spec.json",
+              "line": 147,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:614cc55b3aef537d37da740768c44eda181a92c053341f7977d46a24e54c6079",
+          "at": "2026-07-22T12:28:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:215e13927caaa9ed4045f426ab632243cbb6565132d20de5e5bca41df74ebfa9",
+          "at": "2026-07-22T12:31:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:215e13927caaa9ed4045f426ab632243cbb6565132d20de5e5bca41df74ebfa9",
+          "at": "2026-07-22T12:31:19Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c3d7f4e4e010fd6b9e53150bcc0c6d9244aeeb8dc4f0dac9de708fd4a7e77df",
+          "at": "2026-07-22T12:24:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c3d7f4e4e010fd6b9e53150bcc0c6d9244aeeb8dc4f0dac9de708fd4a7e77df",
+          "at": "2026-07-22T12:26:18Z"
+        }
+      ]
     }
   }
 }
