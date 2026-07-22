@@ -25,4 +25,4 @@ GO-01: T1, T2, T3, T4, T5.
 > Update the rollback-diagnoser cross-reference and the diagnose workflow's re-entry briefing requirement. IN-02, IN-07, AC-06.
 
 - [x] **T4**: Update `.harness/capabilities/rollback-diagnoser.md` with the convention cross-reference pointer. IN-02, IN-07, CN-02, CN-03, AC-03, AC-05, OUT-01. (`b5cd26b760bc479e7d2cd89a930e80af0fc43377`)
-- [x] **T5**: Update `.harness/workflows/track/diagnose.md` Step 3 with the pre-dispatch convergence-evidence check. IN-02, AC-05, AC-06.
+- [x] **T5**: Update `.harness/workflows/track/diagnose.md` Step 3 with the pre-dispatch convergence-evidence check. IN-02, AC-05, AC-06. (`6b3f712a543c552e3531befee6c874ab40505ef5`)

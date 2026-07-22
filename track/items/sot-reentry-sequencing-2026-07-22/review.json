@@ -1,21 +1,79 @@
 {
   "schema_version": 2,
   "scopes": {
-    "adr": {
+    "spec": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1982c15e9974b92a645574f4c58db1c8256db0a1102e400a478aa520b61c3f78",
-          "at": "2026-07-22T04:05:02Z"
+          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
+          "at": "2026-07-22T04:26:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "IN-08 cites `knowledge/conventions/README.md` to justify indexing the new document there, but that README explicitly excludes template-wide workflows from `knowledge/conventions/`. The cited convention therefore contradicts rather than grounds this scope item, leaving downstream work directed to a location whose governing convention disallows this artifact class.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 110,
+              "category": "broken cross-reference at narrative level"
+            },
+            {
+              "message": "`no-upstream-restatement.md` limits its scope to impl-plan descriptions and type-catalogue documentation, while explicitly exempting `spec.json` and workflow documents. It therefore cannot ground IN-01/CN-01's SSoT-reference rule for a new workflow convention; its `convention_refs` and `related_conventions` entries are off-topic.",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 34,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
+          "at": "2026-07-22T04:29:39Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1982c15e9974b92a645574f4c58db1c8256db0a1102e400a478aa520b61c3f78",
-          "at": "2026-07-22T04:08:39Z"
+          "hash": "rvw1:sha256:87c60a3d9298c8daf642b794cda5bd633e155cd958ab3344a9ba21b6087aa4b5",
+          "at": "2026-07-22T04:31:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e05cf504ae60ffc977faeb92d995552795f380dcad3d7fe1cb85efafe49decb8",
+          "at": "2026-07-22T05:05:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 は D1 を含む順次処理規律の一貫した定着を求め、IN-02 は `diagnose.md` に dispatch 前の三要素・直上流チェックと収束証跡の引き渡しを要求しています。しかし AC-01〜AC-04 は convention または writer capability の内容だけを検査し、AC-05 は `diagnose.md` を許容差分へ加えるだけでその要求内容を検証しません。そのため orchestrator-side のチェックと証跡引き渡しが欠けたままでも全 AC を満たせ、GO-01 の完了を決定的に証明できません。",
+              "severity": "P1",
+              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
+              "line": 220,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:e05cf504ae60ffc977faeb92d995552795f380dcad3d7fe1cb85efafe49decb8",
+          "at": "2026-07-22T05:09:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bb41305fdb53e4cfac00ec3fa5d198460089c186cf608c61b87f3c1145dc1df",
+          "at": "2026-07-22T05:13:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:084a60859369138c32f8b575594aa86d196369c1fd767ee0f5d3b6a723ad27f6",
+          "at": "2026-07-22T05:34:44Z"
         }
       ]
     },
@@ -170,6 +228,20 @@
           "findings": [],
           "hash": "rvw1:sha256:e62a0f0c79e0cb27c0aca88c79fc3ff00384ef176f629cc3c9cafd40e7106427",
           "at": "2026-07-22T05:26:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee22cc91faa3eea03cb8cd5797f90bd6e0514aa7bfe384867f6739d2348a5e19",
+          "at": "2026-07-22T05:36:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ee22cc91faa3eea03cb8cd5797f90bd6e0514aa7bfe384867f6739d2348a5e19",
+          "at": "2026-07-22T05:39:16Z"
         }
       ]
     },
@@ -235,79 +307,21 @@
         }
       ]
     },
-    "spec": {
+    "adr": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
-          "at": "2026-07-22T04:26:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "IN-08 cites `knowledge/conventions/README.md` to justify indexing the new document there, but that README explicitly excludes template-wide workflows from `knowledge/conventions/`. The cited convention therefore contradicts rather than grounds this scope item, leaving downstream work directed to a location whose governing convention disallows this artifact class.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 110,
-              "category": "broken cross-reference at narrative level"
-            },
-            {
-              "message": "`no-upstream-restatement.md` limits its scope to impl-plan descriptions and type-catalogue documentation, while explicitly exempting `spec.json` and workflow documents. It therefore cannot ground IN-01/CN-01's SSoT-reference rule for a new workflow convention; its `convention_refs` and `related_conventions` entries are off-topic.",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 34,
-              "category": "broken cross-reference at narrative level"
-            }
-          ],
-          "hash": "rvw1:sha256:6cf993ddc0266a1cdc82d524931939fa97df153df1ddbcc1ee5255105dea28a6",
-          "at": "2026-07-22T04:29:39Z"
+          "hash": "rvw1:sha256:1982c15e9974b92a645574f4c58db1c8256db0a1102e400a478aa520b61c3f78",
+          "at": "2026-07-22T04:05:02Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:87c60a3d9298c8daf642b794cda5bd633e155cd958ab3344a9ba21b6087aa4b5",
-          "at": "2026-07-22T04:31:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e05cf504ae60ffc977faeb92d995552795f380dcad3d7fe1cb85efafe49decb8",
-          "at": "2026-07-22T05:05:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 は D1 を含む順次処理規律の一貫した定着を求め、IN-02 は `diagnose.md` に dispatch 前の三要素・直上流チェックと収束証跡の引き渡しを要求しています。しかし AC-01〜AC-04 は convention または writer capability の内容だけを検査し、AC-05 は `diagnose.md` を許容差分へ加えるだけでその要求内容を検証しません。そのため orchestrator-side のチェックと証跡引き渡しが欠けたままでも全 AC を満たせ、GO-01 の完了を決定的に証明できません。",
-              "severity": "P1",
-              "file": "track/items/sot-reentry-sequencing-2026-07-22/spec.json",
-              "line": 220,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:e05cf504ae60ffc977faeb92d995552795f380dcad3d7fe1cb85efafe49decb8",
-          "at": "2026-07-22T05:09:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9bb41305fdb53e4cfac00ec3fa5d198460089c186cf608c61b87f3c1145dc1df",
-          "at": "2026-07-22T05:13:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:084a60859369138c32f8b575594aa86d196369c1fd767ee0f5d3b6a723ad27f6",
-          "at": "2026-07-22T05:34:44Z"
+          "hash": "rvw1:sha256:1982c15e9974b92a645574f4c58db1c8256db0a1102e400a478aa520b61c3f78",
+          "at": "2026-07-22T04:08:39Z"
         }
       ]
     },

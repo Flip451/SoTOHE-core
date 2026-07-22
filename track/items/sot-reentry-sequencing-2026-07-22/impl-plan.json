@@ -28,7 +28,8 @@
     {
       "id": "T5",
       "description": "Update `.harness/workflows/track/diagnose.md` Step 3 with the pre-dispatch convergence-evidence check. IN-02, AC-05, AC-06.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "6b3f712a543c552e3531befee6c874ab40505ef5"
     }
   ],
   "plan": {
