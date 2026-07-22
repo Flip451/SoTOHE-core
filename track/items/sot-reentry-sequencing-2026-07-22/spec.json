@@ -22,17 +22,21 @@
     "in_scope": [
       {
         "id": "IN-01",
-        "text": "`knowledge/conventions/sot-reentry-sequencing.md` を追加し、phase 収束を参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings` の三要素として、既存 SSoT を参照して規定する。",
+        "text": "`knowledge/conventions/sot-reentry-sequencing.md` を追加し、`adr_user` chain の ADR 収束は参照 signal と ADR scope review の `zero_findings` の二要素とし、それ以外の phase 収束は参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings` の三要素として、既存 SSoT を参照して規定する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
             "anchor": "D2"
+          },
+          {
+            "file": "knowledge/adr/2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md",
+            "anchor": "D1"
           }
         ]
       },
       {
         "id": "IN-02",
-        "text": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` と直上流 1 層を確認し、その収束証跡を writer briefing に渡すことを規定する。",
+        "text": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が直上流 1 層について、`adr_user` chain の ADR 収束では参照 signal と ADR scope review の `zero_findings` を、それ以外の phase 収束では参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡すことを規定する。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
@@ -45,6 +49,10 @@
           {
             "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
             "anchor": "D3"
+          },
+          {
+            "file": "knowledge/adr/2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md",
+            "anchor": "D1"
           }
         ]
       },
@@ -177,11 +185,15 @@
   "acceptance_criteria": [
     {
       "id": "AC-01",
-      "text": "新 convention は、phase 収束を参照 signal、該当 `bin/sotp ref-verify` scope、該当 SoT scope review の `zero_findings` の三要素として扱い、各要素の具体的な許容値・対応表は既存 SSoT を参照する。",
+      "text": "新 convention は、`adr_user` chain の ADR 収束を参照 signal と ADR scope review の `zero_findings` の二要素として扱い、それ以外の phase 収束を参照 signal、該当 `bin/sotp ref-verify` scope、該当 SoT scope review の `zero_findings` の三要素として扱う。各要素の具体的な許容値・対応表は既存 SSoT を参照する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
           "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md",
+          "anchor": "D1"
         }
       ]
     },
@@ -217,7 +229,7 @@
     },
     {
       "id": "AC-05",
-      "text": "実装差分は新 convention、指定された五つの capability documents、`.harness/workflows/track/diagnose.md`、および再生成された conventions index に限定され、gate、CI、signal-gates configuration、`adr_user` evaluator に変更を含まない。",
+      "text": "実装差分は新 convention、`rollback-diagnoser`、`spec-designer`、`type-designer`、`impl-planner`、`implementer` の五つの capability documents、`.harness/workflows/track/diagnose.md`、および再生成された conventions index に限定され、gate、CI、signal-gates configuration、`adr_user` evaluator に変更を含まない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
@@ -227,7 +239,7 @@
     },
     {
       "id": "AC-06",
-      "text": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings`、および直上流 1 層を確認し、その収束証跡を writer briefing に渡す手順を明記する。",
+      "text": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が直上流 1 層について、`adr_user` chain の ADR 収束では参照 signal と ADR scope review の `zero_findings` を、それ以外の phase 収束では参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡す手順を明記する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
@@ -240,6 +252,10 @@
         {
           "file": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
           "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md",
+          "anchor": "D1"
         }
       ]
     }

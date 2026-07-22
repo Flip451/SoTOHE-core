@@ -461,13 +461,7 @@ Wire-format validity (role vocabulary membership, entry-name validity, function-
 
 ## Re-entry prerequisite (sequencing discipline)
 
-Per `knowledge/conventions/sot-reentry-sequencing.md`, a re-entry dispatch of this capability
-requires the convergence of its direct upstream only — the spec (`spec_adr` chain: reference
-signal per `.harness/config/signal-gates.json`, the applicable `bin/sotp ref-verify` scope,
-and spec-scope review `zero_findings`). If the briefing shows this prerequisite unmet, do not
-start catalogue work: return the briefing to the orchestrator stating the unmet prerequisite.
-If mid-work you discover `spec.json` (or further upstream) needs editing, stop immediately and
-return to the orchestrator (immediate bounce-back; no deferred-fix continuation).
+Per `knowledge/conventions/sot-reentry-sequencing.md`, a re-entry dispatch of this capability requires the convergence of its direct upstream only — the spec (`spec_adr` chain: reference signal per `.harness/config/signal-gates.json`, the applicable `bin/sotp ref-verify` scope, and spec-scope review `zero_findings`). If the briefing shows this prerequisite unmet, do not start catalogue work: return the briefing to the orchestrator stating the unmet prerequisite. If mid-work you discover `spec.json` (or further upstream) needs editing, stop immediately and return to the orchestrator (immediate bounce-back; no deferred-fix continuation).
 
 ## Rules
 

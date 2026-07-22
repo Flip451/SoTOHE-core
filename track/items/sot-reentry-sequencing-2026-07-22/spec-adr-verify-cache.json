@@ -3,10 +3,10 @@
   "entries": [
     {
       "claim_hash": "b1bfa8fd10300e27a02b6f66f843e5c4a50a7aa001451bef033783058849fbe0",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
-        "citation": "本規律はルーティング後の降下順序の強制を担う。Prerequisite の充足確認と降下順序の遵守は dispatch する orchestrator の責務とし、各 writer capability は自分の Prerequisite が満たされていない briefing を受けた場合、作業せず orchestrator へ差し戻す。"
+        "citation": "本規律はルーティング後の降下順序の強制を担う。Prerequisite の充足確認と降下順序の遵守は dispatch する orchestrator の責務とし"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -26,7 +26,7 @@
     },
     {
       "claim_hash": "b1bfa8fd10300e27a02b6f66f843e5c4a50a7aa001451bef033783058849fbe0",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
         "citation": "各フェーズは直上流 1 層のみを検査する。上流の上流の収束は直上流の収束が推移的に保証する"
@@ -48,18 +48,18 @@
       }
     },
     {
-      "claim_hash": "d7ab259d9679a9afb738a7850656334071ebe4f4ef37d1f84724f4ac41ad5c45",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "claim_hash": "28927832ef5b3a72c7cf8b37f8f7ee7f62bf191aebfa709fc4a0ead803183f92",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
-        "citation": "### D2: フェーズ収束の 3 要素定義\n\nフェーズ X が「収束している」とは、次のすべてが成立していること:\n\n1. **参照信号**: X の成果物を引用側（下流）とする chain の参照信号 — 参照の存在を機械評価した\n   🔵 / 🟡 / 🔴 — が、`.harness/config/signal-gates.json` の当該 chain × gate 指定\n   （interim / strict）を満たす。許容水準の SSoT は同設定ファイルであり、本規律は値を\n   再記述しない。\n2. **意味論検証**: `bin/sotp ref-verify` の該当 scope が通過している（参照先の内容と引用側の\n   記述の意味的整合。参照信号とは独立の検証で、scope と chain の対応は ref-verify 側の\n   定義に従う）。\n3. **レビュー**: 該当 SoT スコープの review が `zero_findings` で完了している。"
+        "citation": "フェーズ X が「収束している」とは、次のすべてが成立していること:"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "`knowledge/conventions/sot-reentry-sequencing.md` を追加し、phase 収束を参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings` の三要素として、既存 SSoT を参照して規定する。"
+          "text_label": "`knowledge/conventions/sot-reentry-sequencing.md` を追加し、`adr_user` chain の ADR 収束は参照 signal と ADR scope review の `zero_findings` の二要素とし、それ以外の phase 収束は参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings` の三要素として、既存 SSoT を参照して規定する。"
         }
       },
       "evidence_origin": {
@@ -71,18 +71,41 @@
       }
     },
     {
-      "claim_hash": "b21477e32759b8cc687ad85b13a12e30c386c1247cac0033ef3878237c1c3ac9",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "claim_hash": "28927832ef5b3a72c7cf8b37f8f7ee7f62bf191aebfa709fc4a0ead803183f92",
+      "evidence_hash": "158fb34cccbb3917bc4bec4b4da2f81bfdd8405dcd14915f787ac6b4a8b9315d",
       "verdict": {
         "kind": "pass",
-        "citation": "回帰先の判定は rollback-diagnoser（勧告。orchestrator の override 余地も既存どおり）が担い、本規律はルーティング後の降下順序の強制を担う。Prerequisite の充足確認と降下順序の遵守は dispatch する orchestrator の責務とし、各 writer capability は自分の Prerequisite が満たされていない briefing を受けた場合、作業せず orchestrator へ差し戻す。"
+        "citation": "ADR 収束は、次の両方が成立したときに限り成立する。\n\n1. `adr_user` の参照信号が `.harness/config/signal-gates.json` の当該 chain × gate 指定を満たす。\n2. ADR scope review が `zero_findings` で完了している。\n\nこの除外は `adr_user` chain の ADR 収束だけに限定する。他の chain のフェーズ収束には、D2 の参照信号・意味論検証・レビューという 3 要素を引き続きすべて要求する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`knowledge/conventions/sot-reentry-sequencing.md` を追加し、`adr_user` chain の ADR 収束は参照 signal と ADR scope review の `zero_findings` の二要素とし、それ以外の phase 収束は参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings` の三要素として、既存 SSoT を参照して規定する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "59e12fff5ce5ebd3efca00856acac1aeb118affbd064cb5e2edd0cd726aba352",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「回帰先の判定は rollback-diagnoser（勧告。orchestrator の override 余地も既存どおり）が担い、本規律はルーティング後の降下順序の強制を担う。Prerequisite の充足確認と降下順序の遵守は dispatch する orchestrator の責務とし、各 writer capability は自分の Prerequisite が満たされていない briefing を受けた場合、作業せず orchestrator へ差し戻す。」"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
           "element_id": "IN-02",
-          "text_label": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` と直上流 1 層を確認し、その収束証跡を writer briefing に渡すことを規定する。"
+          "text_label": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が直上流 1 層について、`adr_user` chain の ADR 収束では参照 signal と ADR scope review の `zero_findings` を、それ以外の phase 収束では参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡すことを規定する。"
         }
       },
       "evidence_origin": {
@@ -94,18 +117,18 @@
       }
     },
     {
-      "claim_hash": "b21477e32759b8cc687ad85b13a12e30c386c1247cac0033ef3878237c1c3ac9",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "claim_hash": "59e12fff5ce5ebd3efca00856acac1aeb118affbd064cb5e2edd0cd726aba352",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
-        "citation": "フェーズ X が「収束している」とは、次のすべてが成立していること:\n\n1. **参照信号**: X の成果物を引用側（下流）とする chain の参照信号 — 参照の存在を機械評価した 🔵 / 🟡 / 🔴 — が、`.harness/config/signal-gates.json` の当該 chain × gate 指定（interim / strict）を満たす。\n2. **意味論検証**: `bin/sotp ref-verify` の該当 scope が通過している（参照先の内容と引用側の記述の意味的整合。参照信号とは独立の検証で、scope と chain の対応は ref-verify 側の定義に従う）。\n3. **レビュー**: 該当 SoT スコープの review が `zero_findings` で完了している。"
+        "citation": "### D2: フェーズ収束の 3 要素定義\n\nフェーズ X が「収束している」とは、次のすべてが成立していること:\n\n1. **参照信号**: X の成果物を引用側（下流）とする chain の参照信号 — 参照の存在を機械評価した 🔵 / 🟡 / 🔴 — が、`.harness/config/signal-gates.json` の当該 chain × gate 指定（interim / strict）を満たす。\n2. **意味論検証**: `bin/sotp ref-verify` の該当 scope が通過している（参照先の内容と引用側の記述の意味的整合。参照信号とは独立の検証で、scope と chain の対応は ref-verify 側の定義に従う）。\n3. **レビュー**: 該当 SoT スコープの review が `zero_findings` で完了している。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
           "element_id": "IN-02",
-          "text_label": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` と直上流 1 層を確認し、その収束証跡を writer briefing に渡すことを規定する。"
+          "text_label": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が直上流 1 層について、`adr_user` chain の ADR 収束では参照 signal と ADR scope review の `zero_findings` を、それ以外の phase 収束では参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡すことを規定する。"
         }
       },
       "evidence_origin": {
@@ -117,18 +140,18 @@
       }
     },
     {
-      "claim_hash": "b21477e32759b8cc687ad85b13a12e30c386c1247cac0033ef3878237c1c3ac9",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "claim_hash": "59e12fff5ce5ebd3efca00856acac1aeb118affbd064cb5e2edd0cd726aba352",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
-        "citation": "各フェーズは直上流 1 層のみを検査する。"
+        "citation": "各フェーズは直上流 1 層のみを検査する。上流の上流の収束は直上流の収束が推移的に保証する（SoT Chain の layer skip 禁止と同型）。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
           "element_id": "IN-02",
-          "text_label": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` と直上流 1 層を確認し、その収束証跡を writer briefing に渡すことを規定する。"
+          "text_label": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が直上流 1 層について、`adr_user` chain の ADR 収束では参照 signal と ADR scope review の `zero_findings` を、それ以外の phase 収束では参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡すことを規定する。"
         }
       },
       "evidence_origin": {
@@ -140,8 +163,31 @@
       }
     },
     {
+      "claim_hash": "59e12fff5ce5ebd3efca00856acac1aeb118affbd064cb5e2edd0cd726aba352",
+      "evidence_hash": "158fb34cccbb3917bc4bec4b4da2f81bfdd8405dcd14915f787ac6b4a8b9315d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ADR 収束（`adr_user` chain）には、D2 の意味論検証（ref-verify）要素を要求しない。ADR 収束は、次の両方が成立したときに限り成立する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "`knowledge/conventions/sot-reentry-sequencing.md` は rollback-diagnoser、orchestrator、writer capability の責務分離を規定し、`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が直上流 1 層について、`adr_user` chain の ADR 収束では参照 signal と ADR scope review の `zero_findings` を、それ以外の phase 収束では参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡すことを規定する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
       "claim_hash": "994b846bc462552c135b840afba1fc6531086013552fa2dedc9cb5e486478695",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
         "citation": "各フェーズは直上流 1 層のみを検査する。"
@@ -164,10 +210,10 @@
     },
     {
       "claim_hash": "b6c54b4d6f8410409368085f1e3224c7a0527addd3ce0f65ecafc2bc12be6307",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
-        "citation": "下流作業中に収束済み上流 SoT への編集の必要性が発見された時点で、下流作業を中断して上流へ戻る（ルーティングが自明でなければ diagnose 経由）。"
+        "citation": "下流作業中に収束済み上流 SoT への編集の必要性が発見された時点で、下流作業を中断して上流へ戻る（ルーティングが自明でなければ diagnose 経由）。上流 SoT への編集は適用された時点で当該フェーズの収束を即座に失効させ、再収束（D2 の 3 要素）まで下流フェーズの再開を禁止する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -187,7 +233,7 @@
     },
     {
       "claim_hash": "328e9a6f01cdf0c20668996192413f673012047cccde1c39e7864d31b0563abf",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
         "citation": "各 writer capability は自分の Prerequisite が満たされていない briefing を受けた場合、作業せず orchestrator へ差し戻す。"
@@ -210,7 +256,7 @@
     },
     {
       "claim_hash": "066a19fef97618b4f0e0de46a3fc3fd377576d1157bcbb590f9a32e8dfec610c",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
         "citation": "各フェーズは直上流 1 層のみを検査する。"
@@ -233,7 +279,7 @@
     },
     {
       "claim_hash": "b7ff2ffafb2a9e3073f572bc30648c0dcf304079657e33a781b786b50415db9b",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
         "citation": "回帰先の判定は rollback-diagnoser（勧告。orchestrator の override 余地も既存どおり）が担い、本規律はルーティング後の降下順序の強制を担う。"
@@ -256,7 +302,7 @@
     },
     {
       "claim_hash": "731ddffd998653b51e12e85419f354d57ff735ebc6df4be4d18204dcbcaf2252",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
         "citation": "本規律は convention 文書と各 writer capability 文書への追記で運用する。"
@@ -279,7 +325,7 @@
     },
     {
       "claim_hash": "009ac7280e5a621edec161e833e1db83b2594d42dab9c98ead78e8e6c62c384b",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
         "citation": "gate / CI / `.harness/config/signal-gates.json` / `adr_user` 評価は変更しない。"
@@ -302,7 +348,7 @@
     },
     {
       "claim_hash": "bb1c3e7d6d1e1396d19fbcfba06056ac131c982888f6954cef7991523bda1719",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
         "citation": "この例外を他の SoT へ一般化しない。"
@@ -325,10 +371,10 @@
     },
     {
       "claim_hash": "46a71685bc01d1c8bbb8c34d4e2bbde12e02c756e0c9fde55fb4709e61d9e11b",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
-        "citation": "「許容水準の SSoT は同設定ファイルであり、本規律は値を再記述しない。」および「scope と chain の対応は ref-verify 側の定義に従う」"
+        "citation": "許容水準の SSoT は同設定ファイルであり、本規律は値を再記述しない。／scope と chain の対応は ref-verify 側の定義に従う。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -348,10 +394,10 @@
     },
     {
       "claim_hash": "ba58e9482a4038def223826a5a21998227617c669636c0c0760120097942f408",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
-        "citation": "下流作業中に収束済み上流 SoT への編集の必要性が発見された時点で、下流作業を中断して上流へ戻る（ルーティングが自明でなければ diagnose 経由）。"
+        "citation": "下流作業中に収束済み上流 SoT への編集の必要性が発見された時点で、下流作業を中断して上流へ戻る（ルーティングが自明でなければ diagnose 経由）。「後でまとめて直す」「変更の有無を判定して続行する」は禁止する — 収束の有効性判定という裁量を挟まない。上流 SoT への編集は適用された時点で当該フェーズの収束を即座に失効させ、再収束（D2 の 3 要素）まで下流フェーズの再開を禁止する。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -371,10 +417,10 @@
     },
     {
       "claim_hash": "e18ef2a499ed8a68da79ff434aa1233112aac9e2e74e63838f83c5579cc6cc03",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
-        "citation": "本規律は convention 文書と各 writer capability 文書への追記で運用する。gate / CI / `.harness/config/signal-gates.json` / `adr_user` 評価は変更しない。"
+        "citation": "本規律は convention 文書と各 writer capability 文書への追記で運用する。gate / CI / `.harness/config/signal-gates.json` / `adr_user` 評価は変更しない。機械 enforcement への昇格（enforce-by-mechanism）は、…本 ADR の範囲外とする。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -393,18 +439,18 @@
       }
     },
     {
-      "claim_hash": "1f887da561858d14d0380a5874eb839b1174c4674d871382f2d4485713fbcfc7",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "claim_hash": "31302169497b401c691fa7d481fbdcaf7599bc64ec4fb4b46142094c37eeb045",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
-        "citation": "### D2: フェーズ収束の 3 要素定義\n\nフェーズ X が「収束している」とは、次のすべてが成立していること:\n\n1. **参照信号**: X の成果物を引用側（下流）とする chain の参照信号 — 参照の存在を機械評価した\n   🔵 / 🟡 / 🔴 — が、`.harness/config/signal-gates.json` の当該 chain × gate 指定\n   （interim / strict）を満たす。\n2. **意味論検証**: `bin/sotp ref-verify` の該当 scope が通過している（参照先の内容と引用側の\n   記述の意味的整合。参照信号とは独立の検証で、scope と chain の対応は ref-verify 側の\n   定義に従う）。\n3. **レビュー**: 該当 SoT スコープの review が `zero_findings` で完了している。"
+        "citation": "「フェーズ X が『収束している』とは、次のすべてが成立していること: 1. **参照信号**: X の成果物を引用側（下流）とする chain の参照信号… 2. **意味論検証**: `bin/sotp ref-verify` の該当 scope が通過している… 3. **レビュー**: 該当 SoT スコープの review が `zero_findings` で完了している。」"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "新 convention は、phase 収束を参照 signal、該当 `bin/sotp ref-verify` scope、該当 SoT scope review の `zero_findings` の三要素として扱い、各要素の具体的な許容値・対応表は既存 SSoT を参照する。"
+          "text_label": "新 convention は、`adr_user` chain の ADR 収束を参照 signal と ADR scope review の `zero_findings` の二要素として扱い、それ以外の phase 収束を参照 signal、該当 `bin/sotp ref-verify` scope、該当 SoT scope review の `zero_findings` の三要素として扱う。各要素の具体的な許容値・対応表は既存 SSoT を参照する。"
         }
       },
       "evidence_origin": {
@@ -416,8 +462,31 @@
       }
     },
     {
+      "claim_hash": "31302169497b401c691fa7d481fbdcaf7599bc64ec4fb4b46142094c37eeb045",
+      "evidence_hash": "158fb34cccbb3917bc4bec4b4da2f81bfdd8405dcd14915f787ac6b4a8b9315d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ADR 収束（`adr_user` chain）には、D2 の意味論検証（ref-verify）要素を要求しない。ADR 収束は、次の両方が成立したときに限り成立する。\n\n1. `adr_user` の参照信号が `.harness/config/signal-gates.json` の当該 chain × gate 指定を満たす。\n2. ADR scope review が `zero_findings` で完了している。\n\nこの除外は `adr_user` chain の ADR 収束だけに限定する。他の chain のフェーズ収束には、D2 の参照信号・意味論検証・レビューという 3 要素を引き続きすべて要求する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "新 convention は、`adr_user` chain の ADR 収束を参照 signal と ADR scope review の `zero_findings` の二要素として扱い、それ以外の phase 収束を参照 signal、該当 `bin/sotp ref-verify` scope、該当 SoT scope review の `zero_findings` の三要素として扱う。各要素の具体的な許容値・対応表は既存 SSoT を参照する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
       "claim_hash": "fa044009e22b90b055689cb3618eacefc9901432131fae691ab333566329d4c7",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
         "citation": "各フェーズは直上流 1 層のみを検査する。"
@@ -440,7 +509,7 @@
     },
     {
       "claim_hash": "36608812a808a8bb2ba5746f6966087fafe32b9e342f1a27de8ab8c6bed5ffa2",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
         "citation": "下流作業中に収束済み上流 SoT への編集の必要性が発見された時点で、下流作業を中断して上流へ戻る"
@@ -463,7 +532,7 @@
     },
     {
       "claim_hash": "0ce83ca30135befa8f5a354e0e9a13087b038a3d3dce23b50bb1d4fb0dd8bf32",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
         "citation": "`impl-plan.json` のみ、review 収束後も `bin/sotp track transition` による task ステータス遷移を許容し、これは収束を失効させない。それ以外の impl-plan 変更は D4 に従い失効・再収束を要する。この例外を他の SoT へ一般化しない。"
@@ -485,8 +554,8 @@
       }
     },
     {
-      "claim_hash": "7af87a084ae2bda6aede7557a329b73455532169ddbbde509a4cafa531ff2989",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "claim_hash": "9c2d2194311b4a7ea9acccf4272501b68f8f856a96c8d6d3cb80b43787a5a3cb",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
         "citation": "本規律は convention 文書と各 writer capability 文書への追記で運用する。gate / CI / `.harness/config/signal-gates.json` / `adr_user` 評価は変更しない。"
@@ -496,7 +565,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "実装差分は新 convention、指定された五つの capability documents、`.harness/workflows/track/diagnose.md`、および再生成された conventions index に限定され、gate、CI、signal-gates configuration、`adr_user` evaluator に変更を含まない。"
+          "text_label": "実装差分は新 convention、`rollback-diagnoser`、`spec-designer`、`type-designer`、`impl-planner`、`implementer` の五つの capability documents、`.harness/workflows/track/diagnose.md`、および再生成された conventions index に限定され、gate、CI、signal-gates configuration、`adr_user` evaluator に変更を含まない。"
         }
       },
       "evidence_origin": {
@@ -508,18 +577,18 @@
       }
     },
     {
-      "claim_hash": "c452f2a6725a21dcd27524b32c9c842292cb223ddb7dfdf65505f0fc11583831",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "claim_hash": "775546fd7b2dc39a5102d645128c61b74af268c18e3b791aa516f13783c87d8c",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
-        "citation": "「本規律はルーティング後の降下順序の強制を担う。Prerequisite の充足確認と降下順序の遵守は dispatch する orchestrator の責務」"
+        "citation": "「Prerequisite の充足確認と降下順序の遵守は dispatch する orchestrator の責務とし」"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings`、および直上流 1 層を確認し、その収束証跡を writer briefing に渡す手順を明記する。"
+          "text_label": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が直上流 1 層について、`adr_user` chain の ADR 収束では参照 signal と ADR scope review の `zero_findings` を、それ以外の phase 収束では参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡す手順を明記する。"
         }
       },
       "evidence_origin": {
@@ -531,18 +600,18 @@
       }
     },
     {
-      "claim_hash": "c452f2a6725a21dcd27524b32c9c842292cb223ddb7dfdf65505f0fc11583831",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "claim_hash": "775546fd7b2dc39a5102d645128c61b74af268c18e3b791aa516f13783c87d8c",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
-        "citation": "\"フェーズ X が「収束している」とは、次のすべてが成立していること: ... 1. **参照信号** ... 2. **意味論検証**: `bin/sotp ref-verify` の該当 scope が通過している ... 3. **レビュー**: 該当 SoT スコープの review が `zero_findings` で完了している。\""
+        "citation": "フェーズ X が「収束している」とは、次のすべてが成立していること:\n\n1. **参照信号**: X の成果物を引用側（下流）とする chain の参照信号 — 参照の存在を機械評価した 🔵 / 🟡 / 🔴 — が、`.harness/config/signal-gates.json` の当該 chain × gate 指定（interim / strict）を満たす。\n2. **意味論検証**: `bin/sotp ref-verify` の該当 scope が通過している（参照先の内容と引用側の記述の意味的整合。参照信号とは独立の検証で、scope と chain の対応は ref-verify 側の定義に従う）。\n3. **レビュー**: 該当 SoT スコープの review が `zero_findings` で完了している。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings`、および直上流 1 層を確認し、その収束証跡を writer briefing に渡す手順を明記する。"
+          "text_label": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が直上流 1 層について、`adr_user` chain の ADR 収束では参照 signal と ADR scope review の `zero_findings` を、それ以外の phase 収束では参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡す手順を明記する。"
         }
       },
       "evidence_origin": {
@@ -554,18 +623,18 @@
       }
     },
     {
-      "claim_hash": "c452f2a6725a21dcd27524b32c9c842292cb223ddb7dfdf65505f0fc11583831",
-      "evidence_hash": "8a7495732c3eb7ba9c52f9b643c591e1a2b8c37d0bf2a3b95d83005957660d46",
+      "claim_hash": "775546fd7b2dc39a5102d645128c61b74af268c18e3b791aa516f13783c87d8c",
+      "evidence_hash": "8b0e9574e1a4599236f800cb88a59179d4b946ae0cf96a0c50a4eaa92cba9c3f",
       "verdict": {
         "kind": "pass",
-        "citation": "「各フェーズは直上流 1 層のみを検査する。上流の上流の収束は直上流の収束が推移的に保証する」"
+        "citation": "各フェーズは直上流 1 層のみを検査する。上流の上流の収束は直上流の収束が推移的に保証する"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が参照 signal、該当 ref-verify scope、該当 SoT scope review の `zero_findings`、および直上流 1 層を確認し、その収束証跡を writer briefing に渡す手順を明記する。"
+          "text_label": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が直上流 1 層について、`adr_user` chain の ADR 収束では参照 signal と ADR scope review の `zero_findings` を、それ以外の phase 収束では参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡す手順を明記する。"
         }
       },
       "evidence_origin": {
@@ -573,6 +642,29 @@
         "data": {
           "file_path": "knowledge/adr/2026-07-22-0400-sot-reentry-sequencing.md",
           "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "775546fd7b2dc39a5102d645128c61b74af268c18e3b791aa516f13783c87d8c",
+      "evidence_hash": "158fb34cccbb3917bc4bec4b4da2f81bfdd8405dcd14915f787ac6b4a8b9315d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ADR 収束（`adr_user` chain）には、D2 の意味論検証（ref-verify）要素を要求しない。ADR 収束は、次の両方が成立したときに限り成立する。\n\n1. `adr_user` の参照信号が `.harness/config/signal-gates.json` の当該 chain × gate 指定を満たす。\n2. ADR scope review が `zero_findings` で完了している。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`.harness/workflows/track/diagnose.md` は routing 後かつ各再入 writer dispatch 前に、orchestrator が直上流 1 層について、`adr_user` chain の ADR 収束では参照 signal と ADR scope review の `zero_findings` を、それ以外の phase 収束では参照 signal・該当 ref-verify scope・該当 SoT scope review の `zero_findings` を確認し、その収束証跡を writer briefing に渡す手順を明記する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md",
+          "decision_id": "D1"
         }
       }
     }

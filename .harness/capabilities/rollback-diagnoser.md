@@ -20,11 +20,7 @@ structured **routing decision** identifying which phase
 order to close the finding. This capability **never** edits SoT artifacts or invokes writer
 subagents; the dispatch belongs to the calling orchestrator.
 
-**Boundary with the re-entry sequencing discipline**: this capability's responsibility ends at
-the routing recommendation. The post-routing descent — confirming each writer phase's re-entry
-prerequisite (direct-upstream convergence) and enforcing the sequential order back down the
-chain — is the dispatching orchestrator's duty, governed by
-`knowledge/conventions/sot-reentry-sequencing.md`.
+**Boundary with the re-entry sequencing discipline**: this capability's responsibility ends at the routing recommendation. The post-routing descent — confirming each writer phase's re-entry prerequisite (direct-upstream convergence) and enforcing the sequential order back down the chain — is the dispatching orchestrator's duty, governed by `knowledge/conventions/sot-reentry-sequencing.md`.
 
 ## Trigger inputs (caller's responsibility to assemble)
 
