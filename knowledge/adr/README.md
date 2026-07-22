@@ -150,6 +150,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [タスク単位の契約履行 pre-review ゲート — Phase 3 attribution artifact と impl_catalog 信号の binary 再利用](2026-06-27-0852-pre-review-task-contract-conformance-gate.md) | Accepted | 2026-06-27 |
 | [remote sync 専用コマンドの新設と git 操作の hexagonal 是正 — switch と pull の分離、意味論 port への全面移管](2026-07-04-0155-git-sync-dedicated-command.md) | Proposed | 2026-07-04 |
 | [/track:adr2pr の呼び出し型を引数指定から文脈自動解決に戻す](2026-07-20-1508-adr2pr-argless-context-resolution.md) | Proposed | 2026-07-20 |
+| [SoT 再入の順次処理規律 — ルーティング後のフェーズ収束 Prerequisite](2026-07-22-0400-sot-reentry-sequencing.md) | Proposed | 2026-07-22 |
 
 ### ADR 運用
 
@@ -219,6 +220,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [外部 provider 実行基盤の修復](2026-07-13-0410-capability-exec-infra-repair.md) | Proposed | 2026-07-13 |
 | [外部 agent 呼び出しのコスト削減](2026-07-13-2217-agent-dispatch-cost-reduction.md) | Proposed | 2026-07-13 |
 | [codex reviewer runtime の bootstrap 解決リンク（resolve & link）配備](2026-07-18-1359-codex-resolve-and-link-provisioning.md) | Proposed | 2026-07-18 |
+| [.claude/agents の description に capability exec 経由を明記する](2026-07-21-1522-agent-md-capability-exec-routing.md) | Proposed | 2026-07-21 |
 
 ### テスト・CI ツーリング
 

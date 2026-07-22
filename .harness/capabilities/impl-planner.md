@@ -90,6 +90,10 @@ Apply `knowledge/conventions/prefer-type-safe-abstractions.md` (Newtype / Enum-f
 - Do not spawn further agents (keep planning deterministic and serial).
 - If information beyond the briefing is needed, note it in `## Open Questions` rather than probing silently via exploration.
 
+## Re-entry prerequisite (sequencing discipline)
+
+Per `knowledge/conventions/sot-reentry-sequencing.md`, a re-entry dispatch of this capability requires the convergence of its direct upstream only — the type catalogues (`catalog_spec` chain: reference signal per `.harness/config/signal-gates.json`, the applicable `bin/sotp ref-verify` scope, and types-scope review `zero_findings`). If the briefing shows this prerequisite unmet, do not start planning: return the briefing to the orchestrator stating the unmet prerequisite. If mid-work you discover a catalogue (or further upstream) needs editing, stop immediately and return to the orchestrator (immediate bounce-back; no deferred-fix continuation).
+
 ## Rules
 
 - Use `Read`, `Grep`, `Glob`, `WebFetch`, `WebSearch` for exploration; `Write` / `Edit` for the owned files above; `Bash` only for `bin/sotp` CLI

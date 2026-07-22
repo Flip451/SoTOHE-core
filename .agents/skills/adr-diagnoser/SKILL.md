@@ -1,7 +1,17 @@
 ---
 name: adr-diagnoser
 sandbox: read-only
-description: Use when Codex is assigned the SoTOHE `adr-diagnoser` capability — the guardian of ADR decisions under the two-box model. Four read-only verdict modes; (1) Phase 0 edit judgment: does an applied in-place edit preserve or break the recorded decisions (supplying a preserving alternative or a no-change rationale when breaking); (2) Phase 1+ delta admission: the three-way admit / bounce-with-resolution / modification-proposal judgment on track-born draft candidates; (3) classification & conformance: semantic vs non-semantic classification of applied input-box fixes, and conformance re-audits of user-decision implementation edits (adoption / rejection / restoration); (4) mismatch classification: non-semantic restamp, deviation, or unknown-editor for unexpected baseline divergence. Always returns a structured read-only verdict for the orchestrator.
+description: >-
+  Use when Codex is assigned the SoTOHE `adr-diagnoser` capability — the guardian of ADR
+  decisions under the two-box model. Four read-only verdict modes; (1) Phase 0 edit judgment:
+  does an applied in-place edit preserve or break the recorded decisions (supplying a
+  preserving alternative or a no-change rationale when breaking); (2) Phase 1+ delta admission:
+  the three-way admit / bounce-with-resolution / modification-proposal judgment on track-born
+  draft candidates; (3) classification & conformance: semantic vs non-semantic classification
+  of applied input-box fixes, and conformance re-audits of user-decision implementation edits
+  (adoption / rejection / restoration); (4) mismatch classification: non-semantic restamp,
+  deviation, or unknown-editor for unexpected baseline divergence. Always returns a structured
+  read-only verdict for the orchestrator.
 ---
 
 # ADR-Diagnoser (Codex skill)

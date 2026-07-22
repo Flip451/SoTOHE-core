@@ -1,0 +1,154 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": ".claude/agents の capability 定義を capability exec 経由へ誘導する",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "capability に対応する `.claude/agents/*.md` の description が、orchestrator を provider / model 解決を内包する `bin/sotp capability exec` の正規経路へ誘導し、Agent tool による直接呼び出しを行わせないようにする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-21-1522-agent-md-capability-exec-routing.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "`adr-editor`、`dry-fix-lead`、`impl-planner`、`implementer`、`researcher`、`review-fix-lead`、`rollback-diagnoser`、`spec-designer`、`type-designer` に対応する `.claude/agents/*.md` の各 description を、`bin/sotp capability exec` 経由の呼び出しと Agent tool の直接呼び出し禁止を明示する内容へ更新する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-21-1522-agent-md-capability-exec-routing.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "各 description が agent 選択時に、capability の provider / model routing SSoT である `.harness/config/agent-profiles.json` を経由する正規 dispatch 経路を理解できる誘導を提供する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-21-1522-agent-md-capability-exec-routing.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OUT-01",
+        "text": "`.claude/agents/README.md` のような index を capability agent definition として扱ったり、その description 更新対象に含めたりしない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-21-1522-agent-md-capability-exec-routing.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OUT-02",
+        "text": "capability 相当 agent の Agent tool 直接呼び出しを hook 等で機械的に block する enforcement は導入しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-21-1522-agent-md-capability-exec-routing.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OUT-03",
+        "text": "`.harness/config/agent-profiles.json` の capability → provider / model routing、または `bin/sotp capability exec` の dispatch の仕組み自体は変更しない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-21-1522-agent-md-capability-exec-routing.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "description による案内は、provider / model 解決の唯一の権威を `.harness/config/agent-profiles.json` とし、その解決を内包する `bin/sotp capability exec` を正規経路として一貫して示さなければならない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-21-1522-agent-md-capability-exec-routing.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "この track の対策は description による誘導に留め、agent 判定の複雑さや誤検知を伴う新しい機械的 block を追加しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-21-1522-agent-md-capability-exec-routing.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "対象となる 9 個の capability-corresponding `.claude/agents/*.md` 定義のそれぞれについて、description が `bin/sotp capability exec` を経由して呼び出すことと、Agent tool で直接呼び出さないことの両方を明記している。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-21-1522-agent-md-capability-exec-routing.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "各対象 description は、direct Agent-tool invocation が provider / model 解決を bypass すること、及び `bin/sotp capability exec` が `.harness/config/agent-profiles.json` による profile 解決を内包する正規経路であることを明記している。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-21-1522-agent-md-capability-exec-routing.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "`.claude/agents/README.md` は index として扱われ、agent definition の更新対象に含まれない。hook などを用いる direct Agent-tool invocation の新規機械的 block も存在しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-21-1522-agent-md-capability-exec-routing.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-21-1522-agent-md-capability-exec-routing.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/adr.md",
+      "anchor": "Format"
+    },
+    {
+      "file": "knowledge/conventions/enforce-by-mechanism.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/no-upstream-restatement.md",
+      "anchor": "Rules"
+    }
+  ],
+  "signals": {
+    "blue": 11,
+    "yellow": 0,
+    "red": 0
+  }
+}

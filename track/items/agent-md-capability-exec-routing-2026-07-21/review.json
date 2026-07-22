@@ -1,0 +1,261 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d78dd6d1f4919360eddeef46d569818da4ecefb0df7aacdea1fca8befeec3575",
+          "at": "2026-07-21T15:50:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d78dd6d1f4919360eddeef46d569818da4ecefb0df7aacdea1fca8befeec3575",
+          "at": "2026-07-21T15:52:44Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new routing instruction contradicts this adapter's operational instructions: the frontmatter says never invoke through the Agent tool and requires `bin/sotp capability exec`, but the body still says `/track:diagnose` triggers it via the Agent tool. Update the body or qualify the routing guidance so the rollback-diagnoser has one coherent invocation path.",
+              "severity": "P1",
+              "file": ".claude/agents/rollback-diagnoser.md",
+              "line": 25,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:43b319137532c2f726c637c8ec1a812860bdf80b9877c35d4b6684908f982617",
+          "at": "2026-07-21T16:03:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f3f583c23639f22b2a245ae53aacf842fc58c6ed2f062190055116fc52862111",
+          "at": "2026-07-21T16:04:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "追加文中の `tool:` はコロン直後に空白を伴うため、未引用の YAML plain scalar を壊します。`capability_exec` の `serde_yaml` preflight でこの Claude adapter が拒否されるので、`description: |` に変更するか値全体を引用してください。",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 4,
+              "category": "capability routing mismatch"
+            },
+            {
+              "message": "追加文中の `tool:` により frontmatter が不正な YAML となり、Claude provider の adapter preflight が dispatch 前に失敗します。`description` を block scalar または引用文字列にしてください。",
+              "severity": "P1",
+              "file": ".claude/agents/implementer.md",
+              "line": 11,
+              "category": "capability routing mismatch"
+            },
+            {
+              "message": "追加文中の `tool:` により frontmatter が不正な YAML となります。Claude-heavy profile で researcher を選ぶと `serde_yaml` preflight が失敗するため、`description` を block scalar または引用文字列にしてください。",
+              "severity": "P1",
+              "file": ".claude/agents/researcher.md",
+              "line": 10,
+              "category": "capability routing mismatch"
+            },
+            {
+              "message": "追加文中の `tool:` は未引用の YAML scalar 内で mapping delimiter と解釈され、frontmatter を壊します。`description: |` に変更するか値全体を引用してください。",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 4,
+              "category": "capability routing mismatch"
+            },
+            {
+              "message": "この adapter は `.harness/config/agent-profiles.json` で `execution_mode: typed-pipeline` ですが、`bin/sotp capability exec` は `orchestrator-output` capability だけを受理します。実際にこの記載どおり実行すると `only orchestrator-output capabilities are eligible for generic dispatch` で停止するため、typed-pipeline 用の正規 entry point を記載してください。",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 4,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "`review-fix-lead` は profile 上 `execution_mode: typed-pipeline` であり、generic `bin/sotp capability exec` の対象外です。現行 CLI はこの案内どおりの呼び出しを dispatch 前に拒否するため、review-fix の正規 entry point を記載してください。",
+              "severity": "P1",
+              "file": ".claude/agents/review-fix-lead.md",
+              "line": 4,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:f3f583c23639f22b2a245ae53aacf842fc58c6ed2f062190055116fc52862111",
+          "at": "2026-07-21T16:12:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "この Claude adapter の canonical route として記載された `cargo make track-local-dry-fix` は、`agent-profiles.json` から provider を解決した後も実装上 `codex` しか dispatch できず、Claude を選ぶと `unsupported dry-fix-lead provider 'claude'` で停止します。この wrapper に Claude dispatch を実装するか、Claude adapterへ到達可能な正規 route を記載してください。",
+              "severity": "P1",
+              "file": ".claude/agents/dry-fix-lead.md",
+              "line": 5,
+              "category": "capability routing mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:0b6d11ca894b5e41aac13824a7924b9702860dae71087821388d38cce2ef0b9a",
+          "at": "2026-07-21T16:16:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b6d11ca894b5e41aac13824a7924b9702860dae71087821388d38cce2ef0b9a",
+          "at": "2026-07-21T16:18:55Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description restates the upstream behavior contract (routing through `bin/sotp capability exec`, profile SSoT, and prohibiting direct Agent-tool invocation) instead of limiting itself to target + operation + anchor cite. See `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/agent-md-capability-exec-routing-2026-07-21/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description repeats the upstream routing behavior contract rather than using only target + operation + anchor cite. See `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/agent-md-capability-exec-routing-2026-07-21/impl-plan.json",
+              "line": 13,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The plan summary sentence “does not introduce enforcement or alter capability dispatch behavior” restates the upstream scope/behavior contract. See `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/agent-md-capability-exec-routing-2026-07-21/impl-plan.json",
+              "line": 22,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 description restates the approved routing behavior instead of only identifying the target, operation, and anchor cite. See `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/agent-md-capability-exec-routing-2026-07-21/impl-plan.json",
+              "line": 29,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 description restates the approved routing behavior instead of only identifying the target, operation, and anchor cite. See `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/agent-md-capability-exec-routing-2026-07-21/impl-plan.json",
+              "line": 39,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:eb2e929701fc68b467fa3b188e90e42c9eaf7f142b677a81a194ae73f6f77226",
+          "at": "2026-07-21T15:50:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e89a40701bff58e98af2f64591892ed6701eb6bf3d11de8a306523d5f9a1c450",
+          "at": "2026-07-21T15:52:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e89a40701bff58e98af2f64591892ed6701eb6bf3d11de8a306523d5f9a1c450",
+          "at": "2026-07-21T15:56:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:040e91e84136ce29f317619cb53a109f05707836450349de25ad5e98a1b82edc",
+          "at": "2026-07-21T16:03:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:040e91e84136ce29f317619cb53a109f05707836450349de25ad5e98a1b82edc",
+          "at": "2026-07-21T16:05:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c1af7d8c75c214752c3d58d0b8cd6e6a6880d93f3ff6d64b055266d3b66d7cf",
+          "at": "2026-07-21T16:22:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9c1af7d8c75c214752c3d58d0b8cd6e6a6880d93f3ff6d64b055266d3b66d7cf",
+          "at": "2026-07-21T16:24:45Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3d60bc388f3a5a388aca52968834bdacd87cfefedd47c516c76e23cb6f43f86d",
+          "at": "2026-07-21T15:31:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3d60bc388f3a5a388aca52968834bdacd87cfefedd47c516c76e23cb6f43f86d",
+          "at": "2026-07-21T15:33:46Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:227e29d19d40cc8719a4d547ec8a5403a5a00c1375e6a3ae3c1ab3669b480211",
+          "at": "2026-07-21T15:50:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-02 makes acceptance depend on whether an orchestrator can “judge” the correct route after reading a description. That cognitive outcome has no deterministic pass/fail procedure. Define the observable text each description must contain—for example, explicitly stating that direct Agent-tool invocation bypasses profile resolution and that `capability exec` performs it.",
+              "severity": "P1",
+              "file": "track/items/agent-md-capability-exec-routing-2026-07-21/spec.json",
+              "line": 108,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:227e29d19d40cc8719a4d547ec8a5403a5a00c1375e6a3ae3c1ab3669b480211",
+          "at": "2026-07-21T15:52:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e6272431acd4c50bd0942edfef231829967f19352d04555f7fccd87859760709",
+          "at": "2026-07-21T15:54:19Z"
+        }
+      ]
+    }
+  }
+}
