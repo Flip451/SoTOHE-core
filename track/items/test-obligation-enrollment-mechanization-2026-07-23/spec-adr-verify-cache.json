@@ -1,0 +1,580 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "0a20f32275bc70542c9b728c793d972a4d9d23a03afd54e3481e5f570d9d7ea6",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "導出結果が 0 件でも明示的に実体化し、「不在」と「導出の結果ゼロ」を区別可能にする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "型カタログを持つ track が test-obligation gate へ必ず明示的に登録され、義務がゼロである結果と enrollment artifact 自体の不在を区別できるようにする。これにより、成果物不在による `check` の空振り合格を除去し、Phase 2 完了時点から task-status 連動の incremental fulfillment lane を有効にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "0a20f32275bc70542c9b728c793d972a4d9d23a03afd54e3481e5f570d9d7ea6",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`<layer>-types.json` が 1 つでも存在する track で obligations.json（および結び付け表）が不在なら、`check` は fail-closed で落とす。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "型カタログを持つ track が test-obligation gate へ必ず明示的に登録され、義務がゼロである結果と enrollment artifact 自体の不在を区別できるようにする。これにより、成果物不在による `check` の空振り合格を除去し、Phase 2 完了時点から task-status 連動の incremental fulfillment lane を有効にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "0a20f32275bc70542c9b728c793d972a4d9d23a03afd54e3481e5f570d9d7ea6",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「義務導出の入力（catalogue / spec / rules）は Phase 2（type-design）完了時点で確定するため、義務導出の最適時点は Phase 2 直後」／「D15 の実装導入後は、未実装 task の義務が 🟡 で通過するため、implementer は task を1つずつ done に遷移させながら、その task に帰属する義務の binding を増分著作できる。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "型カタログを持つ track が test-obligation gate へ必ず明示的に登録され、義務がゼロである結果と enrollment artifact 自体の不在を区別できるようにする。これにより、成果物不在による `check` の空振り合格を除去し、Phase 2 完了時点から task-status 連動の incremental fulfillment lane を有効にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "994498b1cd5c1ad8e0597ac384a2f26b86afc0253763f8c81f464ddc508f15fe",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-design workflow の終端に、`bin/sotp test-obligation derive` による `obligations.json` の実体化と、空 records の `test-bindings.json` の実体化（fail-closed codec が受理する明示的な authoring act）を必須ステップとして追加する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "type-design workflow の終端で `bin/sotp test-obligation derive` を必須実行し、`obligations.json` と空 records の `test-bindings.json` を実体化する。導出結果がゼロ件でも両 artifact を明示的に残し、catalogue / spec を再入した場合は再導出する。両 artifact は計画 artifacts と同じ commit 単位で扱う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "994498b1cd5c1ad8e0597ac384a2f26b86afc0253763f8c81f464ddc508f15fe",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "義務導出の入力（catalogue / spec / rules）は Phase 2（type-design）完了時点で確定するため、義務導出の最適時点は Phase 2 直後であり、その時点で obligations.json + 空 records の test-bindings.json をコミットしておけば implementer は自 entry の義務を brief 付きで参照しながらテスト設計を進められる（TDDD）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "type-design workflow の終端で `bin/sotp test-obligation derive` を必須実行し、`obligations.json` と空 records の `test-bindings.json` を実体化する。導出結果がゼロ件でも両 artifact を明示的に残し、catalogue / spec を再入した場合は再導出する。両 artifact は計画 artifacts と同じ commit 単位で扱う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "6f960c1c69e13be3287593e7330e3b03efd8999906ec6260ee7b518402c65dab",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`<layer>-types.json` が 1 つでも存在する track で obligations.json（および結び付け表）が不在なら、`check` は fail-closed で落とす。catalogue を持たない track（フェーズ 0〜1 のコミット、文書のみの track）は現行どおり 0 件で合格する（整合的な不在）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "一つ以上の `<layer>-types.json` が存在する track で `obligations.json` または `test-bindings.json` が不在なら、`bin/sotp test-obligation check` を fail-closed に失敗させる。catalogue を持たない Phase 0〜1 または文書のみの track は、整合的な artifact 不在として従来どおり zero pairs で通す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "6f960c1c69e13be3287593e7330e3b03efd8999906ec6260ee7b518402c65dab",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「スコープ解決は existence-based 原則に従う: obligations / test-bindings artifact（D9）が不在なら zero pairs で通過し、部分的・不整合な存在（binding だけ存在する等）は fail-closed とする。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "一つ以上の `<layer>-types.json` が存在する track で `obligations.json` または `test-bindings.json` が不在なら、`bin/sotp test-obligation check` を fail-closed に失敗させる。catalogue を持たない Phase 0〜1 または文書のみの track は、整合的な artifact 不在として従来どおり zero pairs で通す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "c611976c3636aa1d5dbe056d0a130f9bd11ed17d5ac633b5be31bee9752fab0f",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implement workflow Step 4 を「binding の増分著作と evaluate ループ」（D15 のバッチごとの増分著作）に限定する記述へ書き換え、「materialize したら」「once obligation artifacts exist」の自己参照条件を除去する。full-cycle / obligation-fulfillment の前提記述も D1 / D2 の規則に揃える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "implement workflow Step 4 を、既に enrollment 済みの義務に対する binding の増分著作と `evaluate` ループに限定する。`when applicable`、`materialize したら`、`once obligation artifacts exist` といった enrollment を任意化または自己参照させる条件を除去し、full-cycle と obligation-fulfillment の前提文書も同じ規則に同期する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "c611976c3636aa1d5dbe056d0a130f9bd11ed17d5ac633b5be31bee9752fab0f",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「バッチごとの増分著作: D15 の実装導入後は、未実装 task の義務が 🟡 で通過するため、implementer は task を1つずつ done に遷移させながら、その task に帰属する義務の binding を増分著作できる。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "implement workflow Step 4 を、既に enrollment 済みの義務に対する binding の増分著作と `evaluate` ループに限定する。`when applicable`、`materialize したら`、`once obligation artifacts exist` といった enrollment を任意化または自己参照させる条件を除去し、full-cycle と obligation-fulfillment の前提文書も同じ規則に同期する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "40e9acd44c48b8ce18d42560fb4e6c9710f47d84401f8d50deb4c4875b44811a",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implement workflow Step 4 を「binding の増分著作と evaluate ループ」（D15 のバッチごとの増分著作）に限定する記述へ書き換え"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "Rust テストコード本文、binding 内容、または fulfillment verdict の自動生成は対象にしない。enrollment 後の binding 著作と意味論評価は既存の implement / obligation-fulfillment lanes が担う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "40e9acd44c48b8ce18d42560fb4e6c9710f47d84401f8d50deb4c4875b44811a",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Rust テストコード本文の自動生成は**行わない**。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "Rust テストコード本文、binding 内容、または fulfillment verdict の自動生成は対象にしない。enrollment 後の binding 著作と意味論評価は既存の implement / obligation-fulfillment lanes が担う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "0fd2ce317ec70b51f671d379e11c20162a32b70f8e9d8b515a0da1206f0e314e",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D15 の task-status 連動は導出済み義務の履行状態を統制する既決であり、本決定はその手前の「導出されていない」状態を閉じる補完である"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "既存の task-status lane、strictest-wins、todo の warning 許容、または merge 時の収束条件を変更しない。本 track は、これらの規則が導出済み義務へ確実に適用される前提を機構化する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "0fd2ce317ec70b51f671d379e11c20162a32b70f8e9d8b515a0da1206f0e314e",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「導入後の merge gate の自然収束」: merge gate（`sotp pr wait-and-merge` の task completion 強制）は既に「全 task が done に到達していること」を merge 前提として要求している。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "既存の task-status lane、strictest-wins、todo の warning 許容、または merge 時の収束条件を変更しない。本 track は、これらの規則が導出済み義務へ確実に適用される前提を機構化する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D15"
+        }
+      }
+    },
+    {
+      "claim_hash": "0fd2ce317ec70b51f671d379e11c20162a32b70f8e9d8b515a0da1206f0e314e",
+      "evidence_hash": "2355211c58b4e40566ec02849d0b3ff5f3744a4b506c0caa15d38ce24822812b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本決定は親 ADR の D6 edge-locality、D9 drift classification、D10 rules totality、D11 fail-closed、D14 results-informational、D16 fingerprint validity を変更せず、いずれの保証も弱めない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "既存の task-status lane、strictest-wins、todo の warning 許容、または merge 時の収束条件を変更しない。本 track は、これらの規則が導出済み義務へ確実に適用される前提を機構化する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-11-0802-test-obligation-skipped-status-lane.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "95f388b47f0317e1297e3cba706fc9fefda3dc41780bf214ec8e9271d398f963",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue を持たない track（フェーズ 0〜1 のコミット、文書のみの track）は現行どおり 0 件で合格する（整合的な不在）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-03",
+          "text_label": "catalogue を持たない track に obligation artifacts を強制せず、catalogue 存在以外の Phase 2 完了判定も導入しない。必要になった場合は ADR の再評価条件として別途扱う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "36e6a8ffc5b2ec879d6e9ffbde95f591aa4a8268f5b3159ff6b95e36f05e9051",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check` は fail-closed で落とす。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "`check` は pure-read の fail-closed gate であり続ける。commit gate または `check` の実行中に derive、binding 作成、artifact 修復、または暗黙の再導出を行ってはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "7b1e47d0c9f6640dc0488af4ba0a6959c9e968a7b3eddea27c139415ad4c4fb5",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`<layer>-types.json` が 1 つでも存在する track で obligations.json（および結び付け表）が不在なら、`check` は fail-closed で落とす。」「D15 の task-status 連動は導出済み義務の履行状態を統制する既決であり、本決定はその手前の「導出されていない」状態を閉じる補完である"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "enrollment の有無は artifact の存在と catalogue の存在で機械的に判定し、orchestrator の任意判断、軟条件語彙、または task status の有無に依存させない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "7b1e47d0c9f6640dc0488af4ba0a6959c9e968a7b3eddea27c139415ad4c4fb5",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implement workflow Step 4 を「binding の増分著作と evaluate ループ」（D15 のバッチごとの増分著作）に限定する記述へ書き換え、「materialize したら」「once obligation artifacts exist」の自己参照条件を除去する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "enrollment の有無は artifact の存在と catalogue の存在で機械的に判定し、orchestrator の任意判断、軟条件語彙、または task status の有無に依存させない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "15a060cdb33d38a903fd06c53e549ddcf4e6a98f40dcda0665a530c9c3d125f3",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "導出結果が 0 件でも明示的に実体化し、「不在」と「導出の結果ゼロ」を区別可能にする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "obligation artifacts の不在、導出結果ゼロ、未解消の binding / verdict を別々に観測可能な状態として維持する。導出結果ゼロを artifact 不在と同一視してはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "74026a73d393f31b2203617d61268eca1eedf3e5e1bb7f4071e39a85225be6f0",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-design workflow の終端に、`bin/sotp test-obligation derive` による `obligations.json` の実体化と、空 records の `test-bindings.json` の実体化（fail-closed codec が受理する明示的な authoring act）を必須ステップとして追加する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "type-design workflow を完了した track では、`derive` の結果件数にかかわらず `obligations.json` と空 records を含む `test-bindings.json` が作成されることを検証する。これらの artifact が plan artifacts と同じ commit 単位に含まれ、catalogue または spec への再入後に再導出されることも検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "12918bb2c9aab8de7fa8f5bad83dadb27e24529b2dc4b33000b2a603739412db",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "導出結果が 0 件でも明示的に実体化し、「不在」と「導出の結果ゼロ」を区別可能にする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "一つ以上の catalogue がある track で `obligations.json` と `test-bindings.json` のいずれかが不在のとき、`bin/sotp test-obligation check` が非零 exit で fail-closed に失敗することを検証する。両 artifact が存在し導出結果がゼロ件のときは、artifact 不在として扱われないことも検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "12918bb2c9aab8de7fa8f5bad83dadb27e24529b2dc4b33000b2a603739412db",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`<layer>-types.json` が 1 つでも存在する track で obligations.json（および結び付け表）が不在なら、`check` は fail-closed で落とす。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "一つ以上の catalogue がある track で `obligations.json` と `test-bindings.json` のいずれかが不在のとき、`bin/sotp test-obligation check` が非零 exit で fail-closed に失敗することを検証する。両 artifact が存在し導出結果がゼロ件のときは、artifact 不在として扱われないことも検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "12918bb2c9aab8de7fa8f5bad83dadb27e24529b2dc4b33000b2a603739412db",
+      "evidence_hash": "0598b571663f515d6858697d90b2c5d36f95c7631f07b5bd71556471f1a3b735",
+      "verdict": {
+        "kind": "pass",
+        "citation": "スコープ解決は existence-based 原則に従う: obligations / test-bindings artifact（D9）が不在なら zero pairs で通過し、部分的・不整合な存在（binding だけ存在する等）は fail-closed とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "一つ以上の catalogue がある track で `obligations.json` と `test-bindings.json` のいずれかが不在のとき、`bin/sotp test-obligation check` が非零 exit で fail-closed に失敗することを検証する。両 artifact が存在し導出結果がゼロ件のときは、artifact 不在として扱われないことも検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-02-0359-test-obligation-and-fulfillment-gate.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "307b3ebd3d97cecbaf0fd9ef1a9165e6aa51f8ffa4aa85b12e5213cbc1ac66e4",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue を持たない track（フェーズ 0〜1 のコミット、文書のみの track）は現行どおり 0 件で合格する（整合的な不在）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "catalogue を持たない Phase 0〜1 または文書のみの track では、obligation artifacts の両方が不在でも `check` が整合的な zero-pair scope として通ることを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "bd3c6b28c4334ee21bc33781965cc79cc842c2511665987bcad557bff3bdfc3a",
+      "evidence_hash": "8b8eacd9cc594205cb4e30046fb840343210b3a8322932a1f14af8e2877e364a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "implement workflow Step 4 を「binding の増分著作と evaluate ループ」（D15 のバッチごとの増分著作）に限定する記述へ書き換え、「materialize したら」「once obligation artifacts exist」の自己参照条件を除去する。full-cycle / obligation-fulfillment の前提記述も D1 / D2 の規則に揃える。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "implement workflow は enrollment の有無を条件にせず、既存 artifacts に対する binding の増分著作と `evaluate` ループだけを Step 4 の完了条件として示すことを検証する。full-cycle と obligation-fulfillment の文書も同じ前提で同期され、旧来の任意化・自己参照表現を残さないことを検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+          "decision_id": "D3"
+        }
+      }
+    }
+  ]
+}

@@ -1,6 +1,69 @@
 {
   "schema_version": 2,
   "scopes": {
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CheckTestObligationsInteractor` の `docs` が spec の fail-closed / catalogue-bearing 判定ロジックを prose で再記述しており、upstream restatement に該当します。`docs` は仕様本文を複製せず、`spec_refs` のアンカー参照に留めてください。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/usecase-types.json",
+              "line": 10,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:b97a3a7b85a4b12184918316f40a1deb1d16352a983b90cf7f3f005c6190ea62",
+          "at": "2026-07-22T18:46:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CheckTestObligationsInteractor` の `docs` が spec の fail-closed 判定ロジックを prose で再記述しており、upstream restatement に該当します。仕様本文を複製せず、`spec_refs` のアンカー参照に留めてください。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/usecase-types.json",
+              "line": 10,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:d5f2cb1c00521d9430c44dd637244863cbbfb0fcbdf06000bc88967939610f8a",
+          "at": "2026-07-22T18:51:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5f2cb1c00521d9430c44dd637244863cbbfb0fcbdf06000bc88967939610f8a",
+          "at": "2026-07-22T18:53:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::CheckTestObligationsInteractor` is marked `action: modify`, but its declared `new` method exactly matches the rustdoc baseline: the same 12 parameters, ordering, types, and `Self` return. D2 can use the already-injected `catalogue_reader`, so this currently declares no public contract change and contradicts the briefing's claimed constructor extension. Remove this type declaration (and its trait-impl reference), or declare the actual changed signature if one is intended.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/usecase-types.json",
+              "line": 9,
+              "category": "SoT integrity: action incoherent with the diff"
+            }
+          ],
+          "hash": "rvw1:sha256:d5f2cb1c00521d9430c44dd637244863cbbfb0fcbdf06000bc88967939610f8a",
+          "at": "2026-07-22T18:57:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70122e1bc37bae9346f976206d009a74af2d8f41a3e0c9a777a3192d5d39e826",
+          "at": "2026-07-22T19:04:10Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -45,6 +108,121 @@
           "findings": [],
           "hash": "rvw1:sha256:fa07cd273766a7ab174c5bb089f30b63262d174c19ccaf8ffe9f43e6931b9d84",
           "at": "2026-07-22T18:25:27Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df311cc64834044e3670e99907dabe9870c00fd1b7a1cdf3bc07aa8b51cc80ca",
+          "at": "2026-07-22T18:46:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df311cc64834044e3670e99907dabe9870c00fd1b7a1cdf3bc07aa8b51cc80ca",
+          "at": "2026-07-22T18:48:25Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 の description は `CheckTestObligationsInteractor` または対象ファイルを明示せず、実装境界を executor に推測させるため executable-plan 要件を満たさない。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001〜T003 の description は fail-closed 判定、成果物の必須化、workflow の具体的挙動を上流 spec の散文として再記述している。対象 + 操作 + anchor cite の形式に縮約すべき。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S1〜S3 の section description も実装方針・期待挙動を再記述しており、no-upstream-restatement 規則に違反する。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`plan.summary` が空で、spec の GO-01 に対する計画上の traceability がありません。GO 要素は task-coverage ではなく impl-plan の summary で追跡する必要があります。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 24,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:e683c36e1960ca38b71040fa1935ef4966ef46a837c33597ff98f78d49aca704",
+          "at": "2026-07-22T18:46:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 の description は対象ファイルまたは明示的なシンボル境界を示さず、executor に実装対象を推測させる。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001〜T003 の description は fail-closed 判定、成果物必須化、workflow 挙動を上流 spec の散文として再記述している。対象 + 操作 + anchor cite に縮約すべき。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S1〜S3 の section description も実装方針・期待挙動を再記述しており、upstream restatement に該当する。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "plan.summary が空で、spec の GO-01 に対する計画上の goal traceability がない。GO 要素は task-coverage ではなく impl-plan の summary で追跡する必要がある。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 24,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:454b09bfb95237af1df9fc8c805d766ca7d0b256e25d5cf6149fea434d1f7e45",
+          "at": "2026-07-22T18:49:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14f4b58942e0e842a17a20f157a8b157b301ee40e155af9592c5d015f422531b",
+          "at": "2026-07-22T18:55:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14f4b58942e0e842a17a20f157a8b157b301ee40e155af9592c5d015f422531b",
+          "at": "2026-07-22T19:01:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d73fb35a00ecf5743a4b5ed69c50dbf2d9a09158dcdfce68988520fedb58ca3",
+          "at": "2026-07-22T19:06:49Z"
         }
       ]
     }
