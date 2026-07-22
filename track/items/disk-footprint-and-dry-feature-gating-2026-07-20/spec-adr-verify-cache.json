@@ -49,10 +49,10 @@
     },
     {
       "claim_hash": "fa6593a20411fed6e209c54408c594226b360839314763576483eea4db28fe51",
-      "evidence_hash": "3000325773ef6cff8e0ba19c3f985c17f1f667ddc14610f8eb288ee8cfa100fe",
+      "evidence_hash": "b2da442dfb6a02eaf9585c2a61e0200ff7e46beb41908656419f28ee913df542",
       "verdict": {
         "kind": "pass",
-        "citation": "`enabled: true` かつ `semantic-dup` feature が無効の場合、gate 評価点は feature 無効を明示するメッセージと非成功終了で fail-closed とする。"
+        "citation": "`write`、`results`、`fix-local` など、gate 評価点ではなく利用者が dry 処理そのものを実行するコマンドは同 D2 の対象に残り、feature 無効時に一律 fail-closed とする。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -256,7 +256,7 @@
     },
     {
       "claim_hash": "5903a14197da673cbc502bf73bb7f730ca2372dcac9e7ee543bdeea9494dd9b8",
-      "evidence_hash": "3000325773ef6cff8e0ba19c3f985c17f1f667ddc14610f8eb288ee8cfa100fe",
+      "evidence_hash": "b2da442dfb6a02eaf9585c2a61e0200ff7e46beb41908656419f28ee913df542",
       "verdict": {
         "kind": "pass",
         "citation": "`enabled: false` の場合、`semantic-dup` feature の有無にかかわらず semantic duplicate 機能を実行せず、`check-approved` は通過、DFP 起動判定は DFP 不要を返す。\n- `enabled: true` かつ `semantic-dup` feature が無効の場合、gate 評価点は feature 無効を明示するメッセージと非成功終了で fail-closed とする。"
@@ -417,7 +417,7 @@
     },
     {
       "claim_hash": "9873cb8534dde06770dffcf82619529e1c70cef8a3449eb351803c5913333882",
-      "evidence_hash": "3000325773ef6cff8e0ba19c3f985c17f1f667ddc14610f8eb288ee8cfa100fe",
+      "evidence_hash": "b2da442dfb6a02eaf9585c2a61e0200ff7e46beb41908656419f28ee913df542",
       "verdict": {
         "kind": "pass",
         "citation": "`write`、`results`、`fix-local` など、gate 評価点ではなく利用者が dry 処理そのものを実行するコマンドは同 D2 の対象に残り、feature 無効時に一律 fail-closed とする。"
@@ -624,7 +624,7 @@
     },
     {
       "claim_hash": "c16c1b6e3d3e96c93eff53a09a4dff94ff4d58d5415e8dd8b4ba5573becad1f9",
-      "evidence_hash": "3000325773ef6cff8e0ba19c3f985c17f1f667ddc14610f8eb288ee8cfa100fe",
+      "evidence_hash": "b2da442dfb6a02eaf9585c2a61e0200ff7e46beb41908656419f28ee913df542",
       "verdict": {
         "kind": "pass",
         "citation": "`enabled: false` の場合、`semantic-dup` feature の有無にかかわらず semantic duplicate 機能を実行せず、`check-approved` は通過、DFP 起動判定は DFP 不要を返す。\n- `enabled: true` かつ `semantic-dup` feature が無効の場合、gate 評価点は feature 無効を明示するメッセージと非成功終了で fail-closed とする。"
