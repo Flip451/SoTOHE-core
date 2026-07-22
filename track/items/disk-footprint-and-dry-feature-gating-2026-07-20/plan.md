@@ -34,4 +34,4 @@ GO-04 → T004
 
 > T006 で `libs/usecase/src/dry_check_approved_driver.rs`、`apps/cli-driver/src/dry.rs`、`apps/cli-composition/src/dry_gate.rs`、`apps/cli/src/commands/dry.rs` の check-approved gate evaluation path と AC-07 の feature-off 両分岐 command coverage を追加・接続する。IN-07, AC-07。
 
-- [x] **T006**: `libs/usecase/src/dry_check_approved_driver.rs` の gate interactor、`apps/cli-driver/src/dry.rs` の専用 CLI driver、`apps/cli-composition/src/dry_gate.rs` の composition root、`apps/cli/src/commands/dry.rs` の check-approved dispatch を実装し、旧 `execute_dry_check_approved` を除去する。AC-07 の feature-off 両分岐に対する command coverage を追加する。IN-07, AC-07。
+- [x] **T006**: `libs/usecase/src/dry_check_approved_driver.rs` の gate interactor、`apps/cli-driver/src/dry.rs` の専用 CLI driver、`apps/cli-composition/src/dry_gate.rs` の composition root、`apps/cli/src/commands/dry.rs` の check-approved dispatch を実装し、旧 `execute_dry_check_approved` を除去する。AC-07 の feature-off 両分岐に対する command coverage を追加する。IN-07, AC-07。 (`0d61b54ff04901ef6776749776c4ded3ec57f09a`)
