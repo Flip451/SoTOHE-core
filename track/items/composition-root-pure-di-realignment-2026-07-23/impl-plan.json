@@ -4,12 +4,13 @@
     {
       "id": "T001",
       "description": "Update `CatalogueLinterRule`, `CatalogueLinterRuleKind`, `evaluate_catalogue_lint`, and `LintRuleKind`; add catalogue-lint regression cases. IN-03/OUT-02/CN-03/AC-04.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "d2887360daf79a0882c860259082db3b25b3bb5f"
     },
     {
       "id": "T002",
       "description": "Update the `invoke leak`, public-surface exposure, and `PrimaryAdapter` allowance priority categories in `.harness/custom/review-prompts/cli_composition.md`. IN-02/CN-01/CN-02/AC-03.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T003",

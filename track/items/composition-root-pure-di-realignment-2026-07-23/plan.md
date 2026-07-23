@@ -8,19 +8,19 @@ T001 updates catalogue-lint before review-policy work.
 T002 updates `.harness/custom/review-prompts/cli_composition.md` after the lint vocabulary.
 T003 updates and regression-tests the shipped greeting placeholder after the policy work.
 
-## Tasks (1/3 resolved)
+## Tasks (2/3 resolved)
 
 ### enforcement — Catalogue-lint enforcement
 
 > Update the catalogue-lint rule path and regression cases. IN-03/CN-03/AC-04. T001.
 
-- [x] **T001**: Update `CatalogueLinterRule`, `CatalogueLinterRuleKind`, `evaluate_catalogue_lint`, and `LintRuleKind`; add catalogue-lint regression cases. IN-03/OUT-02/CN-03/AC-04.
+- [x] **T001**: Update `CatalogueLinterRule`, `CatalogueLinterRuleKind`, `evaluate_catalogue_lint`, and `LintRuleKind`; add catalogue-lint regression cases. IN-03/OUT-02/CN-03/AC-04. (`d2887360daf79a0882c860259082db3b25b3bb5f`)
 
 ### review-policy — Composition review policy
 
 > Update priority categories in `.harness/custom/review-prompts/cli_composition.md`. IN-02/CN-01/CN-02/AC-03. T002.
 
-- [ ] **T002**: Update the `invoke leak`, public-surface exposure, and `PrimaryAdapter` allowance priority categories in `.harness/custom/review-prompts/cli_composition.md`. IN-02/CN-01/CN-02/AC-03.
+- [x] **T002**: Update the `invoke leak`, public-surface exposure, and `PrimaryAdapter` allowance priority categories in `.harness/custom/review-prompts/cli_composition.md`. IN-02/CN-01/CN-02/AC-03.
 
 ### shipped-positive-example — Shipped pure-DI positive example
 
