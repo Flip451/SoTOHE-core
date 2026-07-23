@@ -1,21 +1,155 @@
 {
   "schema_version": 2,
   "scopes": {
-    "types": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4c616718b1a15a87e7507c5517119b8655d7fffc6e0acf7806fcdd17b42ec575",
-          "at": "2026-07-22T19:22:13Z"
+          "hash": "rvw1:sha256:fb43496b0190f94ffea01c3156b93e9d03c9966d30281097171b4999f0b64643",
+          "at": "2026-07-23T00:20:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`adr-baseline-check-review` タスクを削除した一方、出荷対象の `knowledge/conventions/review-protocol.md:15` と `track-lifecycle.md:41` は引き続き `cargo make adr-baseline-check-review` を正規手順として要求しています。fresh consumer では `Task not found` になり、review-protocol の「wrapper が prelude を強制する」という説明も現在の dependencies と矛盾します。両規約を `bin/sotp adr-baseline check-review` へ同期してください。",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 820,
+              "category": "command_wiring"
+            },
+            {
+              "message": "`dry-check-workflow.md` を除外すると、同時に出荷される `knowledge/conventions/branch-strategy.md:12` の参照が fresh consumer で必ず切れます。索引再生成は本文中の参照を修復しません。これは `knowledge/conventions/responsibility-boundary.md` が定める配布面での template-distribution reference leak です。",
+              "severity": "P1",
+              "file": ".harness/config/template-boundary.json",
+              "line": 41,
+              "category": "template_distribution"
+            },
+            {
+              "message": "唯一出荷される `architecture-customizer` が、ここで `gemini-system` と `repomix-snapshot` の更新を必須化していますが、両 skill は `.gitignore` と boundary manifest の双方で配布対象外です。fresh consumer では存在しないファイルを更新する手順となるため、source-only の survey prompt を出荷版の同期対象から外す必要があります（`knowledge/conventions/responsibility-boundary.md` の配布境界違反）。",
+              "severity": "P1",
+              "file": ".claude/skills/architecture-customizer/SKILL.md",
+              "line": 55,
+              "category": "template_distribution"
+            },
+            {
+              "message": "ADR D1 の Context は `shell-parsing` を SotP 開発固有規約の流出例として明示していますが、manifest は include のままです。この規約は fresh scaffold に存在しない `domain::guard::ShellParser` と `infrastructure::shell::ConchShellParser` を必須 API として指定するため、consumer に実行不能な SoTOHE-core 内部規約を配布します。exclude へ変更し、出荷される guardrails 側の参照も同期してください。",
+              "severity": "P1",
+              "file": ".harness/config/template-boundary.json",
+              "line": 55,
+              "category": "responsibility_boundary"
+            },
+            {
+              "message": "D3 で出荷用 `language.md` を「ユーザーの preferred language に応答する」中立版へ差し替える一方、出荷される architecture skill は対話を日本語に固定しています。非日本語 consumer では同梱された言語規則と skill が相反するため、preferred/project language に従う指示へ変更し、同じ固定指示を持つ command adapter も同期する必要があります。",
+              "severity": "P1",
+              "file": ".claude/skills/architecture-customizer/SKILL.md",
+              "line": 12,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "workspace CLI 流出検査は root `Makefile.toml` 内の単一行 `cargo run ... -p cli` だけを検索しています。cargo-make で一般的な `command = \"cargo\"` と `args = [\"run\", ..., \"-p\", \"cli\"]` 形式、および root から extend される `Makefile.host.toml` / `Makefile.docker.toml` 内の task は検出できません。そのため D4 が禁止する実行を追加しても恒常検査を通過できます。exported task graph 全体の実行定義を検査してください。",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 464,
+              "category": "gate_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:fb43496b0190f94ffea01c3156b93e9d03c9966d30281097171b4999f0b64643",
+          "at": "2026-07-23T00:30:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ed10bd6e06a453c5fb9031e1b07152ded13caf01d785ba751b8771c6249ef78",
+          "at": "2026-07-23T00:33:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-review` / `track-local-review-fix` から ADR baseline dependency が削除され、現在は review workflow の事前処理が検証を担いますが、ここでは依然として review wrapper 自体が同じ prelude を強制すると記載され、`CLAUDE.md:24` にも同様の記述があります。wrapper を直接実行した場合は baseline gate が動かないため、実際の責務に合わせて両記述を workflow/orchestrator 所有へ更新してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/review-protocol.md",
+              "line": 22,
+              "category": "command_wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:526efba5f1483352ee2ad8c3edb16fefcbd219451ec5073fb88bab8e365162f2",
+          "at": "2026-07-23T00:39:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "この必須読込指示の `guardrails.md` はリポジトリルート相対では存在せず、fresh consumer では参照できません。改名後の実在パスである `.claude/rules/guardrails.md` を指定してください（template distribution の dead reference）。",
+              "severity": "P1",
+              "file": "CLAUDE.md",
+              "line": 67,
+              "category": "template_distribution_reference_leak"
+            }
+          ],
+          "hash": "rvw1:sha256:b1c1b77115a119f94a47e0c01ae95d89c7461d1377a0163ecaf9ab3f4cb87235",
+          "at": "2026-07-23T00:45:42Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4c616718b1a15a87e7507c5517119b8655d7fffc6e0acf7806fcdd17b42ec575",
-          "at": "2026-07-22T19:25:09Z"
+          "hash": "rvw1:sha256:ac3bd77cea7fb54c005989638fb15df7058dd48260397c1d48c60601802059e1",
+          "at": "2026-07-23T00:48:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:794b4c29389f5e6c98ac1195b30bf3ac0b9741db94c7f06f958b75a574f77c1b",
+          "at": "2026-07-23T00:51:59Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98d4ef4f1b0aa1a1c2ec73235af8aa46938b729050529c106c86cb24456312b2",
+          "at": "2026-07-23T00:20:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The update removes the regression test that proved detection skips an invalid suffixed occurrence and continues to a later valid command. The remaining unknown-suffix test only checks rejection, so an implementation that stops scanning after `/track:reviewer` would pass. Restore the scenario using `/track:reviewer then /track:review feature` and assert that `/track:review` is detected.",
+              "severity": "P1",
+              "file": "libs/domain/src/skill_compliance/tests.rs",
+              "line": 75,
+              "category": "test coverage"
+            },
+            {
+              "message": "After deleting the `/track:plan` case, the public `check_compliance` API is tested only for its empty/error path. Add a remaining-command happy-path test such as `check_compliance(\"/track:review\")` that asserts `skill_match.is_some()` and `!is_empty()`, as required for public APIs.",
+              "severity": "P1",
+              "file": "libs/domain/src/skill_compliance/tests.rs",
+              "line": 82,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:98d4ef4f1b0aa1a1c2ec73235af8aa46938b729050529c106c86cb24456312b2",
+          "at": "2026-07-23T00:21:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7017708ef8729c0410ef9079cd683099a7d2491cd2503d7b05063a265b924bf2",
+          "at": "2026-07-23T00:23:53Z"
         }
       ]
     },
@@ -141,43 +275,39 @@
         }
       ]
     },
-    "domain": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:98d4ef4f1b0aa1a1c2ec73235af8aa46938b729050529c106c86cb24456312b2",
-          "at": "2026-07-23T00:20:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The update removes the regression test that proved detection skips an invalid suffixed occurrence and continues to a later valid command. The remaining unknown-suffix test only checks rejection, so an implementation that stops scanning after `/track:reviewer` would pass. Restore the scenario using `/track:reviewer then /track:review feature` and assert that `/track:review` is detected.",
-              "severity": "P1",
-              "file": "libs/domain/src/skill_compliance/tests.rs",
-              "line": 75,
-              "category": "test coverage"
-            },
-            {
-              "message": "After deleting the `/track:plan` case, the public `check_compliance` API is tested only for its empty/error path. Add a remaining-command happy-path test such as `check_compliance(\"/track:review\")` that asserts `skill_match.is_some()` and `!is_empty()`, as required for public APIs.",
-              "severity": "P1",
-              "file": "libs/domain/src/skill_compliance/tests.rs",
-              "line": 82,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:98d4ef4f1b0aa1a1c2ec73235af8aa46938b729050529c106c86cb24456312b2",
-          "at": "2026-07-23T00:21:54Z"
+          "hash": "rvw1:sha256:32380e7f157b04a9eb336ad9f439a74e0c81c5d62b0d3198a21a2d6056bc3b94",
+          "at": "2026-07-23T00:20:07Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7017708ef8729c0410ef9079cd683099a7d2491cd2503d7b05063a265b924bf2",
-          "at": "2026-07-23T00:23:53Z"
+          "hash": "rvw1:sha256:32380e7f157b04a9eb336ad9f439a74e0c81c5d62b0d3198a21a2d6056bc3b94",
+          "at": "2026-07-23T00:21:43Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c616718b1a15a87e7507c5517119b8655d7fffc6e0acf7806fcdd17b42ec575",
+          "at": "2026-07-22T19:22:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c616718b1a15a87e7507c5517119b8655d7fffc6e0acf7806fcdd17b42ec575",
+          "at": "2026-07-22T19:25:09Z"
         }
       ]
     },
@@ -686,136 +816,20 @@
           "findings": [],
           "hash": "rvw1:sha256:153041de760ec0e3768496bd5b0672e7f0fd0dd5cbf4c4b670c69fd320e369c6",
           "at": "2026-07-23T00:24:12Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fb43496b0190f94ffea01c3156b93e9d03c9966d30281097171b4999f0b64643",
-          "at": "2026-07-23T00:20:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`adr-baseline-check-review` タスクを削除した一方、出荷対象の `knowledge/conventions/review-protocol.md:15` と `track-lifecycle.md:41` は引き続き `cargo make adr-baseline-check-review` を正規手順として要求しています。fresh consumer では `Task not found` になり、review-protocol の「wrapper が prelude を強制する」という説明も現在の dependencies と矛盾します。両規約を `bin/sotp adr-baseline check-review` へ同期してください。",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 820,
-              "category": "command_wiring"
-            },
-            {
-              "message": "`dry-check-workflow.md` を除外すると、同時に出荷される `knowledge/conventions/branch-strategy.md:12` の参照が fresh consumer で必ず切れます。索引再生成は本文中の参照を修復しません。これは `knowledge/conventions/responsibility-boundary.md` が定める配布面での template-distribution reference leak です。",
-              "severity": "P1",
-              "file": ".harness/config/template-boundary.json",
-              "line": 41,
-              "category": "template_distribution"
-            },
-            {
-              "message": "唯一出荷される `architecture-customizer` が、ここで `gemini-system` と `repomix-snapshot` の更新を必須化していますが、両 skill は `.gitignore` と boundary manifest の双方で配布対象外です。fresh consumer では存在しないファイルを更新する手順となるため、source-only の survey prompt を出荷版の同期対象から外す必要があります（`knowledge/conventions/responsibility-boundary.md` の配布境界違反）。",
-              "severity": "P1",
-              "file": ".claude/skills/architecture-customizer/SKILL.md",
-              "line": 55,
-              "category": "template_distribution"
-            },
-            {
-              "message": "ADR D1 の Context は `shell-parsing` を SotP 開発固有規約の流出例として明示していますが、manifest は include のままです。この規約は fresh scaffold に存在しない `domain::guard::ShellParser` と `infrastructure::shell::ConchShellParser` を必須 API として指定するため、consumer に実行不能な SoTOHE-core 内部規約を配布します。exclude へ変更し、出荷される guardrails 側の参照も同期してください。",
-              "severity": "P1",
-              "file": ".harness/config/template-boundary.json",
-              "line": 55,
-              "category": "responsibility_boundary"
-            },
-            {
-              "message": "D3 で出荷用 `language.md` を「ユーザーの preferred language に応答する」中立版へ差し替える一方、出荷される architecture skill は対話を日本語に固定しています。非日本語 consumer では同梱された言語規則と skill が相反するため、preferred/project language に従う指示へ変更し、同じ固定指示を持つ command adapter も同期する必要があります。",
-              "severity": "P1",
-              "file": ".claude/skills/architecture-customizer/SKILL.md",
-              "line": 12,
-              "category": "convention_contradiction"
-            },
-            {
-              "message": "workspace CLI 流出検査は root `Makefile.toml` 内の単一行 `cargo run ... -p cli` だけを検索しています。cargo-make で一般的な `command = \"cargo\"` と `args = [\"run\", ..., \"-p\", \"cli\"]` 形式、および root から extend される `Makefile.host.toml` / `Makefile.docker.toml` 内の task は検出できません。そのため D4 が禁止する実行を追加しても恒常検査を通過できます。exported task graph 全体の実行定義を検査してください。",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 464,
-              "category": "gate_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:fb43496b0190f94ffea01c3156b93e9d03c9966d30281097171b4999f0b64643",
-          "at": "2026-07-23T00:30:25Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1ed10bd6e06a453c5fb9031e1b07152ded13caf01d785ba751b8771c6249ef78",
-          "at": "2026-07-23T00:33:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track-local-review` / `track-local-review-fix` から ADR baseline dependency が削除され、現在は review workflow の事前処理が検証を担いますが、ここでは依然として review wrapper 自体が同じ prelude を強制すると記載され、`CLAUDE.md:24` にも同様の記述があります。wrapper を直接実行した場合は baseline gate が動かないため、実際の責務に合わせて両記述を workflow/orchestrator 所有へ更新してください。",
-              "severity": "P1",
-              "file": "knowledge/conventions/review-protocol.md",
-              "line": 22,
-              "category": "command_wiring"
-            }
-          ],
-          "hash": "rvw1:sha256:526efba5f1483352ee2ad8c3edb16fefcbd219451ec5073fb88bab8e365162f2",
-          "at": "2026-07-23T00:39:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "この必須読込指示の `guardrails.md` はリポジトリルート相対では存在せず、fresh consumer では参照できません。改名後の実在パスである `.claude/rules/guardrails.md` を指定してください（template distribution の dead reference）。",
-              "severity": "P1",
-              "file": "CLAUDE.md",
-              "line": 67,
-              "category": "template_distribution_reference_leak"
-            }
-          ],
-          "hash": "rvw1:sha256:b1c1b77115a119f94a47e0c01ae95d89c7461d1377a0163ecaf9ab3f4cb87235",
-          "at": "2026-07-23T00:45:42Z"
+          "hash": "rvw1:sha256:dd26a6b04f3e4d79daf95869863d16ac23215577049370eef0993cdfa7440ee9",
+          "at": "2026-07-23T00:54:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ac3bd77cea7fb54c005989638fb15df7058dd48260397c1d48c60601802059e1",
-          "at": "2026-07-23T00:48:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:794b4c29389f5e6c98ac1195b30bf3ac0b9741db94c7f06f958b75a574f77c1b",
-          "at": "2026-07-23T00:51:59Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:32380e7f157b04a9eb336ad9f439a74e0c81c5d62b0d3198a21a2d6056bc3b94",
-          "at": "2026-07-23T00:20:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:32380e7f157b04a9eb336ad9f439a74e0c81c5d62b0d3198a21a2d6056bc3b94",
-          "at": "2026-07-23T00:21:43Z"
+          "hash": "rvw1:sha256:dd26a6b04f3e4d79daf95869863d16ac23215577049370eef0993cdfa7440ee9",
+          "at": "2026-07-23T00:56:46Z"
         }
       ]
     },

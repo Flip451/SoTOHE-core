@@ -4,32 +4,38 @@
     {
       "id": "T001",
       "description": "Classify every convention in `.harness/config/template-boundary.json` as an explicit `include` or `exclude`, then run `cargo make template-export-smoke` against the manifest. GO-01/IN-01/OS-01/AC-01/AC-02.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "ff2a4a7498db610d462387fb32949f866408aeae"
     },
     {
       "id": "T002",
       "description": "Add `bin/sotp conventions update-index` to the exported-scaffold bootstrap in `overlay/Makefile.toml` after `bin/sotp` provisioning, then inspect the bootstrap order and run `cargo make template-export-smoke`. GO-01/IN-02/AC-02.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "ff2a4a7498db610d462387fb32949f866408aeae"
     },
     {
       "id": "T003",
       "description": "Update `.claude/skills/.gitignore`, remove `.claude/skills/track-plan` and `.claude/skills/diagnose`, and update the skill-compliance hook mapping; run `cargo make template-export-smoke` and inspect the hook mapping. GO-01/IN-03/OS-02/AC-03.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "ff2a4a7498db610d462387fb32949f866408aeae"
     },
     {
       "id": "T004",
       "description": "Rename numbered `.claude/rules` files, add the neutral language overlay, exclude `maintainer-checklist` from shipped rules, and update references in `CLAUDE.md`, rules, and workflows; run `cargo make template-export-smoke` and scan the migrated references. GO-01/IN-04/IN-05/OS-03/AC-04.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "ff2a4a7498db610d462387fb32949f866408aeae"
     },
     {
       "id": "T005",
       "description": "Update `.harness/workflows/track/review.md` and `overlay/Makefile.toml` to remove the stale baseline wrapper step and workspace-CLI invocation, and add the `ci-track` step. GO-02/IN-06/OS-04/AC-07.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "ff2a4a7498db610d462387fb32949f866408aeae"
     },
     {
       "id": "T006",
       "description": "Add workflow-task-existence and workspace-CLI-invocation cases to `template-export-smoke`. GO-02/IN-06/OS-04/CO-01/CO-02/AC-05/AC-06/AC-07.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "ff2a4a7498db610d462387fb32949f866408aeae"
     }
   ],
   "plan": {
