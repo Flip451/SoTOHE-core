@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1131a1c6e03dba24c7fcdb215daf35051621a66cb39c3cf27da9b50720695d4a",
+          "at": "2026-07-23T05:31:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1131a1c6e03dba24c7fcdb215daf35051621a66cb39c3cf27da9b50720695d4a",
+          "at": "2026-07-23T05:36:28Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -75,6 +93,218 @@
           "findings": [],
           "hash": "rvw1:sha256:a3534d12d488562f291beaf1eb361d19b8c9ed80624aa42c3b79f66101173a7b",
           "at": "2026-07-23T05:00:50Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description restates the upstream behavior contract (“add passing and failing regression cases for execution methods and prohibited public-surface role exposure” and “approved catalogue-lint enforcement boundary”) instead of limiting the plan text to target, operation, and anchor cite. See knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description restates the upstream review-policy behavior contract, including which calls and exposed types are deviations and that a fully wired PrimaryAdapter is allowed. See knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 description restates the upstream composition-root and CLI behavior contract (“fully wired adapter,” “parse, obtain, handle, emit,” validation placement, and prohibited types). See knowledge/conventions/no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The T001 plan summary restates the upstream pure-DI public-surface rationale rather than providing only implementation sequencing context and the task anchor.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/impl-plan.json",
+              "line": 25,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The T002 plan summary restates the upstream composition-deviation behavior contract rather than limiting the summary to sequencing and task attribution.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/impl-plan.json",
+              "line": 26,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The T003 plan summary restates the upstream positive-example behavior and migration-boundary rationale rather than limiting the summary to sequencing and task attribution.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/impl-plan.json",
+              "line": 27,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The enforcement section description restates the pure-DI public-surface behavior contract instead of stating only the target operation and anchor.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/impl-plan.json",
+              "line": 34,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The review-policy section description restates the deviation and allowance behavior contract instead of stating only the target operation and anchor.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/impl-plan.json",
+              "line": 44,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The shipped-positive-example section description restates the migration-boundary rationale instead of stating only the target operation and anchor.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/impl-plan.json",
+              "line": 54,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:8cae786e9b1e20f74084ab094946103de19088ef624882b891a036dc1b0b35dc",
+          "at": "2026-07-23T05:31:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is attributed to catalogue entries `CatalogueLinterRule` and `LintRuleKind`, but its executable description only names `CatalogueLinterRuleKind` and `evaluate_catalogue_lint` as targets. Either name the two attributed entries in T001’s description or remove the unjustified attributions.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/task-contract.json",
+              "line": 5,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:c4e5f1512e626890fd3d00bf66e66a9f3c3f3c5ec22b180b5a7eb583185a3a4d",
+          "at": "2026-07-23T05:33:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1fdc02b2e58ec221955066a522663bfb6d5d1c5f2b590508ff0337fdba2d960e",
+          "at": "2026-07-23T05:34:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.summary` only describes task ordering and never maps GO-01 to any task. Goal traceability must live in this field because `task-coverage.json` cannot represent goals; add an explicit GO-01 → task mapping.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/impl-plan.json",
+              "line": 25,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T002 names only “the `apps/cli-composition` review-policy checks”; that is a source directory, not the policy file or a concrete symbol/section to edit. The executor must discover the actual boundary. Name `.harness/custom/review-prompts/cli_composition.md` and the categories/checks to update.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003 is the sole mapping for IN-04 and AC-05, but its only operation updates the shipped greeting placeholder. It neither records nor verifies the existing internal composition-facade deviation and opportunistic-migration policy, so these mappings are implausible despite the anchor citations.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/task-coverage.json",
+              "line": 13,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T003 is the sole carrier for AC-01 and AC-02 but includes no validation step for the changed CompositionRoot, PrimaryAdapter, or CLI flow. Migrating or adding the relevant wiring, happy/error-path, and command-flow regression tests is therefore hidden work; identify those checks in the task.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/impl-plan.json",
+              "line": 18,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:1fdc02b2e58ec221955066a522663bfb6d5d1c5f2b590508ff0337fdba2d960e",
+          "at": "2026-07-23T05:40:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 restates IN-02/AC-03 in prose with “flag both interactor and driver invocation,” the prohibited type list, and the PrimaryAdapter exception. Per `knowledge/conventions/no-upstream-restatement.md`, retain only the target file, an operation such as updating its priority categories, and the existing anchor citations.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates IN-01, CN-01/CN-02, and AC-01/AC-02 through the required return value, validation placement, adapter signature, and parse-to-emit sequence, then restates IN-04/CN-04/AC-05 and OUT-01. Reduce it to the named files/symbols, the update and regression-test operations, and anchor citations as required by `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `review-policy` repeats the behavioral contract for execution-method detection, prohibited public exposure, and the PrimaryAdapter exception. Its description must use target + operation + anchors instead of restating IN-02/AC-03; cite `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/impl-plan.json",
+              "line": 45,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `shipped-positive-example` repeats the pure-DI flow and the internal-facade deviation/migration contract, including the no-big-bang boundary. Replace that prose with the concrete targets, update/test/verification operations, and existing anchors; cite `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-realignment-2026-07-23/impl-plan.json",
+              "line": 55,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:0bbc861deb46aff12c5f0ba304c1457299d1d1930b0bf4ca1900bf3f05800968",
+          "at": "2026-07-23T05:44:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:615b2f4113683cff03908fd42cc4ba800e35bff8e99dd42ab5301ab8293db17f",
+          "at": "2026-07-23T05:46:38Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49091cef82df749f46885fe8918a52475e4f141a3f92b2ae1922b94717f69965",
+          "at": "2026-07-23T05:31:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49091cef82df749f46885fe8918a52475e4f141a3f92b2ae1922b94717f69965",
+          "at": "2026-07-23T05:34:48Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72995b80cb2f6722ddb830c53f514332ab60868a5b9a54cb157eff72de0d9b7e",
+          "at": "2026-07-23T05:31:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72995b80cb2f6722ddb830c53f514332ab60868a5b9a54cb157eff72de0d9b7e",
+          "at": "2026-07-23T05:35:49Z"
         }
       ]
     }

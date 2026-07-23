@@ -1,0 +1,22 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-23T05:19:06Z",
+  "declaration_hash": "983df0f9c5331e09d95514c91ba31be4c7f8fcfaa9aff7e099eb9ae07a6841a0",
+  "implementation_input_hash": "b4073a9ebd785afce781e38713e678e2b6324c64abdc6e94f9c3794422f13c9e",
+  "signals": [
+    {
+      "type_name": "LintRuleKind",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Deserialize<'de>",
+        "Eq",
+        "PartialEq",
+        "Serialize"
+      ]
+    }
+  ]
+}
