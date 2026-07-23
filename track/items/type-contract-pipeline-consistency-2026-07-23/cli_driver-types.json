@@ -1,8 +1,102 @@
 {
   "crate_name": "cli_driver",
   "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::contract_map_workflow::RenderContractMap>"
+            }
+          ],
+          "returns": "ContractMapDriver"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ContractMapInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "type_name": "ContractMapDriver"
+    }
+  ],
   "layer": "cli_driver",
   "schema_version": 5,
   "traits": {},
-  "types": {}
+  "types": {
+    "ContractMapDriver": {
+      "action": "add",
+      "docs": "Primary adapter for the track contract-map command; invokes the application service and renders warnings for CLI users. IN-04; AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "contract_map",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "ContractMapInput": {
+      "action": "add",
+      "docs": "CLI-driver input DTO that reuses the validated typed contract-map command instead of reconstructing its concepts from raw primitives. IN-04; AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "command",
+              "ty": "usecase::contract_map_workflow::RenderContractMapCommand"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "contract_map",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        }
+      ]
+    }
+  }
 }

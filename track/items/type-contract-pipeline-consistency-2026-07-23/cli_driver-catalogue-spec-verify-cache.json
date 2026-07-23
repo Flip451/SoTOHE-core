@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "layer": "cli_driver",
+  "entries": [
+    {
+      "claim_hash": "70a0f8dcc516b983bce4a9b7f616ede7cb69a3c36db0012c3658b6630a1e7f25",
+      "evidence_hash": "4ed93cfdce6bd73e8fda12c3ebd477c124985d07aeb4821707a3538c62423811",
+      "verdict": {
+        "kind": "pass",
+        "citation": "renderer が未定義 role を検出した場合は既定スタイルへの無言のフォールバックではなく警告を出す"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ContractMapDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "contract-map style 設定が DataRole・ContractRole・FunctionRole の全値に対応する classDef を持つことを必須にし、renderer が未定義 role を検出した場合は既定スタイルへの無言のフォールバックではなく警告を出す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "70a0f8dcc516b983bce4a9b7f616ede7cb69a3c36db0012c3658b6630a1e7f25",
+      "evidence_hash": "2f89bf9c5eec34fe6e8ca2c18f1b1d9f35858a21e83a81bf9bb2a9984908d0b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "contract-map style 設定は全 DataRole・ContractRole・FunctionRole の classDef を備え、renderer は未定義 role を検出すると警告を出して利用者が無スタイル描画を認識できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ContractMapDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "contract-map style 設定は全 DataRole・ContractRole・FunctionRole の classDef を備え、renderer は未定義 role を検出すると警告を出して利用者が無スタイル描画を認識できる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "924497763566fc33578f131d9102f7c486d48ead92e84efb08d312cf7a963f16",
+      "evidence_hash": "4ed93cfdce6bd73e8fda12c3ebd477c124985d07aeb4821707a3538c62423811",
+      "verdict": {
+        "kind": "pass",
+        "citation": "contract-map style 設定が DataRole・ContractRole・FunctionRole の全値に対応する classDef を持つことを必須にし、renderer が未定義 role を検出した場合は既定スタイルへの無言のフォールバックではなく警告を出す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ContractMapInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "contract-map style 設定が DataRole・ContractRole・FunctionRole の全値に対応する classDef を持つことを必須にし、renderer が未定義 role を検出した場合は既定スタイルへの無言のフォールバックではなく警告を出す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "924497763566fc33578f131d9102f7c486d48ead92e84efb08d312cf7a963f16",
+      "evidence_hash": "2f89bf9c5eec34fe6e8ca2c18f1b1d9f35858a21e83a81bf9bb2a9984908d0b4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "contract-map style 設定は全 DataRole・ContractRole・FunctionRole の classDef を備え、renderer は未定義 role を検出すると警告を出して利用者が無スタイル描画を認識できる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ContractMapInput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "contract-map style 設定は全 DataRole・ContractRole・FunctionRole の classDef を備え、renderer は未定義 role を検出すると警告を出して利用者が無スタイル描画を認識できる。"
+        }
+      }
+    }
+  ]
+}

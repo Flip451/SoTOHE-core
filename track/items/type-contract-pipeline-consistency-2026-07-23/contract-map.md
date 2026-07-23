@@ -157,6 +157,19 @@ subgraph infrastructure["infrastructure"]
 end
 subgraph cli_driver["cli_driver"]
   direction TB
+  subgraph cli_driver_cli_driver_module_contract_map["cli_driver::contract_map"]
+    direction TB
+  subgraph T39_cli_driver_cli_driver_ContractMapDriver["contract_map::ContractMapDriver"]
+    direction TB
+    T39_cli_driver_cli_driver_ContractMapDriver__self[ContractMapDriver]
+    T39_cli_driver_cli_driver_ContractMapDriver_new([new])
+    T39_cli_driver_cli_driver_ContractMapDriver_handle([handle])
+  end
+  subgraph T38_cli_driver_cli_driver_ContractMapInput["contract_map::ContractMapInput"]
+    direction TB
+    T38_cli_driver_cli_driver_ContractMapInput__self[ContractMapInput]
+  end
+  end
 end
 subgraph cli_composition["cli_composition"]
   direction TB
@@ -186,6 +199,8 @@ F75_domain_domain_domain__tddd__catalogue_linter__eval__evaluate_catalogue_lint 
 T28_usecase_usecase_LintRuleKind_ReferencedRoleConstraint --o|expected_role| T22_domain_domain_RoleKind__self
 T28_usecase_usecase_LintRuleKind_NoRoleInMethodSignature --o|forbidden_roles| T22_domain_domain_RoleKind__self
 T39_usecase_usecase_RenderContractMapOutput__self --o|warnings| T38_domain_domain_ContractMapRenderWarning__self
+T39_cli_driver_cli_driver_ContractMapDriver_new --> T39_cli_driver_cli_driver_ContractMapDriver__self
+T39_cli_driver_cli_driver_ContractMapDriver_handle --o T38_cli_driver_cli_driver_ContractMapInput__self
 class T33_domain_domain_CatalogueLinterRule_new method_node
 class T33_domain_domain_CatalogueLinterRule_target method_node
 class T33_domain_domain_CatalogueLinterRule_kind method_node
@@ -265,4 +280,8 @@ class T28_usecase_usecase_LintRuleKind_ForbidPrimitiveInTypes variant_node
 class T28_usecase_usecase_LintRuleKind_DomainValueObjectInboundReferenceRequired variant_node
 class T28_usecase_usecase_LintRuleKind__self dto
 class T39_usecase_usecase_RenderContractMapOutput__self dto
+class T39_cli_driver_cli_driver_ContractMapDriver_new method_node
+class T39_cli_driver_cli_driver_ContractMapDriver_handle method_node
+class T39_cli_driver_cli_driver_ContractMapDriver__self primary_adapter
+class T38_cli_driver_cli_driver_ContractMapInput__self dto
 ```

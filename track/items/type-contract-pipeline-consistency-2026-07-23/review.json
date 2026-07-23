@@ -1,6 +1,90 @@
 {
   "schema_version": 2,
   "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf4a8ffed5c05cab8bd329f4ef59e294f7ebc1a1e950e41914c21aad370cba69",
+          "at": "2026-07-22T17:12:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf4a8ffed5c05cab8bd329f4ef59e294f7ebc1a1e950e41914c21aad370cba69",
+          "at": "2026-07-22T17:14:50Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b40779acf796828aa701f6e3061e08270ae4532449d67952d40668aad96ff85",
+          "at": "2026-07-22T18:03:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b40779acf796828aa701f6e3061e08270ae4532449d67952d40668aad96ff85",
+          "at": "2026-07-22T18:05:44Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "R1 now makes domain `ValueObject` placement conditional on an inbound reference, but R10 still explicitly states that `ValueObject` is the domain default and requires every domain concept to be placed in a domain role. These rules conflict, so type designers cannot determine whether an unreferenced domain concept should remain a domain `ValueObject` or be moved to a usecase DTO/Command.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 247,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8e74c915adc268d0f09c09891d47f4e982c0e1113a57fe86530aef323562e531",
+          "at": "2026-07-22T20:21:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7efc86d64a9d16c66fff3d320df54bc7a323e1b5059d960a7b834c962d9c7251",
+          "at": "2026-07-22T20:24:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "R1/R10 now says a ValueObject candidate is a domain concept only when another domain entry references it, but the unchanged classifier below still says concept classification depends only on domain meaning and that ambiguous cases must be modeled in domain. A domain-meaning wrapper with no inbound reference therefore receives mutually exclusive placement instructions. Align the classifier with the new inbound-reference rule.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 242,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7efc86d64a9d16c66fff3d320df54bc7a323e1b5059d960a7b834c962d9c7251",
+          "at": "2026-07-22T20:30:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0445dc4dbd711541d2f599f6cdb8f1c7f4f6d05a4c2d5a6a8a1960e640227855",
+          "at": "2026-07-22T20:33:21Z"
+        }
+      ]
+    },
     "usecase": {
       "rounds": [
         {
@@ -16,6 +100,346 @@
           "findings": [],
           "hash": "rvw1:sha256:c40a5053133bdb8e745f152bacb57b983de608c7024a82262fd6edd6ae77d0ca",
           "at": "2026-07-22T20:28:09Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ContractMapDriver::handle` returns `Result<CommandOutcome, RenderContractMapError>` instead of `CommandOutcome`. The primary adapter must render use-case errors into `CommandOutcome.stderr` with an appropriate exit code rather than propagating `Result` to its caller.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/contract_map.rs",
+              "line": 38,
+              "category": "non-CommandOutcome return"
+            }
+          ],
+          "hash": "rvw1:sha256:32818e7b75163435d615ef0e13dcbba5304d2726eb95bea92009bf818b37c9ea",
+          "at": "2026-07-23T00:56:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bb0b5546a0e845990e5ce6995ac857ef2abe83716169275a3d4d4b900a3ccb57",
+          "at": "2026-07-23T01:12:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bb0b5546a0e845990e5ce6995ac857ef2abe83716169275a3d4d4b900a3ccb57",
+          "at": "2026-07-23T01:14:25Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52398b424fca70769ccb0d8a1e6396c611d5c96b43dc0c001b30dac499fb5295",
+          "at": "2026-07-22T20:21:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52398b424fca70769ccb0d8a1e6396c611d5c96b43dc0c001b30dac499fb5295",
+          "at": "2026-07-22T20:29:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5a11cf5627b850467fbe0eebfee1460ea22ec85dbd194b4d39d97855061bec8",
+          "at": "2026-07-23T00:37:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5a11cf5627b850467fbe0eebfee1460ea22ec85dbd194b4d39d97855061bec8",
+          "at": "2026-07-23T00:40:34Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new inbound evaluator imports `collect_methods_for_type` from its parent module (`super`), but that function is defined in the sibling `helpers` module and is not re-exported by the parent. This causes the domain crate to fail compilation; import it via `super::helpers::collect_methods_for_type` (or re-export it).",
+              "severity": "P0",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_inbound.rs",
+              "line": 8,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:31ef26dbba7bc3d91a16f1ac89df9d409f6ee680f49c6f98e31b288d2b3a60a8",
+          "at": "2026-07-22T20:22:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c101f49243ca4b7e680db7931a114ecffafe6568d29bd4597bcf4a3638a71cd0",
+          "at": "2026-07-22T20:24:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueLinterRule::new` accepts `DomainValueObjectInboundReferenceRequired` with a target that cannot match `ValueObject` (for example, `[Entity]`). Evaluation then filters every candidate through `target.matches(ValueObject)` and silently returns no violations, disabling a rule whose contract requires checking every domain ValueObject. This leaves an invalid configuration representable despite the fallible constructor, contrary to `prefer-type-safe-abstractions.md` §Parse-don't-validate. Reject targets that do not match `ValueObject`, ignore the generic target for this fixed-target rule, or encode the target in the rule type.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 456,
+              "category": "typestate / parse-don't-validate gap"
+            }
+          ],
+          "hash": "rvw1:sha256:c101f49243ca4b7e680db7931a114ecffafe6568d29bd4597bcf4a3638a71cd0",
+          "at": "2026-07-22T20:29:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f0cd374e74aba7779ed5abea2d3c0f05014d9b257f495330649246f28286978f",
+          "at": "2026-07-22T20:33:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62737cc2c287cc77b1b3e443b95194230da573dd95ce800b132c4c292f0f0819",
+          "at": "2026-07-23T00:01:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62737cc2c287cc77b1b3e443b95194230da573dd95ce800b132c4c292f0f0819",
+          "at": "2026-07-23T00:02:29Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::LintRuleKind` の `docs` が、usecase 配置を選ぶ理由と payload の serde/domain 値オブジェクト方針を散文で再記述しています。下流カタログでは変更対象・操作・アンカー参照に限定してください。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/usecase-types.json",
+              "line": 62,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::RenderContractMapOutput` の `docs` が、DTO の配置理由、usize を許容する理由、warnings の型方針を再記述しています。これらは upstream の設計理由・契約であり、docs はアンカー参照に留めるべきです。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/usecase-types.json",
+              "line": 135,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`domain::ContractMapContent` の `docs` が、Mermaid text を opaque presentation value として扱う R9 例外の理由と受け渡し挙動を再記述しています。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 370,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`domain::RoleKind` の `docs` が、exhaustive enum と presentation-only label の設計意図を再記述しています。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 524,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:14ab07e1f505d8d15214fe2e722cb4c6080f2c1278aa822cf323842a2dfde9ea",
+          "at": "2026-07-22T18:04:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0475f6ea5f262f2c88fca06f26eefdb3b271ee0b22a42445d22610c98bbee1af",
+          "at": "2026-07-22T18:10:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint` is declared `action: modify`, but its generic bound, parameters, return type, and syncness are identical to the rustdoc baseline; D2 changes only its body. `modify` requires a structural contract delta, so this entry should be omitted or represented as structurally unchanged.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 5,
+              "category": "SoT integrity/action incoherent with diff"
+            },
+            {
+              "message": "`domain::CatalogueLinterRule` is declared `action: modify`, although its fields, methods, and impl surface are baseline-identical; only constructor behavior changes to accommodate the modified rule-kind enum. This is not a structural type-contract modification, so the entry should be omitted or represented as structurally unchanged.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 286,
+              "category": "SoT integrity/action incoherent with diff"
+            }
+          ],
+          "hash": "rvw1:sha256:0475f6ea5f262f2c88fca06f26eefdb3b271ee0b22a42445d22610c98bbee1af",
+          "at": "2026-07-22T18:15:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Catalogue methods use `Self` in return types despite the project convention requiring concrete type names. Replace `Self` with `ContractMapRenderResult` in `new` and `Result<ContractMapRenderResult, CatalogueLinterRuleError>` as applicable.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 79,
+              "category": "API shape"
+            },
+            {
+              "message": "`CatalogueLinterRule::new` declares `Result<Self, CatalogueLinterRuleError>`; the return type must use the concrete `CatalogueLinterRule` name.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 312,
+              "category": "API shape"
+            },
+            {
+              "message": "`ContractMapContent::new` declares `Self`; the return type must use the concrete `ContractMapContent` name.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 530,
+              "category": "API shape"
+            },
+            {
+              "message": "`RoleKind::from_data_role`, `from_contract_role`, `from_function_role`, and `all` use `Self` in return types. Use concrete `RoleKind` / `&[RoleKind]` types per the catalogue convention.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 787,
+              "category": "API shape"
+            }
+          ],
+          "hash": "rvw1:sha256:f1b7c585895b77aae353a56eb15897973febf587e8462fca6a80e0e42f9d2c7f",
+          "at": "2026-07-22T18:20:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ac30160778ecf6b66caf72f741aba28c23ec58276b60fb1ad34491cd046bb2e",
+          "at": "2026-07-22T18:28:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4ac30160778ecf6b66caf72f741aba28c23ec58276b60fb1ad34491cd046bb2e",
+          "at": "2026-07-22T18:31:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::RoleKind` is declared `action: modify` but its modified methods still use `Self` in return types (`from_data_role`, `from_contract_role`, `from_function_role`, and `all`). The type contract requires concrete return names for new/modified contracts; use `RoleKind` and `&'static [RoleKind]` so the catalogue does not preserve the disallowed baseline shorthand.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+              "line": 832,
+              "category": "API shape"
+            }
+          ],
+          "hash": "rvw1:sha256:397f9b55db1c845ca6751be1e63d8c42c3a6edd72f18d26bf0ce01f017ba27ac",
+          "at": "2026-07-22T20:30:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be78e4a2ccbe497a702db947d2244660e6f21d866cf924aa3d19d12ef06b153b",
+          "at": "2026-07-22T23:52:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be78e4a2ccbe497a702db947d2244660e6f21d866cf924aa3d19d12ef06b153b",
+          "at": "2026-07-23T00:00:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ContractMapDriver::new` declares `returns: \"Self\"`; new/modified contracts must use the concrete type name (`ContractMapDriver`) rather than `Self` per the type-catalogue convention.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/cli_driver-types.json",
+              "line": 14,
+              "category": "API shape"
+            },
+            {
+              "message": "`ContractMapDriver::handle` returns `Result<CommandOutcome, RenderContractMapError>`, leaving use-case errors to the CLI caller. As the primary adapter, this contract must render application errors into `CommandOutcome` (including an appropriate exit status/stderr) rather than propagate `RenderContractMapError`; otherwise the declared adapter responsibility is incomplete.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/cli_driver-types.json",
+              "line": 31,
+              "category": "Cross-layer contract"
+            }
+          ],
+          "hash": "rvw1:sha256:fd41a63880474f80da0c1eb6c98aa66269c1901b147ac1747b00cc25856cc36b",
+          "at": "2026-07-23T00:56:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77c0cdb6b321627928ac37ffb2d56d61beb19d82540feed04688b329e51db0d8",
+          "at": "2026-07-23T01:11:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77c0cdb6b321627928ac37ffb2d56d61beb19d82540feed04688b329e51db0d8",
+          "at": "2026-07-23T01:16:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Both `cli_driver::ContractMapDriver` and `cli_driver::ContractMapInput` omit `CN-04` from `spec_refs[]`, even though CN-04 is the contract-map style-completeness constraint that governs these D4 types. The catalogue entries should retain the complete relevant IN/AC/CN trace rather than silently skipping the constraint reference.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/cli_driver-types.json",
+              "line": 62,
+              "category": "spec_refs mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:623c9affb60df907af0022812d88ca2931adf67e63c20590335ace6ed3fdefbe",
+          "at": "2026-07-23T01:28:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:623c9affb60df907af0022812d88ca2931adf67e63c20590335ace6ed3fdefbe",
+          "at": "2026-07-23T01:29:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:623c9affb60df907af0022812d88ca2931adf67e63c20590335ace6ed3fdefbe",
+          "at": "2026-07-23T01:31:17Z"
         }
       ]
     },
@@ -185,318 +609,97 @@
           "findings": [],
           "hash": "rvw1:sha256:c06ae9fc271fefc31fd1a79cdcd501490e71e0d107a53add991cc009758bbb77",
           "at": "2026-07-23T00:09:33Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5b40779acf796828aa701f6e3061e08270ae4532449d67952d40668aad96ff85",
-          "at": "2026-07-22T18:03:44Z"
         },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5b40779acf796828aa701f6e3061e08270ae4532449d67952d40668aad96ff85",
-          "at": "2026-07-22T18:05:44Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "R1 now makes domain `ValueObject` placement conditional on an inbound reference, but R10 still explicitly states that `ValueObject` is the domain default and requires every domain concept to be placed in a domain role. These rules conflict, so type designers cannot determine whether an unreferenced domain concept should remain a domain `ValueObject` or be moved to a usecase DTO/Command.",
+              "message": "T004 is attributed to `cli_driver::ContractMapInput` and `cli_driver::ContractMapDriver`, but T004's description does not claim to add or modify any `apps/cli-driver` target. Update the task description to include the CLI-driver work or remove these attributions; otherwise task-contract attribution is inconsistent.",
               "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 247,
-              "category": "convention contradiction"
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/task-contract.json",
+              "line": 20,
+              "category": "task-contract attribution mismatch"
             }
           ],
-          "hash": "rvw1:sha256:8e74c915adc268d0f09c09891d47f4e982c0e1113a57fe86530aef323562e531",
-          "at": "2026-07-22T20:21:44Z"
+          "hash": "rvw1:sha256:02960de64f642c5a45b613e14b670e473227051c2a310dd74ad02067a30e54fe",
+          "at": "2026-07-23T00:56:29Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7efc86d64a9d16c66fff3d320df54bc7a323e1b5059d960a7b834c962d9c7251",
-          "at": "2026-07-22T20:24:57Z"
+          "hash": "rvw1:sha256:af668c83a7b2d43f258a99ccfb374902010087e9a77bc2f8be0549ad8d36cfa6",
+          "at": "2026-07-23T01:12:06Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "R1/R10 now says a ValueObject candidate is a domain concept only when another domain entry references it, but the unchanged classifier below still says concept classification depends only on domain meaning and that ambiguous cases must be modeled in domain. A domain-meaning wrapper with no inbound reference therefore receives mutually exclusive placement instructions. Align the classifier with the new inbound-reference rule.",
+              "message": "T004 の CLI-driver 作業は対象を `apps/cli-driver` の “primary-adapter surface” としか示しておらず、変更する file / symbol を特定していません。`apps/cli-driver/src/contract_map.rs`、`ContractMapInput`、`ContractMapDriver` など実装境界を明記してください。",
               "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 242,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:7efc86d64a9d16c66fff3d320df54bc7a323e1b5059d960a7b834c962d9c7251",
-          "at": "2026-07-22T20:30:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0445dc4dbd711541d2f599f6cdb8f1c7f4f6d05a4c2d5a6a8a1960e640227855",
-          "at": "2026-07-22T20:33:21Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:52398b424fca70769ccb0d8a1e6396c611d5c96b43dc0c001b30dac499fb5295",
-          "at": "2026-07-22T20:21:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:52398b424fca70769ccb0d8a1e6396c611d5c96b43dc0c001b30dac499fb5295",
-          "at": "2026-07-22T20:29:04Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::LintRuleKind` の `docs` が、usecase 配置を選ぶ理由と payload の serde/domain 値オブジェクト方針を散文で再記述しています。下流カタログでは変更対象・操作・アンカー参照に限定してください。",
-              "severity": "P1",
-              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/usecase-types.json",
-              "line": 62,
-              "category": "upstream restatement"
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/impl-plan.json",
+              "line": 24,
+              "category": "task description non-executable"
             },
             {
-              "message": "`usecase::RenderContractMapOutput` の `docs` が、DTO の配置理由、usize を許容する理由、warnings の型方針を再記述しています。これらは upstream の設計理由・契約であり、docs はアンカー参照に留めるべきです。",
+              "message": "T004 の “so its presentation input and driver propagate the completed style and warning result end to end” は AC-04 の挙動を散文で再記述しています。`knowledge/conventions/no-upstream-restatement.md` に従い、対象・操作・anchor cite のみにしてください。",
               "severity": "P1",
-              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/usecase-types.json",
-              "line": 135,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`domain::ContractMapContent` の `docs` が、Mermaid text を opaque presentation value として扱う R9 例外の理由と受け渡し挙動を再記述しています。",
-              "severity": "P1",
-              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
-              "line": 370,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`domain::RoleKind` の `docs` が、exhaustive enum と presentation-only label の設計意図を再記述しています。",
-              "severity": "P1",
-              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
-              "line": 524,
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/impl-plan.json",
+              "line": 24,
               "category": "upstream restatement"
             }
           ],
-          "hash": "rvw1:sha256:14ab07e1f505d8d15214fe2e722cb4c6080f2c1278aa822cf323842a2dfde9ea",
-          "at": "2026-07-22T18:04:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0475f6ea5f262f2c88fca06f26eefdb3b271ee0b22a42445d22610c98bbee1af",
-          "at": "2026-07-22T18:10:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint` is declared `action: modify`, but its generic bound, parameters, return type, and syncness are identical to the rustdoc baseline; D2 changes only its body. `modify` requires a structural contract delta, so this entry should be omitted or represented as structurally unchanged.",
-              "severity": "P1",
-              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
-              "line": 5,
-              "category": "SoT integrity/action incoherent with diff"
-            },
-            {
-              "message": "`domain::CatalogueLinterRule` is declared `action: modify`, although its fields, methods, and impl surface are baseline-identical; only constructor behavior changes to accommodate the modified rule-kind enum. This is not a structural type-contract modification, so the entry should be omitted or represented as structurally unchanged.",
-              "severity": "P1",
-              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
-              "line": 286,
-              "category": "SoT integrity/action incoherent with diff"
-            }
-          ],
-          "hash": "rvw1:sha256:0475f6ea5f262f2c88fca06f26eefdb3b271ee0b22a42445d22610c98bbee1af",
-          "at": "2026-07-22T18:15:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Catalogue methods use `Self` in return types despite the project convention requiring concrete type names. Replace `Self` with `ContractMapRenderResult` in `new` and `Result<ContractMapRenderResult, CatalogueLinterRuleError>` as applicable.",
-              "severity": "P1",
-              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
-              "line": 79,
-              "category": "API shape"
-            },
-            {
-              "message": "`CatalogueLinterRule::new` declares `Result<Self, CatalogueLinterRuleError>`; the return type must use the concrete `CatalogueLinterRule` name.",
-              "severity": "P1",
-              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
-              "line": 312,
-              "category": "API shape"
-            },
-            {
-              "message": "`ContractMapContent::new` declares `Self`; the return type must use the concrete `ContractMapContent` name.",
-              "severity": "P1",
-              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
-              "line": 530,
-              "category": "API shape"
-            },
-            {
-              "message": "`RoleKind::from_data_role`, `from_contract_role`, `from_function_role`, and `all` use `Self` in return types. Use concrete `RoleKind` / `&[RoleKind]` types per the catalogue convention.",
-              "severity": "P1",
-              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
-              "line": 787,
-              "category": "API shape"
-            }
-          ],
-          "hash": "rvw1:sha256:f1b7c585895b77aae353a56eb15897973febf587e8462fca6a80e0e42f9d2c7f",
-          "at": "2026-07-22T18:20:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4ac30160778ecf6b66caf72f741aba28c23ec58276b60fb1ad34491cd046bb2e",
-          "at": "2026-07-22T18:28:06Z"
+          "hash": "rvw1:sha256:af668c83a7b2d43f258a99ccfb374902010087e9a77bc2f8be0549ad8d36cfa6",
+          "at": "2026-07-23T01:15:23Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:4ac30160778ecf6b66caf72f741aba28c23ec58276b60fb1ad34491cd046bb2e",
-          "at": "2026-07-22T18:31:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`domain::RoleKind` is declared `action: modify` but its modified methods still use `Self` in return types (`from_data_role`, `from_contract_role`, `from_function_role`, and `all`). The type contract requires concrete return names for new/modified contracts; use `RoleKind` and `&'static [RoleKind]` so the catalogue does not preserve the disallowed baseline shorthand.",
-              "severity": "P1",
-              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
-              "line": 832,
-              "category": "API shape"
-            }
-          ],
-          "hash": "rvw1:sha256:397f9b55db1c845ca6751be1e63d8c42c3a6edd72f18d26bf0ce01f017ba27ac",
-          "at": "2026-07-22T20:30:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:be78e4a2ccbe497a702db947d2244660e6f21d866cf924aa3d19d12ef06b153b",
-          "at": "2026-07-22T23:52:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:be78e4a2ccbe497a702db947d2244660e6f21d866cf924aa3d19d12ef06b153b",
-          "at": "2026-07-23T00:00:07Z"
+          "hash": "rvw1:sha256:9da2c54ae2a7bbf49a453665dace41600728f9d3a7be2918579f499c836744cd",
+          "at": "2026-07-23T01:18:10Z"
         }
       ]
     },
-    "domain": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new inbound evaluator imports `collect_methods_for_type` from its parent module (`super`), but that function is defined in the sibling `helpers` module and is not re-exported by the parent. This causes the domain crate to fail compilation; import it via `super::helpers::collect_methods_for_type` (or re-export it).",
-              "severity": "P0",
-              "file": "libs/domain/src/tddd/catalogue_linter_eval_inbound.rs",
-              "line": 8,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:31ef26dbba7bc3d91a16f1ac89df9d409f6ee680f49c6f98e31b288d2b3a60a8",
-          "at": "2026-07-22T20:22:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c101f49243ca4b7e680db7931a114ecffafe6568d29bd4597bcf4a3638a71cd0",
-          "at": "2026-07-22T20:24:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CatalogueLinterRule::new` accepts `DomainValueObjectInboundReferenceRequired` with a target that cannot match `ValueObject` (for example, `[Entity]`). Evaluation then filters every candidate through `target.matches(ValueObject)` and silently returns no violations, disabling a rule whose contract requires checking every domain ValueObject. This leaves an invalid configuration representable despite the fallible constructor, contrary to `prefer-type-safe-abstractions.md` §Parse-don't-validate. Reject targets that do not match `ValueObject`, ignore the generic target for this fixed-target rule, or encode the target in the rule type.",
+              "message": "The composition root still assembles the user-facing contract-map success string, including warning formatting; rendering/presentation belongs in cli_driver.",
               "severity": "P1",
-              "file": "libs/domain/src/tddd/catalogue_linter.rs",
-              "line": 456,
-              "category": "typestate / parse-don't-validate gap"
+              "file": "apps/cli-composition/src/track/tddd.rs",
+              "line": 600,
+              "category": "render leak"
             }
           ],
-          "hash": "rvw1:sha256:c101f49243ca4b7e680db7931a114ecffafe6568d29bd4597bcf4a3638a71cd0",
-          "at": "2026-07-22T20:29:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f0cd374e74aba7779ed5abea2d3c0f05014d9b257f495330649246f28286978f",
-          "at": "2026-07-22T20:33:06Z"
+          "hash": "rvw1:sha256:38552e10e286bf177f8c94fb9f302143a621c4e17f4b56afb63d1bbb3534ee40",
+          "at": "2026-07-23T00:37:43Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:62737cc2c287cc77b1b3e443b95194230da573dd95ce800b132c4c292f0f0819",
-          "at": "2026-07-23T00:01:07Z"
+          "hash": "rvw1:sha256:2745f4112e00168522481ae9069dd260c1d00f54e835cfe77382f154ea461932",
+          "at": "2026-07-23T00:56:33Z"
         },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:62737cc2c287cc77b1b3e443b95194230da573dd95ce800b132c4c292f0f0819",
-          "at": "2026-07-23T00:02:29Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cf4a8ffed5c05cab8bd329f4ef59e294f7ebc1a1e950e41914c21aad370cba69",
-          "at": "2026-07-22T17:12:27Z"
+          "hash": "rvw1:sha256:dba420553a147e75fdf384c3a19e477aaff67caad4439539f98380f1d8f35e7d",
+          "at": "2026-07-23T01:11:43Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cf4a8ffed5c05cab8bd329f4ef59e294f7ebc1a1e950e41914c21aad370cba69",
-          "at": "2026-07-22T17:14:50Z"
+          "hash": "rvw1:sha256:dba420553a147e75fdf384c3a19e477aaff67caad4439539f98380f1d8f35e7d",
+          "at": "2026-07-23T01:14:11Z"
         }
       ]
     }

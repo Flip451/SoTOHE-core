@@ -97,17 +97,18 @@ impl ContractMapRenderer for ContractMapRendererAdapter {
         let output = render::render_mermaid(catalogues, layer_order, &style)?;
         Ok(ContractMapRenderResult::new(
             ContractMapContent::new(output),
-            undefined_role_style_warnings(catalogues, &style),
+            undefined_role_style_warnings(catalogues, layer_order, &style),
         ))
     }
 }
 
 fn undefined_role_style_warnings(
     catalogues: &[CatalogueDocument],
+    layer_order: &[LayerId],
     style: &render::StyleConfig,
 ) -> Vec<ContractMapRenderWarning> {
     let mut roles = Vec::new();
-    for catalogue in catalogues {
+    for catalogue in catalogues.iter().filter(|catalogue| layer_order.contains(catalogue.layer())) {
         for entry in catalogue.types().values() {
             if entry.action() != ItemAction::Delete {
                 roles.push(RoleKind::from_data_role(entry.role()));
@@ -284,6 +285,42 @@ include_function_roles = []
         assert_eq!(
             result.warnings().to_vec(),
             vec![ContractMapRenderWarning::UndefinedRoleStyle { role: RoleKind::ValueObject }]
+        );
+    }
+
+    #[test]
+    fn test_render_undefined_role_style_ignores_excluded_layer() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = write_style_config(tmp.path(), MINIMAL_VALID_CONFIG);
+        let adapter = ContractMapRendererAdapter::new(path);
+        let rendered_layer = LayerId::try_new("domain").unwrap();
+        let excluded_layer = LayerId::try_new("usecase").unwrap();
+        let crate_name = CrateName::new("usecase").unwrap();
+        let mut excluded_catalogue = CatalogueDocument::new(3, crate_name, excluded_layer);
+        excluded_catalogue.insert_type(
+            TypeName::new("UnstyledBoundaryValue").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let result = adapter
+            .render(&[excluded_catalogue], &[rendered_layer], &ContractMapRenderOptions::default())
+            .unwrap();
+
+        assert!(
+            result.warnings().is_empty(),
+            "roles in excluded layers must not produce style warnings: {:?}",
+            result.warnings()
         );
     }
 

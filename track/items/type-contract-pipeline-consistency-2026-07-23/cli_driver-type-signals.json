@@ -1,7 +1,20 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-22T17:45:22Z",
-  "declaration_hash": "d78dd1aba3148b227f3c009e165a097f37132b396d02844f22f2898cf794a5b2",
-  "implementation_input_hash": "3d94fc70982bc4756339341b94765bf293ca43cab0e5e2fbd3884ec3fefa274d",
-  "signals": []
+  "generated_at": "2026-07-23T01:24:08Z",
+  "declaration_hash": "5e907ed729dd91fbd735c26b94fab4036cf12f6283fea0a9e7d20b769bd6750f",
+  "implementation_input_hash": "434954617ba547295685e31b3b703b918dc34bd44b3421e300f54e917a5e01f3",
+  "signals": [
+    {
+      "type_name": "ContractMapDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ContractMapInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
 }

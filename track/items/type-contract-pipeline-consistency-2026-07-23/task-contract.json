@@ -16,7 +16,9 @@
       { "layer": "domain", "entry_key": "ContractMapRenderWarning" },
       { "layer": "domain", "entry_key": "RoleKind" },
       { "layer": "domain", "entry_key": "ContractMapRenderer" },
-      { "layer": "usecase", "entry_key": "RenderContractMapOutput" }
+      { "layer": "usecase", "entry_key": "RenderContractMapOutput" },
+      { "layer": "cli_driver", "entry_key": "ContractMapInput" },
+      { "layer": "cli_driver", "entry_key": "ContractMapDriver" }
     ]
   }
 }
