@@ -5,7 +5,7 @@
 //! types it needs are reached through `usecase`'s re-exports, so it never takes
 //! a direct dependency on the domain crate.
 
-use usecase::{GreetUser, SalutationProvider, Username};
+use usecase::{GreetError, GreetUser, SalutationProvider, Username};
 
 /// Rendered result of a CLI command, ready for a presenter to print.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -17,22 +17,41 @@ pub struct CommandOutcome {
 }
 
 /// Driver that renders the greeting use case into a [`CommandOutcome`].
-pub struct GreetDriver<P: SalutationProvider> {
-    interactor: GreetUser<P>,
+pub struct GreetDriver {
+    interactor: Box<dyn GreetingService>,
 }
 
-impl<P: SalutationProvider> GreetDriver<P> {
+trait GreetingService {
+    fn execute(&self, user: &Username) -> Result<String, GreetError>;
+}
+
+impl<P: SalutationProvider> GreetingService for GreetUser<P> {
+    fn execute(&self, user: &Username) -> Result<String, GreetError> {
+        GreetUser::execute(self, user)
+    }
+}
+
+impl GreetDriver {
     /// Builds the driver from the injected interactor.
-    pub fn new(interactor: GreetUser<P>) -> Self {
-        Self { interactor }
+    #[must_use]
+    pub fn new<P: SalutationProvider + 'static>(interactor: GreetUser<P>) -> Self {
+        Self { interactor: Box::new(interactor) }
     }
 
-    /// Runs the greeting use case for `user` and renders the outcome.
+    /// Validates `raw_name`, runs the greeting use case, and renders the outcome.
     ///
-    /// Errors from the use case are captured into the returned
+    /// Validation and use-case errors are captured into the returned
     /// [`CommandOutcome`] rather than propagated, so the presenter has a single
     /// value to render.
-    pub fn run(&self, user: &Username) -> CommandOutcome {
+    #[must_use]
+    pub fn handle(&self, raw_name: &str) -> CommandOutcome {
+        match Username::new(raw_name) {
+            Ok(user) => self.render_greeting(&user),
+            Err(error) => CommandOutcome { message: error.to_string(), success: false },
+        }
+    }
+
+    fn render_greeting(&self, user: &Username) -> CommandOutcome {
         match self.interactor.execute(user) {
             Ok(message) => CommandOutcome { message, success: true },
             Err(error) => CommandOutcome { message: error.to_string(), success: false },
@@ -63,19 +82,26 @@ mod tests {
     }
 
     #[test]
-    fn test_run_successful_usecase_returns_success_outcome() {
+    fn test_handle_valid_raw_name_returns_success_outcome() {
         let driver = GreetDriver::new(GreetUser::new(FixedSalutation("Hello")));
-        let user = Username::new("ada").unwrap();
-        let outcome = driver.run(&user);
+        let outcome = driver.handle("ada");
         assert!(outcome.success);
         assert_eq!(outcome.message, "Hello, ada!");
     }
 
     #[test]
-    fn test_run_usecase_error_returns_failure_outcome() {
+    fn test_handle_empty_raw_name_returns_validation_failure() {
+        let driver = GreetDriver::new(GreetUser::new(FixedSalutation("Hello")));
+        let outcome = driver.handle("   ");
+
+        assert!(!outcome.success);
+        assert_eq!(outcome.message, "username must not be empty");
+    }
+
+    #[test]
+    fn test_handle_unavailable_salutation_returns_failure_outcome() {
         let driver = GreetDriver::new(GreetUser::new(MissingSalutation));
-        let user = Username::new("ada").unwrap();
-        let outcome = driver.run(&user);
+        let outcome = driver.handle("ada");
         assert!(!outcome.success);
         assert_eq!(outcome.message, "salutation is unavailable");
     }

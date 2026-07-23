@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "e407f8b44688b09b18257cfeee23da340fc4145bea2a9e86334e6c0867babb1a",
+  "signals": [
+    {
+      "type_name": "CatalogueLinterRule",
+      "signal": "blue",
+      "entry_hash": "aaa700205037ebbba0640879847e1f3c1e6447d2b64de6382ff3acf1dd3497b3"
+    },
+    {
+      "type_name": "CatalogueLinterRuleKind",
+      "signal": "blue",
+      "entry_hash": "05552ac382f3f9e5ebc950c4058bb5ae9587cfb4af35eebf8e28566e1199a67c"
+    },
+    {
+      "type_name": "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint",
+      "signal": "blue",
+      "entry_hash": "e71b8ee72cfaaced3ea223626c89ea51f2afca2898417ad8ddbd0473bc268a72"
+    }
+  ]
+}

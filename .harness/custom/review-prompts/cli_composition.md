@@ -13,12 +13,30 @@ in `usecase` or `cli_driver`.
 
 Violations of the role statement above are always reportable. The following priority categories focus the review and guide severity assessment; they are not an exhaustive list of reportable design deviations. The exclusions in **What NOT to report** still apply:
 
-- **invoke leak**: a wiring function or module in `cli_composition` that directly
-  calls a use-case interactor method (e.g., `.run(...)` / `.dispatch(...)` /
-  `.execute(...)`) instead of constructing it and injecting it into a Driver.
-  Composition root wires object graphs at startup; invoking a use case at
-  wiring time is an invoke leak. Cite `type-designer-kind-selection.md` R1
-  (`CompositionRoot`).
+- **invoke leak**: a composition entry point that executes application flow,
+  whether it directly calls a use-case interactor (e.g., `.run(...)` /
+  `.dispatch(...)` / `.execute(...)`) or delegates to a `PrimaryAdapter` / Driver
+  method (e.g., `.handle(...)` / `.run(...)`). This includes a `CompositionRoot`
+  method and any public free function in `cli_composition`. A composition root may
+  construct and inject those collaborators, but it must not accept a request and
+  return an application result itself. Cite `type-designer-kind-selection.md` R1
+  (`CompositionRoot` and `FreeFunction`).
+- **public free-function composition entry point**: a public free function in
+  `cli_composition`, including one that only returns a fully wired adapter.
+  Composition wiring belongs on a `CompositionRoot` method; a free function is not
+  a permitted handoff surface. Cite `type-designer-kind-selection.md` R1
+  (`FreeFunction`).
+- **prohibited public-surface exposure**: a `CompositionRoot` public field,
+  generic bound, implemented application trait, or method signature that exposes
+  a domain type, use-case type (including its error types), or an internal role
+  type. Keep those details behind the composition boundary; a composition-local
+  typed wiring error remains permitted. Cite `type-designer-kind-selection.md`
+  R1 (`CompositionRoot`).
+- **`PrimaryAdapter` wiring allowance**: do not report a composition method
+  solely because it constructs the object graph and returns a fully wired
+  `PrimaryAdapter`. That return value is the permitted pure-DI handoff to
+  `apps/cli`; it does not permit the composition method to expose prohibited
+  role types or invoke the adapter's application flow.
 - **render leak**: a module in `cli_composition` that assembles user-facing
   strings, formats tables, or performs output templating. Rendering is the
   `cli_driver` layer's responsibility; string construction in the composition

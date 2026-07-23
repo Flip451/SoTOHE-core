@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "983df0f9c5331e09d95514c91ba31be4c7f8fcfaa9aff7e099eb9ae07a6841a0",
+  "signals": [
+    {
+      "type_name": "LintRuleKind",
+      "signal": "blue",
+      "entry_hash": "b1fa727c52cc275898ba780f3e81dd42c7d3c718521a15e63f8f8eb21e9e11d1"
+    }
+  ]
+}

@@ -37,6 +37,9 @@ use eval_helpers::{resolve_type_role, sig_type_contains_entry};
 #[path = "catalogue_linter_eval_inbound.rs"]
 mod eval_inbound;
 
+#[path = "catalogue_linter_eval_composition_root.rs"]
+mod eval_composition_root;
+
 fn ensure_target_can_produce_type_ref_checks(
     rule_kind: &str,
     target_roles: &[RoleKind],
@@ -668,6 +671,15 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                     catalogue,
                     all_catalogues,
                 )?);
+            }
+
+            CatalogueLinterRuleKind::CompositionRootPureDi => {
+                violations.extend(eval_composition_root::evaluate_composition_root_pure_di(
+                    rule,
+                    catalogue,
+                    all_catalogues,
+                    target_layer_id,
+                )?)
             }
         }
     }
