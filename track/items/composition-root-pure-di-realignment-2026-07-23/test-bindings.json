@@ -1,4 +1,142 @@
 {
   "track_id": "composition-root-pure-di-realignment-2026-07-23",
-  "records": []
+  "records": [
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-realignment-2026-07-23/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_composition_root_pure_di_happy_path_allows_primary_adapter_accessor"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_composition_root_pure_di_detects_execution_method"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_composition_root_pure_di_detects_prohibited_public_role_exposure"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-realignment-2026-07-23/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_composition_root_pure_di_detects_execution_method"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-realignment-2026-07-23/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_composition_root_pure_di_happy_path_allows_primary_adapter_accessor"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_composition_root_pure_di_detects_execution_method"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::catalogue_linter::tests",
+          "test_name": "test_composition_root_pure_di_detects_prohibited_public_role_exposure"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "LintRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-realignment-2026-07-23/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_lint_workflow::tests",
+          "test_name": "test_execute_composition_root_pure_di_detects_execution_method"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_lint_workflow::tests",
+          "test_name": "test_execute_composition_root_pure_di_detects_prohibited_public_role_exposure"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "LintRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-realignment-2026-07-23/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_lint_workflow::tests",
+          "test_name": "test_execute_composition_root_pure_di_detects_execution_method"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "LintRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-realignment-2026-07-23/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_lint_workflow::tests",
+          "test_name": "test_execute_composition_root_pure_di_detects_execution_method"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_lint_workflow::tests",
+          "test_name": "test_execute_composition_root_pure_di_detects_prohibited_public_role_exposure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_lint_workflow::tests",
+          "test_name": "test_execute_composition_root_pure_di_allows_primary_adapter_surface"
+        }
+      ]
+    }
+  ]
 }

@@ -1,98 +1,21 @@
 {
   "schema_version": 2,
   "scopes": {
-    "types": {
+    "usecase": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1131a1c6e03dba24c7fcdb215daf35051621a66cb39c3cf27da9b50720695d4a",
-          "at": "2026-07-23T05:31:45Z"
+          "hash": "rvw1:sha256:e305f382a5428253ca2d89e2c27a550bbf5908513d2d61334e12491cda81c85d",
+          "at": "2026-07-23T06:29:30Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1131a1c6e03dba24c7fcdb215daf35051621a66cb39c3cf27da9b50720695d4a",
-          "at": "2026-07-23T05:36:28Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D5 embeds an exhaustive lint schema, phase wiring, grandfathering behavior, and residual-risk boundary inside the ADR, obscuring the architectural decision. Move these operational details to the relevant convention/capability SSoT and retain only the decision to enforce the public-face rule via catalogue lint.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
-              "line": 73,
-              "category": "decision obscured by excess detail"
-            }
-          ],
-          "hash": "rvw1:sha256:647060fc8d093744415c4ae9a3356b31b894cbcfb2ad1e5801a9c77841d8c2d2",
-          "at": "2026-07-23T03:52:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c10654357daa34ce2c5123dd7743b1b83e988d32a6a6f281acb6aba3cbd99cbb",
-          "at": "2026-07-23T03:57:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 treats any other-layer type on the composition public surface as a violation, but D1/D2 require that surface to return the wired `GreetDriver` from `cli_driver`. The mandated pure-DI API would therefore violate its own review category. Narrow the category to forbidden domain/usecase/internal-role exposure while explicitly permitting the returned `PrimaryAdapter`.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
-              "line": 60,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:c10654357daa34ce2c5123dd7743b1b83e988d32a6a6f281acb6aba3cbd99cbb",
-          "at": "2026-07-23T04:00:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1babcb87d9cbb804cb6f8c9584be9f705f4dabe16b01b16dd5bd2526bc054839",
-          "at": "2026-07-23T04:06:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D5 embeds operational lint schema/configuration and enforcement details in the ADR, including concrete convention/config paths and preset ownership. This obscures the architectural decision and leaks downstream gate/lint implementation concerns into the ADR; delegate those mechanics to the referenced convention/config SSoTs while retaining only the high-level choice of enforcement mechanism.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
-              "line": 69,
-              "category": "decision obscured by excess detail"
-            }
-          ],
-          "hash": "rvw1:sha256:876f76407d9bb2e1a216b84e7f84e7c16c0735eff13a678cce3d7790a425c662",
-          "at": "2026-07-23T04:53:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a3534d12d488562f291beaf1eb361d19b8c9ed80624aa42c3b79f66101173a7b",
-          "at": "2026-07-23T04:57:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a3534d12d488562f291beaf1eb361d19b8c9ed80624aa42c3b79f66101173a7b",
-          "at": "2026-07-23T05:00:50Z"
+          "hash": "rvw1:sha256:e305f382a5428253ca2d89e2c27a550bbf5908513d2d61334e12491cda81c85d",
+          "at": "2026-07-23T07:28:20Z"
         }
       ]
     },
@@ -269,6 +192,115 @@
           "findings": [],
           "hash": "rvw1:sha256:615b2f4113683cff03908fd42cc4ba800e35bff8e99dd42ab5301ab8293db17f",
           "at": "2026-07-23T05:46:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99dc6583f3dc6dba968f79f0b1ed8024bdee05cf185b0282a546aa1364215a3c",
+          "at": "2026-07-23T06:30:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99dc6583f3dc6dba968f79f0b1ed8024bdee05cf185b0282a546aa1364215a3c",
+          "at": "2026-07-23T07:34:51Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D5 embeds an exhaustive lint schema, phase wiring, grandfathering behavior, and residual-risk boundary inside the ADR, obscuring the architectural decision. Move these operational details to the relevant convention/capability SSoT and retain only the decision to enforce the public-face rule via catalogue lint.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+              "line": 73,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:647060fc8d093744415c4ae9a3356b31b894cbcfb2ad1e5801a9c77841d8c2d2",
+          "at": "2026-07-23T03:52:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c10654357daa34ce2c5123dd7743b1b83e988d32a6a6f281acb6aba3cbd99cbb",
+          "at": "2026-07-23T03:57:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 treats any other-layer type on the composition public surface as a violation, but D1/D2 require that surface to return the wired `GreetDriver` from `cli_driver`. The mandated pure-DI API would therefore violate its own review category. Narrow the category to forbidden domain/usecase/internal-role exposure while explicitly permitting the returned `PrimaryAdapter`.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+              "line": 60,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:c10654357daa34ce2c5123dd7743b1b83e988d32a6a6f281acb6aba3cbd99cbb",
+          "at": "2026-07-23T04:00:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1babcb87d9cbb804cb6f8c9584be9f705f4dabe16b01b16dd5bd2526bc054839",
+          "at": "2026-07-23T04:06:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D5 embeds operational lint schema/configuration and enforcement details in the ADR, including concrete convention/config paths and preset ownership. This obscures the architectural decision and leaks downstream gate/lint implementation concerns into the ADR; delegate those mechanics to the referenced convention/config SSoTs while retaining only the high-level choice of enforcement mechanism.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+              "line": 69,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:876f76407d9bb2e1a216b84e7f84e7c16c0735eff13a678cce3d7790a425c662",
+          "at": "2026-07-23T04:53:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3534d12d488562f291beaf1eb361d19b8c9ed80624aa42c3b79f66101173a7b",
+          "at": "2026-07-23T04:57:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3534d12d488562f291beaf1eb361d19b8c9ed80624aa42c3b79f66101173a7b",
+          "at": "2026-07-23T05:00:50Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:870e11a03b8ba7b73d0734ddc6da03b0124cdaebc2302e1d1d868e3c09b88754",
+          "at": "2026-07-23T06:30:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:870e11a03b8ba7b73d0734ddc6da03b0124cdaebc2302e1d1d868e3c09b88754",
+          "at": "2026-07-23T07:31:27Z"
         }
       ]
     },
@@ -290,6 +322,184 @@
         }
       ]
     },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af8cc38793a0a2751297bea4da5ff7957a2394ef79a98ceba661fd4b3b7874e3",
+          "at": "2026-07-23T06:28:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CompositionRootPureDi` inspects only methods. Public fields are ignored, so a root with `pub interactor: GreetUser` and a valid driver accessor passes despite exposing an internal role. AC-04 requires these public-surface exposures to be detected.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 54,
+              "category": "public-surface enforcement gap"
+            },
+            {
+              "message": "The signature scan includes only parameters and the return type, omitting method generic bounds and where-predicates. For example, a zero-argument PrimaryAdapter accessor constrained by `usecase::ApplicationService` passes while exposing a prohibited usecase role.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 79,
+              "category": "public-surface enforcement gap"
+            },
+            {
+              "message": "`collect_methods_for_type` covers only `TypeEntry.methods` and inherent impls. Methods supplied through catalogue `trait_impls` are never evaluated, allowing a CompositionRoot to implement an ApplicationService trait with a request-to-result method without triggering this rule.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 55,
+              "category": "execution-method enforcement gap"
+            },
+            {
+              "message": "The constructor exemption accepts only exact `new() -> Self`, while the role scan permits only PrimaryAdapter. Consequently valid fallible wiring APIs such as `new() -> Result<Self, CompositionError>` and `driver() -> Result<Driver, CompositionError>` are rejected, despite the composition policy requiring typed wiring errors to propagate. Composition-local errors must remain permitted while usecase errors stay prohibited.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 63,
+              "category": "valid-surface false positive"
+            },
+            {
+              "message": "The new fallible `CatalogueLinterRule::new` branch is untested: every `CompositionRootPureDi` test supplies exactly `[CompositionRoot]`. Add an error-path test proving that an empty/all-role or wrong-role target returns `InvalidRuleConfig`, as required for public APIs.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter.rs",
+              "line": 486,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:af8cc38793a0a2751297bea4da5ff7957a2394ef79a98ceba661fd4b3b7874e3",
+          "at": "2026-07-23T06:38:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CompositionRoot の型自体に宣言された generic bounds / where predicates が検査されていません。現在は公開フィールドと各メソッドの型だけを走査するため、例えば `pub struct GreetingCompositionRoot<T> where T: usecase::ApplicationService` は禁止された usecase ロールを公開型表面に露出していても通過します。`TypeEntry::generics()` と `TypeEntry::where_predicates()`（併せて必要なら inherent impl の制約）も同じロール検査へ含めてください。",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 157,
+              "category": "domain-invariant"
+            },
+            {
+              "message": "`public_field_types` が enum と type alias を無条件に空として扱うため、CompositionRoot の enum variant payload や alias target にある禁止ロールを見逃します。例えば `type GreetingCompositionRoot = usecase::GreetUser`、または variant が `usecase::GreetUser` を保持する enum は違反なしになります。variant payload / alias target を走査するか、CompositionRoot を struct に限定して不正な形を拒否してください。",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 117,
+              "category": "domain-invariant"
+            },
+            {
+              "message": "trait impl と trait entry の `Reference` を除外しているため、既存 trait を実装する CompositionRoot の公開実行メソッドを検査できません。カタログでは既存の trait/impl が `Reference` で表現され得るので、root が `Modify` された場合でも、参照された `ApplicationService` trait の `execute` 等が丸ごと抜けて AC-04 を迂回します。参照 entry に保持された method surface も検査するか、情報不足時は workspace trait impl を fail-closed で扱ってください。",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 83,
+              "category": "domain-invariant"
+            }
+          ],
+          "hash": "rvw1:sha256:4eb1e26371252e742d2bd7c948f9d2903d904de0d97f604d6efce679f062e0e0",
+          "at": "2026-07-23T06:51:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`is_wiring_constructor` が引数なしの `new` だけを constructor と認識するため、`new(repo_root: PathBuf) -> Self` のような正当な object-graph 構築 API も line 227 で execution method と誤判定されます。ADR D1 が禁止するのは request-to-result 実行であり、配線用入力を受ける constructor ではありません。receiver/name/Self-return で constructor を識別し、引数型の禁止 role 検査は別途維持してください。",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 182,
+              "category": "domain-invariant"
+            },
+            {
+              "message": "CompositionRoot に属する trait impl について、実装 trait の method しか検査せず、`trait_ref` と impl-level generics / where predicates を公開面として検査していません。そのため method を持たない `impl usecase::ApplicationService for GreetingCompositionRoot` や `impl External<usecase::GreetUser> ...` が禁止 role を露出しても通過します。`TraitImplDeclV2` の trait reference、generic bounds、where predicates も role 検査へ含めてください。",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 86,
+              "category": "domain-invariant"
+            },
+            {
+              "message": "trait impl の self type を `bare_name_in_type_ref` で包含一致させているため、`impl SomeTrait for Wrapper<GreetingCompositionRoot>` まで `GreetingCompositionRoot` 自身の impl として扱われます。trait に引数付き method があれば、適合している root に架空の execution-method 違反が発生します。`for_type` は既存の `has_trait_impl` と同様、型名の完全一致または root 自身の generic self type のみに限定してください。",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 88,
+              "category": "domain-invariant"
+            }
+          ],
+          "hash": "rvw1:sha256:ef492425880f98554d94af1046ba669ca180e8ba6d982f88e6a3717f2905990b",
+          "at": "2026-07-23T06:59:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "execution-method 判定が、constructor 以外では引数が 1 つでもあれば無条件に違反とするため、`driver(&self, items_dir: PathBuf) -> TaskContractDriver` のように配線用設定を受け取り fully-wired PrimaryAdapter を返す純 DI builder も拒否されます。CN-01 が禁止する request-to-result 実行とは異なるため、PrimaryAdapter を返し、引数にも禁止 role を露出しない wiring method は通過できるよう判定してください。",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 243,
+              "category": "domain-invariant"
+            },
+            {
+              "message": "trait method surface は `all_catalogues` 内で trait entry を解決できた場合にしか追加されません。したがって、カタログに宣言のない `external::Runner` を CompositionRoot が実装し、その trait が `run(request) -> result` を公開していても、`TraitImplDeclV2` 自体には method 情報がないため違反なしで通過します。未解決の trait impl を黙って無視せず、既知の非実行 trait を限定的に許可するか、method surface を解決できない場合は fail-closed にしてください。",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 87,
+              "category": "domain-invariant"
+            }
+          ],
+          "hash": "rvw1:sha256:0f173d0138f6150d40a90314ea3776555870cdc0ef8ca2e27a97c09d39a53f07",
+          "at": "2026-07-23T07:07:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "未解決の trait impl を一律違反にしたため、`core::default::Default` や `core::fmt::Debug` のような正常な標準 trait も拒否されます。これらは CompositionRoot の catalogue で実際に trait_impl として記録されますが、DDD の `TraitEntry` ではないため `all_catalogues` から解決できません。結果として Default を実装した Add/Modify root は純 DI でも AC-04 を通過できません。既知の非実行・構造的 trait を閉じた許可集合で扱い、未解決の任意 behavioral trait だけを fail-closed にしてください。",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 246,
+              "category": "domain-invariant"
+            },
+            {
+              "message": "wiring constructor の認識が method 名 `new` に固定されているため、`try_new(config) -> Result<Self, CompositionError>` や `from_config(config) -> Self` のような正当な構築 API が execution method と誤判定されます。ADR/spec は constructor 名を制約していないため、receiver のない Self／fallible Self 返却を名前に依存せず constructor surface として判定し、引数の禁止 role 検査は維持してください。",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 209,
+              "category": "domain-invariant"
+            }
+          ],
+          "hash": "rvw1:sha256:b140b1905b4be3e4acc984768f80fda31be634f44c642d9ac9266774f0a1fc41",
+          "at": "2026-07-23T07:13:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "未解決 trait の許可集合が構造 trait だけに固定されているため、`impl TryFrom<PathBuf> for GreetingCompositionRoot` や `impl From<Config> ...` のような標準の構築 trait も違反になります。これらの method surface はそれぞれ `try_from(input) -> Result<Self, _>` / `from(input) -> Self` に固定され、既に許可されている associated constructor と同じ純 DI の構築 API です。trait generic 引数への禁止 role 検査は維持しつつ、`core`/`std::convert::{From, TryFrom}` を constructor trait として扱うか、その既知 method surface を評価してください。",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/catalogue_linter_eval_composition_root.rs",
+              "line": 268,
+              "category": "domain-invariant"
+            }
+          ],
+          "hash": "rvw1:sha256:655227ccd35a0ea7542cce28ea98d1edce8e0e1958dd398369aa2a25373e0cd9",
+          "at": "2026-07-23T07:21:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3cd91f7d21c46e4e9d7b33e4f2f16aebbe1b634c182e70b4a677c07e22bea1bf",
+          "at": "2026-07-23T07:24:48Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -305,6 +515,38 @@
           "findings": [],
           "hash": "rvw1:sha256:72995b80cb2f6722ddb830c53f514332ab60868a5b9a54cb157eff72de0d9b7e",
           "at": "2026-07-23T05:35:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b89e67844d3d49e29d854c18c17f8537aa5ce70b072f7a78469939cede321cf",
+          "at": "2026-07-23T06:31:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b89e67844d3d49e29d854c18c17f8537aa5ce70b072f7a78469939cede321cf",
+          "at": "2026-07-23T07:37:26Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1131a1c6e03dba24c7fcdb215daf35051621a66cb39c3cf27da9b50720695d4a",
+          "at": "2026-07-23T05:31:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1131a1c6e03dba24c7fcdb215daf35051621a66cb39c3cf27da9b50720695d4a",
+          "at": "2026-07-23T05:36:28Z"
         }
       ]
     }

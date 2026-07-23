@@ -1,0 +1,149 @@
+{
+  "track_id": "composition-root-pure-di-realignment-2026-07-23",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-realignment-2026-07-23/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "61619c659854582598e680359f27d6872168e8e1862932db683b10f02e10dbc7",
+        "declaration_hash": "84dd4574a5e9c7096d5516f23bcb604a55f9ea193389d30070988a5889246d36",
+        "anchor_text_hash": "1aefbd34747c63cc4966c9f8208fcf1e759e47ef30937df0c8df6c45a5863a6a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(violations.len(), 1, \"request-to-result method must be rejected\"); ... assert!(violations.iter().any(|violation| {\n            violation.message().contains(\"prohibited public-surface role 'ValueObject'\")\n        }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-realignment-2026-07-23/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "29fd45d95a2e9116ec27258041d9974e7e035d00907da92fde4bc900ede372c8",
+        "declaration_hash": "84dd4574a5e9c7096d5516f23bcb604a55f9ea193389d30070988a5889246d36",
+        "anchor_text_hash": "da094ce851724d78df2958f16b88cc5837818d1222f304d21f194eb849b54bb5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let rule = CatalogueLinterRule::new(\n            RuleTarget::new(vec![RoleKind::CompositionRoot]),\n            CatalogueLinterRuleKind::CompositionRootPureDi,\n        )\n        .unwrap();\n\n        let violations = evaluate_catalogue_lint(\n            &[rule],\n            &all_catalogues,\n            &composition_layer,\n            &StubPrimitiveScanner,\n        )\n        .unwrap();"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-realignment-2026-07-23/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "61619c659854582598e680359f27d6872168e8e1862932db683b10f02e10dbc7",
+        "declaration_hash": "84dd4574a5e9c7096d5516f23bcb604a55f9ea193389d30070988a5889246d36",
+        "anchor_text_hash": "4a1dccc53c1bedc9fd654edb07c3b8ac017668f59cf6be0a35852d6503cfb58a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(violations.is_empty(), \"a wired PrimaryAdapter accessor must be allowed\");\nassert_eq!(violations.len(), 1, \"request-to-result method must be rejected\");\nassert!(violations[0].message().contains(\"execution method\"));\nassert!(violations.iter().any(|violation| {\n    violation.message().contains(\"prohibited public-surface role 'ValueObject'\")\n}));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LintRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-realignment-2026-07-23/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LintRuleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "9868ffdfe9fa10423f831c440fe921a23bb7e2f05c2600abd4f296105b091b5e",
+        "declaration_hash": "bf368c26be448493ef6909d8057a70dacf57f6b155904edd655dfdb5de30e56c",
+        "anchor_text_hash": "1aefbd34747c63cc4966c9f8208fcf1e759e47ef30937df0c8df6c45a5863a6a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(violations[0].rule_kind(), \"CompositionRootPureDi\");\nassert!(violations[0].message().contains(\"execution method\"));\nassert!(violation.message().contains(\"prohibited public-surface role 'ValueObject'\"))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LintRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-realignment-2026-07-23/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LintRuleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "66ac02d60e75a827f14054e218b9fc3032dcdc0373355d877474c0780076d75b",
+        "declaration_hash": "bf368c26be448493ef6909d8057a70dacf57f6b155904edd655dfdb5de30e56c",
+        "anchor_text_hash": "da094ce851724d78df2958f16b88cc5837818d1222f304d21f194eb849b54bb5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let violations = interactor\n            .execute(composition_root_command())\n            .expect(\"catalogue lint must evaluate the composition-root rule\");\n\n        assert_eq!(violations.len(), 1, \"execution method must be rejected\");\n        assert_eq!(violations[0].rule_kind(), \"CompositionRootPureDi\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LintRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-realignment-2026-07-23/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LintRuleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "dff2a6dab023f74241a6b679d7d9eca5c876e8f8e435712eaa1a133fa05f7a4f",
+        "declaration_hash": "bf368c26be448493ef6909d8057a70dacf57f6b155904edd655dfdb5de30e56c",
+        "anchor_text_hash": "4a1dccc53c1bedc9fd654edb07c3b8ac017668f59cf6be0a35852d6503cfb58a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(violations[0].rule_kind(), \"CompositionRootPureDi\"); ... assert!(violation.message().contains(\"prohibited public-surface role 'ValueObject'\")); ... assert!(violations.is_empty(), \"a PrimaryAdapter surface must be allowed\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ]
+}

@@ -34,6 +34,7 @@ enum LintRuleKindWire {
     ForbiddenMethodReceiver { forbidden_receiver: String },
     ForbidPrimitiveInTypes { primitives: Vec<String>, layers: Vec<String>, positions: Vec<String> },
     DomainValueObjectInboundReferenceRequired,
+    CompositionRootPureDi,
 }
 
 impl<'de> Deserialize<'de> for LintRuleKind {
@@ -128,6 +129,7 @@ impl From<&LintRuleKind> for LintRuleKindWire {
             LintRuleKind::DomainValueObjectInboundReferenceRequired => {
                 Self::DomainValueObjectInboundReferenceRequired
             }
+            LintRuleKind::CompositionRootPureDi => Self::CompositionRootPureDi,
         }
     }
 }
@@ -236,5 +238,6 @@ fn lint_rule_kind_from_wire(wire: LintRuleKindWire) -> Result<LintRuleKind, Cata
         LintRuleKindWire::DomainValueObjectInboundReferenceRequired => {
             Ok(LintRuleKind::DomainValueObjectInboundReferenceRequired)
         }
+        LintRuleKindWire::CompositionRootPureDi => Ok(LintRuleKind::CompositionRootPureDi),
     }
 }

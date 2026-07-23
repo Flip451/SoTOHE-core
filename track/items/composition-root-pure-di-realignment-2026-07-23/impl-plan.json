@@ -4,20 +4,17 @@
     {
       "id": "T001",
       "description": "Update `CatalogueLinterRule`, `CatalogueLinterRuleKind`, `evaluate_catalogue_lint`, and `LintRuleKind`; add catalogue-lint regression cases. IN-03/OUT-02/CN-03/AC-04.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T002",
       "description": "Update the `invoke leak`, public-surface exposure, and `PrimaryAdapter` allowance priority categories in `.harness/custom/review-prompts/cli_composition.md`. IN-02/CN-01/CN-02/AC-03.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     },
     {
       "id": "T003",
       "description": "Update `run_greeting`, `GreetDriver`, and greeting `main` in the three `overlay/apps/cli*/src/{lib.rs,main.rs}` files; add their regression tests; and verify D4 in `knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md`. IN-01/IN-04/OUT-01/CN-01/CN-02/CN-04/AC-01/AC-02/AC-05.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "todo"
     }
   ],
   "plan": {

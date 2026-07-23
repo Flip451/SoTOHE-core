@@ -8,13 +8,13 @@ T001 updates catalogue-lint before review-policy work.
 T002 updates `.harness/custom/review-prompts/cli_composition.md` after the lint vocabulary.
 T003 updates and regression-tests the shipped greeting placeholder after the policy work.
 
-## Tasks (0/3 resolved)
+## Tasks (1/3 resolved)
 
 ### enforcement — Catalogue-lint enforcement
 
 > Update the catalogue-lint rule path and regression cases. IN-03/CN-03/AC-04. T001.
 
-- [ ] **T001**: Update `CatalogueLinterRule`, `CatalogueLinterRuleKind`, `evaluate_catalogue_lint`, and `LintRuleKind`; add catalogue-lint regression cases. IN-03/OUT-02/CN-03/AC-04.
+- [x] **T001**: Update `CatalogueLinterRule`, `CatalogueLinterRuleKind`, `evaluate_catalogue_lint`, and `LintRuleKind`; add catalogue-lint regression cases. IN-03/OUT-02/CN-03/AC-04.
 
 ### review-policy — Composition review policy
 

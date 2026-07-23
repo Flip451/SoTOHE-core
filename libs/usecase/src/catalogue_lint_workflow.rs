@@ -153,6 +153,8 @@ pub enum LintRuleKind {
     },
     /// Rule requires domain ValueObjects to have an inbound domain reference.
     DomainValueObjectInboundReferenceRequired,
+    /// Rule constrains CompositionRoot public surfaces to pure-DI wiring accessors.
+    CompositionRootPureDi,
 }
 
 /// Usecase-owned string-only description of a single lint rule.
@@ -407,6 +409,7 @@ fn lint_rule_spec_to_domain(spec: LintRuleSpec) -> Result<CatalogueLinterRule, C
         LintRuleKind::DomainValueObjectInboundReferenceRequired => {
             CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired
         }
+        LintRuleKind::CompositionRootPureDi => CatalogueLinterRuleKind::CompositionRootPureDi,
     };
 
     CatalogueLinterRule::new(target, kind).map_err(|e| CatalogueLintError(e.to_string()))
@@ -505,7 +508,10 @@ mod tests {
     use domain::tddd::catalogue_ports::{CatalogueLoader, CatalogueLoaderError};
     use domain::tddd::catalogue_v2::document::CatalogueDocument;
     use domain::tddd::catalogue_v2::entries::TypeEntry;
-    use domain::tddd::catalogue_v2::identifiers::{CrateName, FieldName, ModulePath, TypeName};
+    use domain::tddd::catalogue_v2::identifiers::{
+        CrateName, FieldName, MethodName, ModulePath, ParamName, TypeName, TypeRef,
+    };
+    use domain::tddd::catalogue_v2::methods::{MethodDeclaration, ParamDeclaration};
     use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction, NonEmptyVec};
     use domain::tddd::catalogue_v2::variants::FieldDecl;
     use domain::tddd::catalogue_v2::{StructKind, StructShape, TypeKindV2};
@@ -678,6 +684,63 @@ mod tests {
         LintRuleSpec { target_roles: vec![], kind: LintRuleKind::NoPublicField }
     }
 
+    fn composition_root_pure_di_rule_spec() -> LintRuleSpec {
+        LintRuleSpec {
+            target_roles: vec!["CompositionRoot".to_owned()],
+            kind: LintRuleKind::CompositionRootPureDi,
+        }
+    }
+
+    fn type_entry_with_methods(role: DataRole, methods: Vec<MethodDeclaration>) -> TypeEntry {
+        TypeEntry::new(
+            ItemAction::Add,
+            role,
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
+            methods,
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        )
+    }
+
+    fn method(
+        name: &str,
+        receiver: Option<SelfReceiver>,
+        params: Vec<(&str, &str)>,
+        returns: &str,
+    ) -> MethodDeclaration {
+        MethodDeclaration::new(
+            MethodName::new(name).unwrap(),
+            receiver,
+            params
+                .into_iter()
+                .map(|(param_name, param_type)| {
+                    ParamDeclaration::new(
+                        ParamName::new(param_name).unwrap(),
+                        TypeRef::new(param_type).unwrap(),
+                    )
+                })
+                .collect(),
+            TypeRef::new(returns).unwrap(),
+            false,
+            None,
+        )
+    }
+
+    fn composition_root_command() -> RunCatalogueLintCommand {
+        RunCatalogueLintCommand {
+            track_id: "my-track".to_owned(),
+            layer_id: "cli_composition".to_owned(),
+            rules: vec![composition_root_pure_di_rule_spec()],
+        }
+    }
+
     fn cmd(track: &str, layer_name: &str) -> RunCatalogueLintCommand {
         RunCatalogueLintCommand {
             track_id: track.to_owned(),
@@ -764,11 +827,11 @@ mod tests {
     }
 
     // ------------------------------------------------------------------
-    // T004: lint_rule_spec_to_domain — all 12 LintRuleKind variants convert
+    // T004: lint_rule_spec_to_domain — all LintRuleKind variants convert
     // ------------------------------------------------------------------
 
     #[test]
-    fn test_lint_rule_spec_to_domain_converts_all_12_kinds() {
+    fn test_lint_rule_spec_to_domain_converts_all_15_kinds() {
         let specs: Vec<LintRuleSpec> = vec![
             LintRuleSpec {
                 target_roles: vec![],
@@ -835,11 +898,23 @@ mod tests {
                 },
             },
             LintRuleSpec {
+                target_roles: vec![],
+                kind: LintRuleKind::ForbidPrimitiveInTypes {
+                    primitives: NonEmptyVec::new(PrimitiveName::new("String").unwrap(), vec![]),
+                    layers: NonEmptyVec::new(layer("domain"), vec![]),
+                    positions: NonEmptyVec::new(PrimitiveOccurrencePosition::NamedField, vec![]),
+                },
+            },
+            LintRuleSpec {
                 target_roles: vec!["ValueObject".to_owned()],
                 kind: LintRuleKind::DomainValueObjectInboundReferenceRequired,
             },
+            LintRuleSpec {
+                target_roles: vec!["CompositionRoot".to_owned()],
+                kind: LintRuleKind::CompositionRootPureDi,
+            },
         ];
-        assert_eq!(specs.len(), 13, "must cover all 13 LintRuleKind variants");
+        assert_eq!(specs.len(), 15, "must cover all 15 LintRuleKind variants");
         for spec in specs {
             let kind_name = format!("{:?}", spec.kind).split(' ').next().unwrap().to_owned();
             let result = lint_rule_spec_to_domain(spec);
@@ -1207,6 +1282,137 @@ mod tests {
 
         let round_tripped = serde_json::to_value(&kind).unwrap();
         assert_eq!(round_tripped, json, "serialized form must match the wire format exactly");
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_json_round_trips_through_lint_rule_kind() {
+        let json = serde_json::json!("CompositionRootPureDi");
+        let kind: LintRuleKind =
+            serde_json::from_value(json.clone()).expect("valid CompositionRootPureDi JSON");
+
+        assert_eq!(kind, LintRuleKind::CompositionRootPureDi);
+        assert_eq!(serde_json::to_value(kind).unwrap(), json);
+    }
+
+    #[test]
+    fn test_execute_composition_root_pure_di_detects_execution_method() {
+        let mut composition_catalogue = empty_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            type_entry_with_methods(
+                DataRole::CompositionRoot,
+                vec![method(
+                    "run",
+                    Some(SelfReceiver::SharedRef),
+                    vec![("raw_name", "String")],
+                    "CommandOutcome",
+                )],
+            ),
+        );
+        let composition_layer = composition_catalogue.layer().clone();
+        let mut catalogues = BTreeMap::new();
+        catalogues.insert(composition_layer.clone(), composition_catalogue);
+        let order = vec![composition_layer];
+
+        let mut loader = MockLoader::new();
+        loader
+            .expect_load_all()
+            .times(1)
+            .returning(move |_| Ok((order.clone(), catalogues.clone())));
+        let interactor =
+            RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader, StubScanner);
+
+        let violations = interactor
+            .execute(composition_root_command())
+            .expect("catalogue lint must evaluate the composition-root rule");
+
+        assert_eq!(violations.len(), 1, "execution method must be rejected");
+        assert_eq!(violations[0].rule_kind(), "CompositionRootPureDi");
+        assert!(violations[0].message().contains("execution method"));
+    }
+
+    #[test]
+    fn test_execute_composition_root_pure_di_detects_prohibited_public_role_exposure() {
+        let mut composition_catalogue = empty_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            type_entry_with_methods(
+                DataRole::CompositionRoot,
+                vec![method("username", Some(SelfReceiver::SharedRef), vec![], "domain::Username")],
+            ),
+        );
+        let mut domain_catalogue = empty_doc("domain");
+        domain_catalogue.insert_type(
+            TypeName::new("Username").unwrap(),
+            type_entry_with_methods(DataRole::value_object(), vec![]),
+        );
+        let composition_layer = composition_catalogue.layer().clone();
+        let domain_layer = domain_catalogue.layer().clone();
+        let mut catalogues = BTreeMap::new();
+        catalogues.insert(composition_layer.clone(), composition_catalogue);
+        catalogues.insert(domain_layer.clone(), domain_catalogue);
+        let order = vec![composition_layer, domain_layer];
+
+        let mut loader = MockLoader::new();
+        loader
+            .expect_load_all()
+            .times(1)
+            .returning(move |_| Ok((order.clone(), catalogues.clone())));
+        let interactor =
+            RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader, StubScanner);
+
+        let violations = interactor
+            .execute(composition_root_command())
+            .expect("catalogue lint must evaluate the composition-root rule");
+
+        assert!(violations.iter().any(|violation| {
+            violation.message().contains("prohibited public-surface role 'ValueObject'")
+        }));
+    }
+
+    #[test]
+    fn test_execute_composition_root_pure_di_allows_primary_adapter_surface() {
+        let mut composition_catalogue = empty_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            type_entry_with_methods(
+                DataRole::CompositionRoot,
+                vec![
+                    method("new", None, vec![], "Self"),
+                    method(
+                        "greeting_driver",
+                        Some(SelfReceiver::SharedRef),
+                        vec![],
+                        "cli_driver::GreetingDriver",
+                    ),
+                ],
+            ),
+        );
+        let mut driver_catalogue = empty_doc("cli_driver");
+        driver_catalogue.insert_type(
+            TypeName::new("GreetingDriver").unwrap(),
+            type_entry_with_methods(DataRole::PrimaryAdapter, vec![]),
+        );
+        let composition_layer = composition_catalogue.layer().clone();
+        let driver_layer = driver_catalogue.layer().clone();
+        let mut catalogues = BTreeMap::new();
+        catalogues.insert(composition_layer.clone(), composition_catalogue);
+        catalogues.insert(driver_layer.clone(), driver_catalogue);
+        let order = vec![composition_layer, driver_layer];
+
+        let mut loader = MockLoader::new();
+        loader
+            .expect_load_all()
+            .times(1)
+            .returning(move |_| Ok((order.clone(), catalogues.clone())));
+        let interactor =
+            RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader, StubScanner);
+
+        let violations = interactor
+            .execute(composition_root_command())
+            .expect("catalogue lint must evaluate the composition-root rule");
+
+        assert!(violations.is_empty(), "a PrimaryAdapter surface must be allowed");
     }
 
     // ------------------------------------------------------------------

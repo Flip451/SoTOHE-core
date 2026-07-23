@@ -90,6 +90,10 @@
       "kind": { "KindLayerConstraint": { "permitted_layers": ["cli_composition"] } }
     },
     {
+      "target_roles": ["CompositionRoot"],
+      "kind": "CompositionRootPureDi"
+    },
+    {
       "target_roles": ["PrimaryAdapter"],
       "kind": { "KindLayerConstraint": { "permitted_layers": ["cli_driver"] } }
     },
