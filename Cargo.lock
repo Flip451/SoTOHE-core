@@ -901,6 +901,7 @@ dependencies = [
 name = "cli_driver"
 version = "0.1.0"
 dependencies = [
+ "domain",
  "serde_json",
  "usecase",
 ]
@@ -2988,7 +2989,6 @@ dependencies = [
  "globset",
  "lancedb",
  "libc",
- "ort",
  "proc-macro2",
  "regex",
  "rstest",

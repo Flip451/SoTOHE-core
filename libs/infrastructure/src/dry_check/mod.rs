@@ -15,7 +15,7 @@
 //!
 //! And the corpus-manifest adapter (D4 / T008):
 //!
-//! - [`FsDryCorpusMetaAdapter`]: implements `DryCorpusMetaPort` via the
+//! - `FsDryCorpusMetaAdapter`: implements `DryCorpusMetaPort` via the
 //!   `dry-check-corpus-root.json` sidecar.
 
 pub mod approval_factory;
@@ -24,12 +24,14 @@ mod codex_dry_checker;
 mod commit_hash_store;
 pub mod config;
 pub mod corpus;
+#[cfg(feature = "semantic-dup")]
 pub mod corpus_meta;
 mod coverage;
 pub mod diff_base_resolver;
 mod diff_getter;
 pub mod dry_driver_shared;
 pub mod dry_fix_local;
+#[cfg(feature = "semantic-dup")]
 pub mod dry_write_driver;
 pub mod noop_approval;
 pub mod recording_agent;
@@ -40,6 +42,7 @@ pub use codex_dry_checker::CodexDryChecker;
 pub use commit_hash_store::{DryCheckCommitHashError, FsDryCheckCommitHashStore};
 pub use config::{DryCheckConfig, DryCheckConfigError};
 pub use corpus::compute_corpus_fingerprint;
+#[cfg(feature = "semantic-dup")]
 pub use corpus_meta::FsDryCorpusMetaAdapter;
 pub use coverage::FsDryCheckCoverageAdapter;
 pub use diff_base_resolver::FsDiffBaseResolverAdapter;

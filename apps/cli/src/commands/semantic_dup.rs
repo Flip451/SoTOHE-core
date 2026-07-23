@@ -9,10 +9,17 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
+#[cfg(feature = "semantic-dup")]
 use cli_composition::SemanticDupCompositionRoot;
+#[cfg(feature = "semantic-dup")]
 use cli_driver::semantic_dup::SemanticDupInput;
 
+#[cfg(feature = "semantic-dup")]
 use crate::commands::driver_outcome_to_exit;
+#[cfg(not(feature = "semantic-dup"))]
+use crate::commands::semantic_dup_feature_gate::{
+    SemanticDupCommandFamily, semantic_dup_feature_disabled_exit,
+};
 
 // ── sotp find-similar ─────────────────────────────────────────────────────────
 
@@ -39,6 +46,7 @@ pub struct FindSimilarArgs {
 /// Execute `sotp find-similar`.
 ///
 /// CN-05: information-only, never blocks (always exits 0).
+#[cfg(feature = "semantic-dup")]
 pub fn execute_find_similar(args: FindSimilarArgs) -> ExitCode {
     driver_outcome_to_exit(SemanticDupCompositionRoot::new().semantic_dup_driver().handle(
         SemanticDupInput::FindSimilar {
@@ -48,6 +56,11 @@ pub fn execute_find_similar(args: FindSimilarArgs) -> ExitCode {
             db_path: args.db_path,
         },
     ))
+}
+
+#[cfg(not(feature = "semantic-dup"))]
+pub fn execute_find_similar(_args: FindSimilarArgs) -> ExitCode {
+    semantic_dup_feature_disabled_exit(SemanticDupCommandFamily::SemanticDuplicate)
 }
 
 // ── sotp dup-index ────────────────────────────────────────────────────────────
@@ -82,6 +95,7 @@ pub struct DupIndexMeasureQualityArgs {
 }
 
 /// Execute `sotp dup-index <subcommand>`.
+#[cfg(feature = "semantic-dup")]
 pub fn execute_dup_index(cmd: DupIndexCommand) -> ExitCode {
     let driver = SemanticDupCompositionRoot::new().semantic_dup_driver();
     match cmd {
@@ -97,6 +111,11 @@ pub fn execute_dup_index(cmd: DupIndexCommand) -> ExitCode {
             }))
         }
     }
+}
+
+#[cfg(not(feature = "semantic-dup"))]
+pub fn execute_dup_index(_cmd: DupIndexCommand) -> ExitCode {
+    semantic_dup_feature_disabled_exit(SemanticDupCommandFamily::SemanticDuplicate)
 }
 
 // ── sotp dup-check ────────────────────────────────────────────────────────────
@@ -133,6 +152,7 @@ pub struct DupCheckArgs {
 ///
 /// CN-02/AC-04: soft gate — warnings go to stderr, always exits 0.
 /// AC-05: fragments whose hash appears in `--ack-file` are suppressed.
+#[cfg(feature = "semantic-dup")]
 pub fn execute_dup_check(args: DupCheckArgs) -> ExitCode {
     driver_outcome_to_exit(SemanticDupCompositionRoot::new().semantic_dup_driver().handle(
         SemanticDupInput::DupCheck {
@@ -143,4 +163,9 @@ pub fn execute_dup_check(args: DupCheckArgs) -> ExitCode {
             ack: args.ack,
         },
     ))
+}
+
+#[cfg(not(feature = "semantic-dup"))]
+pub fn execute_dup_check(_args: DupCheckArgs) -> ExitCode {
+    semantic_dup_feature_disabled_exit(SemanticDupCommandFamily::SemanticDuplicate)
 }

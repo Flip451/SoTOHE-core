@@ -20,10 +20,12 @@ mod render;
 
 use std::path::{Path, PathBuf};
 
+use domain::tddd::catalogue_linter::RoleKind;
 use domain::tddd::catalogue_v2::CatalogueDocument;
+use domain::tddd::catalogue_v2::roles::ItemAction;
 use domain::tddd::{
-    ContractMapContent, ContractMapRenderOptions, ContractMapRenderer, ContractMapRendererError,
-    LayerId,
+    ContractMapContent, ContractMapRenderOptions, ContractMapRenderResult,
+    ContractMapRenderWarning, ContractMapRenderer, ContractMapRendererError, LayerId,
 };
 
 use crate::track::symlink_guard::reject_symlinks_below;
@@ -90,11 +92,59 @@ impl ContractMapRenderer for ContractMapRendererAdapter {
         catalogues: &[CatalogueDocument],
         layer_order: &[LayerId],
         _opts: &ContractMapRenderOptions,
-    ) -> Result<ContractMapContent, ContractMapRendererError> {
+    ) -> Result<ContractMapRenderResult, ContractMapRendererError> {
         let style = self.load_style_config()?;
         let output = render::render_mermaid(catalogues, layer_order, &style)?;
-        Ok(ContractMapContent::new(output))
+        Ok(ContractMapRenderResult::new(
+            ContractMapContent::new(output),
+            undefined_role_style_warnings(catalogues, layer_order, &style),
+        ))
     }
+}
+
+fn undefined_role_style_warnings(
+    catalogues: &[CatalogueDocument],
+    layer_order: &[LayerId],
+    style: &render::StyleConfig,
+) -> Vec<ContractMapRenderWarning> {
+    let mut roles = Vec::new();
+    for catalogue in catalogues.iter().filter(|catalogue| layer_order.contains(catalogue.layer())) {
+        for entry in catalogue.types().values() {
+            if entry.action() != ItemAction::Delete {
+                roles.push(RoleKind::from_data_role(entry.role()));
+            }
+        }
+        for entry in catalogue.traits().values() {
+            if entry.action() != ItemAction::Delete {
+                roles.push(RoleKind::from_contract_role(entry.role()));
+            }
+        }
+        for entry in catalogue.functions().values() {
+            if entry.action() != ItemAction::Delete {
+                roles.push(RoleKind::from_function_role(&entry.role()));
+            }
+        }
+    }
+
+    missing_role_style_warnings(&roles, style)
+}
+
+fn missing_role_style_warnings(
+    rendered_roles: &[RoleKind],
+    style: &render::StyleConfig,
+) -> Vec<ContractMapRenderWarning> {
+    let mut warnings = Vec::new();
+    for role in RoleKind::all() {
+        if rendered_roles.contains(role)
+            && style
+                .role
+                .get(role.variant_name())
+                .is_none_or(|role_style| !style.class.contains_key(&role_style.class))
+        {
+            warnings.push(ContractMapRenderWarning::UndefinedRoleStyle { role: *role });
+        }
+    }
+    warnings
 }
 
 // ---------------------------------------------------------------------------
@@ -210,7 +260,88 @@ include_function_roles = []
         let result = adapter.render(&[], &[], &opts);
         assert!(result.is_ok(), "expected Ok with valid config, got {result:?}");
         let content = result.unwrap();
-        assert!(content.as_ref().contains("flowchart LR"), "must contain 'flowchart LR'");
+        assert!(content.content().as_ref().contains("flowchart LR"), "must contain 'flowchart LR'");
+    }
+
+    #[test]
+    fn test_render_undefined_role_style_returns_typed_warning() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = write_style_config(tmp.path(), MINIMAL_VALID_CONFIG);
+        let adapter = ContractMapRendererAdapter::new(path);
+        let layer = LayerId::try_new("domain").unwrap();
+        let crate_name = CrateName::new("domain").unwrap();
+        let mut doc = CatalogueDocument::new(3, crate_name, layer.clone());
+        doc.insert_type(
+            TypeName::new("UnstyledValue").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let result =
+            adapter.render(&[doc], &[layer], &ContractMapRenderOptions::default()).unwrap();
+        assert_eq!(
+            result.warnings().to_vec(),
+            vec![ContractMapRenderWarning::UndefinedRoleStyle { role: RoleKind::ValueObject }]
+        );
+    }
+
+    #[test]
+    fn test_missing_role_style_warnings_cover_all_role_kinds() {
+        let style = toml::from_str::<render::StyleConfig>(MINIMAL_VALID_CONFIG).unwrap();
+
+        let warnings = missing_role_style_warnings(RoleKind::all(), &style);
+        let expected = RoleKind::all()
+            .iter()
+            .map(|role| ContractMapRenderWarning::UndefinedRoleStyle { role: *role })
+            .collect::<Vec<_>>();
+
+        assert_eq!(warnings, expected, "every declared role must be checked for a classDef");
+    }
+
+    #[test]
+    fn test_render_undefined_role_style_ignores_excluded_layer() {
+        let tmp = tempfile::tempdir().unwrap();
+        let path = write_style_config(tmp.path(), MINIMAL_VALID_CONFIG);
+        let adapter = ContractMapRendererAdapter::new(path);
+        let rendered_layer = LayerId::try_new("domain").unwrap();
+        let excluded_layer = LayerId::try_new("usecase").unwrap();
+        let crate_name = CrateName::new("usecase").unwrap();
+        let mut excluded_catalogue = CatalogueDocument::new(3, crate_name, excluded_layer);
+        excluded_catalogue.insert_type(
+            TypeName::new("UnstyledBoundaryValue").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::value_object(),
+                TypeKindV2::Struct(StructKind::new(StructShape::Unit, None)),
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+
+        let result = adapter
+            .render(&[excluded_catalogue], &[rendered_layer], &ContractMapRenderOptions::default())
+            .unwrap();
+
+        assert!(
+            result.warnings().is_empty(),
+            "roles in excluded layers must not produce style warnings: {:?}",
+            result.warnings()
+        );
     }
 
     #[test]
@@ -313,7 +444,7 @@ include_function_roles = []
         let adapter = ContractMapRendererAdapter::new(path);
         let opts = ContractMapRenderOptions::default();
         let content = adapter.render(&[], &[], &opts).unwrap();
-        let text = content.as_ref();
+        let text = content.content().as_ref();
 
         // Header comment must be the very first line.
         assert!(
@@ -413,7 +544,7 @@ include_function_roles = []
         );
 
         let content = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let text = content.as_ref();
+        let text = content.content().as_ref();
 
         // Extract the mermaid body (between ```mermaid\n and \n```).
         let fence_open = "```mermaid\n";
@@ -549,7 +680,7 @@ include_function_roles = []
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         // Both must appear; specific structural order is not asserted here,
         // but both names must be present.
         assert!(output.contains("RootType"), "must mention RootType: {output}");
@@ -628,7 +759,7 @@ include_function_roles = []
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         // The transition edge syntax should appear.
         assert!(output.contains("==>"), "transition edge '==>' must appear: {output}");
         assert!(output.contains("transitions_to"), "label 'transitions_to' must appear: {output}");
@@ -700,7 +831,7 @@ include_function_roles = []
         });
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         assert!(output.contains("as_str"), "as_str method must appear: {output}");
         assert!(output.contains("validate"), "validate method must appear: {output}");
     }
@@ -743,7 +874,7 @@ include_function_roles = []
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         // Tuple variant should have unlabeled edge (--o without label).
         assert!(output.contains("Some"), "Some variant must appear: {output}");
         // None variant should not have an edge (Unit — no edge).
@@ -808,7 +939,7 @@ include_function_roles = []
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         // Struct variant should have labeled edge with field name.
         assert!(output.contains("message"), "field name 'message' must appear in edge: {output}");
     }
@@ -873,7 +1004,7 @@ include_function_roles = []
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         assert!(output.contains("email"), "field edge with label 'email' must appear: {output}");
     }
 
@@ -913,7 +1044,7 @@ include_function_roles = []
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         // 'secret' label must NOT appear in edges (field edge suppressed).
         assert!(
             !output.contains("|secret|"),
@@ -985,7 +1116,7 @@ include_function_roles = []
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         assert!(output.contains(".0"), "positional label '.0' must appear: {output}");
         assert!(output.contains(".1"), "positional label '.1' must appear: {output}");
         // The undeclared primitive `String` must not create a ghost node.
@@ -1050,7 +1181,7 @@ include_function_roles = []
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         assert!(output.contains("alias_of"), "alias_of label must appear: {output}");
     }
 
@@ -1099,7 +1230,7 @@ include_function_roles = []
         ));
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         // The impl edge syntax must appear.
         assert!(output.contains("-.impl.->"), "impl edge must appear: {output}");
     }
@@ -1123,7 +1254,7 @@ include_function_roles = []
         let result = adapter.render(&[doc1, doc2], &[l1, l2], &opts);
         assert!(result.is_ok(), "2-layer config must succeed: {result:?}");
         let output = result.unwrap();
-        let text = output.as_ref();
+        let text = output.content().as_ref();
         // Layer subgraph labels must be the actual layer names (not hardcoded).
         assert!(text.contains("\"core\""), "must use layer label 'core': {text}");
         assert!(text.contains("\"api\""), "must use layer label 'api': {text}");
@@ -1161,7 +1292,7 @@ include_function_roles = []
         let doc2 = CatalogueDocument::new(3, CrateName::new("beta").unwrap(), l2.clone());
 
         let result = adapter.render(&[doc1, doc2], &[l1, l2], &opts).unwrap();
-        let text = result.as_ref();
+        let text = result.content().as_ref();
         assert!(text.contains("\"alpha\""), "must use layer label 'alpha': {text}");
         assert!(text.contains("\"beta\""), "must use layer label 'beta': {text}");
     }
@@ -1220,7 +1351,7 @@ include_function_roles = []
 
         let result =
             adapter.render(&[domain_doc, infra_doc], &[domain_layer, infra_layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         assert!(
             output.contains("-.impl.->"),
             "impl edge must be generated for cross-crate qualified trait ref: {output}"
@@ -1264,7 +1395,7 @@ include_function_roles = []
             ));
 
             let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-            let output = result.as_ref();
+            let output = result.content().as_ref();
             assert!(
                 !output.contains("-.impl.->"),
                 "no impl edge for external trait ref {trait_ref}: {output}"
@@ -1330,7 +1461,7 @@ include_function_roles = []
         ));
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         assert!(
             !output.contains("RemovedTrait"),
             "Delete-action trait must not appear in output: {output}"
@@ -1377,7 +1508,7 @@ include_function_roles = []
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         assert!(
             !output.contains("removed_fn"),
             "Delete-action function must not appear in output: {output}"
@@ -1424,7 +1555,7 @@ include_function_roles = []
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         // `String` must not appear as a floating node outside any layer subgraph.
         assert!(
             !output.contains("String"),
@@ -1480,7 +1611,7 @@ include_function_roles = []
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         // Generic params `W` and `L` must not appear as ghost nodes.
         assert!(
             !output.contains("--o W"),
@@ -1551,7 +1682,7 @@ include_function_roles = []
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         // OldToken is deleted — must not appear in output at all.
         assert!(!output.contains("OldToken"), "deleted type must not appear: {output}");
         // Session is still rendered.
@@ -1631,7 +1762,7 @@ include_function_roles = []
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         // Both declared type params must be wired — verify the `-->` edge appears
         // and both target nodes are present.
         assert!(
@@ -1720,7 +1851,7 @@ include_function_roles = []
             );
 
             let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-            let output = result.as_ref();
+            let output = result.content().as_ref();
             assert!(
                 output.contains("--o"),
                 "param edge '--o' must appear for {param_type}: {output}"
@@ -1786,7 +1917,7 @@ include_function_roles = []
         );
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
         // No edge: String, T are undeclared.
         assert!(
             !output.contains("--o String"),
@@ -1860,7 +1991,7 @@ include_function_roles = []
         ));
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
 
         // Collect all subgraph ids from the output.
         let mut subgraph_ids: Vec<&str> = Vec::new();
@@ -1954,7 +2085,7 @@ include_function_roles = []
         doc.insert_trait(TraitName::new("MyTrait").unwrap(), make_empty_trait_entry());
 
         let result = adapter.render(&[doc], &[layer], &opts).unwrap();
-        let output = result.as_ref();
+        let output = result.content().as_ref();
 
         // The representative node id is the subgraph id with `__self` suffix.
         // Since we know the type/trait names we can derive the subgraph ids and check.
@@ -2432,6 +2563,7 @@ include_function_roles = []
         let output = adapter
             .render(catalogues, layer_order, &ContractMapRenderOptions::default())
             .unwrap()
+            .content()
             .as_ref()
             .to_string();
         let edge_lines = output

@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "b1fa727c52cc275898ba780f3e81dd42c7d3c718521a15e63f8f8eb21e9e11d1",
+      "evidence_hash": "ad6f7858b0918f38db73c5170f9bbfc9911b6c6406898da01f964a8a18d5f9c9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition root の公開面規律を既存 catalogue-lint mechanism で強制し、実行メソッドまたは禁止された公開型露出の逸脱を検出できる状態にする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-realignment-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "LintRuleKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "composition root の公開面規律を既存 catalogue-lint mechanism で強制し、実行メソッドまたは禁止された公開型露出の逸脱を検出できる状態にする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b1fa727c52cc275898ba780f3e81dd42c7d3c718521a15e63f8f8eb21e9e11d1",
+      "evidence_hash": "1b18e8ae886b110a62e0485dc6fd361f95ead23a4638567afc4b6ad71193284d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "公開面規律の enforcement は既存 catalogue lint を使用し、source-level 検査を追加しない。具体的な lint schema と type-shape の選択は後続 phase に委ねる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-realignment-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "LintRuleKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "公開面規律の enforcement は既存 catalogue lint を使用し、source-level 検査を追加しない。具体的な lint schema と type-shape の選択は後続 phase に委ねる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b1fa727c52cc275898ba780f3e81dd42c7d3c718521a15e63f8f8eb21e9e11d1",
+      "evidence_hash": "8247872a6b61848bd9ef78acd06e56d38a0727f67f1221b889e77801d0abd7e5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 catalogue lint は composition root の execution-method deviation と prohibited public-surface exposure deviation を検出し、適合する public surface を通過させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-realignment-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "LintRuleKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "既存 catalogue lint は composition root の execution-method deviation と prohibited public-surface exposure deviation を検出し、適合する public surface を通過させる。"
+        }
+      }
+    }
+  ]
+}

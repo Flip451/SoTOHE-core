@@ -14,28 +14,24 @@ use std::sync::Arc;
 
 use domain::TrackId;
 use domain::dry_check::DryCheckConfigFingerprint;
-use usecase::dry_check::{
-    DryCheckApprovalService, DryCheckConfig, DryCheckParallelism, DryCheckPercent,
-    DryFragmentPipelineInteractor,
-};
+use usecase::dry_check::{DryCheckConfig, DryCheckParallelism, DryCheckPercent};
 use usecase::dry_driver_shared::{
     GitDiscoveryFailureDetail, IoFailureDetail, MetadataDecodeFailureDetail,
 };
-use usecase::fixpoint_resolve::{FixpointDryGateInteractor, FixpointDryGateService};
 use usecase::fixpoint_resolve_driver::{
     DryCheckConfigLoadFailureDetail, DryCheckConfigLoaderError, DryCheckConfigLoaderPort,
-    FixpointDryGateFactoryPort, FixpointGateStateFactoryPort, FixpointWorkspaceContext,
-    FixpointWorkspaceContextError, FixpointWorkspaceContextPort,
+    FixpointGateStateFactoryPort, FixpointWorkspaceContext, FixpointWorkspaceContextError,
+    FixpointWorkspaceContextPort,
 };
 
-use crate::dry_check::approval_factory::FsDryApprovalFactoryAdapter;
-use crate::dry_check::diff_base_resolver::FsDiffBaseResolverAdapter;
-use crate::dry_check::noop_approval::NoOpDryApprovalService;
-use crate::dry_check::{DryCheckConfig as InfraDryCheckConfig, FsDryCorpusMetaAdapter};
+use crate::dry_check::DryCheckConfig as InfraDryCheckConfig;
 use crate::git_cli::SystemGitRepo;
-use crate::semantic_dup::CodeFragmentExtractorAdapter;
 use crate::track::gate_state::{FsRefVerifyGateStateAdapter, FsReviewGateStateAdapter};
 use crate::track::symlink_guard::reject_symlinks_below;
+
+mod dry_gate_factory;
+
+pub use dry_gate_factory::FsFixpointDryGateFactoryAdapter;
 
 // ── Local helpers (reimplemented — see per-fn docs) ───────────────────────────
 
@@ -262,30 +258,6 @@ impl DryCheckConfigLoaderPort for FsDryCheckConfigLoaderAdapter {
     }
 }
 
-// ── FsFixpointDryGateFactoryAdapter ───────────────────────────────────────────
-
-/// Factory adapter implementing [`FixpointDryGateFactoryPort`].
-///
-/// Reproduces unchanged the wiring previously done by the removed
-/// `TrackCompositionRoot::make_dry_gate_interactor` helper.
-pub struct FsFixpointDryGateFactoryAdapter;
-
-impl FixpointDryGateFactoryPort for FsFixpointDryGateFactoryAdapter {
-    fn build(&self, base_branch: &str) -> Arc<dyn FixpointDryGateService> {
-        let diff_source = Arc::new(crate::dry_check::GitDryCheckDiffGetter);
-        let extractor = Arc::new(CodeFragmentExtractorAdapter::new());
-        let fragment_pipeline =
-            Arc::new(DryFragmentPipelineInteractor::new(diff_source, extractor));
-        Arc::new(FixpointDryGateInteractor::new(
-            Arc::new(NoOpDryApprovalService) as Arc<dyn DryCheckApprovalService + Send + Sync>,
-            Arc::new(FsDiffBaseResolverAdapter::new(base_branch.to_owned())),
-            Arc::new(FsDryCorpusMetaAdapter),
-            fragment_pipeline,
-            Arc::new(FsDryApprovalFactoryAdapter),
-        ))
-    }
-}
-
 // ── FsFixpointGateStateFactoryAdapter ─────────────────────────────────────────
 
 /// Factory adapter implementing [`FixpointGateStateFactoryPort`].
@@ -313,7 +285,7 @@ impl FixpointGateStateFactoryPort for FsFixpointGateStateFactoryAdapter {
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
-#[cfg(test)]
+#[cfg(all(test, feature = "semantic-dup"))]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use std::process::Command;

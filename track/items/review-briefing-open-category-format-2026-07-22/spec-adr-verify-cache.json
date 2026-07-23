@@ -1,0 +1,488 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "6569a08464a6403a38375a8e17310741dc0f72591d4987ce1e7668e46848dcdd",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- 「Report findings ONLY for the following categories」の文言を廃止する。\n- 冒頭の役割文への違反は常に報告対象であることを明文化する。\n- 既存のカテゴリ列挙は「優先カテゴリ」（探索の焦点・severity 判定の基準）へ改称し、網羅の主張を外す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "コード層 reviewer briefing を半開形式へ移行し、優先カテゴリに列挙されていない場合でも役割文への違反を報告可能にする。一方で、文書検査系の閉列挙とノイズ抑制の下限は維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "6569a08464a6403a38375a8e17310741dc0f72591d4987ce1e7668e46848dcdd",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ノイズ抑制の下限（文体・命名・体裁・閉じたゲート後の代替案提案）は 2026-04 の設計意図として有効であり、半開化後も維持する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "コード層 reviewer briefing を半開形式へ移行し、優先カテゴリに列挙されていない場合でも役割文への違反を報告可能にする。一方で、文書検査系の閉列挙とノイズ抑制の下限は維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "6569a08464a6403a38375a8e17310741dc0f72591d4987ce1e7668e46848dcdd",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "SoT 別 briefing（adr / spec / types / impl-plan）は移行タスクでこの基準により個別判定する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "コード層 reviewer briefing を半開形式へ移行し、優先カテゴリに列挙されていない場合でも役割文への違反を報告可能にする。一方で、文書検査系の閉列挙とノイズ抑制の下限は維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "99ecdcc093f0aa710511cda466398da3ece91fd9b0d4eacdd185df9c2d5d5bf0",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "briefing を改訂する際、「役割文で禁じた事象が、報告可能なカテゴリを持たないままになっていないか」を確認する項目を maintainer checklist に追加する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "briefing 改訂時に役割文で禁じた事象と報告可能なカテゴリの不整合を発見できる maintainer guidance を整備する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "cd37f2d5ea7ef82b8fc23abb855f5f522683ad28b3287f045500e0a64b8c52f2",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "### D1: コード層 briefing を半開形式に改める"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "`.harness/custom/review-prompts/` の `domain.md`、`usecase.md`、`infrastructure.md`、`cli.md`、`cli_composition.md`、`cli_driver.md`、`harness-policy.md` を、閉列挙ではないコード層 reviewer briefing として改訂する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e8ae1759fba4ffb845547f34cfd8cbc9ae51183083c98bae7ddbf243448dfad7",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- 「Report findings ONLY for the following categories」の文言を廃止する。\n- 冒頭の役割文への違反は常に報告対象であることを明文化する。\n- 既存のカテゴリ列挙は「優先カテゴリ」（探索の焦点・severity 判定の基準）へ改称し、網羅の主張を外す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "対象コード層 briefing から「Report findings ONLY for the following categories」という閉列挙の指示を除き、役割文への違反は常に報告対象であることを明記する。既存カテゴリ列挙は、網羅を主張しない優先カテゴリとして扱う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d23eb589c4f9a7175a05f95c89f7b5583c4280d34f3c37d6f3bec3c4129dd749",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ノイズ抑制の下限（文体・命名・体裁・閉じたゲート後の代替案提案）は 2026-04 の設計意図として有効であり、半開化後も維持する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "全 reviewer briefing の What NOT to report を維持し、文体・命名・体裁などのノイズや、閉じた gate 後の代替案提案を報告対象へ戻さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "0415dd109a7ea1eb517e8975091f21442970f2056db256426c876388b5a3ae85",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`plan-artifacts.md` を典型とする事実検査系は欠陥クラスが列挙で閉じるため、閉列挙のままとする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`plan-artifacts.md` を代表とする事実検査系 briefing は、欠陥クラスが列挙で閉じるものとして閉列挙のまま維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "1590bca9f6a4c4a882c40c79a94304615d9065be2aa06d485a348c8d02ab8888",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`plan-artifacts.md` を典型とする事実検査系は欠陥クラスが列挙で閉じるため、閉列挙のままとする。半開・閉の帰属判定基準は「レビュー対象の欠陥クラスが列挙で閉じるか」であり、SoT 別 briefing（adr / spec / types / impl-plan）は移行タスクでこの基準により個別判定する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "ADR、spec、types、impl-plan の SoT 別 briefing は、各 briefing が ADR / 行動契約 / 型カタログ / 実行可能計画の事実検査を対象とし、欠陥クラスを既存の列挙で閉じられるため、個別判定の結果をすべて閉列挙として維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "39f10523f101bd700dbb13573521f21643d6b9d4bc7a2dcc6e5b474e69dce89f",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "briefing を改訂する際、「役割文で禁じた事象が、報告可能なカテゴリを持たないままになっていないか」を確認する項目を maintainer checklist に追加する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "`.claude/rules/09-maintainer-checklist.md` に、briefing の役割文で禁じた事象が報告可能なカテゴリを持たないまま残っていないことを確認する項目を追加する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "498c782b936f1798a10250f9b152135328ec81e72093cb590e0d9258d7c1b578",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`plan-artifacts.md` を典型とする事実検査系は欠陥クラスが列挙で閉じるため、閉列挙のままとする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "文書検査系 briefing の閉列挙を一律に廃止したり、事実検査として閉じている欠陥クラスを自由記述レビューへ変更したりしない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "3afbd4ee1f32754c7f00dc070b820638a08698f47346b0b3f2f0fd4286bd7caa",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ノイズ抑制の下限（文体・命名・体裁・閉じたゲート後の代替案提案）は 2026-04 の設計意図として有効であり、半開化後も維持する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "ノイズ抑制のための What NOT to report を削除または弱めず、役割文違反を理由に文体・命名・体裁の指摘を報告可能にしない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "8171b4fa9a9379b7189628686991f257a8ddaac07940ac42c27761717ef61b5d",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存のカテゴリ列挙は「優先カテゴリ」（探索の焦点・severity 判定の基準）へ改称し、網羅の主張を外す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-03",
+          "text_label": "未列挙の役割文違反ごとに新しい閉列挙カテゴリを追加して追随する方式にはしない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d13d154e18db3e5121db5ee8b8f86132830b76c027435cadb5c6633847c18c6e",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存のカテゴリ列挙は「優先カテゴリ」（探索の焦点・severity 判定の基準）へ改称し、網羅の主張を外す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "半開化した briefing は、優先カテゴリを探索の焦点および severity 判定の基準として維持しつつ、それらが報告可能な設計逸脱の全件列挙であると示してはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e412c25b90c55a690a4f07a00b57cd0dcfe01b8a54c364c67466e98077954395",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "半開・閉の帰属判定基準は「レビュー対象の欠陥クラスが列挙で閉じるか」であり、SoT 別 briefing（adr / spec / types / impl-plan）は移行タスクでこの基準により個別判定する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "半開・閉の選択は、review 対象の欠陥クラスを既存カテゴリの列挙だけで完全に判定できるかで決める。7 本のコード層 briefing は設計逸脱が開集合のため半開にし、ADR、spec、types、impl-plan および plan-artifacts 型の事実検査 briefing は欠陥クラスが列挙で閉じるため閉列挙にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "b004edf844121c94b5c36a0e8193b8c38a1774828e01da1002f67e040316cde9",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "冒頭の役割文への違反は常に報告対象であることを明文化する。既存のカテゴリ列挙は「優先カテゴリ」（探索の焦点・severity 判定の基準）へ改称し、網羅の主張を外す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "briefing の role statement は、優先カテゴリの判定文脈を与える役割を維持し、カテゴリ列挙との整合を取るために削除しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e39c85354fb0035ced1c662c6f1779ada73df5626af513b048e2f69ea0c85b20",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- 「Report findings ONLY for the following categories」の文言を廃止する。\n- 冒頭の役割文への違反は常に報告対象であることを明文化する。\n- 既存のカテゴリ列挙は「優先カテゴリ」（探索の焦点・severity 判定の基準）へ改称し、網羅の主張を外す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "7 本の対象コード層 briefing のそれぞれについて、閉列挙の ONLY 指示がなく、role statement 違反を常に報告対象とする明文があり、既存カテゴリが優先カテゴリとして示されることを文書内容で確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "a9cdb84be1b5bdfc8f5f8d8e2ba6139d0c51db9ff6f16acbf64d8c613730f977",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ノイズ抑制の下限（文体・命名・体裁・閉じたゲート後の代替案提案）は 2026-04 の設計意図として有効であり、半開化後も維持する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "全 reviewer briefing に What NOT to report が残り、文体・命名・体裁の指摘と閉じた gate 後の代替案提案が引き続き非報告対象であることを確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "cfcabb974393d51bad3cc231ed992e6740f0ed55116b406b02ab601806cad475",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`plan-artifacts.md` を典型とする事実検査系は欠陥クラスが列挙で閉じるため、閉列挙のままとする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "`impl-plan.md` に `Report findings ONLY for the following categories` という閉列挙の明文と列挙された欠陥カテゴリが残り、同 briefing が列挙外の報告を許可しないことを文書内容で確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "e0d59efe3d2d5fc68dd4614d4e8f2b04c04b3044541097c6c5f4bdf48d41e148",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`plan-artifacts.md` を典型とする事実検査系は欠陥クラスが列挙で閉じるため、閉列挙のままとする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "ADR、spec、types、impl-plan の各 SoT briefing に `Report findings ONLY for the following categories` の閉列挙が残り、各 briefing の既存カテゴリだけで ADR / 行動契約 / 型カタログ / 実行可能計画の事実検査を判定することを文書内容で確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "709e45935b070176757459de9acef46e34fb393b75a298dc33cbb1c5c135effd",
+      "evidence_hash": "05357795f6909a9304944b6b85e8fb6566cc58d1a4894932712aa05b262535e9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "briefing を改訂する際、「役割文で禁じた事象が、報告可能なカテゴリを持たないままになっていないか」を確認する項目を maintainer checklist に追加する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "maintainer checklist に、briefing 改訂時に role statement で禁じた事象が報告可能なカテゴリを持たないまま残っていないかを確認する項目が存在することを確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0109-review-briefing-open-category-format.md",
+          "decision_id": "D4"
+        }
+      }
+    }
+  ]
+}

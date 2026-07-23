@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "6f59bc4b7b8df9d9a3f37878703761ee58834c64ea3622368d3f01ab9e0fe3cf",
+  "signals": [
+    {
+      "type_name": "FsDiskMaintenanceAdapter",
+      "signal": "blue",
+      "entry_hash": "10ad84bfcb5349bbd435874440d987df9b965929dab2cf6489b74a51124590b6"
+    },
+    {
+      "type_name": "CodeFragmentExtractorAdapter",
+      "signal": "blue",
+      "entry_hash": "025525a0c1e178f3b12882335dd2bcf125161eb261cd87846f2835f14cc39157"
+    },
+    {
+      "type_name": "DryCheckServiceFactoryAdapter",
+      "signal": "blue",
+      "entry_hash": "5c5a1da309c6c2905087fde313c3d5bd9911be9dde6983e895bed7a69f75c1cd"
+    },
+    {
+      "type_name": "ExtractError",
+      "signal": "blue",
+      "entry_hash": "8dffbb19146fa7df786573d1cd8fe656382700f5c29cdbe0a8bc9bd89df52c6e"
+    },
+    {
+      "type_name": "FastEmbedAdapter",
+      "signal": "blue",
+      "entry_hash": "c4310c5b4ff59e95be6ea25156ddaf55a2f5d2949439183fc9cafc807b268d1c"
+    },
+    {
+      "type_name": "FsDryCorpusFragmentsAdapter",
+      "signal": "blue",
+      "entry_hash": "5c5a1da309c6c2905087fde313c3d5bd9911be9dde6983e895bed7a69f75c1cd"
+    },
+    {
+      "type_name": "FsDryCorpusMetaAdapter",
+      "signal": "blue",
+      "entry_hash": "9470b5922de4ff5656cc007fc77acb30ebe0a33fc53b1bac7d624b0cc2cd7ce8"
+    },
+    {
+      "type_name": "FsDryCorpusRootManifestAdapter",
+      "signal": "blue",
+      "entry_hash": "c0d89f0acbab575d3abd23a9fc7c1e2ced5d11e1910a40f8b36f79fd70b9526b"
+    },
+    {
+      "type_name": "FsDryWriteConfigLoaderAdapter",
+      "signal": "blue",
+      "entry_hash": "5c5a1da309c6c2905087fde313c3d5bd9911be9dde6983e895bed7a69f75c1cd"
+    },
+    {
+      "type_name": "LanceDbSemanticIndexAdapter",
+      "signal": "blue",
+      "entry_hash": "9831f29b40c22816f4ff6c2ce9c4d2ffde86594e26a566c5195422766e86746c"
+    },
+    {
+      "type_name": "NoopSemanticIndexPort",
+      "signal": "blue",
+      "entry_hash": "cdbfd90113540b509586063ff5dc1b74facf72d91254a2cb9fa2b2d29305dbbb"
+    },
+    {
+      "type_name": "NullInsertIndexProxy",
+      "signal": "blue",
+      "entry_hash": "3491a1831e448f8f82e74708166b782b4357cac6a3d06ebbc36b17a4146d84a8"
+    },
+    {
+      "type_name": "PersistentIndexLock",
+      "signal": "blue",
+      "entry_hash": "3491a1831e448f8f82e74708166b782b4357cac6a3d06ebbc36b17a4146d84a8"
+    },
+    {
+      "type_name": "PersistentIndexLockError",
+      "signal": "blue",
+      "entry_hash": "3491a1831e448f8f82e74708166b782b4357cac6a3d06ebbc36b17a4146d84a8"
+    },
+    {
+      "type_name": "RecordingDryTierTelemetryAdapter",
+      "signal": "blue",
+      "entry_hash": "c0d89f0acbab575d3abd23a9fc7c1e2ced5d11e1910a40f8b36f79fd70b9526b"
+    },
+    {
+      "type_name": "infrastructure::semantic_dup::extractor::extract_code_fragments",
+      "signal": "blue",
+      "entry_hash": "61a0285a81e28d3902495caaae956e6011a0c7492bf8902ec64f806ddab40ba3"
+    },
+    {
+      "type_name": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock",
+      "signal": "blue",
+      "entry_hash": "61a0285a81e28d3902495caaae956e6011a0c7492bf8902ec64f806ddab40ba3"
+    },
+    {
+      "type_name": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path",
+      "signal": "blue",
+      "entry_hash": "61a0285a81e28d3902495caaae956e6011a0c7492bf8902ec64f806ddab40ba3"
+    }
+  ]
+}

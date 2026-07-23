@@ -29,6 +29,9 @@ use domain::tddd::primitive_occurrence_scanner::{
 };
 use thiserror::Error;
 
+#[path = "catalogue_lint_workflow_serde.rs"]
+mod serde_wire;
+
 // ---------------------------------------------------------------------------
 // Config file support (D19)
 // ---------------------------------------------------------------------------
@@ -104,47 +107,54 @@ pub trait LintConfigLoader: Send + Sync {
 
 /// Usecase-owned mirror of `domain::tddd::catalogue_linter::CatalogueLinterRuleKind`.
 ///
-/// Callers (e.g. CLI) use this enum so they never import domain types
-/// directly (CN-01 / AC-03). All payload fields use `String` / `Vec<String>`
-/// as boundary representations; the interactor converts them to domain types.
-#[derive(Debug, Clone, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
-#[serde(deny_unknown_fields)]
+/// Callers (e.g. CLI) use this enum so they never import the domain linter
+/// rule enum directly. Its payloads retain the domain's validated types, so
+/// malformed rule values cannot survive deserialization into the usecase DTO.
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LintRuleKind {
     /// Rule asserts that the named field must be empty for matching entries.
-    FieldEmpty { target_field: String },
+    FieldEmpty { target_field: RolePayloadField },
     /// Rule asserts that the named field must be non-empty for matching entries.
-    FieldNonEmpty { target_field: String },
+    FieldNonEmpty { target_field: RolePayloadField },
     /// Rule constrains which layers entries of the target role may appear in.
-    KindLayerConstraint { permitted_layers: Vec<String> },
+    KindLayerConstraint { permitted_layers: NonEmptyVec<LayerId> },
     /// Rule asserts that typed entries in `target_field` are declared with
     /// `expected_role` in the catalogue.
-    ReferencedRoleConstraint { target_field: String, expected_role: String },
+    ReferencedRoleConstraint { target_field: RolePayloadField, expected_role: RoleKind },
     /// Rule asserts that `trait_impls` contains all of `required_traits`.
-    TraitImplRequired { required_traits: Vec<String> },
+    TraitImplRequired { required_traits: NonEmptyVec<TypeRef> },
     /// Rule asserts that no method signature contains a type with a forbidden
     /// role.
-    NoRoleInMethodSignature { forbidden_roles: Vec<String> },
+    NoRoleInMethodSignature { forbidden_roles: NonEmptyVec<RoleKind> },
     /// Rule asserts that the method referenced by `target_field` exists in the
     /// entry's public method set and satisfies the expected signature.
-    MethodReferenceSignature { target_field: String },
+    MethodReferenceSignature { target_field: RolePayloadField },
     /// Rule asserts that the entry has a public accessor getter matching the
     /// identity signature.
-    AccessorSignatureRequired { target_field: String },
+    AccessorSignatureRequired { target_field: RolePayloadField },
     /// Rule asserts that elements in `target_field` are unique across all
     /// entries of the target role.
-    FieldElementUniqueAcrossEntries { target_field: String },
+    FieldElementUniqueAcrossEntries { target_field: RolePayloadField },
     /// Rule asserts that elements listed in `target_field` do not appear in
     /// any other entry's method signatures.
-    NoExternalReferenceInMethods { target_field: String },
+    NoExternalReferenceInMethods { target_field: RolePayloadField },
     /// Rule asserts that the entry has no public struct fields. Unit variant.
     NoPublicField,
     /// Rule asserts that no method uses the given self-receiver kind.
-    ForbiddenMethodReceiver { forbidden_receiver: String },
+    ForbiddenMethodReceiver { forbidden_receiver: SelfReceiver },
     /// Rule asserts that none of `primitives` occurs at any of `positions`
     /// within catalogue entries in `layers`. Role-axis filtering is not part
     /// of this variant's payload; it reuses `target_roles` on the enclosing
     /// [`LintRuleSpec`] instead.
-    ForbidPrimitiveInTypes { primitives: Vec<String>, layers: Vec<String>, positions: Vec<String> },
+    ForbidPrimitiveInTypes {
+        primitives: NonEmptyVec<PrimitiveName>,
+        layers: NonEmptyVec<LayerId>,
+        positions: NonEmptyVec<PrimitiveOccurrencePosition>,
+    },
+    /// Rule requires domain ValueObjects to have an inbound domain reference.
+    DomainValueObjectInboundReferenceRequired,
+    /// Rule constrains CompositionRoot public surfaces to pure-DI wiring accessors.
+    CompositionRootPureDi,
 }
 
 /// Usecase-owned string-only description of a single lint rule.
@@ -357,115 +367,49 @@ fn lint_rule_spec_to_domain(spec: LintRuleSpec) -> Result<CatalogueLinterRule, C
         spec.target_roles.iter().map(|s| parse_role_kind(s)).collect::<Result<Vec<_>, _>>()?;
     let target = RuleTarget::new(target_roles);
 
-    // Convert LintRuleKind to CatalogueLinterRuleKind.
+    // LintRuleKind already carries the domain's validated payload types.
     let kind = match spec.kind {
-        LintRuleKind::FieldEmpty { target_field } => CatalogueLinterRuleKind::FieldEmpty {
-            target_field: parse_role_payload_field(&target_field)?,
-        },
-        LintRuleKind::FieldNonEmpty { target_field } => CatalogueLinterRuleKind::FieldNonEmpty {
-            target_field: parse_role_payload_field(&target_field)?,
-        },
+        LintRuleKind::FieldEmpty { target_field } => {
+            CatalogueLinterRuleKind::FieldEmpty { target_field }
+        }
+        LintRuleKind::FieldNonEmpty { target_field } => {
+            CatalogueLinterRuleKind::FieldNonEmpty { target_field }
+        }
         LintRuleKind::KindLayerConstraint { permitted_layers } => {
-            let layers: Vec<LayerId> = permitted_layers
-                .into_iter()
-                .map(|s| {
-                    LayerId::try_new(s.clone())
-                        .map_err(|e| CatalogueLintError(format!("invalid layer_id '{s}': {e}")))
-                })
-                .collect::<Result<Vec<_>, _>>()?;
-            let non_empty = NonEmptyVec::try_new(layers)
-                .map_err(|_| CatalogueLintError("permitted_layers must not be empty".to_owned()))?;
-            CatalogueLinterRuleKind::KindLayerConstraint { permitted_layers: non_empty }
+            CatalogueLinterRuleKind::KindLayerConstraint { permitted_layers }
         }
         LintRuleKind::ReferencedRoleConstraint { target_field, expected_role } => {
-            let role = parse_role_kind(&expected_role)?;
-            CatalogueLinterRuleKind::ReferencedRoleConstraint {
-                target_field: parse_role_payload_field(&target_field)?,
-                expected_role: role,
-            }
+            CatalogueLinterRuleKind::ReferencedRoleConstraint { target_field, expected_role }
         }
         LintRuleKind::TraitImplRequired { required_traits } => {
-            let refs: Vec<TypeRef> = required_traits
-                .into_iter()
-                .map(|s| {
-                    TypeRef::new(s.clone()).map_err(|e| {
-                        CatalogueLintError(format!("invalid required trait '{s}': {e}"))
-                    })
-                })
-                .collect::<Result<Vec<_>, _>>()?;
-            let non_empty = NonEmptyVec::try_new(refs)
-                .map_err(|_| CatalogueLintError("required_traits must not be empty".to_owned()))?;
-            CatalogueLinterRuleKind::TraitImplRequired { required_traits: non_empty }
+            CatalogueLinterRuleKind::TraitImplRequired { required_traits }
         }
         LintRuleKind::NoRoleInMethodSignature { forbidden_roles } => {
-            let roles: Vec<RoleKind> = forbidden_roles
-                .iter()
-                .map(|s| parse_role_kind(s))
-                .collect::<Result<Vec<_>, _>>()?;
-            let non_empty = NonEmptyVec::try_new(roles)
-                .map_err(|_| CatalogueLintError("forbidden_roles must not be empty".to_owned()))?;
-            CatalogueLinterRuleKind::NoRoleInMethodSignature { forbidden_roles: non_empty }
+            CatalogueLinterRuleKind::NoRoleInMethodSignature { forbidden_roles }
         }
         LintRuleKind::MethodReferenceSignature { target_field } => {
-            CatalogueLinterRuleKind::MethodReferenceSignature {
-                target_field: parse_role_payload_field(&target_field)?,
-            }
+            CatalogueLinterRuleKind::MethodReferenceSignature { target_field }
         }
         LintRuleKind::AccessorSignatureRequired { target_field } => {
-            CatalogueLinterRuleKind::AccessorSignatureRequired {
-                target_field: parse_role_payload_field(&target_field)?,
-            }
+            CatalogueLinterRuleKind::AccessorSignatureRequired { target_field }
         }
         LintRuleKind::FieldElementUniqueAcrossEntries { target_field } => {
-            CatalogueLinterRuleKind::FieldElementUniqueAcrossEntries {
-                target_field: parse_role_payload_field(&target_field)?,
-            }
+            CatalogueLinterRuleKind::FieldElementUniqueAcrossEntries { target_field }
         }
         LintRuleKind::NoExternalReferenceInMethods { target_field } => {
-            CatalogueLinterRuleKind::NoExternalReferenceInMethods {
-                target_field: parse_role_payload_field(&target_field)?,
-            }
+            CatalogueLinterRuleKind::NoExternalReferenceInMethods { target_field }
         }
         LintRuleKind::NoPublicField => CatalogueLinterRuleKind::NoPublicField,
         LintRuleKind::ForbiddenMethodReceiver { forbidden_receiver } => {
-            CatalogueLinterRuleKind::ForbiddenMethodReceiver {
-                forbidden_receiver: parse_self_receiver(&forbidden_receiver)?,
-            }
+            CatalogueLinterRuleKind::ForbiddenMethodReceiver { forbidden_receiver }
         }
         LintRuleKind::ForbidPrimitiveInTypes { primitives, layers, positions } => {
-            let primitive_names: Vec<PrimitiveName> = primitives
-                .into_iter()
-                .map(|s| {
-                    PrimitiveName::new(s.clone())
-                        .map_err(|e| CatalogueLintError(format!("invalid primitive '{s}': {e}")))
-                })
-                .collect::<Result<Vec<_>, _>>()?;
-            let non_empty_primitives = NonEmptyVec::try_new(primitive_names)
-                .map_err(|_| CatalogueLintError("primitives must not be empty".to_owned()))?;
-
-            let layer_ids: Vec<LayerId> = layers
-                .into_iter()
-                .map(|s| {
-                    LayerId::try_new(s.clone())
-                        .map_err(|e| CatalogueLintError(format!("invalid layer_id '{s}': {e}")))
-                })
-                .collect::<Result<Vec<_>, _>>()?;
-            let non_empty_layers = NonEmptyVec::try_new(layer_ids)
-                .map_err(|_| CatalogueLintError("layers must not be empty".to_owned()))?;
-
-            let position_values: Vec<PrimitiveOccurrencePosition> = positions
-                .iter()
-                .map(|s| parse_primitive_occurrence_position(s))
-                .collect::<Result<Vec<_>, _>>()?;
-            let non_empty_positions = NonEmptyVec::try_new(position_values)
-                .map_err(|_| CatalogueLintError("positions must not be empty".to_owned()))?;
-
-            CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
-                primitives: non_empty_primitives,
-                layers: non_empty_layers,
-                positions: non_empty_positions,
-            }
+            CatalogueLinterRuleKind::ForbidPrimitiveInTypes { primitives, layers, positions }
         }
+        LintRuleKind::DomainValueObjectInboundReferenceRequired => {
+            CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired
+        }
+        LintRuleKind::CompositionRootPureDi => CatalogueLinterRuleKind::CompositionRootPureDi,
     };
 
     CatalogueLinterRule::new(target, kind).map_err(|e| CatalogueLintError(e.to_string()))
@@ -564,7 +508,10 @@ mod tests {
     use domain::tddd::catalogue_ports::{CatalogueLoader, CatalogueLoaderError};
     use domain::tddd::catalogue_v2::document::CatalogueDocument;
     use domain::tddd::catalogue_v2::entries::TypeEntry;
-    use domain::tddd::catalogue_v2::identifiers::{CrateName, FieldName, ModulePath, TypeName};
+    use domain::tddd::catalogue_v2::identifiers::{
+        CrateName, FieldName, MethodName, ModulePath, ParamName, TypeName, TypeRef,
+    };
+    use domain::tddd::catalogue_v2::methods::{MethodDeclaration, ParamDeclaration};
     use domain::tddd::catalogue_v2::roles::{DataRole, ItemAction, NonEmptyVec};
     use domain::tddd::catalogue_v2::variants::FieldDecl;
     use domain::tddd::catalogue_v2::{StructKind, StructShape, TypeKindV2};
@@ -737,6 +684,63 @@ mod tests {
         LintRuleSpec { target_roles: vec![], kind: LintRuleKind::NoPublicField }
     }
 
+    fn composition_root_pure_di_rule_spec() -> LintRuleSpec {
+        LintRuleSpec {
+            target_roles: vec!["CompositionRoot".to_owned()],
+            kind: LintRuleKind::CompositionRootPureDi,
+        }
+    }
+
+    fn type_entry_with_methods(role: DataRole, methods: Vec<MethodDeclaration>) -> TypeEntry {
+        TypeEntry::new(
+            ItemAction::Add,
+            role,
+            TypeKindV2::Struct(StructKind::new(
+                StructShape::Plain { fields: vec![], has_stripped_fields: false },
+                None,
+            )),
+            methods,
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        )
+    }
+
+    fn method(
+        name: &str,
+        receiver: Option<SelfReceiver>,
+        params: Vec<(&str, &str)>,
+        returns: &str,
+    ) -> MethodDeclaration {
+        MethodDeclaration::new(
+            MethodName::new(name).unwrap(),
+            receiver,
+            params
+                .into_iter()
+                .map(|(param_name, param_type)| {
+                    ParamDeclaration::new(
+                        ParamName::new(param_name).unwrap(),
+                        TypeRef::new(param_type).unwrap(),
+                    )
+                })
+                .collect(),
+            TypeRef::new(returns).unwrap(),
+            false,
+            None,
+        )
+    }
+
+    fn composition_root_command() -> RunCatalogueLintCommand {
+        RunCatalogueLintCommand {
+            track_id: "my-track".to_owned(),
+            layer_id: "cli_composition".to_owned(),
+            rules: vec![composition_root_pure_di_rule_spec()],
+        }
+    }
+
     fn cmd(track: &str, layer_name: &str) -> RunCatalogueLintCommand {
         RunCatalogueLintCommand {
             track_id: track.to_owned(),
@@ -823,78 +827,94 @@ mod tests {
     }
 
     // ------------------------------------------------------------------
-    // T004: lint_rule_spec_to_domain — all 12 LintRuleKind variants convert
+    // T004: lint_rule_spec_to_domain — all LintRuleKind variants convert
     // ------------------------------------------------------------------
 
     #[test]
-    fn test_lint_rule_spec_to_domain_converts_all_12_kinds() {
+    fn test_lint_rule_spec_to_domain_converts_all_15_kinds() {
         let specs: Vec<LintRuleSpec> = vec![
             LintRuleSpec {
                 target_roles: vec![],
-                kind: LintRuleKind::FieldEmpty { target_field: "invariants".to_owned() },
+                kind: LintRuleKind::FieldEmpty { target_field: RolePayloadField::Invariants },
             },
             LintRuleSpec {
                 target_roles: vec![],
-                kind: LintRuleKind::FieldNonEmpty { target_field: "emits".to_owned() },
+                kind: LintRuleKind::FieldNonEmpty { target_field: RolePayloadField::Emits },
             },
             LintRuleSpec {
                 target_roles: vec!["EventPolicy".to_owned()],
                 kind: LintRuleKind::KindLayerConstraint {
-                    permitted_layers: vec!["domain".to_owned()],
+                    permitted_layers: NonEmptyVec::new(layer("domain"), vec![]),
                 },
             },
             LintRuleSpec {
                 target_roles: vec!["AggregateRoot".to_owned()],
                 kind: LintRuleKind::ReferencedRoleConstraint {
-                    target_field: "emits".to_owned(),
-                    expected_role: "DomainEvent".to_owned(),
+                    target_field: RolePayloadField::Emits,
+                    expected_role: RoleKind::DomainEvent,
                 },
             },
             LintRuleSpec {
                 target_roles: vec!["ValueObject".to_owned()],
                 kind: LintRuleKind::TraitImplRequired {
-                    required_traits: vec!["PartialEq".to_owned()],
+                    required_traits: NonEmptyVec::new(TypeRef::new("PartialEq").unwrap(), vec![]),
                 },
             },
             LintRuleSpec {
                 target_roles: vec!["EventPolicy".to_owned()],
                 kind: LintRuleKind::NoRoleInMethodSignature {
-                    forbidden_roles: vec!["Repository".to_owned()],
+                    forbidden_roles: NonEmptyVec::new(RoleKind::Repository, vec![]),
                 },
             },
             LintRuleSpec {
                 target_roles: vec![],
                 kind: LintRuleKind::MethodReferenceSignature {
-                    target_field: "invariants".to_owned(),
+                    target_field: RolePayloadField::Invariants,
                 },
             },
             LintRuleSpec {
                 target_roles: vec![],
                 kind: LintRuleKind::AccessorSignatureRequired {
-                    target_field: "identity".to_owned(),
+                    target_field: RolePayloadField::Identity,
                 },
             },
             LintRuleSpec {
                 target_roles: vec![],
                 kind: LintRuleKind::FieldElementUniqueAcrossEntries {
-                    target_field: "exclusive_members".to_owned(),
+                    target_field: RolePayloadField::ExclusiveMembers,
                 },
             },
             LintRuleSpec {
                 target_roles: vec![],
                 kind: LintRuleKind::NoExternalReferenceInMethods {
-                    target_field: "exclusive_members".to_owned(),
+                    target_field: RolePayloadField::ExclusiveMembers,
                 },
             },
             LintRuleSpec { target_roles: vec![], kind: LintRuleKind::NoPublicField },
             LintRuleSpec {
                 target_roles: vec![],
                 kind: LintRuleKind::ForbiddenMethodReceiver {
-                    forbidden_receiver: "&mut self".to_owned(),
+                    forbidden_receiver: SelfReceiver::ExclusiveRef,
                 },
             },
+            LintRuleSpec {
+                target_roles: vec![],
+                kind: LintRuleKind::ForbidPrimitiveInTypes {
+                    primitives: NonEmptyVec::new(PrimitiveName::new("String").unwrap(), vec![]),
+                    layers: NonEmptyVec::new(layer("domain"), vec![]),
+                    positions: NonEmptyVec::new(PrimitiveOccurrencePosition::NamedField, vec![]),
+                },
+            },
+            LintRuleSpec {
+                target_roles: vec!["ValueObject".to_owned()],
+                kind: LintRuleKind::DomainValueObjectInboundReferenceRequired,
+            },
+            LintRuleSpec {
+                target_roles: vec!["CompositionRoot".to_owned()],
+                kind: LintRuleKind::CompositionRootPureDi,
+            },
         ];
-        assert_eq!(specs.len(), 12, "must cover all 12 LintRuleKind variants");
+        assert_eq!(specs.len(), 15, "must cover all 15 LintRuleKind variants");
         for spec in specs {
             let kind_name = format!("{:?}", spec.kind).split(' ').next().unwrap().to_owned();
             let result = lint_rule_spec_to_domain(spec);
@@ -938,77 +958,25 @@ mod tests {
     }
 
     // ------------------------------------------------------------------
-    // T007: lint_rule_spec_to_domain — empty permitted_layers is rejected
+    // Typed serde boundary rejects malformed wire payloads before a
+    // LintRuleKind value can be constructed.
     // ------------------------------------------------------------------
 
     #[test]
-    fn test_lint_rule_spec_to_domain_rejects_empty_permitted_layers() {
-        let spec = LintRuleSpec {
-            target_roles: vec![],
-            kind: LintRuleKind::KindLayerConstraint { permitted_layers: vec![] },
-        };
-        let result = lint_rule_spec_to_domain(spec);
-        assert!(result.is_err(), "expected Err for empty permitted_layers, got Ok");
-        let msg = result.unwrap_err();
-        assert!(
-            msg.contains("permitted_layers"),
-            "error message should mention permitted_layers, got: {msg}"
-        );
-    }
-
-    // ------------------------------------------------------------------
-    // T008: lint_rule_spec_to_domain — empty required_traits is rejected
-    // ------------------------------------------------------------------
-
-    #[test]
-    fn test_lint_rule_spec_to_domain_rejects_empty_required_traits() {
-        let spec = LintRuleSpec {
-            target_roles: vec![],
-            kind: LintRuleKind::TraitImplRequired { required_traits: vec![] },
-        };
-        let result = lint_rule_spec_to_domain(spec);
-        assert!(result.is_err(), "expected Err for empty required_traits, got Ok");
-        let msg = result.unwrap_err();
-        assert!(
-            msg.contains("required_traits"),
-            "error message should mention required_traits, got: {msg}"
-        );
-    }
-
-    // ------------------------------------------------------------------
-    // T009: lint_rule_spec_to_domain — empty forbidden_roles is rejected
-    // ------------------------------------------------------------------
-
-    #[test]
-    fn test_lint_rule_spec_to_domain_rejects_empty_forbidden_roles() {
-        let spec = LintRuleSpec {
-            target_roles: vec![],
-            kind: LintRuleKind::NoRoleInMethodSignature { forbidden_roles: vec![] },
-        };
-        let result = lint_rule_spec_to_domain(spec);
-        assert!(result.is_err(), "expected Err for empty forbidden_roles, got Ok");
-        let msg = result.unwrap_err();
-        assert!(
-            msg.contains("forbidden_roles"),
-            "error message should mention forbidden_roles, got: {msg}"
-        );
-    }
-
-    // ------------------------------------------------------------------
-    // T010: lint_rule_spec_to_domain — empty target_field is rejected
-    // ------------------------------------------------------------------
-
-    #[test]
-    fn test_lint_rule_spec_to_domain_rejects_empty_target_field() {
-        // FieldNonEmpty with empty target_field should be rejected by
-        // parse_role_payload_field (an empty string parses as no RolePayloadField
-        // variant), before a domain value is ever constructed.
-        let spec = LintRuleSpec {
-            target_roles: vec![],
-            kind: LintRuleKind::FieldNonEmpty { target_field: "".to_owned() },
-        };
-        let result = lint_rule_spec_to_domain(spec);
-        assert!(result.is_err(), "expected Err for empty target_field, got Ok");
+    fn test_lint_rule_kind_deserialization_rejects_invalid_payloads() {
+        for json in [
+            serde_json::json!({ "KindLayerConstraint": { "permitted_layers": [] } }),
+            serde_json::json!({ "TraitImplRequired": { "required_traits": [] } }),
+            serde_json::json!({ "NoRoleInMethodSignature": { "forbidden_roles": [] } }),
+            serde_json::json!({ "FieldNonEmpty": { "target_field": "" } }),
+            serde_json::json!({ "FieldEmpty": { "target_field": "emit" } }),
+            serde_json::json!({ "ForbiddenMethodReceiver": { "forbidden_receiver": "&mutself" } }),
+        ] {
+            assert!(
+                serde_json::from_value::<LintRuleKind>(json).is_err(),
+                "malformed lint-rule wire payload must be rejected"
+            );
+        }
     }
 
     // ------------------------------------------------------------------
@@ -1137,76 +1105,6 @@ mod tests {
         let result = interactor.execute(cmd("my-track", "domain"));
 
         assert!(result.is_ok(), "expected Ok with CLI rules bypassing config, got: {result:?}");
-    }
-
-    // ------------------------------------------------------------------
-    // T016: lint_rule_spec_to_domain — unrecognised target_field is rejected
-    // ------------------------------------------------------------------
-
-    #[test]
-    fn test_lint_rule_spec_to_domain_rejects_unknown_target_field() {
-        // `RolePayloadField` is a closed enum; a typo'd target_field string (e.g.
-        // "emit" instead of "emits") must be rejected by `parse_role_payload_field`
-        // at the usecase boundary, before it ever reaches the domain constructor.
-        let spec = LintRuleSpec {
-            target_roles: vec![],
-            kind: LintRuleKind::FieldEmpty { target_field: "emit".to_owned() }, // typo
-        };
-        let result = lint_rule_spec_to_domain(spec);
-        assert!(result.is_err(), "expected Err for unknown target_field 'emit', got Ok");
-        let msg = result.unwrap_err();
-        assert!(
-            msg.contains("emit"),
-            "error message should mention the bad target_field, got: {msg}"
-        );
-    }
-
-    // ------------------------------------------------------------------
-    // T017: lint_rule_spec_to_domain — unrecognised forbidden_receiver is rejected
-    // ------------------------------------------------------------------
-
-    #[test]
-    fn test_lint_rule_spec_to_domain_rejects_unknown_forbidden_receiver() {
-        // `SelfReceiver` is a closed enum; a typo'd receiver string (e.g.
-        // "&mutself" instead of "&mut self") must be rejected by
-        // `parse_self_receiver` at the usecase boundary, before it ever reaches
-        // the domain constructor.
-        let spec = LintRuleSpec {
-            target_roles: vec![],
-            kind: LintRuleKind::ForbiddenMethodReceiver {
-                forbidden_receiver: "&mutself".to_owned(), // typo
-            },
-        };
-        let result = lint_rule_spec_to_domain(spec);
-        assert!(result.is_err(), "expected Err for unknown forbidden_receiver '&mutself', got Ok");
-        let msg = result.unwrap_err();
-        assert!(
-            msg.contains("&mutself"),
-            "error message should mention the bad forbidden_receiver, got: {msg}"
-        );
-    }
-
-    // ------------------------------------------------------------------
-    // T018: lint_rule_spec_to_domain — empty-string required_traits element is rejected
-    // ------------------------------------------------------------------
-
-    #[test]
-    fn test_lint_rule_spec_to_domain_rejects_empty_required_trait_element() {
-        // A non-empty Vec containing an empty-string element would previously
-        // have silently produced a TraitImplRequired rule that could never be
-        // satisfied by any impl (D19 fail-closed). `TypeRef::new` now rejects
-        // the empty string per-element, before NonEmptyVec::try_new even runs.
-        let spec = LintRuleSpec {
-            target_roles: vec![],
-            kind: LintRuleKind::TraitImplRequired { required_traits: vec![String::new()] },
-        };
-        let result = lint_rule_spec_to_domain(spec);
-        assert!(result.is_err(), "expected Err for empty-string required trait element, got Ok");
-        let msg = result.unwrap_err();
-        assert!(
-            msg.contains("required trait"),
-            "error message should mention the invalid required trait, got: {msg}"
-        );
     }
 
     // ------------------------------------------------------------------
@@ -1376,14 +1274,145 @@ mod tests {
         assert_eq!(
             kind,
             LintRuleKind::ForbidPrimitiveInTypes {
-                primitives: vec!["String".to_owned()],
-                layers: vec!["domain".to_owned()],
-                positions: vec!["result_err".to_owned()],
+                primitives: NonEmptyVec::new(PrimitiveName::new("String").unwrap(), vec![]),
+                layers: NonEmptyVec::new(layer("domain"), vec![]),
+                positions: NonEmptyVec::new(PrimitiveOccurrencePosition::ResultErr, vec![]),
             }
         );
 
         let round_tripped = serde_json::to_value(&kind).unwrap();
         assert_eq!(round_tripped, json, "serialized form must match the wire format exactly");
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_json_round_trips_through_lint_rule_kind() {
+        let json = serde_json::json!("CompositionRootPureDi");
+        let kind: LintRuleKind =
+            serde_json::from_value(json.clone()).expect("valid CompositionRootPureDi JSON");
+
+        assert_eq!(kind, LintRuleKind::CompositionRootPureDi);
+        assert_eq!(serde_json::to_value(kind).unwrap(), json);
+    }
+
+    #[test]
+    fn test_execute_composition_root_pure_di_detects_execution_method() {
+        let mut composition_catalogue = empty_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            type_entry_with_methods(
+                DataRole::CompositionRoot,
+                vec![method(
+                    "run",
+                    Some(SelfReceiver::SharedRef),
+                    vec![("raw_name", "String")],
+                    "CommandOutcome",
+                )],
+            ),
+        );
+        let composition_layer = composition_catalogue.layer().clone();
+        let mut catalogues = BTreeMap::new();
+        catalogues.insert(composition_layer.clone(), composition_catalogue);
+        let order = vec![composition_layer];
+
+        let mut loader = MockLoader::new();
+        loader
+            .expect_load_all()
+            .times(1)
+            .returning(move |_| Ok((order.clone(), catalogues.clone())));
+        let interactor =
+            RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader, StubScanner);
+
+        let violations = interactor
+            .execute(composition_root_command())
+            .expect("catalogue lint must evaluate the composition-root rule");
+
+        assert_eq!(violations.len(), 1, "execution method must be rejected");
+        assert_eq!(violations[0].rule_kind(), "CompositionRootPureDi");
+        assert!(violations[0].message().contains("execution method"));
+    }
+
+    #[test]
+    fn test_execute_composition_root_pure_di_detects_prohibited_public_role_exposure() {
+        let mut composition_catalogue = empty_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            type_entry_with_methods(
+                DataRole::CompositionRoot,
+                vec![method("username", Some(SelfReceiver::SharedRef), vec![], "domain::Username")],
+            ),
+        );
+        let mut domain_catalogue = empty_doc("domain");
+        domain_catalogue.insert_type(
+            TypeName::new("Username").unwrap(),
+            type_entry_with_methods(DataRole::value_object(), vec![]),
+        );
+        let composition_layer = composition_catalogue.layer().clone();
+        let domain_layer = domain_catalogue.layer().clone();
+        let mut catalogues = BTreeMap::new();
+        catalogues.insert(composition_layer.clone(), composition_catalogue);
+        catalogues.insert(domain_layer.clone(), domain_catalogue);
+        let order = vec![composition_layer, domain_layer];
+
+        let mut loader = MockLoader::new();
+        loader
+            .expect_load_all()
+            .times(1)
+            .returning(move |_| Ok((order.clone(), catalogues.clone())));
+        let interactor =
+            RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader, StubScanner);
+
+        let violations = interactor
+            .execute(composition_root_command())
+            .expect("catalogue lint must evaluate the composition-root rule");
+
+        assert!(violations.iter().any(|violation| {
+            violation.message().contains("prohibited public-surface role 'ValueObject'")
+        }));
+    }
+
+    #[test]
+    fn test_execute_composition_root_pure_di_allows_primary_adapter_surface() {
+        let mut composition_catalogue = empty_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            type_entry_with_methods(
+                DataRole::CompositionRoot,
+                vec![
+                    method("new", None, vec![], "Self"),
+                    method(
+                        "greeting_driver",
+                        Some(SelfReceiver::SharedRef),
+                        vec![],
+                        "cli_driver::GreetingDriver",
+                    ),
+                ],
+            ),
+        );
+        let mut driver_catalogue = empty_doc("cli_driver");
+        driver_catalogue.insert_type(
+            TypeName::new("GreetingDriver").unwrap(),
+            type_entry_with_methods(DataRole::PrimaryAdapter, vec![]),
+        );
+        let composition_layer = composition_catalogue.layer().clone();
+        let driver_layer = driver_catalogue.layer().clone();
+        let mut catalogues = BTreeMap::new();
+        catalogues.insert(composition_layer.clone(), composition_catalogue);
+        catalogues.insert(driver_layer.clone(), driver_catalogue);
+        let order = vec![composition_layer, driver_layer];
+
+        let mut loader = MockLoader::new();
+        loader
+            .expect_load_all()
+            .times(1)
+            .returning(move |_| Ok((order.clone(), catalogues.clone())));
+        let interactor =
+            RunCatalogueLintInteractor::new(loader, StubMissingConfigLoader, StubScanner);
+
+        let violations = interactor
+            .execute(composition_root_command())
+            .expect("catalogue lint must evaluate the composition-root rule");
+
+        assert!(violations.is_empty(), "a PrimaryAdapter surface must be allowed");
     }
 
     // ------------------------------------------------------------------
@@ -1396,9 +1425,15 @@ mod tests {
         let spec = LintRuleSpec {
             target_roles: vec![],
             kind: LintRuleKind::ForbidPrimitiveInTypes {
-                primitives: vec!["String".to_owned(), "i32".to_owned()],
-                layers: vec!["domain".to_owned(), "usecase".to_owned()],
-                positions: vec!["named_field".to_owned(), "result_err".to_owned()],
+                primitives: NonEmptyVec::new(
+                    PrimitiveName::new("String").unwrap(),
+                    vec![PrimitiveName::new("i32").unwrap()],
+                ),
+                layers: NonEmptyVec::new(layer("domain"), vec![layer("usecase")]),
+                positions: NonEmptyVec::new(
+                    PrimitiveOccurrencePosition::NamedField,
+                    vec![PrimitiveOccurrencePosition::ResultErr],
+                ),
             },
         };
         let rule = lint_rule_spec_to_domain(spec).expect("expected successful conversion");
@@ -1422,138 +1457,23 @@ mod tests {
         }
     }
 
-    // ------------------------------------------------------------------
-    // T023: lint_rule_spec_to_domain -- ForbidPrimitiveInTypes rejects an
-    // empty `primitives` list.
-    // ------------------------------------------------------------------
-
     #[test]
-    fn test_lint_rule_spec_to_domain_rejects_empty_forbid_primitive_in_types_primitives() {
-        let spec = LintRuleSpec {
-            target_roles: vec![],
-            kind: LintRuleKind::ForbidPrimitiveInTypes {
-                primitives: vec![],
-                layers: vec!["domain".to_owned()],
-                positions: vec!["named_field".to_owned()],
-            },
-        };
-        let result = lint_rule_spec_to_domain(spec);
-        assert!(result.is_err(), "expected Err for empty primitives, got Ok");
-        let msg = result.unwrap_err();
-        assert!(msg.contains("primitives"), "error message should mention primitives, got: {msg}");
-    }
-
-    // ------------------------------------------------------------------
-    // T024: lint_rule_spec_to_domain -- ForbidPrimitiveInTypes rejects an
-    // empty `layers` list.
-    // ------------------------------------------------------------------
-
-    #[test]
-    fn test_lint_rule_spec_to_domain_rejects_empty_forbid_primitive_in_types_layers() {
-        let spec = LintRuleSpec {
-            target_roles: vec![],
-            kind: LintRuleKind::ForbidPrimitiveInTypes {
-                primitives: vec!["String".to_owned()],
-                layers: vec![],
-                positions: vec!["named_field".to_owned()],
-            },
-        };
-        let result = lint_rule_spec_to_domain(spec);
-        assert!(result.is_err(), "expected Err for empty layers, got Ok");
-        let msg = result.unwrap_err();
-        assert!(msg.contains("layers"), "error message should mention layers, got: {msg}");
-    }
-
-    // ------------------------------------------------------------------
-    // T025: lint_rule_spec_to_domain -- ForbidPrimitiveInTypes rejects an
-    // empty `positions` list.
-    // ------------------------------------------------------------------
-
-    #[test]
-    fn test_lint_rule_spec_to_domain_rejects_empty_forbid_primitive_in_types_positions() {
-        let spec = LintRuleSpec {
-            target_roles: vec![],
-            kind: LintRuleKind::ForbidPrimitiveInTypes {
-                primitives: vec!["String".to_owned()],
-                layers: vec!["domain".to_owned()],
-                positions: vec![],
-            },
-        };
-        let result = lint_rule_spec_to_domain(spec);
-        assert!(result.is_err(), "expected Err for empty positions, got Ok");
-        let msg = result.unwrap_err();
-        assert!(msg.contains("positions"), "error message should mention positions, got: {msg}");
-    }
-
-    // ------------------------------------------------------------------
-    // T026: lint_rule_spec_to_domain -- ForbidPrimitiveInTypes rejects an
-    // unparseable position string.
-    // ------------------------------------------------------------------
-
-    #[test]
-    fn test_lint_rule_spec_to_domain_rejects_unknown_forbid_primitive_in_types_position() {
-        let spec = LintRuleSpec {
-            target_roles: vec![],
-            kind: LintRuleKind::ForbidPrimitiveInTypes {
-                primitives: vec!["String".to_owned()],
-                layers: vec!["domain".to_owned()],
-                positions: vec!["result_ok".to_owned()], // not a real position
-            },
-        };
-        let result = lint_rule_spec_to_domain(spec);
-        assert!(result.is_err(), "expected Err for unknown position 'result_ok', got Ok");
-        let msg = result.unwrap_err();
-        assert!(
-            msg.contains("result_ok"),
-            "error message should mention the bad position, got: {msg}"
-        );
-    }
-
-    // ------------------------------------------------------------------
-    // T027: lint_rule_spec_to_domain -- ForbidPrimitiveInTypes rejects an
-    // invalid primitive name (non-identifier).
-    // ------------------------------------------------------------------
-
-    #[test]
-    fn test_lint_rule_spec_to_domain_rejects_invalid_forbid_primitive_in_types_primitive_name() {
-        let spec = LintRuleSpec {
-            target_roles: vec![],
-            kind: LintRuleKind::ForbidPrimitiveInTypes {
-                primitives: vec!["Vec<String>".to_owned()], // not a bare identifier
-                layers: vec!["domain".to_owned()],
-                positions: vec!["named_field".to_owned()],
-            },
-        };
-        let result = lint_rule_spec_to_domain(spec);
-        assert!(result.is_err(), "expected Err for invalid primitive name, got Ok");
-        let msg = result.unwrap_err();
-        assert!(
-            msg.contains("Vec<String>"),
-            "error message should mention the bad primitive name, got: {msg}"
-        );
-    }
-
-    // ------------------------------------------------------------------
-    // T028: lint_rule_spec_to_domain -- ForbidPrimitiveInTypes rejects an
-    // empty-string primitive name element.
-    // ------------------------------------------------------------------
-
-    #[test]
-    fn test_lint_rule_spec_to_domain_rejects_empty_forbid_primitive_in_types_primitive_element() {
-        let spec = LintRuleSpec {
-            target_roles: vec![],
-            kind: LintRuleKind::ForbidPrimitiveInTypes {
-                primitives: vec![String::new()],
-                layers: vec!["domain".to_owned()],
-                positions: vec!["named_field".to_owned()],
-            },
-        };
-        let result = lint_rule_spec_to_domain(spec);
-        assert!(result.is_err(), "expected Err for empty-string primitive element, got Ok");
-        let msg = result.unwrap_err();
-        assert!(
-            msg.contains("invalid primitive"),
-            "error message should mention the invalid primitive, got: {msg}"
-        );
+    fn test_forbid_primitive_in_types_deserialization_rejects_invalid_values() {
+        for json in [
+            serde_json::json!({ "ForbidPrimitiveInTypes": {
+                "primitives": [], "layers": ["domain"], "positions": ["named_field"]
+            }}),
+            serde_json::json!({ "ForbidPrimitiveInTypes": {
+                "primitives": ["String"], "layers": [], "positions": ["named_field"]
+            }}),
+            serde_json::json!({ "ForbidPrimitiveInTypes": {
+                "primitives": ["String"], "layers": ["domain"], "positions": ["result_ok"]
+            }}),
+            serde_json::json!({ "ForbidPrimitiveInTypes": {
+                "primitives": ["Vec<String>"], "layers": ["domain"], "positions": ["named_field"]
+            }}),
+        ] {
+            assert!(serde_json::from_value::<LintRuleKind>(json).is_err());
+        }
     }
 }

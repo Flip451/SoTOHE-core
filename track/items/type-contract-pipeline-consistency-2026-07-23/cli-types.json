@@ -1,0 +1,55 @@
+{
+  "crate_name": "cli",
+  "functions": {
+    "cli::commands::track::tddd::emit_command_outcome": {
+      "action": "add",
+      "docs": "add; IN-04, AC-04",
+      "generics": [
+        {
+          "bounds": [
+            "std::io::Write"
+          ],
+          "name": "W"
+        },
+        {
+          "bounds": [
+            "std::io::Write"
+          ],
+          "name": "E"
+        }
+      ],
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "outcome",
+          "ty": "&cli_composition::CommandOutcome"
+        },
+        {
+          "name": "stdout",
+          "ty": "&mut W"
+        },
+        {
+          "name": "stderr",
+          "ty": "&mut E"
+        }
+      ],
+      "returns": "Result<std::process::ExitCode, CliError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "cli",
+  "schema_version": 5,
+  "traits": {},
+  "types": {}
+}

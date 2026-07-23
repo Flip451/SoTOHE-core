@@ -1,0 +1,125 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-22T16:53:38Z",
+  "declaration_hash": "bcc5b862e56b7f601030c0752e0f4816da287289afd8dde76f83781bf0c8e469",
+  "implementation_input_hash": "d0d8eb2fd205543b3f9684ba18583aee6ae80f3254d1041ed93c7c5d43ea2ed1",
+  "signals": [
+    {
+      "type_name": "CleanupPlanQuery",
+      "kind_tag": "query",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "CleanupPlanResponse",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "DiskMaintenanceCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "DiskMaintenanceCommandInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DiskMaintenanceCommandService"
+      ]
+    },
+    {
+      "type_name": "DiskMaintenanceCommandPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DiskMaintenanceCommandResponse",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "DiskMaintenanceCommandService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DiskMaintenanceError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error",
+        "From<DiskMaintenanceValidationError>"
+      ]
+    },
+    {
+      "type_name": "DiskMaintenanceQueryInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DiskMaintenanceQueryService"
+      ]
+    },
+    {
+      "type_name": "DiskMaintenanceQueryPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "DiskMaintenanceQueryService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FeatureDisabledDryGateInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "DryCheckApprovedDriverService"
+      ]
+    },
+    {
+      "type_name": "DryCheckApprovedDriverService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

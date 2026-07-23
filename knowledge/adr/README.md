@@ -75,6 +75,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [技術スタック・製品ガイドラインの grandfathered baseline](2026-07-08-1405-grandfathered-tech-and-product-baseline.md) | Proposed | 2026-07-08 |
 | [retention gate の verify サブコマンド化](2026-07-08-2306-retention-gate-verify-subcommand.md) | Proposed | 2026-07-08 |
 | [公開テンプレート配布前の阻害要因解消](2026-07-13-0818-public-template-blocker-cleanup.md) | Proposed | 2026-07-13 |
+| [出荷面を最小化し、workflow と出荷物の乖離クラスを閉じる](2026-07-23-0117-export-surface-minimization.md) | Proposed | 2026-07-23 |
 | [scripts/ Python ヘルパーの段階的 Rust 移行ロードマップ](2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md) | Proposed | 2026-04-13 |
 | [external_guides 撤去 — Python migration roadmap Phase 3 supersede](2026-04-28-1258-remove-external-guides.md) | — | 2026-04-28 |
 | [Python 固有ロジックの Rust 完全移行と Python ランタイム依存の撤去](2026-06-03-1327-python-runtime-full-removal.md) | Proposed | 2026-06-03 |
@@ -126,7 +127,10 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [型カタログ作成の「生成 + 注釈」への移行 — 意図入力スキャフォールディング API](2026-07-02-1345-catalogue-generation-annotation.md) | — | 2026-07-02 |
 | [テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成](2026-07-02-0359-test-obligation-and-fulfillment-gate.md) | Proposed | 2026-07-02 |
 | [テスト義務ゲートにおける skipped task status レーン](2026-07-11-0802-test-obligation-skipped-status-lane.md) | Proposed | 2026-07-11 |
+| [テスト義務ゲートへの登録を機構化し、成果物不在による空振り合格を廃する](2026-07-23-0240-test-obligation-enrollment-mechanization.md) | Proposed | 2026-07-23 |
 | [contract-map renderer: `dyn Trait` return/param edge の解決](2026-07-13-0308-contract-map-dyn-trait-return-edge.md) | Proposed | 2026-07-13 |
+| [composition root 規範を純 DI に確定し、実践側の逸脱を解消する](2026-07-23-0111-composition-root-pure-di-realignment.md) | Proposed | 2026-07-23 |
+| [型契約パイプラインの規範と機構を実挙動に整合させる](2026-07-23-0113-type-contract-pipeline-consistency.md) | Proposed | 2026-07-23 |
 
 ### トラック・ワークフロー
 
@@ -151,6 +155,10 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [remote sync 専用コマンドの新設と git 操作の hexagonal 是正 — switch と pull の分離、意味論 port への全面移管](2026-07-04-0155-git-sync-dedicated-command.md) | Proposed | 2026-07-04 |
 | [/track:adr2pr の呼び出し型を引数指定から文脈自動解決に戻す](2026-07-20-1508-adr2pr-argless-context-resolution.md) | Proposed | 2026-07-20 |
 | [SoT 再入の順次処理規律 — ルーティング後のフェーズ収束 Prerequisite](2026-07-22-0400-sot-reentry-sequencing.md) | Proposed | 2026-07-22 |
+| [ADR 収束に対する ref-verify 要求の除外](2026-07-22-0546-adr-convergence-ref-verify-scope-exemption.md) | Proposed | 2026-07-22 |
+| [impl-plan task ステータス遷移後の review refresh](2026-07-22-0633-impl-plan-transition-review-refresh.md) | Proposed | 2026-07-22 |
+| [上流収束における意味論検証の chain scope 明確化](2026-07-22-0817-deferred-upstream-semantic-verification.md) | Proposed | 2026-07-22 |
+| [dry gate 評価点における設定無効と feature 無効の優先規則](2026-07-22-1541-dry-gate-evaluation-feature-off-precedence.md) | Proposed | 2026-07-22 |
 
 ### ADR 運用
 
@@ -221,6 +229,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [外部 agent 呼び出しのコスト削減](2026-07-13-2217-agent-dispatch-cost-reduction.md) | Proposed | 2026-07-13 |
 | [codex reviewer runtime の bootstrap 解決リンク（resolve & link）配備](2026-07-18-1359-codex-resolve-and-link-provisioning.md) | Proposed | 2026-07-18 |
 | [.claude/agents の description に capability exec 経由を明記する](2026-07-21-1522-agent-md-capability-exec-routing.md) | Proposed | 2026-07-21 |
+| [Codex 正規入口の整備](2026-07-22-1149-codex-merge-done-adr-entrypoints.md) | Proposed | 2026-07-22 |
 
 ### テスト・CI ツーリング
 
@@ -234,6 +243,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [DRY ゲートを利用者設定で切り替え可能にし、既定を無効（opt-in）とする](2026-06-19-2335-dry-gate-configurable-default-off.md) | — | 2026-06-19 |
 | [長くなった CI の短縮 — ソースを変えずキャッシュ戦略のみ見直す](2026-06-01-0336-ci-shorten-cache-strategy-only.md) | — | 2026-06-01 |
 | [モジュールサイズ制限の厳格化と分割リファクタリング](2026-06-06-1609-enforce-module-size-limit-splitting.md) | Proposed | 2026-06-06 |
+| [ビルド成果物によるディスク圧迫の解消と dry gate 重量依存の feature flag 化](2026-07-20-1608-disk-footprint-and-dry-feature-gating.md) | Proposed | 2026-07-20 |
 
 ### DRY / リファクタ
 
@@ -253,3 +263,4 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [レイヤー別 reviewer briefing prompt の導入と review-prompts ディレクトリの再配置](2026-06-18-1406-review-prompts-relocation-per-layer-briefings.md) | — | 2026-06-18 |
 | [内容レビューの SoT 別スコープ化](2026-06-30-1549-per-sot-review-scope.md) | — | 2026-06-30 |
 | [レビュー負荷軽減 — findings 全件報告と下流 artifact の再記述禁止](2026-07-02-1600-review-load-batch-findings-no-restatement.md) | — | 2026-07-02 |
+| [レビュー指示書のカテゴリ閉列挙を半開形式へ改める](2026-07-23-0109-review-briefing-open-category-format.md) | Proposed | 2026-07-23 |

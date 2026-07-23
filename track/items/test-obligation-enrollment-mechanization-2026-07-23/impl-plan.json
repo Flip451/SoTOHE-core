@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Update `libs/usecase/src/test_obligation/check.rs` (`CheckTestObligationsInteractor`) and `check_tests.rs`: add fail-closed enrollment validation and focused tests. IN-02; OUT-02, OUT-03; CN-01, CN-02, CN-03; AC-02, AC-03.",
+      "status": "done",
+      "commit_hash": "7d9423f560031287a6d8af0cf987be66014a15b5"
+    },
+    {
+      "id": "T002",
+      "description": "Update `.harness/workflows/track/type-design.md` and `.harness/capabilities/type-designer.md`: add terminal `bin/sotp test-obligation derive` execution and AC-01 artifact-lifecycle verification. Retain `.claude/commands/track/type-design.md` and `.agents/skills/track-type-design/SKILL.md` as thin SSoT adapters. IN-01; CN-03; AC-01.",
+      "status": "done",
+      "commit_hash": "7d9423f560031287a6d8af0cf987be66014a15b5"
+    },
+    {
+      "id": "T003",
+      "description": "Update `.harness/workflows/track/{implement,full-cycle,obligation-fulfillment}.md`: normalize enrollment handoff instructions; keep provider adapters as SSoT references. IN-03; OUT-01, OUT-02; CN-02; AC-04.",
+      "status": "done",
+      "commit_hash": "7d9423f560031287a6d8af0cf987be66014a15b5"
+    }
+  ],
+  "plan": {
+    "summary": [
+      "GO-01: T001, T002, T003."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Fail-closed enrollment recognition",
+        "description": [],
+        "task_ids": [
+          "T001"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Mandatory enrollment workflow",
+        "description": [],
+        "task_ids": [
+          "T002"
+        ]
+      },
+      {
+        "id": "S3",
+        "title": "Downstream workflow alignment",
+        "description": [],
+        "task_ids": [
+          "T003"
+        ]
+      }
+    ]
+  }
+}

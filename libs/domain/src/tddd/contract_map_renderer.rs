@@ -18,9 +18,58 @@
 use std::path::PathBuf;
 
 use crate::tddd::LayerId;
+use crate::tddd::catalogue_linter::RoleKind;
 use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::contract_map_content::ContractMapContent;
 use crate::tddd::contract_map_options::ContractMapRenderOptions;
+
+/// A non-fatal rendering issue that leaves the Contract Map usable but makes
+/// a missing presentation contract visible to its caller.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ContractMapRenderWarning {
+    /// A rendered role has no corresponding, defined Mermaid class.
+    UndefinedRoleStyle { role: RoleKind },
+}
+
+impl ContractMapRenderWarning {
+    /// Returns the role whose style is not defined.
+    #[must_use]
+    pub fn role(&self) -> RoleKind {
+        match self {
+            Self::UndefinedRoleStyle { role } => *role,
+        }
+    }
+}
+
+/// Rendered content together with non-fatal style warnings.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ContractMapRenderResult {
+    content: ContractMapContent,
+    warnings: Vec<ContractMapRenderWarning>,
+}
+
+impl ContractMapRenderResult {
+    /// Creates a renderer result from content and warnings.
+    #[must_use]
+    pub fn new(
+        content: ContractMapContent,
+        warnings: Vec<ContractMapRenderWarning>,
+    ) -> ContractMapRenderResult {
+        Self { content, warnings }
+    }
+
+    /// Returns the rendered Mermaid content.
+    #[must_use]
+    pub fn content(&self) -> &ContractMapContent {
+        &self.content
+    }
+
+    /// Returns all non-fatal rendering warnings.
+    #[must_use]
+    pub fn warnings(&self) -> &[ContractMapRenderWarning] {
+        &self.warnings
+    }
+}
 
 /// Secondary port for v3 contract-map rendering.
 ///
@@ -51,7 +100,7 @@ pub trait ContractMapRenderer: Send + Sync {
         catalogues: &[CatalogueDocument],
         layer_order: &[LayerId],
         opts: &ContractMapRenderOptions,
-    ) -> Result<ContractMapContent, ContractMapRendererError>;
+    ) -> Result<ContractMapRenderResult, ContractMapRendererError>;
 }
 
 /// Error returned by [`ContractMapRenderer::render`].
@@ -142,5 +191,24 @@ mod tests {
             &ContractMapRendererError::RenderFailed { reason: "test".to_owned() };
         // source() should return None (no chained cause).
         assert!(err.source().is_none());
+    }
+
+    #[test]
+    fn test_render_warning_exposes_undefined_role() {
+        let warning = ContractMapRenderWarning::UndefinedRoleStyle { role: RoleKind::ValueObject };
+
+        assert_eq!(warning.role(), RoleKind::ValueObject);
+    }
+
+    #[test]
+    fn test_render_result_preserves_content_and_warnings() {
+        let content = ContractMapContent::new("flowchart LR".to_owned());
+        let warnings =
+            vec![ContractMapRenderWarning::UndefinedRoleStyle { role: RoleKind::ValueObject }];
+
+        let result = ContractMapRenderResult::new(content, warnings.clone());
+
+        assert_eq!(result.content().as_ref(), "flowchart LR");
+        assert_eq!(result.warnings(), warnings.as_slice());
     }
 }

@@ -143,7 +143,7 @@ pub(super) fn render_contract_map_view(
             return Ok(());
         }
     };
-    let rendered_str: &str = content.as_ref();
+    let rendered_str: &str = content.content().as_ref();
     if old.as_deref().is_none_or(|existing| !super::rendered_matches(existing, rendered_str)) {
         if let Err(e) = super::super::atomic_write::atomic_write_file(
             &contract_map_path,

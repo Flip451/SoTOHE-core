@@ -55,6 +55,11 @@ enum CliCommand {
         #[command(subcommand)]
         cmd: commands::hook::HookCommand,
     },
+    /// Configure sccache and clean configured build artifacts.
+    Maintenance {
+        #[command(subcommand)]
+        cmd: commands::maintenance::MaintenanceCommand,
+    },
     /// Track operations (transition, etc.) with file-system persistence.
     Track {
         #[command(subcommand)]
@@ -178,6 +183,7 @@ fn run_cli_with(
         Some(CliCommand::Domain { cmd }) => commands::domain::execute(cmd),
         Some(CliCommand::Guard { cmd }) => commands::guard::execute(cmd),
         Some(CliCommand::Hook { cmd }) => execute_hook_with_telemetry(cmd),
+        Some(CliCommand::Maintenance { cmd }) => commands::maintenance::execute(cmd),
         Some(CliCommand::Track { cmd }) => execute_track_with_telemetry(cmd),
         Some(CliCommand::Git { cmd }) => commands::git::execute(cmd),
         Some(CliCommand::Pr { cmd }) => commands::pr::execute(cmd),

@@ -31,7 +31,7 @@ filename is recorded as that track's init baseline.
   (`subagent_type: "<capability>"`, `run_in_background: true`) with the briefing path and
   discipline body as the task prompt. Never invoke a capability's Agent-tool subagent without
   that delegation outcome; this adapter must not resolve or assume the provider itself. Pass
-  `--resume` only when continuing the same assignment (`.claude/rules/08-orchestration.md`).
+  `--resume` only when continuing the same assignment (`.claude/rules/orchestration.md`).
 - **Interaction boundaries**: honor the workflow SSoT's user-interaction and terminal-state
   rules; this adapter does not restate them.
 - **Staging**: `bin/sotp git add-all`

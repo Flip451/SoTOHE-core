@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "8c08ed02bdce0f0e9384ed2f65ac600d457a8cabd405e05836de993dea94b700",
+  "signals": [
+    {
+      "type_name": "CleanupArgs",
+      "signal": "blue",
+      "entry_hash": "c1ea8670aec00d698e76b41b0be9a5043073cc5cb2cb3429ff0c4fc0ff7bdaf6"
+    },
+    {
+      "type_name": "CliCommand",
+      "signal": "blue",
+      "entry_hash": "55cd5929a523887d722d2fab27cc0315f8db3c727efc0977ef8c25bbf073cac4"
+    },
+    {
+      "type_name": "MaintenanceCommand",
+      "signal": "blue",
+      "entry_hash": "9803b7c28f393688c791b9b5071af92d637a10cbf8cc79b835aac39c4eab0bab"
+    },
+    {
+      "type_name": "ProjectRootArgs",
+      "signal": "blue",
+      "entry_hash": "ba2c10d46e83dd8846f0ccfb9fc24625b832d1e7a805c9e06ac7f6f22d74cec9"
+    },
+    {
+      "type_name": "SemanticDupCommandFamily",
+      "signal": "blue",
+      "entry_hash": "f5a7bce075f08fcee03f6c7d5b3aa41bfd954adea5d43496581a25ce550e54b2"
+    },
+    {
+      "type_name": "VerdictFilterArg",
+      "signal": "blue",
+      "entry_hash": "0d04b905c33b2a3dcedaae4d96fc3517433876de0dd12605428f9d5922282b0a"
+    },
+    {
+      "type_name": "cli::commands::maintenance::execute",
+      "signal": "blue",
+      "entry_hash": "f61f437e8079db6fe3b1bff6386e0265b885247f9459cabbf747dabbcb8ccfb2"
+    },
+    {
+      "type_name": "cli::commands::semantic_dup_feature_gate::semantic_dup_feature_disabled_exit",
+      "signal": "blue",
+      "entry_hash": "8c216778701fb4e507b6c2a99d4fd0d9def1eaf41e8e31aa2b8cef44862263b0"
+    },
+    {
+      "type_name": "cli::commands::dry::execute_dry_check_approved",
+      "signal": "blue",
+      "entry_hash": "01e865d55e2290e23aba67b2ec0782e5f279eb0a0f59888d3d6383e3e8971f92"
+    },
+    {
+      "type_name": "cli::commands::dry::execute_dry_fix_local",
+      "signal": "blue",
+      "entry_hash": "61a0285a81e28d3902495caaae956e6011a0c7492bf8902ec64f806ddab40ba3"
+    },
+    {
+      "type_name": "cli::commands::dry::execute_dry_results",
+      "signal": "blue",
+      "entry_hash": "61a0285a81e28d3902495caaae956e6011a0c7492bf8902ec64f806ddab40ba3"
+    },
+    {
+      "type_name": "cli::commands::dry::execute_dry_write",
+      "signal": "blue",
+      "entry_hash": "61a0285a81e28d3902495caaae956e6011a0c7492bf8902ec64f806ddab40ba3"
+    }
+  ]
+}

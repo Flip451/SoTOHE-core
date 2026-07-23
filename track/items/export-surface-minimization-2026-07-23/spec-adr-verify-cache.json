@@ -1,0 +1,764 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "91bddcde61ec69148a4d1a88e8f883e13c6e7b6bc5c48d6e35bad6b518c7153f",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界 manifest の conventions をディレクトリ include からファイル単位の分類（汎用 = include / sotp 開発固有 = exclude）に落とす。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "テンプレート利用者に、その場で意味を持つ最小の規約・skills・rules だけを出荷する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "91bddcde61ec69148a4d1a88e8f883e13c6e7b6bc5c48d6e35bad6b518c7153f",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出荷する .claude/skills は `architecture-customizer` のみとする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "テンプレート利用者に、その場で意味を持つ最小の規約・skills・rules だけを出荷する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "91bddcde61ec69148a4d1a88e8f883e13c6e7b6bc5c48d6e35bad6b518c7153f",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "常時出荷する rules の必須集合は dev-environment / orchestration / guardrails 相当の 3 本とし、maintainer-checklist は exclude する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "テンプレート利用者に、その場で意味を持つ最小の規約・skills・rules だけを出荷する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "7dffcd04bda686dd078481891468b9fb97583e9ddd01d56517c4dbe35969a9ef",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検査は既存のスモークゲートに組み込む。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "出荷 workflow と Makefile の既知の乖離クラスを、maintainer CI の template-export-smoke で恒常的に検出できる状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "8adbdbb007301d2291410f3ded80c2fd62054c0b180003b3222cb33c466d055c",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界 manifest の conventions をディレクトリ include からファイル単位の分類（汎用 = include / sotp 開発固有 = exclude）に落とす。 UnclassifiedPath の fail-closed により、以後は規約を 1 本追加するたびに出荷可否の分類が強制され、再肥大が構造的に防がれる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "template boundary manifest の conventions を、各 convention ファイルごとの include または exclude 分類に変更し、未分類の新規 convention を fail-closed で検出する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "80e2ce50c4f5a3ea40368def9063db907aa7893ab39fb73ca00c98a556ac3a9b",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "規約索引は自動生成のため、export 後の scaffold の bootstrap に、出荷された部分集合に対する索引再生成を組み込む。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "export 後の scaffold bootstrap が出荷済み convention 部分集合から convention index を再生成し、export 本体は copy と overlay 上書きだけを続ける。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "80e2ce50c4f5a3ea40368def9063db907aa7893ab39fb73ca00c98a556ac3a9b",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「export = 除外コピー + overlay 上書きのみで、プログラム的なファイル書き換えは行わない。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "export 後の scaffold bootstrap が出荷済み convention 部分集合から convention index を再生成し、export 本体は copy と overlay 上書きだけを続ける。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "b04e80b883add5a2e16793d0174629cbd714a0f40af3174d8542fd50f8b993e4",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出荷する .claude/skills は `architecture-customizer` のみとする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "出荷する .claude skills を architecture-customizer だけに限定し、重複した track-plan と diagnose skill のソースを削除し、skill-compliance hook の対応表を更新する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "d4fd967eed677041632f3f681e8a301b9d624e013ce1092169cfed5fa1ab4bab",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.claude/rules/` のファイル名から番号を外し、読み順は CLAUDE.md の列挙が所有する（conventions と同形式）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": ".claude/rules の番号プレフィックスを除去し、読み順を CLAUDE.md の列挙へ移し、必須 rules を出荷し language rule は中立版 overlay で出荷する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "679831f0870ecd44fcc12c5371597baa876c3f159100290ea3121fc54558e08f",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLAUDE.md・rules 相互参照・workflows の参照更新を同 track の co-update に含める。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "rules の改名・出荷集合に合わせて、CLAUDE.md、rules 相互参照、workflow の参照を共同更新し、旧番号付き path を残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "f4715015de23e4418d368cd4d38fff528a58bcf21da4d528687af4c88cd2222a",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本決定は、workflow 参照タスクの欠落と workspace CLI の `cargo run` 流出の 2 種を検出する強制機構のみを新設する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "maintainer-CI の template-export-smoke に、出荷 workflow が参照する cargo make task の overlay Makefile での欠落と、overlay Makefile への workspace CLI cargo run 流出を検出する二つの恒常チェックを追加し、既存の二件の回帰を修復する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "f4715015de23e4418d368cd4d38fff528a58bcf21da4d528687af4c88cd2222a",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "採録基準は「workflow logic SSoT（`.harness/workflows/`）・capability 仕様 SSoT（`.harness/capabilities/`）・briefing 面（`.harness/briefings/`・`.harness/custom/review-prompts/`)・process 強制（`.githooks/`)・配布される CI 定義・workflow SSoT を持たない utility command の command-local 定義・sotp バイナリの案内文、のいずれかから参照されるタスク + その推移的必要」のみ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "maintainer-CI の template-export-smoke に、出荷 workflow が参照する cargo make task の overlay Makefile での欠落と、overlay Makefile への workspace CLI cargo run 流出を検出する二つの恒常チェックを追加し、既存の二件の回帰を修復する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "f4715015de23e4418d368cd4d38fff528a58bcf21da4d528687af4c88cd2222a",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Makefile タスクとして残す機構的基準を次の 2 つに限定する:"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "maintainer-CI の template-export-smoke に、出荷 workflow が参照する cargo make task の overlay Makefile での欠落と、overlay Makefile への workspace CLI cargo run 流出を検出する二つの恒常チェックを追加し、既存の二件の回帰を修復する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "ac555afb48c017e181cab7cc59ee0ab41efdf233f3a34a96793404282bd28c6e",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界 manifest の conventions をディレクトリ include からファイル単位の分類（汎用 = include / sotp 開発固有 = exclude）に落とす。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "convention を汎用用と sotp 開発用の二つの物理ディレクトリへ分割すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "63c8cd4906bb193777f0c64d662ef8ecbe8149e192157c943b6bff558e810d7f",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track-plan` / `diagnose` スキルは exclude ではなくソースから削除する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "track-plan または diagnose skill を export manifest の exclude だけで残し、ソースの論理複製を温存すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "aa604aff35fb8cc7277dbd0cda29822c7db01445b28a8773a5700ffe19feeed6",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "再発番は増減のたびに歯抜けが再発するため採らない。\n常時出荷する rules の必須集合は dev-environment / orchestration / guardrails 相当の 3 本とし、maintainer-checklist は exclude する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "rules の番号を別の連番として再導入すること、または maintainer-checklist を常時出荷 rules に含めること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "487abad9221d02b578db67b15cdd3ce605121a6f363f438d34cdf7003bf217e5",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "配布 Makefile の採録基準と直呼び原則（ADR 2026-07-16-1438 D1 / D2）は再決定しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "配布 Makefile の採録基準または単発操作の bin/sotp 直呼び原則を再決定すること、あるいは template export 自体を新しい fail-closed 条件で利用者側から停止すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "487abad9221d02b578db67b15cdd3ce605121a6f363f438d34cdf7003bf217e5",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存ファイルからの剪定ではなく、ゼロベースで積み上げる。採録基準は「workflow logic SSoT（`.harness/workflows/`）・capability 仕様 SSoT（`.harness/capabilities/`）・briefing 面（`.harness/briefings/`・`.harness/custom/review-prompts/`）・process 強制（`.githooks/`）・配布される CI 定義・workflow SSoT を持たない utility command の command-local 定義・sotp バイナリの案内文、のいずれかから参照されるタスク + その推移的必要」のみ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "配布 Makefile の採録基準または単発操作の bin/sotp 直呼び原則を再決定すること、あるいは template export 自体を新しい fail-closed 条件で利用者側から停止すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "487abad9221d02b578db67b15cdd3ce605121a6f363f438d34cdf7003bf217e5",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Makefile タスクとして残す機構的基準を次の 2 つに限定する:"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "配布 Makefile の採録基準または単発操作の bin/sotp 直呼び原則を再決定すること、あるいは template export 自体を新しい fail-closed 条件で利用者側から停止すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5b4c649608b7ee2ad64da7d195d165d55125850e9a33fd3d993a721766938d9",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本決定は、workflow 参照タスクの欠落と workspace CLI の `cargo run` 流出の 2 種を検出する強制機構のみを新設する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CO-01",
+          "text_label": "新しい出荷面の整合性チェックは、テンプレート framework 自身の export / workflow / Makefile 整合性だけを対象にし、利用者の provider や agent 設定選択を CI で強制しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "53b30075e04306c22bb90ba2cb5b6c6b9afa81094341c20ed6a31160a73419e4",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検査は既存のスモークゲートに組み込む。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CO-02",
+          "text_label": "新しい恒常検査は既存の template-export-smoke に内蔵し、新規の独立した verify サブコマンドまたは CI gate 面を増やさない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "8edd6169a6690146f4d92819dcc68038772103208b657668e7b4f3d7d7b7c57a",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "境界 manifest の conventions をディレクトリ include からファイル単位の分類（汎用 = include / sotp 開発固有 = exclude）に落とす。UnclassifiedPath の fail-closed により、以後は規約を 1 本追加するたびに出荷可否の分類が強制され"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "template boundary manifest が convention ごとの include / exclude を表し、全 convention の出荷可否が一意に分類される。出荷集合には汎用 convention だけが含まれ、sotp 開発固有 convention は exclude として分類される。新規 convention を未分類のまま追加すると export 前の検証が失敗する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "6b4cf0235d36e6ea76fb862db5e190f896ec8761cfecff762b54be6f09f13b86",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "規約索引は自動生成のため、export 後の scaffold の bootstrap に、出荷された部分集合に対する索引再生成を組み込む。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "export 済み scaffold には分類で include された convention だけが存在し、その bootstrap 実行後の convention index は出荷済み集合と一致する。export はファイル内容のプログラム的変換を行わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "6b4cf0235d36e6ea76fb862db5e190f896ec8761cfecff762b54be6f09f13b86",
+      "evidence_hash": "ac8dc21de1946706b4fb1be823062970ee89b1a436a886e82e6238e548446a9d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "export = 除外コピー + overlay 上書きのみで、プログラム的なファイル書き換えは行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "export 済み scaffold には分類で include された convention だけが存在し、その bootstrap 実行後の convention index は出荷済み集合と一致する。export はファイル内容のプログラム的変換を行わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "f0b002ebb042746d8c564f4ec5cf176ea9371ceb5d9df2180b901fe4689efe9c",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出荷する .claude/skills は `architecture-customizer` のみとする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "export 済み scaffold の .claude/skills には architecture-customizer だけが含まれ、track-plan、diagnose、repomix-snapshot、codex-system、gemini-system は出荷されない。削除対象の重複 skill を参照する skill-compliance hook mapping は残らない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "221fe132590d0efcbcd41d8c9a705a7ffcccfcc2fba81ea8f0207694a30cda49",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "常時出荷する rules の必須集合は dev-environment / orchestration / guardrails 相当の 3 本とし、maintainer-checklist は exclude する。\nlanguage はこの必須集合に含めず、原文ではなく中立版 overlay に差し替えて出荷する。\nCLAUDE.md・rules 相互参照・workflows の参照更新を同 track の co-update に含める。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "出荷 rules は番号なしの dev-environment、orchestration、guardrails と中立 language overlay からなり、maintainer-checklist は出荷されない。CLAUDE.md、rules、workflows の参照はこの最終 path 集合と一致する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "3aed1054074475e9b9820431a2151b7cf9a2553d8a3a79f53807d2f0809c5348",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検査 1: 出荷 workflow（.harness/workflows/**）が参照する cargo make タスク名の集合 ⊆ exported Makefile のタスク集合。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "template-export-smoke は export 後の workflow が参照する cargo make task を overlay Makefile が提供しない場合に失敗し、提供される場合に通過する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "3aed1054074475e9b9820431a2151b7cf9a2553d8a3a79f53807d2f0809c5348",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「workflow logic SSoT（`.harness/workflows/`）…のいずれかから参照されるタスク + その推移的必要」のみ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "template-export-smoke は export 後の workflow が参照する cargo make task を overlay Makefile が提供しない場合に失敗し、提供される場合に通過する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "81dc4df93a0009097fa808abe7a34fe32bb901056f546297dadc653c45420357",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "検査 2: exported Makefile のタスク定義にワークスペース CLI の `cargo run` 実行（`-p cli` 形式）が含まれないこと（ソース結合イディオムの流出防止）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "template-export-smoke は overlay Makefile に workspace CLI を対象とする cargo run 呼び出しが残る場合に失敗し、配布 scaffold が bin/sotp を利用する場合に通過する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "81dc4df93a0009097fa808abe7a34fe32bb901056f546297dadc653c45420357",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「現行ガード実装はこの直接呼び出しをブロックしない。」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "template-export-smoke は overlay Makefile に workspace CLI を対象とする cargo run 呼び出しが残る場合に失敗し、配布 scaffold が bin/sotp を利用する場合に通過する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "199f9c2ec4d9c94def517e1de52e7c69594fb8b2256e9b69d26df35a8516cbe1",
+      "evidence_hash": "eac8b425905f82df7b30402eaf8544b0edd15ee79b93468c581e76be441303b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本決定は、workflow 参照タスクの欠落と workspace CLI の `cargo run` 流出の 2 種を検出する強制機構のみを新設する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "既存の workflow の wrapper 参照による task 欠落と、scaffold の ci-track における bin/sotp adr-baseline check-commit 欠落を修復する。maintainer CI の template-export-smoke は、出荷 workflow が参照する cargo make task の欠落と、exported Makefile への workspace CLI cargo run 流出の二種を検出し、修復後に通過する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "199f9c2ec4d9c94def517e1de52e7c69594fb8b2256e9b69d26df35a8516cbe1",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「workflow logic SSoT（`.harness/workflows/`）…・配布される CI 定義…のいずれかから参照されるタスク + その推移的必要」のみ。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "既存の workflow の wrapper 参照による task 欠落と、scaffold の ci-track における bin/sotp adr-baseline check-commit 欠落を修復する。maintainer CI の template-export-smoke は、出荷 workflow が参照する cargo make task の欠落と、exported Makefile への workspace CLI cargo run 流出の二種を検出し、修復後に通過する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "199f9c2ec4d9c94def517e1de52e7c69594fb8b2256e9b69d26df35a8516cbe1",
+      "evidence_hash": "0f949f2821e34d5577853b8e320cc63bbbd047a376005f1d5b0c62894a5efbb2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Makefile タスクとして残す機構的基準を次の 2 つに限定する: 1. Makefile 上で複数ステップのオーケストレーションを組んでいるタスク（コミットゲート連鎖、signal 再生成連鎖、レビュー前ゲートの依存連鎖、bootstrap） 2. そのオーケストレーションに組み込まれているタスク（CI 集約の依存列の構成員、オーケストレーションが `cargo make` で呼ぶタスク）"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "既存の workflow の wrapper 参照による task 欠落と、scaffold の ci-track における bin/sotp adr-baseline check-commit 欠落を修復する。maintainer CI の template-export-smoke は、出荷 workflow が参照する cargo make task の欠落と、exported Makefile への workspace CLI cargo run 流出の二種を検出し、修復後に通過する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "decision_id": "D2"
+        }
+      }
+    }
+  ]
+}

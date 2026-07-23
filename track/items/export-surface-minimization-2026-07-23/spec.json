@@ -1,0 +1,310 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "出荷面を最小化し、workflow と出荷物の乖離クラスを閉じる",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "テンプレート利用者に、その場で意味を持つ最小の規約・skills・rules だけを出荷する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "出荷 workflow と Makefile の既知の乖離クラスを、maintainer CI の template-export-smoke で恒常的に検出できる状態にする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "anchor": "D4"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "template boundary manifest の conventions を、各 convention ファイルごとの include または exclude 分類に変更し、未分類の新規 convention を fail-closed で検出する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "export 後の scaffold bootstrap が出荷済み convention 部分集合から convention index を再生成し、export 本体は copy と overlay 上書きだけを続ける。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "出荷する .claude skills を architecture-customizer だけに限定し、重複した track-plan と diagnose skill のソースを削除し、skill-compliance hook の対応表を更新する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": ".claude/rules の番号プレフィックスを除去し、読み順を CLAUDE.md の列挙へ移し、必須 rules を出荷し language rule は中立版 overlay で出荷する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "rules の改名・出荷集合に合わせて、CLAUDE.md、rules 相互参照、workflow の参照を共同更新し、旧番号付き path を残さない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "maintainer-CI の template-export-smoke に、出荷 workflow が参照する cargo make task の overlay Makefile での欠落と、overlay Makefile への workspace CLI cargo run 流出を検出する二つの恒常チェックを追加し、既存の二件の回帰を修復する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+            "anchor": "D2"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "convention を汎用用と sotp 開発用の二つの物理ディレクトリへ分割すること。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "track-plan または diagnose skill を export manifest の exclude だけで残し、ソースの論理複製を温存すること。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "rules の番号を別の連番として再導入すること、または maintainer-checklist を常時出荷 rules に含めること。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "配布 Makefile の採録基準または単発操作の bin/sotp 直呼び原則を再決定すること、あるいは template export 自体を新しい fail-closed 条件で利用者側から停止すること。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+            "anchor": "D4"
+          },
+          {
+            "file": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+            "anchor": "D2"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CO-01",
+      "text": "新しい出荷面の整合性チェックは、テンプレート framework 自身の export / workflow / Makefile 整合性だけを対象にし、利用者の provider や agent 設定選択を CI で強制しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "anchor": "D4"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/responsibility-boundary.md",
+          "anchor": "Rules"
+        }
+      ]
+    },
+    {
+      "id": "CO-02",
+      "text": "新しい恒常検査は既存の template-export-smoke に内蔵し、新規の独立した verify サブコマンドまたは CI gate 面を増やさない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "anchor": "D4"
+        }
+      ],
+      "convention_refs": [
+        {
+          "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+          "anchor": "Rules"
+        },
+        {
+          "file": "knowledge/conventions/enforce-by-mechanism.md",
+          "anchor": "Rules"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "template boundary manifest が convention ごとの include / exclude を表し、全 convention の出荷可否が一意に分類される。出荷集合には汎用 convention だけが含まれ、sotp 開発固有 convention は exclude として分類される。新規 convention を未分類のまま追加すると export 前の検証が失敗する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "export 済み scaffold には分類で include された convention だけが存在し、その bootstrap 実行後の convention index は出荷済み集合と一致する。export はファイル内容のプログラム的変換を行わない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-06-1717-template-extraction-boundary.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "export 済み scaffold の .claude/skills には architecture-customizer だけが含まれ、track-plan、diagnose、repomix-snapshot、codex-system、gemini-system は出荷されない。削除対象の重複 skill を参照する skill-compliance hook mapping は残らない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "出荷 rules は番号なしの dev-environment、orchestration、guardrails と中立 language overlay からなり、maintainer-checklist は出荷されない。CLAUDE.md、rules、workflows の参照はこの最終 path 集合と一致する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "template-export-smoke は export 後の workflow が参照する cargo make task を overlay Makefile が提供しない場合に失敗し、提供される場合に通過する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "template-export-smoke は overlay Makefile に workspace CLI を対象とする cargo run 呼び出しが残る場合に失敗し、配布 scaffold が bin/sotp を利用する場合に通過する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "既存の workflow の wrapper 参照による task 欠落と、scaffold の ci-track における bin/sotp adr-baseline check-commit 欠落を修復する。maintainer CI の template-export-smoke は、出荷 workflow が参照する cargo make task の欠落と、exported Makefile への workspace CLI cargo run 流出の二種を検出し、修復後に通過する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-16-1438-consumer-scaffold-host-first-makefile.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/responsibility-boundary.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/enforce-by-mechanism.md",
+      "anchor": "Rules"
+    }
+  ],
+  "signals": {
+    "blue": 21,
+    "yellow": 0,
+    "red": 0
+  }
+}

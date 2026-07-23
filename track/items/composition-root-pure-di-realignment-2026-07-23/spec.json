@@ -1,0 +1,224 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Composition Root Pure DI Realignment",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "出荷される composition-root の正例、CLI 呼出しフロー、およびその enforcement surface を純 DI の composition-root 境界へ整合させ、composition root が完全に配線した primary adapter を渡すだけの状態にする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "anchor": "D2"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "出荷 placeholder と CLI call flow を、composition root が secondary adapter・interactor・driver を構築・配線して primary adapter を返し、CLI が parse → adapter 取得 → handle → emit の順で実行する正例へ整合させる。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "composition review policy が、composition 上の request-to-result 実行メソッドと composition の公開面への domain・usecase・internal role 型の露出を逸脱として検出し、純 DI の成果物として返される PrimaryAdapter は許可する状態にする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "composition root の公開面規律を既存 catalogue-lint mechanism で強制し、実行メソッドまたは禁止された公開型露出の逸脱を検出できる状態にする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "既存の internal composition facade を既知乖離として登記し、各 bounded context を実質的に改修する将来 track で opportunistic に純 DI へ移行する方針を可視化する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+            "anchor": "D4"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OUT-01",
+        "text": "sotp 本体にある全 composition root の big-bang な純 DI 移行は本 track の対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "OUT-02",
+        "text": "新規 source-level verify の導入、および catalogue-lint の具体的な schema・設定・型形状の決定は本 track の behavioral contract の対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+            "anchor": "D5"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "composition root は object graph の構築・配線と fully wired PrimaryAdapter の引渡しだけを担い、request を受けて result を返す実行メソッドを公開してはならない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "出荷 placeholder の composition 公開面は domain 型・usecase error 型・internal role 型を露出せず、入力検証を primary adapter 側の振る舞いに置く。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "公開面規律の enforcement は既存 catalogue lint を使用し、source-level 検査を追加しない。具体的な lint schema と type-shape の選択は後続 phase に委ねる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "既知の internal composition facade は、本 track で一括移行を要求せず、対象 context の実質的な改修 track が発生したときに当該 track に純 DI 化を含める。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "anchor": "D4"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "出荷 placeholder の composition root は fully wired PrimaryAdapter を返し、公開面に request-to-result 実行メソッドを持たない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "CLI は入力を parse した後に composition root から PrimaryAdapter を取得し、その adapter の handle を呼び、結果を emit する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "composition review policy は、interactor 呼出しと driver 呼出しのいずれを行う execution method も逸脱として検出し、domain・usecase・internal role 型の composition 公開面への露出も逸脱として検出する一方、返却される PrimaryAdapter は許可する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "既存 catalogue lint は composition root の execution-method deviation と prohibited public-surface exposure deviation を検出し、適合する public surface を通過させる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "sotp 本体の既存 internal composition facade は既知乖離として記録され、全件の即時移行を要求せず、各 context の実質的な改修時に opportunistic 移行する方針が維持される。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "anchor": "D4"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/type-designer-kind-selection.md",
+      "anchor": "R1. Layer-Kind Compatibility (層 × kind 互換マトリクス)"
+    },
+    {
+      "file": "knowledge/conventions/no-upstream-restatement.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    },
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/track-lifecycle.md",
+      "anchor": "Rules"
+    }
+  ],
+  "signals": {
+    "blue": 16,
+    "yellow": 0,
+    "red": 0
+  }
+}

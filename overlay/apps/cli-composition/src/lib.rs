@@ -2,30 +2,36 @@
 //!
 //! The only place allowed to know every layer at once. It constructs the
 //! concrete infrastructure adapter, injects it into the usecase interactor,
-//! wires that into the CLI driver, and runs the requested command — turning the
-//! layered dependency graph into a single callable entry point.
+//! and wires that into the CLI driver.
 
-use cli_driver::{CommandOutcome, GreetDriver};
-use domain::Username;
+use cli_driver::GreetDriver;
 use infrastructure::StaticSalutation;
-use usecase::{GreetUser, UsernameError};
+use usecase::GreetUser;
 
-/// Wires the greeting feature end to end and runs it for `raw_name`.
-///
-/// This is the composition root: it selects the [`StaticSalutation`] adapter,
-/// builds the [`GreetUser`] interactor and [`GreetDriver`], validates the input
-/// into a [`Username`], and returns the rendered [`CommandOutcome`].
-///
-/// # Errors
-///
-/// Returns [`UsernameError`] when `raw_name` is empty after trimming.
-pub fn run_greeting(raw_name: &str) -> Result<CommandOutcome, UsernameError> {
-    let adapter = StaticSalutation::new("Hello");
-    let interactor = GreetUser::new(adapter);
-    let driver = GreetDriver::new(interactor);
+/// Composition root for the greeting command.
+pub struct GreetingCompositionRoot;
 
-    let user = Username::new(raw_name)?;
-    Ok(driver.run(&user))
+impl GreetingCompositionRoot {
+    /// Creates a greeting composition root.
+    #[must_use]
+    pub fn new() -> Self {
+        Self
+    }
+
+    /// Builds the fully wired greeting primary adapter.
+    #[must_use]
+    pub fn greeting_driver(&self) -> GreetDriver {
+        let adapter = StaticSalutation::new("Hello");
+        let interactor = GreetUser::new(adapter);
+
+        GreetDriver::new(interactor)
+    }
+}
+
+impl Default for GreetingCompositionRoot {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[cfg(test)]
@@ -34,14 +40,19 @@ mod tests {
     use super::*;
 
     #[test]
-    fn run_greeting_wires_all_layers() {
-        let outcome = run_greeting("ada").unwrap();
+    fn test_greeting_driver_wires_all_layers() {
+        let root = GreetingCompositionRoot::new();
+        let outcome = root.greeting_driver().handle("ada");
         assert!(outcome.success);
         assert_eq!(outcome.message, "Hello, ada!");
     }
 
     #[test]
-    fn run_greeting_rejects_empty_name() {
-        assert_eq!(run_greeting("   "), Err(UsernameError::Empty));
+    fn test_greeting_driver_rejects_empty_name() {
+        let root = GreetingCompositionRoot::new();
+        let outcome = root.greeting_driver().handle("   ");
+
+        assert!(!outcome.success);
+        assert_eq!(outcome.message, "username must not be empty");
     }
 }

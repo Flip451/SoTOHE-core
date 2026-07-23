@@ -1,0 +1,170 @@
+{
+  "track_id": "type-contract-pipeline-consistency-2026-07-23",
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ContractMapRenderer",
+        "item_identifier": "trait_method:render",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::contract_map_renderer_adapter::tests",
+          "test_name": "test_render_valid_style_config_returns_ok"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::contract_map_renderer_adapter::tests",
+          "test_name": "test_render_undefined_role_style_returns_typed_warning"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::contract_map_renderer_adapter::tests",
+          "test_name": "test_render_undefined_role_style_ignores_excluded_layer"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "cli::commands::track::tddd::emit_command_outcome",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::contract_map::tests",
+          "test_name": "test_contract_map_failure_outcome_emits_stderr_and_nonzero_exit"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::track::tddd::contract_map::tests",
+          "test_name": "test_contract_map_warning_outcome_emits_stdout_and_zero_exit"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::contract_map_renderer_adapter::tests",
+          "test_name": "test_render_undefined_role_style_returns_typed_warning"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CatalogueLinterRuleKind", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_domain_value_object_inbound_reference_required_rejects_all_contact_actions"}, {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_domain_value_object_inbound_reference_required_accepts_other_domain_signature"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CatalogueLinterRuleKind", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "AC-02"}},
+      "tests": [{"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_domain_value_object_inbound_reference_required_rejects_all_contact_actions"}, {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_domain_value_object_inbound_reference_required_accepts_other_domain_signature"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CatalogueLinterRuleKind", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "CN-02"}},
+      "reason": "At CatalogueLinterRuleKind x CN-02, this enum selects the inbound-reference rule but neither builds nor compares reference graphs. The same-source cross-entry mechanism is owned by the catalogue evaluator and contract-map renderer, not by this finite rule vocabulary."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ContractMapRenderResult", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "IN-04"}},
+      "tests": [{"layer": "domain", "module_path": "domain::tddd::contract_map_renderer::tests", "test_name": "test_render_result_preserves_content_and_warnings"}, {"layer": "infrastructure", "module_path": "infrastructure::tddd::contract_map_renderer_adapter::tests", "test_name": "test_render_undefined_role_style_returns_typed_warning"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ContractMapRenderResult", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "AC-04"}},
+      "tests": [{"layer": "domain", "module_path": "domain::tddd::contract_map_renderer::tests", "test_name": "test_render_result_preserves_content_and_warnings"}, {"layer": "infrastructure", "module_path": "infrastructure::tddd::contract_map_renderer_adapter::tests", "test_name": "test_render_undefined_role_style_returns_typed_warning"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ContractMapRenderResult", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "CN-04"}},
+      "tests": [{"layer": "domain", "module_path": "domain::tddd::contract_map_renderer::tests", "test_name": "test_render_result_preserves_content_and_warnings"}, {"layer": "infrastructure", "module_path": "infrastructure::tddd::contract_map_renderer_adapter::tests", "test_name": "test_render_undefined_role_style_returns_typed_warning"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ContractMapRenderWarning", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "IN-04"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::tddd::contract_map_renderer_adapter::tests", "test_name": "test_render_undefined_role_style_returns_typed_warning"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ContractMapRenderWarning", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "AC-04"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::tddd::contract_map_renderer_adapter::tests", "test_name": "test_render_undefined_role_style_returns_typed_warning"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ContractMapRenderWarning", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "CN-04"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::tddd::contract_map_renderer_adapter::tests", "test_name": "test_render_undefined_role_style_returns_typed_warning"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "RoleKind", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "IN-04"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::tddd::contract_map_renderer_adapter::tests", "test_name": "test_render_undefined_role_style_returns_typed_warning"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "RoleKind", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "AC-04"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::tddd::contract_map_renderer_adapter::tests", "test_name": "test_render_undefined_role_style_returns_typed_warning"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "RoleKind", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "CN-04"}},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::tddd::contract_map_renderer_adapter::tests", "test_name": "test_render_undefined_role_style_returns_typed_warning"}, {"layer": "infrastructure", "module_path": "infrastructure::tddd::contract_map_renderer_adapter::tests", "test_name": "test_missing_role_style_warnings_cover_all_role_kinds"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "LintRuleKind", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "IN-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::catalogue_lint_workflow::tests", "test_name": "test_lint_rule_spec_to_domain_converts_all_12_kinds"}, {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_domain_value_object_inbound_reference_required_rejects_all_contact_actions"}, {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_domain_value_object_inbound_reference_required_accepts_other_domain_signature"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "LintRuleKind", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "AC-02"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::catalogue_lint_workflow::tests", "test_name": "test_lint_rule_spec_to_domain_converts_all_12_kinds"}, {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_domain_value_object_inbound_reference_required_rejects_all_contact_actions"}, {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_domain_value_object_inbound_reference_required_accepts_other_domain_signature"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "LintRuleKind", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "OS-01"}},
+      "reason": "At LintRuleKind x OS-01, this usecase DTO defines the typed lint-rule wire boundary but makes no promise about whether domain types appear in the usecase public surface; that public-surface policy is explicitly out of scope."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "RenderContractMapOutput", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "IN-04"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::contract_map_workflow::tests", "test_name": "test_execute_happy_path_calls_renderer_writer_and_returns_metrics"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "RenderContractMapOutput", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "AC-04"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::contract_map_workflow::tests", "test_name": "test_execute_happy_path_calls_renderer_writer_and_returns_metrics"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "RenderContractMapOutput", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "CN-04"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::contract_map_workflow::tests", "test_name": "test_execute_happy_path_calls_renderer_writer_and_returns_metrics"}, {"layer": "infrastructure", "module_path": "infrastructure::tddd::contract_map_renderer_adapter::tests", "test_name": "test_missing_role_style_warnings_cover_all_role_kinds"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "RenderContractMapOutput", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "OS-01"}},
+      "reason": "At RenderContractMapOutput x OS-01, this result DTO carries render metrics and warnings but makes no promise governing usecase public-surface exposure of domain types; that policy is explicitly out of scope."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ContractMapDriver", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "IN-04"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::contract_map::tests", "test_name": "test_contract_map_input_forwards_validated_command_without_reconstruction"}, {"layer": "cli_driver", "module_path": "cli_driver::contract_map::tests", "test_name": "test_contract_map_driver_success_renders_warning_outcome"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ContractMapDriver", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "AC-04"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::contract_map::tests", "test_name": "test_contract_map_driver_success_renders_warning_outcome"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ContractMapInput", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "IN-04"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::contract_map::tests", "test_name": "test_contract_map_driver_success_renders_warning_outcome"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ContractMapInput", "anchor_id": {"file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json", "element_id": "AC-04"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::contract_map::tests", "test_name": "test_contract_map_input_forwards_validated_command_without_reconstruction"}, {"layer": "infrastructure", "module_path": "infrastructure::tddd::contract_map_renderer_adapter::tests", "test_name": "test_missing_role_style_warnings_cover_all_role_kinds"}]
+    }
+  ]
+}

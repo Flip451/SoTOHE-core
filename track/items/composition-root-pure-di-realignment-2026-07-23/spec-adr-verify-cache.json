@@ -1,0 +1,488 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "e98bddead263d746bfb996186819941cc33233faae43005884bcbe1ac2f0a65c",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition root の仕事は「secondary adapter・interactor・driver の構築と配線、および配線済み driver の引き渡し」のみとする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "出荷される composition-root の正例、CLI 呼出しフロー、およびその enforcement surface を純 DI の composition-root 境界へ整合させ、composition root が完全に配線した primary adapter を渡すだけの状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e98bddead263d746bfb996186819941cc33233faae43005884bcbe1ac2f0a65c",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`run_greeting` free function を廃止し、CompositionRoot struct のメソッドが配線済み `GreetDriver` を返す形にする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "出荷される composition-root の正例、CLI 呼出しフロー、およびその enforcement surface を純 DI の composition-root 境界へ整合させ、composition root が完全に配線した primary adapter を渡すだけの状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "c2ff4704dda802ab2e05cd6109670b06a19fd988b89c639862c3f205f62caa89",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition root の仕事は「secondary adapter・interactor・driver の構築と配線、および配線済み driver の引き渡し」のみとする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "出荷 placeholder と CLI call flow を、composition root が secondary adapter・interactor・driver を構築・配線して primary adapter を返し、CLI が parse → adapter 取得 → handle → emit の順で実行する正例へ整合させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "c2ff4704dda802ab2e05cd6109670b06a19fd988b89c639862c3f205f62caa89",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- bin は parse → composition から driver 取得 → `handle` → emit の 3 手に揃える（cli.md の記述どおり）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "出荷 placeholder と CLI call flow を、composition root が secondary adapter・interactor・driver を構築・配線して primary adapter を返し、CLI が parse → adapter 取得 → handle → emit の順で実行する正例へ整合させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "618fb895d5b5c471140923e39962219a262a72a718fa5aab7be5fb33f105c249",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition.md` のカテゴリに「composition 上の実行メソッド（interactor / driver いずれの invoke も）」「composition 公開面への domain / usecase 型および内部 role 型の露出」を追加する。純 DI の成果物として返す `PrimaryAdapter` は許可する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "composition review policy が、composition 上の request-to-result 実行メソッドと composition の公開面への domain・usecase・internal role 型の露出を逸脱として検出し、純 DI の成果物として返される PrimaryAdapter は許可する状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "ad6f7858b0918f38db73c5170f9bbfc9911b6c6406898da01f964a8a18d5f9c9",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition root の公開面規律は、新規の source-level 検査ではなく、既存の catalogue lint で強制する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "composition root の公開面規律を既存 catalogue-lint mechanism で強制し、実行メソッドまたは禁止された公開型露出の逸脱を検出できる状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "6ba35033df419a775147d56f90fbe246ef414d0d7b8e7faddadbae87eb3c6bc3",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "23 の bounded-context composition root を一斉改修する big-bang は行わない。当該 context を実質的に改修する track が発生した時点で、その context の driver 抽出と composition の純 DI 化を同 track に含める。移行完了までの間、本体の様式は既知乖離として本 ADR に登記された状態とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "既存の internal composition facade を既知乖離として登記し、各 bounded context を実質的に改修する将来 track で opportunistic に純 DI へ移行する方針を可視化する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "1c4652d0ed54572f5306fb8360f9e4a4a64f7399f713a50a064594bfcc2726cb",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "23 の bounded-context composition root を一斉改修する big-bang は行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "sotp 本体にある全 composition root の big-bang な純 DI 移行は本 track の対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "6c3a7b20e21a389baf2bcf78b402eb21ba642a7270446ef9f7953451083bdeb1",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "具体的な lint schema・設定・検査運用は関連する規約・設定 SSoT に委ね、本 ADR では固定しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "新規 source-level verify の導入、および catalogue-lint の具体的な schema・設定・型形状の決定は本 track の behavioral contract の対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5b4df6044d3db5cbf65296aff000d5a9686417b49a5626b3c0cf52b87a3f7b0",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition root の公開面に実行メソッド（リクエストを受けて結果を返すメソッド）を置くことを、interactor 呼び出し・driver 呼び出しの別を問わず禁止と明文化する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "composition root は object graph の構築・配線と fully wired PrimaryAdapter の引渡しだけを担い、request を受けて result を返す実行メソッドを公開してはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5b4df6044d3db5cbf65296aff000d5a9686417b49a5626b3c0cf52b87a3f7b0",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition.md` のカテゴリに「composition 上の実行メソッド（interactor / driver いずれの invoke も）」「composition 公開面への domain / usecase 型および内部 role 型の露出」を追加する。純 DI の成果物として返す `PrimaryAdapter` は許可する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "composition root は object graph の構築・配線と fully wired PrimaryAdapter の引渡しだけを担い、request を受けて result を返す実行メソッドを公開してはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "9cc7edcd53523f25682f1fb06bda66cc4a64041d55c79e27c1fbc727d8ec11e8",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- 入力検証は driver の内部（usecase 呼び出し経由）に移し、driver の公開シグネチャを `handle(raw 入力) -> CommandOutcome` にして domain 型（Username）を面から除去する。\n- composition の公開面から usecase error 型（UsernameError）を除去する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "出荷 placeholder の composition 公開面は domain 型・usecase error 型・internal role 型を露出せず、入力検証を primary adapter 側の振る舞いに置く。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "9cc7edcd53523f25682f1fb06bda66cc4a64041d55c79e27c1fbc727d8ec11e8",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「composition 公開面への domain / usecase 型および内部 role 型の露出」を追加する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "出荷 placeholder の composition 公開面は domain 型・usecase error 型・internal role 型を露出せず、入力検証を primary adapter 側の振る舞いに置く。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "1b18e8ae886b110a62e0485dc6fd361f95ead23a4638567afc4b6ad71193284d",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition root の公開面規律は、新規の source-level 検査ではなく、既存の catalogue lint で強制する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "公開面規律の enforcement は既存 catalogue lint を使用し、source-level 検査を追加しない。具体的な lint schema と type-shape の選択は後続 phase に委ねる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "f3597f658f70405b452e7cb58bc46b90d0cd9a513c6305c0a4a81d7f47c204f5",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "23 の bounded-context composition root を一斉改修する big-bang は行わない。\n当該 context を実質的に改修する track が発生した時点で、その context の driver 抽出と composition の純 DI 化を同 track に含める。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "既知の internal composition facade は、本 track で一括移行を要求せず、対象 context の実質的な改修 track が発生したときに当該 track に純 DI 化を含める。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "659a6c6d3fb9c7ff0164bcf29111a358fc3e3bcd7315c659bcd59c23a7409a35",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition root の仕事は「secondary adapter・interactor・driver の構築と配線、および配線済み driver の引き渡し」のみとする。\ncomposition root の公開面に実行メソッド（リクエストを受けて結果を返すメソッド）を置くことを、interactor 呼び出し・driver 呼び出しの別を問わず禁止と明文化する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "出荷 placeholder の composition root は fully wired PrimaryAdapter を返し、公開面に request-to-result 実行メソッドを持たない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "659a6c6d3fb9c7ff0164bcf29111a358fc3e3bcd7315c659bcd59c23a7409a35",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`run_greeting` free function を廃止し、CompositionRoot struct のメソッドが配線済み `GreetDriver` を返す形にする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "出荷 placeholder の composition root は fully wired PrimaryAdapter を返し、公開面に request-to-result 実行メソッドを持たない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "64f8b8447e12e80d6cf135fa145cc52a92775f3a730881679cf42ea301a748f0",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "- bin は parse → composition から driver 取得 → `handle` → emit の 3 手に揃える（cli.md の記述どおり）。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "CLI は入力を parse した後に composition root から PrimaryAdapter を取得し、その adapter の handle を呼び、結果を emit する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "0687899f09b86b8a4d7ac848de1dd671cd855000e0025b3b3b632fac0450b271",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cli_composition.md` のカテゴリに「composition 上の実行メソッド（interactor / driver いずれの invoke も）」「composition 公開面への domain / usecase 型および内部 role 型の露出」を追加する。純 DI の成果物として返す `PrimaryAdapter` は許可する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "composition review policy は、interactor 呼出しと driver 呼出しのいずれを行う execution method も逸脱として検出し、domain・usecase・internal role 型の composition 公開面への露出も逸脱として検出する一方、返却される PrimaryAdapter は許可する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "8247872a6b61848bd9ef78acd06e56d38a0727f67f1221b889e77801d0abd7e5",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition root の公開面規律は、新規の source-level 検査ではなく、既存の catalogue lint で強制する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "既存 catalogue lint は composition root の execution-method deviation と prohibited public-surface exposure deviation を検出し、適合する public surface を通過させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "912df7d579198e3981cd372722bd3058b065214c81963502c9da5775e8da4e89",
+      "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "23 の bounded-context composition root を一斉改修する big-bang は行わない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "sotp 本体の既存 internal composition facade は既知乖離として記録され、全件の即時移行を要求せず、各 context の実質的な改修時に opportunistic 移行する方針が維持される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "decision_id": "D4"
+        }
+      }
+    }
+  ]
+}

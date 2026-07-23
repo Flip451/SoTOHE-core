@@ -11,9 +11,9 @@ The reviewer focuses on consistency drift — wiring that is internally
 plausible but breaks an established contract with the rest of the
 harness.
 
-## What to report
+## Priority categories
 
-Report findings ONLY for the following categories:
+Violations of the role statement above are always reportable. The following priority categories focus the review and guide severity assessment; they are not an exhaustive list of reportable design deviations. The exclusions in **What NOT to report** still apply:
 
 - **command wiring breakage**: a `.claude/commands/<x>.md` step that
   references another command (`/track:y`) whose surface has changed in
@@ -40,13 +40,13 @@ Report findings ONLY for the following categories:
   surface.
 - **permission posture drift**: an addition to `.claude/settings.json`
   `permissions.allow` (or `.claude/permission-extensions.json`) that
-  matches a pattern in `.claude/rules/10-guardrails.md` §Dangerous
+  matches a pattern in `.claude/rules/guardrails.md` §Dangerous
   to allow without a documented exception. Cite the specific
   dangerous-allow entry.
 - **hook coverage gap**: a Bash command / agent flow that the
   `block-direct-git-ops` hook is supposed to intercept but the change
   routes around (e.g., wrapping git ops inside a Codex subprocess
-  with `workspace-write`). Cite `.claude/rules/10-guardrails.md`
+  with `workspace-write`). Cite `.claude/rules/guardrails.md`
   §Sandbox and Hook Coverage Warning.
 - **review-scope or briefing wiring inconsistency**: a
   `.harness/config/review-scope.json` change that adds a scope without

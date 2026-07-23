@@ -135,12 +135,12 @@ pub enum RolePayloadField {
 }
 
 // ---------------------------------------------------------------------------
-// CatalogueLinterRuleKind — 13-variant rule category enum
+// CatalogueLinterRuleKind — 15-variant rule category enum
 // ---------------------------------------------------------------------------
 
 /// Classifies what invariant a catalogue linter rule asserts (D15).
 ///
-/// 13 variants: 12 data-carrying + 1 unit (`NoPublicField`).
+/// 15 variants: 12 data-carrying + 3 unit rules.
 ///
 /// Payloads use `RolePayloadField` for structured field-name references
 /// (validated by construction), and `String` / `Vec<String>` / `Vec<RoleKind>`
@@ -257,6 +257,14 @@ pub enum CatalogueLinterRuleKind {
         /// Catalogue-structural positions to check for occurrences.
         positions: NonEmptyVec<PrimitiveOccurrencePosition>,
     },
+
+    /// Rule requires every domain-layer ValueObject to be referenced by the
+    /// signature of a different domain catalogue entry.
+    DomainValueObjectInboundReferenceRequired,
+
+    /// Rule constrains a composition root's public catalogue surface to
+    /// zero-argument PrimaryAdapter wiring accessors.
+    CompositionRootPureDi,
 }
 
 impl CatalogueLinterRuleKind {
@@ -277,6 +285,10 @@ impl CatalogueLinterRuleKind {
             Self::NoPublicField => "NoPublicField",
             Self::ForbiddenMethodReceiver { .. } => "ForbiddenMethodReceiver",
             Self::ForbidPrimitiveInTypes { .. } => "ForbidPrimitiveInTypes",
+            Self::DomainValueObjectInboundReferenceRequired => {
+                "DomainValueObjectInboundReferenceRequired"
+            }
+            Self::CompositionRootPureDi => "CompositionRootPureDi",
         }
     }
 }
@@ -397,9 +409,11 @@ impl CatalogueLinterRule {
     ///
     /// Returns [`CatalogueLinterRuleError::InvalidRuleConfig`] when
     /// `NoRoleInMethodSignature` tries to forbid a `FunctionRole` discriminant
-    /// that method-signature scanning cannot enforce, or when a rule other
-    /// than `KindLayerConstraint` or `ForbidPrimitiveInTypes` targets a
-    /// `FunctionRole` discriminant.
+    /// that method-signature scanning cannot enforce, when a rule other than
+    /// `KindLayerConstraint` or `ForbidPrimitiveInTypes` targets a
+    /// `FunctionRole` discriminant, or when
+    /// `DomainValueObjectInboundReferenceRequired` excludes `ValueObject`, or
+    /// `CompositionRootPureDi` does not target only `CompositionRoot`.
     pub fn new(
         target: RuleTarget,
         kind: CatalogueLinterRuleKind,
@@ -446,6 +460,13 @@ impl CatalogueLinterRule {
             | CatalogueLinterRuleKind::NoPublicField
             | CatalogueLinterRuleKind::ForbiddenMethodReceiver { .. }
             | CatalogueLinterRuleKind::ForbidPrimitiveInTypes { .. } => {}
+            CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired => {
+                if !target.matches(RoleKind::ValueObject) {
+                    return Err(CatalogueLinterRuleError::InvalidRuleConfig(FreeText::new(
+                        "DomainValueObjectInboundReferenceRequired must target ValueObject",
+                    )));
+                }
+            }
             CatalogueLinterRuleKind::NoRoleInMethodSignature { forbidden_roles } => {
                 if let Some(function_role) = forbidden_roles
                     .as_slice()
@@ -459,6 +480,13 @@ impl CatalogueLinterRule {
                          method signatures are checked against type and trait catalogue entries",
                             function_role.variant_name()
                         ),
+                    )));
+                }
+            }
+            CatalogueLinterRuleKind::CompositionRootPureDi => {
+                if target.target_roles() != [RoleKind::CompositionRoot] {
+                    return Err(CatalogueLinterRuleError::InvalidRuleConfig(FreeText::new(
+                        "CompositionRootPureDi must target only CompositionRoot",
                     )));
                 }
             }
@@ -788,11 +816,11 @@ mod tests {
     }
 
     // ------------------------------------------------------------------
-    // CatalogueLinterRuleKind — 13 variants exist and discriminant_name works
+    // CatalogueLinterRuleKind — 15 variants exist and discriminant_name works
     // ------------------------------------------------------------------
 
     #[test]
-    fn test_catalogue_linter_rule_kind_has_13_variants_with_distinct_names() {
+    fn test_catalogue_linter_rule_kind_has_15_variants_with_distinct_names() {
         let permitted = NonEmptyVec::new(layer("domain"), vec![]);
         let required_traits = NonEmptyVec::new(TypeRef::new("PartialEq").unwrap(), vec![]);
         let forbidden_roles = NonEmptyVec::new(RoleKind::Repository, vec![]);
@@ -828,8 +856,10 @@ mod tests {
                 layers: NonEmptyVec::new(layer("domain"), vec![]),
                 positions: NonEmptyVec::new(PrimitiveOccurrencePosition::NamedField, vec![]),
             },
+            CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired,
+            CatalogueLinterRuleKind::CompositionRootPureDi,
         ];
-        assert_eq!(kinds.len(), 13, "must have exactly 13 variants");
+        assert_eq!(kinds.len(), 15, "must have exactly 15 variants");
 
         let names: Vec<&str> = kinds.iter().map(|k| k.discriminant_name()).collect();
         let expected = [
@@ -846,8 +876,772 @@ mod tests {
             "NoPublicField",
             "ForbiddenMethodReceiver",
             "ForbidPrimitiveInTypes",
+            "DomainValueObjectInboundReferenceRequired",
+            "CompositionRootPureDi",
         ];
         assert_eq!(names, expected);
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_happy_path_allows_primary_adapter_accessor() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::CompositionRoot,
+                vec![
+                    method_with_params("new", None, vec![], "Self"),
+                    method_shared_ref_no_params("greeting_driver", "cli_driver::GreetingDriver"),
+                ],
+            ),
+        );
+        let mut driver_catalogue = make_doc("cli_driver");
+        driver_catalogue.insert_type(
+            TypeName::new("GreetingDriver").unwrap(),
+            make_type_entry(DataRole::PrimaryAdapter),
+        );
+        let mut all_catalogues = std::collections::BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(driver_catalogue.layer().clone(), driver_catalogue);
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::CompositionRoot]),
+            CatalogueLinterRuleKind::CompositionRootPureDi,
+        )
+        .unwrap();
+
+        let violations = evaluate_catalogue_lint(
+            &[rule],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(violations.is_empty(), "a wired PrimaryAdapter accessor must be allowed");
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_detects_execution_method() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::CompositionRoot,
+                vec![method_with_params(
+                    "run",
+                    Some(SelfReceiver::SharedRef),
+                    vec![("raw_name", "String")],
+                    "CommandOutcome",
+                )],
+            ),
+        );
+        let all_catalogues = all_catalogues_single(&composition_catalogue);
+        let composition_layer = composition_catalogue.layer().clone();
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::CompositionRoot]),
+            CatalogueLinterRuleKind::CompositionRootPureDi,
+        )
+        .unwrap();
+
+        let violations = evaluate_catalogue_lint(
+            &[rule],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert_eq!(violations.len(), 1, "request-to-result method must be rejected");
+        assert_eq!(violations[0].rule_kind(), "CompositionRootPureDi");
+        assert!(violations[0].message().contains("execution method"));
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_detects_prohibited_public_role_exposure() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::CompositionRoot,
+                vec![method_shared_ref_no_params("username", "domain::Username")],
+            ),
+        );
+        let mut domain_catalogue = make_doc("domain");
+        domain_catalogue.insert_type(
+            TypeName::new("Username").unwrap(),
+            make_type_entry(DataRole::value_object()),
+        );
+        let mut all_catalogues = std::collections::BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(domain_catalogue.layer().clone(), domain_catalogue);
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::CompositionRoot]),
+            CatalogueLinterRuleKind::CompositionRootPureDi,
+        )
+        .unwrap();
+
+        let violations = evaluate_catalogue_lint(
+            &[rule],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(violations.iter().any(|violation| {
+            violation.message().contains("prohibited public-surface role 'ValueObject'")
+        }));
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_detects_prohibited_public_field_exposure() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            make_type_entry_with_kind(
+                DataRole::CompositionRoot,
+                plain_struct_kind(vec![field_decl("interactor", "usecase::GreetUser")]),
+            ),
+        );
+        let mut usecase_catalogue = make_doc("usecase");
+        usecase_catalogue.insert_type(
+            TypeName::new("GreetUser").unwrap(),
+            make_type_entry(DataRole::Interactor),
+        );
+        let mut all_catalogues = BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(usecase_catalogue.layer().clone(), usecase_catalogue);
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(
+            violations.iter().any(|violation| {
+                violation.message().contains("public-surface role 'Interactor'")
+            })
+        );
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_detects_roles_in_generic_bounds_and_where_predicates() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        let mut accessor = method_shared_ref_no_params("driver", "cli_driver::GreetingDriver");
+        accessor.generics = vec![MethodGenericParam {
+            name: ParamName::new("T").unwrap(),
+            bounds: vec![TypeRef::new("usecase::ApplicationService").unwrap()],
+        }];
+        accessor.where_predicates = vec![WherePredicateDecl {
+            lhs: TypeRef::new("T").unwrap(),
+            rhs: vec![TypeRef::new("usecase::GreetUser").unwrap()],
+            operator: BoundOp::Bound,
+        }];
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            make_type_entry_with_methods(DataRole::CompositionRoot, vec![accessor]),
+        );
+        let mut driver_catalogue = make_doc("cli_driver");
+        driver_catalogue.insert_type(
+            TypeName::new("GreetingDriver").unwrap(),
+            make_type_entry(DataRole::PrimaryAdapter),
+        );
+        let mut usecase_catalogue = make_doc("usecase");
+        usecase_catalogue.insert_type(
+            TypeName::new("GreetUser").unwrap(),
+            make_type_entry(DataRole::Interactor),
+        );
+        usecase_catalogue.insert_trait(
+            TraitName::new("ApplicationService").unwrap(),
+            make_trait_entry(ContractRole::ApplicationService),
+        );
+        let mut all_catalogues = BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(driver_catalogue.layer().clone(), driver_catalogue);
+        all_catalogues.insert(usecase_catalogue.layer().clone(), usecase_catalogue);
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(violations.iter().any(|violation| {
+            violation.message().contains("public-surface role 'ApplicationService'")
+        }));
+        assert!(
+            violations.iter().any(|violation| {
+                violation.message().contains("public-surface role 'Interactor'")
+            })
+        );
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_detects_execution_methods_from_trait_impls() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            make_type_entry(DataRole::CompositionRoot),
+        );
+        composition_catalogue.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("usecase::ApplicationService").unwrap(),
+            TypeRef::new("GreetingCompositionRoot").unwrap(),
+        ));
+        let mut usecase_catalogue = make_doc("usecase");
+        usecase_catalogue.insert_trait(
+            TraitName::new("ApplicationService").unwrap(),
+            make_trait_entry_with_methods(
+                ContractRole::ApplicationService,
+                vec![method_with_params(
+                    "execute",
+                    Some(SelfReceiver::SharedRef),
+                    vec![("request", "GreetRequest")],
+                    "GreetResponse",
+                )],
+            ),
+        );
+        let mut all_catalogues = BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(usecase_catalogue.layer().clone(), usecase_catalogue);
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(
+            violations.iter().any(|violation| violation.message().contains("execution method"))
+        );
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_allows_fallible_local_wiring_apis() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::CompositionRoot,
+                vec![
+                    method_with_params("new", None, vec![], "Result<Self, CompositionError>"),
+                    method_shared_ref_no_params(
+                        "driver",
+                        "Result<cli_driver::GreetingDriver, CompositionError>",
+                    ),
+                ],
+            ),
+        );
+        composition_catalogue.insert_type(
+            TypeName::new("CompositionError").unwrap(),
+            make_type_entry(DataRole::ErrorType),
+        );
+        let mut driver_catalogue = make_doc("cli_driver");
+        driver_catalogue.insert_type(
+            TypeName::new("GreetingDriver").unwrap(),
+            make_type_entry(DataRole::PrimaryAdapter),
+        );
+        let mut all_catalogues = BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(driver_catalogue.layer().clone(), driver_catalogue);
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(violations.is_empty(), "local typed wiring errors must remain allowed");
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_allows_constructor_wiring_inputs() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::CompositionRoot,
+                vec![method_with_params("new", None, vec![("workspace", "PathBuf")], "Self")],
+            ),
+        );
+        let all_catalogues = all_catalogues_single(&composition_catalogue);
+        let composition_layer = composition_catalogue.layer().clone();
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(violations.is_empty(), "constructors may accept object-graph wiring inputs");
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_allows_named_construction_factories() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::CompositionRoot,
+                vec![method_with_params(
+                    "try_from_config",
+                    None,
+                    vec![("workspace", "PathBuf")],
+                    "Result<Self, CompositionError>",
+                )],
+            ),
+        );
+        composition_catalogue.insert_type(
+            TypeName::new("CompositionError").unwrap(),
+            make_type_entry(DataRole::ErrorType),
+        );
+        let all_catalogues = all_catalogues_single(&composition_catalogue);
+        let composition_layer = composition_catalogue.layer().clone();
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(violations.is_empty(), "associated Self-returning factories are constructors");
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_allows_known_non_execution_trait_impls() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            make_type_entry(DataRole::CompositionRoot),
+        );
+        for trait_ref in [
+            "core::default::Default",
+            "core::fmt::Debug",
+            "core::convert::From<PathBuf>",
+            "core::convert::TryFrom<PathBuf>",
+        ] {
+            composition_catalogue.push_trait_impl(TraitImplDeclV2::new(
+                TypeRef::new(trait_ref).unwrap(),
+                TypeRef::new("GreetingCompositionRoot").unwrap(),
+            ));
+        }
+        let all_catalogues = all_catalogues_single(&composition_catalogue);
+        let composition_layer = composition_catalogue.layer().clone();
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(
+            violations.is_empty(),
+            "known non-execution traits do not expose execution methods"
+        );
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_allows_primary_adapter_builder_inputs() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::CompositionRoot,
+                vec![method_with_params(
+                    "driver",
+                    Some(SelfReceiver::SharedRef),
+                    vec![("workspace", "PathBuf")],
+                    "cli_driver::GreetingDriver",
+                )],
+            ),
+        );
+        let mut driver_catalogue = make_doc("cli_driver");
+        driver_catalogue.insert_type(
+            TypeName::new("GreetingDriver").unwrap(),
+            make_type_entry(DataRole::PrimaryAdapter),
+        );
+        let mut all_catalogues = BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(driver_catalogue.layer().clone(), driver_catalogue);
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(violations.is_empty(), "wiring builders may accept configuration inputs");
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_detects_roles_in_type_and_impl_bounds() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            TypeEntry::new(
+                ItemAction::Add,
+                DataRole::CompositionRoot,
+                unit_struct_kind(),
+                vec![],
+                vec![MethodGenericParam {
+                    name: ParamName::new("T").unwrap(),
+                    bounds: vec![TypeRef::new("usecase::ApplicationService").unwrap()],
+                }],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        composition_catalogue.push_inherent_impl(InherentImplDeclV2 {
+            type_name: TypeName::new("GreetingCompositionRoot").unwrap(),
+            impl_generics: vec![],
+            impl_where_predicates: vec![WherePredicateDecl {
+                lhs: TypeRef::new("T").unwrap(),
+                rhs: vec![TypeRef::new("usecase::GreetUser").unwrap()],
+                operator: BoundOp::Bound,
+            }],
+            methods: vec![],
+        });
+        let mut usecase_catalogue = make_doc("usecase");
+        usecase_catalogue.insert_type(
+            TypeName::new("GreetUser").unwrap(),
+            make_type_entry(DataRole::Interactor),
+        );
+        usecase_catalogue.insert_trait(
+            TraitName::new("ApplicationService").unwrap(),
+            make_trait_entry(ContractRole::ApplicationService),
+        );
+        let mut all_catalogues = BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(usecase_catalogue.layer().clone(), usecase_catalogue);
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(violations.iter().any(|violation| {
+            violation.message().contains("public-surface role 'ApplicationService'")
+        }));
+        assert!(
+            violations.iter().any(|violation| {
+                violation.message().contains("public-surface role 'Interactor'")
+            })
+        );
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_detects_roles_in_enum_and_alias_shapes() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("EnumCompositionRoot").unwrap(),
+            make_type_entry_with_kind(
+                DataRole::CompositionRoot,
+                TypeKindV2::Enum {
+                    variants: vec![VariantDecl::tuple(
+                        VariantName::new("Wired").unwrap(),
+                        vec![TypeRef::new("usecase::GreetUser").unwrap()],
+                    )],
+                },
+            ),
+        );
+        composition_catalogue.insert_type(
+            TypeName::new("AliasCompositionRoot").unwrap(),
+            make_type_entry_with_kind(
+                DataRole::CompositionRoot,
+                TypeKindV2::TypeAlias { target: TypeRef::new("usecase::GreetUser").unwrap() },
+            ),
+        );
+        let mut usecase_catalogue = make_doc("usecase");
+        usecase_catalogue.insert_type(
+            TypeName::new("GreetUser").unwrap(),
+            make_type_entry(DataRole::Interactor),
+        );
+        let mut all_catalogues = BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(usecase_catalogue.layer().clone(), usecase_catalogue);
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert_eq!(
+            violations
+                .iter()
+                .filter(|violation| violation
+                    .message()
+                    .contains("public-surface role 'Interactor'"))
+                .count(),
+            2,
+            "enum payloads and alias targets must both be scanned"
+        );
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_checks_reference_trait_impl_method_surface() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            make_type_entry(DataRole::CompositionRoot),
+        );
+        composition_catalogue.push_trait_impl(TraitImplDeclV2::from_parts(
+            ItemAction::Reference,
+            TypeRef::new("usecase::ApplicationService").unwrap(),
+            TypeRef::new("GreetingCompositionRoot").unwrap(),
+            vec![],
+            vec![],
+        ));
+        let mut usecase_catalogue = make_doc("usecase");
+        usecase_catalogue.insert_trait(
+            TraitName::new("ApplicationService").unwrap(),
+            TraitEntry::new(
+                ItemAction::Reference,
+                ContractRole::ApplicationService,
+                vec![method_with_params(
+                    "execute",
+                    Some(SelfReceiver::SharedRef),
+                    vec![("request", "GreetRequest")],
+                    "GreetResponse",
+                )],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                vec![],
+                ModulePath::root(),
+                None,
+                vec![],
+                vec![],
+            ),
+        );
+        let mut all_catalogues = BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(usecase_catalogue.layer().clone(), usecase_catalogue);
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(
+            violations.iter().any(|violation| violation.message().contains("execution method"))
+        );
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_checks_trait_impl_declaration_surface() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            make_type_entry(DataRole::CompositionRoot),
+        );
+        composition_catalogue.push_trait_impl(TraitImplDeclV2::from_parts(
+            ItemAction::Add,
+            TypeRef::new("usecase::ApplicationService").unwrap(),
+            TypeRef::new("GreetingCompositionRoot").unwrap(),
+            vec![MethodGenericParam {
+                name: ParamName::new("T").unwrap(),
+                bounds: vec![TypeRef::new("usecase::GreetUser").unwrap()],
+            }],
+            vec![],
+        ));
+        let mut usecase_catalogue = make_doc("usecase");
+        usecase_catalogue.insert_type(
+            TypeName::new("GreetUser").unwrap(),
+            make_type_entry(DataRole::Interactor),
+        );
+        usecase_catalogue.insert_trait(
+            TraitName::new("ApplicationService").unwrap(),
+            make_trait_entry(ContractRole::ApplicationService),
+        );
+        let mut all_catalogues = BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(usecase_catalogue.layer().clone(), usecase_catalogue);
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(violations.iter().any(|violation| {
+            violation.message().contains("public-surface role 'ApplicationService'")
+        }));
+        assert!(
+            violations.iter().any(|violation| {
+                violation.message().contains("public-surface role 'Interactor'")
+            })
+        );
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_rejects_unresolved_trait_impl_surface() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            make_type_entry(DataRole::CompositionRoot),
+        );
+        composition_catalogue.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("external::Runner").unwrap(),
+            TypeRef::new("GreetingCompositionRoot").unwrap(),
+        ));
+        let all_catalogues = all_catalogues_single(&composition_catalogue);
+        let composition_layer = composition_catalogue.layer().clone();
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(violations.iter().any(|violation| {
+            violation.message().contains("implements unresolved trait 'external::Runner'")
+        }));
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_ignores_trait_impls_for_wrapper_types() {
+        let mut composition_catalogue = make_doc("cli_composition");
+        composition_catalogue.insert_type(
+            TypeName::new("GreetingCompositionRoot").unwrap(),
+            make_type_entry(DataRole::CompositionRoot),
+        );
+        composition_catalogue.push_trait_impl(TraitImplDeclV2::new(
+            TypeRef::new("usecase::ApplicationService").unwrap(),
+            TypeRef::new("Wrapper<GreetingCompositionRoot>").unwrap(),
+        ));
+        let mut usecase_catalogue = make_doc("usecase");
+        usecase_catalogue.insert_trait(
+            TraitName::new("ApplicationService").unwrap(),
+            make_trait_entry_with_methods(
+                ContractRole::ApplicationService,
+                vec![method_with_params(
+                    "execute",
+                    Some(SelfReceiver::SharedRef),
+                    vec![("request", "GreetRequest")],
+                    "GreetResponse",
+                )],
+            ),
+        );
+        let mut all_catalogues = BTreeMap::new();
+        let composition_layer = composition_catalogue.layer().clone();
+        all_catalogues.insert(composition_layer.clone(), composition_catalogue);
+        all_catalogues.insert(usecase_catalogue.layer().clone(), usecase_catalogue);
+
+        let violations = evaluate_catalogue_lint(
+            &[composition_root_rule()],
+            &all_catalogues,
+            &composition_layer,
+            &StubPrimitiveScanner,
+        )
+        .unwrap();
+
+        assert!(violations.is_empty(), "impls for wrapper types do not belong to the root");
+    }
+
+    #[test]
+    fn test_composition_root_pure_di_rejects_non_composition_root_targets() {
+        for target in [RuleTarget::all_roles(), RuleTarget::new(vec![RoleKind::PrimaryAdapter])] {
+            let result =
+                CatalogueLinterRule::new(target, CatalogueLinterRuleKind::CompositionRootPureDi);
+            assert!(
+                matches!(result, Err(CatalogueLinterRuleError::InvalidRuleConfig(_))),
+                "CompositionRootPureDi must reject any target other than CompositionRoot"
+            );
+        }
+    }
+
+    #[test]
+    fn test_domain_value_object_inbound_reference_required_rejects_all_contact_actions() {
+        for action in [ItemAction::Add, ItemAction::Modify, ItemAction::Reference] {
+            let mut doc = make_doc("domain");
+            doc.insert_type(
+                TypeName::new("BoundaryValue").unwrap(),
+                TypeEntry::new(
+                    action,
+                    DataRole::value_object(),
+                    unit_struct_kind(),
+                    vec![],
+                    vec![],
+                    vec![],
+                    ModulePath::root(),
+                    None,
+                    vec![],
+                    vec![],
+                ),
+            );
+
+            let violations = run_rule(
+                &doc,
+                RuleTarget::new(vec![RoleKind::ValueObject]),
+                CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired,
+            );
+            assert_eq!(violations.len(), 1, "action {action:?} must be checked");
+            assert_eq!(violations[0].rule_kind(), "DomainValueObjectInboundReferenceRequired");
+        }
+    }
+
+    #[test]
+    fn test_domain_value_object_inbound_reference_required_accepts_other_domain_signature() {
+        let mut doc = make_doc("domain");
+        doc.insert_type(TypeName::new("Money").unwrap(), make_type_entry(DataRole::value_object()));
+        doc.insert_type(
+            TypeName::new("Price").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::Entity { identity: identity_accessor("id"), invariants: vec![] },
+                vec![method_shared_ref_no_params("amount", "Money")],
+            ),
+        );
+
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::ValueObject]),
+            CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired,
+        );
+        assert!(violations.is_empty(), "a different domain signature consumes Money");
     }
 
     // ------------------------------------------------------------------
@@ -875,6 +1669,24 @@ mod tests {
         .unwrap();
         assert_eq!(rule.kind().discriminant_name(), "KindLayerConstraint");
         assert_eq!(rule.target().target_roles(), &[RoleKind::EventPolicy]);
+    }
+
+    #[test]
+    fn test_linter_rule_new_inbound_reference_rule_rejects_target_without_value_object() {
+        let result = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::Entity]),
+            CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired,
+        );
+
+        assert!(
+            matches!(
+                &result,
+                Err(CatalogueLinterRuleError::InvalidRuleConfig(msg))
+                    if msg.as_str().contains("DomainValueObjectInboundReferenceRequired")
+                        && msg.as_str().contains("ValueObject")
+            ),
+            "expected InvalidRuleConfig for a target that excludes ValueObject, got: {result:?}"
+        );
     }
 
     #[test]
@@ -1294,6 +2106,34 @@ mod tests {
             vec![],
             vec![],
         )
+    }
+
+    fn make_trait_entry_with_methods(
+        role: ContractRole,
+        methods: Vec<MethodDeclaration>,
+    ) -> TraitEntry {
+        TraitEntry::new(
+            ItemAction::Add,
+            role,
+            methods,
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        )
+    }
+
+    fn composition_root_rule() -> CatalogueLinterRule {
+        CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::CompositionRoot]),
+            CatalogueLinterRuleKind::CompositionRootPureDi,
+        )
+        .unwrap()
     }
 
     fn make_trait_entry(role: ContractRole) -> TraitEntry {

@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "`.agents/skills/track-merge/SKILL.md`: add the Codex `$track-merge` host adapter (IN-01/OUT-01/OUT-02/CN-01/CN-02/AC-01/AC-02).",
+      "status": "done",
+      "commit_hash": "439a204c5211ebc36651c9a3a43f82b388ef7831"
+    },
+    {
+      "id": "T002",
+      "description": "`.agents/skills/track-done/SKILL.md`: add the Codex `$track-done` host adapter (IN-02/OUT-01/OUT-02/CN-01/CN-02/AC-01/AC-02).",
+      "status": "done",
+      "commit_hash": "439a204c5211ebc36651c9a3a43f82b388ef7831"
+    },
+    {
+      "id": "T003",
+      "description": "`.harness/workflows/adr/add.md`: extract the provider-independent ADR-add workflow SSoT from the existing command behavior; `.agents/skills/adr-add/SKILL.md`: add the thin Codex `$adr-add` host adapter that references that SSoT (IN-03/OUT-01/CN-01/CN-02/AC-01/AC-02).",
+      "status": "done",
+      "commit_hash": "439a204c5211ebc36651c9a3a43f82b388ef7831"
+    }
+  ],
+  "plan": {
+    "summary": [
+      "GO-01 is delivered by T001, T002, and T003.",
+      "All Phase 2 catalogues are empty for this documentation-only track; no catalogue entries are attributed to implementation tasks."
+    ],
+    "sections": [
+      {
+        "id": "S1",
+        "title": "Track lifecycle entrypoints",
+        "description": [
+          "Execute T001 and T002 to add their respective host adapters (IN-01/IN-02/AC-01/AC-02)."
+        ],
+        "task_ids": [
+          "T001",
+          "T002"
+        ]
+      },
+      {
+        "id": "S2",
+        "title": "Pre-track ADR entrypoint",
+        "description": [
+          "Execute T003 to establish the provider-independent ADR-add workflow SSoT and add its thin Codex host adapter (IN-03/AC-01/AC-02)."
+        ],
+        "task_ids": [
+          "T003"
+        ]
+      }
+    ]
+  }
+}

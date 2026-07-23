@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "8b4dcd61f652246a2aa2124e8a68171dc5389ad77306c3e46ccdbd93af112082",
+      "evidence_hash": "6f960c1c69e13be3287593e7330e3b03efd8999906ec6260ee7b518402c65dab",
+      "verdict": {
+        "kind": "pass",
+        "citation": "一つ以上の `<layer>-types.json` が存在する track で `obligations.json` または `test-bindings.json` が不在なら、`bin/sotp test-obligation check` を fail-closed に失敗させる。catalogue を持たない Phase 0〜1 または文書のみの track は、整合的な artifact 不在として従来どおり zero pairs で通す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-enrollment-mechanization-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CheckTestObligationsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "一つ以上の `<layer>-types.json` が存在する track で `obligations.json` または `test-bindings.json` が不在なら、`bin/sotp test-obligation check` を fail-closed に失敗させる。catalogue を持たない Phase 0〜1 または文書のみの track は、整合的な artifact 不在として従来どおり zero pairs で通す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8b4dcd61f652246a2aa2124e8a68171dc5389ad77306c3e46ccdbd93af112082",
+      "evidence_hash": "12918bb2c9aab8de7fa8f5bad83dadb27e24529b2dc4b33000b2a603739412db",
+      "verdict": {
+        "kind": "pass",
+        "citation": "一つ以上の catalogue がある track で `obligations.json` と `test-bindings.json` のいずれかが不在のとき、`bin/sotp test-obligation check` が非零 exit で fail-closed に失敗することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-enrollment-mechanization-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CheckTestObligationsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "一つ以上の catalogue がある track で `obligations.json` と `test-bindings.json` のいずれかが不在のとき、`bin/sotp test-obligation check` が非零 exit で fail-closed に失敗することを検証する。両 artifact が存在し導出結果がゼロ件のときは、artifact 不在として扱われないことも検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8b4dcd61f652246a2aa2124e8a68171dc5389ad77306c3e46ccdbd93af112082",
+      "evidence_hash": "307b3ebd3d97cecbaf0fd9ef1a9165e6aa51f8ffa4aa85b12e5213cbc1ac66e4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue を持たない Phase 0〜1 または文書のみの track では、obligation artifacts の両方が不在でも `check` が整合的な zero-pair scope として通ることを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-enrollment-mechanization-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CheckTestObligationsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "catalogue を持たない Phase 0〜1 または文書のみの track では、obligation artifacts の両方が不在でも `check` が整合的な zero-pair scope として通ることを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8b4dcd61f652246a2aa2124e8a68171dc5389ad77306c3e46ccdbd93af112082",
+      "evidence_hash": "36e6a8ffc5b2ec879d6e9ffbde95f591aa4a8268f5b3159ff6b95e36f05e9051",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check` は pure-read の fail-closed gate であり続ける。commit gate または `check` の実行中に derive、binding 作成、artifact 修復、または暗黙の再導出を行ってはならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-enrollment-mechanization-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CheckTestObligationsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "`check` は pure-read の fail-closed gate であり続ける。commit gate または `check` の実行中に derive、binding 作成、artifact 修復、または暗黙の再導出を行ってはならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8b4dcd61f652246a2aa2124e8a68171dc5389ad77306c3e46ccdbd93af112082",
+      "evidence_hash": "7b1e47d0c9f6640dc0488af4ba0a6959c9e968a7b3eddea27c139415ad4c4fb5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "enrollment の有無は artifact の存在と catalogue の存在で機械的に判定し、orchestrator の任意判断、軟条件語彙、または task status の有無に依存させない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-enrollment-mechanization-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CheckTestObligationsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "enrollment の有無は artifact の存在と catalogue の存在で機械的に判定し、orchestrator の任意判断、軟条件語彙、または task status の有無に依存させない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8b4dcd61f652246a2aa2124e8a68171dc5389ad77306c3e46ccdbd93af112082",
+      "evidence_hash": "15a060cdb33d38a903fd06c53e549ddcf4e6a98f40dcda0665a530c9c3d125f3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "obligation artifacts の不在、導出結果ゼロ、未解消の binding / verdict を別々に観測可能な状態として維持する。導出結果ゼロを artifact 不在と同一視してはならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-enrollment-mechanization-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CheckTestObligationsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "obligation artifacts の不在、導出結果ゼロ、未解消の binding / verdict を別々に観測可能な状態として維持する。導出結果ゼロを artifact 不在と同一視してはならない。"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,307 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "LintRuleKind",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "LintRuleKind",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "LintRuleKind",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "LintRuleKind",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "LintRuleKind",
+      "trait_ref": "serde::ser::Serialize"
+    },
+    {
+      "action": "modify",
+      "for_type": "LintRuleKind",
+      "trait_ref": "serde::de::Deserialize<'de>"
+    },
+    {
+      "action": "modify",
+      "for_type": "RenderContractMapOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "RenderContractMapOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "RenderContractMapOutput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "RenderContractMapOutput",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "LintRuleKind": {
+      "action": "modify",
+      "docs": "LintRuleKind typed-payload update. IN-02; AC-02; OS-01.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "FieldEmpty",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "FieldNonEmpty",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "KindLayerConstraint",
+            "payload": {
+              "fields": [
+                {
+                  "name": "permitted_layers",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::LayerId>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ReferencedRoleConstraint",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                },
+                {
+                  "name": "expected_role",
+                  "ty": "domain::tddd::catalogue_linter::RoleKind"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TraitImplRequired",
+            "payload": {
+              "fields": [
+                {
+                  "name": "required_traits",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::catalogue_v2::TypeRef>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoRoleInMethodSignature",
+            "payload": {
+              "fields": [
+                {
+                  "name": "forbidden_roles",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::catalogue_linter::RoleKind>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "MethodReferenceSignature",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "AccessorSignatureRequired",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "FieldElementUniqueAcrossEntries",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoExternalReferenceInMethods",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoPublicField",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ForbiddenMethodReceiver",
+            "payload": {
+              "fields": [
+                {
+                  "name": "forbidden_receiver",
+                  "ty": "domain::tddd::catalogue_v2::SelfReceiver"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ForbidPrimitiveInTypes",
+            "payload": {
+              "fields": [
+                {
+                  "name": "primitives",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::primitive_occurrence_scanner::PrimitiveName>"
+                },
+                {
+                  "name": "layers",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::LayerId>"
+                },
+                {
+                  "name": "positions",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::primitive_occurrence_scanner::PrimitiveOccurrencePosition>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DomainValueObjectInboundReferenceRequired",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalogue_lint_workflow",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "OS-01",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "RenderContractMapOutput": {
+      "action": "modify",
+      "docs": "RenderContractMapOutput warning-field update; R9 ground: raw presentation metrics. IN-04; AC-04; CN-04; OS-01.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "rendered_layer_count",
+              "ty": "usize"
+            },
+            {
+              "name": "total_entry_count",
+              "ty": "usize"
+            },
+            {
+              "name": "warnings",
+              "ty": "Vec<domain::tddd::ContractMapRenderWarning>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "contract_map_workflow",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "OS-01",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        }
+      ]
+    }
+  }
+}

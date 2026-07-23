@@ -37,12 +37,17 @@ else
 fi
 
 echo ""
-echo "--- Step 4/7: Provision Codex runtime link ---"
+echo "--- Step 4/8: Regenerate the convention index ---"
+bin/sotp conventions update-index
+echo "[OK] convention index regenerated"
+
+echo ""
+echo "--- Step 5/8: Provision Codex runtime link ---"
 bin/sotp codex-runtime provision --project-root .
 echo "[OK] Codex runtime link provisioned"
 
 echo ""
-echo "--- Step 5/7: Configure git hooks path ---"
+echo "--- Step 6/8: Configure git hooks path ---"
 if [ "$(git config --local core.hooksPath 2>/dev/null || true)" = ".githooks" ]; then
   echo "[OK] core.hooksPath already set"
 else
@@ -52,12 +57,12 @@ fi
 chmod +x .githooks/reference-transaction .githooks/pre-push 2>/dev/null || true
 
 echo ""
-echo "--- Step 6/7: Run CI ---"
+echo "--- Step 7/8: Run CI ---"
 cargo make ci
 echo "[OK] CI passed"
 
 echo ""
-echo "--- Step 7/7: Configure git notes fetch refspec ---"
+echo "--- Step 8/8: Configure git notes fetch refspec ---"
 if git remote get-url origin >/dev/null 2>&1; then
   if git config --get-all remote.origin.fetch | grep -q 'refs/notes'; then
     echo "[OK] git notes refspec already configured"
@@ -278,15 +283,17 @@ args = ["task-contract", "check"]
 
 [tasks.ci-rust]
 description = "[gate] Run Rust-only CI checks"
-dependencies = ["fmt-check", "clippy", "test", "deny", "check-layers", "verify-canonical-modules"]
+dependencies = ["fmt-check", "clippy", "test", "test-cli-feature-off", "deny", "check-layers", "verify-canonical-modules"]
 
 [tasks.ci]
 description = "[gate] Run repository-wide CI checks. Track-aware gates live in ci-track."
-dependencies = ["fmt-check", "clippy", "test", "test-doc", "deny", "check-layers", "verify-arch-docs", "verify-doc-links", "verify-track-metadata", "verify-hooks-path", "verify-canonical-modules", "verify-latest-track", "verify-module-size", "verify-domain-strings", "verify-domain-purity", "verify-usecase-purity", "verify-view-freshness", "verify-plan-artifact-refs", "verify-adr-signals"]
+dependencies = ["fmt-check", "clippy", "test", "test-cli-feature-off", "test-doc", "deny", "check-layers", "verify-arch-docs", "verify-doc-links", "verify-track-metadata", "verify-hooks-path", "verify-canonical-modules", "verify-latest-track", "verify-module-size", "verify-domain-strings", "verify-domain-purity", "verify-usecase-purity", "verify-view-freshness", "verify-plan-artifact-refs", "verify-adr-signals"]
 
 [tasks.ci-track]
 description = "[gate] Run track-aware CI gates. Requires a track/<id> branch."
 dependencies = ["task-contract-check-local", "verify-spec-states-current", "signal-check-impl-catalog", "verify-catalogue-spec-refs", "check-catalogue-spec-signals"]
+script_runner = "@shell"
+script = ['bin/sotp adr-baseline check-commit']
 
 # ---------------------------------------------------------------------------
 # Review and guarded commit

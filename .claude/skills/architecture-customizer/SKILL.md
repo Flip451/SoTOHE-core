@@ -9,7 +9,7 @@ Use this workflow when architecture changes are requested.
 
 ## Workflow
 
-1. Clarify target architecture in Japanese with concrete crate map.
+1. Clarify target architecture in the user's preferred or project language with a concrete crate map.
 2. Translate target architecture into explicit dependency rules and deny reasons.
 3. Update enforcement first, then code layout, then docs.
 4. Run architecture checks and stop if any gate fails.
@@ -48,11 +48,9 @@ Define which crates may depend on which crates.
 2. Update `Makefile.toml` `ci-local` / `ci-container` dependencies if quality gates change, and ensure `sotp verify layers` still reflects the new architecture rules.
 3. Update `knowledge/conventions/coding-principles.md` module layout example if module conventions change.
 4. Synchronize the live architecture-document set: `CLAUDE.md`, `AGENTS.md`,
-   `.claude/rules/09-maintainer-checklist.md`, this skill,
+   this skill,
    `.harness/capabilities/{implementer,dry-fix-lead,review-fix-lead,rollback-diagnoser}.md`,
    `.harness/custom/review-prompts/{cli,cli_composition,cli_driver,domain,infrastructure,types,usecase}.md`,
-   the survey prompts (`.gemini/GEMINI.md`,
-   `.claude/skills/{gemini-system,repomix-snapshot}/SKILL.md`),
    and applicable `knowledge/conventions/` references (especially
    `coding-principles.md`, `type-designer-kind-selection.md`, and
    `impl-delegation-arch-guard.md`).
