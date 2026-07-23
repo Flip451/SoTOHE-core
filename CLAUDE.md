@@ -21,7 +21,7 @@ Each downstream artifact must cite its direct upstream (no layer skipping, no re
 - commit gate — `spec_adr` / `catalog_spec` strict; `adr_user` / `impl_catalog` interim (in-progress implementation may carry 🟡 into a commit, but design-chain references must already be grounded)
 - merge gate — strict on all four chains
 - pre-review task-contract gate (`bin/sotp task-contract check`, binary) — reads `impl_catalog` signals per task status via `task-contract.json`: entries attributed to done / in_progress tasks must be 🔵, todo-task entries may remain 🟡, 🔴 always blocks. Its precondition — every catalogue entry attributed to an existing task — is enforced separately by `bin/sotp task-contract coverage` (in `cargo make ci`). The gate asserts structural conformance only; body semantics remain the reviewer's lane.
-- ADR-baseline freeze gate (`bin/sotp adr-baseline`) — at Phase 0, the orchestrator designates primary ADR source(s) exclusively by creating `init` snapshots; those ledger records are the designation, with no separate metadata or external primary pointer. Review wrappers run `check-review`, whose CLI requires a nonempty init-record designation set and verifies every recorded ledger copy; a current ADR that differs from its latest baseline is a normal Phase 0 draft state and does not block review dispatch. `--primary-source <file>` is only a direct-CLI override. Byte matching fires at the commit gate and track-aware CI: `cargo make ci-track` and guarded commits run `check-commit` for all recorded ADRs and separately enforce coverage for non-draft ADRs cited by `spec.json`. This is a separate byte-comparison gate; it does not change `adr_user` evaluation or `.harness/config/signal-gates.json`.
+- ADR-baseline freeze gate (`bin/sotp adr-baseline`) — at Phase 0, the orchestrator designates primary ADR source(s) exclusively by creating `init` snapshots; those ledger records are the designation, with no separate metadata or external primary pointer. The review workflow requires the orchestrator to run `check-review` before dispatching reviewer wrappers; its CLI requires a nonempty init-record designation set and verifies every recorded ledger copy. A current ADR that differs from its latest baseline is a normal Phase 0 draft state and does not block review dispatch. `--primary-source <file>` is only a direct-CLI override. Byte matching fires at the commit gate and track-aware CI: `cargo make ci-track` and guarded commits run `check-commit` for all recorded ADRs and separately enforce coverage for non-draft ADRs cited by `spec.json`. This is a separate byte-comparison gate; it does not change `adr_user` evaluation or `.harness/config/signal-gates.json`.
 
 The unit of work is a **track** (one feature / fix / refactor) living on branch `track/<id>` with its artifacts under `track/items/<id>/`. The active track id is resolved from the current git branch name (branch-bound); on the base branch resolution fail-closes as `NotTrackBranch`, and only read commands with an explicit `--track-id` work there (`knowledge/conventions/branch-strategy.md`).
 
@@ -59,16 +59,16 @@ Derived read-only views — never hand-edit, regenerate via `bin/sotp track view
 ## Hard invariants
 
 - Public UI is `/track:*`; never use legacy aliases.
-- No direct `git add` / `commit` / `merge` / `rebase` / `switch` — use `/track:*` or the guarded `bin/sotp git`, `bin/sotp track branch`, and `bin/sotp pr` workflow commands (`.claude/rules/10-guardrails.md`).
+- No direct `git add` / `commit` / `merge` / `rebase` / `switch` — use `/track:*` or the guarded `bin/sotp git`, `bin/sotp track branch`, and `bin/sotp pr` workflow commands (`.claude/rules/guardrails.md`).
 - The orchestrator never edits SoT files directly (1 file = 1 writer): ADR → `adr-editor`, `spec.json` → `spec-designer`, catalogues → `type-designer`, `impl-plan.json` → `impl-planner`. Task state transitions go through `bin/sotp track transition`.
 - Every commit (plan artifacts included) is preceded by a reviewer-capability cycle to `zero_findings`; inline self-review is never a substitute (`knowledge/conventions/review-protocol.md`).
 - Do not manually copy, edit, or remove ADR baseline records. A missing init snapshot blocks review and commit; a byte mismatch blocks commit and track-aware CI (not review — a Phase 0 draft divergence is normal). Use the sanctioned snapshot, restore, and diagnoser routes.
 - Enforce rules by mechanism (type system > CI gate > hook > lint > docs), and prefer type-safe abstractions over lint/doc rules (`knowledge/conventions/{enforce-by-mechanism,prefer-type-safe-abstractions}.md`).
-- Read `.claude/rules/08-orchestration.md`, `09-maintainer-checklist.md`, and `10-guardrails.md` before making changes.
+- Read `.claude/rules/orchestration.md` and `.claude/rules/guardrails.md` before making changes.
 
 ## Rules and conventions
 
-- `.claude/rules/` — Claude Code-specific operating rules (only these five): `01-language.md` (think in English, answer in Japanese), `07-dev-environment.md` (toolchain, cargo-make, `bin/sotp` build), `08-orchestration.md` (delegation), `09-maintainer-checklist.md` (co-update matrix), `10-guardrails.md` (guards, hooks, permissions).
+- `.claude/rules/` — Claude Code-specific operating rules: `language.md` (language guidance), `dev-environment.md` (toolchain, cargo-make, `bin/sotp` build), `orchestration.md` (delegation), and `guardrails.md` (guards, hooks, permissions).
 - `knowledge/conventions/` — ~30 engineering conventions; the index in its `README.md` is auto-generated (`bin/sotp conventions update-index`) and lists them in reading order. Load-bearing for daily work: `track-lifecycle.md`, `branch-strategy.md`, `git-notes.md`, `task-completion-flow.md`, `pre-track-adr-authoring.md`, `adr.md`, `review-protocol.md`, `coding-principles.md`, `type-designer-kind-selection.md`, `no-upstream-restatement.md`.
 
 ## Workspace shape
@@ -81,7 +81,7 @@ Six crates. `architecture-rules.json` and `deny.toml` are the SSoT for permitted
 - `bin/sotp track views sync` — regenerate `plan.md` + `registry.md`
 - `cargo make ci` — full pre-commit gate (`ci-rust` = inner Rust-only loop)
 - `cargo make ci-track` — active-track gates, including ADR-baseline `check-commit`
-- `cargo make --list-all-steps` — task catalogue (details: `.claude/rules/07-dev-environment.md`)
+- `cargo make --list-all-steps` — task catalogue (details: `.claude/rules/dev-environment.md`)
 
 ## Delegation surfaces
 
@@ -90,4 +90,4 @@ Six crates. `architecture-rules.json` and `deny.toml` are the SSoT for permitted
 
 ## Maintenance
 
-When changing workflow or architecture, update all affected layers together (`.claude/rules/09-maintainer-checklist.md`: README, conventions, `Makefile.toml`, `sotp verify` gates, `.claude/settings.json` hooks), then run `cargo make ci`.
+When changing workflow or architecture, update all affected layers together (README, conventions, `Makefile.toml`, `sotp verify` gates, and `.claude/settings.json` hooks), then run `cargo make ci`.

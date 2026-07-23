@@ -6,7 +6,7 @@
 /// A detected `/track:*` command with its skill phase requirements.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SkillMatch {
-    /// The matched command (e.g., "/track:plan").
+    /// The matched command (e.g., "/track:review").
     pub command: String,
     /// Phase reminders for the matched command.
     pub reminders: Vec<String>,
@@ -47,16 +47,6 @@ impl ComplianceContext {
 
 /// Known `/track:*` commands and their SKILL.md phase reminders.
 const SKILL_COMMANDS: &[(&str, &[&str])] = &[
-    (
-        "/track:plan",
-        &[
-            "Phase 0: Mode Selection (Full/Focused/Quick)",
-            "Phase 1: UNDERSTAND (researcher capability + Claude Lead)",
-            "Phase 1.5: DESIGN REVIEW (planner capability — mandatory for Full mode)",
-            "Phase 2: RESEARCH & DESIGN (Agent Teams — Full mode only)",
-            "Phase 3: PLAN & APPROVE (plan synthesis + user approval before artifacts)",
-        ],
-    ),
     (
         "/track:implement",
         &[
@@ -114,7 +104,7 @@ pub fn detect_skill_command(prompt: &str) -> Option<SkillMatch> {
     let mut best: Option<(usize, &str, &[&str])> = None;
     for (command, reminders) in SKILL_COMMANDS {
         // Scan all occurrences — the first match may fail boundary check
-        // (e.g. "/track:planner then /track:plan").
+        // (e.g. "/track:reviewer then /track:review").
         let mut search_start = 0;
         let found_pos = loop {
             let Some(rel) = prompt_lower[search_start..].find(command) else {

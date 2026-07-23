@@ -382,7 +382,7 @@ args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-catalog-spec", "--
 
 [tasks.template-export-smoke-local]
 private = true
-description = "[internal] Source-repo smoke gate: export the template tree to a fresh tmp dir OUTSIDE the workspace root, then run the exported tree's own gates with the ambient toolchain: skeleton fmt/clippy/test, exported-Makefile parseability, the exported tree's file-based `bin/sotp verify` gates (layers / module-size / canonical-modules / arch-docs / doc-links / purity trio, exercising the exported architecture-rules.json), deny.toml validation (bans/licenses/sources) when cargo-deny is available, plus the three post-export `bin/sotp` transplant checks required by ADR 2026-07-08-0541 (spec IN-05, AC-02, AC-07, CN-08, CN-09): (a) `bin/sotp` exists, (b) executable bit set on unix, (c) `bin/sotp --help` exits 0. Uses `cargo run -p cli -- template export` (not the source bin/sotp) so the gate runs unchanged inside ci-container, where the host-built bin/sotp is absent. Scope boundary (OS-10/CN-09): the gate only asserts export success and exported-tree structural health; it deliberately does not hard-fail on consumer-owned config VALUES and skips when source-only overlay artifacts are absent."
+description = "[internal] Source-repo smoke gate: export the template tree to a fresh tmp dir OUTSIDE the workspace root, then run the exported tree's own gates with the ambient toolchain: skeleton fmt/clippy/test, exported-Makefile parseability, shipped-workflow cargo-make task coverage, no exported workspace-CLI cargo run, the exported tree's file-based `bin/sotp verify` gates (layers / module-size / canonical-modules / arch-docs / doc-links / purity trio, exercising the exported architecture-rules.json), deny.toml validation (bans/licenses/sources) when cargo-deny is available, plus the three post-export `bin/sotp` transplant checks required by ADR 2026-07-08-0541 (spec IN-05, AC-02, AC-07, CN-08, CN-09): (a) `bin/sotp` exists, (b) executable bit set on unix, (c) `bin/sotp --help` exits 0. Uses `cargo run -p cli -- template export` (not the source bin/sotp) so the gate runs unchanged inside ci-container, where the host-built bin/sotp is absent. Scope boundary (OS-10/CN-09): the gate only asserts export success and exported-tree structural health; it deliberately does not hard-fail on consumer-owned config VALUES and skips when source-only overlay artifacts are absent."
 script_runner = "@shell"
 script = ['''
 set -e
@@ -433,6 +433,17 @@ fi
 # smoke resilient to skeleton Cargo.lock drift.
 export CARGO_TARGET_DIR="$SMOKE_OUT/target"
 cd "$SMOKE_OUT"
+bin/sotp conventions update-index
+for convention in knowledge/conventions/*.md; do
+  name="$(basename "$convention")"
+  if [ "$name" = "README.md" ]; then
+    continue
+  fi
+  if ! grep -Fq "\`$name\`" knowledge/conventions/README.md; then
+    echo "[FAIL] template-export-smoke-local: convention index omits $name" >&2
+    exit 1
+  fi
+done
 cargo fmt --all -- --check
 cargo clippy --all-targets --all-features -- -D warnings
 cargo test --all-features
@@ -442,6 +453,18 @@ cargo test --all-features
 # consumer checkout.
 # Exported Makefile parses and enumerates its task graph.
 cargo make --list-all-steps >/dev/null
+WORKFLOW_TASKS="$(rg --no-filename -o 'cargo make[[:space:]]+[A-Za-z0-9_-]+' .harness/workflows | sed -E 's/^cargo make[[:space:]]+//' | sort -u)"
+EXPORTED_TASKS="$(cargo make --list-all-steps 2>&1 | awk '/^[[:alnum:]_-]+ - / { print $1 }')"
+for task in $WORKFLOW_TASKS; do
+  if ! printf '%s\n' "$EXPORTED_TASKS" | grep -Fxq "$task"; then
+    echo "[FAIL] template-export-smoke-local: shipped workflow references missing cargo-make task: $task" >&2
+    exit 1
+  fi
+done
+if rg -n -U 'cargo[[:space:]]+run.*-p[[:space:]]+cli|args[[:space:]]*=[[:space:]]*\\[(?s:[^]]*"run"[^]]*"-p"[^]]*"cli"[^]]*)\\]' Makefile*.toml; then
+  echo "[FAIL] template-export-smoke-local: exported Makefile runs the workspace cli with cargo run -p cli" >&2
+  exit 1
+fi
 # File-based verify gates against the exported tree (parse the exported
 # architecture-rules.json fail-closed; scan the skeleton sources; purity trio runs
 # via the exported arch-rules verify opt-ins). The machine-path scan over the
@@ -726,11 +749,6 @@ description = "[gate] Run the active track's pure-read test-obligation fulfillme
 command = "bin/sotp"
 args = ["test-obligation", "check"]
 
-[tasks.adr-baseline-check-review]
-description = "[gate] Require an active-track init designation, then verify every recorded ADR baseline before review. --primary-source is only for direct CLI invocations."
-script_runner = "@shell"
-script = ['bin/sotp adr-baseline check-review']
-
 [tasks.track-active-gate]
 private = true
 description = "[gate] Regen sequence: signal calc-impl-catalog → signal calc-catalog-spec → catalogue-lint check-active-track → catalog check → views sync. Both track-commit-message and review invocations depend on this shared task. Fail-closed: non-zero exit aborts the chain."
@@ -799,14 +817,14 @@ args = ["run", "--quiet", "-p", "cli", "--", "adr-baseline", "check-commit"]
 # Cargo-make dependencies run before task scripts, so pre-gate track/branch
 # guards must live outside these wrappers or inside the gate commands.
 [tasks.track-local-review]
-description = "[wrapper] Require an active-track init designation and verify every recorded ADR baseline, fire attribution-completeness + liveness gates (via task-contract-check), refresh signals + rendered views (via track-active-gate), then invoke a single reviewer round via bin/sotp review local. --primary-source is only for direct CLI invocations. Running track-active-gate after task-contract-check ensures the reviewer sees view artifacts rendered from the latest signal state (the fixer's between-rounds code edits would otherwise leave *-types.md stale)."
-dependencies = ["adr-baseline-check-review", "task-contract-check", "track-active-gate"]
+description = "[wrapper] Fire attribution-completeness + liveness gates (via task-contract-check), refresh signals + rendered views (via track-active-gate), then invoke a single reviewer round via bin/sotp review local. ADR-baseline verification is performed by the review workflow before this wrapper. Running track-active-gate after task-contract-check ensures the reviewer sees view artifacts rendered from the latest signal state (the fixer's between-rounds code edits would otherwise leave *-types.md stale)."
+dependencies = ["task-contract-check", "track-active-gate"]
 script_runner = "@shell"
 script = ['case "${1:-}" in --) shift ;; esac; bin/sotp review local "$@"']
 
 [tasks.track-local-review-fix]
-description = "[wrapper] Same as track-local-review but invokes bin/sotp review fix-local instead of review local. It first requires an active-track init designation and verifies every recorded ADR baseline, runs task-contract gates, then refreshes signals + rendered views before delegation. --primary-source is only for direct CLI invocations. Provider-agnostic: bin/sotp resolves provider/model from .harness/config/agent-profiles.json. Active track auto-resolved from current git branch (--track-id is intentionally not accepted at the cargo-make layer)."
-dependencies = ["adr-baseline-check-review", "task-contract-check", "track-active-gate"]
+description = "[wrapper] Same as track-local-review but invokes bin/sotp review fix-local instead of review local. It runs task-contract gates, then refreshes signals + rendered views before delegation. ADR-baseline verification is performed by the review workflow before this wrapper. Provider-agnostic: bin/sotp resolves provider/model from .harness/config/agent-profiles.json. Active track auto-resolved from current git branch (--track-id is intentionally not accepted at the cargo-make layer)."
+dependencies = ["task-contract-check", "track-active-gate"]
 script_runner = "@shell"
 script = ['case "${1:-}" in --) shift ;; esac; bin/sotp review fix-local "$@"']
 

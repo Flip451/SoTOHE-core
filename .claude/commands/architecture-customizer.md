@@ -5,7 +5,7 @@ description: Customize or migrate the workspace architecture safely.
 Canonical wrapper for workspace architecture changes in this template.
 
 Execution:
-- Clarify the target architecture in Japanese with a concrete crate map before any edits.
+- Clarify the target architecture in the user's preferred or project language with a concrete crate map before any edits.
 - Translate the target architecture into explicit dependency rules and denial reasons.
 - Update `architecture-rules.json` first, then enforcement, then crate layout, then documentation.
 - Run the architecture validation gates in order and stop if any gate fails.
