@@ -1,0 +1,77 @@
+{
+  "track_id": "type-contract-pipeline-consistency-2026-07-23",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "waived_reason_hash": "deb943ac8b65cab4f36b0c3a1148a4dbd20b8b191c5fc692be156427bb29c844",
+        "declaration_hash": "761f54c04c7b7386619f8570a6f275678191466e5e85bee403e7302a2d363bf8",
+        "anchor_text_hash": "45a685de7a59918994db5f9e3fda8548dfb7201dc0f04888fe8b067db0a30660"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "D2 の判定は contract-map renderer が構築する参照グラフと同じ情報源に基づく cross-entry 検査として実現する。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LintRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json",
+          "element_id": "OS-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LintRuleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:OS-01"
+      },
+      "key": {
+        "waived_reason_hash": "2b6fb360338b18c2e13a0e9f38ffbd1ddae49dc1d974a71c9f8ad3b2760ddc8d",
+        "declaration_hash": "0d6031f37f6215a01c6abc58b934f6c6654f526105959db8927a60bd26b25e53",
+        "anchor_text_hash": "5981d4a6013be1e7b08e82f6dc5c3d95b253b7a92ca7d251ff17007b2bce1a03"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "usecase 境界型が domain 型を公開面に出すことの可否や公開面規律は扱わない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "RenderContractMapOutput",
+        "anchor_id": {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json",
+          "element_id": "OS-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RenderContractMapOutput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:OS-01"
+      },
+      "key": {
+        "waived_reason_hash": "42b1e2df119239df7cffac75cec77c1613e54a57d36ed634136b8ceef8f96709",
+        "declaration_hash": "107534d67bf694302290d2c8c2ea4869fd1c39c05ebe45cf65e5a44c4cf66b89",
+        "anchor_text_hash": "5981d4a6013be1e7b08e82f6dc5c3d95b253b7a92ca7d251ff17007b2bce1a03"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "usecase 境界型が domain 型を公開面に出すことの可否や公開面規律は扱わない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ]
+}

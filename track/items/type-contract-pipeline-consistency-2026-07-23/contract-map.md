@@ -176,6 +176,10 @@ subgraph cli_composition["cli_composition"]
 end
 subgraph cli["cli"]
   direction TB
+  subgraph cli_cli_module_commands["cli::commands"]
+    direction TB
+  F56_cli_cli_cli__commands__track__tddd__emit_command_outcome[[emit_command_outcome]]
+  end
 end
 T33_domain_domain_CatalogueLinterRule_new --o T37_domain_domain_CatalogueLinterRuleKind__self
 T33_domain_domain_CatalogueLinterRule_new --> T33_domain_domain_CatalogueLinterRule__self
@@ -284,4 +288,6 @@ class T39_cli_driver_cli_driver_ContractMapDriver_new method_node
 class T39_cli_driver_cli_driver_ContractMapDriver_handle method_node
 class T39_cli_driver_cli_driver_ContractMapDriver__self primary_adapter
 class T38_cli_driver_cli_driver_ContractMapInput__self dto
+class F56_cli_cli_cli__commands__track__tddd__emit_command_outcome free_function
+class F56_cli_cli_cli__commands__track__tddd__emit_command_outcome function_node
 ```

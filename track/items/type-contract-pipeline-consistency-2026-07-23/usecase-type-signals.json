@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-22T20:08:14Z",
+  "generated_at": "2026-07-23T02:39:02Z",
   "declaration_hash": "c17833c3012e0140d5f58f00302feaac65014452e91f34b0db2f12bb01ec6ea0",
-  "implementation_input_hash": "3d0fa91f2a43fb6af1b9186cb3a924f84af83cdbc5968b070f6cfdfa292e889f",
+  "implementation_input_hash": "3ac9dddc5bdcc9562904239da53ce2a8b1942fcf4decf96f25d365d0113003b2",
   "signals": [
     {
       "type_name": "LintRuleKind",

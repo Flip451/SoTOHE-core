@@ -1,7 +1,14 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-22T17:45:26Z",
-  "declaration_hash": "a37dc03aacd2f1bf2a071561c0012c9023c6ced85febf0eb530df5b6feb60d7d",
-  "implementation_input_hash": "9ebbdce5e5b46cd9aaaca42aa1d5a67d4893d70125a29a8562723b3673f9616d",
-  "signals": []
+  "generated_at": "2026-07-23T02:39:54Z",
+  "declaration_hash": "8d475a2e0aaa064d4fb73dd721e63d45db0925bc670b10660623503eb742228c",
+  "implementation_input_hash": "90b93ff62f0e3bb2e09be7c41554dc6831ac722d67c37d14033c454129e756ea",
+  "signals": [
+    {
+      "type_name": "cli::commands::track::tddd::emit_command_outcome",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
 }

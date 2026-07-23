@@ -21,7 +21,7 @@
     },
     {
       "id": "T004",
-      "description": "Complete `.harness/config/contract-map-style.toml`; update `RoleKind` in `libs/domain/src/tddd/catalogue_linter_role.rs` and the contract-map renderer result flow in `libs/domain/src/tddd/contract_map_renderer.rs`, `libs/usecase/src/contract_map_workflow.rs`, and `libs/infrastructure/src/tddd/contract_map_renderer_adapter/`; update `ContractMapInput` and `ContractMapDriver` in `apps/cli-driver/src/contract_map.rs`; and add renderer, workflow, and cli-driver presentation regression coverage. IN-04, CN-04, AC-04.",
+      "description": "Complete `.harness/config/contract-map-style.toml`; update `RoleKind` in `libs/domain/src/tddd/catalogue_linter_role.rs` and the contract-map renderer result flow in `libs/domain/src/tddd/contract_map_renderer.rs`, `libs/usecase/src/contract_map_workflow.rs`, and `libs/infrastructure/src/tddd/contract_map_renderer_adapter/`; update `ContractMapInput` and `ContractMapDriver` in `apps/cli-driver/src/contract_map.rs`; surface the completed command outcome, including warnings and failures, through the `apps/cli` primary-adapter output target; and add renderer, workflow, cli-driver, and CLI presentation regression coverage. IN-04, CN-04, AC-04.",
       "status": "done",
       "commit_hash": "87178dce272cdebef44725695f891b143c012515"
     }

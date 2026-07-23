@@ -18,7 +18,8 @@
       { "layer": "domain", "entry_key": "ContractMapRenderer" },
       { "layer": "usecase", "entry_key": "RenderContractMapOutput" },
       { "layer": "cli_driver", "entry_key": "ContractMapInput" },
-      { "layer": "cli_driver", "entry_key": "ContractMapDriver" }
+      { "layer": "cli_driver", "entry_key": "ContractMapDriver" },
+      { "layer": "cli", "entry_key": "cli::commands::track::tddd::emit_command_outcome" }
     ]
   }
 }

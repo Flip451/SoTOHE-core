@@ -126,9 +126,16 @@ fn undefined_role_style_warnings(
         }
     }
 
+    missing_role_style_warnings(&roles, style)
+}
+
+fn missing_role_style_warnings(
+    rendered_roles: &[RoleKind],
+    style: &render::StyleConfig,
+) -> Vec<ContractMapRenderWarning> {
     let mut warnings = Vec::new();
     for role in RoleKind::all() {
-        if roles.contains(role)
+        if rendered_roles.contains(role)
             && style
                 .role
                 .get(role.variant_name())
@@ -286,6 +293,19 @@ include_function_roles = []
             result.warnings().to_vec(),
             vec![ContractMapRenderWarning::UndefinedRoleStyle { role: RoleKind::ValueObject }]
         );
+    }
+
+    #[test]
+    fn test_missing_role_style_warnings_cover_all_role_kinds() {
+        let style = toml::from_str::<render::StyleConfig>(MINIMAL_VALID_CONFIG).unwrap();
+
+        let warnings = missing_role_style_warnings(RoleKind::all(), &style);
+        let expected = RoleKind::all()
+            .iter()
+            .map(|role| ContractMapRenderWarning::UndefinedRoleStyle { role: *role })
+            .collect::<Vec<_>>();
+
+        assert_eq!(warnings, expected, "every declared role must be checked for a classDef");
     }
 
     #[test]

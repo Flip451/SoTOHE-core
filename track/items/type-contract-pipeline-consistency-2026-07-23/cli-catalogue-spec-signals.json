@@ -1,5 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a37dc03aacd2f1bf2a071561c0012c9023c6ced85febf0eb530df5b6feb60d7d",
-  "signals": []
+  "catalogue_declaration_hash": "8d475a2e0aaa064d4fb73dd721e63d45db0925bc670b10660623503eb742228c",
+  "signals": [
+    {
+      "type_name": "cli::commands::track::tddd::emit_command_outcome",
+      "signal": "blue",
+      "entry_hash": "f23ebad87da02ba41592ffe000090503671d7ab0c90855edb513866dedb52b0e"
+    }
+  ]
 }

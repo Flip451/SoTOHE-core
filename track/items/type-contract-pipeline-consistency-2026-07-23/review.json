@@ -1,105 +1,35 @@
 {
   "schema_version": 2,
   "scopes": {
-    "adr": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cf4a8ffed5c05cab8bd329f4ef59e294f7ebc1a1e950e41914c21aad370cba69",
-          "at": "2026-07-22T17:12:27Z"
+          "hash": "rvw1:sha256:d9a76e4e56d6cc20a748e416c531335e469b653a62611c565f70ad2a116e3ae0",
+          "at": "2026-07-23T01:52:24Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cf4a8ffed5c05cab8bd329f4ef59e294f7ebc1a1e950e41914c21aad370cba69",
-          "at": "2026-07-22T17:14:50Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5b40779acf796828aa701f6e3061e08270ae4532449d67952d40668aad96ff85",
-          "at": "2026-07-22T18:03:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5b40779acf796828aa701f6e3061e08270ae4532449d67952d40668aad96ff85",
-          "at": "2026-07-22T18:05:44Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "R1 now makes domain `ValueObject` placement conditional on an inbound reference, but R10 still explicitly states that `ValueObject` is the domain default and requires every domain concept to be placed in a domain role. These rules conflict, so type designers cannot determine whether an unreferenced domain concept should remain a domain `ValueObject` or be moved to a usecase DTO/Command.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 247,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:8e74c915adc268d0f09c09891d47f4e982c0e1113a57fe86530aef323562e531",
-          "at": "2026-07-22T20:21:44Z"
+          "hash": "rvw1:sha256:d9a76e4e56d6cc20a748e416c531335e469b653a62611c565f70ad2a116e3ae0",
+          "at": "2026-07-23T01:55:05Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7efc86d64a9d16c66fff3d320df54bc7a323e1b5059d960a7b834c962d9c7251",
-          "at": "2026-07-22T20:24:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "R1/R10 now says a ValueObject candidate is a domain concept only when another domain entry references it, but the unchanged classifier below still says concept classification depends only on domain meaning and that ambiguous cases must be modeled in domain. A domain-meaning wrapper with no inbound reference therefore receives mutually exclusive placement instructions. Align the classifier with the new inbound-reference rule.",
-              "severity": "P1",
-              "file": "knowledge/conventions/type-designer-kind-selection.md",
-              "line": 242,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:7efc86d64a9d16c66fff3d320df54bc7a323e1b5059d960a7b834c962d9c7251",
-          "at": "2026-07-22T20:30:16Z"
+          "hash": "rvw1:sha256:6928820765184e838b7befb2fd1987a5548bedac568c0a482799fe3659eba66a",
+          "at": "2026-07-23T02:40:34Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0445dc4dbd711541d2f599f6cdb8f1c7f4f6d05a4c2d5a6a8a1960e640227855",
-          "at": "2026-07-22T20:33:21Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c40a5053133bdb8e745f152bacb57b983de608c7024a82262fd6edd6ae77d0ca",
-          "at": "2026-07-22T20:21:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c40a5053133bdb8e745f152bacb57b983de608c7024a82262fd6edd6ae77d0ca",
-          "at": "2026-07-22T20:28:09Z"
+          "hash": "rvw1:sha256:6928820765184e838b7befb2fd1987a5548bedac568c0a482799fe3659eba66a",
+          "at": "2026-07-23T02:42:09Z"
         }
       ]
     },
@@ -133,38 +63,20 @@
           "findings": [],
           "hash": "rvw1:sha256:bb0b5546a0e845990e5ce6995ac857ef2abe83716169275a3d4d4b900a3ccb57",
           "at": "2026-07-23T01:14:25Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:52398b424fca70769ccb0d8a1e6396c611d5c96b43dc0c001b30dac499fb5295",
-          "at": "2026-07-22T20:21:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:52398b424fca70769ccb0d8a1e6396c611d5c96b43dc0c001b30dac499fb5295",
-          "at": "2026-07-22T20:29:04Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d5a11cf5627b850467fbe0eebfee1460ea22ec85dbd194b4d39d97855061bec8",
-          "at": "2026-07-23T00:37:42Z"
+          "hash": "rvw1:sha256:ad0d08084ff8e380e304394034e40baf5bee1f064160fa71c5c79174dc93e7e2",
+          "at": "2026-07-23T02:41:02Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d5a11cf5627b850467fbe0eebfee1460ea22ec85dbd194b4d39d97855061bec8",
-          "at": "2026-07-23T00:40:34Z"
+          "hash": "rvw1:sha256:ad0d08084ff8e380e304394034e40baf5bee1f064160fa71c5c79174dc93e7e2",
+          "at": "2026-07-23T02:42:59Z"
         }
       ]
     },
@@ -227,6 +139,70 @@
           "findings": [],
           "hash": "rvw1:sha256:62737cc2c287cc77b1b3e443b95194230da573dd95ce800b132c4c292f0f0819",
           "at": "2026-07-23T00:02:29Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf4a8ffed5c05cab8bd329f4ef59e294f7ebc1a1e950e41914c21aad370cba69",
+          "at": "2026-07-22T17:12:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf4a8ffed5c05cab8bd329f4ef59e294f7ebc1a1e950e41914c21aad370cba69",
+          "at": "2026-07-22T17:14:50Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52398b424fca70769ccb0d8a1e6396c611d5c96b43dc0c001b30dac499fb5295",
+          "at": "2026-07-22T20:21:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52398b424fca70769ccb0d8a1e6396c611d5c96b43dc0c001b30dac499fb5295",
+          "at": "2026-07-22T20:29:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5a11cf5627b850467fbe0eebfee1460ea22ec85dbd194b4d39d97855061bec8",
+          "at": "2026-07-23T00:37:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5a11cf5627b850467fbe0eebfee1460ea22ec85dbd194b4d39d97855061bec8",
+          "at": "2026-07-23T00:40:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca745fdcb8f9d4597a145fe966c6d6c14e5fa6aba886306ad79a8b015e4001ee",
+          "at": "2026-07-23T02:41:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca745fdcb8f9d4597a145fe966c6d6c14e5fa6aba886306ad79a8b015e4001ee",
+          "at": "2026-07-23T02:44:24Z"
         }
       ]
     },
@@ -440,6 +416,67 @@
           "findings": [],
           "hash": "rvw1:sha256:623c9affb60df907af0022812d88ca2931adf67e63c20590335ace6ed3fdefbe",
           "at": "2026-07-23T01:31:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6859ba4c70a8f331e78f0fb811f6354273f6e1fdfa5f051ce23f6ad33f7171ff",
+          "at": "2026-07-23T01:52:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::commands::track::tddd::emit_command_outcome` の docs は「exit code を保持する」「警告や失敗を利用者へ表示する」という IN-04／AC-04 の挙動を散文で再記述しています。変更対象・操作と anchor cite だけに短縮し、上流仕様との重複を除いてください。",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/cli-types.json",
+              "line": 5,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:6859ba4c70a8f331e78f0fb811f6354273f6e1fdfa5f051ce23f6ad33f7171ff",
+          "at": "2026-07-23T01:55:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cf45a8115d6ce6b6dd1e8589c23872a7766df0ad1e7cdc66a8c6259472e06e1",
+          "at": "2026-07-23T02:05:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cf45a8115d6ce6b6dd1e8589c23872a7766df0ad1e7cdc66a8c6259472e06e1",
+          "at": "2026-07-23T02:40:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cf45a8115d6ce6b6dd1e8589c23872a7766df0ad1e7cdc66a8c6259472e06e1",
+          "at": "2026-07-23T02:42:07Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b40779acf796828aa701f6e3061e08270ae4532449d67952d40668aad96ff85",
+          "at": "2026-07-22T18:03:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b40779acf796828aa701f6e3061e08270ae4532449d67952d40668aad96ff85",
+          "at": "2026-07-22T18:05:44Z"
         }
       ]
     },
@@ -660,6 +697,71 @@
           "findings": [],
           "hash": "rvw1:sha256:9da2c54ae2a7bbf49a453665dace41600728f9d3a7be2918579f499c836744cd",
           "at": "2026-07-23T01:18:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99e0e113bba624497d9788295543f6a50a40388cd0066ac471f1de4b651da80b",
+          "at": "2026-07-23T01:52:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:99e0e113bba624497d9788295543f6a50a40388cd0066ac471f1de4b651da80b",
+          "at": "2026-07-23T01:55:33Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c40a5053133bdb8e745f152bacb57b983de608c7024a82262fd6edd6ae77d0ca",
+          "at": "2026-07-22T20:21:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c40a5053133bdb8e745f152bacb57b983de608c7024a82262fd6edd6ae77d0ca",
+          "at": "2026-07-22T20:28:09Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1988fe483ef3cf923c9eb6806186a4de86d88b29d0aa7ad1db6c70383076676c",
+          "at": "2026-07-23T02:41:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `RoleKind × CN-04` voluntary binding cites only the single-`ValueObject` warning test. That test still passes if another role is introduced without being covered by the style-completeness path, which is precisely the regression CN-04 requires this edge to detect. Bind the existing all-role completeness test (and any supporting role-enumeration coverage) instead.",
+              "severity": "P1",
+              "file": "track/items/type-contract-pipeline-consistency-2026-07-23/test-bindings.json",
+              "line": 112,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:1988fe483ef3cf923c9eb6806186a4de86d88b29d0aa7ad1db6c70383076676c",
+          "at": "2026-07-23T02:47:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb6bd693f054e719d3e9fac469070ecde892d44d8384602ac1adae7cbe1eb7d3",
+          "at": "2026-07-23T02:50:44Z"
         }
       ]
     },
@@ -700,6 +802,54 @@
           "findings": [],
           "hash": "rvw1:sha256:dba420553a147e75fdf384c3a19e477aaff67caad4439539f98380f1d8f35e7d",
           "at": "2026-07-23T01:14:11Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "R1 now makes domain `ValueObject` placement conditional on an inbound reference, but R10 still explicitly states that `ValueObject` is the domain default and requires every domain concept to be placed in a domain role. These rules conflict, so type designers cannot determine whether an unreferenced domain concept should remain a domain `ValueObject` or be moved to a usecase DTO/Command.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 247,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8e74c915adc268d0f09c09891d47f4e982c0e1113a57fe86530aef323562e531",
+          "at": "2026-07-22T20:21:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7efc86d64a9d16c66fff3d320df54bc7a323e1b5059d960a7b834c962d9c7251",
+          "at": "2026-07-22T20:24:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "R1/R10 now says a ValueObject candidate is a domain concept only when another domain entry references it, but the unchanged classifier below still says concept classification depends only on domain meaning and that ambiguous cases must be modeled in domain. A domain-meaning wrapper with no inbound reference therefore receives mutually exclusive placement instructions. Align the classifier with the new inbound-reference rule.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 242,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7efc86d64a9d16c66fff3d320df54bc7a323e1b5059d960a7b834c962d9c7251",
+          "at": "2026-07-22T20:30:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0445dc4dbd711541d2f599f6cdb8f1c7f4f6d05a4c2d5a6a8a1960e640227855",
+          "at": "2026-07-22T20:33:21Z"
         }
       ]
     }

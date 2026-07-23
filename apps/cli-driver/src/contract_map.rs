@@ -69,6 +69,8 @@ fn contract_map_success_message<W: Debug>(
 #[allow(clippy::unwrap_used)]
 mod tests {
     use super::*;
+    use domain::RoleKind;
+    use domain::tddd::ContractMapRenderWarning;
     use usecase::TrackId;
 
     #[derive(Debug)]
@@ -91,6 +93,44 @@ mod tests {
         {
             Err(usecase::contract_map_workflow::RenderContractMapError::EmptyCatalogue {
                 track_id: command.track_id.clone(),
+            })
+        }
+    }
+
+    struct WarningContractMapService;
+
+    impl RenderContractMap for WarningContractMapService {
+        fn execute(
+            &self,
+            _: &RenderContractMapCommand,
+        ) -> Result<RenderContractMapOutput, usecase::contract_map_workflow::RenderContractMapError>
+        {
+            Ok(RenderContractMapOutput {
+                rendered_layer_count: 1,
+                total_entry_count: 2,
+                warnings: vec![ContractMapRenderWarning::UndefinedRoleStyle {
+                    role: RoleKind::ValueObject,
+                }],
+            })
+        }
+    }
+
+    struct ValidatedCommandContractMapService;
+
+    impl RenderContractMap for ValidatedCommandContractMapService {
+        fn execute(
+            &self,
+            command: &RenderContractMapCommand,
+        ) -> Result<RenderContractMapOutput, usecase::contract_map_workflow::RenderContractMapError>
+        {
+            assert_eq!(command.track_id.as_ref(), "validated-track");
+            assert!(command.layer_filter.is_none());
+            Ok(RenderContractMapOutput {
+                rendered_layer_count: 1,
+                total_entry_count: 2,
+                warnings: vec![ContractMapRenderWarning::UndefinedRoleStyle {
+                    role: RoleKind::ValueObject,
+                }],
             })
         }
     }
@@ -141,6 +181,52 @@ mod tests {
             Some(
                 "catalogue loader returned no enabled layers for track 'test-track'; \
                  check `architecture-rules.json` tddd blocks"
+            )
+        );
+    }
+
+    #[test]
+    fn test_contract_map_driver_success_renders_warning_outcome() {
+        let driver = ContractMapDriver::new(Arc::new(WarningContractMapService));
+        let input = ContractMapInput {
+            command: RenderContractMapCommand {
+                track_id: TrackId::try_new("test-track").unwrap(),
+                layer_filter: None,
+            },
+        };
+
+        let outcome = driver.handle(input);
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(
+                "[OK] contract-map: wrote track/items/test-track/contract-map.md \
+                 (layers=1, entries=2, warnings=[UndefinedRoleStyle { role: ValueObject }])"
+            )
+        );
+    }
+
+    #[test]
+    fn test_contract_map_input_forwards_validated_command_without_reconstruction() {
+        let driver = ContractMapDriver::new(Arc::new(ValidatedCommandContractMapService));
+        let input = ContractMapInput {
+            command: RenderContractMapCommand {
+                track_id: TrackId::try_new("validated-track").unwrap(),
+                layer_filter: None,
+            },
+        };
+
+        let outcome = driver.handle(input);
+
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(outcome.stderr, None);
+        assert_eq!(
+            outcome.stdout.as_deref(),
+            Some(
+                "[OK] contract-map: wrote track/items/validated-track/contract-map.md \
+                 (layers=1, entries=2, warnings=[UndefinedRoleStyle { role: ValueObject }])"
             )
         );
     }

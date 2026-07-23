@@ -2,6 +2,7 @@
 //!
 //! Thin CLI adapter: delegates all orchestration to the composition root in `cli_composition`.
 
+use std::io;
 use std::path::PathBuf;
 use std::process::ExitCode;
 
@@ -23,10 +24,7 @@ pub fn execute_baseline_graph(
     let outcome = TrackCompositionRoot::new()
         .track_baseline_graph(items_dir, Some(track_id), workspace_root, layers)
         .map_err(|e| CliError::Message(e.to_string()))?;
-    if let Some(ref s) = outcome.stdout {
-        println!("{s}");
-    }
-    Ok(ExitCode::from(outcome.exit_code))
+    super::emit_command_outcome(&outcome, &mut io::stdout(), &mut io::stderr())
 }
 
 #[cfg(test)]
