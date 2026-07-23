@@ -1,0 +1,556 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef composition_root fill:#e0e7ff,stroke:#3730a3,stroke-width:2px
+classDef domain_event fill:#fce7f3,stroke:#9d174d,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef event_policy fill:#fef3c7,stroke:#92400e,stroke-width:1px
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef primary_adapter fill:#ecfccb,stroke:#3f6212,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef repository fill:#f5f3ff,stroke:#6d28d9,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_adr_baseline["usecase::adr_baseline"]
+    direction TB
+  subgraph T37_usecase_usecase_AdrBaselineInteractor["adr_baseline::AdrBaselineInteractor"]
+    direction TB
+    T37_usecase_usecase_AdrBaselineInteractor__self[AdrBaselineInteractor]
+    T37_usecase_usecase_AdrBaselineInteractor_new([new])
+  end
+  subgraph T42_usecase_usecase_AdrBaselineQueryInteractor["adr_baseline::AdrBaselineQueryInteractor"]
+    direction TB
+    T42_usecase_usecase_AdrBaselineQueryInteractor__self[AdrBaselineQueryInteractor]
+    T42_usecase_usecase_AdrBaselineQueryInteractor_new([new])
+  end
+  subgraph R39_usecase_usecase_AdrBaselineQueryService["adr_baseline::AdrBaselineQueryService"]
+    direction TB
+    R39_usecase_usecase_AdrBaselineQueryService__self[AdrBaselineQueryService]
+    R39_usecase_usecase_AdrBaselineQueryService_execute([execute])
+  end
+  subgraph R34_usecase_usecase_AdrBaselineService["adr_baseline::AdrBaselineService"]
+    direction TB
+    R34_usecase_usecase_AdrBaselineService__self[AdrBaselineService]
+    R34_usecase_usecase_AdrBaselineService_execute([execute])
+  end
+  subgraph R37_usecase_usecase_AdrBaselineSourcePort["adr_baseline::AdrBaselineSourcePort"]
+    direction TB
+    R37_usecase_usecase_AdrBaselineSourcePort__self[AdrBaselineSourcePort]
+    R37_usecase_usecase_AdrBaselineSourcePort_working_bytes([working_bytes])
+    R37_usecase_usecase_AdrBaselineSourcePort_fork_point_bytes([fork_point_bytes])
+    R37_usecase_usecase_AdrBaselineSourcePort_cited_sources([cited_sources])
+    R37_usecase_usecase_AdrBaselineSourcePort_source_state([source_state])
+  end
+  subgraph R36_usecase_usecase_AdrBaselineStorePort["adr_baseline::AdrBaselineStorePort"]
+    direction TB
+    R36_usecase_usecase_AdrBaselineStorePort__self[AdrBaselineStorePort]
+    R36_usecase_usecase_AdrBaselineStorePort_snapshot([snapshot])
+    R36_usecase_usecase_AdrBaselineStorePort_restore([restore])
+  end
+  subgraph R40_usecase_usecase_AdrBaselineStoreReadPort["adr_baseline::AdrBaselineStoreReadPort"]
+    direction TB
+    R40_usecase_usecase_AdrBaselineStoreReadPort__self[AdrBaselineStoreReadPort]
+    R40_usecase_usecase_AdrBaselineStoreReadPort_read_entries([read_entries])
+    R40_usecase_usecase_AdrBaselineStoreReadPort_verify_recorded_copy([verify_recorded_copy])
+  end
+  end
+  subgraph usecase_usecase_module_catalog_gen["usecase::catalog_gen"]
+    direction TB
+  subgraph T28_usecase_usecase_CatalogError["catalog_gen::CatalogError"]
+    direction TB
+    T28_usecase_usecase_CatalogError__self[CatalogError]
+    T28_usecase_usecase_CatalogError_FileExists[FileExists]
+    T28_usecase_usecase_CatalogError_FileMissing[FileMissing]
+    T28_usecase_usecase_CatalogError_DuplicateEntry[DuplicateEntry]
+    T28_usecase_usecase_CatalogError_AnchorNotFound[AnchorNotFound]
+    T28_usecase_usecase_CatalogError_InvalidRole[InvalidRole]
+    T28_usecase_usecase_CatalogError_ParseFragment[ParseFragment]
+    T28_usecase_usecase_CatalogError_SchemaInvalid[SchemaInvalid]
+    T28_usecase_usecase_CatalogError_Port[Port]
+  end
+  subgraph T33_usecase_usecase_CatalogInteractor["catalog_gen::CatalogInteractor"]
+    direction TB
+    T33_usecase_usecase_CatalogInteractor__self[CatalogInteractor]
+    T33_usecase_usecase_CatalogInteractor_new([new])
+  end
+  subgraph T29_usecase_usecase_CatalogTarget["catalog_gen::CatalogTarget"]
+    direction TB
+    T29_usecase_usecase_CatalogTarget__self[CatalogTarget]
+  end
+  subgraph R27_usecase_usecase_CatalogPort["catalog_gen::CatalogPort"]
+    direction TB
+    R27_usecase_usecase_CatalogPort__self[CatalogPort]
+    R27_usecase_usecase_CatalogPort_init([init])
+    R27_usecase_usecase_CatalogPort_add([add])
+    R27_usecase_usecase_CatalogPort_import([import])
+    R27_usecase_usecase_CatalogPort_cite([cite])
+    R27_usecase_usecase_CatalogPort_check([check])
+  end
+  subgraph R35_usecase_usecase_CatalogQueryService["catalog_gen::CatalogQueryService"]
+    direction TB
+    R35_usecase_usecase_CatalogQueryService__self[CatalogQueryService]
+    R35_usecase_usecase_CatalogQueryService_check([check])
+  end
+  subgraph R30_usecase_usecase_CatalogService["catalog_gen::CatalogService"]
+    direction TB
+    R30_usecase_usecase_CatalogService__self[CatalogService]
+    R30_usecase_usecase_CatalogService_init([init])
+    R30_usecase_usecase_CatalogService_add([add])
+    R30_usecase_usecase_CatalogService_import([import])
+    R30_usecase_usecase_CatalogService_cite([cite])
+  end
+  end
+  subgraph usecase_usecase_module_pre_review_gate["usecase::pre_review_gate"]
+    direction TB
+  subgraph T40_usecase_usecase_CoverageVerifyInteractor["pre_review_gate::CoverageVerifyInteractor"]
+    direction TB
+    T40_usecase_usecase_CoverageVerifyInteractor__self[CoverageVerifyInteractor]
+    T40_usecase_usecase_CoverageVerifyInteractor_new([new])
+  end
+  subgraph T42_usecase_usecase_ImplCatalogSignalReadError["pre_review_gate::ImplCatalogSignalReadError"]
+    direction TB
+    T42_usecase_usecase_ImplCatalogSignalReadError__self[ImplCatalogSignalReadError]
+    T42_usecase_usecase_ImplCatalogSignalReadError_ReadFailed[ReadFailed]
+  end
+  subgraph T33_usecase_usecase_ImplPlanReadError["pre_review_gate::ImplPlanReadError"]
+    direction TB
+    T33_usecase_usecase_ImplPlanReadError__self[ImplPlanReadError]
+    T33_usecase_usecase_ImplPlanReadError_ReadFailed[ReadFailed]
+  end
+  subgraph T39_usecase_usecase_PreReviewGateInteractor["pre_review_gate::PreReviewGateInteractor"]
+    direction TB
+    T39_usecase_usecase_PreReviewGateInteractor__self[PreReviewGateInteractor]
+    T39_usecase_usecase_PreReviewGateInteractor_new([new])
+  end
+  subgraph T37_usecase_usecase_TaskContractReadError["pre_review_gate::TaskContractReadError"]
+    direction TB
+    T37_usecase_usecase_TaskContractReadError__self[TaskContractReadError]
+    T37_usecase_usecase_TaskContractReadError_NotFound[NotFound]
+    T37_usecase_usecase_TaskContractReadError_ReadFailed[ReadFailed]
+  end
+  subgraph R37_usecase_usecase_CoverageVerifyService["pre_review_gate::CoverageVerifyService"]
+    direction TB
+    R37_usecase_usecase_CoverageVerifyService__self[CoverageVerifyService]
+    R37_usecase_usecase_CoverageVerifyService_verify_coverage([verify_coverage])
+  end
+  subgraph R43_usecase_usecase_ImplCatalogSignalReaderPort["pre_review_gate::ImplCatalogSignalReaderPort"]
+    direction TB
+    R43_usecase_usecase_ImplCatalogSignalReaderPort__self[ImplCatalogSignalReaderPort]
+    R43_usecase_usecase_ImplCatalogSignalReaderPort_read_signals([read_signals])
+    R43_usecase_usecase_ImplCatalogSignalReaderPort_read_optional_signals([read_optional_signals])
+  end
+  subgraph R34_usecase_usecase_ImplPlanReaderPort["pre_review_gate::ImplPlanReaderPort"]
+    direction TB
+    R34_usecase_usecase_ImplPlanReaderPort__self[ImplPlanReaderPort]
+    R34_usecase_usecase_ImplPlanReaderPort_read_task_statuses([read_task_statuses])
+  end
+  subgraph R36_usecase_usecase_PreReviewGateService["pre_review_gate::PreReviewGateService"]
+    direction TB
+    R36_usecase_usecase_PreReviewGateService__self[PreReviewGateService]
+    R36_usecase_usecase_PreReviewGateService_check([check])
+  end
+  subgraph R38_usecase_usecase_TaskContractReaderPort["pre_review_gate::TaskContractReaderPort"]
+    direction TB
+    R38_usecase_usecase_TaskContractReaderPort__self[TaskContractReaderPort]
+    R38_usecase_usecase_TaskContractReaderPort_read([read])
+  end
+  end
+  subgraph usecase_usecase_module_template_export["usecase::template_export"]
+    direction TB
+  subgraph T40_usecase_usecase_TemplateExportInteractor["template_export::TemplateExportInteractor"]
+    direction TB
+    T40_usecase_usecase_TemplateExportInteractor__self[TemplateExportInteractor]
+    T40_usecase_usecase_TemplateExportInteractor_new([new])
+  end
+  subgraph R40_usecase_usecase_SelfBinaryTransplantPort["template_export::SelfBinaryTransplantPort"]
+    direction TB
+    R40_usecase_usecase_SelfBinaryTransplantPort__self[SelfBinaryTransplantPort]
+    R40_usecase_usecase_SelfBinaryTransplantPort_transplant([transplant])
+  end
+  subgraph R44_usecase_usecase_TemplateBoundaryManifestPort["template_export::TemplateBoundaryManifestPort"]
+    direction TB
+    R44_usecase_usecase_TemplateBoundaryManifestPort__self[TemplateBoundaryManifestPort]
+    R44_usecase_usecase_TemplateBoundaryManifestPort_read([read])
+  end
+  subgraph R34_usecase_usecase_TemplateExportPort["template_export::TemplateExportPort"]
+    direction TB
+    R34_usecase_usecase_TemplateExportPort__self[TemplateExportPort]
+    R34_usecase_usecase_TemplateExportPort_export([export])
+  end
+  subgraph R37_usecase_usecase_TemplateExportService["template_export::TemplateExportService"]
+    direction TB
+    R37_usecase_usecase_TemplateExportService__self[TemplateExportService]
+    R37_usecase_usecase_TemplateExportService_export([export])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_adr_baseline["infrastructure::adr_baseline"]
+    direction TB
+  subgraph T48_infrastructure_infrastructure_FsAdrBaselineStore["adr_baseline::store::FsAdrBaselineStore"]
+    direction TB
+    T48_infrastructure_infrastructure_FsAdrBaselineStore__self[FsAdrBaselineStore]
+  end
+  subgraph T52_infrastructure_infrastructure_FsGitAdrBaselineSource["adr_baseline::source::FsGitAdrBaselineSource"]
+    direction TB
+    T52_infrastructure_infrastructure_FsGitAdrBaselineSource__self[FsGitAdrBaselineSource]
+  end
+  end
+  subgraph infrastructure_infrastructure_module_impl_catalog_signal_reader["infrastructure::impl_catalog_signal_reader"]
+    direction TB
+  subgraph T55_infrastructure_infrastructure_FsImplCatalogSignalReader["impl_catalog_signal_reader::FsImplCatalogSignalReader"]
+    direction TB
+    T55_infrastructure_infrastructure_FsImplCatalogSignalReader__self[FsImplCatalogSignalReader]
+    T55_infrastructure_infrastructure_FsImplCatalogSignalReader_new([new])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_impl_plan_reader["infrastructure::impl_plan_reader"]
+    direction TB
+  subgraph T46_infrastructure_infrastructure_FsImplPlanReader["impl_plan_reader::FsImplPlanReader"]
+    direction TB
+    T46_infrastructure_infrastructure_FsImplPlanReader__self[FsImplPlanReader]
+    T46_infrastructure_infrastructure_FsImplPlanReader_new([new])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_task_contract_reader["infrastructure::task_contract_reader"]
+    direction TB
+  subgraph T50_infrastructure_infrastructure_FsTaskContractReader["task_contract_reader::FsTaskContractReader"]
+    direction TB
+    T50_infrastructure_infrastructure_FsTaskContractReader__self[FsTaskContractReader]
+    T50_infrastructure_infrastructure_FsTaskContractReader_new([new])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_tddd["infrastructure::tddd"]
+    direction TB
+  subgraph T46_infrastructure_infrastructure_FsCatalogAdapter["tddd::catalog_gen::FsCatalogAdapter"]
+    direction TB
+    T46_infrastructure_infrastructure_FsCatalogAdapter__self[FsCatalogAdapter]
+    T46_infrastructure_infrastructure_FsCatalogAdapter_new([new])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_template_export["infrastructure::template_export"]
+    direction TB
+  subgraph T59_infrastructure_infrastructure_FsSelfBinaryTransplantAdapter["template_export::FsSelfBinaryTransplantAdapter"]
+    direction TB
+    T59_infrastructure_infrastructure_FsSelfBinaryTransplantAdapter__self[FsSelfBinaryTransplantAdapter]
+    T59_infrastructure_infrastructure_FsSelfBinaryTransplantAdapter_new([new])
+  end
+  subgraph T63_infrastructure_infrastructure_FsTemplateBoundaryManifestAdapter["template_export::FsTemplateBoundaryManifestAdapter"]
+    direction TB
+    T63_infrastructure_infrastructure_FsTemplateBoundaryManifestAdapter__self[FsTemplateBoundaryManifestAdapter]
+    T63_infrastructure_infrastructure_FsTemplateBoundaryManifestAdapter_new([new])
+  end
+  subgraph T53_infrastructure_infrastructure_FsTemplateExportAdapter["template_export::FsTemplateExportAdapter"]
+    direction TB
+    T53_infrastructure_infrastructure_FsTemplateExportAdapter__self[FsTemplateExportAdapter]
+    T53_infrastructure_infrastructure_FsTemplateExportAdapter_new([new])
+  end
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+  subgraph cli_driver_cli_driver_module_adr_baseline["cli_driver::adr_baseline"]
+    direction TB
+  subgraph T39_cli_driver_cli_driver_AdrBaselineDriver["adr_baseline::AdrBaselineDriver"]
+    direction TB
+    T39_cli_driver_cli_driver_AdrBaselineDriver__self[AdrBaselineDriver]
+    T39_cli_driver_cli_driver_AdrBaselineDriver_new([new])
+    T39_cli_driver_cli_driver_AdrBaselineDriver_handle([handle])
+  end
+  end
+  subgraph cli_driver_cli_driver_module_catalog_gen["cli_driver::catalog_gen"]
+    direction TB
+  subgraph T35_cli_driver_cli_driver_CatalogDriver["catalog_gen::CatalogDriver"]
+    direction TB
+    T35_cli_driver_cli_driver_CatalogDriver__self[CatalogDriver]
+    T35_cli_driver_cli_driver_CatalogDriver_new([new])
+    T35_cli_driver_cli_driver_CatalogDriver_handle([handle])
+  end
+  end
+  subgraph cli_driver_cli_driver_module_task_contract["cli_driver::task_contract"]
+    direction TB
+  subgraph T40_cli_driver_cli_driver_TaskContractDriver["task_contract::TaskContractDriver"]
+    direction TB
+    T40_cli_driver_cli_driver_TaskContractDriver__self[TaskContractDriver]
+    T40_cli_driver_cli_driver_TaskContractDriver_new([new])
+    T40_cli_driver_cli_driver_TaskContractDriver_handle([handle])
+  end
+  end
+  subgraph cli_driver_cli_driver_module_template_export["cli_driver::template_export"]
+    direction TB
+  subgraph T36_cli_driver_cli_driver_TemplateDriver["template_export::TemplateDriver"]
+    direction TB
+    T36_cli_driver_cli_driver_TemplateDriver__self[TemplateDriver]
+    T36_cli_driver_cli_driver_TemplateDriver_new([new])
+    T36_cli_driver_cli_driver_TemplateDriver_handle([handle])
+  end
+  end
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+  subgraph cli_composition_cli_composition_module_adr_baseline["cli_composition::adr_baseline"]
+    direction TB
+  subgraph T58_cli_composition_cli_composition_AdrBaselineCompositionRoot["adr_baseline::AdrBaselineCompositionRoot"]
+    direction TB
+    T58_cli_composition_cli_composition_AdrBaselineCompositionRoot__self[AdrBaselineCompositionRoot]
+    T58_cli_composition_cli_composition_AdrBaselineCompositionRoot_new([new])
+    T58_cli_composition_cli_composition_AdrBaselineCompositionRoot_adr_baseline_driver([adr_baseline_driver])
+  end
+  end
+  subgraph cli_composition_cli_composition_module_catalog["cli_composition::catalog"]
+    direction TB
+  subgraph T54_cli_composition_cli_composition_CatalogCompositionRoot["catalog::CatalogCompositionRoot"]
+    direction TB
+    T54_cli_composition_cli_composition_CatalogCompositionRoot__self[CatalogCompositionRoot]
+    T54_cli_composition_cli_composition_CatalogCompositionRoot_new([new])
+    T54_cli_composition_cli_composition_CatalogCompositionRoot_catalog_driver([catalog_driver])
+  end
+  end
+  subgraph cli_composition_cli_composition_module_task_contract["cli_composition::task_contract"]
+    direction TB
+  subgraph T59_cli_composition_cli_composition_TaskContractCompositionRoot["task_contract::TaskContractCompositionRoot"]
+    direction TB
+    T59_cli_composition_cli_composition_TaskContractCompositionRoot__self[TaskContractCompositionRoot]
+    T59_cli_composition_cli_composition_TaskContractCompositionRoot_new([new])
+    T59_cli_composition_cli_composition_TaskContractCompositionRoot_task_contract_driver([task_contract_driver])
+  end
+  end
+  subgraph cli_composition_cli_composition_module_template_export["cli_composition::template_export"]
+    direction TB
+  subgraph T55_cli_composition_cli_composition_TemplateCompositionRoot["template_export::TemplateCompositionRoot"]
+    direction TB
+    T55_cli_composition_cli_composition_TemplateCompositionRoot__self[TemplateCompositionRoot]
+    T55_cli_composition_cli_composition_TemplateCompositionRoot_new([new])
+    T55_cli_composition_cli_composition_TemplateCompositionRoot_template_driver([template_driver])
+  end
+  end
+end
+subgraph cli["cli"]
+  direction TB
+end
+T37_usecase_usecase_AdrBaselineInteractor_new --o R36_usecase_usecase_AdrBaselineStorePort__self
+T37_usecase_usecase_AdrBaselineInteractor_new --o R37_usecase_usecase_AdrBaselineSourcePort__self
+T37_usecase_usecase_AdrBaselineInteractor_new --> T37_usecase_usecase_AdrBaselineInteractor__self
+T42_usecase_usecase_AdrBaselineQueryInteractor_new --o R40_usecase_usecase_AdrBaselineStoreReadPort__self
+T42_usecase_usecase_AdrBaselineQueryInteractor_new --o R37_usecase_usecase_AdrBaselineSourcePort__self
+T42_usecase_usecase_AdrBaselineQueryInteractor_new --> T42_usecase_usecase_AdrBaselineQueryInteractor__self
+T33_usecase_usecase_CatalogInteractor_new --o R27_usecase_usecase_CatalogPort__self
+T33_usecase_usecase_CatalogInteractor_new --> T33_usecase_usecase_CatalogInteractor__self
+R27_usecase_usecase_CatalogPort_init --> T28_usecase_usecase_CatalogError__self
+R27_usecase_usecase_CatalogPort_add --> T28_usecase_usecase_CatalogError__self
+R27_usecase_usecase_CatalogPort_import --> T28_usecase_usecase_CatalogError__self
+R27_usecase_usecase_CatalogPort_cite --> T28_usecase_usecase_CatalogError__self
+R27_usecase_usecase_CatalogPort_check --> T28_usecase_usecase_CatalogError__self
+R35_usecase_usecase_CatalogQueryService_check --o T29_usecase_usecase_CatalogTarget__self
+R35_usecase_usecase_CatalogQueryService_check --> T28_usecase_usecase_CatalogError__self
+R30_usecase_usecase_CatalogService_init --o T29_usecase_usecase_CatalogTarget__self
+R30_usecase_usecase_CatalogService_init --> T28_usecase_usecase_CatalogError__self
+R30_usecase_usecase_CatalogService_add --o T29_usecase_usecase_CatalogTarget__self
+R30_usecase_usecase_CatalogService_add --> T28_usecase_usecase_CatalogError__self
+R30_usecase_usecase_CatalogService_import --o T29_usecase_usecase_CatalogTarget__self
+R30_usecase_usecase_CatalogService_import --> T28_usecase_usecase_CatalogError__self
+R30_usecase_usecase_CatalogService_cite --o T29_usecase_usecase_CatalogTarget__self
+R30_usecase_usecase_CatalogService_cite --> T28_usecase_usecase_CatalogError__self
+T40_usecase_usecase_CoverageVerifyInteractor_new --o R38_usecase_usecase_TaskContractReaderPort__self
+T40_usecase_usecase_CoverageVerifyInteractor_new --o R43_usecase_usecase_ImplCatalogSignalReaderPort__self
+T40_usecase_usecase_CoverageVerifyInteractor_new --o R34_usecase_usecase_ImplPlanReaderPort__self
+T40_usecase_usecase_CoverageVerifyInteractor_new --> T40_usecase_usecase_CoverageVerifyInteractor__self
+T39_usecase_usecase_PreReviewGateInteractor_new --o R38_usecase_usecase_TaskContractReaderPort__self
+T39_usecase_usecase_PreReviewGateInteractor_new --o R43_usecase_usecase_ImplCatalogSignalReaderPort__self
+T39_usecase_usecase_PreReviewGateInteractor_new --o R34_usecase_usecase_ImplPlanReaderPort__self
+T39_usecase_usecase_PreReviewGateInteractor_new --> T39_usecase_usecase_PreReviewGateInteractor__self
+R43_usecase_usecase_ImplCatalogSignalReaderPort_read_signals --> T42_usecase_usecase_ImplCatalogSignalReadError__self
+R43_usecase_usecase_ImplCatalogSignalReaderPort_read_optional_signals --> T42_usecase_usecase_ImplCatalogSignalReadError__self
+R34_usecase_usecase_ImplPlanReaderPort_read_task_statuses --> T33_usecase_usecase_ImplPlanReadError__self
+R38_usecase_usecase_TaskContractReaderPort_read --> T37_usecase_usecase_TaskContractReadError__self
+T40_usecase_usecase_TemplateExportInteractor_new --o R44_usecase_usecase_TemplateBoundaryManifestPort__self
+T40_usecase_usecase_TemplateExportInteractor_new --o R34_usecase_usecase_TemplateExportPort__self
+T40_usecase_usecase_TemplateExportInteractor_new --o R40_usecase_usecase_SelfBinaryTransplantPort__self
+T40_usecase_usecase_TemplateExportInteractor_new --> T40_usecase_usecase_TemplateExportInteractor__self
+T37_usecase_usecase_AdrBaselineInteractor__self -.impl.-> R34_usecase_usecase_AdrBaselineService__self
+T42_usecase_usecase_AdrBaselineQueryInteractor__self -.impl.-> R39_usecase_usecase_AdrBaselineQueryService__self
+T33_usecase_usecase_CatalogInteractor__self -.impl.-> R30_usecase_usecase_CatalogService__self
+T33_usecase_usecase_CatalogInteractor__self -.impl.-> R35_usecase_usecase_CatalogQueryService__self
+T40_usecase_usecase_CoverageVerifyInteractor__self -.impl.-> R37_usecase_usecase_CoverageVerifyService__self
+T39_usecase_usecase_PreReviewGateInteractor__self -.impl.-> R36_usecase_usecase_PreReviewGateService__self
+T40_usecase_usecase_TemplateExportInteractor__self -.impl.-> R37_usecase_usecase_TemplateExportService__self
+T55_infrastructure_infrastructure_FsImplCatalogSignalReader_new --> T55_infrastructure_infrastructure_FsImplCatalogSignalReader__self
+T46_infrastructure_infrastructure_FsImplPlanReader_new --> T46_infrastructure_infrastructure_FsImplPlanReader__self
+T50_infrastructure_infrastructure_FsTaskContractReader_new --> T50_infrastructure_infrastructure_FsTaskContractReader__self
+T46_infrastructure_infrastructure_FsCatalogAdapter_new --> T46_infrastructure_infrastructure_FsCatalogAdapter__self
+T59_infrastructure_infrastructure_FsSelfBinaryTransplantAdapter_new --> T59_infrastructure_infrastructure_FsSelfBinaryTransplantAdapter__self
+T63_infrastructure_infrastructure_FsTemplateBoundaryManifestAdapter_new --> T63_infrastructure_infrastructure_FsTemplateBoundaryManifestAdapter__self
+T53_infrastructure_infrastructure_FsTemplateExportAdapter_new --> T53_infrastructure_infrastructure_FsTemplateExportAdapter__self
+T48_infrastructure_infrastructure_FsAdrBaselineStore__self -.impl.-> R36_usecase_usecase_AdrBaselineStorePort__self
+T48_infrastructure_infrastructure_FsAdrBaselineStore__self -.impl.-> R40_usecase_usecase_AdrBaselineStoreReadPort__self
+T52_infrastructure_infrastructure_FsGitAdrBaselineSource__self -.impl.-> R37_usecase_usecase_AdrBaselineSourcePort__self
+T46_infrastructure_infrastructure_FsCatalogAdapter__self -.impl.-> R27_usecase_usecase_CatalogPort__self
+T63_infrastructure_infrastructure_FsTemplateBoundaryManifestAdapter__self -.impl.-> R44_usecase_usecase_TemplateBoundaryManifestPort__self
+T53_infrastructure_infrastructure_FsTemplateExportAdapter__self -.impl.-> R34_usecase_usecase_TemplateExportPort__self
+T59_infrastructure_infrastructure_FsSelfBinaryTransplantAdapter__self -.impl.-> R40_usecase_usecase_SelfBinaryTransplantPort__self
+T50_infrastructure_infrastructure_FsTaskContractReader__self -.impl.-> R38_usecase_usecase_TaskContractReaderPort__self
+T55_infrastructure_infrastructure_FsImplCatalogSignalReader__self -.impl.-> R43_usecase_usecase_ImplCatalogSignalReaderPort__self
+T46_infrastructure_infrastructure_FsImplPlanReader__self -.impl.-> R34_usecase_usecase_ImplPlanReaderPort__self
+T39_cli_driver_cli_driver_AdrBaselineDriver_new --o R34_usecase_usecase_AdrBaselineService__self
+T39_cli_driver_cli_driver_AdrBaselineDriver_new --o R39_usecase_usecase_AdrBaselineQueryService__self
+T39_cli_driver_cli_driver_AdrBaselineDriver_new --> T39_cli_driver_cli_driver_AdrBaselineDriver__self
+T35_cli_driver_cli_driver_CatalogDriver_new --o R30_usecase_usecase_CatalogService__self
+T35_cli_driver_cli_driver_CatalogDriver_new --o R35_usecase_usecase_CatalogQueryService__self
+T35_cli_driver_cli_driver_CatalogDriver_new --> T35_cli_driver_cli_driver_CatalogDriver__self
+T40_cli_driver_cli_driver_TaskContractDriver_new --o R36_usecase_usecase_PreReviewGateService__self
+T40_cli_driver_cli_driver_TaskContractDriver_new --o R37_usecase_usecase_CoverageVerifyService__self
+T40_cli_driver_cli_driver_TaskContractDriver_new --> T40_cli_driver_cli_driver_TaskContractDriver__self
+T36_cli_driver_cli_driver_TemplateDriver_new --o R37_usecase_usecase_TemplateExportService__self
+T36_cli_driver_cli_driver_TemplateDriver_new --> T36_cli_driver_cli_driver_TemplateDriver__self
+T58_cli_composition_cli_composition_AdrBaselineCompositionRoot_new --> T58_cli_composition_cli_composition_AdrBaselineCompositionRoot__self
+T58_cli_composition_cli_composition_AdrBaselineCompositionRoot_adr_baseline_driver --> T39_cli_driver_cli_driver_AdrBaselineDriver__self
+T54_cli_composition_cli_composition_CatalogCompositionRoot_new --> T54_cli_composition_cli_composition_CatalogCompositionRoot__self
+T54_cli_composition_cli_composition_CatalogCompositionRoot_catalog_driver --> T35_cli_driver_cli_driver_CatalogDriver__self
+T59_cli_composition_cli_composition_TaskContractCompositionRoot_new --> T59_cli_composition_cli_composition_TaskContractCompositionRoot__self
+T59_cli_composition_cli_composition_TaskContractCompositionRoot_task_contract_driver --> T40_cli_driver_cli_driver_TaskContractDriver__self
+T55_cli_composition_cli_composition_TemplateCompositionRoot_new --> T55_cli_composition_cli_composition_TemplateCompositionRoot__self
+T55_cli_composition_cli_composition_TemplateCompositionRoot_template_driver --> T36_cli_driver_cli_driver_TemplateDriver__self
+class T37_usecase_usecase_AdrBaselineInteractor_new method_node
+class T37_usecase_usecase_AdrBaselineInteractor__self interactor
+class T42_usecase_usecase_AdrBaselineQueryInteractor_new method_node
+class T42_usecase_usecase_AdrBaselineQueryInteractor__self interactor
+class R39_usecase_usecase_AdrBaselineQueryService_execute method_node
+class R39_usecase_usecase_AdrBaselineQueryService__self app_service
+class R34_usecase_usecase_AdrBaselineService_execute method_node
+class R34_usecase_usecase_AdrBaselineService__self app_service
+class R37_usecase_usecase_AdrBaselineSourcePort_working_bytes method_node
+class R37_usecase_usecase_AdrBaselineSourcePort_fork_point_bytes method_node
+class R37_usecase_usecase_AdrBaselineSourcePort_cited_sources method_node
+class R37_usecase_usecase_AdrBaselineSourcePort_source_state method_node
+class R37_usecase_usecase_AdrBaselineSourcePort__self secondary_port
+class R36_usecase_usecase_AdrBaselineStorePort_snapshot method_node
+class R36_usecase_usecase_AdrBaselineStorePort_restore method_node
+class R36_usecase_usecase_AdrBaselineStorePort__self secondary_port
+class R40_usecase_usecase_AdrBaselineStoreReadPort_read_entries method_node
+class R40_usecase_usecase_AdrBaselineStoreReadPort_verify_recorded_copy method_node
+class R40_usecase_usecase_AdrBaselineStoreReadPort__self secondary_port
+class T28_usecase_usecase_CatalogError_FileExists variant_node
+class T28_usecase_usecase_CatalogError_FileMissing variant_node
+class T28_usecase_usecase_CatalogError_DuplicateEntry variant_node
+class T28_usecase_usecase_CatalogError_AnchorNotFound variant_node
+class T28_usecase_usecase_CatalogError_InvalidRole variant_node
+class T28_usecase_usecase_CatalogError_ParseFragment variant_node
+class T28_usecase_usecase_CatalogError_SchemaInvalid variant_node
+class T28_usecase_usecase_CatalogError_Port variant_node
+class T28_usecase_usecase_CatalogError__self error_type
+class T33_usecase_usecase_CatalogInteractor_new method_node
+class T33_usecase_usecase_CatalogInteractor__self interactor
+class T29_usecase_usecase_CatalogTarget__self dto
+class R27_usecase_usecase_CatalogPort_init method_node
+class R27_usecase_usecase_CatalogPort_add method_node
+class R27_usecase_usecase_CatalogPort_import method_node
+class R27_usecase_usecase_CatalogPort_cite method_node
+class R27_usecase_usecase_CatalogPort_check method_node
+class R27_usecase_usecase_CatalogPort__self secondary_port
+class R35_usecase_usecase_CatalogQueryService_check method_node
+class R35_usecase_usecase_CatalogQueryService__self app_service
+class R30_usecase_usecase_CatalogService_init method_node
+class R30_usecase_usecase_CatalogService_add method_node
+class R30_usecase_usecase_CatalogService_import method_node
+class R30_usecase_usecase_CatalogService_cite method_node
+class R30_usecase_usecase_CatalogService__self app_service
+class T40_usecase_usecase_CoverageVerifyInteractor_new method_node
+class T40_usecase_usecase_CoverageVerifyInteractor__self interactor
+class T42_usecase_usecase_ImplCatalogSignalReadError_ReadFailed variant_node
+class T42_usecase_usecase_ImplCatalogSignalReadError__self error_type
+class T33_usecase_usecase_ImplPlanReadError_ReadFailed variant_node
+class T33_usecase_usecase_ImplPlanReadError__self error_type
+class T39_usecase_usecase_PreReviewGateInteractor_new method_node
+class T39_usecase_usecase_PreReviewGateInteractor__self interactor
+class T37_usecase_usecase_TaskContractReadError_NotFound variant_node
+class T37_usecase_usecase_TaskContractReadError_ReadFailed variant_node
+class T37_usecase_usecase_TaskContractReadError__self error_type
+class R37_usecase_usecase_CoverageVerifyService_verify_coverage method_node
+class R37_usecase_usecase_CoverageVerifyService__self app_service
+class R43_usecase_usecase_ImplCatalogSignalReaderPort_read_signals method_node
+class R43_usecase_usecase_ImplCatalogSignalReaderPort_read_optional_signals method_node
+class R43_usecase_usecase_ImplCatalogSignalReaderPort__self secondary_port
+class R34_usecase_usecase_ImplPlanReaderPort_read_task_statuses method_node
+class R34_usecase_usecase_ImplPlanReaderPort__self secondary_port
+class R36_usecase_usecase_PreReviewGateService_check method_node
+class R36_usecase_usecase_PreReviewGateService__self app_service
+class R38_usecase_usecase_TaskContractReaderPort_read method_node
+class R38_usecase_usecase_TaskContractReaderPort__self secondary_port
+class T40_usecase_usecase_TemplateExportInteractor_new method_node
+class T40_usecase_usecase_TemplateExportInteractor__self interactor
+class R40_usecase_usecase_SelfBinaryTransplantPort_transplant method_node
+class R40_usecase_usecase_SelfBinaryTransplantPort__self secondary_port
+class R44_usecase_usecase_TemplateBoundaryManifestPort_read method_node
+class R44_usecase_usecase_TemplateBoundaryManifestPort__self secondary_port
+class R34_usecase_usecase_TemplateExportPort_export method_node
+class R34_usecase_usecase_TemplateExportPort__self secondary_port
+class R37_usecase_usecase_TemplateExportService_export method_node
+class R37_usecase_usecase_TemplateExportService__self app_service
+class T48_infrastructure_infrastructure_FsAdrBaselineStore__self secondary_adapter
+class T52_infrastructure_infrastructure_FsGitAdrBaselineSource__self secondary_adapter
+class T55_infrastructure_infrastructure_FsImplCatalogSignalReader_new method_node
+class T55_infrastructure_infrastructure_FsImplCatalogSignalReader__self secondary_adapter
+class T46_infrastructure_infrastructure_FsImplPlanReader_new method_node
+class T46_infrastructure_infrastructure_FsImplPlanReader__self secondary_adapter
+class T50_infrastructure_infrastructure_FsTaskContractReader_new method_node
+class T50_infrastructure_infrastructure_FsTaskContractReader__self secondary_adapter
+class T46_infrastructure_infrastructure_FsCatalogAdapter_new method_node
+class T46_infrastructure_infrastructure_FsCatalogAdapter__self secondary_adapter
+class T59_infrastructure_infrastructure_FsSelfBinaryTransplantAdapter_new method_node
+class T59_infrastructure_infrastructure_FsSelfBinaryTransplantAdapter__self secondary_adapter
+class T63_infrastructure_infrastructure_FsTemplateBoundaryManifestAdapter_new method_node
+class T63_infrastructure_infrastructure_FsTemplateBoundaryManifestAdapter__self secondary_adapter
+class T53_infrastructure_infrastructure_FsTemplateExportAdapter_new method_node
+class T53_infrastructure_infrastructure_FsTemplateExportAdapter__self secondary_adapter
+class T39_cli_driver_cli_driver_AdrBaselineDriver_new method_node
+class T39_cli_driver_cli_driver_AdrBaselineDriver_handle method_node
+class T39_cli_driver_cli_driver_AdrBaselineDriver__self primary_adapter
+class T35_cli_driver_cli_driver_CatalogDriver_new method_node
+class T35_cli_driver_cli_driver_CatalogDriver_handle method_node
+class T35_cli_driver_cli_driver_CatalogDriver__self primary_adapter
+class T40_cli_driver_cli_driver_TaskContractDriver_new method_node
+class T40_cli_driver_cli_driver_TaskContractDriver_handle method_node
+class T40_cli_driver_cli_driver_TaskContractDriver__self primary_adapter
+class T36_cli_driver_cli_driver_TemplateDriver_new method_node
+class T36_cli_driver_cli_driver_TemplateDriver_handle method_node
+class T36_cli_driver_cli_driver_TemplateDriver__self primary_adapter
+class T58_cli_composition_cli_composition_AdrBaselineCompositionRoot_new method_node
+class T58_cli_composition_cli_composition_AdrBaselineCompositionRoot_adr_baseline_driver method_node
+class T58_cli_composition_cli_composition_AdrBaselineCompositionRoot__self composition_root
+class T54_cli_composition_cli_composition_CatalogCompositionRoot_new method_node
+class T54_cli_composition_cli_composition_CatalogCompositionRoot_catalog_driver method_node
+class T54_cli_composition_cli_composition_CatalogCompositionRoot__self composition_root
+class T59_cli_composition_cli_composition_TaskContractCompositionRoot_new method_node
+class T59_cli_composition_cli_composition_TaskContractCompositionRoot_task_contract_driver method_node
+class T59_cli_composition_cli_composition_TaskContractCompositionRoot__self composition_root
+class T55_cli_composition_cli_composition_TemplateCompositionRoot_new method_node
+class T55_cli_composition_cli_composition_TemplateCompositionRoot_template_driver method_node
+class T55_cli_composition_cli_composition_TemplateCompositionRoot__self composition_root
+```

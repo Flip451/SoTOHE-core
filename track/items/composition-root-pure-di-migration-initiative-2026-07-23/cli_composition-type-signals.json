@@ -1,0 +1,32 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-23T16:09:42Z",
+  "declaration_hash": "2dc5ea0836d7a08ebdadf7b2f0b4942374646c3a4ffc802c1313cf932a1cfd5b",
+  "implementation_input_hash": "5b84e3020eb3489727a0ab93368aa059cc79a0f55332eeeaa73e000dd48579b2",
+  "signals": [
+    {
+      "type_name": "AdrBaselineCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskContractCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TemplateCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "yellow",
+      "found_type": true
+    }
+  ]
+}

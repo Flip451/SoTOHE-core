@@ -1,0 +1,203 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-23T17:35:58Z",
+  "declaration_hash": "810b800e339241bb1a4bc79b4c6a2e9760f0719c17a33b6b9471577bfbd09ba7",
+  "implementation_input_hash": "776faddfb8835df44426188e2898b14fb75698bdbdca28f788ca31fd2922bd33",
+  "signals": [
+    {
+      "type_name": "CatalogError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogInteractor",
+      "kind_tag": "interactor",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "CatalogService"
+      ],
+      "missing_items": [
+        "CatalogQueryService"
+      ]
+    },
+    {
+      "type_name": "CatalogPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogQueryService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "CatalogService",
+      "kind_tag": "application_service",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogTarget",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ImplCatalogSignalReadError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "ImplCatalogSignalReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "ImplPlanReadError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "ImplPlanReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskContractReadError",
+      "kind_tag": "error_type",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "TaskContractReaderPort",
+      "kind_tag": "secondary_port",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineQueryInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineQueryService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineSourcePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineStorePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineStoreReadPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CoverageVerifyInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CoverageVerifyService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PreReviewGateInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PreReviewGateService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SelfBinaryTransplantPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TemplateBoundaryManifestPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TemplateExportInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TemplateExportPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TemplateExportService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

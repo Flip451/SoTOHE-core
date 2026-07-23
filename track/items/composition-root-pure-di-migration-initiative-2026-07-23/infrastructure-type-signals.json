@@ -1,0 +1,74 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-23T17:35:58Z",
+  "declaration_hash": "67491d189628860f962cca75ac11590825c4a4f7de5aaf5b8e3a4456a1386f9d",
+  "implementation_input_hash": "0ce67410c9105109f382fe43e8acee0586a13b3ed39853b1439f59c6f6e991c3",
+  "signals": [
+    {
+      "type_name": "FsCatalogAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogPort"
+      ]
+    },
+    {
+      "type_name": "FsImplCatalogSignalReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ImplCatalogSignalReaderPort"
+      ]
+    },
+    {
+      "type_name": "FsImplPlanReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ImplPlanReaderPort"
+      ]
+    },
+    {
+      "type_name": "FsTaskContractReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TaskContractReaderPort"
+      ]
+    },
+    {
+      "type_name": "FsAdrBaselineStore",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FsGitAdrBaselineSource",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FsSelfBinaryTransplantAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FsTemplateBoundaryManifestAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FsTemplateExportAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

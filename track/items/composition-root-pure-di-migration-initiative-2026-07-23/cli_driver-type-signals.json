@@ -1,0 +1,32 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-23T16:42:28Z",
+  "declaration_hash": "2a9a527dc4681fba756d099c3649efaf46e157b7f4f4fdb36c6660314d6512e8",
+  "implementation_input_hash": "bac3080fa268b1de0c12149801abd3c707a1e3e42dae06dba2f550d16c11feec",
+  "signals": [
+    {
+      "type_name": "CatalogDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TaskContractDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TemplateDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

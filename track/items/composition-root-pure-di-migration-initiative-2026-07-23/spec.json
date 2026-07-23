@@ -1,0 +1,218 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Composition root pure DI migration initiative — Leaf commands slice",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "Leaf commands（ADR baseline、Catalog、Template、TaskContract）を担当するこの slice を、独立してレビュー可能で CI-green のまま統合できる delivery unit として完了する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "Leaf commands の composition-root 実行経路を純 DI 境界へ収束させ、CLI 引数、stdout、stderr、exit code、および永続化結果の外部契約を維持する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D5"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+            "anchor": "D5"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OUT-01",
+        "text": "Support workflows、Collaboration workflows、Core lifecycle の command 文脈の純 DI 化は、この Leaf commands track の対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OUT-02",
+        "text": "リポジトリ全体の CompositionRootPureDi 適合、全互換 shim と逆委譲仲介 *ServiceImpl の物理削除、関連 export・lint・文書の最終同期、およびイニシアチブ全体の完了宣言は Final convergence track の対象とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+            "anchor": "D3"
+          },
+          {
+            "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+            "anchor": "D5"
+          },
+          {
+            "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+            "anchor": "D6"
+          }
+        ]
+      },
+      {
+        "id": "OUT-03",
+        "text": "Interactor と Application Service を別 crate に分離する変更、または crate topology の変更は本 track の対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+            "anchor": "D9"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "Leaf commands の構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "この Leaf commands slice は単独でレビュー可能かつ CI-green のまま統合可能であり、未統合の他 track の変更を暗黙に前提にしない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "crate topology を維持し、Interactor と Application Service は libs/usecase 内の適切な command 文脈 module に置いて同一 application boundary 内で役割を分離する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D9"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "ADR baseline、Catalog、Template、TaskContract の各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "統合テストは、各所有 Leaf command 文脈について同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "この slice は単独で CI-green を維持して統合でき、他の未統合 migration track の実装を必要としない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D9"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/track-lifecycle.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    },
+    {
+      "file": "knowledge/conventions/type-designer-kind-selection.md",
+      "anchor": "R1. Layer-Kind Compatibility (層 × kind 互換マトリクス)"
+    }
+  ],
+  "signals": {
+    "blue": 15,
+    "yellow": 0,
+    "red": 0
+  }
+}

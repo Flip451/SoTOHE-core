@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "2a9a527dc4681fba756d099c3649efaf46e157b7f4f4fdb36c6660314d6512e8",
+  "signals": [
+    {
+      "type_name": "AdrBaselineDriver",
+      "signal": "blue",
+      "entry_hash": "dd5896d51407db5f317d213ec6eb4496d8b90a4d3d9901b51f6b926c4c6a054b"
+    },
+    {
+      "type_name": "CatalogDriver",
+      "signal": "blue",
+      "entry_hash": "7e355428f89ed1b60854d75e8276374e3c2e2b208289435d0269b9d4009e72f8"
+    },
+    {
+      "type_name": "TaskContractDriver",
+      "signal": "blue",
+      "entry_hash": "0f49d4aaac77c58fdd78292fc5b3408a97669c080e8a7cdff381215269b4604b"
+    },
+    {
+      "type_name": "TemplateDriver",
+      "signal": "blue",
+      "entry_hash": "aa2323b200071c59895de95a1091eea5f158f14f08cbd2ffc6ea1c4bd9d4340c"
+    }
+  ]
+}

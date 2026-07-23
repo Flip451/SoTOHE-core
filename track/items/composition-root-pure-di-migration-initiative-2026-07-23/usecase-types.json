@@ -1,0 +1,1771 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineInteractor",
+      "trait_ref": "AdrBaselineService"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineQueryInteractor",
+      "trait_ref": "AdrBaselineQueryService"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogInteractor",
+      "trait_ref": "CatalogService"
+    },
+    {
+      "action": "add",
+      "for_type": "CatalogInteractor",
+      "trait_ref": "CatalogQueryService"
+    },
+    {
+      "action": "reference",
+      "for_type": "CoverageVerifyInteractor",
+      "trait_ref": "CoverageVerifyService"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateInteractor",
+      "trait_ref": "PreReviewGateService"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportInteractor",
+      "trait_ref": "TemplateExportService"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "CatalogTarget",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "CatalogTarget",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CatalogTarget",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CatalogTarget",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "add",
+      "for_type": "TaskContractReadError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "TaskContractReadError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "TaskContractReadError",
+      "trait_ref": "std::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "ImplCatalogSignalReadError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ImplCatalogSignalReadError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "ImplCatalogSignalReadError",
+      "trait_ref": "std::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "ImplPlanReadError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "ImplPlanReadError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "add",
+      "for_type": "ImplPlanReadError",
+      "trait_ref": "std::error::Error"
+    }
+  ],
+  "traits": {
+    "AdrBaselineQueryService": {
+      "action": "reference",
+      "docs": "Primary port implemented by AdrBaselineQueryInteractor.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "query",
+              "ty": "AdrBaselineQuery"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<AdrBaselineQueryOutput, AdrBaselineQueryError>"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "AdrBaselineService": {
+      "action": "reference",
+      "docs": "Primary port implemented by AdrBaselineInteractor.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "command",
+              "ty": "AdrBaselineCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<AdrBaselineOutput, AdrBaselineError>"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "AdrBaselineSourcePort": {
+      "action": "reference",
+      "docs": "Synchronous/blocking secondary port. Returned byte vectors are opaque file contents.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "working_bytes",
+          "params": [
+            {
+              "name": "source",
+              "ty": "&domain::adr_baseline::AdrSourceFileName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<std::vec::Vec<u8>, AdrBaselineSourceError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "fork_point_bytes",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "source",
+              "ty": "&domain::adr_baseline::AdrSourceFileName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<std::vec::Vec<u8>, AdrBaselineSourceError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "cited_sources",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<std::vec::Vec<domain::adr_baseline::AdrSourceFileName>, AdrBaselineSourceError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "source_state",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "source",
+              "ty": "&domain::adr_baseline::AdrSourceFileName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<domain::adr_baseline::AdrBaselineSourceState, AdrBaselineSourceError>"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "AdrBaselineStorePort": {
+      "action": "reference",
+      "docs": "Synchronous/blocking secondary port. The byte vector is opaque file content.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "snapshot",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "source",
+              "ty": "&domain::adr_baseline::AdrSourceFileName"
+            },
+            {
+              "name": "bytes",
+              "ty": "std::vec::Vec<u8>"
+            },
+            {
+              "name": "kind",
+              "ty": "domain::adr_baseline::AdrBaselineKind"
+            },
+            {
+              "name": "reason",
+              "ty": "core::option::Option<domain::NonEmptyString>"
+            },
+            {
+              "name": "timestamp",
+              "ty": "domain::Timestamp"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<domain::adr_baseline::AdrBaselineLedgerEntry, AdrBaselineStoreError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "restore",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "source",
+              "ty": "&domain::adr_baseline::AdrSourceFileName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<(), AdrBaselineStoreError>"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "AdrBaselineStoreReadPort": {
+      "action": "reference",
+      "docs": "Synchronous/blocking secondary port.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read_entries",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<std::vec::Vec<domain::adr_baseline::AdrBaselineLedgerEntry>, AdrBaselineStoreReadError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_recorded_copy",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "entry",
+              "ty": "&domain::adr_baseline::AdrBaselineLedgerEntry"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<domain::adr_baseline::AdrBaselineRecordedCopyStatus, AdrBaselineStoreReadError>"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "CatalogPort": {
+      "action": "modify",
+      "docs": "Synchronous/blocking secondary port. CatalogError subsets are init={FileExists,SchemaInvalid,Port}, add={FileMissing,DuplicateEntry,AnchorNotFound,InvalidRole,ParseFragment,SchemaInvalid,Port}, import={FileMissing,DuplicateEntry,AnchorNotFound,SchemaInvalid,Port}, cite={FileMissing,AnchorNotFound,SchemaInvalid,Port}, and check={SchemaInvalid,Port}; no other variants are producible by those methods.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "init",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<CatalogInitReport, CatalogError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "add",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "command",
+              "ty": "CatalogAddCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<CatalogWriteReport, CatalogError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "import",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "command",
+              "ty": "CatalogImportCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<CatalogWriteReport, CatalogError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "cite",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "command",
+              "ty": "CatalogCiteCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<CatalogWriteReport, CatalogError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "check",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "query",
+              "ty": "CatalogCheckQuery"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<CatalogCheckReport, CatalogError>"
+        }
+      ],
+      "module_path": "catalog_gen",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "CatalogQueryService": {
+      "action": "add",
+      "docs": "Read-only primary port implemented by CatalogInteractor; check produces only CatalogError::{SchemaInvalid,Port}.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "check",
+          "params": [
+            {
+              "name": "target",
+              "ty": "CatalogTarget"
+            },
+            {
+              "name": "query",
+              "ty": "CatalogCheckQuery"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<CatalogCheckReport, CatalogError>"
+        }
+      ],
+      "module_path": "catalog_gen",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "CatalogService": {
+      "action": "modify",
+      "docs": "Command-side primary port implemented by CatalogInteractor. CatalogError subsets are init={FileExists,SchemaInvalid,Port}, add={FileMissing,DuplicateEntry,AnchorNotFound,InvalidRole,ParseFragment,SchemaInvalid,Port}, import={FileMissing,DuplicateEntry,AnchorNotFound,SchemaInvalid,Port}, and cite={FileMissing,AnchorNotFound,SchemaInvalid,Port}.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "init",
+          "params": [
+            {
+              "name": "target",
+              "ty": "CatalogTarget"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<CatalogInitReport, CatalogError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "add",
+          "params": [
+            {
+              "name": "target",
+              "ty": "CatalogTarget"
+            },
+            {
+              "name": "command",
+              "ty": "CatalogAddCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<CatalogWriteReport, CatalogError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "import",
+          "params": [
+            {
+              "name": "target",
+              "ty": "CatalogTarget"
+            },
+            {
+              "name": "command",
+              "ty": "CatalogImportCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<CatalogWriteReport, CatalogError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "cite",
+          "params": [
+            {
+              "name": "target",
+              "ty": "CatalogTarget"
+            },
+            {
+              "name": "command",
+              "ty": "CatalogCiteCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<CatalogWriteReport, CatalogError>"
+        }
+      ],
+      "module_path": "catalog_gen",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "CoverageVerifyService": {
+      "action": "reference",
+      "docs": "Primary port implemented by CoverageVerifyInteractor.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "verify_coverage",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "CoverageVerifyCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<domain::task_contract::CoverageVerifyOutcome, PreReviewGateError>"
+        }
+      ],
+      "module_path": "pre_review_gate",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "ImplCatalogSignalReaderPort": {
+      "action": "modify",
+      "docs": "Synchronous/blocking secondary port.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read_signals",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "layer",
+              "ty": "&domain::tddd::LayerId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<domain::TypeSignalsDocument, ImplCatalogSignalReadError>"
+        },
+        {
+          "has_default_impl": true,
+          "is_async": false,
+          "name": "read_optional_signals",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "layer",
+              "ty": "&domain::tddd::LayerId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<core::option::Option<domain::TypeSignalsDocument>, ImplCatalogSignalReadError>"
+        }
+      ],
+      "module_path": "pre_review_gate",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "ImplPlanReaderPort": {
+      "action": "modify",
+      "docs": "Synchronous/blocking secondary port.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read_task_statuses",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<std::collections::HashMap<domain::TaskId, domain::TaskStatusKind>, ImplPlanReadError>"
+        }
+      ],
+      "module_path": "pre_review_gate",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "PreReviewGateService": {
+      "action": "reference",
+      "docs": "Primary port implemented by PreReviewGateInteractor.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "check",
+          "params": [
+            {
+              "name": "cmd",
+              "ty": "PreReviewGateCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<domain::task_contract::PreReviewGateOutcome, PreReviewGateError>"
+        }
+      ],
+      "module_path": "pre_review_gate",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "SelfBinaryTransplantPort": {
+      "action": "reference",
+      "docs": "Synchronous/blocking process and filesystem secondary port.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "transplant",
+          "params": [
+            {
+              "name": "destination",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<(), SelfBinaryTransplantError>"
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "TaskContractReaderPort": {
+      "action": "modify",
+      "docs": "Synchronous/blocking secondary port.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<domain::task_contract::TaskContractDocument, TaskContractReadError>"
+        }
+      ],
+      "module_path": "pre_review_gate",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "TemplateBoundaryManifestPort": {
+      "action": "reference",
+      "docs": "Synchronous/blocking secondary port.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "read",
+          "params": [
+            {
+              "name": "manifest_path",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<domain::template_export::TemplateBoundaryManifest, TemplateBoundaryManifestReadError>"
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "TemplateExportPort": {
+      "action": "reference",
+      "docs": "Synchronous/blocking secondary port.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "export",
+          "params": [
+            {
+              "name": "command",
+              "ty": "&TemplateExportCommand"
+            },
+            {
+              "name": "manifest",
+              "ty": "&domain::template_export::TemplateBoundaryManifest"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<TemplateExportReport, TemplateExportPortError>"
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "TemplateExportService": {
+      "action": "reference",
+      "docs": "Primary port implemented by TemplateExportInteractor.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "export",
+          "params": [
+            {
+              "name": "command",
+              "ty": "TemplateExportCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<TemplateExportReport, TemplateExportError>"
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    }
+  },
+  "types": {
+    "AdrBaselineInteractor": {
+      "action": "reference",
+      "docs": "Dependency-bearing implementation of AdrBaselineService.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "store",
+              "ty": "std::sync::Arc<dyn AdrBaselineStorePort>"
+            },
+            {
+              "name": "source",
+              "ty": "std::sync::Arc<dyn AdrBaselineSourcePort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineQueryInteractor": {
+      "action": "reference",
+      "docs": "Dependency-bearing implementation of AdrBaselineQueryService.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "store",
+              "ty": "std::sync::Arc<dyn AdrBaselineStoreReadPort>"
+            },
+            {
+              "name": "source",
+              "ty": "std::sync::Arc<dyn AdrBaselineSourcePort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "CatalogError": {
+      "action": "modify",
+      "docs": "Catalog operation failure vocabulary; DraftIncomplete is removed because no operation constructs it, and the service and port contracts record their exact producible subsets.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "FileExists",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "FileMissing",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DuplicateEntry",
+            "payload": {
+              "fields": [
+                {
+                  "name": "entry_key",
+                  "ty": "domain::tddd::catalog_gen::CatalogEntryName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "AnchorNotFound",
+            "payload": {
+              "fields": [
+                {
+                  "name": "anchor",
+                  "ty": "domain::plan_ref::SpecElementId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InvalidRole",
+            "payload": {
+              "fields": [
+                {
+                  "name": "role",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ParseFragment",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "SchemaInvalid",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Port",
+            "payload": {
+              "fields": [
+                {
+                  "name": "detail",
+                  "ty": "IoFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "CatalogInteractor": {
+      "action": "modify",
+      "docs": "Dependency-bearing implementation of CatalogService and CatalogQueryService.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "port",
+              "ty": "std::sync::Arc<dyn CatalogPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "catalog_gen",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "CatalogTarget": {
+      "action": "add",
+      "docs": "Owned catalogue location passed across primary ports; Dto is intentional because it carries boundary context without domain behavior.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "track_id",
+              "ty": "domain::TrackId"
+            },
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "catalog_gen",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "CoverageVerifyInteractor": {
+      "action": "reference",
+      "docs": "Dependency-bearing implementation of CoverageVerifyService.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "task_contract_reader",
+              "ty": "std::sync::Arc<dyn TaskContractReaderPort>"
+            },
+            {
+              "name": "signal_reader",
+              "ty": "std::sync::Arc<dyn ImplCatalogSignalReaderPort>"
+            },
+            {
+              "name": "impl_plan_reader",
+              "ty": "std::sync::Arc<dyn ImplPlanReaderPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "pre_review_gate",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "ImplCatalogSignalReadError": {
+      "action": "add",
+      "docs": "Failure produced while reading implementation-catalogue signals; FreeText carries unconstrained adapter diagnostics.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "layer",
+                  "ty": "domain::tddd::LayerId"
+                },
+                {
+                  "name": "message",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "ImplPlanReadError": {
+      "action": "add",
+      "docs": "Failure produced while reading implementation-plan task statuses; FreeText carries unconstrained adapter diagnostics.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "PreReviewGateInteractor": {
+      "action": "reference",
+      "docs": "Dependency-bearing implementation of PreReviewGateService.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "task_contract_reader",
+              "ty": "std::sync::Arc<dyn TaskContractReaderPort>"
+            },
+            {
+              "name": "signal_reader",
+              "ty": "std::sync::Arc<dyn ImplCatalogSignalReaderPort>"
+            },
+            {
+              "name": "impl_plan_reader",
+              "ty": "std::sync::Arc<dyn ImplPlanReaderPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "pre_review_gate",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "TaskContractReadError": {
+      "action": "add",
+      "docs": "Failure produced while reading a task-contract document; FreeText carries unconstrained adapter diagnostics.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "NotFound",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "TemplateExportInteractor": {
+      "action": "reference",
+      "docs": "Dependency-bearing implementation of TemplateExportService.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "manifest_port",
+              "ty": "std::sync::Arc<dyn TemplateBoundaryManifestPort>"
+            },
+            {
+              "name": "export_port",
+              "ty": "std::sync::Arc<dyn TemplateExportPort>"
+            },
+            {
+              "name": "transplant_port",
+              "ty": "std::sync::Arc<dyn SelfBinaryTransplantPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,499 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {},
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "trait_ref": "usecase::adr_baseline::AdrBaselineStorePort",
+      "for_type": "FsAdrBaselineStore"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "usecase::adr_baseline::AdrBaselineStoreReadPort",
+      "for_type": "FsAdrBaselineStore"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<std::path::PathBuf>",
+      "for_type": "FsAdrBaselineStore"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FsAdrBaselineStore"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "FsAdrBaselineStore"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "usecase::adr_baseline::AdrBaselineSourcePort",
+      "for_type": "FsGitAdrBaselineSource"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::convert::From<std::path::PathBuf>",
+      "for_type": "FsGitAdrBaselineSource"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FsGitAdrBaselineSource"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::clone::Clone",
+      "for_type": "FsGitAdrBaselineSource"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FsCatalogAdapter"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::default::Default",
+      "for_type": "FsCatalogAdapter"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "usecase::catalog_gen::CatalogPort",
+      "for_type": "FsCatalogAdapter"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FsTemplateBoundaryManifestAdapter"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::default::Default",
+      "for_type": "FsTemplateBoundaryManifestAdapter"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "usecase::template_export::TemplateBoundaryManifestPort",
+      "for_type": "FsTemplateBoundaryManifestAdapter"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FsTemplateExportAdapter"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "usecase::template_export::TemplateExportPort",
+      "for_type": "FsTemplateExportAdapter"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FsSelfBinaryTransplantAdapter"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::default::Default",
+      "for_type": "FsSelfBinaryTransplantAdapter"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "usecase::template_export::SelfBinaryTransplantPort",
+      "for_type": "FsSelfBinaryTransplantAdapter"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FsTaskContractReader"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "usecase::pre_review_gate::TaskContractReaderPort",
+      "for_type": "FsTaskContractReader"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FsImplCatalogSignalReader"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "usecase::pre_review_gate::ImplCatalogSignalReaderPort",
+      "for_type": "FsImplCatalogSignalReader"
+    },
+    {
+      "action": "reference",
+      "trait_ref": "core::fmt::Debug",
+      "for_type": "FsImplPlanReader"
+    },
+    {
+      "action": "modify",
+      "trait_ref": "usecase::pre_review_gate::ImplPlanReaderPort",
+      "for_type": "FsImplPlanReader"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "FsAdrBaselineStore": {
+      "action": "reference",
+      "docs": "Filesystem secondary adapter retained for ADR baseline persistence and ledger reads.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "adr_baseline::store",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "FsCatalogAdapter": {
+      "action": "modify",
+      "docs": "Filesystem secondary adapter retained for catalogue generation and annotation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::catalog_gen",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "FsGitAdrBaselineSource": {
+      "action": "reference",
+      "docs": "Filesystem and Git secondary adapter retained for ADR baseline source reads.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "adr_baseline::source",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "FsImplCatalogSignalReader": {
+      "action": "modify",
+      "docs": "Filesystem secondary adapter retained for per-layer implementation signal reads.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "impl_catalog_signal_reader",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "FsImplPlanReader": {
+      "action": "modify",
+      "docs": "Filesystem secondary adapter retained for implementation-plan task status reads.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "impl_plan_reader",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "FsSelfBinaryTransplantAdapter": {
+      "action": "reference",
+      "docs": "Process-filesystem secondary adapter retained for self-binary transplant during template export.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "FsTaskContractReader": {
+      "action": "modify",
+      "docs": "Filesystem secondary adapter retained for task-contract document reads.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "task_contract_reader",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "FsTemplateBoundaryManifestAdapter": {
+      "action": "reference",
+      "docs": "Filesystem secondary adapter retained for typed template boundary-manifest reads.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "FsTemplateExportAdapter": {
+      "action": "reference",
+      "docs": "Filesystem secondary adapter retained for manifest-driven template export.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "machine_home_dir",
+              "ty": "core::option::Option<std::path::PathBuf>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    }
+  }
+}

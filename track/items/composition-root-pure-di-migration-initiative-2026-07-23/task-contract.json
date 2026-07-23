@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "track_id": "composition-root-pure-di-migration-initiative-2026-07-23",
+  "entries": {
+    "T001": [
+      { "layer": "usecase", "entry_key": "AdrBaselineQueryService" },
+      { "layer": "usecase", "entry_key": "AdrBaselineService" },
+      { "layer": "usecase", "entry_key": "AdrBaselineSourcePort" },
+      { "layer": "usecase", "entry_key": "AdrBaselineStorePort" },
+      { "layer": "usecase", "entry_key": "AdrBaselineStoreReadPort" },
+      { "layer": "usecase", "entry_key": "AdrBaselineInteractor" },
+      { "layer": "usecase", "entry_key": "AdrBaselineQueryInteractor" },
+      { "layer": "infrastructure", "entry_key": "FsAdrBaselineStore" },
+      { "layer": "infrastructure", "entry_key": "FsGitAdrBaselineSource" },
+      { "layer": "cli_driver", "entry_key": "AdrBaselineDriver" },
+      { "layer": "cli_composition", "entry_key": "AdrBaselineCompositionRoot" }
+    ],
+    "T002": [
+      { "layer": "usecase", "entry_key": "CatalogPort" },
+      { "layer": "usecase", "entry_key": "CatalogQueryService" },
+      { "layer": "usecase", "entry_key": "CatalogService" },
+      { "layer": "usecase", "entry_key": "CatalogError" },
+      { "layer": "usecase", "entry_key": "CatalogInteractor" },
+      { "layer": "usecase", "entry_key": "CatalogTarget" },
+      { "layer": "infrastructure", "entry_key": "FsCatalogAdapter" },
+      { "layer": "cli_driver", "entry_key": "CatalogDriver" },
+      { "layer": "cli_composition", "entry_key": "CatalogCompositionRoot" }
+    ],
+    "T003": [
+      { "layer": "usecase", "entry_key": "SelfBinaryTransplantPort" },
+      { "layer": "usecase", "entry_key": "TemplateBoundaryManifestPort" },
+      { "layer": "usecase", "entry_key": "TemplateExportPort" },
+      { "layer": "usecase", "entry_key": "TemplateExportService" },
+      { "layer": "usecase", "entry_key": "TemplateExportInteractor" },
+      { "layer": "infrastructure", "entry_key": "FsSelfBinaryTransplantAdapter" },
+      { "layer": "infrastructure", "entry_key": "FsTemplateBoundaryManifestAdapter" },
+      { "layer": "infrastructure", "entry_key": "FsTemplateExportAdapter" },
+      { "layer": "cli_driver", "entry_key": "TemplateDriver" },
+      { "layer": "cli_composition", "entry_key": "TemplateCompositionRoot" }
+    ],
+    "T004": [
+      { "layer": "usecase", "entry_key": "CoverageVerifyService" },
+      { "layer": "usecase", "entry_key": "ImplCatalogSignalReaderPort" },
+      { "layer": "usecase", "entry_key": "ImplCatalogSignalReadError" },
+      { "layer": "usecase", "entry_key": "ImplPlanReaderPort" },
+      { "layer": "usecase", "entry_key": "ImplPlanReadError" },
+      { "layer": "usecase", "entry_key": "PreReviewGateService" },
+      { "layer": "usecase", "entry_key": "TaskContractReaderPort" },
+      { "layer": "usecase", "entry_key": "TaskContractReadError" },
+      { "layer": "usecase", "entry_key": "CoverageVerifyInteractor" },
+      { "layer": "usecase", "entry_key": "PreReviewGateInteractor" },
+      { "layer": "infrastructure", "entry_key": "FsImplCatalogSignalReader" },
+      { "layer": "infrastructure", "entry_key": "FsImplPlanReader" },
+      { "layer": "infrastructure", "entry_key": "FsTaskContractReader" },
+      { "layer": "cli_driver", "entry_key": "TaskContractDriver" },
+      { "layer": "cli_composition", "entry_key": "TaskContractCompositionRoot" }
+    ]
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "67491d189628860f962cca75ac11590825c4a4f7de5aaf5b8e3a4456a1386f9d",
+  "signals": [
+    {
+      "type_name": "FsAdrBaselineStore",
+      "signal": "blue",
+      "entry_hash": "79584da34b4cbbf387c2d00053f27b4b523ad6df77606857382160c706bd8af7"
+    },
+    {
+      "type_name": "FsCatalogAdapter",
+      "signal": "blue",
+      "entry_hash": "630cc6b2aa7cfcb1f45d6d0fb372df1d1b86762d5781fa76443af3f4c89d5fd8"
+    },
+    {
+      "type_name": "FsGitAdrBaselineSource",
+      "signal": "blue",
+      "entry_hash": "03f82c9948d438c51009bd6e27832f68da9cabd97676d4ecd7ba4c5679a1ee5b"
+    },
+    {
+      "type_name": "FsImplCatalogSignalReader",
+      "signal": "blue",
+      "entry_hash": "59b78374b13b51e0ec10500572aa2ccebaaeabfdfdc8075998b685ae77cfe5d5"
+    },
+    {
+      "type_name": "FsImplPlanReader",
+      "signal": "blue",
+      "entry_hash": "a192041ddb0ed5e6fce87a7f270527d96ea75292f9a7c994bd14323d3fdc6113"
+    },
+    {
+      "type_name": "FsSelfBinaryTransplantAdapter",
+      "signal": "blue",
+      "entry_hash": "1ec4c466a71171509af1df011e128cf0a321211a4a9805d96cb44e5f399434a6"
+    },
+    {
+      "type_name": "FsTaskContractReader",
+      "signal": "blue",
+      "entry_hash": "35733a395fbf17eff72c4208152b7625d4c8cc166c3bbc52d9cd784b7db250aa"
+    },
+    {
+      "type_name": "FsTemplateBoundaryManifestAdapter",
+      "signal": "blue",
+      "entry_hash": "09953702f48a4fb71cc95d5cc9011fd5d7ddfe577f08c50b0f07ca013e81c676"
+    },
+    {
+      "type_name": "FsTemplateExportAdapter",
+      "signal": "blue",
+      "entry_hash": "4d96345b818b626477d4be6d27abb35a5d4bdcf9b6c180db397e271a7828980e"
+    }
+  ]
+}

@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "Update the ADR baseline command's catalogued cli_driver, usecase, infrastructure, and cli_composition entries; add focused regression coverage. AC-01–AC-05; IN-01–IN-02; CN-01–CN-03.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T002",
+      "description": "Update the Catalog command's catalogued cli_driver, usecase, infrastructure, and cli_composition entries; add focused regression coverage. AC-01–AC-05; IN-01–IN-02; CN-01–CN-03.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T003",
+      "description": "Update the Template command's catalogued cli_driver, usecase, infrastructure, and cli_composition entries; add focused regression coverage. AC-01–AC-05; IN-01–IN-02; CN-01–CN-03.",
+      "status": "todo",
+      "commit_hash": null
+    },
+    {
+      "id": "T004",
+      "description": "Update the TaskContract command's catalogued cli_driver, usecase, infrastructure, and cli_composition entries; add focused regression coverage. AC-01–AC-05; IN-01–IN-02; CN-01–CN-03.",
+      "status": "todo",
+      "commit_hash": null
+    }
+  ],
+  "plan": {
+    "summary": [
+      "GO-01: Leaf command task scope and entry attribution: T001–T004 in task-contract.json.",
+      "GO-02: Leaf command acceptance and constraint coverage: T001–T004 cover AC-01–AC-05, IN-01–IN-02, and CN-01–CN-03 in task-coverage.json."
+    ],
+    "sections": [
+      {
+        "id": "adr-baseline",
+        "title": "ADR baseline command migration",
+        "description": [
+          "Update the ADR baseline command's attributed catalogue entries and regression coverage. AC-01–AC-05; IN-01–IN-02; CN-01–CN-03.",
+          "Completion evidence: the task's attributed catalogue entries are implemented and its focused regression coverage passes. AC-01–AC-05; IN-01–IN-02; CN-01–CN-03."
+        ],
+        "task_ids": ["T001"]
+      },
+      {
+        "id": "catalog",
+        "title": "Catalog command migration",
+        "description": [
+          "Update the Catalog command's attributed catalogue entries and regression coverage. AC-01–AC-05; IN-01–IN-02; CN-01–CN-03.",
+          "Completion evidence: the task's attributed catalogue entries are implemented and its focused regression coverage passes. AC-01–AC-05; IN-01–IN-02; CN-01–CN-03."
+        ],
+        "task_ids": ["T002"]
+      },
+      {
+        "id": "template",
+        "title": "Template command migration",
+        "description": [
+          "Update the Template command's attributed catalogue entries and regression coverage. AC-01–AC-05; IN-01–IN-02; CN-01–CN-03.",
+          "Completion evidence: the task's attributed catalogue entries are implemented and its focused regression coverage passes. AC-01–AC-05; IN-01–IN-02; CN-01–CN-03."
+        ],
+        "task_ids": ["T003"]
+      },
+      {
+        "id": "task-contract",
+        "title": "TaskContract command migration",
+        "description": [
+          "Update the TaskContract command's attributed catalogue entries and regression coverage. AC-01–AC-05; IN-01–IN-02; CN-01–CN-03.",
+          "Completion evidence: the task's attributed catalogue entries are implemented and its focused regression coverage passes. AC-01–AC-05; IN-01–IN-02; CN-01–CN-03."
+        ],
+        "task_ids": ["T004"]
+      }
+    ]
+  }
+}

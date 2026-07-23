@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "2dc5ea0836d7a08ebdadf7b2f0b4942374646c3a4ffc802c1313cf932a1cfd5b",
+  "signals": [
+    {
+      "type_name": "AdrBaselineCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "86fffbd7369fbe7ee808a784403f7ea0a36c434046e32a94706d057244ab0b95"
+    },
+    {
+      "type_name": "CatalogCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "7baa2ad64aec1c239a1db13691a42f0c15ae17c2cd290fe5bb51edaa8c71acba"
+    },
+    {
+      "type_name": "TaskContractCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "c3e5f8c16f8c370ed39a12782a305b09716bd87e10cb36c6fcf374f13b1a2f7a"
+    },
+    {
+      "type_name": "TemplateCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "9050f8782e96724f8711c3117e94eead1b301d9d08ced71e1a6bab8762822783"
+    }
+  ]
+}
