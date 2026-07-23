@@ -8,16 +8,21 @@ flowchart LR
 classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
 classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
 classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef composition_root fill:#e0e7ff,stroke:#3730a3,stroke-width:2px
+classDef domain_event fill:#fce7f3,stroke:#9d174d,stroke-width:1px
 classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
 classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
 classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
 classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef event_policy fill:#fef3c7,stroke:#92400e,stroke-width:1px
 classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
 classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
 classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
 classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
 classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef primary_adapter fill:#ecfccb,stroke:#3f6212,stroke-width:1px
 classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef repository fill:#f5f3ff,stroke:#6d28d9,stroke-width:1px
 classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
 classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
 classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
@@ -162,8 +167,8 @@ end
 T33_domain_domain_CatalogueLinterRule_new --o T37_domain_domain_CatalogueLinterRuleKind__self
 T33_domain_domain_CatalogueLinterRule_new --> T33_domain_domain_CatalogueLinterRule__self
 T33_domain_domain_CatalogueLinterRule_kind --> T37_domain_domain_CatalogueLinterRuleKind__self
-T37_domain_domain_CatalogueLinterRuleKind_ReferencedRoleConstraint --o T22_domain_domain_RoleKind__self
-T37_domain_domain_CatalogueLinterRuleKind_NoRoleInMethodSignature --o T22_domain_domain_RoleKind__self
+T37_domain_domain_CatalogueLinterRuleKind_ReferencedRoleConstraint --o|expected_role| T22_domain_domain_RoleKind__self
+T37_domain_domain_CatalogueLinterRuleKind_NoRoleInMethodSignature --o|forbidden_roles| T22_domain_domain_RoleKind__self
 T32_domain_domain_ContractMapContent_new --> T32_domain_domain_ContractMapContent__self
 T37_domain_domain_ContractMapRenderResult_new --o T32_domain_domain_ContractMapContent__self
 T37_domain_domain_ContractMapRenderResult_new --o T38_domain_domain_ContractMapRenderWarning__self
@@ -178,8 +183,8 @@ T22_domain_domain_RoleKind_from_function_role --> T22_domain_domain_RoleKind__se
 T22_domain_domain_RoleKind_all --> T22_domain_domain_RoleKind__self
 R33_domain_domain_ContractMapRenderer_render --> T37_domain_domain_ContractMapRenderResult__self
 F75_domain_domain_domain__tddd__catalogue_linter__eval__evaluate_catalogue_lint --o T33_domain_domain_CatalogueLinterRule__self
-T28_usecase_usecase_LintRuleKind_ReferencedRoleConstraint --o T22_domain_domain_RoleKind__self
-T28_usecase_usecase_LintRuleKind_NoRoleInMethodSignature --o T22_domain_domain_RoleKind__self
+T28_usecase_usecase_LintRuleKind_ReferencedRoleConstraint --o|expected_role| T22_domain_domain_RoleKind__self
+T28_usecase_usecase_LintRuleKind_NoRoleInMethodSignature --o|forbidden_roles| T22_domain_domain_RoleKind__self
 T39_usecase_usecase_RenderContractMapOutput__self --o|warnings| T38_domain_domain_ContractMapRenderWarning__self
 class T33_domain_domain_CatalogueLinterRule_new method_node
 class T33_domain_domain_CatalogueLinterRule_target method_node

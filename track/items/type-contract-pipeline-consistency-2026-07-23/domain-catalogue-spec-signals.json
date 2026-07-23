@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "752307768cf3f88b85c50f503ad2a9e371b5c23fe6f87e00f4c07aa0827eab49",
+  "catalogue_declaration_hash": "89ccd486eda63aa9862e73bd13eed3a229d5b8a3a50f77fa2b8ed40ed16dcae3",
   "signals": [
     {
       "type_name": "CatalogueLinterRule",
@@ -10,7 +10,7 @@
     {
       "type_name": "CatalogueLinterRuleKind",
       "signal": "blue",
-      "entry_hash": "950c9e81784e7709061e5d1bfc4460ca8a308b11c3fa320a3855c1213107d9c5"
+      "entry_hash": "6798e8b6feacdebfe75db50efaa35166d679f6f10c4ac7aafb732ffa81168f5b"
     },
     {
       "type_name": "ContractMapContent",
@@ -30,7 +30,7 @@
     {
       "type_name": "RoleKind",
       "signal": "blue",
-      "entry_hash": "596afdf7fc0a120006703359498a2dd95af53dc0dacf817d50cb193d305b8e70"
+      "entry_hash": "54e5c6cfc60ad12d5570058dd702868e6ba8608b284740781df852589b423895"
     },
     {
       "type_name": "ContractMapRenderer",

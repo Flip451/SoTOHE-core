@@ -18,6 +18,8 @@
 
 use std::path::{Path, PathBuf};
 
+use domain::tddd::LayerId;
+use domain::tddd::primitive_occurrence_scanner::{PrimitiveName, PrimitiveOccurrencePosition};
 use infrastructure::tddd::fs_lint_config_loader::FsLintConfigLoader;
 use usecase::catalogue_lint_workflow::{LintConfigLoader, LintRuleKind, LintRuleSpec};
 
@@ -65,7 +67,7 @@ fn expected_roles_excluding_dto_and_command() -> Vec<String> {
 /// TDDD-enabled layer names, enumerated from the real `architecture-rules.json`
 /// at test run time (not hard-coded) — every layer whose `tddd.enabled` is
 /// `true`, in file declaration order.
-fn expected_layers() -> Vec<String> {
+fn expected_layers() -> Vec<LayerId> {
     let path = repo_root().join("architecture-rules.json");
     let content =
         std::fs::read_to_string(&path).unwrap_or_else(|e| panic!("read {}: {e}", path.display()));
@@ -77,10 +79,11 @@ fn expected_layers() -> Vec<String> {
         .iter()
         .filter(|layer| layer["tddd"]["enabled"].as_bool().unwrap_or(false))
         .map(|layer| {
-            layer["crate"]
+            let crate_name = layer["crate"]
                 .as_str()
-                .unwrap_or_else(|| panic!("layer entry missing 'crate' string: {layer}"))
-                .to_owned()
+                .unwrap_or_else(|| panic!("layer entry missing 'crate' string: {layer}"));
+            LayerId::try_new(crate_name)
+                .unwrap_or_else(|error| panic!("layer crate '{crate_name}' must be valid: {error}"))
         })
         .collect()
 }
@@ -180,9 +183,9 @@ fn assert_adr_d7_default_rules(rules: &[LintRuleSpec]) {
     );
     match rule1.kind.clone() {
         LintRuleKind::ForbidPrimitiveInTypes { primitives, layers: rule_layers, positions } => {
-            assert_eq!(primitives, vec!["String".to_owned()]);
-            assert_eq!(rule_layers, layers);
-            assert_eq!(positions, vec!["result_err".to_owned()]);
+            assert_eq!(primitives.as_slice(), &[PrimitiveName::new("String").unwrap()]);
+            assert_eq!(rule_layers.as_slice(), layers.as_slice());
+            assert_eq!(positions.as_slice(), &[PrimitiveOccurrencePosition::ResultErr]);
         }
         other => panic!("rule 1: expected ForbidPrimitiveInTypes, got {other:?}"),
     }
@@ -199,9 +202,15 @@ fn assert_adr_d7_default_rules(rules: &[LintRuleSpec]) {
     assert!(!rule2.target_roles.iter().any(|r| r == "Command"));
     match rule2.kind.clone() {
         LintRuleKind::ForbidPrimitiveInTypes { primitives, layers: rule_layers, positions } => {
-            assert_eq!(primitives, vec!["String".to_owned()]);
-            assert_eq!(rule_layers, layers);
-            assert_eq!(positions, vec!["named_field".to_owned(), "variant_field".to_owned()]);
+            assert_eq!(primitives.as_slice(), &[PrimitiveName::new("String").unwrap()]);
+            assert_eq!(rule_layers.as_slice(), layers.as_slice());
+            assert_eq!(
+                positions.as_slice(),
+                &[
+                    PrimitiveOccurrencePosition::NamedField,
+                    PrimitiveOccurrencePosition::VariantField,
+                ]
+            );
         }
         other => panic!("rule 2: expected ForbidPrimitiveInTypes, got {other:?}"),
     }

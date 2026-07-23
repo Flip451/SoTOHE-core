@@ -68,91 +68,124 @@
             "name": "FieldEmpty",
             "payload": {
               "fields": [
-                "domain::tddd::catalogue_linter::RolePayloadField"
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "FieldNonEmpty",
             "payload": {
               "fields": [
-                "domain::tddd::catalogue_linter::RolePayloadField"
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "KindLayerConstraint",
             "payload": {
               "fields": [
-                "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::LayerId>"
+                {
+                  "name": "permitted_layers",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::LayerId>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "ReferencedRoleConstraint",
             "payload": {
               "fields": [
-                "domain::tddd::catalogue_linter::RolePayloadField",
-                "domain::tddd::catalogue_linter::RoleKind"
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                },
+                {
+                  "name": "expected_role",
+                  "ty": "domain::tddd::catalogue_linter::RoleKind"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "TraitImplRequired",
             "payload": {
               "fields": [
-                "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::catalogue_v2::TypeRef>"
+                {
+                  "name": "required_traits",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::catalogue_v2::TypeRef>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "NoRoleInMethodSignature",
             "payload": {
               "fields": [
-                "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::catalogue_linter::RoleKind>"
+                {
+                  "name": "forbidden_roles",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::catalogue_linter::RoleKind>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "MethodReferenceSignature",
             "payload": {
               "fields": [
-                "domain::tddd::catalogue_linter::RolePayloadField"
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "AccessorSignatureRequired",
             "payload": {
               "fields": [
-                "domain::tddd::catalogue_linter::RolePayloadField"
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "FieldElementUniqueAcrossEntries",
             "payload": {
               "fields": [
-                "domain::tddd::catalogue_linter::RolePayloadField"
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "NoExternalReferenceInMethods",
             "payload": {
               "fields": [
-                "domain::tddd::catalogue_linter::RolePayloadField"
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
@@ -165,20 +198,32 @@
             "name": "ForbiddenMethodReceiver",
             "payload": {
               "fields": [
-                "domain::tddd::catalogue_v2::SelfReceiver"
+                {
+                  "name": "forbidden_receiver",
+                  "ty": "domain::tddd::catalogue_v2::SelfReceiver"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "ForbidPrimitiveInTypes",
             "payload": {
               "fields": [
-                "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::primitive_occurrence_scanner::PrimitiveName>",
-                "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::LayerId>",
-                "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::primitive_occurrence_scanner::PrimitiveOccurrencePosition>"
+                {
+                  "name": "primitives",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::primitive_occurrence_scanner::PrimitiveName>"
+                },
+                {
+                  "name": "layers",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::LayerId>"
+                },
+                {
+                  "name": "positions",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::primitive_occurrence_scanner::PrimitiveOccurrencePosition>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {

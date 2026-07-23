@@ -1,13 +1,13 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-22T18:06:39Z",
-  "declaration_hash": "0e1bba4304435e474c9c055d98a2ec859f9ca3b62902adb02d1b3d7ae6a83758",
-  "implementation_input_hash": "00be805a825c646ad05034ff907c3347e897fabceecc4acb1db77c33fd436787",
+  "generated_at": "2026-07-22T20:08:14Z",
+  "declaration_hash": "c17833c3012e0140d5f58f00302feaac65014452e91f34b0db2f12bb01ec6ea0",
+  "implementation_input_hash": "3d0fa91f2a43fb6af1b9186cb3a924f84af83cdbc5968b070f6cfdfa292e889f",
   "signals": [
     {
       "type_name": "LintRuleKind",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Clone",
@@ -21,7 +21,7 @@
     {
       "type_name": "RenderContractMapOutput",
       "kind_tag": "dto",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Clone",

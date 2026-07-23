@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "0e1bba4304435e474c9c055d98a2ec859f9ca3b62902adb02d1b3d7ae6a83758",
+  "catalogue_declaration_hash": "c17833c3012e0140d5f58f00302feaac65014452e91f34b0db2f12bb01ec6ea0",
   "signals": [
     {
       "type_name": "LintRuleKind",
       "signal": "blue",
-      "entry_hash": "5931ee372cd4c9e16918b20fb36e486f02d8011618163bb63182518b8c68beac"
+      "entry_hash": "8002c23bac382443325dbf44600f97466b80d4c5e3e2054df40aabcde2425588"
     },
     {
       "type_name": "RenderContractMapOutput",

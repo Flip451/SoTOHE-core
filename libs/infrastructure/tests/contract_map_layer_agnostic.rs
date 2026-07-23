@@ -59,7 +59,7 @@ fn render_for(fixture: &str, style_config_path: PathBuf) -> String {
     let content = adapter
         .render(&catalogues_vec, &order, &opts)
         .unwrap_or_else(|e| panic!("render failed for {fixture}: {e}"));
-    content.into_string()
+    content.content().as_ref().to_owned()
 }
 
 // ---- fixture_2layers ---------------------------------------------------

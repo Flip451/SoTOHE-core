@@ -72,6 +72,21 @@ class = "use_case_function"
 [role.SecondaryAdapter]
 class = "secondary_adapter"
 
+[role.EventPolicy]
+class = "event_policy"
+
+[role.DomainEvent]
+class = "domain_event"
+
+[role.CompositionRoot]
+class = "composition_root"
+
+[role.PrimaryAdapter]
+class = "primary_adapter"
+
+[role.Repository]
+class = "repository"
+
 # ---------------------------------------------------------------------------
 # Node category styles
 # ---------------------------------------------------------------------------
@@ -190,6 +205,31 @@ stroke_width = "1px"
 [class.secondary_adapter]
 fill = "#fafaf9"
 stroke = "#57534e"
+stroke_width = "1px"
+
+[class.event_policy]
+fill = "#fef3c7"
+stroke = "#92400e"
+stroke_width = "1px"
+
+[class.domain_event]
+fill = "#fce7f3"
+stroke = "#9d174d"
+stroke_width = "1px"
+
+[class.composition_root]
+fill = "#e0e7ff"
+stroke = "#3730a3"
+stroke_width = "2px"
+
+[class.primary_adapter]
+fill = "#ecfccb"
+stroke = "#3f6212"
+stroke_width = "1px"
+
+[class.repository]
+fill = "#f5f3ff"
+stroke = "#6d28d9"
 stroke_width = "1px"
 
 [class.method_node]

@@ -1,13 +1,13 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-22T18:24:18Z",
-  "declaration_hash": "752307768cf3f88b85c50f503ad2a9e371b5c23fe6f87e00f4c07aa0827eab49",
-  "implementation_input_hash": "179c7ab6c2b04920a8ffb4971ed50877ca646f94750131fa45454635a5904344",
+  "generated_at": "2026-07-22T23:38:54Z",
+  "declaration_hash": "89ccd486eda63aa9862e73bd13eed3a229d5b8a3a50f77fa2b8ed40ed16dcae3",
+  "implementation_input_hash": "4bd2e5d563884ea7c964549900d273eb304166f80dda84227e89bdcf959c59ab",
   "signals": [
     {
       "type_name": "CatalogueLinterRuleKind",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Clone",
@@ -19,9 +19,9 @@
     {
       "type_name": "ContractMapRenderResult",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -31,9 +31,9 @@
     {
       "type_name": "ContractMapRenderWarning",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -43,13 +43,13 @@
     {
       "type_name": "ContractMapRenderer",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "RoleKind",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Clone",

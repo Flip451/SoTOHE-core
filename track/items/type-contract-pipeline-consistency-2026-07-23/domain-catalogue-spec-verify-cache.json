@@ -51,7 +51,7 @@
       }
     },
     {
-      "claim_hash": "950c9e81784e7709061e5d1bfc4460ca8a308b11c3fa320a3855c1213107d9c5",
+      "claim_hash": "6798e8b6feacdebfe75db50efaa35166d679f6f10c4ac7aafb732ffa81168f5b",
       "evidence_hash": "082cadc0f5c4206116ca2fc28629063788660a7fe2420a14bfe541e0283c2e88",
       "verdict": {
         "kind": "pass",
@@ -75,7 +75,7 @@
       }
     },
     {
-      "claim_hash": "950c9e81784e7709061e5d1bfc4460ca8a308b11c3fa320a3855c1213107d9c5",
+      "claim_hash": "6798e8b6feacdebfe75db50efaa35166d679f6f10c4ac7aafb732ffa81168f5b",
       "evidence_hash": "cf116210361598ab5f99c2d78d84cbbccea6d7936db36561a329accfe4700a94",
       "verdict": {
         "kind": "pass",
@@ -99,7 +99,7 @@
       }
     },
     {
-      "claim_hash": "950c9e81784e7709061e5d1bfc4460ca8a308b11c3fa320a3855c1213107d9c5",
+      "claim_hash": "6798e8b6feacdebfe75db50efaa35166d679f6f10c4ac7aafb732ffa81168f5b",
       "evidence_hash": "b19c9c654a4b11bc936dd1ff4016ab696fc9412eb1be04396726aa5d9d5cf106",
       "verdict": {
         "kind": "pass",
@@ -315,7 +315,7 @@
       }
     },
     {
-      "claim_hash": "596afdf7fc0a120006703359498a2dd95af53dc0dacf817d50cb193d305b8e70",
+      "claim_hash": "54e5c6cfc60ad12d5570058dd702868e6ba8608b284740781df852589b423895",
       "evidence_hash": "4ed93cfdce6bd73e8fda12c3ebd477c124985d07aeb4821707a3538c62423811",
       "verdict": {
         "kind": "pass",
@@ -339,7 +339,7 @@
       }
     },
     {
-      "claim_hash": "596afdf7fc0a120006703359498a2dd95af53dc0dacf817d50cb193d305b8e70",
+      "claim_hash": "54e5c6cfc60ad12d5570058dd702868e6ba8608b284740781df852589b423895",
       "evidence_hash": "2f89bf9c5eec34fe6e8ca2c18f1b1d9f35858a21e83a81bf9bb2a9984908d0b4",
       "verdict": {
         "kind": "pass",
@@ -363,7 +363,7 @@
       }
     },
     {
-      "claim_hash": "596afdf7fc0a120006703359498a2dd95af53dc0dacf817d50cb193d305b8e70",
+      "claim_hash": "54e5c6cfc60ad12d5570058dd702868e6ba8608b284740781df852589b423895",
       "evidence_hash": "58e63376e8bed3ed378c23d37a8d721ea70f5455db5d139007dabe33b4e60a0b",
       "verdict": {
         "kind": "pass",

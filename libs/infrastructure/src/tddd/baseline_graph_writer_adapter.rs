@@ -275,6 +275,10 @@ mod tests {
         assert!(out.is_file(), "index.md must exist at {}", out.display());
         let content = std::fs::read_to_string(&out).unwrap();
         assert!(content.contains("flowchart LR"));
+        assert!(
+            !track_dir.join("domain-graph-d2").exists(),
+            "writing d1 alone must not materialize a d2 directory"
+        );
     }
 
     // -----------------------------------------------------------------------

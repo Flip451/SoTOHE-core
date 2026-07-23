@@ -4,26 +4,22 @@
     {
       "id": "T001",
       "description": "Update the type-designer kind-selection convention for IN-01, CN-01, and AC-01.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T002",
       "description": "Add the inbound-reference rule to `libs/domain/src/tddd/catalogue_linter.rs` and `catalogue_linter_eval.rs`, and wire its typed configuration through `libs/usecase/src/catalogue_lint_workflow.rs`. Add evaluator and workflow regression coverage for AC-02. IN-02, CN-01, CN-02, AC-02.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T003",
       "description": "Align the empty-layer 12a receipt in `.harness/capabilities/type-designer.md` and `.agents/skills/type-designer/SKILL.md` with the baseline-graph workflow and output documentation in `libs/usecase/src/baseline_graph_workflow.rs` and `libs/infrastructure/src/tddd/baseline_graph_writer_adapter.rs`. Add corresponding regression coverage in those workflow and writer modules for AC-03. IN-03, CN-03, AC-03.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     },
     {
       "id": "T004",
       "description": "Complete `.harness/config/contract-map-style.toml` and update `RoleKind` in `libs/domain/src/tddd/catalogue_linter_role.rs` plus the contract-map renderer result flow in `libs/domain/src/tddd/contract_map_renderer.rs`, `libs/usecase/src/contract_map_workflow.rs`, and `libs/infrastructure/src/tddd/contract_map_renderer_adapter/`. Add renderer and workflow regression coverage for AC-04. IN-04, CN-04, AC-04.",
-      "status": "todo",
-      "commit_hash": null
+      "status": "done"
     }
   ],
   "plan": {
@@ -39,7 +35,10 @@
         "description": [
           "Groups T001 and T002."
         ],
-        "task_ids": ["T001", "T002"]
+        "task_ids": [
+          "T001",
+          "T002"
+        ]
       },
       {
         "id": "S2",
@@ -47,7 +46,9 @@
         "description": [
           "Groups T003."
         ],
-        "task_ids": ["T003"]
+        "task_ids": [
+          "T003"
+        ]
       },
       {
         "id": "S3",
@@ -55,7 +56,9 @@
         "description": [
           "Groups T004."
         ],
-        "task_ids": ["T004"]
+        "task_ids": [
+          "T004"
+        ]
       }
     ]
   }

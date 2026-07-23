@@ -40,7 +40,7 @@
 
 | role (v5) | domain | usecase | infrastructure | cli | cli_composition | cli_driver | 配置根拠 |
 |---|---|---|---|---|---|---|---|
-| `ValueObject` (DataRole) | ✓ | △ | △ | ✗ | ✗ | ✗ | "validated value" は domain 概念。layer-flexible だが domain 外配置は要根拠 |
+| `ValueObject` (DataRole) | △ | ✓ | △ | ✗ | ✗ | ✗ | domain 配置には同一 track catalogue の別 domain entry の型・trait・関数シグネチャからの inbound 参照が必要。これを満たさないアプリケーション境界の値ラッパーは usecase の `Dto` または `Command` の構成要素を既定とする |
 | `Entity` (DataRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | entity は domain 概念。他層での使用は domain leak |
 | `AggregateRoot` (DataRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | aggregate root は domain 概念 |
 | `DomainService` (DataRole) | ✓ | △ | ✗ | ✗ | ✗ | ✗ | domain knowledge を集約する behavior 中心 struct。usecase は trans-domain な application logic で要根拠 |
@@ -65,6 +65,8 @@
 | `UseCaseFunction` (FunctionRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | use-case entrypoint function。usecase 層 |
 
 凡例: `✓` = OK, `△` = 要根拠 (default ではない、docs フィールドに根拠を記録)、`✗` = forbidden, `**ONLY**` = この層以外で使うことを禁止
+
+`ValueObject` を domain に置く場合、同一 track catalogue の別 domain entry の型・trait・関数シグネチャが当該 ValueObject を参照していなければならない。この domain-internal inbound reference がない値ラッパーは domain 概念ではなくアプリケーション境界の値として扱い、usecase の `Dto` または `Command` の構成要素に置く。根拠のない domain `ValueObject` は catalogue lint が action (`add` / `reference` / `modify`) を問わず拒否する。
 
 `✗` または **ONLY** を破る role × layer 選択は、`bin/sotp signal calc-impl-catalog` の signal 評価以前に **role 違反** として draft 段階で却下する。
 
@@ -222,7 +224,7 @@ catalogue の field / payload / param / returns / map キーで、検証可能�
    - フィールド / Vec 要素が domain VO/enum を表す → infra 側 `deserialize_with` で domain VO/enum へパースする (例: `include_function_roles: Vec<FunctionRole>` を文字列要素からパースする deserializer で受ける。`Vec<String>` 禁止)
    - **serde map キー** が serde-free な domain enum を表す → infra 側に deserializable な **mirror enum** を定義し (`#[derive(Deserialize)]` + domain enum への `From` / `TryFrom`)、`BTreeMap<MirrorEnum, _>` で受ける。生 String キー + runtime 検証へ退避してはならない
    - **config キー / filter 値が domain 概念を名指すなら、それは概念への参照である**。`[role.<RoleName>]` の RoleName、`[edge.<EdgeKind>]` の EdgeKind、`include_function_roles` の各 FunctionRole 等、有限の domain 概念集合を名指すキー/値は「ただの設定文字列」ではなく、当該 domain enum (serde は infra mirror 経由) で型付ける。「open-ended だから String」「runtime で検証するから String」は R9 違反
-   - 対応する domain enum が未だ無ければ R10 に従い domain enum を新設する (迷う場合は概念扱いで domain へ)。生 String 可は color / mermaid 構文のような domain 的意味を持たない提示専用値のみ
+   - 対応する enum が未だ無ければ、まず R1 の domain-internal inbound reference で配置を判定する。要件を満たす domain 概念なら R10 に従い domain enum を新設する。満たさないアプリケーション境界の値なら、usecase の `Dto` または `Command` の構成要素として型付ける。いずれの場合も生 String へ退避してはならない。生 String 可は color / mermaid 構文のような domain 的意味を持たない提示専用値のみ
 
 draft が本ルールに違反する (制約ある概念を生 primitive で宣言している) 場合、orchestrator レビュー前に self-reject して値オブジェクト化する。
 
@@ -235,34 +237,36 @@ draft が本ルールに違反する (制約ある概念を生 primitive で宣�
 
 **根拠**: `knowledge/conventions/prefer-type-safe-abstractions.md` § Make Illegal States Unrepresentable / Newtype。本ルールは当プロジェクト固有 convention であり、生 primitive を許容する方針のプロジェクトでは異なりうる (type-designer.md の横断性を保つため、本制約は agent 定義でなく本 convention に置く)。
 
-### R10. Concept → Domain Object in Domain Layer (概念は domain 層にドメインオブジェクトとして定義する)
+### R10. Domain Concept → Domain Object in Domain Layer (domain 概念は domain 層にドメインオブジェクトとして定義する)
 
-ドメイン上の概念 (ユビキタス言語に現れる名詞: 識別子・数量・分類・ポリシー・状態 等) は、必ず **ドメインオブジェクト** として R1 マトリクスで domain 層に合法な role (`ValueObject` / `Entity` / `AggregateRoot` / `DomainService` / `Specification` / `Factory` / `ErrorType` — R1 マトリクスの domain 列を参照) のいずれかでモデル化し、**domain 層の `domain-types.json` に定義する**。どの層がそれを消費するかは問わない。R9 が「概念を生 primitive にしない」を、本 R10 が「ドメインオブジェクト化 + domain 層配置 + カタログ宣言」を担う。role 選定は R1–R6 の判断木 (R3: ValueObject 制限 / R6: DomainService 選定基準 等) に従う。
+R10 を適用する前に R1 で候補を分類する。`ValueObject` 候補は、同一 track catalogue の別 domain entry からの domain-internal inbound reference がある場合にのみ domain 概念として扱う。この要件を満たさない値ラッパーは、制約や有限集合を持っていてもアプリケーション境界の値であり、domain に置かず usecase の `Dto` または `Command` の構成要素として型付ける。
+
+R1 で domain 概念と分類された概念 (ユビキタス言語に現れる名詞: 識別子・数量・分類・ポリシー・状態 等) は、必ず **ドメインオブジェクト** として R1 マトリクスで domain 層に合法な role (`ValueObject` / `Entity` / `AggregateRoot` / `DomainService` / `Specification` / `Factory` / `ErrorType` — R1 マトリクスの domain 列を参照) のいずれかでモデル化し、**domain 層の `domain-types.json` に定義する**。どの層がそれを消費するかは問わない。R9 が「概念を生 primitive にしない」を、本 R10 が「domain 概念のドメインオブジェクト化 + domain 層配置 + カタログ宣言」を担う。role 選定は R1–R6 の判断木 (R3: ValueObject 制限 / R6: DomainService 選定基準 等) に従う。
 
 論理連鎖 (なぜ概念が省略不能か):
 
-1. 概念は **ドメインオブジェクト化** する (生 primitive 化は R9 で禁止、kind 選定は R1 / R3)
-2. ドメインオブジェクトは **domain 層に配置** する (R1 マトリクス: `Entity` / `AggregateRoot` / `Specification` は domain ONLY、`ValueObject` は domain default)
+1. 候補は R1 で分類する。`ValueObject` 候補は domain-internal inbound reference があれば domain 概念、なければ usecase 境界値である
+2. domain 概念は **ドメインオブジェクト化** して domain 層に配置する (生 primitive 化は R9 で禁止。`Entity` / `AggregateRoot` / `Specification` は domain ONLY、`ValueObject` は R1 の inbound 要件を満たす場合のみ domain)
 3. domain 層の型は他層から参照されるため **`pub` 宣言が必須** (層 = 別クレート境界。`pub` + 公開パスがなければ usecase / infrastructure から名前で参照できずコンパイル不能)
 4. `pub` 型は **カタログ宣言が必須** (カタログは public rustdoc API surface を写す。source に在る pub 型がカタログ未宣言なら signal evaluator の `CMinusSUnionD` = 🔴)
-5. ∴ **各概念は省略不能でカタログに宣言される**
+5. ∴ **各 domain 概念は省略不能で domain catalogue に宣言される**。R1 で usecase 境界値と分類された候補は、その usecase catalogue に宣言される
 
 ただし手順 4 の signal 裏打ち (`CMinusSUnionD` 🔴) は **実装後** にしか効かない (計画段階では概念が source に未在のため、カタログから省いても赤にならない)。よって R10 は **計画段階** で概念のモデル化・配置・宣言を保証する上流ルールであり、R9 / 12c と同じく **信号機評価とは別軸** (全緑でも R10 充足を意味しない)。
 
 **serde / domain 純粋性を概念モデリング省略の口実にしてはならない**:
 
-- domain を serde-free に保つことは、概念を domain にモデル化しない理由には **ならない**。外部形式 (TOML / JSON 等) から読む必要がある概念は、(a) domain 層に serde-free なドメインオブジェクトを定義し、(b) infrastructure 層に `role: Dto` の serde DTO を定義して相互変換する (R1: `Dto` は infrastructure)。purity は「domain モデル + infra DTO」の対で解決する。
-- 「serde が要るから infra の生 struct に留める」「domain に置けないと判断してカタログから省略する」は **いずれも R10 違反**。
+- domain を serde-free に保つことは、R1 で domain 概念と分類された概念を domain にモデル化しない理由には **ならない**。外部形式 (TOML / JSON 等) から読む必要がある domain 概念は、(a) domain 層に serde-free なドメインオブジェクトを定義し、(b) infrastructure 層に `role: Dto` の serde DTO を定義して相互変換する (R1: `Dto` は infrastructure)。purity は「domain モデル + infra DTO」の対で解決する。
+- 「serde が要るから infra の生 struct に留める」「R1 の分類をせずに概念をカタログから省略する」は **いずれも R10 違反**。R1 で usecase 境界値と分類された候補は、domain ではなく usecase catalogue に型付けて宣言する。
 
-判別 (概念か否か):
+判別 (R1 による分類):
 
-- 判別は「ドメイン的意味を持つか (ドメインエキスパートとの会話に現れるか)」のみで行う。serde / 外部形式 / 表示の都合は判別に **関与しない** (それは配置ではなく DTO 変換の問題)。
-- 概念でない (= domain に置かない) と判断してよいのは、ドメイン的意味を一切持たない純粋な技術ノブ (adapter 内部のバッファサイズ・リトライ回数等) のみ。**迷う場合は概念として扱い domain にモデル化する** (省略 / infra 寄せより誤りが少ない)。
+- ドメイン的意味 (ドメインエキスパートとの会話に現れるか) は role 候補を選ぶための材料であり、serde / 外部形式 / 表示の都合は判別に **関与しない** (それは配置ではなく DTO 変換の問題)。ただし `ValueObject` 候補を domain 概念として domain に配置するには、R1 の domain-internal inbound reference が必須である。意味だけでこの要件を上書きしてはならない。
+- ドメイン的意味を一切持たない純粋な技術ノブ (adapter 内部のバッファサイズ・リトライ回数等) は domain に置かない。`ValueObject` 候補が inbound reference を持たない場合も usecase 境界値として扱う。R1〜R6 を適用しても role または配置が確定しない場合は、R5 に従い `## Open Questions` に escalation し、曖昧さだけを理由に domain に配置してはならない。
 
 判定例:
 
-- 「許可された種別の有限集合」という概念 → domain に `role: ValueObject` の `enum` を定義。外部設定から読むなら infrastructure に `role: Dto` を置いて変換。`Vec<String>` を infra に持つのは R9 + R10 違反
-- 検証付き識別子の概念 → domain に `role: ValueObject` newtype。infra DTO フィールドも生 `String` にはしない — `deserialize_with` カスタムデシリアライザで受けてフィールド型を domain VO にするか、serde-free な domain enum を持つ場合はinfra 側に deserializable な mirror newtype を定義して変換する
+- domain entry が参照する「許可された種別の有限集合」という概念 → domain に `role: ValueObject` の `enum` を定義。外部設定から読むなら infrastructure に `role: Dto` を置いて変換。`Vec<String>` を infra に持つのは R9 + R10 違反。domain-internal inbound reference がない境界値なら、usecase の `Dto` または `Command` の構成要素として型付ける
+- domain entry が参照する検証付き識別子の概念 → domain に `role: ValueObject` newtype。infra DTO フィールドも生 `String` にはしない — `deserialize_with` カスタムデシリアライザで受けてフィールド型を domain VO にするか、serde-free な domain enum を持つ場合はinfra 側に deserializable な mirror newtype を定義して変換する。domain-internal inbound reference がない境界値は、usecase の `Dto` または `Command` の構成要素として型付ける
 
 **根拠**: domain は `architecture-rules.json` の `may_depend_on: []` で定義される最内層である。本ルールは当プロジェクト固有 convention であり、agent 定義でなく本 convention に置く (横断性のため)。
 
@@ -307,7 +311,7 @@ type-designer 自身および reviewer は draft 段階で以下を確認する:
 - [ ] top-level `trait_impls[]` のうち `for_type` が `role: SecondaryAdapter` の型を指す entry の `trait_ref` で参照するすべての trait (port) が当該 track の catalogue に `traits` エントリ (role は `SecondaryPort` または `Repository`) として declare されているか (R7)。baseline 由来の port は `action: "reference"` で declare されているか
 - [ ] `methods[].returns` / `methods[].params[].ty` (TypeEntry / TraitEntry) および FunctionEntry の `returns` / `params[].ty` に bare wrapper 名のみの宣言 (`Result` / `Option` / `Vec` / `Box` / `Arc` / `Rc` / `Cow` / `BTreeMap` / `HashMap` / `HashSet` / `BTreeSet`) がないか (R8)
 - [ ] field / payload / param / returns / map キーで、制約ある概念を生 primitive (`String` 等) で宣言していないか (R9)。制約があれば値オブジェクト (newtype / enum) を定義しているか。**`role: Dto` / serde 境界も例外ではない** — 概念を名指す map キー・filter 値は domain enum (serde は infra mirror enum 経由) で型付けているか。生 primitive は color / 自由ラベル等の真に不透明な提示専用値のみで、その場合 `docs` に根拠が記録されているか
-- [ ] ドメイン上の概念がすべて R1 マトリクスで domain 層に合法な role (ValueObject / Entity / AggregateRoot / DomainService / Specification / Factory / ErrorType) のいずれかで domain 層に定義され、カタログに宣言されているか (R10)。role 選定は R1–R6 の判断木に従う。serde / 外部形式の都合を口実に domain モデリングをスキップして infra 生 struct に留めたり、層配置を避けて概念をカタログから省略したりしていないか。外部形式が要る概念は「domain オブジェクト + infra `role: Dto`」の対で表現しているか
+- [ ] `ValueObject` 候補を R1 の domain-internal inbound reference で分類したか。domain 概念は R1 マトリクスで domain 層に合法な role (ValueObject / Entity / AggregateRoot / DomainService / Specification / Factory / ErrorType) のいずれかで domain 層に定義し、domain catalogue に宣言しているか (R10)。inbound reference のない境界値は usecase の `Dto` または `Command` の構成要素として型付け、usecase catalogue に宣言しているか。serde / 外部形式の都合を口実に、R1 の分類をせずに概念を infra 生 struct に留めたりカタログから省略したりしていないか。外部形式が要る domain 概念は「domain オブジェクト + infra `role: Dto`」の対で表現しているか
 - [ ] R1〜R10 のいずれかで判断不能な entry が `## Open Questions` に escalation されているか
 
 ## Enforcement

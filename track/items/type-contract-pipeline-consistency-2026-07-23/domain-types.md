@@ -4,9 +4,9 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CatalogueLinterRuleKind | enum | modify | FieldEmpty, FieldNonEmpty, KindLayerConstraint, ReferencedRoleConstraint, TraitImplRequired, NoRoleInMethodSignature, MethodReferenceSignature, AccessorSignatureRequired, FieldElementUniqueAcrossEntries, NoExternalReferenceInMethods, NoPublicField, ForbiddenMethodReceiver, ForbidPrimitiveInTypes, DomainValueObjectInboundReferenceRequired | 🟡 | 🔵 |
-| ContractMapRenderWarning | enum | add | UndefinedRoleStyle | 🟡 | 🔵 |
-| RoleKind | enum | modify | ValueObject, Entity, AggregateRoot, DomainService, Specification, Factory, UseCase, Interactor, Command, Query, Dto, ErrorType, SecondaryAdapter, EventPolicy, DomainEvent, CompositionRoot, PrimaryAdapter, SpecificationPort, ApplicationService, SecondaryPort, Repository, FreeFunction, UseCaseFunction | 🟡 | 🔵 |
+| CatalogueLinterRuleKind | enum | modify | FieldEmpty, FieldNonEmpty, KindLayerConstraint, ReferencedRoleConstraint, TraitImplRequired, NoRoleInMethodSignature, MethodReferenceSignature, AccessorSignatureRequired, FieldElementUniqueAcrossEntries, NoExternalReferenceInMethods, NoPublicField, ForbiddenMethodReceiver, ForbidPrimitiveInTypes, DomainValueObjectInboundReferenceRequired | 🔵 | 🔵 |
+| ContractMapRenderWarning | enum | add | UndefinedRoleStyle | 🔵 | 🔵 |
+| RoleKind | enum | modify | ValueObject, Entity, AggregateRoot, DomainService, Specification, Factory, UseCase, Interactor, Command, Query, Dto, ErrorType, SecondaryAdapter, EventPolicy, DomainEvent, CompositionRoot, PrimaryAdapter, SpecificationPort, ApplicationService, SecondaryPort, Repository, FreeFunction, UseCaseFunction | 🔵 | 🔵 |
 
 ## Value Objects
 
@@ -14,13 +14,13 @@
 |------|------|--------|---------|--------|----------|
 | CatalogueLinterRule | value_object | reference | — | 🔵 | 🔵 |
 | ContractMapContent | value_object | reference | — | 🔵 | 🔵 |
-| ContractMapRenderResult | value_object | add | — | 🟡 | 🔵 |
+| ContractMapRenderResult | value_object | add | — | 🔵 | 🔵 |
 
 ## Secondary Ports
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ContractMapRenderer | secondary_port | modify | fn render(&self, catalogues: &[CatalogueDocument], layer_order: &[LayerId], opts: &ContractMapRenderOptions) -> Result<ContractMapRenderResult, ContractMapRendererError> | 🟡 | 🔵 |
+| ContractMapRenderer | secondary_port | modify | fn render(&self, catalogues: &[CatalogueDocument], layer_order: &[LayerId], opts: &ContractMapRenderOptions) -> Result<ContractMapRenderResult, ContractMapRendererError> | 🔵 | 🔵 |
 
 ## Free Functions
 

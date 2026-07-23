@@ -354,91 +354,124 @@
             "name": "FieldEmpty",
             "payload": {
               "fields": [
-                "RolePayloadField"
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "FieldNonEmpty",
             "payload": {
               "fields": [
-                "RolePayloadField"
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "KindLayerConstraint",
             "payload": {
               "fields": [
-                "NonEmptyVec<LayerId>"
+                {
+                  "name": "permitted_layers",
+                  "ty": "NonEmptyVec<LayerId>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "ReferencedRoleConstraint",
             "payload": {
               "fields": [
-                "RolePayloadField",
-                "RoleKind"
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                },
+                {
+                  "name": "expected_role",
+                  "ty": "RoleKind"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "TraitImplRequired",
             "payload": {
               "fields": [
-                "NonEmptyVec<TypeRef>"
+                {
+                  "name": "required_traits",
+                  "ty": "NonEmptyVec<TypeRef>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "NoRoleInMethodSignature",
             "payload": {
               "fields": [
-                "NonEmptyVec<RoleKind>"
+                {
+                  "name": "forbidden_roles",
+                  "ty": "NonEmptyVec<RoleKind>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "MethodReferenceSignature",
             "payload": {
               "fields": [
-                "RolePayloadField"
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "AccessorSignatureRequired",
             "payload": {
               "fields": [
-                "RolePayloadField"
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "FieldElementUniqueAcrossEntries",
             "payload": {
               "fields": [
-                "RolePayloadField"
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "NoExternalReferenceInMethods",
             "payload": {
               "fields": [
-                "RolePayloadField"
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
@@ -451,20 +484,32 @@
             "name": "ForbiddenMethodReceiver",
             "payload": {
               "fields": [
-                "SelfReceiver"
+                {
+                  "name": "forbidden_receiver",
+                  "ty": "SelfReceiver"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
             "name": "ForbidPrimitiveInTypes",
             "payload": {
               "fields": [
-                "NonEmptyVec<PrimitiveName>",
-                "NonEmptyVec<LayerId>",
-                "NonEmptyVec<PrimitiveOccurrencePosition>"
+                {
+                  "name": "primitives",
+                  "ty": "NonEmptyVec<PrimitiveName>"
+                },
+                {
+                  "name": "layers",
+                  "ty": "NonEmptyVec<LayerId>"
+                },
+                {
+                  "name": "positions",
+                  "ty": "NonEmptyVec<PrimitiveOccurrencePosition>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           },
           {
@@ -482,7 +527,7 @@
           "name": "discriminant_name",
           "params": [],
           "receiver": "&self",
-          "returns": "&str"
+          "returns": "&'static str"
         }
       ],
       "module_path": "tddd::catalogue_linter",
@@ -816,14 +861,14 @@
           "name": "variant_name",
           "params": [],
           "receiver": "self",
-          "returns": "&str"
+          "returns": "&'static str"
         },
         {
           "has_default_impl": false,
           "is_async": false,
           "name": "all",
           "params": [],
-          "returns": "&[RoleKind]"
+          "returns": "&'static [RoleKind]"
         }
       ],
       "module_path": "tddd::catalogue_linter::role",
