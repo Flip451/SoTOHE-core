@@ -100,6 +100,12 @@ skip implementation only — keep the task in the batch so its working-tree chan
 DFP, Review, Commit, and post-commit task hash recording. Do NOT commit between tasks in the
 same batch.
 
+Test-obligation handoff: a catalogue-bearing track enters this loop already enrolled
+(`obligations.json` + `test-bindings.json` from the `type-design` workflow's terminal derive
+step, ADR 2026-07-23-0240 D1). The `implement` workflow's Step 4 authors binding increments
+against those obligations per batch; this workflow adds no enrollment decision of its own,
+and the commit gate's `sotp test-obligation check` fail-closes if the artifacts are missing.
+
 **Step 1b: Actual-diff guard (advisory ceiling visibility)**
 
 Measure the **actual** per-scope diff against the ceilings loaded in Step 0a. This is run at

@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "6fde7f1109736c9064d2269fdc2bfbd8f3372565a34b6fcbfcce75b850751c4c",
+  "signals": [
+    {
+      "type_name": "FeatureDisabledDryGateDriver",
+      "signal": "blue",
+      "entry_hash": "0cdc12f5769ff498d34aa535fe334d021deacd04bbd22a2b05d0afe81c0ecf69"
+    },
+    {
+      "type_name": "MaintenanceCommandDriver",
+      "signal": "blue",
+      "entry_hash": "82d8c88797a278f7d49d187dd363f24234954de2cb7e925db73693bc50108dbd"
+    },
+    {
+      "type_name": "MaintenanceCommandInput",
+      "signal": "blue",
+      "entry_hash": "7787de55f3df42c028b99a0c353565ea2ebff31ea73ad2145278cc91b85b9dc9"
+    },
+    {
+      "type_name": "MaintenanceQueryDriver",
+      "signal": "blue",
+      "entry_hash": "776393ad8c410bc52f76d6d409088e2dad24e2ec3ff8df20ab2d7f69ec8e1759"
+    },
+    {
+      "type_name": "MaintenanceQueryInput",
+      "signal": "blue",
+      "entry_hash": "e5ee1a366b7b2fe4d2b4be8eeabde04c830dc7d79f5d3cd7b67bccfa02db8ef4"
+    }
+  ]
+}

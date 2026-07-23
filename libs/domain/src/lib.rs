@@ -7,6 +7,7 @@ pub mod auto_phase;
 pub mod branch_strategy;
 pub mod chain;
 mod decision;
+pub mod disk_maintenance;
 pub mod dry_check;
 mod error;
 pub mod git_ref;

@@ -157,6 +157,7 @@ mod tests {
     /// `SystemGitRepo::discover()` picks up the isolated repo and reads the fixture
     /// config rather than the workspace config (which may have `enabled: false`).
     #[test]
+    #[cfg(feature = "semantic-dup")]
     fn test_execute_fixpoint_resolve_dry_blocked_returns_success_exit_code() {
         use std::process::{Command, ExitCode};
 

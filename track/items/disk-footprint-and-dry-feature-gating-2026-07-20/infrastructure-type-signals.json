@@ -1,0 +1,122 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-22T19:18:18Z",
+  "declaration_hash": "6f59bc4b7b8df9d9a3f37878703761ee58834c64ea3622368d3f01ab9e0fe3cf",
+  "implementation_input_hash": "becd472809a119a7cc574c696fd8ee56d365d4b34abec0b3debd03dfd939f721",
+  "signals": [
+    {
+      "type_name": "FsDiskMaintenanceAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Default",
+        "DiskMaintenanceCommandPort",
+        "DiskMaintenanceQueryPort"
+      ]
+    },
+    {
+      "type_name": "CodeFragmentExtractorAdapter",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "DryCheckServiceFactoryAdapter",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "ExtractError",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "FastEmbedAdapter",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "FsDryCorpusFragmentsAdapter",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "FsDryCorpusMetaAdapter",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "FsDryCorpusRootManifestAdapter",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "FsDryWriteConfigLoaderAdapter",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "LanceDbSemanticIndexAdapter",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "NoopSemanticIndexPort",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "NullInsertIndexProxy",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "PersistentIndexLock",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "PersistentIndexLockError",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "RecordingDryTierTelemetryAdapter",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::semantic_dup::extractor::extract_code_fragments",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    }
+  ]
+}

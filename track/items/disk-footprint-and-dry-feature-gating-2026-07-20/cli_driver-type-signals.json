@@ -1,0 +1,50 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-22T16:53:38Z",
+  "declaration_hash": "6fde7f1109736c9064d2269fdc2bfbd8f3372565a34b6fcbfcce75b850751c4c",
+  "implementation_input_hash": "f9aee151518483c8342154bf1c185635e67cc5ffc3c179002cac8048424a2335",
+  "signals": [
+    {
+      "type_name": "FeatureDisabledDryGateDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "MaintenanceCommandDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "MaintenanceCommandInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "MaintenanceQueryDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "MaintenanceQueryInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    }
+  ]
+}

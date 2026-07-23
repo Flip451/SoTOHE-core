@@ -283,11 +283,11 @@ args = ["task-contract", "check"]
 
 [tasks.ci-rust]
 description = "[gate] Run Rust-only CI checks"
-dependencies = ["fmt-check", "clippy", "test", "deny", "check-layers", "verify-canonical-modules"]
+dependencies = ["fmt-check", "clippy", "test", "test-cli-feature-off", "deny", "check-layers", "verify-canonical-modules"]
 
 [tasks.ci]
 description = "[gate] Run repository-wide CI checks. Track-aware gates live in ci-track."
-dependencies = ["fmt-check", "clippy", "test", "test-doc", "deny", "check-layers", "verify-arch-docs", "verify-doc-links", "verify-track-metadata", "verify-hooks-path", "verify-canonical-modules", "verify-latest-track", "verify-module-size", "verify-domain-strings", "verify-domain-purity", "verify-usecase-purity", "verify-view-freshness", "verify-plan-artifact-refs", "verify-adr-signals"]
+dependencies = ["fmt-check", "clippy", "test", "test-cli-feature-off", "test-doc", "deny", "check-layers", "verify-arch-docs", "verify-doc-links", "verify-track-metadata", "verify-hooks-path", "verify-canonical-modules", "verify-latest-track", "verify-module-size", "verify-domain-strings", "verify-domain-purity", "verify-usecase-purity", "verify-view-freshness", "verify-plan-artifact-refs", "verify-adr-signals"]
 
 [tasks.ci-track]
 description = "[gate] Run track-aware CI gates. Requires a track/<id> branch."

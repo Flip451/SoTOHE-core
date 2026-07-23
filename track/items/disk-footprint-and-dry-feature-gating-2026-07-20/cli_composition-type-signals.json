@@ -1,0 +1,59 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-22T16:18:31Z",
+  "declaration_hash": "cfcfc484a8faaa321f2833c66c56125a4e2f6fb7e3ad0d7d682a69d25adc3fc1",
+  "implementation_input_hash": "d4d9c3410c85e2d03243c238dbf91ab17dc1f0262cb6803ca06781218ff6e32a",
+  "signals": [
+    {
+      "type_name": "FeatureDisabledDryGateCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "MaintenanceCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Default"
+      ]
+    },
+    {
+      "type_name": "DryCompositionRoot",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "DupCheckInput",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "DupIndexBuildInput",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "DupIndexMeasureQualityInput",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "FindSimilarInput",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
+      "type_name": "SemanticDupCompositionRoot",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    }
+  ]
+}

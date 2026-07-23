@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "70b95698b068854e62a553f54b771633fea955a70fdc830e5ed07f4db365131d",
+  "signals": [
+    {
+      "type_name": "CacheSize",
+      "signal": "blue",
+      "entry_hash": "104973c76d1824affcabf3e40b05063770f8799b40145b82e90cedc7c02f5538"
+    },
+    {
+      "type_name": "CleanupExecutionMode",
+      "signal": "blue",
+      "entry_hash": "acfade3844e477b2254260e5326d7d2f15c9f0648c87ec17711c380a25368552"
+    },
+    {
+      "type_name": "CleanupScope",
+      "signal": "blue",
+      "entry_hash": "6c7bfee4030a5f8f930ca4e2483f5ca9a39069cb8adde6132ef4ccefce750df6"
+    },
+    {
+      "type_name": "CleanupScopeSet",
+      "signal": "blue",
+      "entry_hash": "2a3b092241a3931827d647ceb18c06206fca59e4597ea0e51b8b1774e8b4f840"
+    },
+    {
+      "type_name": "DiskMaintenanceConfig",
+      "signal": "blue",
+      "entry_hash": "a66c55577789532128a910023545859f010c61a276206c189a0050d8f1fce8c5"
+    },
+    {
+      "type_name": "DiskMaintenanceOperationDetail",
+      "signal": "blue",
+      "entry_hash": "d66fad8c08c778aac6c6f44f66f564f78ba657bc0f48596e67465cdd56165974"
+    },
+    {
+      "type_name": "DiskMaintenanceValidationError",
+      "signal": "blue",
+      "entry_hash": "ccbffac15f4538aa6da24b1f2b5f6d063da9b772402f3e2c35dd797cc2a8e524"
+    },
+    {
+      "type_name": "InvalidDiskMaintenanceInput",
+      "signal": "blue",
+      "entry_hash": "f41e10665ec670e83cc4f42b95ab62bc10dd23ef8d04ad4258185ab7bc488980"
+    }
+  ]
+}

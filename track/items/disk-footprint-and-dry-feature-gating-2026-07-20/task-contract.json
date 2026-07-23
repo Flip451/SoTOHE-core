@@ -1,0 +1,272 @@
+{
+  "schema_version": 1,
+  "track_id": "disk-footprint-and-dry-feature-gating-2026-07-20",
+  "entries": {
+      "T001": [
+        {
+          "layer": "infrastructure",
+          "entry_key": "CodeFragmentExtractorAdapter"
+        },
+        {
+          "layer": "infrastructure",
+          "entry_key": "DryCheckServiceFactoryAdapter"
+        },
+        {
+          "layer": "infrastructure",
+          "entry_key": "ExtractError"
+        },
+        {
+          "layer": "infrastructure",
+          "entry_key": "FastEmbedAdapter"
+        },
+        {
+          "layer": "infrastructure",
+          "entry_key": "FsDryCorpusFragmentsAdapter"
+        },
+        {
+          "layer": "infrastructure",
+          "entry_key": "FsDryCorpusMetaAdapter"
+        },
+        {
+          "layer": "infrastructure",
+          "entry_key": "FsDryCorpusRootManifestAdapter"
+        },
+        {
+          "layer": "infrastructure",
+          "entry_key": "FsDryWriteConfigLoaderAdapter"
+        },
+      {
+        "layer": "infrastructure",
+        "entry_key": "LanceDbSemanticIndexAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "NoopSemanticIndexPort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "NullInsertIndexProxy"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "PersistentIndexLock"
+      },
+        {
+          "layer": "infrastructure",
+          "entry_key": "PersistentIndexLockError"
+        },
+        {
+          "layer": "infrastructure",
+          "entry_key": "RecordingDryTierTelemetryAdapter"
+        },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::semantic_dup::extractor::extract_code_fragments"
+      },
+        {
+          "layer": "infrastructure",
+          "entry_key": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock"
+        },
+        {
+          "layer": "infrastructure",
+          "entry_key": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path"
+        }
+      ],
+      "T002": [
+        {
+          "layer": "cli_composition",
+          "entry_key": "DryCompositionRoot"
+        },
+        {
+          "layer": "cli_composition",
+          "entry_key": "DupCheckInput"
+        },
+        {
+          "layer": "cli_composition",
+          "entry_key": "DupIndexBuildInput"
+        },
+        {
+          "layer": "cli_composition",
+          "entry_key": "DupIndexMeasureQualityInput"
+        },
+        {
+          "layer": "cli_composition",
+          "entry_key": "FindSimilarInput"
+        },
+        {
+          "layer": "cli_composition",
+          "entry_key": "SemanticDupCompositionRoot"
+        },
+        {
+          "layer": "cli",
+          "entry_key": "VerdictFilterArg"
+        },
+        {
+          "layer": "cli",
+          "entry_key": "cli::commands::dry::execute_dry_fix_local"
+        },
+        {
+          "layer": "cli",
+          "entry_key": "cli::commands::dry::execute_dry_results"
+        },
+        {
+          "layer": "cli",
+          "entry_key": "cli::commands::dry::execute_dry_write"
+        },
+        {
+          "layer": "cli",
+          "entry_key": "cli::commands::semantic_dup_feature_gate::semantic_dup_feature_disabled_exit"
+        },
+        {
+          "layer": "cli",
+          "entry_key": "SemanticDupCommandFamily"
+        }
+      ],
+    "T006": [
+      {
+        "layer": "usecase",
+        "entry_key": "DryCheckApprovedDriverService"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "FeatureDisabledDryGateInteractor"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "FeatureDisabledDryGateDriver"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "FeatureDisabledDryGateCompositionRoot"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::dry::execute_dry_check_approved"
+      }
+    ],
+    "T003": [
+        {
+          "layer": "domain",
+          "entry_key": "CacheSize"
+        },
+        {
+          "layer": "domain",
+          "entry_key": "CleanupExecutionMode"
+        },
+        {
+          "layer": "domain",
+          "entry_key": "CleanupScope"
+        },
+        {
+          "layer": "domain",
+          "entry_key": "CleanupScopeSet"
+        },
+        {
+          "layer": "domain",
+          "entry_key": "DiskMaintenanceConfig"
+        },
+        {
+          "layer": "domain",
+          "entry_key": "DiskMaintenanceOperationDetail"
+        },
+        {
+          "layer": "domain",
+          "entry_key": "DiskMaintenanceValidationError"
+        },
+        {
+          "layer": "domain",
+          "entry_key": "InvalidDiskMaintenanceInput"
+        },
+        {
+          "layer": "usecase",
+          "entry_key": "CleanupPlanQuery"
+        },
+        {
+          "layer": "usecase",
+          "entry_key": "CleanupPlanResponse"
+        },
+        {
+          "layer": "usecase",
+          "entry_key": "DiskMaintenanceCommand"
+        },
+        {
+          "layer": "usecase",
+          "entry_key": "DiskMaintenanceCommandInteractor"
+        },
+        {
+          "layer": "usecase",
+          "entry_key": "DiskMaintenanceCommandPort"
+        },
+        {
+          "layer": "usecase",
+          "entry_key": "DiskMaintenanceCommandResponse"
+        },
+        {
+          "layer": "usecase",
+          "entry_key": "DiskMaintenanceCommandService"
+        },
+        {
+          "layer": "usecase",
+          "entry_key": "DiskMaintenanceError"
+        },
+        {
+          "layer": "usecase",
+          "entry_key": "DiskMaintenanceQueryInteractor"
+        },
+        {
+          "layer": "usecase",
+          "entry_key": "DiskMaintenanceQueryPort"
+        },
+        {
+          "layer": "usecase",
+          "entry_key": "DiskMaintenanceQueryService"
+        },
+        {
+        "layer": "infrastructure",
+        "entry_key": "FsDiskMaintenanceAdapter"
+      }
+    ],
+    "T005": [
+      {
+        "layer": "cli_driver",
+        "entry_key": "MaintenanceCommandDriver"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "MaintenanceCommandInput"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "MaintenanceQueryDriver"
+      },
+      {
+        "layer": "cli_driver",
+        "entry_key": "MaintenanceQueryInput"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "CleanupArgs"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "CliCommand"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "MaintenanceCommand"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "ProjectRootArgs"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::maintenance::execute"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "MaintenanceCompositionRoot"
+      }
+    ]
+  }
+}

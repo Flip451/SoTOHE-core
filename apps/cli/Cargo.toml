@@ -9,6 +9,9 @@ publish.workspace = true
 name = "sotp"
 path = "src/main.rs"
 
+[features]
+semantic-dup = ["cli_composition/semantic-dup"]
+
 [lints]
 workspace = true
 

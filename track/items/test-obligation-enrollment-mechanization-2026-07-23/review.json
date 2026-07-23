@@ -1,0 +1,401 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 は既決 ADR 2026-07-02-0359 の D6 が定めた「obligations / test-bindings artifact が不在なら zero pairs で通過する」という existence-based scope を反転させています。それにもかかわらず本 ADR は「D15 の手前を閉じる補完」とだけ記載しており、既決決定の変更・supersede として明示していないため、ADR 間の決定が矛盾します。既決 D6 を変更するなら、その関係を明示的に記録してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0240-test-obligation-enrollment-mechanization.md",
+              "line": 44,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:8afb4e7ecb2a2d00a9d6913117636c58e2f137449b5eda8bc75028894509c23d",
+          "at": "2026-07-22T18:10:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:37c5e932b8759cc906991cdcebf54465cb5b96c3e58ecac676c9b9cdee787b24",
+          "at": "2026-07-22T18:14:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:37c5e932b8759cc906991cdcebf54465cb5b96c3e58ecac676c9b9cdee787b24",
+          "at": "2026-07-22T18:17:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa07cd273766a7ab174c5bb089f30b63262d174c19ccaf8ffe9f43e6931b9d84",
+          "at": "2026-07-22T18:23:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fa07cd273766a7ab174c5bb089f30b63262d174c19ccaf8ffe9f43e6931b9d84",
+          "at": "2026-07-22T18:25:27Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3bb35ceee9e50e32775a551adfed5c580573829ae283b8e08c348361575fd956",
+          "at": "2026-07-22T19:25:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This addition grows `check.rs` to 716 production lines before its `#[cfg(test)]` block (up from 695), exceeding the repository's 700-line production-module maximum. Extract or reduce the new enrollment-presence logic so the module remains within the architecture limit.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/check.rs",
+              "line": 142,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:3bb35ceee9e50e32775a551adfed5c580573829ae283b8e08c348361575fd956",
+          "at": "2026-07-22T19:28:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf7139ca6c163ddbaedf068b1d8eb84c9f199a9e556a13e977ecebd8827f2016",
+          "at": "2026-07-22T19:32:26Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df311cc64834044e3670e99907dabe9870c00fd1b7a1cdf3bc07aa8b51cc80ca",
+          "at": "2026-07-22T18:46:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df311cc64834044e3670e99907dabe9870c00fd1b7a1cdf3bc07aa8b51cc80ca",
+          "at": "2026-07-22T18:48:25Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CheckTestObligationsInteractor` の `docs` が spec の fail-closed / catalogue-bearing 判定ロジックを prose で再記述しており、upstream restatement に該当します。`docs` は仕様本文を複製せず、`spec_refs` のアンカー参照に留めてください。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/usecase-types.json",
+              "line": 10,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:b97a3a7b85a4b12184918316f40a1deb1d16352a983b90cf7f3f005c6190ea62",
+          "at": "2026-07-22T18:46:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CheckTestObligationsInteractor` の `docs` が spec の fail-closed 判定ロジックを prose で再記述しており、upstream restatement に該当します。仕様本文を複製せず、`spec_refs` のアンカー参照に留めてください。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/usecase-types.json",
+              "line": 10,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:d5f2cb1c00521d9430c44dd637244863cbbfb0fcbdf06000bc88967939610f8a",
+          "at": "2026-07-22T18:51:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d5f2cb1c00521d9430c44dd637244863cbbfb0fcbdf06000bc88967939610f8a",
+          "at": "2026-07-22T18:53:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::CheckTestObligationsInteractor` is marked `action: modify`, but its declared `new` method exactly matches the rustdoc baseline: the same 12 parameters, ordering, types, and `Self` return. D2 can use the already-injected `catalogue_reader`, so this currently declares no public contract change and contradicts the briefing's claimed constructor extension. Remove this type declaration (and its trait-impl reference), or declare the actual changed signature if one is intended.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/usecase-types.json",
+              "line": 9,
+              "category": "SoT integrity: action incoherent with the diff"
+            }
+          ],
+          "hash": "rvw1:sha256:d5f2cb1c00521d9430c44dd637244863cbbfb0fcbdf06000bc88967939610f8a",
+          "at": "2026-07-22T18:57:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:70122e1bc37bae9346f976206d009a74af2d8f41a3e0c9a777a3192d5d39e826",
+          "at": "2026-07-22T19:04:10Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`implement` Step 4 says a track without a TDDD catalogue has no enrollment artifacts and passes via a “consistent-absence” skip, but `full-cycle` states the commit gate `sotp test-obligation check` fail-closes whenever enrollment artifacts are missing. These are contradictory gate semantics; the workflow must define whether absence is valid for non-catalogue tracks or always an error.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/implement.md",
+              "line": 84,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:157e2940acd508eee73774e8d5a939332e93dcdc30349e1a35d7458caab3a336",
+          "at": "2026-07-22T19:24:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89dbe0c402a02fba530ce0c4c3c8868a2b1aeff43d04409ec5ba1985dc11b896",
+          "at": "2026-07-22T19:26:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 2 は既存の `test-bindings.json` を skeleton の TODO draft で上書きします。D1 により workflow 開始時には同ファイルが存在し、full-cycle はバッチごとにこの workflow を呼ぶため、2 バッチ目以降で既存の fulfillment/waiver が失われ、D3/IN-03 の増分著作契約を破壊します。skeleton は scratch 上で既存 records へ merge するか、初回作成時だけに限定してください。",
+              "severity": "P0",
+              "file": ".harness/workflows/track/obligation-fulfillment.md",
+              "line": 52,
+              "category": "data-corruption"
+            },
+            {
+              "message": "Mission の「type-designer capability owns all file writes」は、新しい Step 4 および capability contract の Scope Ownership と矛盾します。enrollment artifacts は workflow orchestrator が書き、capability では明示的に書き込み禁止です。capability の所有範囲を catalogue/baseline/rendered-view writes に限定してください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/type-design.md",
+              "line": 14,
+              "category": "responsibility-boundary"
+            },
+            {
+              "message": "既存 track 向けの retrofit/standalone 動作を掲げながら、artifact 不在時は修復しないと定め、Failure / recovery に type-design への復帰または sanctioned migration の経路がありません。旧 track は新しい fail-closed check で停止した後、この workflow を開始できません。不在を早期検出して type-design の terminal derive へ route する回復手順を追加してください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/obligation-fulfillment.md",
+              "line": 38,
+              "category": "workflow-recovery"
+            }
+          ],
+          "hash": "rvw1:sha256:89dbe0c402a02fba530ce0c4c3c8868a2b1aeff43d04409ec5ba1985dc11b896",
+          "at": "2026-07-22T19:32:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cc0b425ada1a22494f8fac3ef3d99076a364d00de2ae5599835001003181c782",
+          "at": "2026-07-22T19:36:40Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 の description は `CheckTestObligationsInteractor` または対象ファイルを明示せず、実装境界を executor に推測させるため executable-plan 要件を満たさない。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001〜T003 の description は fail-closed 判定、成果物の必須化、workflow の具体的挙動を上流 spec の散文として再記述している。対象 + 操作 + anchor cite の形式に縮約すべき。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S1〜S3 の section description も実装方針・期待挙動を再記述しており、no-upstream-restatement 規則に違反する。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`plan.summary` が空で、spec の GO-01 に対する計画上の traceability がありません。GO 要素は task-coverage ではなく impl-plan の summary で追跡する必要があります。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 24,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:e683c36e1960ca38b71040fa1935ef4966ef46a837c33597ff98f78d49aca704",
+          "at": "2026-07-22T18:46:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 の description は対象ファイルまたは明示的なシンボル境界を示さず、executor に実装対象を推測させる。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T001〜T003 の description は fail-closed 判定、成果物必須化、workflow 挙動を上流 spec の散文として再記述している。対象 + 操作 + anchor cite に縮約すべき。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "S1〜S3 の section description も実装方針・期待挙動を再記述しており、upstream restatement に該当する。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "plan.summary が空で、spec の GO-01 に対する計画上の goal traceability がない。GO 要素は task-coverage ではなく impl-plan の summary で追跡する必要がある。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 24,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:454b09bfb95237af1df9fc8c805d766ca7d0b256e25d5cf6149fea434d1f7e45",
+          "at": "2026-07-22T18:49:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14f4b58942e0e842a17a20f157a8b157b301ee40e155af9592c5d015f422531b",
+          "at": "2026-07-22T18:55:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14f4b58942e0e842a17a20f157a8b157b301ee40e155af9592c5d015f422531b",
+          "at": "2026-07-22T19:01:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6d73fb35a00ecf5743a4b5ed69c50dbf2d9a09158dcdfce68988520fedb58ca3",
+          "at": "2026-07-22T19:06:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f77159e81ed7d53f285463ece2f30013b8bf7eb33f603025bedf8a78d3cdae3",
+          "at": "2026-07-22T19:25:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7f77159e81ed7d53f285463ece2f30013b8bf7eb33f603025bedf8a78d3cdae3",
+          "at": "2026-07-22T19:27:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-01 mapping to T002 is not load-bearing: T002 only says to require terminal derive/re-entry steps, but AC-01 also requires materializing both `obligations.json` and empty-record `test-bindings.json`, same-commit inclusion, and re-derivation after catalogue/spec re-entry. The task description contains no explicit operation or validation step for these required outcomes.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 12,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:2c00ba6e464cb01e2fff170b8b571c66e9da356acc7709daa79afb60accd1600",
+          "at": "2026-07-22T19:39:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002's description restates the upstream behavior contract in prose: “materialization of both `obligations.json` and `test-bindings.json` with empty records when derivation yields zero pairs,” “re-derivation after catalogue or spec re-entry,” and requiring both artifacts in the same commit unit. Per `knowledge/conventions/no-upstream-restatement.md`, keep only target, operation, and anchor cite; these contract details belong in the cited spec/AC-01.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-enrollment-mechanization-2026-07-23/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:eb177bb3b9ec0c9327d52eac81a8b6e303499461d60de9da02f9ae9cce23a703",
+          "at": "2026-07-22T19:41:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44ca0311b4d6bf02c8e8666c03d115062e839e2cfab0a06254769a37611d1ebc",
+          "at": "2026-07-22T19:42:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:44ca0311b4d6bf02c8e8666c03d115062e839e2cfab0a06254769a37611d1ebc",
+          "at": "2026-07-22T19:44:26Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b14242506cba212af04dad5b79abe304c7736b582268de863b0630b2cdf8ff3",
+          "at": "2026-07-22T19:25:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b14242506cba212af04dad5b79abe304c7736b582268de863b0630b2cdf8ff3",
+          "at": "2026-07-22T19:26:55Z"
+        }
+      ]
+    }
+  }
+}
