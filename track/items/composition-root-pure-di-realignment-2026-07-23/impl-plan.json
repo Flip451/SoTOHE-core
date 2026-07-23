@@ -10,12 +10,13 @@
     {
       "id": "T002",
       "description": "Update the `invoke leak`, public-surface exposure, and `PrimaryAdapter` allowance priority categories in `.harness/custom/review-prompts/cli_composition.md`. IN-02/CN-01/CN-02/AC-03.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "2105f7d8dc45fb9eef5d0f18179dc304b188f62b"
     },
     {
       "id": "T003",
       "description": "Update `run_greeting`, `GreetDriver`, and greeting `main` in the three `overlay/apps/cli*/src/{lib.rs,main.rs}` files; add their regression tests; and verify D4 in `knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md`. IN-01/IN-04/OUT-01/CN-01/CN-02/CN-04/AC-01/AC-02/AC-05.",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "plan": {

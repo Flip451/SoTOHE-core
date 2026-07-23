@@ -1,104 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1131a1c6e03dba24c7fcdb215daf35051621a66cb39c3cf27da9b50720695d4a",
-          "at": "2026-07-23T05:31:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1131a1c6e03dba24c7fcdb215daf35051621a66cb39c3cf27da9b50720695d4a",
-          "at": "2026-07-23T05:36:28Z"
-        }
-      ]
-    },
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:870e11a03b8ba7b73d0734ddc6da03b0124cdaebc2302e1d1d868e3c09b88754",
-          "at": "2026-07-23T06:30:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:870e11a03b8ba7b73d0734ddc6da03b0124cdaebc2302e1d1d868e3c09b88754",
-          "at": "2026-07-23T07:31:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The updated prompt narrows invoke-leak detection to `CompositionRoot` methods and adds no category for a public free function in `cli_composition`. ADR 2026-07-23-0111 explicitly identifies the former `run_greeting` public free function as a violation of the R1 `FreeFunction` restriction; a reviewer following this prompt could miss an equivalent free-function composition entry point if it does not expose a prohibited type. Add an explicit prohibition/category for public free functions in `cli_composition` (or broaden the invoke/public-surface rule accordingly).",
-              "severity": "P1",
-              "file": ".harness/custom/review-prompts/cli_composition.md",
-              "line": 16,
-              "category": "review-policy coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:dd67fa8cc3ece3218e6340a9965b93340bd64af29be83eea2a5b07f46c8d10a6",
-          "at": "2026-07-23T07:52:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dd67fa8cc3ece3218e6340a9965b93340bd64af29be83eea2a5b07f46c8d10a6",
-          "at": "2026-07-23T07:53:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The revised invoke-leak category applies only to `CompositionRoot` methods, so it no longer covers a public free function in `cli_composition` that invokes an interactor or `PrimaryAdapter`. ADR 2026-07-23-0111 identifies `run_greeting`-style public free functions as violations, and R1 forbids `FreeFunction` in this layer. Broaden this category or add an explicit public-free-function prohibition.",
-              "severity": "P1",
-              "file": ".harness/custom/review-prompts/cli_composition.md",
-              "line": 16,
-              "category": "review-policy coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:dd67fa8cc3ece3218e6340a9965b93340bd64af29be83eea2a5b07f46c8d10a6",
-          "at": "2026-07-23T07:54:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:00589936200e5f8a8fe1683fa5c9cc62355569701db122faf756fc35cbdc77c3",
-          "at": "2026-07-23T07:56:58Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e305f382a5428253ca2d89e2c27a550bbf5908513d2d61334e12491cda81c85d",
-          "at": "2026-07-23T06:29:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e305f382a5428253ca2d89e2c27a550bbf5908513d2d61334e12491cda81c85d",
-          "at": "2026-07-23T07:28:20Z"
-        }
-      ]
-    },
     "spec": {
       "rounds": [
         {
@@ -295,38 +197,6 @@
         }
       ]
     },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:72995b80cb2f6722ddb830c53f514332ab60868a5b9a54cb157eff72de0d9b7e",
-          "at": "2026-07-23T05:31:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:72995b80cb2f6722ddb830c53f514332ab60868a5b9a54cb157eff72de0d9b7e",
-          "at": "2026-07-23T05:35:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2b89e67844d3d49e29d854c18c17f8537aa5ce70b072f7a78469939cede321cf",
-          "at": "2026-07-23T06:31:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2b89e67844d3d49e29d854c18c17f8537aa5ce70b072f7a78469939cede321cf",
-          "at": "2026-07-23T07:37:26Z"
-        }
-      ]
-    },
     "adr": {
       "rounds": [
         {
@@ -401,6 +271,104 @@
           "findings": [],
           "hash": "rvw1:sha256:a3534d12d488562f291beaf1eb361d19b8c9ed80624aa42c3b79f66101173a7b",
           "at": "2026-07-23T05:00:50Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:870e11a03b8ba7b73d0734ddc6da03b0124cdaebc2302e1d1d868e3c09b88754",
+          "at": "2026-07-23T06:30:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:870e11a03b8ba7b73d0734ddc6da03b0124cdaebc2302e1d1d868e3c09b88754",
+          "at": "2026-07-23T07:31:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The updated prompt narrows invoke-leak detection to `CompositionRoot` methods and adds no category for a public free function in `cli_composition`. ADR 2026-07-23-0111 explicitly identifies the former `run_greeting` public free function as a violation of the R1 `FreeFunction` restriction; a reviewer following this prompt could miss an equivalent free-function composition entry point if it does not expose a prohibited type. Add an explicit prohibition/category for public free functions in `cli_composition` (or broaden the invoke/public-surface rule accordingly).",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/cli_composition.md",
+              "line": 16,
+              "category": "review-policy coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:dd67fa8cc3ece3218e6340a9965b93340bd64af29be83eea2a5b07f46c8d10a6",
+          "at": "2026-07-23T07:52:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd67fa8cc3ece3218e6340a9965b93340bd64af29be83eea2a5b07f46c8d10a6",
+          "at": "2026-07-23T07:53:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The revised invoke-leak category applies only to `CompositionRoot` methods, so it no longer covers a public free function in `cli_composition` that invokes an interactor or `PrimaryAdapter`. ADR 2026-07-23-0111 identifies `run_greeting`-style public free functions as violations, and R1 forbids `FreeFunction` in this layer. Broaden this category or add an explicit public-free-function prohibition.",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/cli_composition.md",
+              "line": 16,
+              "category": "review-policy coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:dd67fa8cc3ece3218e6340a9965b93340bd64af29be83eea2a5b07f46c8d10a6",
+          "at": "2026-07-23T07:54:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:00589936200e5f8a8fe1683fa5c9cc62355569701db122faf756fc35cbdc77c3",
+          "at": "2026-07-23T07:56:58Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1131a1c6e03dba24c7fcdb215daf35051621a66cb39c3cf27da9b50720695d4a",
+          "at": "2026-07-23T05:31:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1131a1c6e03dba24c7fcdb215daf35051621a66cb39c3cf27da9b50720695d4a",
+          "at": "2026-07-23T05:36:28Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e305f382a5428253ca2d89e2c27a550bbf5908513d2d61334e12491cda81c85d",
+          "at": "2026-07-23T06:29:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e305f382a5428253ca2d89e2c27a550bbf5908513d2d61334e12491cda81c85d",
+          "at": "2026-07-23T07:28:20Z"
         }
       ]
     },
@@ -605,6 +573,66 @@
           "findings": [],
           "hash": "rvw1:sha256:5bc22335e6bad7eef0caf248abd1af0af9a75b5ba7e7394855c5a0221fa6f9a6",
           "at": "2026-07-23T08:01:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d5ee80a66152fd18575e582b4d45d6cce263b751f1b81463e11c57774c24c51",
+          "at": "2026-07-23T08:14:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1d5ee80a66152fd18575e582b4d45d6cce263b751f1b81463e11c57774c24c51",
+          "at": "2026-07-23T08:17:52Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72995b80cb2f6722ddb830c53f514332ab60868a5b9a54cb157eff72de0d9b7e",
+          "at": "2026-07-23T05:31:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72995b80cb2f6722ddb830c53f514332ab60868a5b9a54cb157eff72de0d9b7e",
+          "at": "2026-07-23T05:35:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b89e67844d3d49e29d854c18c17f8537aa5ce70b072f7a78469939cede321cf",
+          "at": "2026-07-23T06:31:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2b89e67844d3d49e29d854c18c17f8537aa5ce70b072f7a78469939cede321cf",
+          "at": "2026-07-23T07:37:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fcd9e0febf3b14006bd5d4f17215d113d13d9ef1b5b4b15ac6fddc1f14f2c755",
+          "at": "2026-07-23T08:19:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fcd9e0febf3b14006bd5d4f17215d113d13d9ef1b5b4b15ac6fddc1f14f2c755",
+          "at": "2026-07-23T08:23:52Z"
         }
       ]
     }
