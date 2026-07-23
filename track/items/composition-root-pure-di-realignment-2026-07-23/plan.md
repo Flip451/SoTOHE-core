@@ -26,4 +26,4 @@ T003 updates and regression-tests the shipped greeting placeholder after the pol
 
 > Update and regression-test `run_greeting`, `GreetDriver`, and greeting `main`; verify ADR D4. IN-01/IN-04/OUT-01/CN-01/CN-02/CN-04/AC-01/AC-02/AC-05. T003.
 
-- [x] **T003**: Update `run_greeting`, `GreetDriver`, and greeting `main` in the three `overlay/apps/cli*/src/{lib.rs,main.rs}` files; add their regression tests; and verify D4 in `knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md`. IN-01/IN-04/OUT-01/CN-01/CN-02/CN-04/AC-01/AC-02/AC-05.
+- [x] **T003**: Update `run_greeting`, `GreetDriver`, and greeting `main` in the three `overlay/apps/cli*/src/{lib.rs,main.rs}` files; add their regression tests; and verify D4 in `knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md`. IN-01/IN-04/OUT-01/CN-01/CN-02/CN-04/AC-01/AC-02/AC-05. (`974265f2b48e08472880a4a02e1ec881719766b8`)
