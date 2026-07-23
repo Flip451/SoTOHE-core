@@ -1,0 +1,82 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D5 embeds an exhaustive lint schema, phase wiring, grandfathering behavior, and residual-risk boundary inside the ADR, obscuring the architectural decision. Move these operational details to the relevant convention/capability SSoT and retain only the decision to enforce the public-face rule via catalogue lint.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+              "line": 73,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:647060fc8d093744415c4ae9a3356b31b894cbcfb2ad1e5801a9c77841d8c2d2",
+          "at": "2026-07-23T03:52:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c10654357daa34ce2c5123dd7743b1b83e988d32a6a6f281acb6aba3cbd99cbb",
+          "at": "2026-07-23T03:57:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 treats any other-layer type on the composition public surface as a violation, but D1/D2 require that surface to return the wired `GreetDriver` from `cli_driver`. The mandated pure-DI API would therefore violate its own review category. Narrow the category to forbidden domain/usecase/internal-role exposure while explicitly permitting the returned `PrimaryAdapter`.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+              "line": 60,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:c10654357daa34ce2c5123dd7743b1b83e988d32a6a6f281acb6aba3cbd99cbb",
+          "at": "2026-07-23T04:00:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1babcb87d9cbb804cb6f8c9584be9f705f4dabe16b01b16dd5bd2526bc054839",
+          "at": "2026-07-23T04:06:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D5 embeds operational lint schema/configuration and enforcement details in the ADR, including concrete convention/config paths and preset ownership. This obscures the architectural decision and leaks downstream gate/lint implementation concerns into the ADR; delegate those mechanics to the referenced convention/config SSoTs while retaining only the high-level choice of enforcement mechanism.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+              "line": 69,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:876f76407d9bb2e1a216b84e7f84e7c16c0735eff13a678cce3d7790a425c662",
+          "at": "2026-07-23T04:53:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3534d12d488562f291beaf1eb361d19b8c9ed80624aa42c3b79f66101173a7b",
+          "at": "2026-07-23T04:57:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3534d12d488562f291beaf1eb361d19b8c9ed80624aa42c3b79f66101173a7b",
+          "at": "2026-07-23T05:00:50Z"
+        }
+      ]
+    }
+  }
+}
