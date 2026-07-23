@@ -110,5 +110,5 @@ TODO: `/track:implement` と `/track:review` skill に Architecture Constraints 
 ## Related Documents
 
 - `architecture-rules.json`: Machine-readable layer dependencies
-- `.claude/rules/08-orchestration.md`: Delegation rules
+- `.claude/rules/orchestration.md`: Delegation rules
 - `knowledge/conventions/type-designer-kind-selection.md` R1: role × layer placement

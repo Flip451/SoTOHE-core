@@ -48,11 +48,11 @@ Extract the track id from the current git branch (`track/<id>`). Read the curren
 Before any reviewer or fixer can modify the worktree, run:
 
 ```
-cargo make adr-baseline-check-review
+bin/sotp adr-baseline check-review
 ```
 
 This fails closed when the ledger is missing or empty, has no init record, or a recorded ledger
-copy is missing or corrupt. The same gate is a dependency of both review wrappers. A current ADR
+copy is missing or corrupt. A current ADR
 that differs from its latest baseline is a draft state and does not block review dispatch; byte
 matching remains a commit-gate and track-aware-CI check.
 
@@ -249,7 +249,7 @@ Final round fixer terminal statuses:
 
 **Single-scope re-entry round (back-and-forth re-convergence surface)**
 
-Back-and-forth loops (the `plan` workflow's Phase 1/Phase 2 loops and the `diagnose` workflow's post-routing descent, per `knowledge/conventions/sot-reentry-sequencing.md`) re-converge one edited upstream scope without launching the Step 4 all-required-scopes wave. The single-scope round reuses this workflow's building blocks unchanged: run Step 1 (`cargo make adr-baseline-check-review`), prepare the target scope's briefing per Step 3, then dispatch that one scope through the same provider-neutral wrapper used by Steps 4-5 — `cargo make track-local-review-fix -- --scope {scope} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md --round-type fast`, then `--round-type final` — to `zero_findings`, honoring the same fixer terminal statuses, the ADR-scope repair lane when the scope is `adr`, and re-launches after applied fixes. Downstream scopes deliberately stay un-launched: their re-entry follows only after this upstream scope re-converges. This surface changes no gate: `bin/sotp review check-approved` and the commit gate still require every required scope to be approved before any commit.
+Back-and-forth loops (the `plan` workflow's Phase 1/Phase 2 loops and the `diagnose` workflow's post-routing descent, per `knowledge/conventions/sot-reentry-sequencing.md`) re-converge one edited upstream scope without launching the Step 4 all-required-scopes wave. The single-scope round reuses this workflow's building blocks unchanged: run Step 1 (`bin/sotp adr-baseline check-review`), prepare the target scope's briefing per Step 3, then dispatch that one scope through the same provider-neutral wrapper used by Steps 4-5 — `cargo make track-local-review-fix -- --scope {scope} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md --round-type fast`, then `--round-type final` — to `zero_findings`, honoring the same fixer terminal statuses, the ADR-scope repair lane when the scope is `adr`, and re-launches after applied fixes. Downstream scopes deliberately stay un-launched: their re-entry follows only after this upstream scope re-converges. This surface changes no gate: `bin/sotp review check-approved` and the commit gate still require every required scope to be approved before any commit.
 
 **Step 6: Final validation**
 
@@ -267,7 +267,7 @@ Once any local round is recorded, the bypass is no longer available.
 
 | Step | Gate | Verdict |
 |------|------|---------|
-| 1 | `cargo make adr-baseline-check-review` exits 0 | pass / fail |
+| 1 | `bin/sotp adr-baseline check-review` exits 0 | pass / fail |
 | 2 | `bin/sotp review results` produces scope list | required / approved / not required |
 | 5 | Each `required` scope reaches `final` `zero_findings` | completed / blocked / failed |
 | 6a | `cargo make ci` exits 0 | pass / fail |

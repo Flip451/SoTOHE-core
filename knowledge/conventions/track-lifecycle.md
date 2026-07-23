@@ -38,7 +38,7 @@
   --kind init`. The command alone writes the append-only `adr-baseline/` ledger and verbatim
   copies; its init records are the designation records. The filename is context-dependent and is
   never derived or stored as a metadata pointer or other external primary identity.
-- Before a review cycle, `cargo make adr-baseline-check-review` invokes the CLI. It requires a
+- Before a review cycle, `bin/sotp adr-baseline check-review` invokes the CLI. It requires a
   nonempty active-track ledger init-record designation set and verifies every recorded ledger
   copy before any fixer may write; a current ADR that differs from its latest baseline is a
   normal Phase 0 draft state and does not block the review. `--primary-source <file>` is only

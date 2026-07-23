@@ -107,7 +107,7 @@ Before writing new parsing/analysis logic, verify the following:
 3. Check whether a matching concern exists in `canonical_modules` in `architecture-rules.json`
 4. If none of the above finds a match, have the `researcher` capability perform a quick survey of crates.io for equivalent functionality
 
-Reference: `knowledge/conventions/shell-parsing.md`
+Apply the relevant `knowledge/conventions/` guidance before adding new parsing or analysis logic.
 
 ## ADR Baseline Guardrail
 

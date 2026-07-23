@@ -9,7 +9,7 @@ base branch / merge target / merge method の具体値はハードコードせ�
 ## Scope
 
 - 適用対象: `track/<id>` 実装ブランチの PR/ガード方針、トラックブランチの作成・切り替え・マージ・PR レビュー・ブランチ操作ガード、branch strategy の設定解決。`/track:*` コマンド、`bin/sotp track branch` / `bin/sotp track switch-base` / `bin/sotp pr`、ブランチガードフック。
-- 適用外: トラック内のタスク状態遷移（`knowledge/conventions/track-lifecycle.md`）、コミットへの構造化メモ付与（`knowledge/conventions/git-notes.md`）、DRY ゲート（`knowledge/conventions/dry-check-workflow.md`）。
+- 適用外: トラック内のタスク状態遷移（`knowledge/conventions/track-lifecycle.md`）、コミットへの構造化メモ付与（`knowledge/conventions/git-notes.md`）、DRY ゲート。
 
 ## Rules
 

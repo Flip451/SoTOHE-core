@@ -93,6 +93,6 @@ bin/sotp track transition T001 done --commit-hash <hash>
 
 ## Related Documents
 
-- `.claude/rules/10-guardrails.md` — ガードレール全般
+- `.claude/rules/guardrails.md` — ガードレール全般
 - `libs/usecase/src/task_completion.rs` — merge 時のタスク完了ガード（push 済み ref の impl-plan.json を読む）
 - `libs/domain/src/impl_plan.rs` — `ImplPlanDocument::all_tasks_resolved()`（タスク状態の SSoT）

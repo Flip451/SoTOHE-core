@@ -75,6 +75,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [技術スタック・製品ガイドラインの grandfathered baseline](2026-07-08-1405-grandfathered-tech-and-product-baseline.md) | Proposed | 2026-07-08 |
 | [retention gate の verify サブコマンド化](2026-07-08-2306-retention-gate-verify-subcommand.md) | Proposed | 2026-07-08 |
 | [公開テンプレート配布前の阻害要因解消](2026-07-13-0818-public-template-blocker-cleanup.md) | Proposed | 2026-07-13 |
+| [出荷面を最小化し、workflow と出荷物の乖離クラスを閉じる](2026-07-23-0117-export-surface-minimization.md) | Proposed | 2026-07-23 |
 | [scripts/ Python ヘルパーの段階的 Rust 移行ロードマップ](2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md) | Proposed | 2026-04-13 |
 | [external_guides 撤去 — Python migration roadmap Phase 3 supersede](2026-04-28-1258-remove-external-guides.md) | — | 2026-04-28 |
 | [Python 固有ロジックの Rust 完全移行と Python ランタイム依存の撤去](2026-06-03-1327-python-runtime-full-removal.md) | Proposed | 2026-06-03 |

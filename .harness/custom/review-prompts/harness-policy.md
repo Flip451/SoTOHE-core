@@ -40,13 +40,13 @@ Violations of the role statement above are always reportable. The following prio
   surface.
 - **permission posture drift**: an addition to `.claude/settings.json`
   `permissions.allow` (or `.claude/permission-extensions.json`) that
-  matches a pattern in `.claude/rules/10-guardrails.md` §Dangerous
+  matches a pattern in `.claude/rules/guardrails.md` §Dangerous
   to allow without a documented exception. Cite the specific
   dangerous-allow entry.
 - **hook coverage gap**: a Bash command / agent flow that the
   `block-direct-git-ops` hook is supposed to intercept but the change
   routes around (e.g., wrapping git ops inside a Codex subprocess
-  with `workspace-write`). Cite `.claude/rules/10-guardrails.md`
+  with `workspace-write`). Cite `.claude/rules/guardrails.md`
   §Sandbox and Hook Coverage Warning.
 - **review-scope or briefing wiring inconsistency**: a
   `.harness/config/review-scope.json` change that adds a scope without

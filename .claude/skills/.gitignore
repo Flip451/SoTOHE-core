@@ -6,13 +6,3 @@
 !.gitignore
 !architecture-customizer/
 !architecture-customizer/**
-!codex-system/
-!codex-system/**
-!diagnose/
-!diagnose/**
-!gemini-system/
-!gemini-system/**
-!repomix-snapshot/
-!repomix-snapshot/**
-!track-plan/
-!track-plan/**

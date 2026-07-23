@@ -2,15 +2,15 @@ const RETIRED_PLANNER_TOKENS: &[&str] = &["plan codex-local", "PlanCodexLocal"];
 
 const LIVE_OPERATIONAL_SURFACES: &[(&str, &str)] = &[
     (
-        ".claude/rules/07-dev-environment.md",
+        ".claude/rules/dev-environment.md",
         include_str!(concat!(
             env!("CARGO_MANIFEST_DIR"),
-            "/../../.claude/rules/07-dev-environment.md"
+            "/../../.claude/rules/dev-environment.md"
         )),
     ),
     (
-        ".claude/rules/10-guardrails.md",
-        include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/../../.claude/rules/10-guardrails.md")),
+        ".claude/rules/guardrails.md",
+        include_str!(concat!(env!("CARGO_MANIFEST_DIR"), "/../../.claude/rules/guardrails.md")),
     ),
     (
         ".claude/commands/track/plan.md",
