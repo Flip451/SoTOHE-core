@@ -490,7 +490,7 @@ for task in $WORKFLOW_TASKS; do
     exit 1
   fi
 done
-if rg -n -U 'cargo[[:space:]]+run.*-p[[:space:]]+cli|args[[:space:]]*=[[:space:]]*\\[(?s:[^]]*"run"[^]]*"-p"[^]]*"cli"[^]]*)\\]' Makefile*.toml; then
+if rg -n -U 'cargo[[:space:]]+run.*-p[[:space:]]+cli|args[[:space:]]*=[[:space:]]*\\[[[:space:]]*"run"[[:space:]]*,(?s:[^]]*"-p"[^]]*"cli"[^]]*)\\]|args[[:space:]]*=[[:space:]]*\\[(?s:[^]]*"cargo"[[:space:]]*,[[:space:]]*"run"[[:space:]]*,[^]]*"-p"[^]]*"cli"[^]]*)\\]' Makefile*.toml; then
   echo "[FAIL] template-export-smoke-local: exported Makefile runs the workspace cli with cargo run -p cli" >&2
   exit 1
 fi

@@ -229,6 +229,11 @@ impl FeatureDisabledDryGateInteractor {
 
 impl DryCheckApprovedDriverService for FeatureDisabledDryGateInteractor {
     fn dry_check_approved(&self, input: DryCheckApprovedDriverInput) -> DryCheckApprovedOutcome {
+        let _track_id = match TrackId::try_new(input.track_id) {
+            Ok(track_id) => track_id,
+            Err(error) => return DryCheckApprovedOutcome::Failure { message: error.to_string() },
+        };
+
         let workspace = match self.repo_root.resolve(&input.items_dir) {
             Ok(workspace) => workspace,
             Err(error) => return DryCheckApprovedOutcome::Failure { message: error.to_string() },
@@ -546,6 +551,16 @@ mod tests {
             }
             other => panic!("enabled feature-off gate must fail closed, got {other:?}"),
         }
+    }
+
+    #[test]
+    fn feature_disabled_gate_invalid_track_id_returns_failure() {
+        let mut input = make_input();
+        input.track_id = String::new();
+
+        let outcome = make_feature_disabled_interactor(false).dry_check_approved(input);
+
+        assert!(matches!(outcome, DryCheckApprovedOutcome::Failure { .. }));
     }
 
     // ── corpus_meta error absorbed into fallback ────────────────────────────

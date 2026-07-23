@@ -1,385 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fb43496b0190f94ffea01c3156b93e9d03c9966d30281097171b4999f0b64643",
-          "at": "2026-07-23T00:20:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`adr-baseline-check-review` タスクを削除した一方、出荷対象の `knowledge/conventions/review-protocol.md:15` と `track-lifecycle.md:41` は引き続き `cargo make adr-baseline-check-review` を正規手順として要求しています。fresh consumer では `Task not found` になり、review-protocol の「wrapper が prelude を強制する」という説明も現在の dependencies と矛盾します。両規約を `bin/sotp adr-baseline check-review` へ同期してください。",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 820,
-              "category": "command_wiring"
-            },
-            {
-              "message": "`dry-check-workflow.md` を除外すると、同時に出荷される `knowledge/conventions/branch-strategy.md:12` の参照が fresh consumer で必ず切れます。索引再生成は本文中の参照を修復しません。これは `knowledge/conventions/responsibility-boundary.md` が定める配布面での template-distribution reference leak です。",
-              "severity": "P1",
-              "file": ".harness/config/template-boundary.json",
-              "line": 41,
-              "category": "template_distribution"
-            },
-            {
-              "message": "唯一出荷される `architecture-customizer` が、ここで `gemini-system` と `repomix-snapshot` の更新を必須化していますが、両 skill は `.gitignore` と boundary manifest の双方で配布対象外です。fresh consumer では存在しないファイルを更新する手順となるため、source-only の survey prompt を出荷版の同期対象から外す必要があります（`knowledge/conventions/responsibility-boundary.md` の配布境界違反）。",
-              "severity": "P1",
-              "file": ".claude/skills/architecture-customizer/SKILL.md",
-              "line": 55,
-              "category": "template_distribution"
-            },
-            {
-              "message": "ADR D1 の Context は `shell-parsing` を SotP 開発固有規約の流出例として明示していますが、manifest は include のままです。この規約は fresh scaffold に存在しない `domain::guard::ShellParser` と `infrastructure::shell::ConchShellParser` を必須 API として指定するため、consumer に実行不能な SoTOHE-core 内部規約を配布します。exclude へ変更し、出荷される guardrails 側の参照も同期してください。",
-              "severity": "P1",
-              "file": ".harness/config/template-boundary.json",
-              "line": 55,
-              "category": "responsibility_boundary"
-            },
-            {
-              "message": "D3 で出荷用 `language.md` を「ユーザーの preferred language に応答する」中立版へ差し替える一方、出荷される architecture skill は対話を日本語に固定しています。非日本語 consumer では同梱された言語規則と skill が相反するため、preferred/project language に従う指示へ変更し、同じ固定指示を持つ command adapter も同期する必要があります。",
-              "severity": "P1",
-              "file": ".claude/skills/architecture-customizer/SKILL.md",
-              "line": 12,
-              "category": "convention_contradiction"
-            },
-            {
-              "message": "workspace CLI 流出検査は root `Makefile.toml` 内の単一行 `cargo run ... -p cli` だけを検索しています。cargo-make で一般的な `command = \"cargo\"` と `args = [\"run\", ..., \"-p\", \"cli\"]` 形式、および root から extend される `Makefile.host.toml` / `Makefile.docker.toml` 内の task は検出できません。そのため D4 が禁止する実行を追加しても恒常検査を通過できます。exported task graph 全体の実行定義を検査してください。",
-              "severity": "P1",
-              "file": "Makefile.toml",
-              "line": 464,
-              "category": "gate_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:fb43496b0190f94ffea01c3156b93e9d03c9966d30281097171b4999f0b64643",
-          "at": "2026-07-23T00:30:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1ed10bd6e06a453c5fb9031e1b07152ded13caf01d785ba751b8771c6249ef78",
-          "at": "2026-07-23T00:33:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`track-local-review` / `track-local-review-fix` から ADR baseline dependency が削除され、現在は review workflow の事前処理が検証を担いますが、ここでは依然として review wrapper 自体が同じ prelude を強制すると記載され、`CLAUDE.md:24` にも同様の記述があります。wrapper を直接実行した場合は baseline gate が動かないため、実際の責務に合わせて両記述を workflow/orchestrator 所有へ更新してください。",
-              "severity": "P1",
-              "file": "knowledge/conventions/review-protocol.md",
-              "line": 22,
-              "category": "command_wiring"
-            }
-          ],
-          "hash": "rvw1:sha256:526efba5f1483352ee2ad8c3edb16fefcbd219451ec5073fb88bab8e365162f2",
-          "at": "2026-07-23T00:39:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "この必須読込指示の `guardrails.md` はリポジトリルート相対では存在せず、fresh consumer では参照できません。改名後の実在パスである `.claude/rules/guardrails.md` を指定してください（template distribution の dead reference）。",
-              "severity": "P1",
-              "file": "CLAUDE.md",
-              "line": 67,
-              "category": "template_distribution_reference_leak"
-            }
-          ],
-          "hash": "rvw1:sha256:b1c1b77115a119f94a47e0c01ae95d89c7461d1377a0163ecaf9ab3f4cb87235",
-          "at": "2026-07-23T00:45:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ac3bd77cea7fb54c005989638fb15df7058dd48260397c1d48c60601802059e1",
-          "at": "2026-07-23T00:48:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:794b4c29389f5e6c98ac1195b30bf3ac0b9741db94c7f06f958b75a574f77c1b",
-          "at": "2026-07-23T00:51:59Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:98d4ef4f1b0aa1a1c2ec73235af8aa46938b729050529c106c86cb24456312b2",
-          "at": "2026-07-23T00:20:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The update removes the regression test that proved detection skips an invalid suffixed occurrence and continues to a later valid command. The remaining unknown-suffix test only checks rejection, so an implementation that stops scanning after `/track:reviewer` would pass. Restore the scenario using `/track:reviewer then /track:review feature` and assert that `/track:review` is detected.",
-              "severity": "P1",
-              "file": "libs/domain/src/skill_compliance/tests.rs",
-              "line": 75,
-              "category": "test coverage"
-            },
-            {
-              "message": "After deleting the `/track:plan` case, the public `check_compliance` API is tested only for its empty/error path. Add a remaining-command happy-path test such as `check_compliance(\"/track:review\")` that asserts `skill_match.is_some()` and `!is_empty()`, as required for public APIs.",
-              "severity": "P1",
-              "file": "libs/domain/src/skill_compliance/tests.rs",
-              "line": 82,
-              "category": "test coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:98d4ef4f1b0aa1a1c2ec73235af8aa46938b729050529c106c86cb24456312b2",
-          "at": "2026-07-23T00:21:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7017708ef8729c0410ef9079cd683099a7d2491cd2503d7b05063a265b924bf2",
-          "at": "2026-07-23T00:23:53Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D4 embeds operational gate wiring and a detailed two-regression repair procedure (lines 67–73), including CI placement, exclusions, and exact command edits. These implementation/workflow details obscure the decision and belong in the relevant workflow or capability SSoT; retain only the decision to add the two invariant checks and defer execution details.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
-              "line": 67,
-              "category": "decision obscured by excess detail"
-            }
-          ],
-          "hash": "rvw1:sha256:5ba00d905041cae692d8023d4d1f9ab7206bfe3e836d159ac5976b1c48fc551c",
-          "at": "2026-07-22T17:57:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d6bb538ccf188c83b9404f921724ceaa6542629bd3dc2727b65f6597dd3daeee",
-          "at": "2026-07-22T18:01:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 states that the shipped rules surface contains only the dev-environment, orchestration, and guardrails equivalents, but then permits `language` to be replaced by a neutral overlay, which would ship a fourth rule. The `exclude or overlay` branch also leaves downstream work to choose between materially different exported surfaces. Record one outcome, or qualify the “only” constraint so both statements agree.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
-              "line": 56,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:d6bb538ccf188c83b9404f921724ceaa6542629bd3dc2727b65f6597dd3daeee",
-          "at": "2026-07-22T18:05:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D4 は ADR 2026-07-16-1438 の D1/D2 に対する強制機構を新設するとしていますが、検査1は D1 が採録面に含める capabilities・briefings・githooks・CI・utility adapters を検査せず、検査2も `cargo run -p cli` を禁じるだけです。そのため、欠落中の `adr-baseline-check-review` を単発 `bin/sotp` wrapper として exported Makefile に追加すれば両検査を通過しつつ D2 の直呼び原則に違反でき、「参照欠落クラスを止める」「現存 regression の修復を強制する」という本文の結論と矛盾します。検査対象を既決の採録面全体と直呼び原則に合わせるか、強制対象の主張を実際の検査範囲へ狭める必要があります。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
-              "line": 65,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:c935f8f54e132894f9ef64a856220b558ccef6f35eb91ec2f012de87c076eb3f",
-          "at": "2026-07-22T18:12:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1 は索引再生成を「export 時実行」でもよいとしていますが、既決 ADR `2026-07-06-1717-template-extraction-boundary.md` D4 は export を copy + overlay のみに固定し、Rejected E で programmatic transform を明示的に退けています。この拒否を扱わず export-time rewrite を許すと境界方式の決定が競合します。bootstrap 組み込みに限定するか、既決 D4/E を明示的に refinement/supersession してください。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
-              "line": 43,
-              "category": "rejected alternative re-emerges in decisions"
-            }
-          ],
-          "hash": "rvw1:sha256:ff41265fdfe5f73f6ea42b0daa745408d8f157a2342bd4a865ee82e1b7a1cef5",
-          "at": "2026-07-22T18:20:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:88445bf87cda6c1a1b1666bd34ddaac8f6b5526a92f77253d83e9f41bce90e7c",
-          "at": "2026-07-22T18:25:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 does not record a single decision for `language`: it leaves both exclusion and replacement with a neutral overlay as permitted outcomes. Choose one shipping policy so downstream work has an unambiguous target.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
-              "line": 58,
-              "category": "decision not actually recorded"
-            }
-          ],
-          "hash": "rvw1:sha256:88445bf87cda6c1a1b1666bd34ddaac8f6b5526a92f77253d83e9f41bce90e7c",
-          "at": "2026-07-22T18:34:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:23b27e22335e712bf2d191defd996af1763f062c2f2b42101ee346e34ae42521",
-          "at": "2026-07-22T18:40:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:23b27e22335e712bf2d191defd996af1763f062c2f2b42101ee346e34ae42521",
-          "at": "2026-07-22T18:43:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D4 embeds operational gate wiring and implementation-placement constraints (smoke-gate integration, export-tree inspection, maintainer-CI boundary, exclusion from `sotp verify`, and repair sequencing) rather than recording only the decision to detect the two divergence classes. This detail obscures the decision and belongs in the workflow/convention or specification layer; delegate those mechanics explicitly and retain the two detection decisions.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
-              "line": 70,
-              "category": "decision obscured by excess detail"
-            }
-          ],
-          "hash": "rvw1:sha256:23b27e22335e712bf2d191defd996af1763f062c2f2b42101ee346e34ae42521",
-          "at": "2026-07-22T18:45:02Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:32380e7f157b04a9eb336ad9f439a74e0c81c5d62b0d3198a21a2d6056bc3b94",
-          "at": "2026-07-23T00:20:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:32380e7f157b04a9eb336ad9f439a74e0c81c5d62b0d3198a21a2d6056bc3b94",
-          "at": "2026-07-23T00:21:43Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4c616718b1a15a87e7507c5517119b8655d7fffc6e0acf7806fcdd17b42ec575",
-          "at": "2026-07-22T19:22:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4c616718b1a15a87e7507c5517119b8655d7fffc6e0acf7806fcdd17b42ec575",
-          "at": "2026-07-22T19:25:09Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`related_conventions` cites `coding-principles.md#No Panics in Library Code`, which is unrelated to this export-surface behavioral contract.",
-              "severity": "P1",
-              "file": "track/items/export-surface-minimization-2026-07-23/spec.json",
-              "line": 293,
-              "category": "broken cross-reference at narrative level"
-            },
-            {
-              "message": "`related_conventions` cites `prefer-type-safe-abstractions.md#Rule`, which is unrelated to the export/Makefile divergence behavior specified here.",
-              "severity": "P1",
-              "file": "track/items/export-surface-minimization-2026-07-23/spec.json",
-              "line": 297,
-              "category": "broken cross-reference at narrative level"
-            },
-            {
-              "message": "`related_conventions` cites `pre-track-adr-authoring.md#Rules`, which is unrelated to this export-surface behavioral contract.",
-              "severity": "P1",
-              "file": "track/items/export-surface-minimization-2026-07-23/spec.json",
-              "line": 313,
-              "category": "broken cross-reference at narrative level"
-            }
-          ],
-          "hash": "rvw1:sha256:15e6c59728a188887f09635706fb4a1479db8591a494443e0d90aee38f0db786",
-          "at": "2026-07-22T19:22:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5e04c07e8dba2379e46b62d3f9090310480e7d4525976b94449131f119ff1930",
-          "at": "2026-07-22T19:23:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 の conventions 最小化を証明する acceptance criterion がありません。AC-01 は全ファイルが include / exclude のどちらかに分類されること、AC-02 は export がその分類に従うことしか要求しないため、全 convention を include にしても両方を満たし、GO-01 に反する出荷面が受理されます。",
-              "severity": "P1",
-              "file": "track/items/export-surface-minimization-2026-07-23/spec.json",
-              "line": 8,
-              "category": "missing AC coverage for a stated goal"
-            },
-            {
-              "message": "AC-07 は「現存 regression 2 件」の片方を workspace CLI の cargo run 流出としていますが、引用先 ADR の D4 で修復対象になっている実在の二件目は scaffold の ci-track における `bin/sotp adr-baseline check-commit` の欠落です。cargo run 流出は恒常検査する将来の乖離クラスであり、現存 regression ではありません。このままでは IN-06 の修復範囲に反して commit 側 byte 照合が欠落したままでも AC 群を満たせます。",
-              "severity": "P1",
-              "file": "track/items/export-surface-minimization-2026-07-23/spec.json",
-              "line": 274,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:5e04c07e8dba2379e46b62d3f9090310480e7d4525976b94449131f119ff1930",
-          "at": "2026-07-22T19:26:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c6b53da1a774926c4777302c9351f21bd0669a53a55a6578faa6927849085e7c",
-          "at": "2026-07-22T19:28:36Z"
-        }
-      ]
-    },
     "impl-plan": {
       "rounds": [
         {
@@ -833,6 +454,352 @@
         }
       ]
     },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb43496b0190f94ffea01c3156b93e9d03c9966d30281097171b4999f0b64643",
+          "at": "2026-07-23T00:20:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`adr-baseline-check-review` タスクを削除した一方、出荷対象の `knowledge/conventions/review-protocol.md:15` と `track-lifecycle.md:41` は引き続き `cargo make adr-baseline-check-review` を正規手順として要求しています。fresh consumer では `Task not found` になり、review-protocol の「wrapper が prelude を強制する」という説明も現在の dependencies と矛盾します。両規約を `bin/sotp adr-baseline check-review` へ同期してください。",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 820,
+              "category": "command_wiring"
+            },
+            {
+              "message": "`dry-check-workflow.md` を除外すると、同時に出荷される `knowledge/conventions/branch-strategy.md:12` の参照が fresh consumer で必ず切れます。索引再生成は本文中の参照を修復しません。これは `knowledge/conventions/responsibility-boundary.md` が定める配布面での template-distribution reference leak です。",
+              "severity": "P1",
+              "file": ".harness/config/template-boundary.json",
+              "line": 41,
+              "category": "template_distribution"
+            },
+            {
+              "message": "唯一出荷される `architecture-customizer` が、ここで `gemini-system` と `repomix-snapshot` の更新を必須化していますが、両 skill は `.gitignore` と boundary manifest の双方で配布対象外です。fresh consumer では存在しないファイルを更新する手順となるため、source-only の survey prompt を出荷版の同期対象から外す必要があります（`knowledge/conventions/responsibility-boundary.md` の配布境界違反）。",
+              "severity": "P1",
+              "file": ".claude/skills/architecture-customizer/SKILL.md",
+              "line": 55,
+              "category": "template_distribution"
+            },
+            {
+              "message": "ADR D1 の Context は `shell-parsing` を SotP 開発固有規約の流出例として明示していますが、manifest は include のままです。この規約は fresh scaffold に存在しない `domain::guard::ShellParser` と `infrastructure::shell::ConchShellParser` を必須 API として指定するため、consumer に実行不能な SoTOHE-core 内部規約を配布します。exclude へ変更し、出荷される guardrails 側の参照も同期してください。",
+              "severity": "P1",
+              "file": ".harness/config/template-boundary.json",
+              "line": 55,
+              "category": "responsibility_boundary"
+            },
+            {
+              "message": "D3 で出荷用 `language.md` を「ユーザーの preferred language に応答する」中立版へ差し替える一方、出荷される architecture skill は対話を日本語に固定しています。非日本語 consumer では同梱された言語規則と skill が相反するため、preferred/project language に従う指示へ変更し、同じ固定指示を持つ command adapter も同期する必要があります。",
+              "severity": "P1",
+              "file": ".claude/skills/architecture-customizer/SKILL.md",
+              "line": 12,
+              "category": "convention_contradiction"
+            },
+            {
+              "message": "workspace CLI 流出検査は root `Makefile.toml` 内の単一行 `cargo run ... -p cli` だけを検索しています。cargo-make で一般的な `command = \"cargo\"` と `args = [\"run\", ..., \"-p\", \"cli\"]` 形式、および root から extend される `Makefile.host.toml` / `Makefile.docker.toml` 内の task は検出できません。そのため D4 が禁止する実行を追加しても恒常検査を通過できます。exported task graph 全体の実行定義を検査してください。",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 464,
+              "category": "gate_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:fb43496b0190f94ffea01c3156b93e9d03c9966d30281097171b4999f0b64643",
+          "at": "2026-07-23T00:30:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ed10bd6e06a453c5fb9031e1b07152ded13caf01d785ba751b8771c6249ef78",
+          "at": "2026-07-23T00:33:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-review` / `track-local-review-fix` から ADR baseline dependency が削除され、現在は review workflow の事前処理が検証を担いますが、ここでは依然として review wrapper 自体が同じ prelude を強制すると記載され、`CLAUDE.md:24` にも同様の記述があります。wrapper を直接実行した場合は baseline gate が動かないため、実際の責務に合わせて両記述を workflow/orchestrator 所有へ更新してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/review-protocol.md",
+              "line": 22,
+              "category": "command_wiring"
+            }
+          ],
+          "hash": "rvw1:sha256:526efba5f1483352ee2ad8c3edb16fefcbd219451ec5073fb88bab8e365162f2",
+          "at": "2026-07-23T00:39:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "この必須読込指示の `guardrails.md` はリポジトリルート相対では存在せず、fresh consumer では参照できません。改名後の実在パスである `.claude/rules/guardrails.md` を指定してください（template distribution の dead reference）。",
+              "severity": "P1",
+              "file": "CLAUDE.md",
+              "line": 67,
+              "category": "template_distribution_reference_leak"
+            }
+          ],
+          "hash": "rvw1:sha256:b1c1b77115a119f94a47e0c01ae95d89c7461d1377a0163ecaf9ab3f4cb87235",
+          "at": "2026-07-23T00:45:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ac3bd77cea7fb54c005989638fb15df7058dd48260397c1d48c60601802059e1",
+          "at": "2026-07-23T00:48:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:794b4c29389f5e6c98ac1195b30bf3ac0b9741db94c7f06f958b75a574f77c1b",
+          "at": "2026-07-23T00:51:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d557270f910f73b13a743bda61c8d842874f295230c7715d2ef3b518adf24a4",
+          "at": "2026-07-23T02:18:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The exported-CLI regex treats any `args` array containing `\"run\"` before `\"-p\", \"cli\"` as `cargo run -p cli`. After the develop merge, the exported `Makefile.host.toml` and `Makefile.docker.toml` legitimately contain `cargo nextest run ... -p cli`, so `template-export-smoke-local` now exits 1 and blocks CI despite no forbidden workspace-CLI invocation. Restrict the check to an actual Cargo `run` subcommand.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 493,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:0d557270f910f73b13a743bda61c8d842874f295230c7715d2ef3b518adf24a4",
+          "at": "2026-07-23T02:25:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The narrowed array regex only recognizes `args` whose first token is `\"run\"`. A forbidden Docker-form invocation in the shipped peer is encoded as `args = [\"compose\", \"run\", ..., \"cargo\", \"run\", \"-p\", \"cli\", ...]`; neither alternative matches that quoted/comma-separated form. Thus `Makefile.docker.toml` can leak the workspace CLI while `template-export-smoke-local` still passes, contrary to the D4/AC-06 all-exported-Makefiles guarantee. Also match adjacent `\"cargo\", \"run\"` array tokens while continuing to exclude `nextest run`.",
+              "severity": "P1",
+              "file": "Makefile.toml",
+              "line": 493,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:c81ea8013a35bc6977c1c5499fb6c33bfc32214d9fe36bfa3030b1339fe750d7",
+          "at": "2026-07-23T02:30:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fbcdb112893b5a2b91318d90fee79136acad96eef5aee01be9ce2f79e2de1230",
+          "at": "2026-07-23T02:32:41Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:98d4ef4f1b0aa1a1c2ec73235af8aa46938b729050529c106c86cb24456312b2",
+          "at": "2026-07-23T00:20:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The update removes the regression test that proved detection skips an invalid suffixed occurrence and continues to a later valid command. The remaining unknown-suffix test only checks rejection, so an implementation that stops scanning after `/track:reviewer` would pass. Restore the scenario using `/track:reviewer then /track:review feature` and assert that `/track:review` is detected.",
+              "severity": "P1",
+              "file": "libs/domain/src/skill_compliance/tests.rs",
+              "line": 75,
+              "category": "test coverage"
+            },
+            {
+              "message": "After deleting the `/track:plan` case, the public `check_compliance` API is tested only for its empty/error path. Add a remaining-command happy-path test such as `check_compliance(\"/track:review\")` that asserts `skill_match.is_some()` and `!is_empty()`, as required for public APIs.",
+              "severity": "P1",
+              "file": "libs/domain/src/skill_compliance/tests.rs",
+              "line": 82,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:98d4ef4f1b0aa1a1c2ec73235af8aa46938b729050529c106c86cb24456312b2",
+          "at": "2026-07-23T00:21:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7017708ef8729c0410ef9079cd683099a7d2491cd2503d7b05063a265b924bf2",
+          "at": "2026-07-23T00:23:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c01bbd5b8d9bf78759a86b1c9b8d7776dc22f07895b93f0ba9c1d39131a6a45",
+          "at": "2026-07-23T02:17:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c01bbd5b8d9bf78759a86b1c9b8d7776dc22f07895b93f0ba9c1d39131a6a45",
+          "at": "2026-07-23T02:20:32Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 embeds operational gate wiring and a detailed two-regression repair procedure (lines 67–73), including CI placement, exclusions, and exact command edits. These implementation/workflow details obscure the decision and belong in the relevant workflow or capability SSoT; retain only the decision to add the two invariant checks and defer execution details.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+              "line": 67,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:5ba00d905041cae692d8023d4d1f9ab7206bfe3e836d159ac5976b1c48fc551c",
+          "at": "2026-07-22T17:57:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6bb538ccf188c83b9404f921724ceaa6542629bd3dc2727b65f6597dd3daeee",
+          "at": "2026-07-22T18:01:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 states that the shipped rules surface contains only the dev-environment, orchestration, and guardrails equivalents, but then permits `language` to be replaced by a neutral overlay, which would ship a fourth rule. The `exclude or overlay` branch also leaves downstream work to choose between materially different exported surfaces. Record one outcome, or qualify the “only” constraint so both statements agree.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+              "line": 56,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:d6bb538ccf188c83b9404f921724ceaa6542629bd3dc2727b65f6597dd3daeee",
+          "at": "2026-07-22T18:05:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 は ADR 2026-07-16-1438 の D1/D2 に対する強制機構を新設するとしていますが、検査1は D1 が採録面に含める capabilities・briefings・githooks・CI・utility adapters を検査せず、検査2も `cargo run -p cli` を禁じるだけです。そのため、欠落中の `adr-baseline-check-review` を単発 `bin/sotp` wrapper として exported Makefile に追加すれば両検査を通過しつつ D2 の直呼び原則に違反でき、「参照欠落クラスを止める」「現存 regression の修復を強制する」という本文の結論と矛盾します。検査対象を既決の採録面全体と直呼び原則に合わせるか、強制対象の主張を実際の検査範囲へ狭める必要があります。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+              "line": 65,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:c935f8f54e132894f9ef64a856220b558ccef6f35eb91ec2f012de87c076eb3f",
+          "at": "2026-07-22T18:12:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 は索引再生成を「export 時実行」でもよいとしていますが、既決 ADR `2026-07-06-1717-template-extraction-boundary.md` D4 は export を copy + overlay のみに固定し、Rejected E で programmatic transform を明示的に退けています。この拒否を扱わず export-time rewrite を許すと境界方式の決定が競合します。bootstrap 組み込みに限定するか、既決 D4/E を明示的に refinement/supersession してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+              "line": 43,
+              "category": "rejected alternative re-emerges in decisions"
+            }
+          ],
+          "hash": "rvw1:sha256:ff41265fdfe5f73f6ea42b0daa745408d8f157a2342bd4a865ee82e1b7a1cef5",
+          "at": "2026-07-22T18:20:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:88445bf87cda6c1a1b1666bd34ddaac8f6b5526a92f77253d83e9f41bce90e7c",
+          "at": "2026-07-22T18:25:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 does not record a single decision for `language`: it leaves both exclusion and replacement with a neutral overlay as permitted outcomes. Choose one shipping policy so downstream work has an unambiguous target.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+              "line": 58,
+              "category": "decision not actually recorded"
+            }
+          ],
+          "hash": "rvw1:sha256:88445bf87cda6c1a1b1666bd34ddaac8f6b5526a92f77253d83e9f41bce90e7c",
+          "at": "2026-07-22T18:34:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23b27e22335e712bf2d191defd996af1763f062c2f2b42101ee346e34ae42521",
+          "at": "2026-07-22T18:40:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:23b27e22335e712bf2d191defd996af1763f062c2f2b42101ee346e34ae42521",
+          "at": "2026-07-22T18:43:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 embeds operational gate wiring and implementation-placement constraints (smoke-gate integration, export-tree inspection, maintainer-CI boundary, exclusion from `sotp verify`, and repair sequencing) rather than recording only the decision to detect the two divergence classes. This detail obscures the decision and belongs in the workflow/convention or specification layer; delegate those mechanics explicitly and retain the two detection decisions.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0117-export-surface-minimization.md",
+              "line": 70,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:23b27e22335e712bf2d191defd996af1763f062c2f2b42101ee346e34ae42521",
+          "at": "2026-07-22T18:45:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc2a510c4a3bef7aac3f40fa14788cb8562ef5f535c30e16ec843cd275d02df7",
+          "at": "2026-07-23T02:18:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bc2a510c4a3bef7aac3f40fa14788cb8562ef5f535c30e16ec843cd275d02df7",
+          "at": "2026-07-23T02:20:21Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -848,6 +815,226 @@
           "findings": [],
           "hash": "rvw1:sha256:2e1e7ebbe6d7766191c59c5c210955668cb85eec78ca8849e70f53e919714604",
           "at": "2026-07-23T00:22:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:10f52c596125a1f01d8a11262555119f8711e44a814fe2b4ed7ae1ecaa0d6c5c",
+          "at": "2026-07-23T02:18:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:10f52c596125a1f01d8a11262555119f8711e44a814fe2b4ed7ae1ecaa0d6c5c",
+          "at": "2026-07-23T02:21:42Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`related_conventions` cites `coding-principles.md#No Panics in Library Code`, which is unrelated to this export-surface behavioral contract.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/spec.json",
+              "line": 293,
+              "category": "broken cross-reference at narrative level"
+            },
+            {
+              "message": "`related_conventions` cites `prefer-type-safe-abstractions.md#Rule`, which is unrelated to the export/Makefile divergence behavior specified here.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/spec.json",
+              "line": 297,
+              "category": "broken cross-reference at narrative level"
+            },
+            {
+              "message": "`related_conventions` cites `pre-track-adr-authoring.md#Rules`, which is unrelated to this export-surface behavioral contract.",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/spec.json",
+              "line": 313,
+              "category": "broken cross-reference at narrative level"
+            }
+          ],
+          "hash": "rvw1:sha256:15e6c59728a188887f09635706fb4a1479db8591a494443e0d90aee38f0db786",
+          "at": "2026-07-22T19:22:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5e04c07e8dba2379e46b62d3f9090310480e7d4525976b94449131f119ff1930",
+          "at": "2026-07-22T19:23:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 の conventions 最小化を証明する acceptance criterion がありません。AC-01 は全ファイルが include / exclude のどちらかに分類されること、AC-02 は export がその分類に従うことしか要求しないため、全 convention を include にしても両方を満たし、GO-01 に反する出荷面が受理されます。",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/spec.json",
+              "line": 8,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "AC-07 は「現存 regression 2 件」の片方を workspace CLI の cargo run 流出としていますが、引用先 ADR の D4 で修復対象になっている実在の二件目は scaffold の ci-track における `bin/sotp adr-baseline check-commit` の欠落です。cargo run 流出は恒常検査する将来の乖離クラスであり、現存 regression ではありません。このままでは IN-06 の修復範囲に反して commit 側 byte 照合が欠落したままでも AC 群を満たせます。",
+              "severity": "P1",
+              "file": "track/items/export-surface-minimization-2026-07-23/spec.json",
+              "line": 274,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:5e04c07e8dba2379e46b62d3f9090310480e7d4525976b94449131f119ff1930",
+          "at": "2026-07-22T19:26:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c6b53da1a774926c4777302c9351f21bd0669a53a55a6578faa6927849085e7c",
+          "at": "2026-07-22T19:28:36Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`FeatureDisabledDryGateInteractor::dry_check_approved` does not validate `input.track_id` before returning `Approved` when the DRY gate is disabled. This diverges from the main driver and allows an invalid track ID to be accepted through the same public service.",
+              "severity": "P1",
+              "file": "libs/usecase/src/dry_check_approved_driver.rs",
+              "line": 232,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3b89858d47df6c4f8ef664116a238e035f4e145d0e8501a30ddd817b33e6ab43",
+          "at": "2026-07-23T02:18:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80a11b8877558864bca4a523aa7ff6f250bf6e72c01dbb239ebfeb5177ee0e24",
+          "at": "2026-07-23T02:24:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80a11b8877558864bca4a523aa7ff6f250bf6e72c01dbb239ebfeb5177ee0e24",
+          "at": "2026-07-23T02:27:21Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:32380e7f157b04a9eb336ad9f439a74e0c81c5d62b0d3198a21a2d6056bc3b94",
+          "at": "2026-07-23T00:20:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:32380e7f157b04a9eb336ad9f439a74e0c81c5d62b0d3198a21a2d6056bc3b94",
+          "at": "2026-07-23T00:21:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e7d62800d86c87f0869475b442ebd5420e68978bfa8800f3a9313259b867a64",
+          "at": "2026-07-23T02:18:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e7d62800d86c87f0869475b442ebd5420e68978bfa8800f3a9313259b867a64",
+          "at": "2026-07-23T02:20:49Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c616718b1a15a87e7507c5517119b8655d7fffc6e0acf7806fcdd17b42ec575",
+          "at": "2026-07-22T19:22:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c616718b1a15a87e7507c5517119b8655d7fffc6e0acf7806fcdd17b42ec575",
+          "at": "2026-07-22T19:25:09Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1586dffb16789ffe4aa013053e714d308b7fd67ea815f6bc568433cc1b18fc07",
+          "at": "2026-07-23T02:18:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1586dffb16789ffe4aa013053e714d308b7fd67ea815f6bc568433cc1b18fc07",
+          "at": "2026-07-23T02:21:07Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bbd31e50f0908bd0ab5ff6a2e3855f05588a6ba60ee486d6f8d6b3c4727bd626",
+          "at": "2026-07-23T02:18:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bbd31e50f0908bd0ab5ff6a2e3855f05588a6ba60ee486d6f8d6b3c4727bd626",
+          "at": "2026-07-23T02:20:43Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efb5a92d0e0659b975c2d1ea93d2ad66205c5d1820b7c37aabee68315136023a",
+          "at": "2026-07-23T02:18:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:efb5a92d0e0659b975c2d1ea93d2ad66205c5d1820b7c37aabee68315136023a",
+          "at": "2026-07-23T02:19:57Z"
         }
       ]
     }
