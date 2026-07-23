@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "5e907ed729dd91fbd735c26b94fab4036cf12f6283fea0a9e7d20b769bd6750f",
+  "signals": [
+    {
+      "type_name": "ContractMapDriver",
+      "signal": "blue",
+      "entry_hash": "70a0f8dcc516b983bce4a9b7f616ede7cb69a3c36db0012c3658b6630a1e7f25"
+    },
+    {
+      "type_name": "ContractMapInput",
+      "signal": "blue",
+      "entry_hash": "924497763566fc33578f131d9102f7c486d48ead92e84efb08d312cf7a963f16"
+    }
+  ]
+}

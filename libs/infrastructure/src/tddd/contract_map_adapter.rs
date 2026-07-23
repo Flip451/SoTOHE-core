@@ -519,7 +519,7 @@ mod tests {
         let catalogues_vec: Vec<_> = catalogues.values().cloned().collect();
         let opts = ContractMapRenderOptions::default();
         let content = adapter.render(&catalogues_vec, &layer_order, &opts).unwrap();
-        let text = content.as_ref();
+        let text = content.content().as_ref();
         assert!(text.contains("flowchart LR"), "render must contain flowchart LR; got:\n{text}");
         // T004–T009: both types must appear in the output.
         assert!(text.contains("UserId"), "UserId must appear in output: {text}");

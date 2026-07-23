@@ -170,6 +170,9 @@ impl TrackCompositionRoot {
         workspace_root: PathBuf,
         layers: Option<String>,
     ) -> Result<CommandOutcome, CompositionError> {
+        use std::sync::Arc;
+
+        use cli_driver::contract_map::{ContractMapDriver, ContractMapInput};
         use infrastructure::tddd::contract_map_adapter::{FsCatalogueLoader, FsContractMapWriter};
         use infrastructure::tddd::contract_map_renderer_adapter::ContractMapRendererAdapter;
         use usecase::contract_map_workflow::{
@@ -192,22 +195,14 @@ impl TrackCompositionRoot {
         let style_config_path = workspace_root.join(".harness/config/contract-map-style.toml");
         let renderer = ContractMapRendererAdapter::new(style_config_path);
 
-        let interactor = RenderContractMapInteractor::new(loader, renderer, writer);
-        let renderer_ref: &dyn RenderContractMap = &interactor;
+        let service: Arc<dyn RenderContractMap> =
+            Arc::new(RenderContractMapInteractor::new(loader, renderer, writer));
+        let driver = ContractMapDriver::new(service);
         let cmd = RenderContractMapCommand {
             track_id: typed_track_id,
             layer_filter: layer_filter_parsed,
         };
-        let out = renderer_ref
-            .execute(&cmd)
-            .map_err(|e| CompositionError::Usecase(format!("contract-map render failed: {e}")))?;
-
-        let msg = format!(
-            "[OK] contract-map: wrote track/items/{resolved_id}/contract-map.md \
-             (layers={}, entries={})",
-            out.rendered_layer_count, out.total_entry_count,
-        );
-        Ok(CommandOutcome::success(Some(msg)))
+        Ok(driver.handle(ContractMapInput { command: cmd }))
     }
 
     /// Regenerate catalogue-spec-signals.json for each catalogue-spec-enabled layer.

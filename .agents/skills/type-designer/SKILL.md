@@ -12,6 +12,7 @@ contract for this capability. Do not duplicate it here.
 ## Codex-skill notes
 - Invoked when Codex is assigned the `type-designer` capability (`.codex/agents/type-designer.toml`).
 - Run the canonical pipeline and the 12a/12b/12c self-verification gates from the shared SSoT before returning.
+- Empty-layer 12a receipt: a layer with zero public items has no `<layer>-graph-d2/` output; its `<layer>-graph-d1/index.md` plus `baseline-graph` exit 0 satisfies 12a (see the SSoT's step 2 / 12a wording).
 
 ## Session resume conformance
 

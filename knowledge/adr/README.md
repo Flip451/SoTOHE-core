@@ -129,6 +129,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [テスト義務ゲートにおける skipped task status レーン](2026-07-11-0802-test-obligation-skipped-status-lane.md) | Proposed | 2026-07-11 |
 | [テスト義務ゲートへの登録を機構化し、成果物不在による空振り合格を廃する](2026-07-23-0240-test-obligation-enrollment-mechanization.md) | Proposed | 2026-07-23 |
 | [contract-map renderer: `dyn Trait` return/param edge の解決](2026-07-13-0308-contract-map-dyn-trait-return-edge.md) | Proposed | 2026-07-13 |
+| [型契約パイプラインの規範と機構を実挙動に整合させる](2026-07-23-0113-type-contract-pipeline-consistency.md) | Proposed | 2026-07-23 |
 
 ### トラック・ワークフロー
 

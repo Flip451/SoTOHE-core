@@ -257,6 +257,10 @@ pub enum CatalogueLinterRuleKind {
         /// Catalogue-structural positions to check for occurrences.
         positions: NonEmptyVec<PrimitiveOccurrencePosition>,
     },
+
+    /// Rule requires every domain-layer ValueObject to be referenced by the
+    /// signature of a different domain catalogue entry.
+    DomainValueObjectInboundReferenceRequired,
 }
 
 impl CatalogueLinterRuleKind {
@@ -277,6 +281,9 @@ impl CatalogueLinterRuleKind {
             Self::NoPublicField => "NoPublicField",
             Self::ForbiddenMethodReceiver { .. } => "ForbiddenMethodReceiver",
             Self::ForbidPrimitiveInTypes { .. } => "ForbidPrimitiveInTypes",
+            Self::DomainValueObjectInboundReferenceRequired => {
+                "DomainValueObjectInboundReferenceRequired"
+            }
         }
     }
 }
@@ -397,9 +404,10 @@ impl CatalogueLinterRule {
     ///
     /// Returns [`CatalogueLinterRuleError::InvalidRuleConfig`] when
     /// `NoRoleInMethodSignature` tries to forbid a `FunctionRole` discriminant
-    /// that method-signature scanning cannot enforce, or when a rule other
-    /// than `KindLayerConstraint` or `ForbidPrimitiveInTypes` targets a
-    /// `FunctionRole` discriminant.
+    /// that method-signature scanning cannot enforce, when a rule other than
+    /// `KindLayerConstraint` or `ForbidPrimitiveInTypes` targets a
+    /// `FunctionRole` discriminant, or when
+    /// `DomainValueObjectInboundReferenceRequired` excludes `ValueObject`.
     pub fn new(
         target: RuleTarget,
         kind: CatalogueLinterRuleKind,
@@ -446,6 +454,13 @@ impl CatalogueLinterRule {
             | CatalogueLinterRuleKind::NoPublicField
             | CatalogueLinterRuleKind::ForbiddenMethodReceiver { .. }
             | CatalogueLinterRuleKind::ForbidPrimitiveInTypes { .. } => {}
+            CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired => {
+                if !target.matches(RoleKind::ValueObject) {
+                    return Err(CatalogueLinterRuleError::InvalidRuleConfig(FreeText::new(
+                        "DomainValueObjectInboundReferenceRequired must target ValueObject",
+                    )));
+                }
+            }
             CatalogueLinterRuleKind::NoRoleInMethodSignature { forbidden_roles } => {
                 if let Some(function_role) = forbidden_roles
                     .as_slice()
@@ -788,11 +803,11 @@ mod tests {
     }
 
     // ------------------------------------------------------------------
-    // CatalogueLinterRuleKind — 13 variants exist and discriminant_name works
+    // CatalogueLinterRuleKind — 14 variants exist and discriminant_name works
     // ------------------------------------------------------------------
 
     #[test]
-    fn test_catalogue_linter_rule_kind_has_13_variants_with_distinct_names() {
+    fn test_catalogue_linter_rule_kind_has_14_variants_with_distinct_names() {
         let permitted = NonEmptyVec::new(layer("domain"), vec![]);
         let required_traits = NonEmptyVec::new(TypeRef::new("PartialEq").unwrap(), vec![]);
         let forbidden_roles = NonEmptyVec::new(RoleKind::Repository, vec![]);
@@ -828,8 +843,9 @@ mod tests {
                 layers: NonEmptyVec::new(layer("domain"), vec![]),
                 positions: NonEmptyVec::new(PrimitiveOccurrencePosition::NamedField, vec![]),
             },
+            CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired,
         ];
-        assert_eq!(kinds.len(), 13, "must have exactly 13 variants");
+        assert_eq!(kinds.len(), 14, "must have exactly 14 variants");
 
         let names: Vec<&str> = kinds.iter().map(|k| k.discriminant_name()).collect();
         let expected = [
@@ -846,8 +862,59 @@ mod tests {
             "NoPublicField",
             "ForbiddenMethodReceiver",
             "ForbidPrimitiveInTypes",
+            "DomainValueObjectInboundReferenceRequired",
         ];
         assert_eq!(names, expected);
+    }
+
+    #[test]
+    fn test_domain_value_object_inbound_reference_required_rejects_all_contact_actions() {
+        for action in [ItemAction::Add, ItemAction::Modify, ItemAction::Reference] {
+            let mut doc = make_doc("domain");
+            doc.insert_type(
+                TypeName::new("BoundaryValue").unwrap(),
+                TypeEntry::new(
+                    action,
+                    DataRole::value_object(),
+                    unit_struct_kind(),
+                    vec![],
+                    vec![],
+                    vec![],
+                    ModulePath::root(),
+                    None,
+                    vec![],
+                    vec![],
+                ),
+            );
+
+            let violations = run_rule(
+                &doc,
+                RuleTarget::new(vec![RoleKind::ValueObject]),
+                CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired,
+            );
+            assert_eq!(violations.len(), 1, "action {action:?} must be checked");
+            assert_eq!(violations[0].rule_kind(), "DomainValueObjectInboundReferenceRequired");
+        }
+    }
+
+    #[test]
+    fn test_domain_value_object_inbound_reference_required_accepts_other_domain_signature() {
+        let mut doc = make_doc("domain");
+        doc.insert_type(TypeName::new("Money").unwrap(), make_type_entry(DataRole::value_object()));
+        doc.insert_type(
+            TypeName::new("Price").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::Entity { identity: identity_accessor("id"), invariants: vec![] },
+                vec![method_shared_ref_no_params("amount", "Money")],
+            ),
+        );
+
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::ValueObject]),
+            CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired,
+        );
+        assert!(violations.is_empty(), "a different domain signature consumes Money");
     }
 
     // ------------------------------------------------------------------
@@ -875,6 +942,24 @@ mod tests {
         .unwrap();
         assert_eq!(rule.kind().discriminant_name(), "KindLayerConstraint");
         assert_eq!(rule.target().target_roles(), &[RoleKind::EventPolicy]);
+    }
+
+    #[test]
+    fn test_linter_rule_new_inbound_reference_rule_rejects_target_without_value_object() {
+        let result = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::Entity]),
+            CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired,
+        );
+
+        assert!(
+            matches!(
+                &result,
+                Err(CatalogueLinterRuleError::InvalidRuleConfig(msg))
+                    if msg.as_str().contains("DomainValueObjectInboundReferenceRequired")
+                        && msg.as_str().contains("ValueObject")
+            ),
+            "expected InvalidRuleConfig for a target that excludes ValueObject, got: {result:?}"
+        );
     }
 
     #[test]

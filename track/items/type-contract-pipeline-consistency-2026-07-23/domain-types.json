@@ -1,0 +1,894 @@
+{
+  "crate_name": "domain",
+  "functions": {
+    "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint": {
+      "action": "reference",
+      "docs": "evaluate_catalogue_lint reference. IN-02; AC-02.",
+      "generics": [
+        {
+          "bounds": [
+            "PrimitiveOccurrenceScanner"
+          ],
+          "name": "S"
+        }
+      ],
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "rules",
+          "ty": "&[CatalogueLinterRule]"
+        },
+        {
+          "name": "all_catalogues",
+          "ty": "&std::collections::BTreeMap<LayerId, CatalogueDocument>"
+        },
+        {
+          "name": "target_layer_id",
+          "ty": "&LayerId"
+        },
+        {
+          "name": "scanner",
+          "ty": "&S"
+        }
+      ],
+      "returns": "Result<Vec<CatalogueLintViolation>, CatalogueLinterError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "role",
+          "params": [],
+          "receiver": "&self",
+          "returns": "RoleKind"
+        }
+      ],
+      "type_name": "ContractMapRenderWarning"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "content",
+              "ty": "ContractMapContent"
+            },
+            {
+              "name": "warnings",
+              "ty": "Vec<ContractMapRenderWarning>"
+            }
+          ],
+          "returns": "ContractMapRenderResult"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "content",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ContractMapContent"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "warnings",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[ContractMapRenderWarning]"
+        }
+      ],
+      "type_name": "ContractMapRenderResult"
+    }
+  ],
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "ContractMapRenderWarning",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ContractMapRenderWarning",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ContractMapRenderWarning",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ContractMapRenderWarning",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ContractMapRenderResult",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ContractMapRenderResult",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ContractMapRenderResult",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ContractMapRenderResult",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueLinterRuleKind",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueLinterRuleKind",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueLinterRuleKind",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueLinterRuleKind",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueLinterRule",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueLinterRule",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueLinterRule",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueLinterRule",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "RoleKind",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "RoleKind",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "RoleKind",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "action": "modify",
+      "for_type": "RoleKind",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "RoleKind",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "RoleKind",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "action": "reference",
+      "for_type": "ContractMapContent",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ContractMapContent",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "ContractMapContent",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ContractMapContent",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ContractMapContent",
+      "trait_ref": "core::convert::AsRef<str>"
+    }
+  ],
+  "traits": {
+    "ContractMapRenderer": {
+      "action": "modify",
+      "docs": "Secondary rendering port with typed warning output. IN-04; AC-04.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "render",
+          "params": [
+            {
+              "name": "catalogues",
+              "ty": "&[CatalogueDocument]"
+            },
+            {
+              "name": "layer_order",
+              "ty": "&[LayerId]"
+            },
+            {
+              "name": "opts",
+              "ty": "&ContractMapRenderOptions"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ContractMapRenderResult, ContractMapRendererError>"
+        }
+      ],
+      "module_path": "tddd::contract_map_renderer",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "CatalogueLinterRule": {
+      "action": "reference",
+      "docs": "CatalogueLinterRule reference. IN-02; AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "target",
+              "ty": "RuleTarget"
+            },
+            {
+              "name": "kind",
+              "ty": "CatalogueLinterRuleKind"
+            }
+          ],
+          "returns": "Result<Self, CatalogueLinterRuleError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "target",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&RuleTarget"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "kind",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CatalogueLinterRuleKind"
+        }
+      ],
+      "module_path": "tddd::catalogue_linter",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "CatalogueLinterRuleKind": {
+      "action": "modify",
+      "docs": "Catalogue lint rule vocabulary update. discriminant_name returns an unconstrained presentation-only label for diagnostics; the finite rule concept remains represented by this enum. IN-02; AC-02.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "FieldEmpty",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "FieldNonEmpty",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "KindLayerConstraint",
+            "payload": {
+              "fields": [
+                {
+                  "name": "permitted_layers",
+                  "ty": "NonEmptyVec<LayerId>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ReferencedRoleConstraint",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                },
+                {
+                  "name": "expected_role",
+                  "ty": "RoleKind"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TraitImplRequired",
+            "payload": {
+              "fields": [
+                {
+                  "name": "required_traits",
+                  "ty": "NonEmptyVec<TypeRef>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoRoleInMethodSignature",
+            "payload": {
+              "fields": [
+                {
+                  "name": "forbidden_roles",
+                  "ty": "NonEmptyVec<RoleKind>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "MethodReferenceSignature",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "AccessorSignatureRequired",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "FieldElementUniqueAcrossEntries",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoExternalReferenceInMethods",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoPublicField",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ForbiddenMethodReceiver",
+            "payload": {
+              "fields": [
+                {
+                  "name": "forbidden_receiver",
+                  "ty": "SelfReceiver"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ForbidPrimitiveInTypes",
+            "payload": {
+              "fields": [
+                {
+                  "name": "primitives",
+                  "ty": "NonEmptyVec<PrimitiveName>"
+                },
+                {
+                  "name": "layers",
+                  "ty": "NonEmptyVec<LayerId>"
+                },
+                {
+                  "name": "positions",
+                  "ty": "NonEmptyVec<PrimitiveOccurrencePosition>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DomainValueObjectInboundReferenceRequired",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "discriminant_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&'static str"
+        }
+      ],
+      "module_path": "tddd::catalogue_linter",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "ContractMapContent": {
+      "action": "reference",
+      "docs": "ContractMapContent reference; R9 ground: opaque presentation text. IN-04; AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "content",
+              "ty": "impl Into"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_string",
+          "params": [],
+          "receiver": "self",
+          "returns": "String"
+        }
+      ],
+      "module_path": "tddd::contract_map_content",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "ContractMapRenderResult": {
+      "action": "add",
+      "docs": "Typed contract-map renderer result. IN-04; AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::contract_map_renderer",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "ContractMapRenderWarning": {
+      "action": "add",
+      "docs": "Typed contract-map renderer warning. IN-04; AC-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "UndefinedRoleStyle",
+            "payload": {
+              "fields": [
+                {
+                  "name": "role",
+                  "ty": "RoleKind"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::contract_map_renderer",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "RoleKind": {
+      "action": "modify",
+      "docs": "RoleKind enumeration update; R9 ground: presentation label. IN-04; AC-04; CN-04.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ValueObject",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Entity",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "AggregateRoot",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DomainService",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Specification",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Factory",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "UseCase",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Interactor",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Command",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Query",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Dto",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ErrorType",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SecondaryAdapter",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "EventPolicy",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "DomainEvent",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CompositionRoot",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "PrimaryAdapter",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SpecificationPort",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ApplicationService",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "SecondaryPort",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Repository",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "FreeFunction",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "UseCaseFunction",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_data_role",
+          "params": [
+            {
+              "name": "role",
+              "ty": "&DataRole"
+            }
+          ],
+          "returns": "RoleKind"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_contract_role",
+          "params": [
+            {
+              "name": "role",
+              "ty": "&ContractRole"
+            }
+          ],
+          "returns": "RoleKind"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_function_role",
+          "params": [
+            {
+              "name": "role",
+              "ty": "&FunctionRole"
+            }
+          ],
+          "returns": "RoleKind"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "variant_name",
+          "params": [],
+          "receiver": "self",
+          "returns": "&'static str"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "all",
+          "params": [],
+          "returns": "&'static [RoleKind]"
+        }
+      ],
+      "module_path": "tddd::catalogue_linter::role",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json"
+        }
+      ]
+    }
+  }
+}

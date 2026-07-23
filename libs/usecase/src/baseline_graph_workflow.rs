@@ -666,6 +666,33 @@ mod tests {
     }
 
     #[test]
+    fn test_execute_empty_layer_writes_only_d1_overview() {
+        let docs = vec![baseline_doc("domain", "domain")];
+        let mut loader = MockLoader::new();
+        {
+            let docs_clone = docs.clone();
+            loader.expect_load_all().returning(move |_| Ok(docs_clone.clone()));
+        }
+        let mut renderer = MockRenderer::new();
+        renderer.expect_render_overview().times(1).returning(|_, _| Ok("overview".to_owned()));
+        renderer.expect_render_clusters().times(1).returning(|_, _| Ok(vec![]));
+
+        let mut writer = MockWriter::new();
+        writer.expect_write_overview().times(1).returning(|_, _, _| Ok(()));
+        writer.expect_write_cluster().times(0);
+
+        let interactor = RenderBaselineGraphInteractor::new(loader, renderer, writer);
+        let out = interactor
+            .execute(&RenderBaselineGraphCommand {
+                track_id: track_id("empty-layer-track"),
+                layer_filter: None,
+            })
+            .unwrap();
+        assert_eq!(out.rendered_layer_count, 1);
+        assert_eq!(out.written_file_count, 1);
+    }
+
+    #[test]
     fn test_execute_happy_path_single_layer_two_clusters_returns_correct_counts() {
         // render_clusters returns 2 ClusterRenders → 2 clusters + 1 overview = 3 files.
         let docs = vec![baseline_doc("domain", "domain")];

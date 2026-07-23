@@ -901,6 +901,7 @@ dependencies = [
 name = "cli_driver"
 version = "0.1.0"
 dependencies = [
+ "domain",
  "serde_json",
  "usecase",
 ]

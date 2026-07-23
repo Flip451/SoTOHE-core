@@ -46,7 +46,10 @@ pub use catalogue_ports::{
 pub use catalogue_to_extended_crate_port::CatalogueToExtendedCratePort;
 pub use contract_map_content::ContractMapContent;
 pub use contract_map_options::ContractMapRenderOptions;
-pub use contract_map_renderer::{ContractMapRenderer, ContractMapRendererError};
+pub use contract_map_renderer::{
+    ContractMapRenderResult, ContractMapRenderWarning, ContractMapRenderer,
+    ContractMapRendererError,
+};
 pub use extended_crate::ExtendedCrate;
 pub use layer_id::LayerId;
 pub use new_typegraph_codec_error::NewTypeGraphCodecError;

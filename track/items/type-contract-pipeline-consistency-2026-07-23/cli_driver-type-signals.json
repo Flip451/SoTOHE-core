@@ -1,0 +1,20 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-23T02:39:28Z",
+  "declaration_hash": "5e907ed729dd91fbd735c26b94fab4036cf12f6283fea0a9e7d20b769bd6750f",
+  "implementation_input_hash": "fd11bf23711d82b84336afd181d6ac9aad1fede6a61fcce59acc9bd11dba6b4d",
+  "signals": [
+    {
+      "type_name": "ContractMapDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ContractMapInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

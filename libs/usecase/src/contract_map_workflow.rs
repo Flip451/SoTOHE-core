@@ -20,7 +20,8 @@ use domain::tddd::catalogue_ports::{
     CatalogueLoader, CatalogueLoaderError, ContractMapWriter, ContractMapWriterError,
 };
 use domain::tddd::{
-    ContractMapRenderOptions, ContractMapRenderer, ContractMapRendererError, LayerId,
+    ContractMapRenderOptions, ContractMapRenderWarning, ContractMapRenderer,
+    ContractMapRendererError, LayerId,
 };
 
 /// Command input for [`RenderContractMap::execute`].
@@ -51,6 +52,7 @@ pub struct RenderContractMapCommand {
 pub struct RenderContractMapOutput {
     pub rendered_layer_count: usize,
     pub total_entry_count: usize,
+    pub warnings: Vec<ContractMapRenderWarning>,
 }
 
 /// Error variants surfaced by [`RenderContractMap::execute`].
@@ -244,9 +246,9 @@ where
         };
 
         // Delegate rendering to the injected ContractMapRenderer port (T002).
-        let content = self.renderer.render(&catalogues_vec, &filtered_layer_order, &opts)?;
+        let render_result = self.renderer.render(&catalogues_vec, &filtered_layer_order, &opts)?;
 
-        self.writer.write(&cmd.track_id, &content)?;
+        self.writer.write(&cmd.track_id, render_result.content())?;
 
         // `rendered_layer_count` reflects only the layers that were actually rendered
         // (respecting `layer_filter`), while `total_entry_count` reflects the full
@@ -259,6 +261,7 @@ where
         Ok(RenderContractMapOutput {
             rendered_layer_count: filtered_layer_order.len(),
             total_entry_count,
+            warnings: render_result.warnings().to_vec(),
         })
     }
 }
@@ -268,7 +271,7 @@ where
 mod tests {
     use std::collections::BTreeMap;
 
-    use domain::tddd::ContractMapContent;
+    use domain::RoleKind;
     use domain::tddd::catalogue_v2::document::CatalogueDocument;
     use domain::tddd::catalogue_v2::entries::{FunctionEntry, TraitEntry, TypeEntry};
     use domain::tddd::catalogue_v2::identifiers::{
@@ -278,6 +281,7 @@ mod tests {
     use domain::tddd::catalogue_v2::{
         MethodDeclaration, ModulePath, StructKind, StructShape, TypeKindV2,
     };
+    use domain::tddd::{ContractMapContent, ContractMapRenderResult, ContractMapRenderWarning};
     use mockall::{mock, predicate};
 
     use super::*;
@@ -303,7 +307,7 @@ mod tests {
                 catalogues: &[CatalogueDocument],
                 layer_order: &[LayerId],
                 opts: &ContractMapRenderOptions,
-            ) -> Result<ContractMapContent, ContractMapRendererError>;
+            ) -> Result<ContractMapRenderResult, ContractMapRendererError>;
         }
     }
 
@@ -424,7 +428,10 @@ mod tests {
 
         let mut renderer = MockRenderer::new();
         renderer.expect_render().times(1).returning(|_catalogues, _layer_order, _opts| {
-            Ok(ContractMapContent::new("flowchart LR\n"))
+            Ok(ContractMapRenderResult::new(
+                ContractMapContent::new("flowchart LR\n"),
+                vec![ContractMapRenderWarning::UndefinedRoleStyle { role: RoleKind::ValueObject }],
+            ))
         });
 
         let mut writer = MockWriter::new();
@@ -441,6 +448,10 @@ mod tests {
         let out = interactor.execute(&cmd).unwrap();
         assert_eq!(out.rendered_layer_count, 3);
         assert_eq!(out.total_entry_count, 4); // 1 type (domain) + 2 traits (usecase) + 1 fn (infra)
+        assert_eq!(
+            out.warnings,
+            vec![ContractMapRenderWarning::UndefinedRoleStyle { role: RoleKind::ValueObject }]
+        );
     }
 
     #[test]
@@ -472,7 +483,9 @@ mod tests {
             .returning(move |_: &TrackId| Ok((order.clone(), catalogues.clone())));
 
         let mut renderer = MockRenderer::new();
-        renderer.expect_render().returning(|_, _, _| Ok(ContractMapContent::new("flowchart LR\n")));
+        renderer.expect_render().returning(|_, _, _| {
+            Ok(ContractMapRenderResult::new(ContractMapContent::new("flowchart LR\n"), vec![]))
+        });
 
         let mut writer = MockWriter::new();
         writer.expect_write().returning(|_: &TrackId, _: &ContractMapContent| {

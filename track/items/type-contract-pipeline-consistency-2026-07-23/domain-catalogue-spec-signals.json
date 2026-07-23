@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "89ccd486eda63aa9862e73bd13eed3a229d5b8a3a50f77fa2b8ed40ed16dcae3",
+  "signals": [
+    {
+      "type_name": "CatalogueLinterRule",
+      "signal": "blue",
+      "entry_hash": "00156c7cb500737cd95d3b8d3f146e57f6fd12eba520001bc3344e0d29062b33"
+    },
+    {
+      "type_name": "CatalogueLinterRuleKind",
+      "signal": "blue",
+      "entry_hash": "6798e8b6feacdebfe75db50efaa35166d679f6f10c4ac7aafb732ffa81168f5b"
+    },
+    {
+      "type_name": "ContractMapContent",
+      "signal": "blue",
+      "entry_hash": "f75a3223c938eb2d906064cf998c9976ca69ef26fa3329e475e93a2d87c72c16"
+    },
+    {
+      "type_name": "ContractMapRenderResult",
+      "signal": "blue",
+      "entry_hash": "b280c3cc5c7a7c7f722bf568a0b2287032a494968ba06745b9dce79d74478fe6"
+    },
+    {
+      "type_name": "ContractMapRenderWarning",
+      "signal": "blue",
+      "entry_hash": "d7ec1f16ae17d4cef39f57d74885606419ee8a6e18df23110e98a58e55900936"
+    },
+    {
+      "type_name": "RoleKind",
+      "signal": "blue",
+      "entry_hash": "54e5c6cfc60ad12d5570058dd702868e6ba8608b284740781df852589b423895"
+    },
+    {
+      "type_name": "ContractMapRenderer",
+      "signal": "blue",
+      "entry_hash": "60f51d71fa6cbfdd1b160c15a369e381829129017c6e37761ecc37dc3f73d013"
+    },
+    {
+      "type_name": "domain::tddd::catalogue_linter::eval::evaluate_catalogue_lint",
+      "signal": "blue",
+      "entry_hash": "ef727e9e00a9e6aea22b17bd123841066380d275aeadb9264e3d938ffe09defd"
+    }
+  ]
+}

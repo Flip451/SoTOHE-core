@@ -102,6 +102,12 @@ impl RoleKind {
         Self::UseCaseFunction,
     ];
 
+    /// Returns every role discriminant in stable declaration order.
+    #[must_use]
+    pub fn all() -> &'static [RoleKind] {
+        &Self::ALL
+    }
+
     /// All `DataRole` discriminants that a type-entry field rule can scan.
     pub(crate) const DATA_ROLES: [Self; 17] = [
         Self::ValueObject,
@@ -128,7 +134,7 @@ impl RoleKind {
 
     /// Returns the payload-free discriminant for a `DataRole`.
     #[must_use]
-    pub fn from_data_role(role: &DataRole) -> Self {
+    pub fn from_data_role(role: &DataRole) -> RoleKind {
         match role {
             DataRole::ValueObject { .. } => Self::ValueObject,
             DataRole::Entity { .. } => Self::Entity,
@@ -152,7 +158,7 @@ impl RoleKind {
 
     /// Returns the payload-free discriminant for a `ContractRole`.
     #[must_use]
-    pub fn from_contract_role(role: &ContractRole) -> Self {
+    pub fn from_contract_role(role: &ContractRole) -> RoleKind {
         match role {
             ContractRole::SpecificationPort => Self::SpecificationPort,
             ContractRole::ApplicationService => Self::ApplicationService,
@@ -163,7 +169,7 @@ impl RoleKind {
 
     /// Returns the payload-free discriminant for a `FunctionRole`.
     #[must_use]
-    pub fn from_function_role(role: &FunctionRole) -> Self {
+    pub fn from_function_role(role: &FunctionRole) -> RoleKind {
         match role {
             FunctionRole::FreeFunction => Self::FreeFunction,
             FunctionRole::UseCaseFunction => Self::UseCaseFunction,

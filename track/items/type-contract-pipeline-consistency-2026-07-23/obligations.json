@@ -1,0 +1,65 @@
+{
+  "track_id": "type-contract-pipeline-consistency-2026-07-23",
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "ContractMapRenderer",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:render"
+      },
+      "target_entry": {
+        "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "ContractMapRenderer"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:render' of ContractMapRenderer",
+      "declaration_hash": "10e9c363dc7e327676c72528efcaa978d5fb0fd7abc98e3456fbb720e5132351",
+      "spec_refs": [
+        {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json",
+          "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::track::tddd::emit_command_outcome",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::track::tddd::emit_command_outcome"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::track::tddd::emit_command_outcome",
+      "declaration_hash": "cc6bb6ad2f255823e0e06fa6af401810c0c23a6ae9c8da02fe1fa81aa0a2a7e2",
+      "spec_refs": [
+        {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/type-contract-pipeline-consistency-2026-07-23/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    }
+  ]
+}

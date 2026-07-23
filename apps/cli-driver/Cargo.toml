@@ -11,3 +11,6 @@ workspace = true
 [dependencies]
 serde_json = "1.0.149"
 usecase = { path = "../../libs/usecase" }
+
+[dev-dependencies]
+domain = { path = "../../libs/domain" }

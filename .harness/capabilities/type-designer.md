@@ -99,7 +99,7 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
    ```
    bin/sotp track baseline-graph --track-id <id> [--layers <layer_ids>]
    ```
-   `baseline-graph` (Reality View) renders both depths from the rustdoc baseline in a **single** invocation: depth=1 overview to `track/items/<id>/<layer>-graph-d1/index.md` and depth=2 cluster detail to `track/items/<id>/<layer>-graph-d2/<cluster>.md`. Cluster = top-level module (fixed) — there is no `--cluster-depth` flag. Requires the baselines captured in step 1. (`--layers` takes a comma-separated id list; omit it to render every `tddd.enabled` layer.)
+   `baseline-graph` (Reality View) renders both depths from the rustdoc baseline in a **single** invocation: depth=1 overview to `track/items/<id>/<layer>-graph-d1/index.md` and, when public items form clusters, depth=2 detail to `track/items/<id>/<layer>-graph-d2/<cluster>.md`. A layer with zero public items has no d2 output; its d1 output plus this command's exit 0 is the canonical completion receipt. Cluster = top-level module (fixed) — there is no `--cluster-depth` flag. Requires the baselines captured in step 1. (`--layers` takes a comma-separated id list; omit it to render every `tddd.enabled` layer.)
 
 3. **(produced by step 2)** — depth=2 detail is emitted by the same `baseline-graph` invocation as depth=1; no separate depth command is needed.
 
@@ -194,7 +194,7 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
     Steps that must have completed in the current session before 12a Glob checks proceed:
 
     - Step 1 (`bin/sotp track baseline-capture`) — produces `<layer>-types-baseline.json`; Bash exit 0 required
-    - Step 2 (`bin/sotp track baseline-graph`) — produces `<layer>-graph-d1/index.md` (depth=1) AND `<layer>-graph-d2/<cluster>.md` (depth=2) in a single command; Bash exit 0 required
+    - Step 2 (`bin/sotp track baseline-graph`) — produces `<layer>-graph-d1/index.md` and, for layers with public-item clusters, `<layer>-graph-d2/<cluster>.md`; for an empty layer, d1 plus Bash exit 0 is the 12a receipt and d2 is correctly absent
     - Step 3 — no separate command; depth=2 is produced by step 2's `baseline-graph` invocation
     - Step 6 (`bin/sotp catalog init` / `add` / `import`) — every generation invocation used in this session returned exit 0 (`init` applies only at the track's first catalogue session; `add` / `import` apply per entry generated in this session)
     - Step 7 (`bin/sotp catalog check`) — exit 0 **after the final annotation edit of this session**; a check that ran before the last Edit is not a valid receipt — re-run it
@@ -207,7 +207,7 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
 
     - `track/items/<id>/<layer>-types-baseline.json` (step 1)
     - `track/items/<id>/<layer>-graph-d1/index.md` (step 2, depth=1 overview)
-    - `track/items/<id>/<layer>-graph-d2/` (step 2, depth=2 — a directory of per-cluster `<cluster>.md` files; depth=2 has no `index.md`)
+    - `track/items/<id>/<layer>-graph-d2/` (step 2, only when the layer has public-item clusters; it is a directory of per-cluster `<cluster>.md` files and has no `index.md`). For a zero-public-item layer, verify instead that this directory is absent while d1 exists and step 2 exited 0.
     - `track/items/<id>/<layer>-types.json` (steps 6–7)
     - `track/items/<id>/<layer>-catalogue-spec-signals.json` (step 8)
     - `track/items/<id>/<layer>-type-signals.json` (step 9)
