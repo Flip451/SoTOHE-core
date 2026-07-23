@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "composition-root-pure-di-migration-initiative-2026-07-23",
+  "title": "Composition root pure DI migration initiative",
+  "branch": "track/composition-root-pure-di-migration-initiative-2026-07-23",
+  "created_at": "2026-07-23T13:28:43Z",
+  "updated_at": "2026-07-23T13:28:43Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

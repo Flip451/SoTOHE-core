@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:820d80a918fead0d127604d5129fd076dcd41c3e4759c3ca734a8634064ac8a5",
+          "at": "2026-07-23T13:31:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 assigns compatibility-shim and intermediate `*ServiceImpl` deletion to the final convergence track, but D5 says each command-context track cannot complete while a compatibility facade or reverse delegation remains. Thus either the earlier tracks must already perform this deletion, leaving no such implementation work for final convergence, or they remain incomplete until that later track and are not independently complete. Assign deletion unambiguously to the context tracks and make final convergence verification-only, or explicitly redefine the permitted intermediate state and per-track completion condition.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+              "line": 69,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:820d80a918fead0d127604d5129fd076dcd41c3e4759c3ca734a8634064ac8a5",
+          "at": "2026-07-23T13:35:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ceac4a93213aa46f6229e48b990b1ce751ba4a0e0f0faf23f83547b8275cb95e",
+          "at": "2026-07-23T13:48:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ceac4a93213aa46f6229e48b990b1ce751ba4a0e0f0faf23f83547b8275cb95e",
+          "at": "2026-07-23T13:51:37Z"
+        }
+      ]
+    }
+  }
+}

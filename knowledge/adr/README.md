@@ -130,6 +130,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [テスト義務ゲートへの登録を機構化し、成果物不在による空振り合格を廃する](2026-07-23-0240-test-obligation-enrollment-mechanization.md) | Proposed | 2026-07-23 |
 | [contract-map renderer: `dyn Trait` return/param edge の解決](2026-07-13-0308-contract-map-dyn-trait-return-edge.md) | Proposed | 2026-07-13 |
 | [composition root 規範を純 DI に確定し、実践側の逸脱を解消する](2026-07-23-0111-composition-root-pure-di-realignment.md) | Proposed | 2026-07-23 |
+| [Composition root 純 DI 化を単一改善イニシアチブと複数独立 track で完遂する](2026-07-23-1318-composition-root-pure-di-migration-initiative.md) | Proposed | 2026-07-23 |
 | [型契約パイプラインの規範と機構を実挙動に整合させる](2026-07-23-0113-type-contract-pipeline-consistency.md) | Proposed | 2026-07-23 |
 
 ### トラック・ワークフロー
