@@ -182,21 +182,64 @@
         }
       ]
     },
-    "spec": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
-          "at": "2026-07-24T21:26:13Z"
+          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
+          "at": "2026-07-24T21:26:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
-          "at": "2026-07-24T21:30:18Z"
+          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
+          "at": "2026-07-24T21:28:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`set -e` stops on failure but does not clean up state created by earlier steps. If `cargo generate-lockfile` fails, the exported directory is left as an initialized Git repository; if `git commit` fails, it is left with staged files. This contradicts the checklist requirement that intermediate failures not leave a half-initialized state and makes recovery/retry behavior ambiguous.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 23,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:3ead8632997c3ba77d9eea5a7f591d5653acfb6fe61707a5d5d2c9f1d8a73944",
+          "at": "2026-07-24T21:46:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0218d0e9f93b2bc856b4142a3be20308cede5eee19dca3ca3f902f4373b97e05",
+          "at": "2026-07-24T21:49:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0218d0e9f93b2bc856b4142a3be20308cede5eee19dca3ca3f902f4373b97e05",
+          "at": "2026-07-24T21:52:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b60c3b677f746b68791b3faa9e3f2c7e5b84662fd235ff99ffa98abe32b6e4f2",
+          "at": "2026-07-24T22:06:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b60c3b677f746b68791b3faa9e3f2c7e5b84662fd235ff99ffa98abe32b6e4f2",
+          "at": "2026-07-24T22:07:38Z"
         }
       ]
     },
@@ -279,67 +322,45 @@
           "findings": [],
           "hash": "rvw1:sha256:caeb8c7b736c9bfc0431e04a8776eb553f11757bd42f1e7bc7719dcac6e8e9df",
           "at": "2026-07-24T21:48:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
+          "at": "2026-07-24T22:14:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
+          "at": "2026-07-24T22:16:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
+          "at": "2026-07-24T22:18:27Z"
         }
       ]
     },
-    "other": {
+    "spec": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
-          "at": "2026-07-24T21:26:35Z"
+          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
+          "at": "2026-07-24T21:26:13Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
-          "at": "2026-07-24T21:28:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`set -e` stops on failure but does not clean up state created by earlier steps. If `cargo generate-lockfile` fails, the exported directory is left as an initialized Git repository; if `git commit` fails, it is left with staged files. This contradicts the checklist requirement that intermediate failures not leave a half-initialized state and makes recovery/retry behavior ambiguous.",
-              "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 23,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:3ead8632997c3ba77d9eea5a7f591d5653acfb6fe61707a5d5d2c9f1d8a73944",
-          "at": "2026-07-24T21:46:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0218d0e9f93b2bc856b4142a3be20308cede5eee19dca3ca3f902f4373b97e05",
-          "at": "2026-07-24T21:49:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0218d0e9f93b2bc856b4142a3be20308cede5eee19dca3ca3f902f4373b97e05",
-          "at": "2026-07-24T21:52:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b60c3b677f746b68791b3faa9e3f2c7e5b84662fd235ff99ffa98abe32b6e4f2",
-          "at": "2026-07-24T22:06:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b60c3b677f746b68791b3faa9e3f2c7e5b84662fd235ff99ffa98abe32b6e4f2",
-          "at": "2026-07-24T22:07:38Z"
+          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
+          "at": "2026-07-24T21:30:18Z"
         }
       ]
     }

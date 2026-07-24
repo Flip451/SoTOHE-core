@@ -4,17 +4,20 @@
     {
       "id": "T001",
       "description": "Add the `init` task to `overlay/Makefile.toml` and focused Makefile-level coverage for its first-run and repeat-invocation paths. IN-01, IN-02, OS-02, OS-03, OS-04, CN-01, CN-02, AC-01, AC-02.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "0156c5fc"
     },
     {
       "id": "T002",
       "description": "Update the overlay branch-strategy configuration and the template-boundary, export, and shipped-Makefile smoke checks. IN-03, OS-01, OS-05, CN-03, CN-04, AC-03, AC-04.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "0156c5fc"
     },
     {
       "id": "T003",
       "description": "Update the shipped `plan` and `adr2pr` command adapters' `TaskCreate` integration and their available/unavailable host-progress coverage. IN-04, CN-05, AC-05.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "0156c5fc"
     }
   ],
   "plan": {
