@@ -1,6 +1,310 @@
 {
   "schema_version": 2,
   "scopes": {
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description restates upstream behavior contracts (fail-closed repeat execution, initialization ordering, and bootstrap) in prose; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description restates upstream branch defaults and maintainer-boundary behavior in prose; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 15,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 description restates the TaskCreate fallback behavior contract in prose; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 description restates the first-run behavior contract instead of only identifying the grouped implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 35,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 description restates the exported-configuration behavior contract instead of only identifying the grouped implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 44,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 description restates the host-independent progress behavior contract instead of only identifying the grouped implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 53,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:e2bd02961a7de7310c8a82f88c9ae6311eee972e303002f818aa29b63ecb7df7",
+          "at": "2026-07-24T21:26:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe388f3fbe5e4ab0b298006678fb7c2c9c5bcc3f664306c59b4f7a0ccb656e59",
+          "at": "2026-07-24T21:28:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe388f3fbe5e4ab0b298006678fb7c2c9c5bcc3f664306c59b4f7a0ccb656e59",
+          "at": "2026-07-24T21:32:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:caeb8c7b736c9bfc0431e04a8776eb553f11757bd42f1e7bc7719dcac6e8e9df",
+          "at": "2026-07-24T21:45:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:caeb8c7b736c9bfc0431e04a8776eb553f11757bd42f1e7bc7719dcac6e8e9df",
+          "at": "2026-07-24T21:48:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
+          "at": "2026-07-24T22:14:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
+          "at": "2026-07-24T22:16:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
+          "at": "2026-07-24T22:18:27Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
+          "at": "2026-07-24T21:26:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
+          "at": "2026-07-24T21:28:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`set -e` stops on failure but does not clean up state created by earlier steps. If `cargo generate-lockfile` fails, the exported directory is left as an initialized Git repository; if `git commit` fails, it is left with staged files. This contradicts the checklist requirement that intermediate failures not leave a half-initialized state and makes recovery/retry behavior ambiguous.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 23,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:3ead8632997c3ba77d9eea5a7f591d5653acfb6fe61707a5d5d2c9f1d8a73944",
+          "at": "2026-07-24T21:46:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0218d0e9f93b2bc856b4142a3be20308cede5eee19dca3ca3f902f4373b97e05",
+          "at": "2026-07-24T21:49:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0218d0e9f93b2bc856b4142a3be20308cede5eee19dca3ca3f902f4373b97e05",
+          "at": "2026-07-24T21:52:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b60c3b677f746b68791b3faa9e3f2c7e5b84662fd235ff99ffa98abe32b6e4f2",
+          "at": "2026-07-24T22:06:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b60c3b677f746b68791b3faa9e3f2c7e5b84662fd235ff99ffa98abe32b6e4f2",
+          "at": "2026-07-24T22:07:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7c81d2d0597a9d9f7a02b6ed067b9970f33336864c19b5b3565e95b2883b1ad",
+          "at": "2026-07-24T23:22:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7c81d2d0597a9d9f7a02b6ed067b9970f33336864c19b5b3565e95b2883b1ad",
+          "at": "2026-07-24T23:26:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cdba9dcc1cd46fa8afd2a766eded074670520f0be1416f049c987dcdea90327",
+          "at": "2026-07-24T23:47:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cdba9dcc1cd46fa8afd2a766eded074670520f0be1416f049c987dcdea90327",
+          "at": "2026-07-24T23:49:34Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7b892eb199edf41c11b13d27f10d006bb5dc5f72b5f2356b2aa976190258d96",
+          "at": "2026-07-24T20:20:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 の初期化列は単なる `git init` なので、初期ブランチ名は利用者の `init.defaultBranch` などに依存し、`main` になる保証がありません。一方、D2 は出荷設定を `main` に固定すれば実在ブランチと一致して不一致プロンプトが消えると決定しています。初期ブランチが `master` 等の環境では同じ摩擦が残るため、D1 で `main` を明示的に作成するなど、D1 と D2 の前提を一致させる必要があります。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+              "line": 36,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:f7b892eb199edf41c11b13d27f10d006bb5dc5f72b5f2356b2aa976190258d96",
+          "at": "2026-07-24T20:23:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb9eb846f93b4f7dd81ba67293184a2fa0e0c41b915bc89bd41d015cc780286e",
+          "at": "2026-07-24T20:27:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb9eb846f93b4f7dd81ba67293184a2fa0e0c41b915bc89bd41d015cc780286e",
+          "at": "2026-07-24T20:30:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bd5df0edcf9a228de96709a2258ac6bbc2e745071fc1c1ab89033df65625bc66",
+          "at": "2026-07-24T20:54:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Rejected Alternative A は「責任分界」を根拠に暗黙のリポジトリ作成を却下していますが、参照先 convention の適用範囲は CI/verifier による consumer 所有の provider/agent 設定の強制可否です。git 初期化や初期コミットの暗黙実行は扱っておらず、A の判断根拠になっていません。該当参照を実際にこの判断を支える文書へ差し替えるか、A をこの convention に依存しない説明にしてください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+              "line": 131,
+              "category": "broken narrative reference"
+            }
+          ],
+          "hash": "rvw1:sha256:bd5df0edcf9a228de96709a2258ac6bbc2e745071fc1c1ab89033df65625bc66",
+          "at": "2026-07-24T20:58:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fea3e68ad0ab5dd0591a02e88ef45742d06715328fb909843a505a5b2fe4dd5d",
+          "at": "2026-07-24T21:02:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fea3e68ad0ab5dd0591a02e88ef45742d06715328fb909843a505a5b2fe4dd5d",
+          "at": "2026-07-24T21:05:47Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
+          "at": "2026-07-24T21:26:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
+          "at": "2026-07-24T21:30:18Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a73284093017ebd4af5abd3638493e3abd671e5fc6682b15ab8a1d1179e0b63a",
+          "at": "2026-07-24T21:26:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a73284093017ebd4af5abd3638493e3abd671e5fc6682b15ab8a1d1179e0b63a",
+          "at": "2026-07-24T21:29:07Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -111,185 +415,20 @@
           "findings": [],
           "hash": "rvw1:sha256:16045d101ec18b9a680709c3283c32edf7d2ff6c904fc3b4b18f726b7eeec653",
           "at": "2026-07-24T23:30:14Z"
-        }
-      ]
-    },
-    "impl-plan": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 description restates upstream behavior contracts (fail-closed repeat execution, initialization ordering, and bootstrap) in prose; retain only target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T002 description restates upstream branch defaults and maintainer-boundary behavior in prose; retain only target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 15,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T003 description restates the TaskCreate fallback behavior contract in prose; retain only target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 24,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S1 description restates the first-run behavior contract instead of only identifying the grouped implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 35,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S2 description restates the exported-configuration behavior contract instead of only identifying the grouped implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 44,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S3 description restates the host-independent progress behavior contract instead of only identifying the grouped implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 53,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:e2bd02961a7de7310c8a82f88c9ae6311eee972e303002f818aa29b63ecb7df7",
-          "at": "2026-07-24T21:26:46Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fe388f3fbe5e4ab0b298006678fb7c2c9c5bcc3f664306c59b4f7a0ccb656e59",
-          "at": "2026-07-24T21:28:36Z"
+          "hash": "rvw1:sha256:202f07942e7b8d5fabed3d9084fe5bbfc846b48c270e20c43943ebb1fbb96bc3",
+          "at": "2026-07-24T23:47:48Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fe388f3fbe5e4ab0b298006678fb7c2c9c5bcc3f664306c59b4f7a0ccb656e59",
-          "at": "2026-07-24T21:32:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:caeb8c7b736c9bfc0431e04a8776eb553f11757bd42f1e7bc7719dcac6e8e9df",
-          "at": "2026-07-24T21:45:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:caeb8c7b736c9bfc0431e04a8776eb553f11757bd42f1e7bc7719dcac6e8e9df",
-          "at": "2026-07-24T21:48:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
-          "at": "2026-07-24T22:14:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
-          "at": "2026-07-24T22:16:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
-          "at": "2026-07-24T22:18:27Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7b892eb199edf41c11b13d27f10d006bb5dc5f72b5f2356b2aa976190258d96",
-          "at": "2026-07-24T20:20:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1 の初期化列は単なる `git init` なので、初期ブランチ名は利用者の `init.defaultBranch` などに依存し、`main` になる保証がありません。一方、D2 は出荷設定を `main` に固定すれば実在ブランチと一致して不一致プロンプトが消えると決定しています。初期ブランチが `master` 等の環境では同じ摩擦が残るため、D1 で `main` を明示的に作成するなど、D1 と D2 の前提を一致させる必要があります。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
-              "line": 36,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:f7b892eb199edf41c11b13d27f10d006bb5dc5f72b5f2356b2aa976190258d96",
-          "at": "2026-07-24T20:23:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fb9eb846f93b4f7dd81ba67293184a2fa0e0c41b915bc89bd41d015cc780286e",
-          "at": "2026-07-24T20:27:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fb9eb846f93b4f7dd81ba67293184a2fa0e0c41b915bc89bd41d015cc780286e",
-          "at": "2026-07-24T20:30:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bd5df0edcf9a228de96709a2258ac6bbc2e745071fc1c1ab89033df65625bc66",
-          "at": "2026-07-24T20:54:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Rejected Alternative A は「責任分界」を根拠に暗黙のリポジトリ作成を却下していますが、参照先 convention の適用範囲は CI/verifier による consumer 所有の provider/agent 設定の強制可否です。git 初期化や初期コミットの暗黙実行は扱っておらず、A の判断根拠になっていません。該当参照を実際にこの判断を支える文書へ差し替えるか、A をこの convention に依存しない説明にしてください。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
-              "line": 131,
-              "category": "broken narrative reference"
-            }
-          ],
-          "hash": "rvw1:sha256:bd5df0edcf9a228de96709a2258ac6bbc2e745071fc1c1ab89033df65625bc66",
-          "at": "2026-07-24T20:58:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fea3e68ad0ab5dd0591a02e88ef45742d06715328fb909843a505a5b2fe4dd5d",
-          "at": "2026-07-24T21:02:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fea3e68ad0ab5dd0591a02e88ef45742d06715328fb909843a505a5b2fe4dd5d",
-          "at": "2026-07-24T21:05:47Z"
+          "hash": "rvw1:sha256:202f07942e7b8d5fabed3d9084fe5bbfc846b48c270e20c43943ebb1fbb96bc3",
+          "at": "2026-07-24T23:52:07Z"
         }
       ]
     },
@@ -337,117 +476,6 @@
           "findings": [],
           "hash": "rvw1:sha256:7e6bbae324ee43f54fc7208b2d54f10ac4434437ab188c9d037cb9fa36c861ad",
           "at": "2026-07-24T23:27:16Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a73284093017ebd4af5abd3638493e3abd671e5fc6682b15ab8a1d1179e0b63a",
-          "at": "2026-07-24T21:26:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a73284093017ebd4af5abd3638493e3abd671e5fc6682b15ab8a1d1179e0b63a",
-          "at": "2026-07-24T21:29:07Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
-          "at": "2026-07-24T21:26:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
-          "at": "2026-07-24T21:28:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`set -e` stops on failure but does not clean up state created by earlier steps. If `cargo generate-lockfile` fails, the exported directory is left as an initialized Git repository; if `git commit` fails, it is left with staged files. This contradicts the checklist requirement that intermediate failures not leave a half-initialized state and makes recovery/retry behavior ambiguous.",
-              "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 23,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:3ead8632997c3ba77d9eea5a7f591d5653acfb6fe61707a5d5d2c9f1d8a73944",
-          "at": "2026-07-24T21:46:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0218d0e9f93b2bc856b4142a3be20308cede5eee19dca3ca3f902f4373b97e05",
-          "at": "2026-07-24T21:49:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0218d0e9f93b2bc856b4142a3be20308cede5eee19dca3ca3f902f4373b97e05",
-          "at": "2026-07-24T21:52:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b60c3b677f746b68791b3faa9e3f2c7e5b84662fd235ff99ffa98abe32b6e4f2",
-          "at": "2026-07-24T22:06:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b60c3b677f746b68791b3faa9e3f2c7e5b84662fd235ff99ffa98abe32b6e4f2",
-          "at": "2026-07-24T22:07:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7c81d2d0597a9d9f7a02b6ed067b9970f33336864c19b5b3565e95b2883b1ad",
-          "at": "2026-07-24T23:22:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7c81d2d0597a9d9f7a02b6ed067b9970f33336864c19b5b3565e95b2883b1ad",
-          "at": "2026-07-24T23:26:47Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
-          "at": "2026-07-24T21:26:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
-          "at": "2026-07-24T21:30:18Z"
         }
       ]
     }

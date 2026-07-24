@@ -229,7 +229,7 @@ fn test_exported_scaffold_makefile_has_only_host_first_workflow_tasks() {
 }
 
 #[test]
-fn test_exported_init_task_first_run_completes_and_repeat_rejects() {
+fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() {
     use std::os::unix::fs::PermissionsExt;
 
     let export_parent = tempfile::tempdir().unwrap();
@@ -267,6 +267,7 @@ fn test_exported_init_task_first_run_completes_and_repeat_rejects() {
 
     let scaffold = enclosing_repository.join("scaffold");
     export_scaffold(&scaffold);
+    fs::write(&global_git_config, "[core]\n\thooksPath = .githooks\n").unwrap();
     let shim_dir = export_parent.path().join("init-test-shim");
     fs::create_dir_all(&shim_dir).unwrap();
 
@@ -290,7 +291,11 @@ fn test_exported_init_task_first_run_completes_and_repeat_rejects() {
 
     let trace = shim_dir.join("init.trace");
     let sotp_shim = scaffold.join("bin/sotp");
-    fs::write(&sotp_shim, "#!/bin/sh\nprintf 'sotp %s\\n' \"$*\" >> \"$INIT_TRACE\"\n").unwrap();
+    fs::write(
+        &sotp_shim,
+        "#!/bin/sh\nprintf 'sotp %s\\n' \"$*\" >> \"$INIT_TRACE\"\nif [ \"$1 $2 $3\" = \"hook dispatch git-ref-update\" ]; then\n  echo 'initial commit must not run inherited hooks' >&2\n  exit 73\nfi\n",
+    )
+    .unwrap();
     fs::set_permissions(&sotp_shim, fs::Permissions::from_mode(0o755)).unwrap();
 
     let run = || {
@@ -324,10 +329,10 @@ fn test_exported_init_task_first_run_completes_and_repeat_rejects() {
     let trace_lines =
         fs::read_to_string(&trace).unwrap().lines().map(str::to_owned).collect::<Vec<_>>();
     let expected_sequence = [
-        "git init -b main",
+        "git -c core.hooksPath=/dev/null init -b main",
         "cargo generate-lockfile",
         "git add -A",
-        "git commit -m Initial commit",
+        "git -c core.hooksPath=/dev/null commit -m Initial commit",
         "cargo make bootstrap",
     ];
     assert!(
@@ -335,6 +340,10 @@ fn test_exported_init_task_first_run_completes_and_repeat_rejects() {
             .windows(expected_sequence.len())
             .any(|window| { window.iter().map(String::as_str).eq(expected_sequence) }),
         "the public task must execute the initialization sequence before bootstrap: {trace_lines:?}",
+    );
+    assert!(
+        !trace_lines.iter().any(|line| line == "sotp hook dispatch git-ref-update"),
+        "the initial commit must bypass inherited hooks: {trace_lines:?}",
     );
     let branch_output = isolated_git_command(&real_git, &global_git_config)
         .args(["branch", "--show-current"])
