@@ -1,0 +1,20 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-24T11:26:43Z",
+  "declaration_hash": "6172f5761fd39ccdb192cdc3df740133fcf04a211efd02d22559cc950410143a",
+  "implementation_input_hash": "50cae9b23303d5143154975e08a459b9d4d18ceb8ed26a7c1e7cfd428dbc99c6",
+  "signals": [
+    {
+      "type_name": "CatalogueLinterRuleKind",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true
+    },
+    {
+      "type_name": "CatalogueLinterRule",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

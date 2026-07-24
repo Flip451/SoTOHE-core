@@ -1,6 +1,412 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01a9cd1c918cb0d3d451b327654941c84e17cc3d9dfd89af6d0f3ee2ca5ab90a",
+          "at": "2026-07-24T11:19:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01a9cd1c918cb0d3d451b327654941c84e17cc3d9dfd89af6d0f3ee2ca5ab90a",
+          "at": "2026-07-24T11:32:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d30ff9aadada504d471b4c49db7a86f72f6a22ad3e0551cd100a4641e837a26",
+          "at": "2026-07-24T17:37:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4d30ff9aadada504d471b4c49db7a86f72f6a22ad3e0551cd100a4641e837a26",
+          "at": "2026-07-24T17:38:45Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::CatalogueLinterRuleKind`'s `docs` field restates design rationale and behavior (semantic ownership across decoding/evaluation and `discriminant_name` semantics) instead of referring to the upstream contract by anchor only.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/domain-types.json",
+              "line": 91,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::LintRuleKind`'s `docs` field restates the layer-placement rationale and conversion behavior instead of using an anchor-only reference to the upstream contract.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
+              "line": 1139,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:450290dd43e07c5b67025d6515abb4a9b5f732fee1ff9074585f5ef402476238",
+          "at": "2026-07-24T11:19:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::AdrBaselineCommand` docs restate the behavioral contract that snapshot timestamps are acquired by the interactor rather than the primary adapter; this should reference the upstream spec/ADR anchor without reproducing the contract.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
+              "line": 246,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::AdrBaselineInteractor` docs restate the snapshot-time policy and restore behavior instead of referring to the upstream contract by anchor.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
+              "line": 375,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`cli_driver::AdrBaselineDriver` docs restate the architectural responsibility split and timestamp-removal behavior instead of using an anchor-only upstream reference.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/cli_driver-types.json",
+              "line": 10,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`cli_composition::AdrBaselineCompositionRoot` docs restate the wiring change and injected-clock behavior instead of using an anchor-only upstream reference.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/cli_composition-types.json",
+              "line": 10,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`infrastructure::SystemClockAdapter` docs restate the adapter's clock sampling and error-conversion behavior instead of using an anchor-only upstream reference.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/infrastructure-types.json",
+              "line": 31,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::AdrBaselineError` docs restate the clock-dependency behavior represented by the error envelope instead of referring to the upstream contract by anchor.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
+              "line": 315,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:ccd87d272c2ad3828d38e73c65861b3dbe32c92a466c044ef244c9a8f15cefdf",
+          "at": "2026-07-24T11:30:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9ad01129230b6a4743808ae4a490f1b875a0117a55c9435a09ad8a75b943270",
+          "at": "2026-07-24T17:16:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::ClockPort`’s `docs` restates the upstream ownership and timing contract—usecase-owned sampling when `AdrBaselineInteractor` makes the write decision—instead of referencing the relevant spec anchors without reproducing their behavior. This violates `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
+              "line": 203,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:e9ad01129230b6a4743808ae4a490f1b875a0117a55c9435a09ad8a75b943270",
+          "at": "2026-07-24T17:23:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba71c0f2273e72f718c5d42a40a7c1514cf12a034ff0439c3a4de9a77a51a5dd",
+          "at": "2026-07-24T17:32:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf994521ad019d1e56b5da7d8a053c6eeeeb8f26dafa0bb9a1326b1c6ce01df0",
+          "at": "2026-07-24T19:47:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf994521ad019d1e56b5da7d8a053c6eeeeb8f26dafa0bb9a1326b1c6ce01df0",
+          "at": "2026-07-24T19:51:27Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81ea76e0f7de32f2223d42d3f02875ef97eb8804aa9781901d1d06f08f84f3d0",
+          "at": "2026-07-24T11:19:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-04 is not deterministically observable: although it lists possible asymmetry dimensions, it neither defines what makes an asymmetry 「実質的」 nor requires recorded evidence or a review check for each CQRS separation. Implementations can therefore classify the same difference arbitrarily, leaving GO-01's CQRS intent without a verifiable completion condition.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+              "line": 256,
+              "category": "acceptance criterion non-observable"
+            }
+          ],
+          "hash": "rvw1:sha256:81ea76e0f7de32f2223d42d3f02875ef97eb8804aa9781901d1d06f08f84f3d0",
+          "at": "2026-07-24T11:32:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f5dc264237225e88717fe84664f7d907f2de68bdb72f0acb793754dbdc8bfd1e",
+          "at": "2026-07-24T11:36:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:111d65d81721b6256eb5b620e77f74481f21e05e26d20c8c76ab221f9f53b509",
+          "at": "2026-07-24T18:02:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02's D11-grounded representative implementation no longer has acceptance coverage for the approved external CLI compatibility boundary. AC-07 now checks only crate topology, and CN-02 was removed, so every AC can pass even if externally observable CLI behavior changes, contrary to the briefing's design intent and the ADR's Neutral consequence.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+              "line": 280,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:111d65d81721b6256eb5b620e77f74481f21e05e26d20c8c76ab221f9f53b509",
+          "at": "2026-07-24T18:05:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6de71dc7181cb3174bd673f60a9d44ae55f2efbb02a161a6da076da057edc60d",
+          "at": "2026-07-24T18:07:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a22b65827c651f59792a323cea3a47e1e94da06048100d68dad32d62c55fcda0",
+          "at": "2026-07-24T18:25:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a22b65827c651f59792a323cea3a47e1e94da06048100d68dad32d62c55fcda0",
+          "at": "2026-07-24T18:26:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4820fba9d9edce7719ee5a0f0d23f5d39cd297ae1a853a547d4143a4b77e2f6",
+          "at": "2026-07-24T18:39:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4820fba9d9edce7719ee5a0f0d23f5d39cd297ae1a853a547d4143a4b77e2f6",
+          "at": "2026-07-24T18:41:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be655a646d83f1cb4b278270a11eda6b46dcbdf90f01c6fab146f357365e9fcb",
+          "at": "2026-07-24T18:49:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be655a646d83f1cb4b278270a11eda6b46dcbdf90f01c6fab146f357365e9fcb",
+          "at": "2026-07-24T18:50:20Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e34b86485f19377711d1d85ef8971aaaa8d42c6a4ea09a3d5237cd8b3465f2c3",
+          "at": "2026-07-24T11:18:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e34b86485f19377711d1d85ef8971aaaa8d42c6a4ea09a3d5237cd8b3465f2c3",
+          "at": "2026-07-24T11:33:03Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ea4bd41d89b23c4238a8a9af5318bdb130950ba5f9e146a6235f96269e0348d4",
+          "at": "2026-07-24T11:19:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 is not executable against the current tree: it says to “retain the already-applied normalization,” but `extract_params` still passes raw rustdoc names directly to `ParamName::new`, and the briefing explicitly says the transient patch was removed. An implementer could therefore leave the required importer repair absent. Explicitly require implementing/reapplying the normalization and its regression tests.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003 is mapped to IN-01, IN-02, and AC-01, but its description only specifies the Primary Adapter signature-rule change; it never requires removing or disabling the existing `DomainValueObjectInboundReferenceRequired` rule. The current evaluator and serde representation still expose that rejecting rule, while the catalogue actions attributed to T003 imply modification of `CatalogueLinterRuleKind` and `LintRuleKind`. Add the explicit rule-removal operation and corresponding regression coverage.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 18,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T007 names only “affected ADR-baseline test modules,” “CLI-composition tests,” and “all changed … paths,” without exact file or symbol targets. Because T004–T006 already own overlapping tests, the executor must invent T007's modification boundary. Name the precise test files/symbols and validation operations.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 42,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "Section `import-and-policy` restates the semantic-first placement behavior in prose and cites only task IDs, rather than direct upstream anchors. Replace it with concrete targets/operations plus anchors as required by `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 58,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `catalogue-enforcement` restates the narrowed structural-lint contract and its policy ordering without direct spec anchors. Reduce it to concrete targets/operations plus anchors per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 69,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `clock-boundary` restates the upstream requirement that snapshot-time policy move into the usecase and gain an infrastructure adapter, but provides no direct anchors. Use target/operation/anchor form per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 79,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `driver-composition-and-verification` restates the delivery-boundary, composition wiring, and external CLI behavior contract without direct anchors. Use target/operation/anchor form per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 90,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:ea4bd41d89b23c4238a8a9af5318bdb130950ba5f9e146a6235f96269e0348d4",
+          "at": "2026-07-24T11:36:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T005 requires a deterministic clock-source failure test at the public `SystemClockAdapter` boundary, but the catalogue defines it as a unit type and `ClockPort::now` has no input or injectable source. Its production path obtains `chrono::Utc::now()` and converts its own valid RFC3339 output, so the named files cannot induce the required public-boundary failure without an unplanned type change or global test hook. Keep failure propagation coverage in T004's injected `ClockPort` test, or explicitly plan an authorized injection seam.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 30,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T007's declared integration boundary cannot exercise the stated clock-error path: `AdrBaselineCompositionRoot` always wires the non-injectable `SystemClockAdapter`, while T007 owns only the new test file and explicitly owns no earlier source edits. A fake `ClockPort` could test interactor/driver propagation, but that would not be the declared ClockPort → SystemClockAdapter → composition path. Limit this integration task to the feasible production happy path and leave injected failure coverage in T004, or name and authorize a separate injectable test composition.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 42,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:60fc6407427c9a8db62a710fa91bc948565332f1f688528f4c8d1eca3b53246c",
+          "at": "2026-07-24T17:41:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de4f45ad1030f217a45fcc3af256962c22b48d150d67fedf6bacaf30eb4bd6ac",
+          "at": "2026-07-24T17:46:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:de4f45ad1030f217a45fcc3af256962c22b48d150d67fedf6bacaf30eb4bd6ac",
+          "at": "2026-07-24T17:47:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f36f95b774b41456c4e2b296adbf4092edc890bf9fcf02f6e608a76fdbc80181",
+          "at": "2026-07-24T19:57:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-09 is mapped to T006/T007, but T006 specifies no validation and T007 explicitly verifies only happy-path output. The governing CLI-contract decision includes exit state, stdout/stderr, and representative success/failure compatibility, so the failure side remains unobserved. Add a deterministic external CLI failure-path regression with an exact file/symbol target to T007 and anchor it to AC-09.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/task-coverage.json",
+              "line": 32,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:f36f95b774b41456c4e2b296adbf4092edc890bf9fcf02f6e608a76fdbc80181",
+          "at": "2026-07-24T20:01:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f313b12dbce03d91d540ecec1d8e44fecc981c7500bbdeec469c33db83392876",
+          "at": "2026-07-24T20:05:18Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -30,6 +436,20 @@
           "findings": [],
           "hash": "rvw1:sha256:2d010ac64b74d391df1e7709cd9c202bc96da4617f216ff1288555b313553105",
           "at": "2026-07-24T10:27:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e4eb9b806c09e3c377e70ddcf7781be92184f3e81d9a1d9054a56c907457b93",
+          "at": "2026-07-24T18:18:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e4eb9b806c09e3c377e70ddcf7781be92184f3e81d9a1d9054a56c907457b93",
+          "at": "2026-07-24T18:21:22Z"
         }
       ]
     }

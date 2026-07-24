@@ -1,0 +1,902 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "75c2c8fbd1e9314fbf1474e5f6931a63dfb8af75ad3dd6077d00db6489ad613b",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "domain concept の判定では、ユビキタス言語に属すること、domain invariant を表すこと、複数の application operation を越えて意味が安定していること、persistence・CLI・workflow の都合を除いても存在する概念であることを主基準とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "型の配置、Primary Adapter 境界、実行時 application policy、および CQRS の適用判断を DDD・Clean Architecture に整合する意味論中心の規則へ再調整し、正当な設計を旧来の構造条件が拒否しない状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "75c2c8fbd1e9314fbf1474e5f6931a63dfb8af75ad3dd6077d00db6489ad613b",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Primary Adapter は usecase が公開する `Command`、`Query`、`Response`、boundary DTO をメソッドシグネチャで参照できるものとする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "型の配置、Primary Adapter 境界、実行時 application policy、および CQRS の適用判断を DDD・Clean Architecture に整合する意味論中心の規則へ再調整し、正当な設計を旧来の構造条件が拒否しない状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "75c2c8fbd1e9314fbf1474e5f6931a63dfb8af75ad3dd6077d00db6489ad613b",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実行時生成値は判断を所有する層へ配置する"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "型の配置、Primary Adapter 境界、実行時 application policy、および CQRS の適用判断を DDD・Clean Architecture に整合する意味論中心の規則へ再調整し、正当な設計を旧来の構造条件が拒否しない状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "75c2c8fbd1e9314fbf1474e5f6931a63dfb8af75ad3dd6077d00db6489ad613b",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Command と Query を別 Interactor／Application Serviceへ分離するのは、副作用、依存、エラー、整合性境界、read/write model の少なくとも一つが実質的に異なる場合とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "型の配置、Primary Adapter 境界、実行時 application policy、および CQRS の適用判断を DDD・Clean Architecture に整合する意味論中心の規則へ再調整し、正当な設計を旧来の構造条件が拒否しない状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "e3ae6d8d63984f7d4d0d86ad829fa68b161a5abcd497865a98d76c7f6c9c76fe",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-designer の convention、role × layer matrix、`NoRoleInMethodSignature` catalogue lint、関連テスト、type-designer と reviewer の briefing を同一 track で更新する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "規範、型配置マトリクス、catalogue lint、テスト、type-designer guidance、reviewer briefing、および ADR baseline の代表実装を同じ変更単位で整合させ、構造的不変条件は機械的に、意味分類は根拠付き review で検証できる状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "e3ae6d8d63984f7d4d0d86ad829fa68b161a5abcd497865a98d76c7f6c9c76fe",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "機械 lint は依存方向、禁止された型露出、role と layer の明白な不整合など、ソースとカタログから決定的に検証できる構造的不変条件を強制する。ユビキタス言語への所属、domain invariant の有無、概念の時間的安定性などの意味分類は、type-designer が根拠を記述し、semantic review が ADR・spec・近接 domain model と照合して検証する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "規範、型配置マトリクス、catalogue lint、テスト、type-designer guidance、reviewer briefing、および ADR baseline の代表実装を同じ変更単位で整合させ、構造的不変条件は機械的に、意味分類は根拠付き review で検証できる状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "e3ae6d8d63984f7d4d0d86ad829fa68b161a5abcd497865a98d76c7f6c9c76fe",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この範囲で規範、機械検証、代表実装を同時に整合させ、後続の設計が新しい判断基準を利用できる状態を完了条件とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "規範、型配置マトリクス、catalogue lint、テスト、type-designer guidance、reviewer briefing、および ADR baseline の代表実装を同じ変更単位で整合させ、構造的不変条件は機械的に、意味分類は根拠付き review で検証できる状態にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D11"
+        }
+      }
+    },
+    {
+      "claim_hash": "4b49cfb50730cc2757c69e8715eea267bce5d4467aeaef21b7671cb680d0dcfc",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "domain concept の判定では、ユビキタス言語に属すること、domain invariant を表すこと、複数の application operation を越えて意味が安定していること、persistence・CLI・workflow の都合を除いても存在する概念であることを主基準とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "domain concept の配置を、ユビキタス言語、不変条件、複数 operation を越えた意味の安定性、および delivery・persistence 都合からの独立性を主基準として判定する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "7b102efc53bf020d5335c21d7db26b59d4c5cdc3f86fcbd7a1b75d1791df0956",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "domain-internal inbound reference は、domain model 内で概念が実際に利用されていることを示す補助シグナルとして保持する。ただし、その欠如だけを理由に domain 配置を拒否してはならない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "same-track domain-internal inbound reference を domain model での利用を示す補助シグナルとして維持する一方、その不在だけで domain 配置を拒否せず、application boundary にのみ意味を持つ値は usecase boundary model として扱う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "4515d76a5524fd8214afb99553204b50aefcff8edefe64db22ac8f7bd1e7bf41",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Primary Adapter は usecase が公開する `Command`、`Query`、`Response`、boundary DTO をメソッドシグネチャで参照できるものとする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "Primary Adapter が usecase の Command、Query、Response、および boundary DTO を公開シグネチャで参照して transport 入出力との変換を担えるようにし、domain Entity・AggregateRoot の直接露出、公開シグネチャへの infrastructure 型露出、application boundary 内への transport 固有型漏出は引き続き禁止する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "4515d76a5524fd8214afb99553204b50aefcff8edefe64db22ac8f7bd1e7bf41",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Primary Adapter では、domain の `Entity`／`AggregateRoot` を transport API として直接露出すること、infrastructure 型を公開シグネチャへ露出すること、transport 固有型を application boundary の内側へ漏出させることを引き続き禁止する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "Primary Adapter が usecase の Command、Query、Response、および boundary DTO を公開シグネチャで参照して transport 入出力との変換を担えるようにし、domain Entity・AggregateRoot の直接露出、公開シグネチャへの infrastructure 型露出、application boundary 内への transport 固有型漏出は引き続き禁止する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "571cece9adc81393f0671aaaf2d6939b04d257b9548eaa2292a233120a10a1c3",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "時刻、乱数、ID 採番などの実行時生成値が usecase の実行判断、永続化内容、整合性、または domain event に影響する場合、その取得能力を usecase の Secondary Port として定義し、Interactor が必要な時点で呼び出す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "usecase の実行判断、永続化内容、整合性、または domain event に影響する時刻・乱数・ID 採番などの実行時値を、その取得能力を表す usecase Secondary Port と Interactor の必要時呼出しを通じて扱う。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "c2b47ee5c25362448693ee1b5186d785d764dfbf53c8b7675323361f7548a28f",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ADR baseline usecase に `ClockPort` を導入し、snapshot を実行する Interactor が port から時刻を取得する。Primary Adapter は timestamp provider を保持せず、ユーザー入力から snapshot command を構築して application service を呼び出すことに専念する。 infrastructure は system clock を用いる adapter を実装し、composition root はその adapter を Interactor へ配線する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "ADR baseline の snapshot 時刻取得を、usecase の ClockPort を Interactor が呼び出す形へ是正し、Primary Adapter から timestamp provider を除去し、infrastructure clock adapter と composition-only wiring で実行経路を成立させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "b997c7989698bb259f0490d75ed1306f0b531ac69983d18db629b1ba39802025",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Command と Query を別 Interactor／Application Serviceへ分離するのは、副作用、依存、エラー、整合性境界、read/write model の少なくとも一つが実質的に異なる場合とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "Command と Query を別 Interactor または Application Service に分離するのは、副作用、依存、エラー、整合性境界、read/write model の少なくとも一つに実質的な非対称性がある場合に限定する。実質的な非対称性とは、当該操作についてその次元の observable action/policy、必要な collaborator、起こり得る error、整合性境界、または read/write model が異なり、分離を選ぶ根拠となる差をいう。分離ごとに、該当する次元、操作固有の差、および分離根拠を review 可能な記録として残す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "bdc0d089968b477c07c2604daf46a09ea0ac2a3ac8e0897877b4d2b8f9228a0b",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-designer の convention、role × layer matrix、`NoRoleInMethodSignature` catalogue lint、関連テスト、type-designer と reviewer の briefing を同一 track で更新する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "type-designer convention、role × layer matrix、catalogue-lint configuration と distributed preset、関連テスト、type-designer guidance、および reviewer briefing を同期して更新し、lint は決定的な構造的不変条件を、semantic review は記録済み根拠による domain 分類を検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "bdc0d089968b477c07c2604daf46a09ea0ac2a3ac8e0897877b4d2b8f9228a0b",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "機械 lint は依存方向、禁止された型露出、role と layer の明白な不整合など、ソースとカタログから決定的に検証できる構造的不変条件を強制する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-07",
+          "text_label": "type-designer convention、role × layer matrix、catalogue-lint configuration と distributed preset、関連テスト、type-designer guidance、および reviewer briefing を同期して更新し、lint は決定的な構造的不変条件を、semantic review は記録済み根拠による domain 分類を検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "ff714ad75dd54f051347aeaf1cec6c795c776d13132a09d32dfa2d52c3fe1d09",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "最初の実装 track は、D8 が定める enforcement 機構の修正と、D1〜D7を具体的に検証する ADR baseline の型配置・境界型・Clock 配置の修正までを対象とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "support workflow の変更は本 track の対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D11"
+        }
+      }
+    },
+    {
+      "claim_hash": "4ff458539ea09d006e75cd4bcd9149532dbf5865af704d525696ee503e5ce844",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "最初の実装 track は、D8 が定める enforcement 機構の修正と、D1〜D7を具体的に検証する ADR baseline の型配置・境界型・Clock 配置の修正までを対象とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "crate topology の変更は本 track の対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D11"
+        }
+      }
+    },
+    {
+      "claim_hash": "641ace68fa991dbe3496e26bfcbb0b6c2ee07763dd8c8b5b88dde806e89a9bb9",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "一括移行を完了条件にはしないが、既存型を恒久的な適用除外にも指定しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-03",
+          "text_label": "既存の未変更型または未変更シグネチャを一括移行することは本 track の完了条件に含めず、後続の専用監査または関連変更 track で段階的に分類・移行する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D10"
+        }
+      }
+    },
+    {
+      "claim_hash": "36b09f05b28afd9225987acd2de6119bd92963fad368403f549f56f01d2d6693",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本決定後に追加または変更する型とシグネチャは、新しい規則へ即時適合させる。既存の未変更型は自動的に正当化も全面 grandfathering もせず"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "今回追加または変更する型とシグネチャは新規則へ即時適合させる一方、未変更の既存型を自動的に適合済みまたは恒久的な例外として扱わない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D10"
+        }
+      }
+    },
+    {
+      "claim_hash": "2a1b1f9092beecd46b08ffc511ae1986a541870ad527299ce53d4017d7c6c3d2",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "最初の実装 track は、D8 が定める enforcement 機構の修正と、D1〜D7を具体的に検証する ADR baseline の型配置・境界型・Clock 配置の修正までを対象とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "representative enforcement と ADR baseline の是正は、crate topology および外部観測可能な CLI 契約を変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D11"
+        }
+      }
+    },
+    {
+      "claim_hash": "2a1b1f9092beecd46b08ffc511ae1986a541870ad527299ce53d4017d7c6c3d2",
+      "evidence_hash": "7b8d725f86a6b06ebf91a6985a28a31dd44a7b92967fce7a56d53f5c3ea8d265",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D11 が選定する代表的な enforcement 機構の変更と ADR baseline の型配置・境界型・Clock 配置の是正は、コマンドおよびサブコマンド、引数とオプションの意味、終了状態、標準出力・標準エラー出力、機械可読出力の構造を含む外部観測可能な CLI 契約を変更してはならない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "representative enforcement と ADR baseline の是正は、crate topology および外部観測可能な CLI 契約を変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0313-architecture-pattern-placement-cli-contract-preservation.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "050321aeb599cb77d4fef2aba4ecf0ddb7748ed3bb61d35a175a1ca7b0116de2",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "機械 lint は依存方向、禁止された型露出、role と layer の明白な不整合など、ソースとカタログから決定的に検証できる構造的不変条件を強制する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "機械 lint は依存方向、禁止型露出、role と layer の明白な不整合など決定的に判定できる構造的不変条件だけを強制し、語彙名の一致だけで domain concept を機械分類しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "34256ce99810a9701f0868f4855342bde7afa79072b4e9a6d9f3836f6f55b5bf",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ユビキタス言語への所属、domain invariant の有無、概念の時間的安定性などの意味分類は、type-designer が根拠を記述し、semantic review が ADR・spec・近接 domain model と照合して検証する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "semantic domain classification は type-designer が根拠を記録し、semantic review が ADR、spec、および近接 domain model と照合して検証可能でなければならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "6e8fc2684858de64393b72972e1f3294c8e75f314a599abc0ed052514f739ecc",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "型が現在どの層から参照されているか、または一つの track catalogue 内でどの entry から参照されているかは、概念の意味を決定しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "domain candidate は same-track inbound reference の有無だけでは拒否されず、意味論上 domain concept と判断される場合は適切な domain role へ配置でき、分類根拠を review 可能な形で記録する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "6e8fc2684858de64393b72972e1f3294c8e75f314a599abc0ed052514f739ecc",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "inbound reference がない候補についても D1 の意味論基準で分類し、domain concept と判断した場合は適切な domain role でモデル化する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "domain candidate は same-track inbound reference の有無だけでは拒否されず、意味論上 domain concept と判断される場合は適切な domain role へ配置でき、分類根拠を review 可能な形で記録する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "6e8fc2684858de64393b72972e1f3294c8e75f314a599abc0ed052514f739ecc",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ユビキタス言語への所属、domain invariant の有無、概念の時間的安定性などの意味分類は、type-designer が根拠を記述し、semantic review が ADR・spec・近接 domain model と照合して検証する。語彙名の一致だけで domain concept を機械判定しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "domain candidate は same-track inbound reference の有無だけでは拒否されず、意味論上 domain concept と判断される場合は適切な domain role へ配置でき、分類根拠を review 可能な形で記録する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "dad71cd964a03ac26ad46ad3386868fefd6d3fd3de5f65d292c6fdfc7f1aa40a",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Primary Adapter は usecase が公開する `Command`、`Query`、`Response`、boundary DTO をメソッドシグネチャで参照できるものとする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "Primary Adapter の適合例は usecase Command、Query、Response、boundary DTO を参照して transport 変換と application service 呼出しを行え、Entity・AggregateRoot・infrastructure 型の公開露出と application boundary 内への transport leakage は lint または review で拒否される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "dad71cd964a03ac26ad46ad3386868fefd6d3fd3de5f65d292c6fdfc7f1aa40a",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Primary Adapter では、domain の `Entity`／`AggregateRoot` を transport API として直接露出すること、infrastructure 型を公開シグネチャへ露出すること、transport 固有型を application boundary の内側へ漏出させることを引き続き禁止する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "Primary Adapter の適合例は usecase Command、Query、Response、boundary DTO を参照して transport 変換と application service 呼出しを行え、Entity・AggregateRoot・infrastructure 型の公開露出と application boundary 内への transport leakage は lint または review で拒否される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "dad71cd964a03ac26ad46ad3386868fefd6d3fd3de5f65d292c6fdfc7f1aa40a",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "機械 lint は依存方向、禁止された型露出、role と layer の明白な不整合など、ソースとカタログから決定的に検証できる構造的不変条件を強制する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "Primary Adapter の適合例は usecase Command、Query、Response、boundary DTO を参照して transport 変換と application service 呼出しを行え、Entity・AggregateRoot・infrastructure 型の公開露出と application boundary 内への transport leakage は lint または review で拒否される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "ab40a9c4dd8ed356f29b4d313a2af09bec3c5cbe7eecc8308ea6f5bbd1ca7933",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "時刻、乱数、ID 採番などの実行時生成値が usecase の実行判断、永続化内容、整合性、または domain event に影響する場合、その取得能力を usecase の Secondary Port として定義し、Interactor が必要な時点で呼び出す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "ADR baseline snapshot の時刻は Interactor が ClockPort から取得し、Primary Adapter は timestamp provider を保持せず、system clock adapter は infrastructure にあり、composition root だけがそれらを配線する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "ab40a9c4dd8ed356f29b4d313a2af09bec3c5cbe7eecc8308ea6f5bbd1ca7933",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ADR baseline usecase に `ClockPort` を導入し、snapshot を実行する Interactor が port から時刻を取得する。Primary Adapter は timestamp provider を保持せず、ユーザー入力から snapshot command を構築して application service を呼び出すことに専念する。\n\ninfrastructure は system clock を用いる adapter を実装し、composition root はその adapter を Interactor へ配線する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "ADR baseline snapshot の時刻は Interactor が ClockPort から取得し、Primary Adapter は timestamp provider を保持せず、system clock adapter は infrastructure にあり、composition root だけがそれらを配線する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "2c5f70a7536da53879b1213099703dcee1f9fb090607984572f18077b8291c92",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Command と Query を別 Interactor／Application Serviceへ分離するのは、副作用、依存、エラー、整合性境界、read/write model の少なくとも一つが実質的に異なる場合とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "CQRS の Command と Query は、操作の副作用、依存、エラー、整合性境界、または read/write model の少なくとも一つについて observable action/policy、必要な collaborator、起こり得る error、整合性境界、または read/write model に操作固有の差があり、その差が分離根拠になる場合だけで分離される。各分離は該当次元、具体的な操作差、および分離根拠を review 可能な記録で示し、review はその記録を ADR D7 と照合する。単に read と write が存在することまたは role が利用可能であることだけでは分離されない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "700ef921a6cc92a63e436f45fa1211f8ff1d0b6a92dfb07ca49aaaa55682d173",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-designer の convention、role × layer matrix、`NoRoleInMethodSignature` catalogue lint、関連テスト、type-designer と reviewer の briefing を同一 track で更新する。文書だけを変更して旧 lint が正当な設計を拒否し続ける状態、または lint だけを緩和して判断基準が失われる状態を許容しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "更新済みの convention、role matrix、lint config・preset、テスト、type-designer guidance、および reviewer briefing は同じ配置・境界判断を表現し、文書だけまたは lint だけが新規則へ進む不整合を残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "92b6e1231682a0da2d929fe09df44604d9591bc95c082c9522677f32a099cce1",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "type-designer の convention、role × layer matrix、`NoRoleInMethodSignature` catalogue lint、関連テスト、type-designer と reviewer の briefing を同一 track で更新する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue lint とそのテストは、新しい許可境界を通過させつつ、依存方向、禁止型露出、role-layer 不整合などの構造違反を検出し、semantic domain classification の最終判断を review に残す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D8"
+        }
+      }
+    },
+    {
+      "claim_hash": "92b6e1231682a0da2d929fe09df44604d9591bc95c082c9522677f32a099cce1",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "機械 lint は依存方向、禁止された型露出、role と layer の明白な不整合など、ソースとカタログから決定的に検証できる構造的不変条件を強制する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue lint とそのテストは、新しい許可境界を通過させつつ、依存方向、禁止型露出、role-layer 不整合などの構造違反を検出し、semantic domain classification の最終判断を review に残す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "e368d7301642dba0780e1fb8f03ffb54361d68c1722bed3aac3cd63e328d2450",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本決定後に追加または変更する型とシグネチャは、新しい規則へ即時適合させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "representative enforcement changes と ADR baseline の型配置・boundary・Clock correction は新規則に即時適合する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D10"
+        }
+      }
+    },
+    {
+      "claim_hash": "1a61f9d1cfa405ef68e52c5575ff1a64eaedae03ca091768482f7f8edf05ee31",
+      "evidence_hash": "5168e41888f1045d30101ba214834ec43290ffdd00c56f99a8cbb5d0001895fd",
+      "verdict": {
+        "kind": "pass",
+        "citation": "最初の実装 track は、D8 が定める enforcement 機構の修正と、D1〜D7を具体的に検証する ADR baseline の型配置・境界型・Clock 配置の修正までを対象とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "representative enforcement changes と ADR baseline の型配置・boundary・Clock correction は、crate topology を変更せずに完了する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-24-1001-architecture-pattern-placement-guard-realignment.md",
+          "decision_id": "D11"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7ce7e3227ccb9ea23fada92d70c77ab89a603339ca7177d813338af8074ba57",
+      "evidence_hash": "7b8d725f86a6b06ebf91a6985a28a31dd44a7b92967fce7a56d53f5c3ea8d265",
+      "verdict": {
+        "kind": "pass",
+        "citation": "D11 が選定する代表的な enforcement 機構の変更と ADR baseline の型配置・境界型・Clock 配置の是正は、コマンドおよびサブコマンド、引数とオプションの意味、終了状態、標準出力・標準エラー出力、機械可読出力の構造を含む外部観測可能な CLI 契約を変更してはならない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "representative enforcement changes と ADR baseline の型配置・boundary・Clock correction の間、外部観測可能な CLI 契約を維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0313-architecture-pattern-placement-cli-contract-preservation.md",
+          "decision_id": "D1"
+        }
+      }
+    }
+  ]
+}

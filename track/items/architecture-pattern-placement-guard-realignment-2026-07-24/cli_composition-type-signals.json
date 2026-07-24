@@ -1,0 +1,14 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-24T11:35:40Z",
+  "declaration_hash": "cef20f7cf9de27a2ad2d672ab9246d1bc42e1102ba245ea16752140d8844a217",
+  "implementation_input_hash": "2daa46046cacb55634ceeb01a12662fc08a83e436e951d08f68eae19f8de2e4f",
+  "signals": [
+    {
+      "type_name": "AdrBaselineCompositionRoot",
+      "kind_tag": "composition_root",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

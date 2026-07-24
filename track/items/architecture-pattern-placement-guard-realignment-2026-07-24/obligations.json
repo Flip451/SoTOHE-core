@@ -1,0 +1,113 @@
+{
+  "track_id": "architecture-pattern-placement-guard-realignment-2026-07-24",
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "AdrBaselineInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "AdrBaselineInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of AdrBaselineInteractor",
+      "declaration_hash": "1a18fdf0da9b9218ab515fef1a44a74e425390591d3b75979d6c694cdc8485a5",
+      "spec_refs": [
+        {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ClockPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:now"
+      },
+      "target_entry": {
+        "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ClockPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:now' of ClockPort",
+      "declaration_hash": "231c54987eb5dfc9016e612dd30d4354c6088bbd8c7b77c6817daf2fa3bc6e00",
+      "spec_refs": [
+        {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SystemClockAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::adr_baseline::ClockPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "SystemClockAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::adr_baseline::ClockPort' of SystemClockAdapter",
+      "declaration_hash": "c1f3ae1f708419eeeb32a93cb28fd28dcabe84e78f904c7605a69f341b4b705a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    }
+  ]
+}

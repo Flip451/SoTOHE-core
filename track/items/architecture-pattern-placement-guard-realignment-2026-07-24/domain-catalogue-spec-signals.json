@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "6172f5761fd39ccdb192cdc3df740133fcf04a211efd02d22559cc950410143a",
+  "signals": [
+    {
+      "type_name": "CatalogueLinterRule",
+      "signal": "blue",
+      "entry_hash": "3a8a8572aa85f0cb405fa7495f47933d8e5c1c1f32364ab0b412568b39ab39f9"
+    },
+    {
+      "type_name": "CatalogueLinterRuleKind",
+      "signal": "blue",
+      "entry_hash": "5d0d121680b113f78412472b4540e6274d7962f4008fd3069c11907653bd6fce"
+    }
+  ]
+}

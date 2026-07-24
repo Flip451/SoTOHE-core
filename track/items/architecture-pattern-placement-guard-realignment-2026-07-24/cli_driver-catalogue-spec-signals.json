@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "202413accd01857a5ecc8927aefd28a175f5b068b9d27bc5d58124da292d9e37",
+  "signals": [
+    {
+      "type_name": "AdrBaselineDriver",
+      "signal": "blue",
+      "entry_hash": "de16d8a0976763c59cb5c55902309d575a91c7b85fa0fa2b001eca914157173d"
+    }
+  ]
+}

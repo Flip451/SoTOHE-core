@@ -1,0 +1,710 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "traits": {
+    "AdrBaselineService": {
+      "action": "reference",
+      "docs": "Baseline-identical application service retained to expose the AdrBaselineInteractor implementation edge.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "command",
+              "ty": "AdrBaselineCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<AdrBaselineOutput, AdrBaselineError>"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "AdrBaselineStorePort": {
+      "action": "reference",
+      "docs": "Baseline-identical synchronous persistence port retained to expose the command interactor's injected dependency.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "snapshot",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "source",
+              "ty": "&domain::adr_baseline::AdrSourceFileName"
+            },
+            {
+              "name": "bytes",
+              "ty": "std::vec::Vec<u8>"
+            },
+            {
+              "name": "kind",
+              "ty": "AdrBaselineSnapshotKind"
+            },
+            {
+              "name": "timestamp",
+              "ty": "domain::Timestamp"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<domain::adr_baseline::AdrBaselineLedgerEntry, AdrBaselineStoreError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "restore",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "source",
+              "ty": "&domain::adr_baseline::AdrSourceFileName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "core::result::Result<(), AdrBaselineStoreError>"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "ClockPort": {
+      "action": "add",
+      "docs": "ADR-baseline clock secondary port.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "now",
+          "params": [],
+          "receiver": "&self",
+          "returns": "core::result::Result<domain::Timestamp, AdrBaselineTimestampError>"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    }
+  },
+  "types": {
+    "AdrBaselineCommand": {
+      "action": "modify",
+      "docs": "ADR-baseline application command.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Snapshot",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "domain::TrackId"
+                },
+                {
+                  "name": "source",
+                  "ty": "domain::adr_baseline::AdrSourceFileName"
+                },
+                {
+                  "name": "kind",
+                  "ty": "AdrBaselineSnapshotKind"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Restore",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "domain::TrackId"
+                },
+                {
+                  "name": "source",
+                  "ty": "domain::adr_baseline::AdrSourceFileName"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineError": {
+      "action": "modify",
+      "docs": "ADR-baseline command error.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Store",
+            "payload": {
+              "fields": [
+                "AdrBaselineStoreError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Source",
+            "payload": {
+              "fields": [
+                "AdrBaselineSourceError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Clock",
+            "payload": {
+              "fields": [
+                "AdrBaselineTimestampError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineInteractor": {
+      "action": "modify",
+      "docs": "ADR-baseline application interactor.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "store",
+              "ty": "std::sync::Arc<dyn AdrBaselineStorePort>"
+            },
+            {
+              "name": "source",
+              "ty": "std::sync::Arc<dyn AdrBaselineSourcePort>"
+            },
+            {
+              "name": "clock",
+              "ty": "std::sync::Arc<dyn ClockPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineTimestampError": {
+      "action": "reference",
+      "docs": "Baseline-identical scoped error returned when the ADR-baseline clock cannot construct a valid domain timestamp.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidTimestamp",
+            "payload": {
+              "fields": [
+                "domain::ValidationError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        }
+      ]
+    },
+    "LintRuleKind": {
+      "action": "modify",
+      "docs": "Usecase boundary DTO; placement and conversion behavior are defined by the cited spec anchors.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "FieldEmpty",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "FieldNonEmpty",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "KindLayerConstraint",
+            "payload": {
+              "fields": [
+                {
+                  "name": "permitted_layers",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::LayerId>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ReferencedRoleConstraint",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                },
+                {
+                  "name": "expected_role",
+                  "ty": "domain::tddd::catalogue_linter::RoleKind"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TraitImplRequired",
+            "payload": {
+              "fields": [
+                {
+                  "name": "required_traits",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::catalogue_v2::TypeRef>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoRoleInMethodSignature",
+            "payload": {
+              "fields": [
+                {
+                  "name": "forbidden_roles",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::catalogue_linter::RoleKind>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "MethodReferenceSignature",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "AccessorSignatureRequired",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "FieldElementUniqueAcrossEntries",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoExternalReferenceInMethods",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "domain::tddd::catalogue_linter::RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoPublicField",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ForbiddenMethodReceiver",
+            "payload": {
+              "fields": [
+                {
+                  "name": "forbidden_receiver",
+                  "ty": "domain::tddd::catalogue_v2::SelfReceiver"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ForbidPrimitiveInTypes",
+            "payload": {
+              "fields": [
+                {
+                  "name": "primitives",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::primitive_occurrence_scanner::PrimitiveName>"
+                },
+                {
+                  "name": "layers",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::LayerId>"
+                },
+                {
+                  "name": "positions",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::primitive_occurrence_scanner::PrimitiveOccurrencePosition>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CompositionRootPureDi",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalogue_lint_workflow",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        }
+      ]
+    }
+  },
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "LintRuleKind",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "LintRuleKind",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "LintRuleKind",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "LintRuleKind",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "LintRuleKind",
+      "trait_ref": "serde::ser::Serialize"
+    },
+    {
+      "action": "reference",
+      "for_type": "LintRuleKind",
+      "trait_ref": "serde::de::Deserialize<'de>"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineInteractor",
+      "trait_ref": "AdrBaselineService"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineTimestampError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineTimestampError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineTimestampError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineTimestampError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineTimestampError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineTimestampError",
+      "trait_ref": "core::error::Error"
+    }
+  ]
+}

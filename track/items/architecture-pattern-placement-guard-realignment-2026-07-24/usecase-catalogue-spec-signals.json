@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "d797415bbda8a7e52309ecc04507c261b271070ea07d25cc362620cfe68b6fe7",
+  "signals": [
+    {
+      "type_name": "AdrBaselineCommand",
+      "signal": "blue",
+      "entry_hash": "33471217cc6193e866329e8635952638066024d30a405360a5b0bf89ef6c2228"
+    },
+    {
+      "type_name": "AdrBaselineError",
+      "signal": "blue",
+      "entry_hash": "3fb42b97688228fe8b06b715f829b0365df904dd387e20e361bf8ab979354c1e"
+    },
+    {
+      "type_name": "AdrBaselineInteractor",
+      "signal": "blue",
+      "entry_hash": "787c5b1da6da84201e73ac2659504979d185de90bdd99b3b8d29d2fffd511686"
+    },
+    {
+      "type_name": "AdrBaselineTimestampError",
+      "signal": "blue",
+      "entry_hash": "229e266a2eb42abe35b91daacfe23d22f8e7eca227c39e4b78de50c6349f4d03"
+    },
+    {
+      "type_name": "LintRuleKind",
+      "signal": "blue",
+      "entry_hash": "8f27707f74b6d730908879dabfa129f3f0e7bd7a944bf9957feb9afb35dae0fe"
+    },
+    {
+      "type_name": "AdrBaselineService",
+      "signal": "blue",
+      "entry_hash": "ff88645f1fcf69d5e2093da9bfb767b5edd083a610bacc1e3996580fc07b40b8"
+    },
+    {
+      "type_name": "AdrBaselineStorePort",
+      "signal": "blue",
+      "entry_hash": "84802b93db6b61ca15da127dad62b944e5d487a7eefac9be7ca61197c7c48806"
+    },
+    {
+      "type_name": "ClockPort",
+      "signal": "blue",
+      "entry_hash": "df7bcd33479d6e38b5ebebb7f12c3620c92fc89207c7f0f41df32bcc069d1280"
+    }
+  ]
+}

@@ -82,10 +82,6 @@
       "kind": "NoPublicField"
     },
     {
-      "target_roles": ["ValueObject"],
-      "kind": "DomainValueObjectInboundReferenceRequired"
-    },
-    {
       "target_roles": ["CompositionRoot"],
       "kind": { "KindLayerConstraint": { "permitted_layers": ["cli_composition"] } }
     },

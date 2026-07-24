@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "e27cdc50544dc10378ce3f35b41536eb07895fd182bd48404717a836cd425ac9",
+  "signals": [
+    {
+      "type_name": "SystemClockAdapter",
+      "signal": "blue",
+      "entry_hash": "a28993639a0dd207e0ccebf6b622efb8a77bd2e594abdda558e63cf4f4f4faee"
+    },
+    {
+      "type_name": "infrastructure::adr_baseline::timestamp_now",
+      "signal": "blue",
+      "entry_hash": "d9b4f622fb212d72c5e65dc15812ffcdcf6df481625071ef200c9ac187ad37a2"
+    }
+  ]
+}
