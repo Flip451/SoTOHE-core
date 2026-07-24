@@ -1,6 +1,110 @@
 {
   "schema_version": 2,
   "scopes": {
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description restates upstream behavior contracts (fail-closed repeat execution, initialization ordering, and bootstrap) in prose; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description restates upstream branch defaults and maintainer-boundary behavior in prose; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 15,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 description restates the TaskCreate fallback behavior contract in prose; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 description restates the first-run behavior contract instead of only identifying the grouped implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 35,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 description restates the exported-configuration behavior contract instead of only identifying the grouped implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 44,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 description restates the host-independent progress behavior contract instead of only identifying the grouped implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 53,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:e2bd02961a7de7310c8a82f88c9ae6311eee972e303002f818aa29b63ecb7df7",
+          "at": "2026-07-24T21:26:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe388f3fbe5e4ab0b298006678fb7c2c9c5bcc3f664306c59b4f7a0ccb656e59",
+          "at": "2026-07-24T21:28:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe388f3fbe5e4ab0b298006678fb7c2c9c5bcc3f664306c59b4f7a0ccb656e59",
+          "at": "2026-07-24T21:32:46Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a73284093017ebd4af5abd3638493e3abd671e5fc6682b15ab8a1d1179e0b63a",
+          "at": "2026-07-24T21:26:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a73284093017ebd4af5abd3638493e3abd671e5fc6682b15ab8a1d1179e0b63a",
+          "at": "2026-07-24T21:29:07Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
+          "at": "2026-07-24T21:26:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
+          "at": "2026-07-24T21:30:18Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -74,6 +178,24 @@
           "findings": [],
           "hash": "rvw1:sha256:fea3e68ad0ab5dd0591a02e88ef45742d06715328fb909843a505a5b2fe4dd5d",
           "at": "2026-07-24T21:05:47Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
+          "at": "2026-07-24T21:26:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
+          "at": "2026-07-24T21:28:25Z"
         }
       ]
     }
