@@ -68,10 +68,25 @@ fn export_scaffold(output_dir: &Path) {
     );
 }
 
+fn isolated_git_command(program: &Path, global_config: &Path) -> Command {
+    let mut command = Command::new(program);
+    command
+        .env("GIT_CONFIG_NOSYSTEM", "1")
+        .env("GIT_CONFIG_GLOBAL", global_config)
+        .env("GIT_CONFIG_COUNT", "0");
+    command
+}
+
 fn exported_file(relative_path: &str) -> String {
     let path = exported_scaffold().join(relative_path);
     fs::read_to_string(&path)
         .unwrap_or_else(|error| panic!("cannot read {}: {error}", path.display()))
+}
+
+fn initial_setup_section(readme: &str) -> &str {
+    let section =
+        &readme[readme.find("### 初回セットアップ").expect("initial setup heading missing")..];
+    section.find("\n### ").map_or(section, |end| &section[..end])
 }
 
 fn task_names(makefile: &str) -> BTreeSet<&str> {
@@ -218,7 +233,39 @@ fn test_exported_init_task_first_run_completes_and_repeat_rejects() {
     use std::os::unix::fs::PermissionsExt;
 
     let export_parent = tempfile::tempdir().unwrap();
-    let scaffold = export_parent.path().join("scaffold");
+    let real_git = std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default())
+        .map(|directory| directory.join("git"))
+        .find(|candidate| candidate.is_file())
+        .expect("Git must be available on PATH");
+    let enclosing_repository = export_parent.path().join("enclosing-repository");
+    let global_git_config = export_parent.path().join("gitconfig");
+    fs::write(&global_git_config, "").unwrap();
+    fs::create_dir_all(&enclosing_repository).unwrap();
+    for (args, writes_outer_file) in [
+        (["init", "-b", "main"].as_slice(), false),
+        (["add", "."].as_slice(), true),
+        (["commit", "-m", "Outer commit"].as_slice(), false),
+    ] {
+        if writes_outer_file {
+            fs::write(enclosing_repository.join("outer.txt"), "outer repository\n").unwrap();
+        }
+        let output = isolated_git_command(&real_git, &global_git_config)
+            .args(args)
+            .current_dir(&enclosing_repository)
+            .env("GIT_AUTHOR_NAME", "Scaffold Test")
+            .env("GIT_AUTHOR_EMAIL", "scaffold-test@example.invalid")
+            .env("GIT_COMMITTER_NAME", "Scaffold Test")
+            .env("GIT_COMMITTER_EMAIL", "scaffold-test@example.invalid")
+            .output()
+            .unwrap();
+        assert!(
+            output.status.success(),
+            "failed to create enclosing repository with {args:?}: {}",
+            String::from_utf8_lossy(&output.stderr),
+        );
+    }
+
+    let scaffold = enclosing_repository.join("scaffold");
     export_scaffold(&scaffold);
     let shim_dir = export_parent.path().join("init-test-shim");
     fs::create_dir_all(&shim_dir).unwrap();
@@ -228,7 +275,7 @@ fn test_exported_init_task_first_run_completes_and_repeat_rejects() {
     let git_shim = shim_dir.join("git");
     fs::write(
         &git_shim,
-        "#!/bin/sh\nprintf 'git %s\\n' \"$*\" >> \"$INIT_TRACE\"\ncase \"$1\" in\n  rev-parse)\n    if [ \"$2\" = \"--verify\" ] && [ \"$3\" = \"HEAD\" ] && [ -f .git/committed ]; then\n      printf '%s\\n' simulated-head\n      exit 0\n    fi\n    exit 1\n    ;;\n  init)\n    mkdir -p .git\n    printf '%s\\n' \"$3\" > .git/branch\n    ;;\n  add) ;;\n  commit)\n    : > .git/committed\n    ;;\n  *)\n    printf 'unexpected git command: %s\\n' \"$*\" >&2\n    exit 64\n    ;;\nesac\n",
+        "#!/bin/sh\nprintf 'git %s\\n' \"$*\" >> \"$INIT_TRACE\"\nexec \"$REAL_GIT\" \"$@\"\n",
     )
     .unwrap();
     fs::set_permissions(&git_shim, fs::Permissions::from_mode(0o755)).unwrap();
@@ -236,7 +283,7 @@ fn test_exported_init_task_first_run_completes_and_repeat_rejects() {
     let cargo_shim = shim_dir.join("cargo");
     fs::write(
         &cargo_shim,
-        "#!/bin/sh\ncase \"$1 $2\" in\n  'generate-lockfile ') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" && printf 'generated lockfile\\n' > Cargo.lock ;;\n  'make bootstrap') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" ;;\n  *) printf 'unexpected cargo command: %s\\n' \"$*\" >&2; exit 64 ;;\nesac\n",
+        "#!/bin/sh\ncase \"$1 $2\" in\n  'generate-lockfile ') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" && printf 'generated lockfile\\n' > Cargo.lock ;;\n  'make bootstrap') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\"; exec \"$REAL_CARGO\" make bootstrap ;;\n  'make install-aux-tools'|'make ci') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" ;;\n  *) printf 'unexpected cargo command: %s\\n' \"$*\" >&2; exit 64 ;;\nesac\n",
     )
     .unwrap();
     fs::set_permissions(&cargo_shim, fs::Permissions::from_mode(0o755)).unwrap();
@@ -254,6 +301,15 @@ fn test_exported_init_task_first_run_completes_and_repeat_rejects() {
             .current_dir(&scaffold)
             .env("PATH", shimmed_path)
             .env("INIT_TRACE", &trace)
+            .env("REAL_CARGO", &real_cargo)
+            .env("REAL_GIT", &real_git)
+            .env("GIT_CONFIG_NOSYSTEM", "1")
+            .env("GIT_CONFIG_GLOBAL", &global_git_config)
+            .env("GIT_CONFIG_COUNT", "0")
+            .env("GIT_AUTHOR_NAME", "Scaffold Test")
+            .env("GIT_AUTHOR_EMAIL", "scaffold-test@example.invalid")
+            .env("GIT_COMMITTER_NAME", "Scaffold Test")
+            .env("GIT_COMMITTER_EMAIL", "scaffold-test@example.invalid")
             .output()
             .unwrap()
     };
@@ -268,7 +324,6 @@ fn test_exported_init_task_first_run_completes_and_repeat_rejects() {
     let trace_lines =
         fs::read_to_string(&trace).unwrap().lines().map(str::to_owned).collect::<Vec<_>>();
     let expected_sequence = [
-        "git rev-parse --verify HEAD",
         "git init -b main",
         "cargo generate-lockfile",
         "git add -A",
@@ -281,12 +336,30 @@ fn test_exported_init_task_first_run_completes_and_repeat_rejects() {
             .any(|window| { window.iter().map(String::as_str).eq(expected_sequence) }),
         "the public task must execute the initialization sequence before bootstrap: {trace_lines:?}",
     );
-    assert_eq!(fs::read_to_string(scaffold.join(".git/branch")).unwrap(), "main\n");
-    assert!(scaffold.join(".git/committed").is_file(), "init must create the first commit");
-    assert_eq!(fs::read_to_string(scaffold.join("Cargo.lock")).unwrap(), "generated lockfile\n");
+    let branch_output = isolated_git_command(&real_git, &global_git_config)
+        .args(["branch", "--show-current"])
+        .current_dir(&scaffold)
+        .output()
+        .unwrap();
+    assert!(branch_output.status.success());
+    assert_eq!(String::from_utf8_lossy(&branch_output.stdout).trim(), "main");
+    let committed_lockfile = isolated_git_command(&real_git, &global_git_config)
+        .args(["show", "HEAD:Cargo.lock"])
+        .current_dir(&scaffold)
+        .output()
+        .unwrap();
+    assert!(committed_lockfile.status.success());
+    assert_eq!(String::from_utf8_lossy(&committed_lockfile.stdout), "generated lockfile\n");
+    let hooks_path = isolated_git_command(&real_git, &global_git_config)
+        .args(["config", "--local", "core.hooksPath"])
+        .current_dir(&scaffold)
+        .output()
+        .unwrap();
+    assert!(hooks_path.status.success());
+    assert_eq!(String::from_utf8_lossy(&hooks_path.stdout).trim(), ".githooks");
 
-    let branch = fs::read_to_string(scaffold.join(".git/branch")).unwrap();
-    let committed = fs::read(scaffold.join(".git/committed")).unwrap();
+    let branch = String::from_utf8_lossy(&branch_output.stdout).into_owned();
+    let committed = String::from_utf8_lossy(&committed_lockfile.stdout).into_owned();
     let lockfile = fs::read_to_string(scaffold.join("Cargo.lock")).unwrap();
     fs::remove_file(&trace).unwrap();
 
@@ -297,16 +370,45 @@ fn test_exported_init_task_first_run_completes_and_repeat_rejects() {
             .contains("before the repository has its first commit")
     );
     let repeat_trace = fs::read_to_string(&trace).unwrap_or_default();
-    assert!(repeat_trace.contains("git rev-parse --verify HEAD"));
+    assert!(repeat_trace.contains("git --git-dir=.git rev-parse --verify HEAD"));
     for state_changing_command in ["git init", "git add", "git commit", "cargo "] {
         assert!(
             !repeat_trace.contains(state_changing_command),
             "repeat initialization must stop before {state_changing_command}: {repeat_trace}",
         );
     }
-    assert_eq!(fs::read_to_string(scaffold.join(".git/branch")).unwrap(), branch);
-    assert_eq!(fs::read(scaffold.join(".git/committed")).unwrap(), committed);
+    let repeat_branch = isolated_git_command(&real_git, &global_git_config)
+        .args(["branch", "--show-current"])
+        .current_dir(&scaffold)
+        .output()
+        .unwrap();
+    assert_eq!(String::from_utf8_lossy(&repeat_branch.stdout), branch);
+    let repeat_committed = isolated_git_command(&real_git, &global_git_config)
+        .args(["show", "HEAD:Cargo.lock"])
+        .current_dir(&scaffold)
+        .output()
+        .unwrap();
+    assert_eq!(String::from_utf8_lossy(&repeat_committed.stdout), committed);
     assert_eq!(fs::read_to_string(scaffold.join("Cargo.lock")).unwrap(), lockfile);
+}
+
+#[test]
+fn test_exported_readme_directs_first_setup_to_init() {
+    let readme = exported_file("README.md");
+    let initial_setup = initial_setup_section(&readme);
+
+    assert!(
+        initial_setup.lines().any(|line| {
+            let command =
+                line.trim().split_once('#').map_or(line.trim(), |(command, _)| command.trim_end());
+            command == "cargo make init"
+        }),
+        "the exported initial-setup instructions must invoke the init workflow"
+    );
+    assert!(
+        !initial_setup.lines().any(|line| line.trim_start().starts_with("cargo make bootstrap")),
+        "the exported initial-setup instructions must not bypass init with bootstrap"
+    );
 }
 
 #[test]

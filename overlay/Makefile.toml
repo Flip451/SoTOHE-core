@@ -21,13 +21,12 @@ script_runner = "@shell"
 script = ['''
 set -e
 
-if git rev-parse --verify HEAD >/dev/null 2>&1; then
-  echo "[ERROR] cargo make init can only run before the repository has its first commit." >&2
-  exit 1
-fi
-
 if [ -e .git ]; then
-  echo "[ERROR] cargo make init requires an exported scaffold without existing Git metadata." >&2
+  if [ -d .git ] && git --git-dir=.git rev-parse --verify HEAD >/dev/null 2>&1; then
+    echo "[ERROR] cargo make init can only run before the repository has its first commit." >&2
+  else
+    echo "[ERROR] cargo make init requires an exported scaffold without existing Git metadata." >&2
+  fi
   exit 1
 fi
 
