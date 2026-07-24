@@ -19,6 +19,7 @@ use std::process::ExitCode;
 
 use clap::{Args, Subcommand};
 use cli_composition::{TaskContractCompositionRoot, TrackCompositionRoot};
+use cli_driver::task_contract::TaskContractInput;
 
 use crate::commands::driver_outcome_to_exit;
 
@@ -161,17 +162,10 @@ fn task_contract_check_core(
             return ExitCode::FAILURE;
         }
     };
-    match TaskContractCompositionRoot::new().task_contract_check(
-        layer,
-        resolved_track_id,
-        items_dir,
-    ) {
-        Ok(outcome) => driver_outcome_to_exit(outcome),
-        Err(e) => {
-            eprintln!("{e}");
-            ExitCode::FAILURE
-        }
-    }
+    let driver = TaskContractCompositionRoot::new().task_contract_driver(items_dir);
+    driver_outcome_to_exit(
+        driver.handle(TaskContractInput::Check { layer, track_id: resolved_track_id }),
+    )
 }
 
 /// Execute `sotp task-contract coverage`.
@@ -203,13 +197,10 @@ fn task_contract_coverage_core(track_id_opt: Option<String>, items_dir: PathBuf)
             return ExitCode::FAILURE;
         }
     };
-    match TaskContractCompositionRoot::new().task_contract_coverage(resolved_track_id, items_dir) {
-        Ok(outcome) => driver_outcome_to_exit(outcome),
-        Err(e) => {
-            eprintln!("{e}");
-            ExitCode::FAILURE
-        }
-    }
+    let driver = TaskContractCompositionRoot::new().task_contract_driver(items_dir);
+    driver_outcome_to_exit(
+        driver.handle(TaskContractInput::Coverage { track_id: resolved_track_id }),
+    )
 }
 
 /// Auto-resolve the active track id from the current git branch.

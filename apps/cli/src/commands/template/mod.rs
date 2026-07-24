@@ -72,7 +72,8 @@ pub fn execute(cmd: TemplateCommand) -> ExitCode {
 
 /// Dispatch an assembled input through the composition root and map the outcome.
 pub fn dispatch(input: TemplateInput) -> ExitCode {
-    crate::commands::outcome_to_exit(TemplateCompositionRoot::new().handle(input))
+    let driver = TemplateCompositionRoot::new().template_driver();
+    crate::commands::driver_outcome_to_exit(driver.handle(input))
 }
 
 #[cfg(test)]

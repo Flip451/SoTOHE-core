@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "2dc5ea0836d7a08ebdadf7b2f0b4942374646c3a4ffc802c1313cf932a1cfd5b",
+  "catalogue_declaration_hash": "2304f3b7d655f03bdd3dbf26c5896b5b5edb1440d9f4c2669f51b7d33d99484c",
   "signals": [
     {
       "type_name": "AdrBaselineCompositionRoot",
       "signal": "blue",
-      "entry_hash": "86fffbd7369fbe7ee808a784403f7ea0a36c434046e32a94706d057244ab0b95"
+      "entry_hash": "80c6953f33427bb628440d68413afdc6116dc1d4ab8dfdbadaefa462b943a720"
     },
     {
       "type_name": "CatalogCompositionRoot",
@@ -21,6 +21,11 @@
       "type_name": "TemplateCompositionRoot",
       "signal": "blue",
       "entry_hash": "9050f8782e96724f8711c3117e94eead1b301d9d08ced71e1a6bab8762822783"
+    },
+    {
+      "type_name": "AdrBaselineResolutionError",
+      "signal": "blue",
+      "entry_hash": "dd45a30c045ed2138c5ba1c89d0737dfc2a00ca4e1a47ccc68d2fbc530ad0197"
     }
   ]
 }

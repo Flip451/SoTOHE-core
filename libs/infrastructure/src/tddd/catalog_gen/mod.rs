@@ -42,6 +42,8 @@ mod verb_import;
 mod verb_init;
 
 #[cfg(test)]
+mod adapter_tests;
+#[cfg(test)]
 mod draft_tests;
 
 // ---------------------------------------------------------------------------
@@ -316,43 +318,47 @@ impl FsCatalogAdapter {
 }
 
 impl CatalogPort for FsCatalogAdapter {
-    fn init(&self, track_id: &str, items_dir: &Path) -> Result<CatalogInitReport, CatalogError> {
-        verb_init::run(track_id, items_dir)
+    fn init(
+        &self,
+        track_id: &domain::TrackId,
+        items_dir: &Path,
+    ) -> Result<CatalogInitReport, CatalogError> {
+        verb_init::run(track_id.as_ref(), items_dir)
     }
 
     fn add(
         &self,
-        track_id: &str,
+        track_id: &domain::TrackId,
         items_dir: &Path,
         command: CatalogAddCommand,
     ) -> Result<CatalogWriteReport, CatalogError> {
-        verb_add::run(track_id, items_dir, command)
+        verb_add::run(track_id.as_ref(), items_dir, command)
     }
 
     fn import(
         &self,
-        track_id: &str,
+        track_id: &domain::TrackId,
         items_dir: &Path,
         command: CatalogImportCommand,
     ) -> Result<CatalogWriteReport, CatalogError> {
-        verb_import::run(track_id, items_dir, command)
+        verb_import::run(track_id.as_ref(), items_dir, command)
     }
 
     fn cite(
         &self,
-        track_id: &str,
+        track_id: &domain::TrackId,
         items_dir: &Path,
         command: CatalogCiteCommand,
     ) -> Result<CatalogWriteReport, CatalogError> {
-        verb_cite::run(track_id, items_dir, command)
+        verb_cite::run(track_id.as_ref(), items_dir, command)
     }
 
     fn check(
         &self,
-        track_id: &str,
+        track_id: &domain::TrackId,
         items_dir: &Path,
         query: CatalogCheckQuery,
     ) -> Result<CatalogCheckReport, CatalogError> {
-        verb_check::run(track_id, items_dir, query)
+        verb_check::run(track_id.as_ref(), items_dir, query)
     }
 }

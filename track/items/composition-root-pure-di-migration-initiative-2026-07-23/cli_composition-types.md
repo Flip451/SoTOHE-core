@@ -4,8 +4,8 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| AdrBaselineCompositionRoot | composition_root | modify | — | 🟡 | 🔵 |
-| CatalogCompositionRoot | composition_root | modify | — | 🟡 | 🔵 |
-| TaskContractCompositionRoot | composition_root | modify | — | 🟡 | 🔵 |
-| TemplateCompositionRoot | composition_root | modify | — | 🟡 | 🔵 |
+| AdrBaselineCompositionRoot | composition_root | modify | — | 🔵 | 🔵 |
+| CatalogCompositionRoot | composition_root | modify | — | 🔵 | 🔵 |
+| TaskContractCompositionRoot | composition_root | modify | — | 🔵 | 🔵 |
+| TemplateCompositionRoot | composition_root | modify | — | 🔵 | 🔵 |
 

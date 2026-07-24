@@ -1,16 +1,41 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "810b800e339241bb1a4bc79b4c6a2e9760f0719c17a33b6b9471577bfbd09ba7",
+  "catalogue_declaration_hash": "4d82315b4e5d187f1a94f911fb7795358bf16915023b4db0593bc61c3a057237",
   "signals": [
+    {
+      "type_name": "AdrBaselineCommand",
+      "signal": "blue",
+      "entry_hash": "92e5d29c70a2f65ac76767da77b2499f2f732aa2374c6c4c8228dafd2af6a40b"
+    },
+    {
+      "type_name": "AdrBaselineError",
+      "signal": "blue",
+      "entry_hash": "5a5b8cf1207b2dbaa3f5bf0a20284d3748e7019f8a9f8ecfca649922a367eac7"
+    },
     {
       "type_name": "AdrBaselineInteractor",
       "signal": "blue",
-      "entry_hash": "c6718543fef9351bf5d76c6184a030043ff56a6326b2a74b7cf9db3119383391"
+      "entry_hash": "ca3b33236fef99cddaf86b10769fe435586d33e9de05a889071ca15ac5291aac"
     },
     {
       "type_name": "AdrBaselineQueryInteractor",
       "signal": "blue",
       "entry_hash": "2d4b48a079b681615a28b5e89564cadd01e076fa374f5806a390fce31824bec4"
+    },
+    {
+      "type_name": "AdrBaselineSnapshotKind",
+      "signal": "blue",
+      "entry_hash": "5f0d59a62d7562c3529d01eb408bda20d59e350e7574ed5d34dd48edefca159b"
+    },
+    {
+      "type_name": "AdrBaselineTimestampError",
+      "signal": "blue",
+      "entry_hash": "6704c4746a85329d3ba489a4a895f22413b9afbbe168d54613eef1ccce343718"
+    },
+    {
+      "type_name": "AdrBaselineValidationError",
+      "signal": "blue",
+      "entry_hash": "06f405db1d2d610435ea4a31cb7855341dcd4e6ec11eefffaf5d5d0c2c404b86"
     },
     {
       "type_name": "CatalogError",
@@ -41,6 +66,11 @@
       "type_name": "ImplPlanReadError",
       "signal": "blue",
       "entry_hash": "8e3305cea5c577cefd40bbad8bd845bfbe08b188d4240f5e5929362df3f9890b"
+    },
+    {
+      "type_name": "PreReviewGateError",
+      "signal": "blue",
+      "entry_hash": "1309ac374a1352ddbc5b465bf98380146d5427a8a64a0f09fcf7f02cefc51432"
     },
     {
       "type_name": "PreReviewGateInteractor",
@@ -75,7 +105,7 @@
     {
       "type_name": "AdrBaselineStorePort",
       "signal": "blue",
-      "entry_hash": "7fa376af65c073ae23ec7290efa6d1f09d4837e9e5535598779483a4379d950d"
+      "entry_hash": "badbf37bb52e52950a70e7efdcd6534f934ce84f5e6f2550027414c5134105ff"
     },
     {
       "type_name": "AdrBaselineStoreReadPort",

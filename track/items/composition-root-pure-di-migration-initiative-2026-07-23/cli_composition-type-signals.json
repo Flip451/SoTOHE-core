@@ -1,32 +1,38 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-23T16:09:42Z",
-  "declaration_hash": "2dc5ea0836d7a08ebdadf7b2f0b4942374646c3a4ffc802c1313cf932a1cfd5b",
-  "implementation_input_hash": "5b84e3020eb3489727a0ab93368aa059cc79a0f55332eeeaa73e000dd48579b2",
+  "generated_at": "2026-07-24T08:39:41Z",
+  "declaration_hash": "2304f3b7d655f03bdd3dbf26c5896b5b5edb1440d9f4c2669f51b7d33d99484c",
+  "implementation_input_hash": "2daa46046cacb55634ceeb01a12662fc08a83e436e951d08f68eae19f8de2e4f",
   "signals": [
     {
       "type_name": "AdrBaselineCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "CatalogCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "TaskContractCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "TemplateCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineResolutionError",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
     }
   ]
 }

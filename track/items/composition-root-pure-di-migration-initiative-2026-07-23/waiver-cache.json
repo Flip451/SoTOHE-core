@@ -1,0 +1,749 @@
+{
+  "track_id": "composition-root-pure-di-migration-initiative-2026-07-23",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "4cc570e88b2f38a45f551ad4e36260591f158e60d28e73999a77e7d249877b2c",
+        "declaration_hash": "1b55bd8232d838e45e65541ebe0e193bddf2ea86bc9c3dd8782f25ceedcbb41b",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Application-service error envelope that losslessly maps operation-specific task-contract, catalogue-signal, and implementation-plan read failures\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "waived_reason_hash": "6e0fbc94d1d4970c3c4841450c6dc1112ef5bb25f2fa6981439066a67aad7261",
+        "declaration_hash": "1b55bd8232d838e45e65541ebe0e193bddf2ea86bc9c3dd8782f25ceedcbb41b",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Modify, role: ErrorType, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"TaskContractNotFound\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"TaskContractReadFailed\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"message\")), ty: TypeRef(\"domain::tddd::catalogue_linter::FreeText\") }]) }, VariantDecl { name: VariantName(Identifier(\"SignalReadFailed\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"layer\")), ty: TypeRef(\"domain::tddd::LayerId\") }, FieldDecl { name: FieldName(Identifier(\"message\")), ty: TypeRef(\"domain::tddd::catalogue_linter::FreeText\") }]) }, VariantDecl { name: VariantName(Identifier(\"ImplPlanReadFailed\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"message\")), ty: TypeRef(\"domain::tddd::catalogue_linter::FreeText\") }]) }] }, methods: [], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"pre_review_gate\")]), docs: Some(DocString(\"Application-service error envelope that losslessly maps operation-specific task-contract, catalogue-signal, and implementation-plan read failures; diagnostic payloads use the domain FreeText newtype because their content is genuinely unstructured.\")),"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PreReviewGateError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PreReviewGateError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "35e81d5b643d4c41409de6b69d6d9a711e347889db442be97e868baee23f9794",
+        "declaration_hash": "1b55bd8232d838e45e65541ebe0e193bddf2ea86bc9c3dd8782f25ceedcbb41b",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Modify, role: ErrorType, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"TaskContractNotFound\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"TaskContractReadFailed\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"message\")), ty: TypeRef(\"domain::tddd::catalogue_linter::FreeText\") }]) }, VariantDecl { name: VariantName(Identifier(\"SignalReadFailed\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"layer\")), ty: TypeRef(\"domain::tddd::LayerId\") }, FieldDecl { name: FieldName(Identifier(\"message\")), ty: TypeRef(\"domain::tddd::catalogue_linter::FreeText\") }]) }, VariantDecl { name: VariantName(Identifier(\"ImplPlanReadFailed\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"message\")), ty: TypeRef(\"domain::tddd::catalogue_linter::FreeText\") }]) }] }, methods: [], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"pre_review_gate\")]), docs: Some(DocString(\"Application-service error envelope that losslessly maps operation-specific task-contract, catalogue-signal, and implementation-plan read failures; diagnostic payloads use the domain FreeText newtype because their content is genuinely unstructured.\")), spec_refs: [SpecRef { file: \"track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json\", anchor: SpecElementId(\"IN-01\") }, SpecRef { file: \"track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json\", anchor: SpecElementId(\"IN-02\") }, SpecRef { file: \"track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json\", anchor: SpecElementId(\"AC-02\") }], informal_grounds: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "ecf45979996bffdda6ecdaeb9e4baaf4d04222dd988e9290418098c5de47e8e0",
+        "declaration_hash": "2822aaa5e32ec9846b5eae82454b45f165747c32eda8acad209b5031ed152568",
+        "anchor_text_hash": "1164210c6b8a00aeefa165926ce2bbd2ec0a85c4195dce0b3c1efcad2c774aad"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Modify, role: ErrorType, kind: Enum"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "bbcd5595fa5186afc1c5ee2d81bc624a442d3a3106adecaa2351ea1c5358c1c7",
+        "declaration_hash": "2822aaa5e32ec9846b5eae82454b45f165747c32eda8acad209b5031ed152568",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineTimestampError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineTimestampError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "b8017972257643ab4919dee086da9318f0ac0add93779136744044eefa56ddc9",
+        "declaration_hash": "b644a1de0e5537da9d0f17ac955f7d78b900501bfb2545830609f5ce350c58b1",
+        "anchor_text_hash": "1164210c6b8a00aeefa165926ce2bbd2ec0a85c4195dce0b3c1efcad2c774aad"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineInput",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "b4ec88462a13d474b26706905eaa8e13a51924b13ef99051232fd294c6a2a43c",
+        "declaration_hash": "a221377d102ca63d3bde8bc49cd9ef3a5e72bca805b83f884b26762d4ca0aa80",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"methods: []\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineInput",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "waived_reason_hash": "a0fc0806833e237266c4c2e0afcd4403ff7d04ab3266ac9e687e17d1d010717b",
+        "declaration_hash": "a221377d102ca63d3bde8bc49cd9ef3a5e72bca805b83f884b26762d4ca0aa80",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Enum {...}, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineInput",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "064b1180997238255bf395346ed21d9b350f8f828a046dc2365ee13eb3d18a59",
+        "declaration_hash": "a221377d102ca63d3bde8bc49cd9ef3a5e72bca805b83f884b26762d4ca0aa80",
+        "anchor_text_hash": "1164210c6b8a00aeefa165926ce2bbd2ec0a85c4195dce0b3c1efcad2c774aad"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Modify, role: Dto, kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Snapshot\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"track_id\")), ty: TypeRef(\"TrackIdInput\") }, FieldDecl { name: FieldName(Identifier(\"source\")), ty: TypeRef(\"AdrSourceFileNameInput\") }, FieldDecl { name: FieldName(Identifier(\"kind\")), ty: TypeRef(\"AdrBaselineSnapshotInput\") }]) }, VariantDecl { name: VariantName(Identifier(\"Restore\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"track_id\")), ty: TypeRef(\"TrackIdInput\") }, FieldDecl { name: FieldName(Identifier(\"source\")), ty: TypeRef(\"AdrSourceFileNameInput\") }]) }, VariantDecl { name: VariantName(Identifier(\"CheckReview\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"track_id\")), ty: TypeRef(\"TrackIdInput\") }, FieldDecl { name: FieldName(Identifier(\"primary_source\")), ty: TypeRef(\"core::option::Option<AdrSourceFileNameInput>\") }]) }, VariantDecl { name: VariantName(Identifier(\"CheckCommit\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"track_id\")), ty: TypeRef(\"TrackIdInput\") }]) }] }, methods: [], generics: [], where_predicates: [], module_path: ModulePath([Identifier(\"adr_baseline\")]), docs: None, spec_refs: [SpecRef { file: \"track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json\", anchor: SpecElementId(\"IN-01\") }, SpecRef { file: \"track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json\", anchor: SpecElementId(\"IN-02\") }, SpecRef { file: \"track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json\", anchor: SpecElementId(\"AC-01\") }, SpecRef { file: \"track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json\", anchor: SpecElementId(\"AC-02\") }, SpecRef { file: \"track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json\", anchor: SpecElementId(\"CN-01\") }], informal_grounds: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineInput",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "52c9c86f9663da7e29a095095e42ab65d12be0d70ffabf4ae94a27c73c7e1a7c",
+        "declaration_hash": "a221377d102ca63d3bde8bc49cd9ef3a5e72bca805b83f884b26762d4ca0aa80",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineInput",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "waived_reason_hash": "ac24908369cfd4e8f2810bf4773b4ca10927f42b7c7c4954ae8d60d23db65683",
+        "declaration_hash": "a221377d102ca63d3bde8bc49cd9ef3a5e72bca805b83f884b26762d4ca0aa80",
+        "anchor_text_hash": "25d5f954a6da7614bf2bc0fc032465e4f4366197b081b6152df4b5a96465b0cd"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "role: Dto"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "fa81f1aa5e30b9f96dc6a378a8713bb6ce123df65357c884d162cc3af89f6895",
+        "declaration_hash": "73d5a2e585aa6c66dbae2f68fb0c74fec2df3cc9454b88d48c67756066c6b8a1",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "CatalogError is a type-level command failure vocabulary."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "waived_reason_hash": "d184bd7893ef10cbf4d4d9cfaf63e19abcafad4ce111990dbbd0c4edec4e8448",
+        "declaration_hash": "73d5a2e585aa6c66dbae2f68fb0c74fec2df3cc9454b88d48c67756066c6b8a1",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Catalog operation failure vocabulary"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "b259d5a57d0bf337317ee19c38df85f4780b421b4de24153220f2992df7c59ad",
+        "declaration_hash": "73d5a2e585aa6c66dbae2f68fb0c74fec2df3cc9454b88d48c67756066c6b8a1",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "035855baa5a41aeda0cc9f75cc21303024f81412a670c5e52905a91e38efb413",
+        "declaration_hash": "73d5a2e585aa6c66dbae2f68fb0c74fec2df3cc9454b88d48c67756066c6b8a1",
+        "anchor_text_hash": "c8bbfbff360a7e362a409096da08f3d2bce35b5aecbe2b295a788b9ac9276557"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogTarget",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogTarget",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "b22e2c40cbf55bf1d4a08fdfd127c6b10f824d76fac4b40bb0afd4b11dcc849a",
+        "declaration_hash": "a7a08d42d274286c517f7bc817a3b1cd15af2ffd86aaec73e4328a0a1ad6f6d5",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Dto is intentional because it carries boundary context without domain behavior."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogTarget",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogTarget",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "waived_reason_hash": "e737e0047c54a9d040386dfc1c1048b8a3d512371288dae1b661d760c2c0806c",
+        "declaration_hash": "a7a08d42d274286c517f7bc817a3b1cd15af2ffd86aaec73e4328a0a1ad6f6d5",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Dto is intentional because it carries boundary context without domain behavior.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogTarget",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogTarget",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "824d9d0b20be3b39a67eb4e93f405c9284f4ed4fd9ef56b45c88e572c7195442",
+        "declaration_hash": "a7a08d42d274286c517f7bc817a3b1cd15af2ffd86aaec73e4328a0a1ad6f6d5",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Dto is intentional because it carries boundary context without domain behavior.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogTarget",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogTarget",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "286d7fd97bea6f186db3affa1faa03877ee96e7cb4ffe8b09e2ef7b7605b765e",
+        "declaration_hash": "a7a08d42d274286c517f7bc817a3b1cd15af2ffd86aaec73e4328a0a1ad6f6d5",
+        "anchor_text_hash": "c8bbfbff360a7e362a409096da08f3d2bce35b5aecbe2b295a788b9ac9276557"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Dto is intentional because it carries boundary context without domain behavior.\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplCatalogSignalReadError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplCatalogSignalReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "e8fd8c8bada5b3b59d7519c08e852690f7daf6cd0c683796caa33426d53be06e",
+        "declaration_hash": "43fe0a000f13a1331de9251facc0d7e3a7810a8d42a9d096e2bd06aa17e3aa33",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Failure produced while reading implementation-catalogue signals; FreeText carries unconstrained adapter diagnostics."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanReadError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "73fb34d3fbf1fd1c35dc58bdde59d8c51c72f34dd952112be38298b2c0cc7ca7",
+        "declaration_hash": "a417b5b715ed48c871360aeef7c07e5e280033b2ec76a7930e00e933471a686c",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Failure produced while reading implementation-plan task statuses; FreeText carries unconstrained adapter diagnostics."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanReadError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "waived_reason_hash": "f68160335c8aa4f9d58c29e77d2622cad36219c608da2f52aa84fd451b0575e2",
+        "declaration_hash": "a417b5b715ed48c871360aeef7c07e5e280033b2ec76a7930e00e933471a686c",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanReadError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "f08a090d7528d9f838a518dd0b6129f0a20679fbdae2515dd31ad109ee1642b1",
+        "declaration_hash": "a417b5b715ed48c871360aeef7c07e5e280033b2ec76a7930e00e933471a686c",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanReadError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "d52a79fa2394913829f67acb3693c8ad4693d31186a324d6451dbf6015604742",
+        "declaration_hash": "a417b5b715ed48c871360aeef7c07e5e280033b2ec76a7930e00e933471a686c",
+        "anchor_text_hash": "c8bbfbff360a7e362a409096da08f3d2bce35b5aecbe2b295a788b9ac9276557"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TypeEntry { action: Add, role: ErrorType"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskContractReadError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "waived_reason_hash": "f5837ae9e9a670ce649dc7be3cf836a7716fbab81520813f8ef29ed75954f697",
+        "declaration_hash": "fde12450db350f38947dc8e35d88845a31af5a84e4adbad8da51a3562630b806",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "variants: [VariantDecl { name: VariantName(Identifier(\"NotFound\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"ReadFailed\")), payload: Struct([FieldDecl { name: FieldName(Identifier(\"message\")), ty: TypeRef(\"domain::tddd::catalogue_linter::FreeText\") }]) }]"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskContractReadError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "waived_reason_hash": "85350f9fc7e4aa60543bcba1db9666eea6211c7dd97a253688ae289e0ceace1a",
+        "declaration_hash": "fde12450db350f38947dc8e35d88845a31af5a84e4adbad8da51a3562630b806",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"methods: []\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskContractReadError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "a1954ae3fe24480a0da2e3125845a1bbda582c57271ba8d944a2c74472eb20c8",
+        "declaration_hash": "fde12450db350f38947dc8e35d88845a31af5a84e4adbad8da51a3562630b806",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Failure produced while reading a task-contract document; FreeText carries unconstrained adapter diagnostics."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskContractReadError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "waived_reason_hash": "83ef2e9b3435227c026b4e429e0257d35bd479a453b59bc3b949f12ffac64aac",
+        "declaration_hash": "fde12450db350f38947dc8e35d88845a31af5a84e4adbad8da51a3562630b806",
+        "anchor_text_hash": "c8bbfbff360a7e362a409096da08f3d2bce35b5aecbe2b295a788b9ac9276557"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Failure produced while reading a task-contract document; FreeText carries unconstrained adapter diagnostics."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineCommand",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "waived_reason_hash": "b3a32e6a88f8eeb03b9f3c3ab30bb67472618b69493cf9abcc534d5bc384ffcd",
+        "declaration_hash": "a088db23d3017099dc5ba892a38a5adb09e16c07e270cff878800b25777c0599",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineCommand",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "089f2df47577593f8e4de807ab4a6a55859f406cecfad62ea26c23573fabe746",
+        "declaration_hash": "a088db23d3017099dc5ba892a38a5adb09e16c07e270cff878800b25777c0599",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Enum"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineSnapshotKind",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineSnapshotKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "b64c4e464afecb265645c6c3f0b700fe897cc7e0d118cbed26960d4508731249",
+        "declaration_hash": "e0f56b00162c91afde1c35a997622ea7a8c4a31088701de588dc6542e5d53051",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Usecase Dto for application-boundary data with no domain behavior."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ]
+}

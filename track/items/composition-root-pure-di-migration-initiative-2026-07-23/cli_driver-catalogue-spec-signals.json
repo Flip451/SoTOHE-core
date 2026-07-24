@@ -1,11 +1,21 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "2a9a527dc4681fba756d099c3649efaf46e157b7f4f4fdb36c6660314d6512e8",
+  "catalogue_declaration_hash": "1bc42ea385fa99623f051f37bfa60fee7f11946126f7bb914db9b0f4d33d0f43",
   "signals": [
     {
       "type_name": "AdrBaselineDriver",
       "signal": "blue",
-      "entry_hash": "dd5896d51407db5f317d213ec6eb4496d8b90a4d3d9901b51f6b926c4c6a054b"
+      "entry_hash": "d958cb6f78cb925333d9584ec3ba59ef266c113f6699c2e54906745b7346c9c2"
+    },
+    {
+      "type_name": "AdrBaselineInput",
+      "signal": "blue",
+      "entry_hash": "27258b9a51d47980c39619625cd9fb4c54283aa6c921775255aff9ed92962980"
+    },
+    {
+      "type_name": "AdrBaselineSnapshotInput",
+      "signal": "blue",
+      "entry_hash": "0843cb170b620d0132c23ffbfc6dddcfd2208efe01ce29462f85e93f4c1ff504"
     },
     {
       "type_name": "CatalogDriver",
@@ -21,6 +31,11 @@
       "type_name": "TemplateDriver",
       "signal": "blue",
       "entry_hash": "aa2323b200071c59895de95a1091eea5f158f14f08cbd2ffc6ea1c4bd9d4340c"
+    },
+    {
+      "type_name": "AdrBaselineRequest",
+      "signal": "blue",
+      "entry_hash": "a731975c30e34f0ecab6ca01237bf41a8c48b8abf27973b7d7f10f4ffbbdc1fa"
     }
   ]
 }

@@ -6,40 +6,55 @@
   "trait_impls": [
     {
       "action": "reference",
-      "trait_ref": "core::default::Default",
-      "for_type": "AdrBaselineCompositionRoot"
+      "for_type": "AdrBaselineCompositionRoot",
+      "trait_ref": "core::default::Default"
     },
     {
       "action": "reference",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "CatalogCompositionRoot"
+      "for_type": "CatalogCompositionRoot",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "reference",
-      "trait_ref": "core::default::Default",
-      "for_type": "CatalogCompositionRoot"
+      "for_type": "CatalogCompositionRoot",
+      "trait_ref": "core::default::Default"
     },
     {
       "action": "reference",
-      "trait_ref": "core::default::Default",
-      "for_type": "TaskContractCompositionRoot"
+      "for_type": "TaskContractCompositionRoot",
+      "trait_ref": "core::default::Default"
     },
     {
       "action": "reference",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TemplateCompositionRoot"
+      "for_type": "TemplateCompositionRoot",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "reference",
-      "trait_ref": "core::default::Default",
-      "for_type": "TemplateCompositionRoot"
+      "for_type": "TemplateCompositionRoot",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "delete",
+      "for_type": "AdrBaselineResolutionError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "delete",
+      "for_type": "AdrBaselineResolutionError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "delete",
+      "for_type": "AdrBaselineResolutionError",
+      "trait_ref": "core::error::Error"
     }
   ],
   "traits": {},
   "types": {
     "AdrBaselineCompositionRoot": {
       "action": "modify",
-      "docs": "Composition owner of the AdrBaselineDriver dependency graph.",
+      "docs": null,
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -90,6 +105,25 @@
         },
         {
           "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineResolutionError": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "adr_baseline",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-01",
           "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
         }
       ]

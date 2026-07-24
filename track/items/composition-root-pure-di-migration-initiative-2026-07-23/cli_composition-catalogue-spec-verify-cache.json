@@ -3,7 +3,7 @@
   "layer": "cli_composition",
   "entries": [
     {
-      "claim_hash": "86fffbd7369fbe7ee808a784403f7ea0a36c434046e32a94706d057244ab0b95",
+      "claim_hash": "80c6953f33427bb628440d68413afdc6116dc1d4ab8dfdbadaefa462b943a720",
       "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
       "verdict": {
         "kind": "pass",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "86fffbd7369fbe7ee808a784403f7ea0a36c434046e32a94706d057244ab0b95",
+      "claim_hash": "80c6953f33427bb628440d68413afdc6116dc1d4ab8dfdbadaefa462b943a720",
       "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
       "verdict": {
         "kind": "pass",
@@ -51,11 +51,11 @@
       }
     },
     {
-      "claim_hash": "86fffbd7369fbe7ee808a784403f7ea0a36c434046e32a94706d057244ab0b95",
-      "evidence_hash": "a838376b2238016525f039726a0fbf981b93d4e1040c94ffb32d7119ce1b787f",
+      "claim_hash": "80c6953f33427bb628440d68413afdc6116dc1d4ab8dfdbadaefa462b943a720",
+      "evidence_hash": "4f3ec37aa2c63716b17d2eb4dffcd4af6e30dde2e315beb76cee4590d912e190",
       "verdict": {
         "kind": "pass",
-        "citation": "ADR baseline、Catalog、Template、TaskContract の各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。"
+        "citation": "composition root はその request を変換・解決せず、既に解決済みの direct driver path を wiring する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -70,12 +70,12 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "ADR baseline、Catalog、Template、TaskContract の各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。"
+          "text_label": "ADR baseline command は CLI で track scope と snapshot input を検証・解決し、解決済みの typed AdrBaselineInput を直接構築する。未解決の互換 DTO AdrBaselineRequest は composition boundary へ渡さず削除し、composition root はその request を変換・解決せず、既に解決済みの direct driver path を wiring する。Catalog、Template、TaskContract を含む各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。"
         }
       }
     },
     {
-      "claim_hash": "86fffbd7369fbe7ee808a784403f7ea0a36c434046e32a94706d057244ab0b95",
+      "claim_hash": "80c6953f33427bb628440d68413afdc6116dc1d4ab8dfdbadaefa462b943a720",
       "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
       "verdict": {
         "kind": "pass",
@@ -148,10 +148,10 @@
     },
     {
       "claim_hash": "7baa2ad64aec1c239a1db13691a42f0c15ae17c2cd290fe5bb51edaa8c71acba",
-      "evidence_hash": "a838376b2238016525f039726a0fbf981b93d4e1040c94ffb32d7119ce1b787f",
+      "evidence_hash": "4f3ec37aa2c63716b17d2eb4dffcd4af6e30dde2e315beb76cee4590d912e190",
       "verdict": {
         "kind": "pass",
-        "citation": "ADR baseline、Catalog、Template、TaskContract の各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。"
+        "citation": "composition root はその request を変換・解決せず、既に解決済みの direct driver path を wiring する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -166,7 +166,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "ADR baseline、Catalog、Template、TaskContract の各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。"
+          "text_label": "ADR baseline command は CLI で track scope と snapshot input を検証・解決し、解決済みの typed AdrBaselineInput を直接構築する。未解決の互換 DTO AdrBaselineRequest は composition boundary へ渡さず削除し、composition root はその request を変換・解決せず、既に解決済みの direct driver path を wiring する。Catalog、Template、TaskContract を含む各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。"
         }
       }
     },
@@ -244,10 +244,10 @@
     },
     {
       "claim_hash": "c3e5f8c16f8c370ed39a12782a305b09716bd87e10cb36c6fcf374f13b1a2f7a",
-      "evidence_hash": "a838376b2238016525f039726a0fbf981b93d4e1040c94ffb32d7119ce1b787f",
+      "evidence_hash": "4f3ec37aa2c63716b17d2eb4dffcd4af6e30dde2e315beb76cee4590d912e190",
       "verdict": {
         "kind": "pass",
-        "citation": "composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。"
+        "citation": "composition root はその request を変換・解決せず、既に解決済みの direct driver path を wiring する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -262,7 +262,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "ADR baseline、Catalog、Template、TaskContract の各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。"
+          "text_label": "ADR baseline command は CLI で track scope と snapshot input を検証・解決し、解決済みの typed AdrBaselineInput を直接構築する。未解決の互換 DTO AdrBaselineRequest は composition boundary へ渡さず削除し、composition root はその request を変換・解決せず、既に解決済みの direct driver path を wiring する。Catalog、Template、TaskContract を含む各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。"
         }
       }
     },
@@ -340,10 +340,10 @@
     },
     {
       "claim_hash": "9050f8782e96724f8711c3117e94eead1b301d9d08ced71e1a6bab8762822783",
-      "evidence_hash": "a838376b2238016525f039726a0fbf981b93d4e1040c94ffb32d7119ce1b787f",
+      "evidence_hash": "4f3ec37aa2c63716b17d2eb4dffcd4af6e30dde2e315beb76cee4590d912e190",
       "verdict": {
         "kind": "pass",
-        "citation": "ADR baseline、Catalog、Template、TaskContract の各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。"
+        "citation": "composition root はその request を変換・解決せず、既に解決済みの direct driver path を wiring する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -358,7 +358,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-01",
-          "text_label": "ADR baseline、Catalog、Template、TaskContract の各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。"
+          "text_label": "ADR baseline command は CLI で track scope と snapshot input を検証・解決し、解決済みの typed AdrBaselineInput を直接構築する。未解決の互換 DTO AdrBaselineRequest は composition boundary へ渡さず削除し、composition root はその request を変換・解決せず、既に解決済みの direct driver path を wiring する。Catalog、Template、TaskContract を含む各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。"
         }
       }
     },
@@ -383,6 +383,78 @@
           "section": "acceptance_criteria",
           "element_id": "AC-02",
           "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "dd45a30c045ed2138c5ba1c89d0737dfc2a00ca4e1a47ccc68d2fbc530ad0197",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineResolutionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "dd45a30c045ed2138c5ba1c89d0737dfc2a00ca4e1a47ccc68d2fbc530ad0197",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineResolutionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "dd45a30c045ed2138c5ba1c89d0737dfc2a00ca4e1a47ccc68d2fbc530ad0197",
+      "evidence_hash": "4f3ec37aa2c63716b17d2eb4dffcd4af6e30dde2e315beb76cee4590d912e190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "未解決の互換 DTO AdrBaselineRequest は composition boundary へ渡さず削除し、composition root はその request を変換・解決せず、既に解決済みの direct driver path を wiring する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineResolutionError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "ADR baseline command は CLI で track scope と snapshot input を検証・解決し、解決済みの typed AdrBaselineInput を直接構築する。未解決の互換 DTO AdrBaselineRequest は composition boundary へ渡さず削除し、composition root はその request を変換・解決せず、既に解決済みの direct driver path を wiring する。Catalog、Template、TaskContract を含む各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。"
         }
       }
     }

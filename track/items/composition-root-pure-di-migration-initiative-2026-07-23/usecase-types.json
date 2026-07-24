@@ -11,6 +11,56 @@
     },
     {
       "action": "reference",
+      "for_type": "AdrBaselineCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineValidationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineValidationError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineValidationError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineValidationError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineValidationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineValidationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "reference",
       "for_type": "AdrBaselineQueryInteractor",
       "trait_ref": "AdrBaselineQueryService"
     },
@@ -118,6 +168,106 @@
       "action": "add",
       "for_type": "ImplPlanReadError",
       "trait_ref": "std::error::Error"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "PreReviewGateError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewGateError",
+      "trait_ref": "core::convert::From<TaskContractReadError>"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewGateError",
+      "trait_ref": "core::convert::From<ImplCatalogSignalReadError>"
+    },
+    {
+      "action": "add",
+      "for_type": "PreReviewGateError",
+      "trait_ref": "core::convert::From<ImplPlanReadError>"
+    },
+    {
+      "for_type": "AdrBaselineSnapshotKind",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineSnapshotKind",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineSnapshotKind",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineSnapshotKind",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "AdrBaselineTimestampError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineTimestampError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineTimestampError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineTimestampError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineTimestampError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "AdrBaselineTimestampError",
+      "trait_ref": "core::error::Error"
     }
   ],
   "traits": {
@@ -303,8 +453,8 @@
       ]
     },
     "AdrBaselineStorePort": {
-      "action": "reference",
-      "docs": "Synchronous/blocking secondary port. The byte vector is opaque file content.",
+      "action": "modify",
+      "docs": "Synchronous/blocking secondary port for filesystem-backed adapters; bytes is opaque file content.",
       "informal_grounds": [],
       "methods": [
         {
@@ -326,11 +476,7 @@
             },
             {
               "name": "kind",
-              "ty": "domain::adr_baseline::AdrBaselineKind"
-            },
-            {
-              "name": "reason",
-              "ty": "core::option::Option<domain::NonEmptyString>"
+              "ty": "AdrBaselineSnapshotKind"
             },
             {
               "name": "timestamp",
@@ -1134,9 +1280,117 @@
     }
   },
   "types": {
+    "AdrBaselineCommand": {
+      "action": "modify",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Snapshot",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "domain::TrackId"
+                },
+                {
+                  "name": "source",
+                  "ty": "domain::adr_baseline::AdrSourceFileName"
+                },
+                {
+                  "name": "kind",
+                  "ty": "AdrBaselineSnapshotKind"
+                },
+                {
+                  "name": "timestamp",
+                  "ty": "domain::Timestamp"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Restore",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "domain::TrackId"
+                },
+                {
+                  "name": "source",
+                  "ty": "domain::adr_baseline::AdrSourceFileName"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineError": {
+      "action": "modify",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Store",
+            "payload": {
+              "fields": [
+                "AdrBaselineStoreError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Source",
+            "payload": {
+              "fields": [
+                "AdrBaselineSourceError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
     "AdrBaselineInteractor": {
       "action": "reference",
-      "docs": "Dependency-bearing implementation of AdrBaselineService.",
+      "docs": null,
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1169,10 +1423,6 @@
         "Interactor": {}
       },
       "spec_refs": [
-        {
-          "anchor": "IN-01",
-          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
-        },
         {
           "anchor": "IN-02",
           "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
@@ -1236,6 +1486,154 @@
         },
         {
           "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineSnapshotKind": {
+      "action": "add",
+      "docs": "Usecase Dto for application-boundary data with no domain behavior.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Init",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Cite",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "NewAdr",
+            "payload": {
+              "fields": [
+                "domain::NonEmptyString"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "NonSemanticFix",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Escalation",
+            "payload": {
+              "fields": [
+                "domain::NonEmptyString"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "uses_fork_point",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_ledger_parts",
+          "params": [],
+          "receiver": "self",
+          "returns": "(domain::adr_baseline::AdrBaselineKind, Option<domain::NonEmptyString>)"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineTimestampError": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidTimestamp",
+            "payload": {
+              "fields": [
+                "domain::ValidationError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineValidationError": {
+      "action": "reference",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidReason",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "InvalidSourceFileName",
+            "payload": {
+              "fields": [
+                "domain::adr_baseline::AdrSourceFileNameError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-01",
           "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
         }
       ]
@@ -1598,6 +1996,81 @@
         },
         {
           "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "PreReviewGateError": {
+      "action": "modify",
+      "docs": "Application-service error envelope that losslessly maps operation-specific task-contract, catalogue-signal, and implementation-plan read failures; diagnostic payloads use the domain FreeText newtype because their content is genuinely unstructured.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "TaskContractNotFound",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "TaskContractReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "SignalReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "layer",
+                  "ty": "domain::tddd::LayerId"
+                },
+                {
+                  "name": "message",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ImplPlanReadFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "message",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pre_review_gate",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
           "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
         }
       ]

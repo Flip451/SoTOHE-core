@@ -1,20 +1,54 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-23T16:42:28Z",
-  "declaration_hash": "2a9a527dc4681fba756d099c3649efaf46e157b7f4f4fdb36c6660314d6512e8",
-  "implementation_input_hash": "bac3080fa268b1de0c12149801abd3c707a1e3e42dae06dba2f550d16c11feec",
+  "generated_at": "2026-07-24T08:39:32Z",
+  "declaration_hash": "1bc42ea385fa99623f051f37bfa60fee7f11946126f7bb914db9b0f4d33d0f43",
+  "implementation_input_hash": "a954ed5c64f2e8bf3ab65b5a7c4ebd1654a7c4b015a377d76c9cdb4af165f09d",
   "signals": [
-    {
-      "type_name": "CatalogDriver",
-      "kind_tag": "primary_adapter",
-      "signal": "yellow",
-      "found_type": true
-    },
     {
       "type_name": "AdrBaselineDriver",
       "kind_tag": "primary_adapter",
       "signal": "blue",
       "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineSnapshotInput",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq",
+        "TryFrom<(AdrBaselineKindInput, Option<AdrBaselineReasonInput>)>"
+      ]
+    },
+    {
+      "type_name": "CatalogDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineSnapshotKind",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "From<AdrBaselineSnapshotInput>"
+      ]
+    },
+    {
+      "type_name": "AdrBaselineRequest",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
     },
     {
       "type_name": "TaskContractDriver",

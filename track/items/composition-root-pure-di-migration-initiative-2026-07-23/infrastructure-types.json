@@ -1,138 +1,177 @@
 {
   "crate_name": "infrastructure",
-  "functions": {},
+  "functions": {
+    "infrastructure::adr_baseline::timestamp_now": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [],
+      "returns": "core::result::Result<domain::Timestamp, usecase::adr_baseline::AdrBaselineTimestampError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "infrastructure::timestamp_now": {
+      "action": "reference",
+      "docs": null,
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [],
+      "returns": "core::result::Result<domain::Timestamp, domain::ValidationError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    }
+  },
   "layer": "infrastructure",
   "schema_version": 5,
   "trait_impls": [
     {
-      "action": "reference",
-      "trait_ref": "usecase::adr_baseline::AdrBaselineStorePort",
-      "for_type": "FsAdrBaselineStore"
+      "action": "modify",
+      "for_type": "FsAdrBaselineStore",
+      "trait_ref": "usecase::adr_baseline::AdrBaselineStorePort"
     },
     {
       "action": "reference",
-      "trait_ref": "usecase::adr_baseline::AdrBaselineStoreReadPort",
-      "for_type": "FsAdrBaselineStore"
+      "for_type": "FsAdrBaselineStore",
+      "trait_ref": "usecase::adr_baseline::AdrBaselineStoreReadPort"
     },
     {
       "action": "reference",
-      "trait_ref": "core::convert::From<std::path::PathBuf>",
-      "for_type": "FsAdrBaselineStore"
+      "for_type": "FsAdrBaselineStore",
+      "trait_ref": "core::convert::From<std::path::PathBuf>"
     },
     {
       "action": "reference",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "FsAdrBaselineStore"
+      "for_type": "FsAdrBaselineStore",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "reference",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "FsAdrBaselineStore"
+      "for_type": "FsAdrBaselineStore",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "reference",
-      "trait_ref": "usecase::adr_baseline::AdrBaselineSourcePort",
-      "for_type": "FsGitAdrBaselineSource"
+      "for_type": "FsGitAdrBaselineSource",
+      "trait_ref": "usecase::adr_baseline::AdrBaselineSourcePort"
     },
     {
       "action": "reference",
-      "trait_ref": "core::convert::From<std::path::PathBuf>",
-      "for_type": "FsGitAdrBaselineSource"
+      "for_type": "FsGitAdrBaselineSource",
+      "trait_ref": "core::convert::From<std::path::PathBuf>"
     },
     {
       "action": "reference",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "FsGitAdrBaselineSource"
+      "for_type": "FsGitAdrBaselineSource",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "reference",
-      "trait_ref": "core::clone::Clone",
-      "for_type": "FsGitAdrBaselineSource"
+      "for_type": "FsGitAdrBaselineSource",
+      "trait_ref": "core::clone::Clone"
     },
     {
       "action": "reference",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "FsCatalogAdapter"
+      "for_type": "FsCatalogAdapter",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "reference",
-      "trait_ref": "core::default::Default",
-      "for_type": "FsCatalogAdapter"
+      "for_type": "FsCatalogAdapter",
+      "trait_ref": "core::default::Default"
     },
     {
       "action": "modify",
-      "trait_ref": "usecase::catalog_gen::CatalogPort",
-      "for_type": "FsCatalogAdapter"
+      "for_type": "FsCatalogAdapter",
+      "trait_ref": "usecase::catalog_gen::CatalogPort"
     },
     {
       "action": "reference",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "FsTemplateBoundaryManifestAdapter"
+      "for_type": "FsTemplateBoundaryManifestAdapter",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "reference",
-      "trait_ref": "core::default::Default",
-      "for_type": "FsTemplateBoundaryManifestAdapter"
+      "for_type": "FsTemplateBoundaryManifestAdapter",
+      "trait_ref": "core::default::Default"
     },
     {
       "action": "reference",
-      "trait_ref": "usecase::template_export::TemplateBoundaryManifestPort",
-      "for_type": "FsTemplateBoundaryManifestAdapter"
+      "for_type": "FsTemplateBoundaryManifestAdapter",
+      "trait_ref": "usecase::template_export::TemplateBoundaryManifestPort"
     },
     {
       "action": "reference",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "FsTemplateExportAdapter"
+      "for_type": "FsTemplateExportAdapter",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "reference",
-      "trait_ref": "usecase::template_export::TemplateExportPort",
-      "for_type": "FsTemplateExportAdapter"
+      "for_type": "FsTemplateExportAdapter",
+      "trait_ref": "usecase::template_export::TemplateExportPort"
     },
     {
       "action": "reference",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "FsSelfBinaryTransplantAdapter"
+      "for_type": "FsSelfBinaryTransplantAdapter",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "reference",
-      "trait_ref": "core::default::Default",
-      "for_type": "FsSelfBinaryTransplantAdapter"
+      "for_type": "FsSelfBinaryTransplantAdapter",
+      "trait_ref": "core::default::Default"
     },
     {
       "action": "reference",
-      "trait_ref": "usecase::template_export::SelfBinaryTransplantPort",
-      "for_type": "FsSelfBinaryTransplantAdapter"
+      "for_type": "FsSelfBinaryTransplantAdapter",
+      "trait_ref": "usecase::template_export::SelfBinaryTransplantPort"
     },
     {
       "action": "reference",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "FsTaskContractReader"
+      "for_type": "FsTaskContractReader",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "modify",
-      "trait_ref": "usecase::pre_review_gate::TaskContractReaderPort",
-      "for_type": "FsTaskContractReader"
+      "for_type": "FsTaskContractReader",
+      "trait_ref": "usecase::pre_review_gate::TaskContractReaderPort"
     },
     {
       "action": "reference",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "FsImplCatalogSignalReader"
+      "for_type": "FsImplCatalogSignalReader",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "modify",
-      "trait_ref": "usecase::pre_review_gate::ImplCatalogSignalReaderPort",
-      "for_type": "FsImplCatalogSignalReader"
+      "for_type": "FsImplCatalogSignalReader",
+      "trait_ref": "usecase::pre_review_gate::ImplCatalogSignalReaderPort"
     },
     {
       "action": "reference",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "FsImplPlanReader"
+      "for_type": "FsImplPlanReader",
+      "trait_ref": "core::fmt::Debug"
     },
     {
       "action": "modify",
-      "trait_ref": "usecase::pre_review_gate::ImplPlanReaderPort",
-      "for_type": "FsImplPlanReader"
+      "for_type": "FsImplPlanReader",
+      "trait_ref": "usecase::pre_review_gate::ImplPlanReaderPort"
     }
   ],
   "traits": {},

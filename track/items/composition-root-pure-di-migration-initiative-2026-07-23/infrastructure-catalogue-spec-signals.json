@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "67491d189628860f962cca75ac11590825c4a4f7de5aaf5b8e3a4456a1386f9d",
+  "catalogue_declaration_hash": "98cf0faba913f3da0fbc04ee7a1a0e773a94abaef4f48a00951647c72bdee407",
   "signals": [
     {
       "type_name": "FsAdrBaselineStore",
@@ -46,6 +46,16 @@
       "type_name": "FsTemplateExportAdapter",
       "signal": "blue",
       "entry_hash": "4d96345b818b626477d4be6d27abb35a5d4bdcf9b6c180db397e271a7828980e"
+    },
+    {
+      "type_name": "infrastructure::timestamp_now",
+      "signal": "blue",
+      "entry_hash": "55beff448f741d4bae11953f6435c3a678f159dcb202b0119bfa167631f6f33c"
+    },
+    {
+      "type_name": "infrastructure::adr_baseline::timestamp_now",
+      "signal": "blue",
+      "entry_hash": "30b0a178d346d0c59c013a716db94492ea4c9bf94495aefc2a64cb816e99198d"
     }
   ]
 }

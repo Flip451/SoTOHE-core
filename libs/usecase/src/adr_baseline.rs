@@ -10,7 +10,7 @@ use domain::adr_baseline::{
     is_required_stamp_satisfied,
 };
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
-use domain::{ContentHash, NonEmptyString, Timestamp, TrackId};
+use domain::{ContentHash, NonEmptyString, Timestamp, TrackId, ValidationError};
 use sha2::{Digest as _, Sha256};
 use thiserror::Error;
 
@@ -21,12 +21,46 @@ pub enum AdrBaselineCommand {
     Snapshot {
         track_id: TrackId,
         source: AdrSourceFileName,
-        kind: AdrBaselineKind,
-        reason: Option<NonEmptyString>,
+        kind: AdrBaselineSnapshotKind,
         timestamp: Timestamp,
     },
     /// Restore the latest recorded snapshot to the ADR source file.
     Restore { track_id: TrackId, source: AdrSourceFileName },
+}
+
+/// Reason-aware snapshot operation supplied by the primary adapter.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum AdrBaselineSnapshotKind {
+    /// The initial designation snapshot.
+    Init,
+    /// A snapshot of an ADR cited by the track.
+    Cite,
+    /// A newly authored ADR, with its required rationale.
+    NewAdr(NonEmptyString),
+    /// A non-semantic correction to an existing ADR.
+    NonSemanticFix,
+    /// An escalated ADR decision, with its required rationale.
+    Escalation(NonEmptyString),
+}
+
+impl AdrBaselineSnapshotKind {
+    /// Returns whether this operation samples the fork-point source view.
+    #[must_use]
+    pub fn uses_fork_point(&self) -> bool {
+        matches!(self, Self::Cite)
+    }
+
+    /// Splits the boundary operation into the ledger's persisted kind and optional rationale.
+    #[must_use]
+    pub fn into_ledger_parts(self) -> (AdrBaselineKind, Option<NonEmptyString>) {
+        match self {
+            Self::Init => (AdrBaselineKind::Init, None),
+            Self::Cite => (AdrBaselineKind::Cite, None),
+            Self::NewAdr(reason) => (AdrBaselineKind::NewAdr, Some(reason)),
+            Self::NonSemanticFix => (AdrBaselineKind::NonSemanticFix, None),
+            Self::Escalation(reason) => (AdrBaselineKind::Escalation, Some(reason)),
+        }
+    }
 }
 
 /// Output returned after a successful write operation.
@@ -95,6 +129,14 @@ pub enum AdrBaselineValidationError {
     InvalidSourceFileName(AdrSourceFileNameError),
 }
 
+/// Failure while obtaining a timestamp for an ADR baseline snapshot.
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+pub enum AdrBaselineTimestampError {
+    /// The infrastructure timestamp source produced an invalid timestamp.
+    #[error(transparent)]
+    InvalidTimestamp(ValidationError),
+}
+
 /// Failure envelope for snapshot and restore commands.
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
 pub enum AdrBaselineError {
@@ -104,9 +146,6 @@ pub enum AdrBaselineError {
     /// The source adapter failed.
     #[error(transparent)]
     Source(AdrBaselineSourceError),
-    /// Command validation failed before any port was invoked.
-    #[error(transparent)]
-    Validation(AdrBaselineValidationError),
 }
 
 /// Operational failure for a read-only freeze check.
@@ -151,8 +190,7 @@ pub trait AdrBaselineStorePort: Send + Sync {
         track_id: &TrackId,
         source: &AdrSourceFileName,
         bytes: Vec<u8>,
-        kind: AdrBaselineKind,
-        reason: Option<NonEmptyString>,
+        kind: AdrBaselineSnapshotKind,
         timestamp: Timestamp,
     ) -> Result<AdrBaselineLedgerEntry, AdrBaselineStoreError>;
     /// Restores the latest snapshot for a source.
@@ -193,7 +231,7 @@ pub trait AdrBaselineQueryService: Send + Sync {
     ) -> Result<AdrBaselineQueryOutput, AdrBaselineQueryError>;
 }
 
-/// Command interactor; the only owner of kind/reason compatibility validation.
+/// Command interactor for already-validated reason-aware snapshot commands.
 pub struct AdrBaselineInteractor {
     store: Arc<dyn AdrBaselineStorePort>,
     source: Arc<dyn AdrBaselineSourcePort>,
@@ -213,12 +251,7 @@ impl AdrBaselineInteractor {
 impl AdrBaselineService for AdrBaselineInteractor {
     fn execute(&self, command: AdrBaselineCommand) -> Result<AdrBaselineOutput, AdrBaselineError> {
         match command {
-            AdrBaselineCommand::Snapshot { track_id, source, kind, reason, timestamp } => {
-                if kind.requires_reason() != reason.is_some() {
-                    return Err(AdrBaselineError::Validation(
-                        AdrBaselineValidationError::InvalidReason,
-                    ));
-                }
+            AdrBaselineCommand::Snapshot { track_id, source, kind, timestamp } => {
                 let bytes = if kind.uses_fork_point() {
                     self.source.fork_point_bytes(&track_id, &source)
                 } else {
@@ -227,7 +260,7 @@ impl AdrBaselineService for AdrBaselineInteractor {
                 .map_err(AdrBaselineError::Source)?;
                 let entry = self
                     .store
-                    .snapshot(&track_id, &source, bytes, kind, reason, timestamp)
+                    .snapshot(&track_id, &source, bytes, kind, timestamp)
                     .map_err(AdrBaselineError::Store)?;
                 Ok(AdrBaselineOutput::SnapshotRecorded(entry))
             }
@@ -473,16 +506,17 @@ mod tests {
     struct Store {
         entries: Mutex<Vec<AdrBaselineLedgerEntry>>,
     }
+
     impl AdrBaselineStorePort for Store {
         fn snapshot(
             &self,
             _: &TrackId,
             _: &AdrSourceFileName,
             bytes: Vec<u8>,
-            kind: AdrBaselineKind,
-            reason: Option<NonEmptyString>,
+            kind: AdrBaselineSnapshotKind,
             timestamp: Timestamp,
         ) -> Result<AdrBaselineLedgerEntry, AdrBaselineStoreError> {
+            let (kind, reason) = kind.into_ledger_parts();
             let saved = match (kind, reason) {
                 (AdrBaselineKind::Init, None) => {
                     AdrBaselineLedgerEntry::Init { source: source(), hash: hash(&bytes), timestamp }
@@ -532,6 +566,42 @@ mod tests {
         }
     }
 
+    type SnapshotCall = (TrackId, AdrSourceFileName, Vec<u8>, AdrBaselineSnapshotKind, Timestamp);
+
+    struct RecordingStore {
+        snapshot_calls: Mutex<Vec<SnapshotCall>>,
+        restore_calls: Mutex<Vec<(TrackId, AdrSourceFileName)>>,
+    }
+
+    impl AdrBaselineStorePort for RecordingStore {
+        fn snapshot(
+            &self,
+            track_id: &TrackId,
+            source: &AdrSourceFileName,
+            bytes: Vec<u8>,
+            kind: AdrBaselineSnapshotKind,
+            timestamp: Timestamp,
+        ) -> Result<AdrBaselineLedgerEntry, AdrBaselineStoreError> {
+            self.snapshot_calls.lock().unwrap().push((
+                track_id.clone(),
+                source.clone(),
+                bytes,
+                kind,
+                timestamp,
+            ));
+            Ok(entry(AdrBaselineKind::Init))
+        }
+
+        fn restore(
+            &self,
+            track_id: &TrackId,
+            source: &AdrSourceFileName,
+        ) -> Result<(), AdrBaselineStoreError> {
+            self.restore_calls.lock().unwrap().push((track_id.clone(), source.clone()));
+            Ok(())
+        }
+    }
+
     struct MissingCopyStore;
 
     impl AdrBaselineStoreReadPort for MissingCopyStore {
@@ -552,7 +622,7 @@ mod tests {
     }
 
     #[test]
-    fn test_adr_baseline_snapshot_rejects_reason_for_init() {
+    fn test_adr_baseline_snapshot_reason_aware_kind_carries_required_reason() {
         let store = Arc::new(Store { entries: Mutex::new(Vec::new()) });
         let interactor = AdrBaselineInteractor::new(
             store,
@@ -566,14 +636,25 @@ mod tests {
         let result = interactor.execute(AdrBaselineCommand::Snapshot {
             track_id: track(),
             source: source(),
-            kind: AdrBaselineKind::Init,
-            reason: Some(NonEmptyString::try_new("no".to_owned()).unwrap()),
+            kind: AdrBaselineSnapshotKind::NewAdr(
+                NonEmptyString::try_new("approved by user".to_owned()).unwrap(),
+            ),
             timestamp: Timestamp::new("2026-07-16T00:00:00Z").unwrap(),
         });
-        assert_eq!(
+        assert!(matches!(
             result,
-            Err(AdrBaselineError::Validation(AdrBaselineValidationError::InvalidReason))
-        );
+            Ok(AdrBaselineOutput::SnapshotRecorded(AdrBaselineLedgerEntry::NewAdr { reason, .. }))
+                if reason.as_ref() == "approved by user"
+        ));
+    }
+
+    #[test]
+    fn test_adr_baseline_timestamp_error_preserves_validation_diagnostic() {
+        let validation_error = Timestamp::new("not-a-timestamp").unwrap_err();
+        let timestamp_error = AdrBaselineTimestampError::InvalidTimestamp(validation_error.clone());
+
+        assert_eq!(timestamp_error.to_string(), validation_error.to_string());
+        assert_eq!(timestamp_error, AdrBaselineTimestampError::InvalidTimestamp(validation_error));
     }
 
     #[test]
@@ -593,14 +674,167 @@ mod tests {
             .execute(AdrBaselineCommand::Snapshot {
                 track_id: track(),
                 source: source(),
-                kind: AdrBaselineKind::Cite,
-                reason: None,
+                kind: AdrBaselineSnapshotKind::Cite,
                 timestamp: timestamp.clone(),
             })
             .unwrap();
         assert!(
             matches!(result, AdrBaselineOutput::SnapshotRecorded(saved) if saved.hash() == &hash(b"fork") && saved.timestamp() == &timestamp)
         );
+    }
+
+    #[test]
+    fn test_adr_baseline_snapshot_uses_explicit_timestamp_without_clock_port() {
+        let interactor = AdrBaselineInteractor::new(
+            Arc::new(Store { entries: Mutex::new(Vec::new()) }),
+            Arc::new(Source {
+                working: b"current".to_vec(),
+                fork: b"fork".to_vec(),
+                cited: Vec::new(),
+                state: AdrBaselineSourceState::ExistingAtForkPoint,
+            }),
+        );
+
+        let result = interactor.execute(AdrBaselineCommand::Snapshot {
+            track_id: track(),
+            source: source(),
+            kind: AdrBaselineSnapshotKind::Init,
+            timestamp: Timestamp::new("2026-07-16T00:00:00Z").unwrap(),
+        });
+        assert!(matches!(
+            result,
+            Ok(AdrBaselineOutput::SnapshotRecorded(AdrBaselineLedgerEntry::Init { .. }))
+        ));
+    }
+
+    #[test]
+    fn test_adr_baseline_snapshot_delegates_exact_input_to_store_port() {
+        let store = Arc::new(RecordingStore {
+            snapshot_calls: Mutex::new(Vec::new()),
+            restore_calls: Mutex::new(Vec::new()),
+        });
+        let expected_track = track();
+        let expected_source = source();
+        let expected_kind = AdrBaselineSnapshotKind::NewAdr(
+            NonEmptyString::try_new("approved by user".to_owned()).unwrap(),
+        );
+        let expected_timestamp = Timestamp::new("2026-07-16T00:00:00Z").unwrap();
+        let interactor = AdrBaselineInteractor::new(
+            store.clone(),
+            Arc::new(Source {
+                working: b"current".to_vec(),
+                fork: b"fork".to_vec(),
+                cited: Vec::new(),
+                state: AdrBaselineSourceState::ExistingAtForkPoint,
+            }),
+        );
+
+        let result = interactor.execute(AdrBaselineCommand::Snapshot {
+            track_id: expected_track.clone(),
+            source: expected_source.clone(),
+            kind: expected_kind.clone(),
+            timestamp: expected_timestamp.clone(),
+        });
+
+        assert!(matches!(result, Ok(AdrBaselineOutput::SnapshotRecorded(_))));
+        let (track_id, source, bytes, kind, timestamp) =
+            store.snapshot_calls.lock().unwrap().pop().unwrap();
+        assert_eq!(track_id, expected_track);
+        assert_eq!(source, expected_source);
+        assert_eq!(bytes, b"current");
+        assert_eq!(kind, expected_kind);
+        assert_eq!(timestamp, expected_timestamp);
+        assert!(store.restore_calls.lock().unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_adr_baseline_restore_delegates_to_store_port() {
+        let store = Arc::new(RecordingStore {
+            snapshot_calls: Mutex::new(Vec::new()),
+            restore_calls: Mutex::new(Vec::new()),
+        });
+        let expected_track = track();
+        let expected_source = source();
+        let interactor = AdrBaselineInteractor::new(
+            store.clone(),
+            Arc::new(Source {
+                working: Vec::new(),
+                fork: Vec::new(),
+                cited: Vec::new(),
+                state: AdrBaselineSourceState::ExistingAtForkPoint,
+            }),
+        );
+
+        let result = interactor.execute(AdrBaselineCommand::Restore {
+            track_id: expected_track.clone(),
+            source: expected_source.clone(),
+        });
+
+        assert!(
+            matches!(result, Ok(AdrBaselineOutput::Restored(source)) if source == expected_source)
+        );
+        assert!(store.snapshot_calls.lock().unwrap().is_empty());
+        assert_eq!(
+            store.restore_calls.lock().unwrap().as_slice(),
+            &[(expected_track, expected_source)]
+        );
+    }
+
+    #[test]
+    fn test_adr_baseline_usecase_path_uses_only_source_and_store_ports() {
+        let source = include_str!("adr_baseline.rs");
+        let production_source = source.split("#[cfg(test)]").next().unwrap();
+        let snapshot_kind_source = production_source
+            .split("impl AdrBaselineSnapshotKind")
+            .nth(1)
+            .unwrap()
+            .split("/// Output returned after a successful write operation")
+            .next()
+            .unwrap();
+        let interactor_source = production_source
+            .split("impl AdrBaselineService for AdrBaselineInteractor")
+            .nth(1)
+            .unwrap()
+            .split("/// Query interactor and owner of recorded-copy and byte verification")
+            .next()
+            .unwrap();
+        let execution_source = format!("{snapshot_kind_source}{interactor_source}");
+
+        for required_path in [
+            "matches!(self, Self::Cite)",
+            "self.source.fork_point_bytes(&track_id, &source)",
+            "self.source.working_bytes(&source)",
+            ".snapshot(&track_id, &source, bytes, kind, timestamp)",
+            "self.store.restore(&track_id, &source)",
+        ] {
+            assert!(
+                execution_source.contains(required_path),
+                "usecase path must use the typed source/store port operation {required_path}"
+            );
+        }
+        for forbidden_path in [
+            "std::fs::",
+            "std::process::",
+            "std::net::",
+            "std::io::",
+            "println!",
+            "eprintln!",
+            "print!",
+            "eprint!",
+            "infrastructure::",
+            "cli_composition",
+            "CompositionRoot",
+            "AdrBaselineRequest",
+            "ServiceImpl",
+            "CompatibilityShim",
+            "CompatService",
+            "CommandOutcome",
+        ] {
+            assert!(
+                !execution_source.contains(forbidden_path),
+                "usecase path must not use direct I/O or reverse-delegate through {forbidden_path}"
+            );
+        }
     }
 
     #[test]

@@ -1,302 +1,264 @@
 {
   "schema_version": 2,
   "scopes": {
-    "types": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:dbd018b6b32ed0631dc9e8e98801cf91bef664d145f0762ef669b415af175b75",
-          "at": "2026-07-23T14:24:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dbd018b6b32ed0631dc9e8e98801cf91bef664d145f0762ef669b415af175b75",
-          "at": "2026-07-23T14:29:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5c3dccab1047f7fbe5bbae244323017a57a003f79c2b0c7ebbbb407e5000e4eb",
-          "at": "2026-07-23T15:49:24Z"
+          "hash": "rvw1:sha256:bbff49630d1d395d993994d985925ae968d1d5cddfdcaad0e0671c5b7d41b620",
+          "at": "2026-07-24T02:04:06Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`usecase::CatalogPort` and `usecase::CatalogService` are both `action: modify` and declare the same five method signatures (`init`, `add`, `import`, `cite`, `check`) verbatim. Every contract change—including this track’s `TrackId` migration—must therefore be duplicated across sibling traits. Introduce a shared declaration or differentiate the application-service contract from the storage port.",
+              "message": "The new CLI-owned dispatch path lacks a successful behavioral test. Current tests only inspect source text/resolvers or fail before driver dispatch on an invalid `items_dir`; none verify that `Snapshot` reaches the wired driver and preserves success output, exit code, and ledger/baseline persistence. Add a temporary-repository round-trip test covering the successful snapshot path, as required by the briefing’s external-contract checklist.",
               "severity": "P1",
-              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
-              "line": 326,
-              "category": "duplicated method signature across sibling types"
-            },
-            {
-              "message": "`usecase::CatalogPort::init` and `usecase::CatalogService::init` return the shared `CatalogError`, although init can only produce the initialization subset while variants such as `DuplicateEntry`, `AnchorNotFound`, `InvalidRole`, `ParseFragment`, `SchemaInvalid`, and `DraftIncomplete` are unreachable. Neither entry documents the producible subset or justifies the broad error type; the same imprecision affects other catalogue verbs to varying degrees.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
-              "line": 334,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "The synchronous I/O ports `usecase::AdrBaselineSourcePort`, `AdrBaselineStorePort`, `AdrBaselineStoreReadPort`, `CatalogPort`, `ImplCatalogSignalReaderPort`, `ImplPlanReaderPort`, `SelfBinaryTransplantPort`, `TaskContractReaderPort`, `TemplateBoundaryManifestPort`, and `TemplateExportPort` all declare only `is_async: false` methods despite filesystem, Git, or process I/O vocabulary. Their entry docs do not acknowledge an intentional blocking design. Document that choice or expose an async-capable boundary.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
-              "line": 99,
-              "category": "sync/async color mismatch"
-            },
-            {
-              "message": "The docs for `cli_composition::AdrBaselineCompositionRoot`, `CatalogCompositionRoot`, `TaskContractCompositionRoot`, and `TemplateCompositionRoot` paraphrase IN-02/AC-01/AC-02’s behavioral rule that roots only wire and return drivers. `no-upstream-restatement.md` requires these downstream entries to rely on their anchors rather than repeat that contract in prose.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/cli_composition-types.json",
-              "line": 42,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The docs for `cli_driver::AdrBaselineDriver`, `CatalogDriver`, `TaskContractDriver`, and `TemplateDriver` restate the upstream primary-adapter behavior—invoke application services and render `CommandOutcome`—instead of leaving that contract at the cited ADR/spec anchors.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/cli_driver-types.json",
-              "line": 17,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The docs for `usecase::AdrBaselineInteractor`, `AdrBaselineQueryInteractor`, `CatalogInteractor`, `CoverageVerifyInteractor`, `PreReviewGateInteractor`, `TemplateExportInteractor`, `AdrBaselineQueryService`, and `AdrBaselineService` re-explain IN-02/AC-02’s injected driver → interactor → port path in prose. Retain the structured anchors without duplicating that behavior contract downstream.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
-              "line": 1041,
-              "category": "upstream restatement"
+              "file": "apps/cli/src/commands/adr_baseline.rs",
+              "line": 138,
+              "category": "test_coverage"
             }
           ],
-          "hash": "rvw1:sha256:5c3dccab1047f7fbe5bbae244323017a57a003f79c2b0c7ebbbb407e5000e4eb",
-          "at": "2026-07-23T15:58:52Z"
+          "hash": "rvw1:sha256:bbff49630d1d395d993994d985925ae968d1d5cddfdcaad0e0671c5b7d41b620",
+          "at": "2026-07-24T02:11:59Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c36c72fc944dcdbb69c0271e5d13ab88f52b31762c201bc4de8e825d89b56823",
-          "at": "2026-07-23T16:25:39Z"
+          "hash": "rvw1:sha256:84ab3818904671d9f615d831c0e9bd9b19420999c38dafea6e93dc1aec91c87d",
+          "at": "2026-07-24T03:56:03Z"
         },
         {
           "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "CatalogError converts every retained named-field variant into a tuple variant (for example, `FileExists { path }` becomes `FileExists(PathBuf)`), although the documented modification only removes `DraftIncomplete`. Implementing this catalogue would unnecessarily break all existing constructions and pattern matches. Preserve the named payload shapes or provide explicit grounded justification for the additional migration.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
-              "line": 1102,
-              "category": "action incoherent with the diff"
-            },
-            {
-              "message": "CatalogService::execute dispatches a CatalogRequest that combines the mutating Init/Add/Import/Cite operations with the read-only Check query and returns one generic CatalogResponse. This collapses command and query contracts into one application-service method and obscures operation-specific responses and errors. Split the command and query primary contracts, or otherwise preserve distinct operations while keeping CatalogPort separate.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
-              "line": 533,
-              "category": "command / query method mixing in one type"
-            },
-            {
-              "message": "ImplCatalogSignalReaderPort, ImplPlanReaderPort, and TaskContractReaderPort all expose the full PreReviewGateError sum even though their adapters can respectively produce only SignalReadFailed, ImplPlanReadFailed, and TaskContractNotFound/TaskContractReadFailed. This advertises impossible failures at each boundary. Use operation-specific errors or explicitly justify and document the shared envelope.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
-              "line": 625,
-              "category": "per-method error imprecision"
-            },
-            {
-              "message": "The docs for the ten synchronous secondary ports repeat the upstream architectural rationale that blocking I/O is intentional and no async runtime is introduced. This sentence-level restatement appears on AdrBaselineSourcePort, AdrBaselineStorePort, AdrBaselineStoreReadPort, CatalogPort, ImplCatalogSignalReaderPort, ImplPlanReaderPort, SelfBinaryTransplantPort, TaskContractReaderPort, TemplateBoundaryManifestPort, and TemplateExportPort. Keep the catalogue prose local to each type and rely on spec_refs for the upstream sync-first decision.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
-              "line": 176,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:c36c72fc944dcdbb69c0271e5d13ab88f52b31762c201bc4de8e825d89b56823",
-          "at": "2026-07-23T16:32:52Z"
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84ab3818904671d9f615d831c0e9bd9b19420999c38dafea6e93dc1aec91c87d",
+          "at": "2026-07-24T04:00:12Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:77dde1ede47e4068925e8f01f7b1fde92be8fc5912dbbdefd82bb2cea120b247",
-          "at": "2026-07-23T17:23:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::CatalogPort` is declared `action: reference`, but all five methods change `track_id` from the baseline `&str` to `&domain::TrackId`. A reference entry must remain baseline-identical and causes the changed declarations to be ignored by reference-signal semantics. Declare this trait as `modify`.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
-              "line": 443,
-              "category": "action incoherent with the diff"
-            },
-            {
-              "message": "`infrastructure::FsCatalogAdapter` and its `CatalogPort` trait implementation remain `action: reference`, although implementing the modified port requires changing all five method signatures from `&str` to `&TrackId`. Declare the adapter and its `CatalogPort` implementation as `modify` so the companion API mutation is represented.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/infrastructure-types.json",
-              "line": 63,
-              "category": "action incoherent with the diff"
-            }
-          ],
-          "hash": "rvw1:sha256:77dde1ede47e4068925e8f01f7b1fde92be8fc5912dbbdefd82bb2cea120b247",
-          "at": "2026-07-23T17:32:44Z"
+          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
+          "at": "2026-07-24T06:16:34Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8c2d90188933e39a44fdffdc72233c96d490d45b7442407bdde0985238b6bc74",
-          "at": "2026-07-23T17:45:51Z"
+          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
+          "at": "2026-07-24T06:17:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
+          "at": "2026-07-24T06:53:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
+          "at": "2026-07-24T07:18:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
+          "at": "2026-07-24T07:54:01Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8c2d90188933e39a44fdffdc72233c96d490d45b7442407bdde0985238b6bc74",
-          "at": "2026-07-23T17:48:25Z"
+          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
+          "at": "2026-07-24T07:56:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
+          "at": "2026-07-24T08:52:35Z"
         }
       ]
     },
-    "spec": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:12228b5763fefdaba1693c23dea5df3fb4074bb283f21b9c5ee2293db3f77468",
-          "at": "2026-07-23T14:24:12Z"
+          "hash": "rvw1:sha256:be5cbd99d340a8550c48fe3d19a66e6f7599598fa14908efb5fed2c884d4f380",
+          "at": "2026-07-23T14:24:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:12228b5763fefdaba1693c23dea5df3fb4074bb283f21b9c5ee2293db3f77468",
-          "at": "2026-07-23T14:27:57Z"
+          "hash": "rvw1:sha256:be5cbd99d340a8550c48fe3d19a66e6f7599598fa14908efb5fed2c884d4f380",
+          "at": "2026-07-23T14:27:50Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3deec11698ce4aa32ac0ee7676d0f3afc51f34c3456e41a242900bc30bc3d8d7",
-          "at": "2026-07-23T14:43:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-01 requires this slice to be an 「独立 track」, but its cited decisions are D1/D3/D4/D5; independence is established by D2, which is not cited. As written, this part of the goal is not grounded in any referenced decision, even though CN-02 and AC-04 correctly cite D2 for the same requirement.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
-              "line": 8,
-              "category": "goal not anchored to a decision"
-            }
-          ],
-          "hash": "rvw1:sha256:3deec11698ce4aa32ac0ee7676d0f3afc51f34c3456e41a242900bc30bc3d8d7",
-          "at": "2026-07-23T14:45:56Z"
+          "hash": "rvw1:sha256:105d1b01f7b5d1413f80fe5a47d31d1225c2d37f345955b29f33efedd2d36deb",
+          "at": "2026-07-23T15:49:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:24f079539a67c45bdfe9b056e74c081f0b5249c3a73e39019454ce4f9437f9fa",
-          "at": "2026-07-23T14:51:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-00 states a repository-wide, completion-tracked initiative, but no acceptance criterion deterministically proves that the initiative is tracked through its explicit completion conditions; the criteria only establish this Leaf slice's completion and explicitly defer repository-wide convergence to Final convergence.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
-              "line": 5,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:2b9310fb52e9c0c8e572eabde4dc87c60f770f00a2184f8584f268965f232dd9",
-          "at": "2026-07-23T15:31:47Z"
+          "hash": "rvw1:sha256:105d1b01f7b5d1413f80fe5a47d31d1225c2d37f345955b29f33efedd2d36deb",
+          "at": "2026-07-23T15:52:01Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d14307ba6c647040ef27cc31df08e320a2116273c44fded81ae5576135249ba1",
-          "at": "2026-07-23T15:33:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-00 states the repository-wide initiative goal, but no acceptance criterion can deterministically prove that goal when this Leaf-only track completes. AC-04 only delegates the D6 convergence check to a future Final convergence track, so it does not provide current-track acceptance coverage for GO-00.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
-              "line": 8,
-              "category": "missing AC coverage for a stated goal"
-            },
-            {
-              "message": "AC-04 makes the later Final convergence track’s repository-wide D6 verification part of this spec’s acceptance criteria, while OUT-02 explicitly places that work outside this Leaf track. The criterion therefore requires out-of-scope future behavior and cannot be satisfied independently with this slice as CN-02 requires.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
-              "line": 178,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:d14307ba6c647040ef27cc31df08e320a2116273c44fded81ae5576135249ba1",
-          "at": "2026-07-23T15:37:16Z"
+          "hash": "rvw1:sha256:3b6c26799c4f0e9fc2839b5b18f67d9e50c5d4eebd0da4ad6c7b78928a99069d",
+          "at": "2026-07-23T16:25:44Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ff9a779545a1614db518054c712504f532417fc4b30a7f5c465943a7abe23099",
-          "at": "2026-07-23T15:39:03Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:820d80a918fead0d127604d5129fd076dcd41c3e4759c3ca734a8634064ac8a5",
-          "at": "2026-07-23T13:31:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 assigns compatibility-shim and intermediate `*ServiceImpl` deletion to the final convergence track, but D5 says each command-context track cannot complete while a compatibility facade or reverse delegation remains. Thus either the earlier tracks must already perform this deletion, leaving no such implementation work for final convergence, or they remain incomplete until that later track and are not independently complete. Assign deletion unambiguously to the context tracks and make final convergence verification-only, or explicitly redefine the permitted intermediate state and per-track completion condition.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
-              "line": 69,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:820d80a918fead0d127604d5129fd076dcd41c3e4759c3ca734a8634064ac8a5",
-          "at": "2026-07-23T13:35:15Z"
+          "hash": "rvw1:sha256:3b6c26799c4f0e9fc2839b5b18f67d9e50c5d4eebd0da4ad6c7b78928a99069d",
+          "at": "2026-07-23T16:28:29Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ceac4a93213aa46f6229e48b990b1ce751ba4a0e0f0faf23f83547b8275cb95e",
-          "at": "2026-07-23T13:48:06Z"
+          "hash": "rvw1:sha256:1172b3a4c9a8487a4afabb5ab90448b5b0ea506f41c42208130e23889e0282a4",
+          "at": "2026-07-23T17:24:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1172b3a4c9a8487a4afabb5ab90448b5b0ea506f41c42208130e23889e0282a4",
+          "at": "2026-07-23T17:25:26Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ceac4a93213aa46f6229e48b990b1ce751ba4a0e0f0faf23f83547b8275cb95e",
-          "at": "2026-07-23T13:51:37Z"
+          "hash": "rvw1:sha256:1172b3a4c9a8487a4afabb5ab90448b5b0ea506f41c42208130e23889e0282a4",
+          "at": "2026-07-23T17:27:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4248bab77558271f12a56c5bbec4bb08da1e9da2c30364c593f63b4845b7b5d",
+          "at": "2026-07-23T17:52:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4248bab77558271f12a56c5bbec4bb08da1e9da2c30364c593f63b4845b7b5d",
+          "at": "2026-07-23T17:54:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cf5e717c1d339d920658cc4a57680adbb04e82473705723ad446e1f77dc2022",
+          "at": "2026-07-24T02:04:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6cf5e717c1d339d920658cc4a57680adbb04e82473705723ad446e1f77dc2022",
+          "at": "2026-07-24T02:13:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c814a809265b8133107500c27d5d24fe5865cc0ba279a766562e37adc6ffca68",
+          "at": "2026-07-24T03:56:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c814a809265b8133107500c27d5d24fe5865cc0ba279a766562e37adc6ffca68",
+          "at": "2026-07-24T04:01:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1bb9b422c8475afcd552d3a93f964ccc42f453df6d280c81e2c21ebb59f745cd",
+          "at": "2026-07-24T06:17:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1bb9b422c8475afcd552d3a93f964ccc42f453df6d280c81e2c21ebb59f745cd",
+          "at": "2026-07-24T06:17:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e803add1ef875fcdb8817516ab2d2e8ca058fdea7ef39c82fd6b2aa568eea46b",
+          "at": "2026-07-24T06:53:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20b0f43fb397be40ee4c5e66798bf04b0fbaf81db235bc5822a911de0022af12",
+          "at": "2026-07-24T07:18:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ecc33078dbaaadd4ccfa8aee2ed254456736e3b03ef8bbac85c1d7a0374ae072",
+          "at": "2026-07-24T07:54:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ecc33078dbaaadd4ccfa8aee2ed254456736e3b03ef8bbac85c1d7a0374ae072",
+          "at": "2026-07-24T07:56:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0120e9b44b42877f2e344f1860fc1ff223312bb59f976873fe5c10cac332ea9",
+          "at": "2026-07-24T08:52:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0120e9b44b42877f2e344f1860fc1ff223312bb59f976873fe5c10cac332ea9",
+          "at": "2026-07-24T08:57:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0120e9b44b42877f2e344f1860fc1ff223312bb59f976873fe5c10cac332ea9",
+          "at": "2026-07-24T09:00:09Z"
         }
       ]
     },
@@ -592,87 +554,1226 @@
           "findings": [],
           "hash": "rvw1:sha256:886e29aeb099c80299ef031533535e1ae47189b51032e212a8b18411a2650cf7",
           "at": "2026-07-23T17:26:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's description scopes work to cli_driver, usecase, infrastructure, and cli_composition, but task-contract.json also attributes three `cli` entries (`items_dir`, `resolve_for_read`, `resolve_for_write`). The task boundary therefore omits catalogue entries it is assigned to touch.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/impl-plan.json",
+              "line": 6,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:02a2bedd1bface5dd9440d003989b0a72f2675b6065d3f4c4f825d0748e136a2",
+          "at": "2026-07-24T02:04:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:75e08be191cfa7fa79526e2b1055fe170e765e19b0f196999b3288f4f6682978",
+          "at": "2026-07-24T02:05:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:75e08be191cfa7fa79526e2b1055fe170e765e19b0f196999b3288f4f6682978",
+          "at": "2026-07-24T02:10:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description includes the behavioral rationale/contract “so timestamp acquisition moves from AdrBaselineDriver to AdrBaselineInteractor”; plan descriptions must use target + operation + anchor cite without restating upstream behavior. See `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/impl-plan.json",
+              "line": 39,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T001's task-contract attribution includes `AdrBaselineValidationError`, but the task description does not identify that symbol or an operation that touches it. An executor cannot derive why this catalogue entry belongs to T001.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/task-contract.json",
+              "line": 10,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:4fda1a51e2d24e6aa89f1e20a698b05b5a7a95368dbaa55300c77d824f6d1d8d",
+          "at": "2026-07-24T03:56:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b66eb2a074cd8e9b6a6906ed60b7bd88120abd2e3c7cb8ffef23703d990619fd",
+          "at": "2026-07-24T03:57:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b66eb2a074cd8e9b6a6906ed60b7bd88120abd2e3c7cb8ffef23703d990619fd",
+          "at": "2026-07-24T04:00:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's description restates upstream behavior/contracts in “while preserving one direct application-service invocation and external CLI behavior”; retain only target, operation, and anchor citations per the no-upstream-restatement rule.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "section.id `adr-baseline` repeats the upstream behavior contract “while preserving one direct application-service invocation and external CLI behavior” in its task description.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/impl-plan.json",
+              "line": 39,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:cba7a157627598d84ac10ca4a6b92c445798dfae731a3f24acca60887077be21",
+          "at": "2026-07-24T06:16:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9a9285c085673125ea134ea54008444d704aab975d5c7578006f6d2dbf6db94",
+          "at": "2026-07-24T06:18:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a9a9285c085673125ea134ea54008444d704aab975d5c7578006f6d2dbf6db94",
+          "at": "2026-07-24T06:18:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c49e56cb5494a3a1e9830b19de2316847f3ed5b805a370c0099bc45f93e2d61",
+          "at": "2026-07-24T06:53:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c49e56cb5494a3a1e9830b19de2316847f3ed5b805a370c0099bc45f93e2d61",
+          "at": "2026-07-24T07:18:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c49e56cb5494a3a1e9830b19de2316847f3ed5b805a370c0099bc45f93e2d61",
+          "at": "2026-07-24T07:54:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c49e56cb5494a3a1e9830b19de2316847f3ed5b805a370c0099bc45f93e2d61",
+          "at": "2026-07-24T07:56:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 restates the upstream behavior contract “retain the documented synchronous/blocking store boundary”; impl-plan descriptions must contain target + operation + anchor cite without repeating ADR/spec rationale or behavior. See `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "section.id `adr-baseline` repeats the upstream behavior contract “retain the documented synchronous/blocking store boundary” and should omit it from the executable task description.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/impl-plan.json",
+              "line": 39,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:3c31712aa299a8df41c5ed8e9be29acc8cd0f0a7033095a8c53ce3171706b057",
+          "at": "2026-07-24T08:52:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fc563a7504f8dad2ab2bc7dba828a681e70c0779819fbc9b16e9716a4304c855",
+          "at": "2026-07-24T08:55:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fc563a7504f8dad2ab2bc7dba828a681e70c0779819fbc9b16e9716a4304c855",
+          "at": "2026-07-24T08:57:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fc563a7504f8dad2ab2bc7dba828a681e70c0779819fbc9b16e9716a4304c855",
+          "at": "2026-07-24T08:59:23Z"
         }
       ]
     },
-    "other": {
+    "adr": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:be5cbd99d340a8550c48fe3d19a66e6f7599598fa14908efb5fed2c884d4f380",
-          "at": "2026-07-23T14:24:33Z"
+          "hash": "rvw1:sha256:820d80a918fead0d127604d5129fd076dcd41c3e4759c3ca734a8634064ac8a5",
+          "at": "2026-07-23T13:31:44Z"
         },
         {
           "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:be5cbd99d340a8550c48fe3d19a66e6f7599598fa14908efb5fed2c884d4f380",
-          "at": "2026-07-23T14:27:50Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 assigns compatibility-shim and intermediate `*ServiceImpl` deletion to the final convergence track, but D5 says each command-context track cannot complete while a compatibility facade or reverse delegation remains. Thus either the earlier tracks must already perform this deletion, leaving no such implementation work for final convergence, or they remain incomplete until that later track and are not independently complete. Assign deletion unambiguously to the context tracks and make final convergence verification-only, or explicitly redefine the permitted intermediate state and per-track completion condition.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+              "line": 69,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:820d80a918fead0d127604d5129fd076dcd41c3e4759c3ca734a8634064ac8a5",
+          "at": "2026-07-23T13:35:15Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:105d1b01f7b5d1413f80fe5a47d31d1225c2d37f345955b29f33efedd2d36deb",
-          "at": "2026-07-23T15:49:05Z"
+          "hash": "rvw1:sha256:ceac4a93213aa46f6229e48b990b1ce751ba4a0e0f0faf23f83547b8275cb95e",
+          "at": "2026-07-23T13:48:06Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:105d1b01f7b5d1413f80fe5a47d31d1225c2d37f345955b29f33efedd2d36deb",
-          "at": "2026-07-23T15:52:01Z"
-        },
+          "hash": "rvw1:sha256:ceac4a93213aa46f6229e48b990b1ce751ba4a0e0f0faf23f83547b8275cb95e",
+          "at": "2026-07-23T13:51:37Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3b6c26799c4f0e9fc2839b5b18f67d9e50c5d4eebd0da4ad6c7b78928a99069d",
-          "at": "2026-07-23T16:25:44Z"
+          "hash": "rvw1:sha256:9cd9af6950dfbf0fa24783677e4b4ebf0323493322273e1c66acb14f2186742b",
+          "at": "2026-07-24T02:03:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new test only searches source text and never invokes `FsCatalogAdapter` through `CatalogPort`. Consequently, the five public operations have no happy-path or error-path adapter coverage, and regressions such as forwarding a hard-coded/wrong track ID would still pass. Add behavioral tests that call the adapter with a validated `TrackId` and verify both the resulting path/report and representative errors.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/adapter_tests.rs",
+              "line": 3,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:9cd9af6950dfbf0fa24783677e4b4ebf0323493322273e1c66acb14f2186742b",
+          "at": "2026-07-24T02:10:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The adapter tests exercise only failure paths for `add`, `import`, and `cite`. Those failures occur at invalid-layer validation, so they do not prove that these public methods forward the requested `TrackId`, operate on its catalogue, or return successful reports. Add happy-path calls for all three operations as required for public APIs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/adapter_tests.rs",
+              "line": 77,
+              "category": "testing"
+            },
+            {
+              "message": "`read_optional_signals` is tested for an absent file and a symlink error, but never for an existing document returning `Ok(Some(_))`. A regression in the adapter-specific `Ok(true)` branch could therefore make present signal documents appear absent and weaken the pre-review gate without failing these tests.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "line": 228,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:4374a056b3ea47bda2d576a170579ad7581b190036c40e9587074f6975d662e1",
+          "at": "2026-07-24T02:15:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3b6c26799c4f0e9fc2839b5b18f67d9e50c5d4eebd0da4ad6c7b78928a99069d",
-          "at": "2026-07-23T16:28:29Z"
+          "hash": "rvw1:sha256:d900c11acbf0406afaf476fc83ba1114cfe8d5c5496503bdd73883cf66500b43",
+          "at": "2026-07-24T02:21:19Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1172b3a4c9a8487a4afabb5ab90448b5b0ea506f41c42208130e23889e0282a4",
-          "at": "2026-07-23T17:24:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1172b3a4c9a8487a4afabb5ab90448b5b0ea506f41c42208130e23889e0282a4",
-          "at": "2026-07-23T17:25:26Z"
+          "hash": "rvw1:sha256:68874861698771ba90afb1dab64b38a473f588b18759153a12626ed1578ed943",
+          "at": "2026-07-24T03:56:12Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1172b3a4c9a8487a4afabb5ab90448b5b0ea506f41c42208130e23889e0282a4",
-          "at": "2026-07-23T17:27:10Z"
+          "hash": "rvw1:sha256:68874861698771ba90afb1dab64b38a473f588b18759153a12626ed1578ed943",
+          "at": "2026-07-24T04:00:21Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b4248bab77558271f12a56c5bbec4bb08da1e9da2c30364c593f63b4845b7b5d",
-          "at": "2026-07-23T17:52:26Z"
+          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
+          "at": "2026-07-24T06:16:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
+          "at": "2026-07-24T06:17:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
+          "at": "2026-07-24T06:53:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
+          "at": "2026-07-24T07:18:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
+          "at": "2026-07-24T07:54:01Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b4248bab77558271f12a56c5bbec4bb08da1e9da2c30364c593f63b4845b7b5d",
-          "at": "2026-07-23T17:54:16Z"
+          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
+          "at": "2026-07-24T07:56:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81b27aef294d6eb8a69e91508d4b6662eab35c80e689f19df905171cc1d46308",
+          "at": "2026-07-24T08:53:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81b27aef294d6eb8a69e91508d4b6662eab35c80e689f19df905171cc1d46308",
+          "at": "2026-07-24T08:57:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81b27aef294d6eb8a69e91508d4b6662eab35c80e689f19df905171cc1d46308",
+          "at": "2026-07-24T08:59:23Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0285404624e26037c45b2718892ec4a50cd2604f8a7c631a1e1915c385788d6",
+          "at": "2026-07-24T02:03:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`timestamp_now()` samples `chrono::Utc::now()` directly, introducing an ambient, unmockable runtime dependency into the primary adapter. This violates the `cli_driver` boundary: drivers should only translate input, invoke one injected application service, and render its outcome without direct infrastructure access. Acquire the timestamp through the appropriate injected boundary and pass the validated value into the snapshot command.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/adr_baseline.rs",
+              "line": 306,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:a0285404624e26037c45b2718892ec4a50cd2604f8a7c631a1e1915c385788d6",
+          "at": "2026-07-24T02:12:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abe2f62ef0d93a77d66be5fa8cf8cba93731a998bb04a9efdf1b890702c40507",
+          "at": "2026-07-24T03:56:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abe2f62ef0d93a77d66be5fa8cf8cba93731a998bb04a9efdf1b890702c40507",
+          "at": "2026-07-24T04:00:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrBaselineSnapshotInput::try_from` embeds the kind/reason compatibility matrix in the primary adapter (`Init/Cite/NonSemanticFix` require no reason; `NewAdr/Escalation` require one). This is business validation/domain policy that belongs in the injected use-case service; the driver should translate the validated input and delegate it, as the prior implementation and `AdrBaselineInteractor` contract indicate. Move this legality check back to the usecase boundary (or pass a passive DTO through).",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/adr_baseline.rs",
+              "line": 179,
+              "category": "business logic in primary adapter"
+            }
+          ],
+          "hash": "rvw1:sha256:c8f4ed96fbdec446fba56f204dcf576f0c011b17c49ac43ce8d1dbfb8222a634",
+          "at": "2026-07-24T06:17:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The primary adapter now owns the ADR snapshot kind/reason compatibility rule in `AdrBaselineSnapshotInput::try_from` (lines 179–192), rejecting combinations before invoking `AdrBaselineService`. This is business validation that the usecase interactor is documented and designed to own; it also changes the previous behavior where the service received the command and produced the rendered validation error. Keep the adapter as a lossless translation and leave this legality check in the usecase.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/adr_baseline.rs",
+              "line": 179,
+              "category": "business logic in primary adapter"
+            }
+          ],
+          "hash": "rvw1:sha256:c8f4ed96fbdec446fba56f204dcf576f0c011b17c49ac43ce8d1dbfb8222a634",
+          "at": "2026-07-24T06:17:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrBaselineSnapshotInput::try_from` embeds the ADR kind/reason compatibility matrix in the primary adapter, rejecting invalid combinations before invoking `AdrBaselineService`. This is business validation/domain policy that belongs in the usecase; the driver should translate the input and delegate it so the application service remains the single owner of this rule and its error mapping.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/adr_baseline.rs",
+              "line": 179,
+              "category": "business logic in primary adapter"
+            }
+          ],
+          "hash": "rvw1:sha256:2ad3d150ac6c24d795ad1b2a7b81517879b2c8836e441ccbe13f5c889b34c3e5",
+          "at": "2026-07-24T06:53:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ad3d150ac6c24d795ad1b2a7b81517879b2c8836e441ccbe13f5c889b34c3e5",
+          "at": "2026-07-24T07:18:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54e011738af91f171244a53c872c360d7cf395e39ad3fe33cc543cb97b61acef",
+          "at": "2026-07-24T07:53:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54e011738af91f171244a53c872c360d7cf395e39ad3fe33cc543cb97b61acef",
+          "at": "2026-07-24T07:57:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76c0eb8fe380bf0fc5a25679da2bbedcbd6c671242189dc883be29e08c127d53",
+          "at": "2026-07-24T08:52:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76c0eb8fe380bf0fc5a25679da2bbedcbd6c671242189dc883be29e08c127d53",
+          "at": "2026-07-24T08:56:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76c0eb8fe380bf0fc5a25679da2bbedcbd6c671242189dc883be29e08c127d53",
+          "at": "2026-07-24T08:59:38Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:12228b5763fefdaba1693c23dea5df3fb4074bb283f21b9c5ee2293db3f77468",
+          "at": "2026-07-23T14:24:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:12228b5763fefdaba1693c23dea5df3fb4074bb283f21b9c5ee2293db3f77468",
+          "at": "2026-07-23T14:27:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3deec11698ce4aa32ac0ee7676d0f3afc51f34c3456e41a242900bc30bc3d8d7",
+          "at": "2026-07-23T14:43:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 requires this slice to be an 「独立 track」, but its cited decisions are D1/D3/D4/D5; independence is established by D2, which is not cited. As written, this part of the goal is not grounded in any referenced decision, even though CN-02 and AC-04 correctly cite D2 for the same requirement.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+              "line": 8,
+              "category": "goal not anchored to a decision"
+            }
+          ],
+          "hash": "rvw1:sha256:3deec11698ce4aa32ac0ee7676d0f3afc51f34c3456e41a242900bc30bc3d8d7",
+          "at": "2026-07-23T14:45:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:24f079539a67c45bdfe9b056e74c081f0b5249c3a73e39019454ce4f9437f9fa",
+          "at": "2026-07-23T14:51:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-00 states a repository-wide, completion-tracked initiative, but no acceptance criterion deterministically proves that the initiative is tracked through its explicit completion conditions; the criteria only establish this Leaf slice's completion and explicitly defer repository-wide convergence to Final convergence.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+              "line": 5,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:2b9310fb52e9c0c8e572eabde4dc87c60f770f00a2184f8584f268965f232dd9",
+          "at": "2026-07-23T15:31:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d14307ba6c647040ef27cc31df08e320a2116273c44fded81ae5576135249ba1",
+          "at": "2026-07-23T15:33:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-00 states the repository-wide initiative goal, but no acceptance criterion can deterministically prove that goal when this Leaf-only track completes. AC-04 only delegates the D6 convergence check to a future Final convergence track, so it does not provide current-track acceptance coverage for GO-00.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+              "line": 8,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "AC-04 makes the later Final convergence track’s repository-wide D6 verification part of this spec’s acceptance criteria, while OUT-02 explicitly places that work outside this Leaf track. The criterion therefore requires out-of-scope future behavior and cannot be satisfied independently with this slice as CN-02 requires.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+              "line": 178,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:d14307ba6c647040ef27cc31df08e320a2116273c44fded81ae5576135249ba1",
+          "at": "2026-07-23T15:37:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ff9a779545a1614db518054c712504f532417fc4b30a7f5c465943a7abe23099",
+          "at": "2026-07-23T15:39:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcf7da8dccc472bce0c70929be65973262487910c81466d6b6c706ea203c9b99",
+          "at": "2026-07-24T06:17:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-01 contradicts OUT-02/D5 by requiring the compatibility DTO `AdrBaselineRequest` to be deleted in this Leaf track, while physical deletion of compatibility shims is explicitly assigned to the Final convergence track.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+              "line": 138,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:dcf7da8dccc472bce0c70929be65973262487910c81466d6b6c706ea203c9b99",
+          "at": "2026-07-24T06:18:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6c494aea6d562c4d10c40b9d99f46c0d9e64629f6bc79a1ea8f1abb62f6b36fd",
+          "at": "2026-07-24T06:19:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-01 requires deleting the compatibility DTO `AdrBaselineRequest` in the Leaf commands track, contradicting OUT-02 and ADR D5, which assign physical deletion of compatibility shims to the Final convergence track.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+              "line": 138,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:dcf7da8dccc472bce0c70929be65973262487910c81466d6b6c706ea203c9b99",
+          "at": "2026-07-24T06:53:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:19aa773770ffb0a01805319887c11e9a39bf6ce0fa90911b16ce32b9a7965b59",
+          "at": "2026-07-24T06:54:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcf7da8dccc472bce0c70929be65973262487910c81466d6b6c706ea203c9b99",
+          "at": "2026-07-24T07:18:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcf7da8dccc472bce0c70929be65973262487910c81466d6b6c706ea203c9b99",
+          "at": "2026-07-24T07:53:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcf7da8dccc472bce0c70929be65973262487910c81466d6b6c706ea203c9b99",
+          "at": "2026-07-24T07:57:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcf7da8dccc472bce0c70929be65973262487910c81466d6b6c706ea203c9b99",
+          "at": "2026-07-24T08:52:38Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbd018b6b32ed0631dc9e8e98801cf91bef664d145f0762ef669b415af175b75",
+          "at": "2026-07-23T14:24:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbd018b6b32ed0631dc9e8e98801cf91bef664d145f0762ef669b415af175b75",
+          "at": "2026-07-23T14:29:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5c3dccab1047f7fbe5bbae244323017a57a003f79c2b0c7ebbbb407e5000e4eb",
+          "at": "2026-07-23T15:49:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::CatalogPort` and `usecase::CatalogService` are both `action: modify` and declare the same five method signatures (`init`, `add`, `import`, `cite`, `check`) verbatim. Every contract change—including this track’s `TrackId` migration—must therefore be duplicated across sibling traits. Introduce a shared declaration or differentiate the application-service contract from the storage port.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+              "line": 326,
+              "category": "duplicated method signature across sibling types"
+            },
+            {
+              "message": "`usecase::CatalogPort::init` and `usecase::CatalogService::init` return the shared `CatalogError`, although init can only produce the initialization subset while variants such as `DuplicateEntry`, `AnchorNotFound`, `InvalidRole`, `ParseFragment`, `SchemaInvalid`, and `DraftIncomplete` are unreachable. Neither entry documents the producible subset or justifies the broad error type; the same imprecision affects other catalogue verbs to varying degrees.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+              "line": 334,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "The synchronous I/O ports `usecase::AdrBaselineSourcePort`, `AdrBaselineStorePort`, `AdrBaselineStoreReadPort`, `CatalogPort`, `ImplCatalogSignalReaderPort`, `ImplPlanReaderPort`, `SelfBinaryTransplantPort`, `TaskContractReaderPort`, `TemplateBoundaryManifestPort`, and `TemplateExportPort` all declare only `is_async: false` methods despite filesystem, Git, or process I/O vocabulary. Their entry docs do not acknowledge an intentional blocking design. Document that choice or expose an async-capable boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+              "line": 99,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "The docs for `cli_composition::AdrBaselineCompositionRoot`, `CatalogCompositionRoot`, `TaskContractCompositionRoot`, and `TemplateCompositionRoot` paraphrase IN-02/AC-01/AC-02’s behavioral rule that roots only wire and return drivers. `no-upstream-restatement.md` requires these downstream entries to rely on their anchors rather than repeat that contract in prose.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/cli_composition-types.json",
+              "line": 42,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `cli_driver::AdrBaselineDriver`, `CatalogDriver`, `TaskContractDriver`, and `TemplateDriver` restate the upstream primary-adapter behavior—invoke application services and render `CommandOutcome`—instead of leaving that contract at the cited ADR/spec anchors.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/cli_driver-types.json",
+              "line": 17,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `usecase::AdrBaselineInteractor`, `AdrBaselineQueryInteractor`, `CatalogInteractor`, `CoverageVerifyInteractor`, `PreReviewGateInteractor`, `TemplateExportInteractor`, `AdrBaselineQueryService`, and `AdrBaselineService` re-explain IN-02/AC-02’s injected driver → interactor → port path in prose. Retain the structured anchors without duplicating that behavior contract downstream.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+              "line": 1041,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:5c3dccab1047f7fbe5bbae244323017a57a003f79c2b0c7ebbbb407e5000e4eb",
+          "at": "2026-07-23T15:58:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c36c72fc944dcdbb69c0271e5d13ab88f52b31762c201bc4de8e825d89b56823",
+          "at": "2026-07-23T16:25:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "CatalogError converts every retained named-field variant into a tuple variant (for example, `FileExists { path }` becomes `FileExists(PathBuf)`), although the documented modification only removes `DraftIncomplete`. Implementing this catalogue would unnecessarily break all existing constructions and pattern matches. Preserve the named payload shapes or provide explicit grounded justification for the additional migration.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+              "line": 1102,
+              "category": "action incoherent with the diff"
+            },
+            {
+              "message": "CatalogService::execute dispatches a CatalogRequest that combines the mutating Init/Add/Import/Cite operations with the read-only Check query and returns one generic CatalogResponse. This collapses command and query contracts into one application-service method and obscures operation-specific responses and errors. Split the command and query primary contracts, or otherwise preserve distinct operations while keeping CatalogPort separate.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+              "line": 533,
+              "category": "command / query method mixing in one type"
+            },
+            {
+              "message": "ImplCatalogSignalReaderPort, ImplPlanReaderPort, and TaskContractReaderPort all expose the full PreReviewGateError sum even though their adapters can respectively produce only SignalReadFailed, ImplPlanReadFailed, and TaskContractNotFound/TaskContractReadFailed. This advertises impossible failures at each boundary. Use operation-specific errors or explicitly justify and document the shared envelope.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+              "line": 625,
+              "category": "per-method error imprecision"
+            },
+            {
+              "message": "The docs for the ten synchronous secondary ports repeat the upstream architectural rationale that blocking I/O is intentional and no async runtime is introduced. This sentence-level restatement appears on AdrBaselineSourcePort, AdrBaselineStorePort, AdrBaselineStoreReadPort, CatalogPort, ImplCatalogSignalReaderPort, ImplPlanReaderPort, SelfBinaryTransplantPort, TaskContractReaderPort, TemplateBoundaryManifestPort, and TemplateExportPort. Keep the catalogue prose local to each type and rely on spec_refs for the upstream sync-first decision.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+              "line": 176,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:c36c72fc944dcdbb69c0271e5d13ab88f52b31762c201bc4de8e825d89b56823",
+          "at": "2026-07-23T16:32:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77dde1ede47e4068925e8f01f7b1fde92be8fc5912dbbdefd82bb2cea120b247",
+          "at": "2026-07-23T17:23:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::CatalogPort` is declared `action: reference`, but all five methods change `track_id` from the baseline `&str` to `&domain::TrackId`. A reference entry must remain baseline-identical and causes the changed declarations to be ignored by reference-signal semantics. Declare this trait as `modify`.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+              "line": 443,
+              "category": "action incoherent with the diff"
+            },
+            {
+              "message": "`infrastructure::FsCatalogAdapter` and its `CatalogPort` trait implementation remain `action: reference`, although implementing the modified port requires changing all five method signatures from `&str` to `&TrackId`. Declare the adapter and its `CatalogPort` implementation as `modify` so the companion API mutation is represented.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/infrastructure-types.json",
+              "line": 63,
+              "category": "action incoherent with the diff"
+            }
+          ],
+          "hash": "rvw1:sha256:77dde1ede47e4068925e8f01f7b1fde92be8fc5912dbbdefd82bb2cea120b247",
+          "at": "2026-07-23T17:32:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c2d90188933e39a44fdffdc72233c96d490d45b7442407bdde0985238b6bc74",
+          "at": "2026-07-23T17:45:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c2d90188933e39a44fdffdc72233c96d490d45b7442407bdde0985238b6bc74",
+          "at": "2026-07-23T17:48:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a765c066cc1e5032efa1b364cf76ea6407195725a78dd2aad3ccb2311de5efce",
+          "at": "2026-07-24T02:04:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::commands::adr_baseline::items_dir` is a read-only selector over `&AdrBaselineCommand`, yet it returns an owned `PathBuf`. This forces cloning one of the command’s existing paths; the dispatch can instead destructure the command once and move that `PathBuf` without this owned-return helper. This is an ownership-signature smell under the types policy.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/cli-types.json",
+              "line": 15,
+              "category": "API shape / ownership signature smell"
+            }
+          ],
+          "hash": "rvw1:sha256:a765c066cc1e5032efa1b364cf76ea6407195725a78dd2aad3ccb2311de5efce",
+          "at": "2026-07-24T02:15:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3cf70ba1e19e89a8b11e229ee1e53b222046b57e6c9e298397804c0d02769c25",
+          "at": "2026-07-24T03:55:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrBaselineClockPort::now` returns the broad `AdrBaselineValidationError`, permitting unrelated `InvalidReason` and `InvalidSourceFileName` failures even though this operation can only produce timestamp failures. Give the clock port an operation-specific error type (or return the timestamp validation error directly) and map it to `AdrBaselineValidationError::InvalidTimestamp` in the interactor.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+              "line": 215,
+              "category": "API error precision"
+            },
+            {
+              "message": "`AdrBaselineCommand::Snapshot` independently stores `AdrBaselineKind` and `Option<NonEmptyString>`, so callers can construct invalid commands such as `NewAdr` without a reason or `Init` with one. Reshape this contract with variants or a validated reason-aware kind that carries a reason only for `NewAdr` and `Escalation`.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+              "line": 1274,
+              "category": "State-shape smell"
+            }
+          ],
+          "hash": "rvw1:sha256:3cf70ba1e19e89a8b11e229ee1e53b222046b57e6c9e298397804c0d02769c25",
+          "at": "2026-07-24T04:03:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4acb0a727e9c4cf4ab57d634cc5715b9e7bf325b31989a2560674b45f35ef6af",
+          "at": "2026-07-24T06:17:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4acb0a727e9c4cf4ab57d634cc5715b9e7bf325b31989a2560674b45f35ef6af",
+          "at": "2026-07-24T06:17:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `docs` fields restate upstream behavioral/design contracts instead of only anchoring them: `AdrBaselineStorePort` repeats the legal reason/kind invariant, `AdrBaselineCommand` repeats timestamp/boundary enforcement, `AdrBaselineSnapshotKind` repeats variant payload rules, and `cli_driver::AdrBaselineInput` repeats the unrepresentable-state guarantee. Replace these prose contracts with upstream anchor references per `no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+              "line": 1398,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:1e4dd8d302b8e3297ee342f925ee9ea54f69d674f9baefd4db792610cbcbd89b",
+          "at": "2026-07-24T06:53:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Upstream behavioral/design contracts are still restated in catalogue `docs` instead of being expressed by anchor references: `cli_composition::AdrBaselineCompositionRoot` describes exact wiring/execution, `cli_driver::AdrBaselineDriver` describes provider invocation/error translation, `infrastructure::timestamp_now` describes the injected timestamp contract, and `usecase::AdrBaselineInteractor` / `usecase::AdrBaselineValidationError` describe the explicit-time and error-boundary decisions. Replace these prose contracts with upstream anchor references per `no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/cli_composition-types.json",
+              "line": 57,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:0f8fc01280a3073390c2b6d3fa25aab7ab3d8e40ac467df3e3178a4296cbb697",
+          "at": "2026-07-24T07:18:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:931e7e03d37c235d38bbcda1b3cff56fac12b3f8b50f5df080d1bc7d8fb5539b",
+          "at": "2026-07-24T07:54:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrBaselineDriver::new` accepts a timestamp provider returning the repository-wide `ValidationError`. That enum includes unrelated track, task, branch, status, and catalogue failures that a clock operation cannot produce, while this entry documents no producible subset. Use a timestamp-specific error contract instead.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/cli_driver-types.json",
+              "line": 87,
+              "category": "API error precision"
+            },
+            {
+              "message": "`AdrBaselineService::execute` still returns `AdrBaselineError`, including its `Validation(AdrBaselineValidationError)` branch. The modified command now contains validated filenames and a reason-aware `AdrBaselineSnapshotKind`, so `AdrBaselineInteractor` has no invalid raw data from which to produce `InvalidSourceFileName` or `InvalidReason`; only Store and Source failures remain reachable. Remove the dead validation branch and declare the companion error-type modification, or narrow the service error contract.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+              "line": 282,
+              "category": "API error precision"
+            },
+            {
+              "message": "`AdrBaselineStorePort` declares synchronous snapshot and restore operations backed by filesystem persistence, but its modified docs no longer acknowledge that blocking choice. Restore an explicit synchronous/blocking contract so adapters are not designed with an ambiguous execution color.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+              "line": 403,
+              "category": "Sync/async color mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:931e7e03d37c235d38bbcda1b3cff56fac12b3f8b50f5df080d1bc7d8fb5539b",
+          "at": "2026-07-24T08:02:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb376bacbea0440555a0f045d444cdaf54ae91687c29f107744c2305cb8a85b0",
+          "at": "2026-07-24T08:52:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb376bacbea0440555a0f045d444cdaf54ae91687c29f107744c2305cb8a85b0",
+          "at": "2026-07-24T08:57:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb376bacbea0440555a0f045d444cdaf54ae91687c29f107744c2305cb8a85b0",
+          "at": "2026-07-24T09:00:41Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f516b7395c8e123709df7aca887f1ea8905d46c30e8de8f807b43f5505aa4903",
+          "at": "2026-07-24T02:04:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_interactor_delegates_to_port` makes every `CatalogPort` method return `Ok`, so it never verifies that `CatalogInteractor` preserves named `CatalogError` variants and payloads across the migrated command methods or the new `CatalogQueryService`. Add failing-port cases for all five verbs and assert unchanged error propagation.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalog_gen.rs",
+              "line": 577,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:f516b7395c8e123709df7aca887f1ea8905d46c30e8de8f807b43f5505aa4903",
+          "at": "2026-07-24T02:11:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:912eb6c1b3388f6a26436abe39239378bc372038c806ab84aebe0bbed7fcfad3",
+          "at": "2026-07-24T02:17:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fd8e9f221854fce1594ce44ddd819514fa5ad3fe9e432f9ef95f0f1ec033f7ad",
+          "at": "2026-07-24T03:56:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Snapshot` now obtains wall-clock time through `self.clock.now()` inside the usecase; the production adapter delegates to `timestamp_now()`. This hides an implicit runtime-time dependency behind a port, contrary to `coding-principles.md` §Usecase Layer Purity, which requires time to be supplied as a usecase-entrypoint argument. Obtain the `Timestamp` at the CLI/composition boundary and carry it in `AdrBaselineCommand::Snapshot` instead.",
+              "severity": "P1",
+              "file": "libs/usecase/src/adr_baseline.rs",
+              "line": 232,
+              "category": "architecture_purity"
+            }
+          ],
+          "hash": "rvw1:sha256:fd8e9f221854fce1594ce44ddd819514fa5ad3fe9e432f9ef95f0f1ec033f7ad",
+          "at": "2026-07-24T04:00:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a0be9f24cf1151e278031eb82be5e60a9324dbfa6c95d2b8d57c2ae89a47dc4",
+          "at": "2026-07-24T06:16:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a0be9f24cf1151e278031eb82be5e60a9324dbfa6c95d2b8d57c2ae89a47dc4",
+          "at": "2026-07-24T06:17:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e15f6fec45cc3a0718f2310e12a7867498643fbc72328f085773acf47403fb07",
+          "at": "2026-07-24T06:53:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f7b7617a40d33587012374540f54588fcf0a3b6c32e21fb2f63943d0cadc1b1",
+          "at": "2026-07-24T07:18:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f7b7617a40d33587012374540f54588fcf0a3b6c32e21fb2f63943d0cadc1b1",
+          "at": "2026-07-24T07:53:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrBaselineSnapshotKind` is classified as a usecase DTO but now owns domain policy: `uses_fork_point` duplicates `domain::AdrBaselineKind::uses_fork_point`, while `into_ledger_parts` defines the kind/reason invariant and persistence mapping. This violates `coding-principles.md` §Usecase Layer Purity; move the reason-aware snapshot type and these decisions into `domain`, leaving the interactor to orchestrate the resulting domain value and ports.",
+              "severity": "P1",
+              "file": "libs/usecase/src/adr_baseline.rs",
+              "line": 49,
+              "category": "architecture_purity"
+            }
+          ],
+          "hash": "rvw1:sha256:4f7b7617a40d33587012374540f54588fcf0a3b6c32e21fb2f63943d0cadc1b1",
+          "at": "2026-07-24T07:57:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f7b7617a40d33587012374540f54588fcf0a3b6c32e21fb2f63943d0cadc1b1",
+          "at": "2026-07-24T08:04:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4f7b7617a40d33587012374540f54588fcf0a3b6c32e21fb2f63943d0cadc1b1",
+          "at": "2026-07-24T08:06:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d400737eca62ebdcebb174a5f3321d4db0dd2ef1723967e0fdd0190e37ff989",
+          "at": "2026-07-24T08:52:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d400737eca62ebdcebb174a5f3321d4db0dd2ef1723967e0fdd0190e37ff989",
+          "at": "2026-07-24T08:57:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9d400737eca62ebdcebb174a5f3321d4db0dd2ef1723967e0fdd0190e37ff989",
+          "at": "2026-07-24T09:01:02Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db80ecab4d305a452c28859a7c5d394f45691cc3cbaadd35a0b2913023ca3703",
+          "at": "2026-07-24T02:03:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db80ecab4d305a452c28859a7c5d394f45691cc3cbaadd35a0b2913023ca3703",
+          "at": "2026-07-24T02:09:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:43744f3a28d4f5a129847c3d95bb7e7ef433474427c615ca1f46f3a230eb0670",
+          "at": "2026-07-24T03:55:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:43744f3a28d4f5a129847c3d95bb7e7ef433474427c615ca1f46f3a230eb0670",
+          "at": "2026-07-24T04:00:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrBaselineCompositionRoot::adr_baseline_driver` injects a closure that directly calls `infrastructure::timestamp_now()` when the driver handles a request. This leaves ambient time/I/O behavior in the composition root instead of wiring a clock adapter behind the intended port boundary, violating the pure-DI composition-root contract.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/adr_baseline.rs",
+              "line": 40,
+              "category": "direct-I/O / port-boundary violation"
+            }
+          ],
+          "hash": "rvw1:sha256:cfc278581cf942a95014a35939f87e9bc4d84d016c100f7231803c528ad94443",
+          "at": "2026-07-24T06:16:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrBaselineCompositionRoot::adr_baseline_driver` injects a closure that directly calls `infrastructure::timestamp_now()` during command handling. This keeps ambient time access in the composition root instead of wiring a clock adapter through the port boundary, violating the pure-DI/direct-I/O composition-root contract.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/adr_baseline.rs",
+              "line": 40,
+              "category": "direct-I/O / port-boundary violation"
+            }
+          ],
+          "hash": "rvw1:sha256:cfc278581cf942a95014a35939f87e9bc4d84d016c100f7231803c528ad94443",
+          "at": "2026-07-24T06:18:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrBaselineCompositionRoot::adr_baseline_driver` injects `infrastructure::timestamp_now` directly as a function pointer. This bypasses a concrete clock adapter/port boundary and leaves an infrastructure I/O dependency in the composition root, contrary to the pure-DI wiring contract.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/adr_baseline.rs",
+              "line": 40,
+              "category": "direct-I/O / port-boundary violation"
+            }
+          ],
+          "hash": "rvw1:sha256:c2ba93a5e56243a0acffc911f4aad3713a9eed48b01a7feb4b2bedb912f35727",
+          "at": "2026-07-24T06:53:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2ba93a5e56243a0acffc911f4aad3713a9eed48b01a7feb4b2bedb912f35727",
+          "at": "2026-07-24T07:18:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2ba93a5e56243a0acffc911f4aad3713a9eed48b01a7feb4b2bedb912f35727",
+          "at": "2026-07-24T07:53:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2ba93a5e56243a0acffc911f4aad3713a9eed48b01a7feb4b2bedb912f35727",
+          "at": "2026-07-24T07:56:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11ce1af5ddd8cbf0760958cdb0cdc2b1f2e0e272a554d4635bd0f69cd1b3f972",
+          "at": "2026-07-24T08:52:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11ce1af5ddd8cbf0760958cdb0cdc2b1f2e0e272a554d4635bd0f69cd1b3f972",
+          "at": "2026-07-24T08:56:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:11ce1af5ddd8cbf0760958cdb0cdc2b1f2e0e272a554d4635bd0f69cd1b3f972",
+          "at": "2026-07-24T08:59:25Z"
         }
       ]
     }

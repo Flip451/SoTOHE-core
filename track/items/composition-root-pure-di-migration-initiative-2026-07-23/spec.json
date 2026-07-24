@@ -135,7 +135,7 @@
   "acceptance_criteria": [
     {
       "id": "AC-01",
-      "text": "ADR baseline、Catalog、Template、TaskContract の各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。",
+      "text": "ADR baseline command は CLI で track scope と snapshot input を検証・解決し、解決済みの typed AdrBaselineInput を直接構築する。未解決の互換 DTO AdrBaselineRequest は composition boundary へ渡さず削除し、composition root はその request を変換・解決せず、既に解決済みの direct driver path を wiring する。Catalog、Template、TaskContract を含む各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",

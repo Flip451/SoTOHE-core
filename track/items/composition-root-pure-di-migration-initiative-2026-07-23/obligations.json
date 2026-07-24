@@ -39,6 +39,70 @@
     },
     {
       "id": {
+        "entry_key": "AdrBaselineStorePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:snapshot"
+      },
+      "target_entry": {
+        "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "AdrBaselineStorePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:snapshot' of AdrBaselineStorePort",
+      "declaration_hash": "ff11418f7912ef89992a34a545398ada67dd0fc5c9ed48a35a9672fd552aeaa8",
+      "spec_refs": [
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "AdrBaselineStorePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:restore"
+      },
+      "target_entry": {
+        "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "AdrBaselineStorePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:restore' of AdrBaselineStorePort",
+      "declaration_hash": "ff11418f7912ef89992a34a545398ada67dd0fc5c9ed48a35a9672fd552aeaa8",
+      "spec_refs": [
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      ]
+    },
+    {
+      "id": {
         "entry_key": "CatalogPort",
         "obligation_kind": "contract",
         "item_identifier": "trait_method:init"
@@ -507,6 +571,66 @@
     },
     {
       "id": {
+        "entry_key": "infrastructure::adr_baseline::timestamp_now",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::adr_baseline::timestamp_now"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::adr_baseline::timestamp_now",
+      "declaration_hash": "03100ee4b400e161757f8b78d971566552f50474238bcc24194b69c1e4f30e19",
+      "spec_refs": [
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsAdrBaselineStore",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::adr_baseline::AdrBaselineStorePort"
+      },
+      "target_entry": {
+        "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsAdrBaselineStore"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::adr_baseline::AdrBaselineStorePort' of FsAdrBaselineStore",
+      "declaration_hash": "b4a7c530ad00511ade285e95d42d29a4f2edfa9a689a9f7ca299fb58043eb96c",
+      "spec_refs": [
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      ]
+    },
+    {
+      "id": {
         "entry_key": "FsCatalogAdapter",
         "obligation_kind": "contract_conformance",
         "item_identifier": "trait_impl:usecase::catalog_gen::CatalogPort"
@@ -630,6 +754,86 @@
         {
           "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
           "element_id": "AC-02"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_read",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::adr_baseline::resolve_for_read"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::adr_baseline::resolve_for_read",
+      "declaration_hash": "360557bcfd0b313c338b09e6f8a55c264ecba3ebf23135209dc96eee9445bb7d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "CN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_write",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::adr_baseline::resolve_for_write"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::adr_baseline::resolve_for_write",
+      "declaration_hash": "360557bcfd0b313c338b09e6f8a55c264ecba3ebf23135209dc96eee9445bb7d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "CN-01"
         }
       ]
     }

@@ -29,6 +29,7 @@ use std::collections::{HashMap, HashSet};
 
 use domain::TypeSignalsDocument;
 use domain::task_contract::ContractedEntryRef;
+use domain::tddd::catalogue_linter::FreeText;
 
 use super::{
     CANONICAL_LAYERS, CoverageVerifyOutcome, PreReviewGateError, PreReviewGateOutcome,
@@ -40,7 +41,7 @@ pub(super) fn blocked_coverage_outcome(
 ) -> Result<CoverageVerifyOutcome, PreReviewGateError> {
     CoverageVerifyOutcome::blocked(violations).map_err(|_| {
         PreReviewGateError::TaskContractReadFailed {
-            message: "coverage verify blocked outcome invariant failed".to_owned(),
+            message: FreeText::new("coverage verify blocked outcome invariant failed"),
         }
     })
 }
@@ -50,7 +51,7 @@ pub(super) fn blocked_outcome(
 ) -> Result<PreReviewGateOutcome, PreReviewGateError> {
     PreReviewGateOutcome::blocked(violations).map_err(|_| {
         PreReviewGateError::TaskContractReadFailed {
-            message: "pre-review gate blocked outcome invariant failed".to_owned(),
+            message: FreeText::new("pre-review gate blocked outcome invariant failed"),
         }
     })
 }
@@ -77,11 +78,11 @@ pub(super) fn build_scope_entries(
         )
         .map_err(|_| PreReviewGateError::SignalReadFailed {
             layer: layer.clone(),
-            message: format!(
+            message: FreeText::new(format!(
                 "invalid entry key '{}' in {}-type-signals.json",
                 signal.type_name(),
                 layer.as_ref()
-            ),
+            )),
         })?;
         let key = entry_key.as_str().to_owned();
         entries.entry(key).or_insert_with(|| ContractedEntryRef::new(layer.clone(), entry_key));
@@ -181,9 +182,9 @@ pub(super) fn entry_key_to_contracted_ref(
         .find(|e| e.layer() == layer && e.entry_key().as_str() == key)
         .cloned()
         .ok_or_else(|| PreReviewGateError::TaskContractReadFailed {
-            message: format!(
+            message: FreeText::new(format!(
                 "internal error: entry_key '{key}' not found in contract for layer '{}'",
                 layer.as_ref()
-            ),
+            )),
         })
 }

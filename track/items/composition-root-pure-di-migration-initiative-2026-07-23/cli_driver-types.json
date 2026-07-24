@@ -6,15 +6,59 @@
   "trait_impls": [
     {
       "action": "reference",
-      "trait_ref": "core::fmt::Debug",
-      "for_type": "TaskContractDriver"
+      "for_type": "TaskContractDriver",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineSnapshotInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "AdrBaselineSnapshotInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "AdrBaselineSnapshotInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "AdrBaselineSnapshotInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "AdrBaselineSnapshotInput",
+      "trait_ref": "core::convert::TryFrom<(AdrBaselineKindInput, Option<AdrBaselineReasonInput>)>"
+    },
+    {
+      "for_type": "usecase::AdrBaselineSnapshotKind",
+      "trait_ref": "core::convert::From<AdrBaselineSnapshotInput>"
     }
   ],
   "traits": {},
   "types": {
     "AdrBaselineDriver": {
-      "action": "reference",
-      "docs": "Primary adapter parameterized by AdrBaselineService and AdrBaselineQueryService.",
+      "action": "modify",
+      "docs": null,
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -37,6 +81,10 @@
             {
               "name": "query_service",
               "ty": "std::sync::Arc<dyn usecase::adr_baseline::AdrBaselineQueryService>"
+            },
+            {
+              "name": "timestamp_provider",
+              "ty": "fn() -> core::result::Result<usecase::Timestamp, usecase::adr_baseline::AdrBaselineTimestampError>"
             }
           ],
           "returns": "Self"
@@ -74,6 +122,183 @@
         },
         {
           "anchor": "CN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineInput": {
+      "action": "modify",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Snapshot",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "TrackIdInput"
+                },
+                {
+                  "name": "source",
+                  "ty": "AdrSourceFileNameInput"
+                },
+                {
+                  "name": "kind",
+                  "ty": "AdrBaselineSnapshotInput"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Restore",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "TrackIdInput"
+                },
+                {
+                  "name": "source",
+                  "ty": "AdrSourceFileNameInput"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CheckReview",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "TrackIdInput"
+                },
+                {
+                  "name": "primary_source",
+                  "ty": "core::option::Option<AdrSourceFileNameInput>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CheckCommit",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "TrackIdInput"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineRequest": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "adr_baseline",
+      "spec_refs": [
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineSnapshotInput": {
+      "action": "add",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Init",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Cite",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "NewAdr",
+            "payload": {
+              "fields": [
+                "usecase::NonEmptyString"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "NonSemanticFix",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Escalation",
+            "payload": {
+              "fields": [
+                "usecase::NonEmptyString"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
           "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
         }
       ]

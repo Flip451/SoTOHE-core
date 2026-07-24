@@ -3,15 +3,15 @@ use std::io::{Read as _, Write as _};
 use std::path::{Path, PathBuf};
 
 use domain::adr_baseline::{
-    AdrBaselineKind, AdrBaselineLedgerEntry, AdrBaselineRecordedCopyStatus, AdrSourceFileName,
+    AdrBaselineLedgerEntry, AdrBaselineRecordedCopyStatus, AdrSourceFileName,
 };
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
-use domain::{ContentHash, NonEmptyString, Timestamp, TrackId};
+use domain::{ContentHash, Timestamp, TrackId};
 use fs4::fs_std::FileExt as _;
 use sha2::{Digest as _, Sha256};
 use usecase::adr_baseline::{
-    AdrBaselineStoreError, AdrBaselineStorePort, AdrBaselineStoreReadError,
-    AdrBaselineStoreReadPort,
+    AdrBaselineSnapshotKind, AdrBaselineStoreError, AdrBaselineStorePort,
+    AdrBaselineStoreReadError, AdrBaselineStoreReadPort,
 };
 
 use super::{decode_ledger_line, diagnostic, encode_ledger_entry, make_entry};
@@ -205,15 +205,9 @@ impl AdrBaselineStorePort for FsAdrBaselineStore {
         track_id: &TrackId,
         source: &AdrSourceFileName,
         bytes: Vec<u8>,
-        kind: AdrBaselineKind,
-        reason: Option<NonEmptyString>,
+        kind: AdrBaselineSnapshotKind,
         timestamp: Timestamp,
     ) -> Result<AdrBaselineLedgerEntry, AdrBaselineStoreError> {
-        if kind.requires_reason() != reason.is_some() {
-            return Err(AdrBaselineStoreError::Write(diagnostic(
-                "snapshot kind and reason are incompatible",
-            )));
-        }
         validate_adr_source_file_name(source).map_err(io_write_error)?;
         if bytes.len() as u64 > MAX_SNAPSHOT_BYTES {
             return Err(AdrBaselineStoreError::Write(diagnostic(
@@ -221,6 +215,7 @@ impl AdrBaselineStorePort for FsAdrBaselineStore {
             )));
         }
         let hash = content_hash(&bytes);
+        let (kind, reason) = kind.into_ledger_parts();
         let entry = make_entry(source.clone(), hash, kind, reason, timestamp)
             .map_err(AdrBaselineStoreError::Write)?;
         let encoded = encode_ledger_entry(&entry)

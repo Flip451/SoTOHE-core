@@ -1,5 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "a37dc03aacd2f1bf2a071561c0012c9023c6ced85febf0eb530df5b6feb60d7d",
-  "signals": []
+  "catalogue_declaration_hash": "25855a56c2c33d84017e914a13d0d746e73bc6163d44762cc28deb7c1145e4b6",
+  "signals": [
+    {
+      "type_name": "cli::commands::adr_baseline::resolve_for_read",
+      "signal": "blue",
+      "entry_hash": "e957b97645bfbd32f954dbdbc116f89824176048732cefffc2d77165a9cf1ee5"
+    },
+    {
+      "type_name": "cli::commands::adr_baseline::resolve_for_write",
+      "signal": "blue",
+      "entry_hash": "e957b97645bfbd32f954dbdbc116f89824176048732cefffc2d77165a9cf1ee5"
+    }
+  ]
 }
