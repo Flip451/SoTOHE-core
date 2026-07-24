@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7b892eb199edf41c11b13d27f10d006bb5dc5f72b5f2356b2aa976190258d96",
+          "at": "2026-07-24T20:20:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 の初期化列は単なる `git init` なので、初期ブランチ名は利用者の `init.defaultBranch` などに依存し、`main` になる保証がありません。一方、D2 は出荷設定を `main` に固定すれば実在ブランチと一致して不一致プロンプトが消えると決定しています。初期ブランチが `master` 等の環境では同じ摩擦が残るため、D1 で `main` を明示的に作成するなど、D1 と D2 の前提を一致させる必要があります。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+              "line": 36,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:f7b892eb199edf41c11b13d27f10d006bb5dc5f72b5f2356b2aa976190258d96",
+          "at": "2026-07-24T20:23:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb9eb846f93b4f7dd81ba67293184a2fa0e0c41b915bc89bd41d015cc780286e",
+          "at": "2026-07-24T20:27:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fb9eb846f93b4f7dd81ba67293184a2fa0e0c41b915bc89bd41d015cc780286e",
+          "at": "2026-07-24T20:30:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bd5df0edcf9a228de96709a2258ac6bbc2e745071fc1c1ab89033df65625bc66",
+          "at": "2026-07-24T20:54:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Rejected Alternative A は「責任分界」を根拠に暗黙のリポジトリ作成を却下していますが、参照先 convention の適用範囲は CI/verifier による consumer 所有の provider/agent 設定の強制可否です。git 初期化や初期コミットの暗黙実行は扱っておらず、A の判断根拠になっていません。該当参照を実際にこの判断を支える文書へ差し替えるか、A をこの convention に依存しない説明にしてください。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+              "line": 131,
+              "category": "broken narrative reference"
+            }
+          ],
+          "hash": "rvw1:sha256:bd5df0edcf9a228de96709a2258ac6bbc2e745071fc1c1ab89033df65625bc66",
+          "at": "2026-07-24T20:58:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fea3e68ad0ab5dd0591a02e88ef45742d06715328fb909843a505a5b2fe4dd5d",
+          "at": "2026-07-24T21:02:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fea3e68ad0ab5dd0591a02e88ef45742d06715328fb909843a505a5b2fe4dd5d",
+          "at": "2026-07-24T21:05:47Z"
+        }
+      ]
+    }
+  }
+}
