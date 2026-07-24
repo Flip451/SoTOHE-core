@@ -17,7 +17,9 @@ filename is recorded as that track's init baseline.
 
 ## Claude Code invocation constraints
 
-- **Progress tracking**: use `TaskCreate` to register the workflow steps as tasks; mark each `in_progress` before starting and `completed` after its gate passes.
+- **Progress tracking**: when `TaskCreate` is available, use it to register the workflow steps
+  as tasks, marking each `in_progress` before starting and `completed` after its gate passes.
+  When it is unavailable, report those transitions in text and continue the workflow.
 - **Sub-command execution**: drive each sub-step by reading its `.claude/commands/track/<name>.md` definition and executing it. Do not re-state sub-command logic here.
 - **Phase 0 input forwarding**: when Step 1 invokes
   `/track:init <feature> --primary-adr <file>`, pass both resolved, user-confirmed inputs

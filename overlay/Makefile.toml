@@ -3,10 +3,59 @@ extend = "Makefile.host.toml"
 [config]
 skip_core_tasks = true
 default_to_workspace = false
+init_task = "cargo-make-lifecycle-init"
 
 # ---------------------------------------------------------------------------
 # Setup
 # ---------------------------------------------------------------------------
+
+[tasks.cargo-make-lifecycle-init]
+private = true
+description = "[internal] Keep cargo-make's lifecycle hook distinct from the public init workflow"
+script_runner = "@shell"
+script = [":"]
+
+[tasks.init]
+description = "[workflow] Initialize an exported scaffold repository (opt-in, first run only)"
+script_runner = "@shell"
+script = ['''
+set -e
+
+if git rev-parse --verify HEAD >/dev/null 2>&1; then
+  echo "[ERROR] cargo make init can only run before the repository has its first commit." >&2
+  exit 1
+fi
+
+if [ -e .git ]; then
+  echo "[ERROR] cargo make init requires an exported scaffold without existing Git metadata." >&2
+  exit 1
+fi
+
+had_lockfile=false
+if [ -e Cargo.lock ]; then
+  had_lockfile=true
+fi
+
+cleanup() {
+  status=$?
+  if [ "$status" -ne 0 ]; then
+    rm -rf .git
+    if [ "$had_lockfile" = false ]; then
+      rm -f Cargo.lock
+    fi
+    echo "[ERROR] initialization failed; created Git state has been rolled back." >&2
+  fi
+  exit "$status"
+}
+trap cleanup EXIT
+
+git init -b main
+cargo generate-lockfile
+git add -A
+git commit -m "Initial commit"
+cargo make bootstrap
+trap - EXIT
+''']
 
 [tasks.bootstrap]
 description = "[gate] Install pinned auxiliary tools and sotp, then run host-first CI"

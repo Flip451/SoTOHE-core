@@ -33,35 +33,39 @@ fn exported_scaffold() -> PathBuf {
     EXPORTED_SCAFFOLD
         .get_or_init(|| {
             let export_parent = tempfile::tempdir().unwrap();
-            let root = workspace_root();
             let output_dir = export_parent.path().join("scaffold");
-            let output = Command::new(env!("CARGO_BIN_EXE_sotp"))
-                .env("SOTP_TELEMETRY", "0")
-                .args([
-                    "template",
-                    "export",
-                    "--workspace-root",
-                    root.to_str().unwrap(),
-                    "--manifest-path",
-                    root.join(".harness/config/template-boundary.json").to_str().unwrap(),
-                    "--overlay-dir",
-                    root.join("overlay").to_str().unwrap(),
-                    "--output-dir",
-                    output_dir.to_str().unwrap(),
-                ])
-                .output()
-                .unwrap();
-
-            assert!(
-                output.status.success(),
-                "template export failed\nstdout: {}\nstderr: {}",
-                String::from_utf8_lossy(&output.stdout),
-                String::from_utf8_lossy(&output.stderr),
-            );
+            export_scaffold(&output_dir);
             export_parent
         })
         .path()
         .join("scaffold")
+}
+
+fn export_scaffold(output_dir: &Path) {
+    let root = workspace_root();
+    let output = Command::new(env!("CARGO_BIN_EXE_sotp"))
+        .env("SOTP_TELEMETRY", "0")
+        .args([
+            "template",
+            "export",
+            "--workspace-root",
+            root.to_str().unwrap(),
+            "--manifest-path",
+            root.join(".harness/config/template-boundary.json").to_str().unwrap(),
+            "--overlay-dir",
+            root.join("overlay").to_str().unwrap(),
+            "--output-dir",
+            output_dir.to_str().unwrap(),
+        ])
+        .output()
+        .unwrap();
+
+    assert!(
+        output.status.success(),
+        "template export failed\nstdout: {}\nstderr: {}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr),
+    );
 }
 
 fn exported_file(relative_path: &str) -> String {
@@ -152,7 +156,11 @@ fn assert_no_retired_passthrough_calls(surface_paths: &[&str]) {
 #[test]
 fn test_exported_scaffold_makefile_has_only_host_first_workflow_tasks() {
     let makefile = exported_file("Makefile.toml");
+    let source_makefile = fs::read_to_string(workspace_root().join("Makefile.toml"))
+        .expect("source Makefile.toml must be readable");
     let expected_tasks = BTreeSet::from([
+        "cargo-make-lifecycle-init",
+        "init",
         "bootstrap",
         "install-aux-tools",
         "install-sotp",
@@ -191,6 +199,10 @@ fn test_exported_scaffold_makefile_has_only_host_first_workflow_tasks() {
     ]);
 
     assert_eq!(task_names(&makefile), expected_tasks);
+    assert!(
+        !task_names(&source_makefile).contains("init"),
+        "the init task must be available only in the exported overlay"
+    );
     assert!(makefile.starts_with("extend = \"Makefile.host.toml\""));
     assert!(makefile.contains("[tasks.verify-track-metadata]"));
     assert_eq!(
@@ -199,6 +211,133 @@ fn test_exported_scaffold_makefile_has_only_host_first_workflow_tasks() {
             .count(),
         1
     );
+}
+
+#[test]
+fn test_exported_init_task_first_run_completes_and_repeat_rejects() {
+    use std::os::unix::fs::PermissionsExt;
+
+    let export_parent = tempfile::tempdir().unwrap();
+    let scaffold = export_parent.path().join("scaffold");
+    export_scaffold(&scaffold);
+    let shim_dir = export_parent.path().join("init-test-shim");
+    fs::create_dir_all(&shim_dir).unwrap();
+
+    let real_cargo = std::env::var_os("CARGO").expect("Cargo must provide its executable path");
+
+    let git_shim = shim_dir.join("git");
+    fs::write(
+        &git_shim,
+        "#!/bin/sh\nprintf 'git %s\\n' \"$*\" >> \"$INIT_TRACE\"\ncase \"$1\" in\n  rev-parse)\n    if [ \"$2\" = \"--verify\" ] && [ \"$3\" = \"HEAD\" ] && [ -f .git/committed ]; then\n      printf '%s\\n' simulated-head\n      exit 0\n    fi\n    exit 1\n    ;;\n  init)\n    mkdir -p .git\n    printf '%s\\n' \"$3\" > .git/branch\n    ;;\n  add) ;;\n  commit)\n    : > .git/committed\n    ;;\n  *)\n    printf 'unexpected git command: %s\\n' \"$*\" >&2\n    exit 64\n    ;;\nesac\n",
+    )
+    .unwrap();
+    fs::set_permissions(&git_shim, fs::Permissions::from_mode(0o755)).unwrap();
+
+    let cargo_shim = shim_dir.join("cargo");
+    fs::write(
+        &cargo_shim,
+        "#!/bin/sh\ncase \"$1 $2\" in\n  'generate-lockfile ') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" && printf 'generated lockfile\\n' > Cargo.lock ;;\n  'make bootstrap') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" ;;\n  *) printf 'unexpected cargo command: %s\\n' \"$*\" >&2; exit 64 ;;\nesac\n",
+    )
+    .unwrap();
+    fs::set_permissions(&cargo_shim, fs::Permissions::from_mode(0o755)).unwrap();
+
+    let trace = shim_dir.join("init.trace");
+    let sotp_shim = scaffold.join("bin/sotp");
+    fs::write(&sotp_shim, "#!/bin/sh\nprintf 'sotp %s\\n' \"$*\" >> \"$INIT_TRACE\"\n").unwrap();
+    fs::set_permissions(&sotp_shim, fs::Permissions::from_mode(0o755)).unwrap();
+
+    let run = || {
+        let shimmed_path =
+            format!("{}:{}", shim_dir.display(), std::env::var("PATH").unwrap_or_default());
+        Command::new(&real_cargo)
+            .args(["make", "init"])
+            .current_dir(&scaffold)
+            .env("PATH", shimmed_path)
+            .env("INIT_TRACE", &trace)
+            .output()
+            .unwrap()
+    };
+
+    let first = run();
+    assert!(
+        first.status.success(),
+        "first initialization must succeed\nstderr: {}\ntrace: {}",
+        String::from_utf8_lossy(&first.stderr),
+        fs::read_to_string(&trace).unwrap_or_default(),
+    );
+    let trace_lines =
+        fs::read_to_string(&trace).unwrap().lines().map(str::to_owned).collect::<Vec<_>>();
+    let expected_sequence = [
+        "git rev-parse --verify HEAD",
+        "git init -b main",
+        "cargo generate-lockfile",
+        "git add -A",
+        "git commit -m Initial commit",
+        "cargo make bootstrap",
+    ];
+    assert!(
+        trace_lines
+            .windows(expected_sequence.len())
+            .any(|window| { window.iter().map(String::as_str).eq(expected_sequence) }),
+        "the public task must execute the initialization sequence before bootstrap: {trace_lines:?}",
+    );
+    assert_eq!(fs::read_to_string(scaffold.join(".git/branch")).unwrap(), "main\n");
+    assert!(scaffold.join(".git/committed").is_file(), "init must create the first commit");
+    assert_eq!(fs::read_to_string(scaffold.join("Cargo.lock")).unwrap(), "generated lockfile\n");
+
+    let branch = fs::read_to_string(scaffold.join(".git/branch")).unwrap();
+    let committed = fs::read(scaffold.join(".git/committed")).unwrap();
+    let lockfile = fs::read_to_string(scaffold.join("Cargo.lock")).unwrap();
+    fs::remove_file(&trace).unwrap();
+
+    let repeat = run();
+    assert!(!repeat.status.success(), "repeat initialization must fail closed");
+    assert!(
+        String::from_utf8_lossy(&repeat.stderr)
+            .contains("before the repository has its first commit")
+    );
+    let repeat_trace = fs::read_to_string(&trace).unwrap_or_default();
+    assert!(repeat_trace.contains("git rev-parse --verify HEAD"));
+    for state_changing_command in ["git init", "git add", "git commit", "cargo "] {
+        assert!(
+            !repeat_trace.contains(state_changing_command),
+            "repeat initialization must stop before {state_changing_command}: {repeat_trace}",
+        );
+    }
+    assert_eq!(fs::read_to_string(scaffold.join(".git/branch")).unwrap(), branch);
+    assert_eq!(fs::read(scaffold.join(".git/committed")).unwrap(), committed);
+    assert_eq!(fs::read_to_string(scaffold.join("Cargo.lock")).unwrap(), lockfile);
+}
+
+#[test]
+fn test_exported_branch_strategy_uses_overlay_main_defaults() {
+    let source = fs::read_to_string(workspace_root().join(".harness/config/branch-strategy.json"))
+        .expect("source branch strategy must be readable");
+    let exported = exported_file(".harness/config/branch-strategy.json");
+
+    assert!(source.contains("\"base_branch\": \"develop\""));
+    assert!(source.contains("\"merge_target\": \"develop\""));
+    assert!(exported.contains("\"base_branch\": \"main\""));
+    assert!(exported.contains("\"merge_target\": \"main\""));
+    assert!(!exported.contains("develop"));
+}
+
+#[test]
+fn test_exported_command_adapters_fallback_when_progress_api_is_unavailable() {
+    for (command, fallback) in [
+        (
+            ".claude/commands/track/plan.md",
+            "When it is unavailable, report the same phase boundaries and\n  termination progress in text and continue the workflow.",
+        ),
+        (
+            ".claude/commands/track/adr2pr.md",
+            "When it is unavailable, report those transitions in text and continue the workflow.",
+        ),
+    ] {
+        let adapter = exported_file(command);
+        assert!(adapter.contains("when `TaskCreate` is available"));
+        assert!(adapter.contains(fallback), "{command} must retain its text-progress fallback");
+    }
 }
 
 #[test]

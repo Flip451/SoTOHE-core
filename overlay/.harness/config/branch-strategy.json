@@ -1,0 +1,5 @@
+{
+  "base_branch": "main",
+  "merge_target": "main",
+  "merge_method": "merge"
+}
