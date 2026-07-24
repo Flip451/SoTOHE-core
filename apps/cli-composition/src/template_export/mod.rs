@@ -13,10 +13,7 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use cli_driver::CommandOutcome;
-use cli_driver::template_export::{TemplateDriver, TemplateInput};
-
-use crate::error::CompositionError;
+use cli_driver::template_export::TemplateDriver;
 
 /// Resolves the work machine's home directory for export-output scanning.
 ///
@@ -69,17 +66,6 @@ impl TemplateCompositionRoot {
         let service: Arc<dyn TemplateExportService> =
             Arc::new(TemplateExportInteractor::new(manifest_port, export_port, transplant_port));
         TemplateDriver::new(service)
-    }
-
-    /// Wire and dispatch a `template` command through the full stack.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`CompositionError`] if composition fails. Wiring is currently
-    /// infallible; the signature preserves room for future wiring errors (e.g.
-    /// config loading), matching the sibling composition roots.
-    pub fn handle(&self, input: TemplateInput) -> Result<CommandOutcome, CompositionError> {
-        Ok(self.template_driver().handle(input))
     }
 }
 
@@ -160,7 +146,7 @@ mod tests {
             output_dir: PathBuf::from("/nonexistent/out"),
         });
 
-        let outcome = root.handle(input).unwrap();
+        let outcome = root.template_driver().handle(input);
 
         assert_eq!(outcome.exit_code, 1, "missing manifest must map to exit 1: {outcome:?}");
         assert_eq!(outcome.stdout, None, "failure path must not emit stdout");
@@ -168,6 +154,45 @@ mod tests {
             outcome.stderr.is_some(),
             "the underlying manifest-read error must be surfaced on stderr"
         );
+    }
+
+    #[test]
+    fn template_composition_root_is_wiring_only() {
+        let source = include_str!("mod.rs");
+        let production_source = source.split("#[cfg(test)]").next().unwrap();
+        assert!(production_source.contains("-> TemplateDriver"));
+        assert!(production_source.contains("TemplateDriver::new("));
+        assert!(production_source.contains("Arc<dyn TemplateExportService>"));
+        for wired_component in [
+            "Arc::new(FsTemplateBoundaryManifestAdapter::new())",
+            "Arc::new(FsTemplateExportAdapter::new(machine_home_directory()))",
+            "Arc::new(FsSelfBinaryTransplantAdapter::new())",
+            "TemplateExportInteractor::new(manifest_port, export_port, transplant_port)",
+            "TemplateDriver::new(service)",
+        ] {
+            assert!(
+                production_source.contains(wired_component),
+                "composition root must wire {wired_component} into the one-way driver path"
+            );
+        }
+        for forbidden in [
+            "CommandOutcome",
+            ".handle(",
+            "std::fs::",
+            "std::process::",
+            "std::net::",
+            "std::io::",
+            "println!",
+            "eprintln!",
+            "print!",
+            "eprint!",
+            "ServiceImpl",
+        ] {
+            assert!(
+                !production_source.contains(forbidden),
+                "composition root must not contain execution or compatibility path {forbidden}"
+            );
+        }
     }
 
     fn write_file(root: &Path, rel: &str, content: &str) {
@@ -218,7 +243,7 @@ mod tests {
             output_dir: output_dir.clone(),
         });
 
-        let outcome = composition_root.handle(input).unwrap();
+        let outcome = composition_root.template_driver().handle(input);
         assert_eq!(outcome.exit_code, 0, "successful export must exit 0: {outcome:?}");
 
         // AC-01: `bin/sotp` exists and is byte-identical to the running binary.

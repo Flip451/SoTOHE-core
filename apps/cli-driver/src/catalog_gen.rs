@@ -12,12 +12,12 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use usecase::LayerId;
 use usecase::catalog_gen::{
     CatalogAddCommand, CatalogCheckQuery, CatalogCheckReport, CatalogCheckVerdict,
     CatalogCiteCommand, CatalogEntryKind, CatalogImportAction, CatalogImportCommand,
-    CatalogInitReport, CatalogService, CatalogWriteReport,
+    CatalogInitReport, CatalogQueryService, CatalogService, CatalogTarget, CatalogWriteReport,
 };
+use usecase::{LayerId, TrackId};
 
 use crate::render::CommandOutcome;
 
@@ -178,13 +178,17 @@ pub enum CatalogInput {
 /// `handle(input) -> CommandOutcome`. One injected interactor — no per-service
 /// fields (D3/D4 cli_driver policy).
 pub struct CatalogDriver {
-    service: Arc<dyn CatalogService>,
+    command_service: Arc<dyn CatalogService>,
+    query_service: Arc<dyn CatalogQueryService>,
 }
 
 impl CatalogDriver {
     /// Create a new `CatalogDriver` with a single injected catalog service.
-    pub fn new(service: Arc<dyn CatalogService>) -> Self {
-        Self { service }
+    pub fn new(
+        command_service: Arc<dyn CatalogService>,
+        query_service: Arc<dyn CatalogQueryService>,
+    ) -> Self {
+        Self { command_service, query_service }
     }
 
     /// Handle a catalog command.
@@ -200,7 +204,11 @@ impl CatalogDriver {
 
     fn catalog_init(&self, input: CatalogInitInput) -> CommandOutcome {
         let CatalogInitInput { track_id, items_dir } = input;
-        match self.service.init(&track_id, &items_dir) {
+        let target = match catalog_target(track_id, items_dir) {
+            Ok(target) => target,
+            Err(error) => return CommandOutcome::failure(Some(error)),
+        };
+        match self.command_service.init(target) {
             Ok(report) => CommandOutcome::success(Some(render_init_report(&report))),
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
@@ -249,7 +257,11 @@ impl CatalogDriver {
             inherent_impl_generics,
             inherent_impl_where_predicates,
         };
-        match self.service.add(&track_id, &items_dir, command) {
+        let target = match catalog_target(track_id, items_dir) {
+            Ok(target) => target,
+            Err(error) => return CommandOutcome::failure(Some(error)),
+        };
+        match self.command_service.add(target, command) {
             Ok(report) => CommandOutcome::success(Some(render_write_report(&report))),
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
@@ -263,7 +275,11 @@ impl CatalogDriver {
         };
         let command =
             CatalogImportCommand { layer, type_path, action: action_to_domain(action), anchors };
-        match self.service.import(&track_id, &items_dir, command) {
+        let target = match catalog_target(track_id, items_dir) {
+            Ok(target) => target,
+            Err(error) => return CommandOutcome::failure(Some(error)),
+        };
+        match self.command_service.import(target, command) {
             Ok(report) => CommandOutcome::success(Some(render_write_report(&report))),
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
@@ -276,7 +292,11 @@ impl CatalogDriver {
             Err(e) => return CommandOutcome::failure(Some(format!("invalid layer: {e}"))),
         };
         let command = CatalogCiteCommand { layer, entry, anchors };
-        match self.service.cite(&track_id, &items_dir, command) {
+        let target = match catalog_target(track_id, items_dir) {
+            Ok(target) => target,
+            Err(error) => return CommandOutcome::failure(Some(error)),
+        };
+        match self.command_service.cite(target, command) {
             Ok(report) => CommandOutcome::success(Some(render_write_report(&report))),
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
@@ -289,11 +309,21 @@ impl CatalogDriver {
             Err(e) => return CommandOutcome::failure(Some(format!("invalid layer: {e}"))),
         };
         let query = CatalogCheckQuery { layer };
-        match self.service.check(&track_id, &items_dir, query) {
+        let target = match catalog_target(track_id, items_dir) {
+            Ok(target) => target,
+            Err(error) => return CommandOutcome::failure(Some(error)),
+        };
+        match self.query_service.check(target, query) {
             Ok(report) => render_check_report(&report),
             Err(e) => CommandOutcome::failure(Some(e.to_string())),
         }
     }
+}
+
+fn catalog_target(track_id: String, items_dir: PathBuf) -> Result<CatalogTarget, String> {
+    TrackId::try_new(track_id)
+        .map(|track_id| CatalogTarget { track_id, items_dir })
+        .map_err(|error| format!("invalid track_id: {error}"))
 }
 
 // ---------------------------------------------------------------------------
@@ -381,13 +411,13 @@ fn render_check_report(report: &CatalogCheckReport) -> CommandOutcome {
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
-    use std::path::{Path, PathBuf};
-    use std::sync::Arc;
+    use std::path::PathBuf;
+    use std::sync::{Arc, Mutex};
 
     use usecase::catalog_gen::{
         CatalogAddCommand, CatalogCheckQuery, CatalogCheckReport, CatalogCheckVerdict,
-        CatalogCiteCommand, CatalogError, CatalogImportCommand, CatalogInitReport, CatalogService,
-        CatalogWriteReport,
+        CatalogCiteCommand, CatalogError, CatalogImportCommand, CatalogInitReport,
+        CatalogQueryService, CatalogService, CatalogTarget, CatalogWriteReport,
     };
 
     use super::{
@@ -399,24 +429,22 @@ mod tests {
     struct FakeService {
         verdict: CatalogCheckVerdict,
         fail: bool,
+        calls: Mutex<Vec<&'static str>>,
     }
 
     impl FakeService {
         fn ok(verdict: CatalogCheckVerdict) -> Self {
-            Self { verdict, fail: false }
+            Self { verdict, fail: false, calls: Mutex::new(Vec::new()) }
         }
 
         fn failing() -> Self {
-            Self { verdict: CatalogCheckVerdict::Pass, fail: true }
+            Self { verdict: CatalogCheckVerdict::Pass, fail: true, calls: Mutex::new(Vec::new()) }
         }
     }
 
     impl CatalogService for FakeService {
-        fn init(
-            &self,
-            _track_id: &str,
-            _items_dir: &Path,
-        ) -> Result<CatalogInitReport, CatalogError> {
+        fn init(&self, _target: CatalogTarget) -> Result<CatalogInitReport, CatalogError> {
+            self.calls.lock().unwrap().push("init");
             if self.fail {
                 return Err(CatalogError::FileExists { path: PathBuf::from("domain-types.json") });
             }
@@ -425,10 +453,10 @@ mod tests {
 
         fn add(
             &self,
-            _track_id: &str,
-            _items_dir: &Path,
+            _target: CatalogTarget,
             _command: CatalogAddCommand,
         ) -> Result<CatalogWriteReport, CatalogError> {
+            self.calls.lock().unwrap().push("add");
             if self.fail {
                 return Err(CatalogError::FileMissing { path: PathBuf::from("domain-types.json") });
             }
@@ -441,10 +469,10 @@ mod tests {
 
         fn import(
             &self,
-            _track_id: &str,
-            _items_dir: &Path,
+            _target: CatalogTarget,
             _command: CatalogImportCommand,
         ) -> Result<CatalogWriteReport, CatalogError> {
+            self.calls.lock().unwrap().push("import");
             Ok(CatalogWriteReport {
                 file_path: "usecase-types.json".to_owned(),
                 entry_key: "Bar".to_owned(),
@@ -454,23 +482,25 @@ mod tests {
 
         fn cite(
             &self,
-            _track_id: &str,
-            _items_dir: &Path,
+            _target: CatalogTarget,
             _command: CatalogCiteCommand,
         ) -> Result<CatalogWriteReport, CatalogError> {
+            self.calls.lock().unwrap().push("cite");
             Ok(CatalogWriteReport {
                 file_path: "domain-types.json".to_owned(),
                 entry_key: "Baz".to_owned(),
                 holes: vec![],
             })
         }
+    }
 
+    impl CatalogQueryService for FakeService {
         fn check(
             &self,
-            _track_id: &str,
-            _items_dir: &Path,
+            _target: CatalogTarget,
             _query: CatalogCheckQuery,
         ) -> Result<CatalogCheckReport, CatalogError> {
+            self.calls.lock().unwrap().push("check");
             Ok(CatalogCheckReport {
                 verdict: self.verdict,
                 findings: vec![],
@@ -480,7 +510,11 @@ mod tests {
     }
 
     fn driver(service: FakeService) -> CatalogDriver {
-        CatalogDriver::new(Arc::new(service))
+        let service = Arc::new(service);
+        CatalogDriver::new(
+            service.clone() as Arc<dyn CatalogService>,
+            service as Arc<dyn CatalogQueryService>,
+        )
     }
 
     fn add_input() -> CatalogAddInput {
@@ -512,6 +546,53 @@ mod tests {
             items_dir: PathBuf::from("track/items"),
             layer: None,
         })
+    }
+
+    #[test]
+    fn catalog_driver_delegates_each_verb_to_injected_usecase_services() {
+        let service = Arc::new(FakeService::ok(CatalogCheckVerdict::Pass));
+        let driver = CatalogDriver::new(
+            service.clone() as Arc<dyn CatalogService>,
+            service.clone() as Arc<dyn CatalogQueryService>,
+        );
+
+        let target = || ("t".to_owned(), PathBuf::from("track/items"));
+        let (track_id, items_dir) = target();
+        driver.handle(CatalogInput::Init(CatalogInitInput { track_id, items_dir }));
+        driver.handle(CatalogInput::Add(add_input()));
+        driver.handle(CatalogInput::Import(CatalogImportInput {
+            track_id: "t".to_owned(),
+            items_dir: PathBuf::from("track/items"),
+            layer: "domain".to_owned(),
+            type_path: "domain::Foo".to_owned(),
+            action: CatalogImportSelect::Reference,
+            anchors: vec![],
+        }));
+        driver.handle(CatalogInput::Cite(CatalogCiteInput {
+            track_id: "t".to_owned(),
+            items_dir: PathBuf::from("track/items"),
+            layer: "domain".to_owned(),
+            entry: "Foo".to_owned(),
+            anchors: vec![],
+        }));
+        driver.handle(check_input());
+
+        assert_eq!(
+            *service.calls.lock().unwrap(),
+            ["init", "add", "import", "cite", "check"],
+            "the primary adapter must route every verb through its injected usecase services"
+        );
+
+        let source = include_str!("catalog_gen.rs");
+        let production_source = source.split("#[cfg(test)]").next().unwrap();
+        for forbidden_runtime_path in
+            ["ServiceImpl", "CompositionRoot", "std::fs::", "std::process::"]
+        {
+            assert!(
+                !production_source.contains(forbidden_runtime_path),
+                "CatalogDriver must not contain {forbidden_runtime_path}"
+            );
+        }
     }
 
     #[test]

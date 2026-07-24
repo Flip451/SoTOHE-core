@@ -33,6 +33,7 @@ use std::sync::Arc;
 
 use domain::ConfidenceSignal;
 use domain::TypeSignalsDocument;
+use domain::tddd::catalogue_linter::FreeText;
 // Re-export domain task_contract types accessible to the cli_driver primary adapter
 // via usecase module path (architecture-rules.json: cli_driver may_depend_on [usecase] only).
 pub use domain::task_contract::{
@@ -90,13 +91,13 @@ pub struct PreReviewGateCommand {
 ///   `MissingTaskContract` enum variant is retained for future refinement
 ///   (e.g. enforcing the gate when `impl-plan.json` exists).
 /// - `TaskContractReadFailed`: I/O or decode error reading the contract;
-///   `message` is an opaque diagnostic string (R9: opaque infrastructure error message).
+///   `message` is opaque diagnostic [`FreeText`] (R9: opaque infrastructure error message).
 /// - `SignalReadFailed`: I/O or decode error reading the per-layer type-signals
 ///   document; `layer` is typed as `domain::tddd::LayerId` (the port takes
 ///   `&LayerId` so the error always originates from a valid `LayerId`), `message`
 ///   is an opaque diagnostic string.
 /// - `ImplPlanReadFailed`: I/O or decode error reading `impl-plan.json` (D7:
-///   added for [`ImplPlanReaderPort`]); `message` is an opaque diagnostic string.
+///   added for [`ImplPlanReaderPort`]); `message` is opaque diagnostic [`FreeText`].
 ///
 /// Gate violations (`NonBlueSignal`, `OrphanEntry` etc.) are NOT errors — they
 /// are data inside [`PreReviewGateOutcome::Blocked`] or
@@ -111,7 +112,7 @@ pub enum PreReviewGateError {
     #[error("failed to read task-contract.json: {message}")]
     TaskContractReadFailed {
         /// Opaque diagnostic message from the infrastructure adapter.
-        message: String,
+        message: FreeText,
     },
 
     /// I/O or decode error reading the per-layer `<layer>-type-signals.json`.
@@ -120,15 +121,72 @@ pub enum PreReviewGateError {
         /// The TDDD layer whose signal document could not be read.
         layer: domain::tddd::LayerId,
         /// Opaque diagnostic message from the infrastructure adapter.
-        message: String,
+        message: FreeText,
     },
 
     /// I/O or decode error reading `impl-plan.json` (D7).
     #[error("failed to read impl-plan.json: {message}")]
     ImplPlanReadFailed {
         /// Opaque diagnostic message from the infrastructure adapter.
-        message: String,
+        message: FreeText,
     },
+}
+
+/// Failure produced while reading a task-contract document.
+#[derive(Debug, Error)]
+pub enum TaskContractReadError {
+    /// The task-contract document does not exist for the requested track.
+    #[error("task-contract.json not found for track")]
+    NotFound,
+
+    /// I/O or decoding failed while reading the task-contract document.
+    #[error("failed to read task-contract.json: {message}")]
+    ReadFailed { message: FreeText },
+}
+
+/// Failure produced while reading implementation-catalogue signals.
+#[derive(Debug, Error)]
+pub enum ImplCatalogSignalReadError {
+    /// I/O or decoding failed while reading a layer's signal document.
+    #[error("failed to read type-signals for layer '{layer}': {message}")]
+    ReadFailed { layer: domain::tddd::LayerId, message: FreeText },
+}
+
+/// Failure produced while reading implementation-plan task statuses.
+#[derive(Debug, Error)]
+pub enum ImplPlanReadError {
+    /// I/O or decoding failed while reading the implementation plan.
+    #[error("failed to read impl-plan.json: {message}")]
+    ReadFailed { message: FreeText },
+}
+
+impl From<TaskContractReadError> for PreReviewGateError {
+    fn from(error: TaskContractReadError) -> Self {
+        match error {
+            TaskContractReadError::NotFound => Self::TaskContractNotFound,
+            TaskContractReadError::ReadFailed { message } => {
+                Self::TaskContractReadFailed { message }
+            }
+        }
+    }
+}
+
+impl From<ImplCatalogSignalReadError> for PreReviewGateError {
+    fn from(error: ImplCatalogSignalReadError) -> Self {
+        match error {
+            ImplCatalogSignalReadError::ReadFailed { layer, message } => {
+                Self::SignalReadFailed { layer, message }
+            }
+        }
+    }
+}
+
+impl From<ImplPlanReadError> for PreReviewGateError {
+    fn from(error: ImplPlanReadError) -> Self {
+        match error {
+            ImplPlanReadError::ReadFailed { message } => Self::ImplPlanReadFailed { message },
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -141,12 +199,12 @@ pub enum PreReviewGateError {
 pub trait TaskContractReaderPort: Send + Sync {
     /// Read the `task-contract.json` for the given track.
     ///
-    /// Returns [`PreReviewGateError::TaskContractNotFound`] when the file does not
-    /// exist; [`PreReviewGateError::TaskContractReadFailed`] on I/O or decode errors.
+    /// Returns [`TaskContractReadError::NotFound`] when the file does not exist;
+    /// [`TaskContractReadError::ReadFailed`] on I/O or decode errors.
     fn read(
         &self,
         track_id: &domain::TrackId,
-    ) -> Result<domain::task_contract::TaskContractDocument, PreReviewGateError>;
+    ) -> Result<domain::task_contract::TaskContractDocument, TaskContractReadError>;
 }
 
 /// Secondary port for reading a per-layer `<layer>-type-signals.json` document.
@@ -157,12 +215,12 @@ pub trait ImplCatalogSignalReaderPort: Send + Sync {
     /// Read the per-layer `impl_catalog` type-signals document for the given track
     /// and layer.
     ///
-    /// Returns [`PreReviewGateError::SignalReadFailed`] on I/O or decode errors.
+    /// Returns [`ImplCatalogSignalReadError::ReadFailed`] on I/O or decode errors.
     fn read_signals(
         &self,
         track_id: &domain::TrackId,
         layer: &domain::tddd::LayerId,
-    ) -> Result<TypeSignalsDocument, PreReviewGateError>;
+    ) -> Result<TypeSignalsDocument, ImplCatalogSignalReadError>;
 
     /// Read the per-layer signal document when absence is expected state.
     /// `Ok(None)` only on positively-classified absent docs; default fail-closed.
@@ -170,7 +228,7 @@ pub trait ImplCatalogSignalReaderPort: Send + Sync {
         &self,
         track_id: &domain::TrackId,
         layer: &domain::tddd::LayerId,
-    ) -> Result<Option<TypeSignalsDocument>, PreReviewGateError> {
+    ) -> Result<Option<TypeSignalsDocument>, ImplCatalogSignalReadError> {
         self.read_signals(track_id, layer).map(Some)
     }
 }
@@ -186,7 +244,7 @@ pub trait ImplPlanReaderPort: Send + Sync {
     fn read_task_statuses(
         &self,
         track_id: &domain::TrackId,
-    ) -> Result<HashMap<domain::TaskId, domain::TaskStatusKind>, PreReviewGateError>;
+    ) -> Result<HashMap<domain::TaskId, domain::TaskStatusKind>, ImplPlanReadError>;
 }
 
 // ---------------------------------------------------------------------------
@@ -278,17 +336,19 @@ impl CoverageVerifyService for CoverageVerifyInteractor {
         // RI) runs as before; no fail-open is introduced for malformed contracts.
         let contract_doc = match self.task_contract_reader.read(&cmd.track_id) {
             Ok(doc) => doc,
-            Err(PreReviewGateError::TaskContractNotFound) => {
+            Err(TaskContractReadError::NotFound) => {
                 return Ok(CoverageVerifyOutcome::Passed);
             }
-            Err(e) => return Err(e),
+            Err(e) => return Err(e.into()),
         };
 
         let mut all_violations: Vec<domain::task_contract::CoverageViolation> = Vec::new();
         for &layer_str in CANONICAL_LAYERS {
             let Ok(layer) = domain::tddd::LayerId::try_new(layer_str.to_owned()) else { continue };
-            let Some(signal_doc) =
-                self.signal_reader.read_optional_signals(&cmd.track_id, &layer)?
+            let Some(signal_doc) = self
+                .signal_reader
+                .read_optional_signals(&cmd.track_id, &layer)
+                .map_err(PreReviewGateError::from)?
             else {
                 all_violations.push(
                     domain::task_contract::CoverageViolation::MissingSignalDocument {
@@ -305,7 +365,10 @@ impl CoverageVerifyService for CoverageVerifyInteractor {
             ));
         }
         all_violations.extend(collect_non_canonical_layer_violations(&contract_doc));
-        let plan_task_ids = self.impl_plan_reader.read_task_statuses(&cmd.track_id)?;
+        let plan_task_ids = self
+            .impl_plan_reader
+            .read_task_statuses(&cmd.track_id)
+            .map_err(PreReviewGateError::from)?;
         all_violations.extend(collect_task_key_ri_violations(&contract_doc, &plan_task_ids));
 
         if all_violations.is_empty() {
@@ -414,11 +477,11 @@ impl PreReviewGateInteractor {
             )
             .map_err(|_| PreReviewGateError::SignalReadFailed {
                 layer: layer.clone(),
-                message: format!(
+                message: FreeText::new(format!(
                     "invalid entry key '{}' in {}-type-signals.json",
                     signal.type_name(),
                     layer.as_ref()
-                ),
+                )),
             })?;
             scope_signals.insert(entry_key.as_str().to_owned(), signal.signal());
         }
@@ -486,7 +549,8 @@ impl PreReviewGateInteractor {
         task_statuses: &HashMap<domain::TaskId, domain::TaskStatusKind>,
     ) -> Result<Vec<PreReviewGateViolation>, PreReviewGateError> {
         // ── Step 1: read type-signals for layer ───────────────────────────────
-        let signal_doc = self.signal_reader.read_signals(track_id, layer)?;
+        let signal_doc =
+            self.signal_reader.read_signals(track_id, layer).map_err(PreReviewGateError::from)?;
         self.check_signal_document(layer, contract_doc, &signal_doc, task_statuses)
     }
 }
@@ -502,10 +566,10 @@ impl PreReviewGateService for PreReviewGateInteractor {
         // `task-contract.json` exists, the liveness check still runs in full.
         let contract_doc = match self.task_contract_reader.read(&cmd.track_id) {
             Ok(doc) => doc,
-            Err(PreReviewGateError::TaskContractNotFound) => {
+            Err(TaskContractReadError::NotFound) => {
                 return Ok(PreReviewGateOutcome::Passed);
             }
-            Err(e) => return Err(e),
+            Err(e) => return Err(e.into()),
         };
 
         // ── Step 0b: load impl-plan.json task statuses (D7) ──────────────────
@@ -513,7 +577,10 @@ impl PreReviewGateService for PreReviewGateInteractor {
         // Used to filter attributions by task status: done/in_progress entries
         // require Blue; entries without a done/in_progress owner tolerate Yellow;
         // Red always blocks.
-        let task_statuses = self.impl_plan_reader.read_task_statuses(&cmd.track_id)?;
+        let task_statuses = self
+            .impl_plan_reader
+            .read_task_statuses(&cmd.track_id)
+            .map_err(PreReviewGateError::from)?;
 
         match cmd.layer {
             Some(layer) => {
@@ -539,7 +606,11 @@ impl PreReviewGateService for PreReviewGateInteractor {
                         // Unreachable: CANONICAL_LAYERS contains only valid identifiers.
                         continue;
                     };
-                    match self.signal_reader.read_optional_signals(&cmd.track_id, &layer)? {
+                    match self
+                        .signal_reader
+                        .read_optional_signals(&cmd.track_id, &layer)
+                        .map_err(PreReviewGateError::from)?
+                    {
                         Some(signal_doc) => {
                             let violations = self.check_signal_document(
                                 &layer,
@@ -592,8 +663,9 @@ mod tests {
 
     use super::{
         CoverageVerifyCommand, CoverageVerifyInteractor, CoverageVerifyService,
-        ImplCatalogSignalReaderPort, ImplPlanReaderPort, PreReviewGateCommand, PreReviewGateError,
-        PreReviewGateInteractor, PreReviewGateService, TaskContractReaderPort,
+        ImplCatalogSignalReadError, ImplCatalogSignalReaderPort, ImplPlanReadError,
+        ImplPlanReaderPort, PreReviewGateCommand, PreReviewGateError, PreReviewGateInteractor,
+        PreReviewGateService, TaskContractReadError, TaskContractReaderPort,
     };
 
     // ── Mock helpers ──────────────────────────────────────────────────────────
@@ -659,24 +731,18 @@ mod tests {
         fn read(
             &self,
             _track_id: &TrackId,
-        ) -> Result<domain::task_contract::TaskContractDocument, PreReviewGateError> {
+        ) -> Result<domain::task_contract::TaskContractDocument, TaskContractReadError> {
             match &self.0 {
                 Ok(doc) => Ok(doc.clone()),
                 Err(PreReviewGateError::TaskContractNotFound) => {
-                    Err(PreReviewGateError::TaskContractNotFound)
+                    Err(TaskContractReadError::NotFound)
                 }
                 Err(PreReviewGateError::TaskContractReadFailed { message }) => {
-                    Err(PreReviewGateError::TaskContractReadFailed { message: message.clone() })
+                    Err(TaskContractReadError::ReadFailed { message: message.clone() })
                 }
-                Err(PreReviewGateError::SignalReadFailed { layer, message }) => {
-                    Err(PreReviewGateError::SignalReadFailed {
-                        layer: layer.clone(),
-                        message: message.clone(),
-                    })
-                }
-                Err(PreReviewGateError::ImplPlanReadFailed { message }) => {
-                    Err(PreReviewGateError::ImplPlanReadFailed { message: message.clone() })
-                }
+                Err(error) => Err(TaskContractReadError::ReadFailed {
+                    message: domain::FreeText::new(error.to_string()),
+                }),
             }
         }
     }
@@ -688,18 +754,19 @@ mod tests {
             &self,
             _track_id: &TrackId,
             _layer: &LayerId,
-        ) -> Result<TypeSignalsDocument, PreReviewGateError> {
+        ) -> Result<TypeSignalsDocument, ImplCatalogSignalReadError> {
             match &self.0 {
                 Ok(doc) => Ok(doc.clone()),
                 Err(PreReviewGateError::SignalReadFailed { layer, message }) => {
-                    Err(PreReviewGateError::SignalReadFailed {
+                    Err(ImplCatalogSignalReadError::ReadFailed {
                         layer: layer.clone(),
                         message: message.clone(),
                     })
                 }
-                Err(e) => {
-                    Err(PreReviewGateError::TaskContractReadFailed { message: e.to_string() })
-                }
+                Err(error) => Err(ImplCatalogSignalReadError::ReadFailed {
+                    layer: LayerId::try_new("domain".to_owned()).expect("valid test layer"),
+                    message: domain::FreeText::new(error.to_string()),
+                }),
             }
         }
     }
@@ -713,12 +780,15 @@ mod tests {
             &self,
             _track_id: &TrackId,
             layer: &LayerId,
-        ) -> Result<TypeSignalsDocument, PreReviewGateError> {
+        ) -> Result<TypeSignalsDocument, ImplCatalogSignalReadError> {
             match self.0.get(layer.as_ref()) {
                 Some(doc) => Ok(doc.clone()),
-                None => Err(PreReviewGateError::SignalReadFailed {
+                None => Err(ImplCatalogSignalReadError::ReadFailed {
                     layer: layer.clone(),
-                    message: format!("no signal document for layer '{}'", layer.as_ref()),
+                    message: domain::FreeText::new(format!(
+                        "no signal document for layer '{}'",
+                        layer.as_ref()
+                    )),
                 }),
             }
         }
@@ -727,7 +797,7 @@ mod tests {
             &self,
             _track_id: &TrackId,
             layer: &LayerId,
-        ) -> Result<Option<TypeSignalsDocument>, PreReviewGateError> {
+        ) -> Result<Option<TypeSignalsDocument>, ImplCatalogSignalReadError> {
             Ok(self.0.get(layer.as_ref()).cloned())
         }
     }
@@ -741,10 +811,10 @@ mod tests {
             &self,
             _track_id: &TrackId,
             layer: &LayerId,
-        ) -> Result<TypeSignalsDocument, PreReviewGateError> {
-            Err(PreReviewGateError::SignalReadFailed {
+        ) -> Result<TypeSignalsDocument, ImplCatalogSignalReadError> {
+            Err(ImplCatalogSignalReadError::ReadFailed {
                 layer: layer.clone(),
-                message: self.message.to_owned(),
+                message: domain::FreeText::new(self.message),
             })
         }
     }
@@ -756,7 +826,7 @@ mod tests {
         fn read_task_statuses(
             &self,
             _track_id: &TrackId,
-        ) -> Result<std::collections::HashMap<TaskId, TaskStatusKind>, PreReviewGateError> {
+        ) -> Result<std::collections::HashMap<TaskId, TaskStatusKind>, ImplPlanReadError> {
             Ok(std::collections::HashMap::new())
         }
     }
@@ -770,6 +840,61 @@ mod tests {
             Arc::new(ConstSignalReader(signals)),
             Arc::new(EmptyImplPlanReader),
         )
+    }
+
+    #[test]
+    fn reader_ports_are_interactor_dependencies_and_are_invoked() {
+        let source = include_str!("pre_review_gate.rs");
+        let production_source = source.split("#[cfg(test)]").next().unwrap();
+
+        for required_fragment in [
+            "pub trait ImplCatalogSignalReaderPort: Send + Sync",
+            "fn read_optional_signals(",
+            "pub trait ImplPlanReaderPort: Send + Sync",
+            "fn read_task_statuses(",
+            "signal_reader: Arc<dyn ImplCatalogSignalReaderPort>",
+            "impl_plan_reader: Arc<dyn ImplPlanReaderPort>",
+            "read_optional_signals(&cmd.track_id, &layer)",
+            "read_task_statuses(&cmd.track_id)",
+        ] {
+            assert!(
+                production_source.contains(required_fragment),
+                "pre-review interactor must declare, receive, and invoke {required_fragment}"
+            );
+        }
+        for forbidden_runtime_path in
+            ["ServiceImpl", "CompatibilityShim", "CompatService", "CompositionRoot"]
+        {
+            assert!(
+                !production_source.contains(forbidden_runtime_path),
+                "signal-reader execution must not reference or reverse-delegate through {forbidden_runtime_path}"
+            );
+        }
+
+        let mut statuses = std::collections::HashMap::new();
+        statuses.insert(task_id("T001"), TaskStatusKind::InProgress);
+        let service = PreReviewGateInteractor::new(
+            Arc::new(ConstContractReader(Ok(make_contract(
+                "my-track",
+                vec![(
+                    task_id("T001"),
+                    vec![ContractedEntryRef::new(layer("domain"), entry_key("Foo"))],
+                )],
+            )))),
+            Arc::new(LayerAwareSignalReader(std::collections::HashMap::from([(
+                "domain".to_owned(),
+                make_signals(vec![blue_signal("Foo")]),
+            )]))),
+            Arc::new(FixedImplPlanReader(statuses)),
+        );
+
+        assert!(
+            matches!(
+                service.check(cmd("my-track", "domain")).unwrap(),
+                PreReviewGateOutcome::Passed
+            ),
+            "the injected reader ports must drive the pre-review result"
+        );
     }
 
     fn cmd(track: &str, group: &str) -> PreReviewGateCommand {
@@ -814,7 +939,7 @@ mod tests {
             PreReviewGateError::SignalReadFailed { layer, message } => {
                 assert_eq!(layer.as_ref(), "domain");
                 assert!(
-                    message.contains("invalid entry key"),
+                    message.as_str().contains("invalid entry key"),
                     "expected invalid entry key diagnostic, got: {message}"
                 );
             }
@@ -1010,7 +1135,7 @@ mod tests {
             PreReviewGateError::SignalReadFailed { layer, message } => {
                 assert_eq!(layer.as_ref(), "domain");
                 assert!(
-                    message.contains("invalid entry key"),
+                    message.as_str().contains("invalid entry key"),
                     "expected malformed signal document to propagate, got: {message}"
                 );
             }
@@ -1042,7 +1167,7 @@ mod tests {
             PreReviewGateError::SignalReadFailed { layer, message } => {
                 assert_eq!(layer.as_ref(), "domain");
                 assert!(
-                    message.contains("codec error"),
+                    message.as_str().contains("codec error"),
                     "expected non-missing signal read failure to propagate, got: {message}"
                 );
             }
@@ -1074,7 +1199,7 @@ mod tests {
             PreReviewGateError::SignalReadFailed { layer, message } => {
                 assert_eq!(layer.as_ref(), "domain");
                 assert!(
-                    message.contains("signal file not found"),
+                    message.as_str().contains("signal file not found"),
                     "expected original diagnostic to propagate, got: {message}"
                 );
             }
@@ -1622,7 +1747,7 @@ mod tests {
         fn read_task_statuses(
             &self,
             _track_id: &TrackId,
-        ) -> Result<std::collections::HashMap<TaskId, TaskStatusKind>, PreReviewGateError> {
+        ) -> Result<std::collections::HashMap<TaskId, TaskStatusKind>, ImplPlanReadError> {
             Ok(self.0.clone())
         }
     }
@@ -1634,9 +1759,9 @@ mod tests {
         fn read_task_statuses(
             &self,
             _track_id: &TrackId,
-        ) -> Result<std::collections::HashMap<TaskId, TaskStatusKind>, PreReviewGateError> {
-            Err(PreReviewGateError::ImplPlanReadFailed {
-                message: "test: impl-plan.json read failed".to_owned(),
+        ) -> Result<std::collections::HashMap<TaskId, TaskStatusKind>, ImplPlanReadError> {
+            Err(ImplPlanReadError::ReadFailed {
+                message: domain::FreeText::new("test: impl-plan.json read failed"),
             })
         }
     }
@@ -1788,11 +1913,54 @@ mod tests {
         match err {
             PreReviewGateError::ImplPlanReadFailed { message } => {
                 assert!(
-                    message.contains("read failed"),
+                    message.as_str().contains("read failed"),
                     "expected read-failed diagnostic, got: {message}"
                 );
             }
             other => panic!("expected ImplPlanReadFailed, got {other}"),
         }
+    }
+
+    #[test]
+    fn test_pre_review_gate_error_conversions_preserve_free_text_and_rendering() {
+        let task_contract_error = PreReviewGateError::from(TaskContractReadError::ReadFailed {
+            message: domain::FreeText::new("contract read failure"),
+        });
+        assert_eq!(
+            task_contract_error.to_string(),
+            "failed to read task-contract.json: contract read failure"
+        );
+        assert!(matches!(
+            task_contract_error,
+            PreReviewGateError::TaskContractReadFailed { message }
+                if message.as_str() == "contract read failure"
+        ));
+
+        let signal_error = PreReviewGateError::from(ImplCatalogSignalReadError::ReadFailed {
+            layer: LayerId::try_new("domain".to_owned()).expect("valid test layer"),
+            message: domain::FreeText::new("signal read failure"),
+        });
+        assert_eq!(
+            signal_error.to_string(),
+            "failed to read type-signals for layer 'domain': signal read failure"
+        );
+        assert!(matches!(
+            signal_error,
+            PreReviewGateError::SignalReadFailed { layer, message }
+                if layer.as_ref() == "domain" && message.as_str() == "signal read failure"
+        ));
+
+        let impl_plan_error = PreReviewGateError::from(ImplPlanReadError::ReadFailed {
+            message: domain::FreeText::new("impl-plan read failure"),
+        });
+        assert_eq!(
+            impl_plan_error.to_string(),
+            "failed to read impl-plan.json: impl-plan read failure"
+        );
+        assert!(matches!(
+            impl_plan_error,
+            PreReviewGateError::ImplPlanReadFailed { message }
+                if message.as_str() == "impl-plan read failure"
+        ));
     }
 }

@@ -10,13 +10,18 @@
 use std::collections::HashMap;
 use std::path::PathBuf;
 
+use domain::tddd::catalogue_linter::FreeText;
 use domain::{TaskId, TaskStatusKind, TrackId};
-use usecase::pre_review_gate::{ImplPlanReaderPort, PreReviewGateError};
+use usecase::pre_review_gate::{ImplPlanReadError, ImplPlanReaderPort};
 
 use crate::impl_plan_codec;
 use crate::track::symlink_guard::reject_symlinks_below;
 
 const MAX_IMPL_PLAN_BYTES: u64 = 16 * 1024 * 1024;
+
+fn read_failed(message: impl Into<String>) -> ImplPlanReadError {
+    ImplPlanReadError::ReadFailed { message: FreeText::new(message.into()) }
+}
 
 /// Filesystem secondary adapter implementing
 /// [`usecase::pre_review_gate::ImplPlanReaderPort`].
@@ -24,8 +29,7 @@ const MAX_IMPL_PLAN_BYTES: u64 = 16 * 1024 * 1024;
 /// Reads `<items_dir>/<track_id>/impl-plan.json`, decodes it via
 /// `impl_plan_codec::decode`, and returns a `HashMap<TaskId, TaskStatusKind>`.
 ///
-/// - Missing file maps to [`PreReviewGateError::ImplPlanReadFailed`].
-/// - I/O and codec errors map to [`PreReviewGateError::ImplPlanReadFailed`].
+/// - Missing files, I/O errors, and codec errors map to [`ImplPlanReadError::ReadFailed`].
 ///
 /// The `items_dir` is injected at construction time so callers do not need to
 /// pass it on every [`read_task_statuses`](FsImplPlanReader::read_task_statuses) call.
@@ -46,28 +50,25 @@ impl ImplPlanReaderPort for FsImplPlanReader {
     fn read_task_statuses(
         &self,
         track_id: &TrackId,
-    ) -> Result<HashMap<TaskId, TaskStatusKind>, PreReviewGateError> {
+    ) -> Result<HashMap<TaskId, TaskStatusKind>, ImplPlanReadError> {
         let items_dir =
             crate::resolve_items_dir_under_current_repo(&self.items_dir).map_err(|e| {
-                PreReviewGateError::ImplPlanReadFailed {
-                    message: format!("items_dir rejected before reading impl-plan.json: {e}"),
-                }
+                read_failed(format!("items_dir rejected before reading impl-plan.json: {e}"))
             })?;
         match std::fs::symlink_metadata(&items_dir) {
             Ok(meta) if meta.file_type().is_symlink() => {
-                return Err(PreReviewGateError::ImplPlanReadFailed {
-                    message: format!(
-                        "symlink check failed for {}: refused symlink",
-                        items_dir.display()
-                    ),
-                });
+                return Err(read_failed(format!(
+                    "symlink check failed for {}: refused symlink",
+                    items_dir.display()
+                )));
             }
             Ok(_) => {}
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
             Err(e) => {
-                return Err(PreReviewGateError::ImplPlanReadFailed {
-                    message: format!("metadata error reading {}: {e}", items_dir.display()),
-                });
+                return Err(read_failed(format!(
+                    "metadata error reading {}: {e}",
+                    items_dir.display()
+                )));
             }
         }
         let path = items_dir.join(track_id.as_ref()).join("impl-plan.json");
@@ -75,85 +76,68 @@ impl ImplPlanReaderPort for FsImplPlanReader {
         match reject_symlinks_below(&path, &items_dir) {
             Ok(true) => {}
             Ok(false) => {
-                return Err(PreReviewGateError::ImplPlanReadFailed {
-                    message: format!(
-                        "impl-plan.json not found for track '{}': {}",
-                        track_id.as_ref(),
-                        path.display()
-                    ),
-                });
+                return Err(read_failed(format!(
+                    "impl-plan.json not found for track '{}': {}",
+                    track_id.as_ref(),
+                    path.display()
+                )));
             }
             Err(e) => {
-                return Err(PreReviewGateError::ImplPlanReadFailed {
-                    message: format!("symlink check failed for {}: {e}", path.display()),
-                });
+                return Err(read_failed(format!(
+                    "symlink check failed for {}: {e}",
+                    path.display()
+                )));
             }
         }
 
         let metadata = match std::fs::symlink_metadata(&path) {
             Ok(meta) if meta.file_type().is_symlink() => {
-                return Err(PreReviewGateError::ImplPlanReadFailed {
-                    message: format!(
-                        "symlink check failed for {}: refused symlink",
-                        path.display()
-                    ),
-                });
+                return Err(read_failed(format!(
+                    "symlink check failed for {}: refused symlink",
+                    path.display()
+                )));
             }
             Ok(meta) => meta,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                return Err(PreReviewGateError::ImplPlanReadFailed {
-                    message: format!(
-                        "impl-plan.json not found for track '{}': {}",
-                        track_id.as_ref(),
-                        path.display()
-                    ),
-                });
+                return Err(read_failed(format!(
+                    "impl-plan.json not found for track '{}': {}",
+                    track_id.as_ref(),
+                    path.display()
+                )));
             }
             Err(e) => {
-                return Err(PreReviewGateError::ImplPlanReadFailed {
-                    message: format!("metadata error reading {}: {e}", path.display()),
-                });
+                return Err(read_failed(format!("metadata error reading {}: {e}", path.display())));
             }
         };
         if metadata.len() > MAX_IMPL_PLAN_BYTES {
-            return Err(PreReviewGateError::ImplPlanReadFailed {
-                message: format!(
-                    "impl-plan.json exceeds maximum size of {MAX_IMPL_PLAN_BYTES} bytes: {} bytes",
-                    metadata.len()
-                ),
-            });
+            return Err(read_failed(format!(
+                "impl-plan.json exceeds maximum size of {MAX_IMPL_PLAN_BYTES} bytes: {} bytes",
+                metadata.len()
+            )));
         }
 
         let bytes = match std::fs::read(&path) {
             Ok(b) => b,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                return Err(PreReviewGateError::ImplPlanReadFailed {
-                    message: format!(
-                        "impl-plan.json not found for track '{}': {}",
-                        track_id.as_ref(),
-                        path.display()
-                    ),
-                });
+                return Err(read_failed(format!(
+                    "impl-plan.json not found for track '{}': {}",
+                    track_id.as_ref(),
+                    path.display()
+                )));
             }
             Err(e) => {
-                return Err(PreReviewGateError::ImplPlanReadFailed {
-                    message: format!("I/O error reading {}: {e}", path.display()),
-                });
+                return Err(read_failed(format!("I/O error reading {}: {e}", path.display())));
             }
         };
 
-        let contents =
-            std::str::from_utf8(&bytes).map_err(|e| PreReviewGateError::ImplPlanReadFailed {
-                message: format!("UTF-8 error in {}: {e}", path.display()),
-            })?;
+        let contents = std::str::from_utf8(&bytes)
+            .map_err(|e| read_failed(format!("UTF-8 error in {}: {e}", path.display())))?;
 
         let doc = impl_plan_codec::decode(contents).map_err(|e| {
-            PreReviewGateError::ImplPlanReadFailed {
-                message: format!(
-                    "codec error reading impl-plan.json for track '{}': {e}",
-                    track_id.as_ref()
-                ),
-            }
+            read_failed(format!(
+                "codec error reading impl-plan.json for track '{}': {e}",
+                track_id.as_ref()
+            ))
         })?;
 
         let statuses =
@@ -173,9 +157,35 @@ mod tests {
     use std::fs;
 
     use domain::{TaskId, TaskStatusKind, TrackId};
-    use usecase::pre_review_gate::PreReviewGateError;
+    use usecase::pre_review_gate::ImplPlanReadError;
 
     use super::*;
+
+    #[test]
+    fn fs_impl_plan_reader_implements_port_without_compatibility_delegation() {
+        let source = include_str!("impl_plan_reader.rs");
+        let production_source = source.split("#[cfg(test)]").next().unwrap();
+
+        assert!(
+            production_source.contains("impl ImplPlanReaderPort for FsImplPlanReader"),
+            "reader must implement its declared secondary port"
+        );
+        assert!(
+            production_source.contains("fn read_task_statuses("),
+            "reader must implement the task-status operation"
+        );
+        for forbidden_runtime_path in [
+            "ServiceImpl",
+            "CompositionRoot",
+            "PreReviewGateInteractor::new",
+            "TaskContractDriver::new",
+        ] {
+            assert!(
+                !production_source.contains(forbidden_runtime_path),
+                "filesystem adapter must not reverse-delegate through {forbidden_runtime_path}"
+            );
+        }
+    }
 
     fn track_id(s: &str) -> TrackId {
         TrackId::try_new(s).unwrap()
@@ -233,7 +243,7 @@ mod tests {
         let reader = FsImplPlanReader::new(dir.path().to_path_buf());
         let err = reader.read_task_statuses(&track_id("nonexistent-track")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::ImplPlanReadFailed { .. }),
+            matches!(err, ImplPlanReadError::ReadFailed { .. }),
             "expected ImplPlanReadFailed, got: {err}"
         );
     }
@@ -248,7 +258,7 @@ mod tests {
         let reader = FsImplPlanReader::new(dir.path().to_path_buf());
         let err = reader.read_task_statuses(&track_id("my-track")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::ImplPlanReadFailed { .. }),
+            matches!(err, ImplPlanReadError::ReadFailed { .. }),
             "expected ImplPlanReadFailed, got: {err}"
         );
     }
@@ -264,7 +274,7 @@ mod tests {
         let reader = FsImplPlanReader::new(dir.path().to_path_buf());
         let err = reader.read_task_statuses(&track_id("my-track")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::ImplPlanReadFailed { .. }),
+            matches!(err, ImplPlanReadError::ReadFailed { .. }),
             "expected ImplPlanReadFailed, got: {err}"
         );
     }
@@ -282,7 +292,7 @@ mod tests {
         let reader = FsImplPlanReader::new(dir.path().to_path_buf());
         let err = reader.read_task_statuses(&track_id("my-track")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::ImplPlanReadFailed { .. }),
+            matches!(err, ImplPlanReadError::ReadFailed { .. }),
             "expected ImplPlanReadFailed, got: {err}"
         );
     }
@@ -299,7 +309,7 @@ mod tests {
         let reader = FsImplPlanReader::new(dir.path().to_path_buf());
         let err = reader.read_task_statuses(&track_id("my-track")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::ImplPlanReadFailed { .. }),
+            matches!(err, ImplPlanReadError::ReadFailed { .. }),
             "expected ImplPlanReadFailed, got: {err}"
         );
     }
@@ -318,7 +328,7 @@ mod tests {
         let reader = FsImplPlanReader::new(link_items_dir);
         let err = reader.read_task_statuses(&track_id("my-track")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::ImplPlanReadFailed { .. }),
+            matches!(err, ImplPlanReadError::ReadFailed { .. }),
             "expected ImplPlanReadFailed, got: {err}"
         );
     }
@@ -329,7 +339,7 @@ mod tests {
         let reader = FsImplPlanReader::new(dir.path().to_path_buf());
         let err = reader.read_task_statuses(&track_id("my-track")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::ImplPlanReadFailed { .. }),
+            matches!(err, ImplPlanReadError::ReadFailed { .. }),
             "expected ImplPlanReadFailed, got: {err}"
         );
     }

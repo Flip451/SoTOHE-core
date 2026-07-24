@@ -13,7 +13,7 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use cli_driver::task_contract::{TaskContractDriver, TaskContractInput};
+use cli_driver::task_contract::TaskContractDriver;
 use infrastructure::impl_catalog_signal_reader::FsImplCatalogSignalReader;
 use infrastructure::impl_plan_reader::FsImplPlanReader;
 use infrastructure::task_contract_reader::FsTaskContractReader;
@@ -21,8 +21,6 @@ use usecase::pre_review_gate::{
     CoverageVerifyInteractor, ImplCatalogSignalReaderPort, ImplPlanReaderPort,
     PreReviewGateInteractor, TaskContractReaderPort,
 };
-
-use crate::error::CompositionError;
 
 /// Composition root for the `task-contract` command family.
 ///
@@ -73,57 +71,63 @@ impl TaskContractCompositionRoot {
 
         TaskContractDriver::new(check_service, coverage_service)
     }
-
-    /// Wire and invoke the pre-review liveness gate check.
-    ///
-    /// Constructs a [`TaskContractDriver`] via
-    /// [`task_contract_driver(items_dir)`](Self::task_contract_driver), then
-    /// dispatches [`TaskContractInput::Check { layer, track_id }`]. The driver
-    /// parses CLI strings, calls the check use case, and renders `Passed`/`Blocked`
-    /// outcomes as [`cli_driver::CommandOutcome`].
-    ///
-    /// When `layer` is `None`, the gate iterates all 6 canonical TDDD layers
-    /// internally and returns a single combined verdict.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`CompositionError`] if composition fails (currently infallible
-    /// for this composition root, but the signature allows future wiring
-    /// errors such as config loading).
-    pub fn task_contract_check(
-        &self,
-        layer: Option<String>,
-        track_id: String,
-        items_dir: PathBuf,
-    ) -> Result<cli_driver::CommandOutcome, CompositionError> {
-        let driver = self.task_contract_driver(items_dir);
-        Ok(driver.handle(TaskContractInput::Check { layer, track_id }))
-    }
-
-    /// Wire and invoke the attribution-completeness coverage check.
-    ///
-    /// Constructs a [`TaskContractDriver`] via
-    /// [`task_contract_driver(items_dir)`](Self::task_contract_driver), then
-    /// dispatches [`TaskContractInput::Coverage { track_id }`]. The driver
-    /// calls the coverage use case and renders `Passed`/`Blocked` outcomes as
-    /// [`cli_driver::CommandOutcome`].
-    ///
-    /// # Errors
-    ///
-    /// Returns [`CompositionError`] if composition fails (currently infallible
-    /// for this composition root).
-    pub fn task_contract_coverage(
-        &self,
-        track_id: String,
-        items_dir: PathBuf,
-    ) -> Result<cli_driver::CommandOutcome, CompositionError> {
-        let driver = self.task_contract_driver(items_dir);
-        Ok(driver.handle(TaskContractInput::Coverage { track_id }))
-    }
 }
 
 impl Default for TaskContractCompositionRoot {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+mod tests {
+    use super::TaskContractCompositionRoot;
+
+    #[test]
+    fn task_contract_composition_root_is_wiring_only() {
+        let source = include_str!("task_contract.rs");
+        let production_source = source.split("#[cfg(test)]").next().unwrap();
+        assert!(production_source.contains("-> TaskContractDriver"));
+        assert!(production_source.contains("TaskContractDriver::new("));
+        assert!(production_source.contains("FsTaskContractReader::new("));
+        assert!(production_source.contains("FsImplCatalogSignalReader::new("));
+        assert!(production_source.contains("FsImplPlanReader::new("));
+        assert!(production_source.contains("Arc<dyn TaskContractReaderPort>"));
+        assert!(production_source.contains("Arc<dyn ImplCatalogSignalReaderPort>"));
+        assert!(production_source.contains("Arc<dyn ImplPlanReaderPort>"));
+        for wired_component in [
+            "Arc::new(FsTaskContractReader::new(items_dir.clone()))",
+            "Arc::new(FsImplCatalogSignalReader::new(items_dir.clone()))",
+            "Arc::new(FsImplPlanReader::new(items_dir))",
+            "PreReviewGateInteractor::new(",
+            "CoverageVerifyInteractor::new(",
+            "TaskContractDriver::new(check_service, coverage_service)",
+        ] {
+            assert!(
+                production_source.contains(wired_component),
+                "composition root must wire {wired_component} into the one-way driver path"
+            );
+        }
+        for forbidden in [
+            "CommandOutcome",
+            ".handle(",
+            "std::fs::",
+            "std::process::",
+            "std::net::",
+            "std::io::",
+            "println!",
+            "eprintln!",
+            "print!",
+            "eprint!",
+            "ServiceImpl",
+        ] {
+            assert!(
+                !production_source.contains(forbidden),
+                "composition root must not contain execution or compatibility path {forbidden}"
+            );
+        }
+
+        let _root = TaskContractCompositionRoot::new();
     }
 }

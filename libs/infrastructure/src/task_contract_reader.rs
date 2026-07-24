@@ -10,12 +10,17 @@ use std::path::PathBuf;
 
 use domain::TrackId;
 use domain::task_contract::TaskContractDocument;
-use usecase::pre_review_gate::{PreReviewGateError, TaskContractReaderPort};
+use domain::tddd::catalogue_linter::FreeText;
+use usecase::pre_review_gate::{TaskContractReadError, TaskContractReaderPort};
 
 use crate::task_contract_codec;
 use crate::track::symlink_guard::reject_symlinks_below;
 
 const MAX_TASK_CONTRACT_BYTES: u64 = 1024 * 1024;
+
+fn read_failed(message: impl Into<String>) -> TaskContractReadError {
+    TaskContractReadError::ReadFailed { message: FreeText::new(message.into()) }
+}
 
 /// Filesystem secondary adapter implementing
 /// [`usecase::pre_review_gate::TaskContractReaderPort`].
@@ -24,8 +29,8 @@ const MAX_TASK_CONTRACT_BYTES: u64 = 1024 * 1024;
 /// `task_contract_codec::decode`, and returns a
 /// `domain::task_contract::TaskContractDocument`.
 ///
-/// - Missing file maps to [`PreReviewGateError::TaskContractNotFound`].
-/// - I/O and codec errors map to [`PreReviewGateError::TaskContractReadFailed`].
+/// - Missing files map to [`TaskContractReadError::NotFound`].
+/// - I/O and codec errors map to [`TaskContractReadError::ReadFailed`].
 ///
 /// The `items_dir` is injected at construction time so callers do not need to
 /// pass it on every [`read`](FsTaskContractReader::read) call.
@@ -43,83 +48,69 @@ impl FsTaskContractReader {
 }
 
 impl TaskContractReaderPort for FsTaskContractReader {
-    fn read(&self, track_id: &TrackId) -> Result<TaskContractDocument, PreReviewGateError> {
+    fn read(&self, track_id: &TrackId) -> Result<TaskContractDocument, TaskContractReadError> {
         let items_dir =
             crate::resolve_items_dir_under_current_repo(&self.items_dir).map_err(|e| {
-                PreReviewGateError::TaskContractReadFailed {
-                    message: format!("items_dir rejected before reading task-contract.json: {e}"),
-                }
+                read_failed(format!("items_dir rejected before reading task-contract.json: {e}"))
             })?;
         let path = items_dir.join(track_id.as_ref()).join("task-contract.json");
 
         match reject_symlinks_below(&path, &items_dir) {
             Ok(true) => {}
-            Ok(false) => return Err(PreReviewGateError::TaskContractNotFound),
+            Ok(false) => return Err(TaskContractReadError::NotFound),
             Err(e) => {
-                return Err(PreReviewGateError::TaskContractReadFailed {
-                    message: format!("symlink check failed for {}: {e}", path.display()),
-                });
+                return Err(read_failed(format!(
+                    "symlink check failed for {}: {e}",
+                    path.display()
+                )));
             }
         }
 
         let metadata = match std::fs::symlink_metadata(&path) {
             Ok(meta) if meta.file_type().is_symlink() => {
-                return Err(PreReviewGateError::TaskContractReadFailed {
-                    message: format!(
-                        "symlink check failed for {}: refused symlink",
-                        path.display()
-                    ),
-                });
+                return Err(read_failed(format!(
+                    "symlink check failed for {}: refused symlink",
+                    path.display()
+                )));
             }
             Ok(meta) => meta,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                return Err(PreReviewGateError::TaskContractNotFound);
+                return Err(TaskContractReadError::NotFound);
             }
             Err(e) => {
-                return Err(PreReviewGateError::TaskContractReadFailed {
-                    message: format!("metadata error reading {}: {e}", path.display()),
-                });
+                return Err(read_failed(format!("metadata error reading {}: {e}", path.display())));
             }
         };
         if metadata.len() > MAX_TASK_CONTRACT_BYTES {
-            return Err(PreReviewGateError::TaskContractReadFailed {
-                message: format!(
-                    "task-contract.json exceeds maximum size of {MAX_TASK_CONTRACT_BYTES} bytes: {} bytes",
-                    metadata.len()
-                ),
-            });
+            return Err(read_failed(format!(
+                "task-contract.json exceeds maximum size of {MAX_TASK_CONTRACT_BYTES} bytes: {} bytes",
+                metadata.len()
+            )));
         }
 
         let bytes = match std::fs::read(&path) {
             Ok(b) => b,
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => {
-                return Err(PreReviewGateError::TaskContractNotFound);
+                return Err(TaskContractReadError::NotFound);
             }
             Err(e) => {
-                return Err(PreReviewGateError::TaskContractReadFailed {
-                    message: format!("I/O error reading {}: {e}", path.display()),
-                });
+                return Err(read_failed(format!("I/O error reading {}: {e}", path.display())));
             }
         };
 
-        let doc = task_contract_codec::decode(&bytes).map_err(|e| {
-            PreReviewGateError::TaskContractReadFailed {
-                message: format!("codec error reading {}: {e}", path.display()),
-            }
-        })?;
+        let doc = task_contract_codec::decode(&bytes)
+            .map_err(|e| read_failed(format!("codec error reading {}: {e}", path.display())))?;
 
         // PR #175 round 2 P1: refuse contract whose embedded track_id does not
         // match the requested track_id. Without this, a contract copied from
         // another track (or generated with a stale track id) would silently
         // evaluate attribution for unrelated data.
         if doc.track_id() != track_id {
-            return Err(PreReviewGateError::TaskContractReadFailed {
-                message: format!(
-                    "track_id mismatch: requested '{}' but task-contract.json contains '{}'",
-                    track_id.as_ref(),
-                    doc.track_id().as_ref()
-                ),
-            });
+            return Err(read_failed(format!(
+                "track_id mismatch: requested '{}' but task-contract.json contains '{}'",
+                track_id.as_ref(),
+                doc.track_id().as_ref()
+            )));
         }
 
         Ok(doc)
@@ -136,9 +127,29 @@ mod tests {
     use std::fs;
 
     use domain::TrackId;
-    use usecase::pre_review_gate::PreReviewGateError;
+    use usecase::pre_review_gate::TaskContractReadError;
 
     use super::*;
+
+    #[test]
+    fn fs_task_contract_reader_implements_port_without_compatibility_delegation() {
+        let source = include_str!("task_contract_reader.rs");
+        let production_source = source.split("#[cfg(test)]").next().unwrap();
+
+        assert!(
+            production_source.contains("impl TaskContractReaderPort for FsTaskContractReader"),
+            "reader must implement its declared secondary port"
+        );
+        assert!(production_source.contains("fn read("), "reader must implement port read");
+        for forbidden_runtime_path in
+            ["ServiceImpl", "CompositionRoot", "PreReviewGateInteractor", "TaskContractDriver"]
+        {
+            assert!(
+                !production_source.contains(forbidden_runtime_path),
+                "filesystem adapter must not reverse-delegate through {forbidden_runtime_path}"
+            );
+        }
+    }
 
     fn track_id(s: &str) -> TrackId {
         TrackId::try_new(s).unwrap()
@@ -187,13 +198,16 @@ mod tests {
         let reader = FsTaskContractReader::new(dir.path().to_path_buf());
         let err = reader.read(&track_id("other-track")).unwrap_err();
         match err {
-            PreReviewGateError::TaskContractReadFailed { message } => {
+            TaskContractReadError::ReadFailed { message } => {
                 assert!(
-                    message.contains("track_id mismatch"),
+                    message.as_str().contains("track_id mismatch"),
                     "expected track_id mismatch diagnostic, got: {message}"
                 );
-                assert!(message.contains("other-track"), "expected requested id in message");
-                assert!(message.contains("my-track"), "expected embedded id in message");
+                assert!(
+                    message.as_str().contains("other-track"),
+                    "expected requested id in message"
+                );
+                assert!(message.as_str().contains("my-track"), "expected embedded id in message");
             }
             other => panic!("expected TaskContractReadFailed, got: {other}"),
         }
@@ -205,7 +219,7 @@ mod tests {
         let reader = FsTaskContractReader::new(dir.path().to_path_buf());
         let err = reader.read(&track_id("nonexistent-track")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::TaskContractNotFound),
+            matches!(err, TaskContractReadError::NotFound),
             "expected TaskContractNotFound, got: {err}"
         );
     }
@@ -220,7 +234,7 @@ mod tests {
         let reader = FsTaskContractReader::new(dir.path().to_path_buf());
         let err = reader.read(&track_id("my-track")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::TaskContractReadFailed { .. }),
+            matches!(err, TaskContractReadError::ReadFailed { .. }),
             "expected TaskContractReadFailed, got: {err}"
         );
     }
@@ -236,7 +250,7 @@ mod tests {
         let reader = FsTaskContractReader::new(dir.path().to_path_buf());
         let err = reader.read(&track_id("my-track")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::TaskContractReadFailed { .. }),
+            matches!(err, TaskContractReadError::ReadFailed { .. }),
             "expected TaskContractReadFailed, got: {err}"
         );
     }
@@ -254,7 +268,7 @@ mod tests {
         let reader = FsTaskContractReader::new(dir.path().to_path_buf());
         let err = reader.read(&track_id("my-track")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::TaskContractReadFailed { .. }),
+            matches!(err, TaskContractReadError::ReadFailed { .. }),
             "expected TaskContractReadFailed, got: {err}"
         );
     }
@@ -271,7 +285,7 @@ mod tests {
         let reader = FsTaskContractReader::new(dir.path().to_path_buf());
         let err = reader.read(&track_id("my-track")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::TaskContractReadFailed { .. }),
+            matches!(err, TaskContractReadError::ReadFailed { .. }),
             "expected TaskContractReadFailed, got: {err}"
         );
     }
@@ -290,7 +304,7 @@ mod tests {
         let reader = FsTaskContractReader::new(link_items_dir);
         let err = reader.read(&track_id("my-track")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::TaskContractReadFailed { .. }),
+            matches!(err, TaskContractReadError::ReadFailed { .. }),
             "expected TaskContractReadFailed, got: {err}"
         );
     }
@@ -301,7 +315,7 @@ mod tests {
         let reader = FsTaskContractReader::new(dir.path().to_path_buf());
         let err = reader.read(&track_id("my-track")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::TaskContractReadFailed { .. }),
+            matches!(err, TaskContractReadError::ReadFailed { .. }),
             "expected TaskContractReadFailed, got: {err}"
         );
     }

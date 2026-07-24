@@ -1,0 +1,20 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-24T07:24:03Z",
+  "declaration_hash": "25855a56c2c33d84017e914a13d0d746e73bc6163d44762cc28deb7c1145e4b6",
+  "implementation_input_hash": "cb9c65505e61d6365e08631aad56d8b40dd8606e688070af5b0555d97c19e68e",
+  "signals": [
+    {
+      "type_name": "cli::commands::adr_baseline::resolve_for_read",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::adr_baseline::resolve_for_write",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

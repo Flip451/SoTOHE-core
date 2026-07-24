@@ -7,14 +7,15 @@ use std::process::Command;
 use std::sync::Arc;
 
 use domain::adr_baseline::{
-    AdrBaselineKind, AdrBaselineLedgerEntry, AdrBaselineRecordedCopyStatus, AdrBaselineSourceState,
+    AdrBaselineLedgerEntry, AdrBaselineRecordedCopyStatus, AdrBaselineSourceState,
     AdrSourceFileName,
 };
 use domain::{ContentHash, NonEmptyString, Timestamp, TrackId};
 use sha2::{Digest as _, Sha256};
 use usecase::adr_baseline::{
     AdrBaselineCheckOutcome, AdrBaselineQuery, AdrBaselineQueryInteractor, AdrBaselineQueryOutput,
-    AdrBaselineQueryService, AdrBaselineSourcePort, AdrBaselineStorePort, AdrBaselineStoreReadPort,
+    AdrBaselineQueryService, AdrBaselineSnapshotKind, AdrBaselineSourcePort, AdrBaselineStorePort,
+    AdrBaselineStoreReadPort, AdrBaselineTimestampError,
 };
 
 use super::store::write_ledger_record;
@@ -48,6 +49,50 @@ fn entry() -> AdrBaselineLedgerEntry {
         source: source(),
         hash: ContentHash::from_bytes(Sha256::digest(b"contents").into()),
         timestamp: Timestamp::new("2026-07-16T00:00:00Z").unwrap(),
+    }
+}
+
+#[test]
+fn test_adr_baseline_timestamp_provider_uses_scoped_error_and_shared_timestamp_source() {
+    let timestamp: Result<Timestamp, AdrBaselineTimestampError> = super::timestamp_now();
+    assert!(timestamp.is_ok());
+
+    let source = include_str!("../adr_baseline.rs");
+    assert!(
+        source.contains(
+            "crate::timestamp_now().map_err(AdrBaselineTimestampError::InvalidTimestamp)"
+        )
+    );
+
+    let provider_source = source
+        .split("pub fn timestamp_now")
+        .nth(1)
+        .unwrap()
+        .split("/// Serde-facing representation")
+        .next()
+        .unwrap();
+    for forbidden_path in [
+        "AdrBaselineCompositionRoot",
+        "AdrBaselineDriver",
+        "AdrBaselineInteractor",
+        "AdrBaselineService",
+        "AdrBaselineQueryService",
+        "ServiceImpl",
+        "CompatibilityShim",
+        "CompatService",
+        "std::fs::",
+        "std::process::",
+        "std::net::",
+        "std::io::",
+        "println!",
+        "eprintln!",
+        "print!",
+        "eprint!",
+    ] {
+        assert!(
+            !provider_source.contains(forbidden_path),
+            "ADR baseline timestamp provider must only delegate to the shared source, not {forbidden_path}"
+        );
     }
 }
 
@@ -120,8 +165,7 @@ fn test_adr_baseline_check_commit_passes_with_init_baseline_and_no_spec() {
             &track(),
             &source(),
             b"contents".to_vec(),
-            AdrBaselineKind::Init,
-            None,
+            AdrBaselineSnapshotKind::Init,
             timestamp(),
         )
         .unwrap();
@@ -168,6 +212,27 @@ fn test_adr_baseline_ledger_append_completes_short_writes() {
 }
 
 #[test]
+fn test_fs_adr_baseline_store_implements_store_port_without_compatibility_delegation() {
+    let production_source = include_str!("store.rs");
+
+    assert!(production_source.contains("impl AdrBaselineStorePort for FsAdrBaselineStore"));
+    for direct_port_operation in ["fn snapshot(", "fn restore("] {
+        assert!(
+            production_source.contains(direct_port_operation),
+            "filesystem store must directly implement {direct_port_operation}"
+        );
+    }
+    for forbidden_runtime_path in
+        ["ServiceImpl", "CompositionRoot", "AdrBaselineInteractor::new", "AdrBaselineDriver::new"]
+    {
+        assert!(
+            !production_source.contains(forbidden_runtime_path),
+            "filesystem store must not reverse-delegate through {forbidden_runtime_path}"
+        );
+    }
+}
+
+#[test]
 fn test_fs_adr_baseline_store_appends_identical_snapshot_without_duplicate_copy() {
     let temp = tempfile::tempdir().unwrap();
     let store = FsAdrBaselineStore::from(temp.path().to_path_buf());
@@ -176,8 +241,7 @@ fn test_fs_adr_baseline_store_appends_identical_snapshot_without_duplicate_copy(
             &track(),
             &source(),
             b"contents".to_vec(),
-            AdrBaselineKind::Init,
-            None,
+            AdrBaselineSnapshotKind::Init,
             timestamp(),
         )
         .unwrap();
@@ -186,8 +250,7 @@ fn test_fs_adr_baseline_store_appends_identical_snapshot_without_duplicate_copy(
             &track(),
             &source(),
             b"contents".to_vec(),
-            AdrBaselineKind::NonSemanticFix,
-            None,
+            AdrBaselineSnapshotKind::NonSemanticFix,
             timestamp(),
         )
         .unwrap();
@@ -213,8 +276,7 @@ fn test_fs_adr_baseline_store_verifies_and_restores_latest_copy() {
             &track(),
             &source(),
             b"baseline".to_vec(),
-            AdrBaselineKind::Init,
-            None,
+            AdrBaselineSnapshotKind::Init,
             timestamp(),
         )
         .unwrap();
@@ -237,8 +299,7 @@ fn test_fs_adr_baseline_store_reports_tampered_copy_hash() {
             &track(),
             &source(),
             b"contents".to_vec(),
-            AdrBaselineKind::Init,
-            None,
+            AdrBaselineSnapshotKind::Init,
             timestamp(),
         )
         .unwrap();
@@ -324,8 +385,7 @@ fn test_fs_adr_baseline_store_rejects_windows_drive_prefixed_source() {
                 &track(),
                 &drive_prefixed_source(),
                 b"contents".to_vec(),
-                AdrBaselineKind::Init,
-                None,
+                AdrBaselineSnapshotKind::Init,
                 timestamp(),
             )
             .is_err()
@@ -346,8 +406,7 @@ fn test_fs_adr_baseline_store_rejects_invalid_ledger_before_creating_copy() {
                 &track(),
                 &source(),
                 b"contents".to_vec(),
-                AdrBaselineKind::Init,
-                None,
+                AdrBaselineSnapshotKind::Init,
                 timestamp(),
             )
             .is_err()
@@ -366,8 +425,7 @@ fn test_fs_adr_baseline_store_rejects_invalid_ledger_before_creating_copy() {
             &track(),
             &source(),
             b"contents".to_vec(),
-            AdrBaselineKind::Init,
-            None,
+            AdrBaselineSnapshotKind::Init,
             timestamp(),
         )
         .unwrap();
@@ -391,8 +449,7 @@ fn test_fs_adr_baseline_store_rejects_symlinked_ledger() {
                 &track(),
                 &source(),
                 b"contents".to_vec(),
-                AdrBaselineKind::Init,
-                None,
+                AdrBaselineSnapshotKind::Init,
                 timestamp(),
             )
             .is_err()
@@ -409,8 +466,7 @@ fn test_fs_adr_baseline_store_rejects_symlinked_recorded_copy() {
             &track(),
             &source(),
             b"contents".to_vec(),
-            AdrBaselineKind::Init,
-            None,
+            AdrBaselineSnapshotKind::Init,
             timestamp(),
         )
         .unwrap();
@@ -575,8 +631,7 @@ fn test_fs_adr_baseline_store_rejects_oversized_snapshot_before_writing() {
                 &track(),
                 &source(),
                 vec![b'x'; MAX_ADR_BYTES + 1],
-                AdrBaselineKind::Init,
-                None,
+                AdrBaselineSnapshotKind::Init,
                 timestamp(),
             )
             .is_err()
@@ -598,8 +653,7 @@ fn test_fs_adr_baseline_store_rejects_append_when_ledger_byte_limit_would_be_exc
                 &track(),
                 &source(),
                 b"contents".to_vec(),
-                AdrBaselineKind::Init,
-                None,
+                AdrBaselineSnapshotKind::Init,
                 timestamp(),
             )
             .is_err()
@@ -629,8 +683,7 @@ fn test_fs_adr_baseline_store_rejects_append_when_ledger_entry_limit_is_reached(
                 &track(),
                 &source(),
                 b"contents".to_vec(),
-                AdrBaselineKind::Init,
-                None,
+                AdrBaselineSnapshotKind::Init,
                 timestamp(),
             )
             .is_err()
@@ -648,8 +701,9 @@ fn test_fs_adr_baseline_store_rejects_append_when_encoded_record_exceeds_line_li
                 &track(),
                 &source(),
                 b"contents".to_vec(),
-                AdrBaselineKind::Escalation,
-                Some(NonEmptyString::try_new("x".repeat(MAX_LEDGER_LINE_BYTES)).unwrap()),
+                AdrBaselineSnapshotKind::Escalation(
+                    NonEmptyString::try_new("x".repeat(MAX_LEDGER_LINE_BYTES)).unwrap(),
+                ),
                 timestamp(),
             )
             .is_err()

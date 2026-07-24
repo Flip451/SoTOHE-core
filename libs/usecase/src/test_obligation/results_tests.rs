@@ -55,7 +55,9 @@ use super::{
     TestObligationResultsCommand, TestObligationResultsInteractor, TestObligationResultsOutput,
     TestObligationStatusLaneSummary,
 };
-use crate::pre_review_gate::{ImplPlanReaderPort, PreReviewGateError, TaskContractReaderPort};
+use crate::pre_review_gate::{
+    ImplPlanReadError, ImplPlanReaderPort, TaskContractReadError, TaskContractReaderPort,
+};
 use domain::task_contract::{ContractedEntryRef, TaskContractDocument};
 
 // ---------------------------------------------------------------------------
@@ -178,8 +180,8 @@ impl TaskContractReaderPort for UnusedTaskContractReader {
     fn read(
         &self,
         _track_id: &TrackId,
-    ) -> Result<domain::task_contract::TaskContractDocument, PreReviewGateError> {
-        Err(PreReviewGateError::TaskContractNotFound)
+    ) -> Result<domain::task_contract::TaskContractDocument, TaskContractReadError> {
+        Err(TaskContractReadError::NotFound)
     }
 }
 
@@ -188,8 +190,8 @@ impl ImplPlanReaderPort for UnusedImplPlanReader {
     fn read_task_statuses(
         &self,
         _track_id: &TrackId,
-    ) -> Result<HashMap<TaskId, TaskStatusKind>, PreReviewGateError> {
-        Err(PreReviewGateError::ImplPlanReadFailed { message: "unused".to_owned() })
+    ) -> Result<HashMap<TaskId, TaskStatusKind>, ImplPlanReadError> {
+        Err(ImplPlanReadError::ReadFailed { message: domain::FreeText::new("unused") })
     }
 }
 
@@ -226,7 +228,7 @@ impl CatalogueDocumentLoaderPort for StatusCatalogueReader {
 
 struct StatusTaskContractReader(TaskContractDocument);
 impl TaskContractReaderPort for StatusTaskContractReader {
-    fn read(&self, _track_id: &TrackId) -> Result<TaskContractDocument, PreReviewGateError> {
+    fn read(&self, _track_id: &TrackId) -> Result<TaskContractDocument, TaskContractReadError> {
         Ok(self.0.clone())
     }
 }
@@ -236,7 +238,7 @@ impl ImplPlanReaderPort for StatusImplPlanReader {
     fn read_task_statuses(
         &self,
         _track_id: &TrackId,
-    ) -> Result<HashMap<TaskId, TaskStatusKind>, PreReviewGateError> {
+    ) -> Result<HashMap<TaskId, TaskStatusKind>, ImplPlanReadError> {
         Ok(self.0.clone())
     }
 }

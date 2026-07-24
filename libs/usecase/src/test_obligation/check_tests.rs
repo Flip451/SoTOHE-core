@@ -62,7 +62,9 @@ use domain::{
 
 use domain::SpecDocumentLoaderPort;
 
-use crate::pre_review_gate::{ImplPlanReaderPort, PreReviewGateError, TaskContractReaderPort};
+use crate::pre_review_gate::{
+    ImplPlanReadError, ImplPlanReaderPort, TaskContractReadError, TaskContractReaderPort,
+};
 
 use super::{
     CheckTestObligationsApplicationService, CheckTestObligationsCommand,
@@ -253,7 +255,7 @@ impl CatalogueDocumentLoaderPort for FailingCatalogue {
 
 struct StubTaskContractReader(TaskContractDocument);
 impl TaskContractReaderPort for StubTaskContractReader {
-    fn read(&self, _track_id: &TrackId) -> Result<TaskContractDocument, PreReviewGateError> {
+    fn read(&self, _track_id: &TrackId) -> Result<TaskContractDocument, TaskContractReadError> {
         Ok(self.0.clone())
     }
 }
@@ -263,7 +265,7 @@ impl ImplPlanReaderPort for StubImplPlanReader {
     fn read_task_statuses(
         &self,
         _track_id: &TrackId,
-    ) -> Result<HashMap<TaskId, TaskStatusKind>, PreReviewGateError> {
+    ) -> Result<HashMap<TaskId, TaskStatusKind>, ImplPlanReadError> {
         Ok(self.0.clone())
     }
 }

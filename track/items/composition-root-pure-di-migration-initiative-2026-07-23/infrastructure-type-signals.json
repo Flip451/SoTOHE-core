@@ -1,0 +1,89 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-24T08:51:56Z",
+  "declaration_hash": "98cf0faba913f3da0fbc04ee7a1a0e773a94abaef4f48a00951647c72bdee407",
+  "implementation_input_hash": "45d12dfc3e41598c1597940d379f8febc526659f65eabb66816dfb4b43016c52",
+  "signals": [
+    {
+      "type_name": "FsCatalogAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogPort"
+      ]
+    },
+    {
+      "type_name": "FsImplCatalogSignalReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ImplCatalogSignalReaderPort"
+      ]
+    },
+    {
+      "type_name": "FsImplPlanReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ImplPlanReaderPort"
+      ]
+    },
+    {
+      "type_name": "FsTaskContractReader",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TaskContractReaderPort"
+      ]
+    },
+    {
+      "type_name": "infrastructure::adr_baseline::timestamp_now",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FsAdrBaselineStore",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "AdrBaselineStorePort"
+      ]
+    },
+    {
+      "type_name": "FsGitAdrBaselineSource",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FsSelfBinaryTransplantAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FsTemplateBoundaryManifestAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FsTemplateExportAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "infrastructure::timestamp_now",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}
