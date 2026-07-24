@@ -5,25 +5,25 @@
       "id": "T001",
       "description": "Remove cli::commands::adr_baseline::items_dir, the track-added AdrBaselineClockPort, and SystemAdrBaselineClockAdapter; dispatch AdrBaselineCommand through one move-based destructure; restore explicit validated Timestamp in AdrBaselineCommand::Snapshot and baseline AdrBaselineInteractor and AdrBaselineValidationError shapes; add reason-aware AdrBaselineSnapshotKind and carry it through AdrBaselineStorePort and FsAdrBaselineStore; add AdrBaselineSnapshotInput, including the cli_driver cross-crate snapshot-kind conversion attribution; use a composition-wired fallible timestamp provider in AdrBaselineDriver with the scoped ADR-baseline timestamp error, remove unreachable validation from AdrBaselineError, and update the ADR-baseline timestamp adapter; update CLI conversion, inputs, and composition wiring; add focused regression coverage. AC-01–AC-05; IN-01–IN-02; CN-01–CN-03.",
       "status": "done",
-      "commit_hash": null
+      "commit_hash": "ec99c348b148dd806e6664f6cc664c2573207115"
     },
     {
       "id": "T002",
       "description": "Update the Catalog command's catalogued cli_driver, usecase, infrastructure, and cli_composition entries; add focused regression coverage. AC-01–AC-05; IN-01–IN-02; CN-01–CN-03.",
       "status": "done",
-      "commit_hash": null
+      "commit_hash": "ec99c348b148dd806e6664f6cc664c2573207115"
     },
     {
       "id": "T003",
       "description": "Update the Template command's catalogued cli_driver, usecase, infrastructure, and cli_composition entries; add focused regression coverage. AC-01–AC-05; IN-01–IN-02; CN-01–CN-03.",
       "status": "done",
-      "commit_hash": null
+      "commit_hash": "ec99c348b148dd806e6664f6cc664c2573207115"
     },
     {
       "id": "T004",
       "description": "Update the TaskContract command's catalogued cli_driver, usecase, infrastructure, and cli_composition entries; add focused regression coverage. AC-01–AC-05; IN-01–IN-02; CN-01–CN-03.",
       "status": "done",
-      "commit_hash": null
+      "commit_hash": "ec99c348b148dd806e6664f6cc664c2573207115"
     }
   ],
   "plan": {

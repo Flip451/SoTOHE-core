@@ -1,267 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bbff49630d1d395d993994d985925ae968d1d5cddfdcaad0e0671c5b7d41b620",
-          "at": "2026-07-24T02:04:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new CLI-owned dispatch path lacks a successful behavioral test. Current tests only inspect source text/resolvers or fail before driver dispatch on an invalid `items_dir`; none verify that `Snapshot` reaches the wired driver and preserves success output, exit code, and ledger/baseline persistence. Add a temporary-repository round-trip test covering the successful snapshot path, as required by the briefing’s external-contract checklist.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/adr_baseline.rs",
-              "line": 138,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:bbff49630d1d395d993994d985925ae968d1d5cddfdcaad0e0671c5b7d41b620",
-          "at": "2026-07-24T02:11:59Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:84ab3818904671d9f615d831c0e9bd9b19420999c38dafea6e93dc1aec91c87d",
-          "at": "2026-07-24T03:56:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:84ab3818904671d9f615d831c0e9bd9b19420999c38dafea6e93dc1aec91c87d",
-          "at": "2026-07-24T04:00:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
-          "at": "2026-07-24T06:16:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
-          "at": "2026-07-24T06:17:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
-          "at": "2026-07-24T06:53:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
-          "at": "2026-07-24T07:18:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
-          "at": "2026-07-24T07:54:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
-          "at": "2026-07-24T07:56:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
-          "at": "2026-07-24T08:52:35Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:be5cbd99d340a8550c48fe3d19a66e6f7599598fa14908efb5fed2c884d4f380",
-          "at": "2026-07-23T14:24:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:be5cbd99d340a8550c48fe3d19a66e6f7599598fa14908efb5fed2c884d4f380",
-          "at": "2026-07-23T14:27:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:105d1b01f7b5d1413f80fe5a47d31d1225c2d37f345955b29f33efedd2d36deb",
-          "at": "2026-07-23T15:49:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:105d1b01f7b5d1413f80fe5a47d31d1225c2d37f345955b29f33efedd2d36deb",
-          "at": "2026-07-23T15:52:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3b6c26799c4f0e9fc2839b5b18f67d9e50c5d4eebd0da4ad6c7b78928a99069d",
-          "at": "2026-07-23T16:25:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3b6c26799c4f0e9fc2839b5b18f67d9e50c5d4eebd0da4ad6c7b78928a99069d",
-          "at": "2026-07-23T16:28:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1172b3a4c9a8487a4afabb5ab90448b5b0ea506f41c42208130e23889e0282a4",
-          "at": "2026-07-23T17:24:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1172b3a4c9a8487a4afabb5ab90448b5b0ea506f41c42208130e23889e0282a4",
-          "at": "2026-07-23T17:25:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1172b3a4c9a8487a4afabb5ab90448b5b0ea506f41c42208130e23889e0282a4",
-          "at": "2026-07-23T17:27:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b4248bab77558271f12a56c5bbec4bb08da1e9da2c30364c593f63b4845b7b5d",
-          "at": "2026-07-23T17:52:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b4248bab77558271f12a56c5bbec4bb08da1e9da2c30364c593f63b4845b7b5d",
-          "at": "2026-07-23T17:54:16Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6cf5e717c1d339d920658cc4a57680adbb04e82473705723ad446e1f77dc2022",
-          "at": "2026-07-24T02:04:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6cf5e717c1d339d920658cc4a57680adbb04e82473705723ad446e1f77dc2022",
-          "at": "2026-07-24T02:13:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c814a809265b8133107500c27d5d24fe5865cc0ba279a766562e37adc6ffca68",
-          "at": "2026-07-24T03:56:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c814a809265b8133107500c27d5d24fe5865cc0ba279a766562e37adc6ffca68",
-          "at": "2026-07-24T04:01:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1bb9b422c8475afcd552d3a93f964ccc42f453df6d280c81e2c21ebb59f745cd",
-          "at": "2026-07-24T06:17:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1bb9b422c8475afcd552d3a93f964ccc42f453df6d280c81e2c21ebb59f745cd",
-          "at": "2026-07-24T06:17:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e803add1ef875fcdb8817516ab2d2e8ca058fdea7ef39c82fd6b2aa568eea46b",
-          "at": "2026-07-24T06:53:32Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:20b0f43fb397be40ee4c5e66798bf04b0fbaf81db235bc5822a911de0022af12",
-          "at": "2026-07-24T07:18:11Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ecc33078dbaaadd4ccfa8aee2ed254456736e3b03ef8bbac85c1d7a0374ae072",
-          "at": "2026-07-24T07:54:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ecc33078dbaaadd4ccfa8aee2ed254456736e3b03ef8bbac85c1d7a0374ae072",
-          "at": "2026-07-24T07:56:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d0120e9b44b42877f2e344f1860fc1ff223312bb59f976873fe5c10cac332ea9",
-          "at": "2026-07-24T08:52:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d0120e9b44b42877f2e344f1860fc1ff223312bb59f976873fe5c10cac332ea9",
-          "at": "2026-07-24T08:57:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d0120e9b44b42877f2e344f1860fc1ff223312bb59f976873fe5c10cac332ea9",
-          "at": "2026-07-24T09:00:09Z"
-        }
-      ]
-    },
     "impl-plan": {
       "rounds": [
         {
@@ -726,305 +465,192 @@
           "findings": [],
           "hash": "rvw1:sha256:fc563a7504f8dad2ab2bc7dba828a681e70c0779819fbc9b16e9716a4304c855",
           "at": "2026-07-24T08:59:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:75f7391ec43734aa396dc820de78b0711066a1bbc5008d182bf24db7894140e5",
+          "at": "2026-07-24T09:07:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:75f7391ec43734aa396dc820de78b0711066a1bbc5008d182bf24db7894140e5",
+          "at": "2026-07-24T09:11:33Z"
         }
       ]
     },
-    "adr": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:820d80a918fead0d127604d5129fd076dcd41c3e4759c3ca734a8634064ac8a5",
-          "at": "2026-07-23T13:31:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 assigns compatibility-shim and intermediate `*ServiceImpl` deletion to the final convergence track, but D5 says each command-context track cannot complete while a compatibility facade or reverse delegation remains. Thus either the earlier tracks must already perform this deletion, leaving no such implementation work for final convergence, or they remain incomplete until that later track and are not independently complete. Assign deletion unambiguously to the context tracks and make final convergence verification-only, or explicitly redefine the permitted intermediate state and per-track completion condition.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
-              "line": 69,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:820d80a918fead0d127604d5129fd076dcd41c3e4759c3ca734a8634064ac8a5",
-          "at": "2026-07-23T13:35:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ceac4a93213aa46f6229e48b990b1ce751ba4a0e0f0faf23f83547b8275cb95e",
-          "at": "2026-07-23T13:48:06Z"
+          "hash": "rvw1:sha256:be5cbd99d340a8550c48fe3d19a66e6f7599598fa14908efb5fed2c884d4f380",
+          "at": "2026-07-23T14:24:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ceac4a93213aa46f6229e48b990b1ce751ba4a0e0f0faf23f83547b8275cb95e",
-          "at": "2026-07-23T13:51:37Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
+          "hash": "rvw1:sha256:be5cbd99d340a8550c48fe3d19a66e6f7599598fa14908efb5fed2c884d4f380",
+          "at": "2026-07-23T14:27:50Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9cd9af6950dfbf0fa24783677e4b4ebf0323493322273e1c66acb14f2186742b",
-          "at": "2026-07-24T02:03:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new test only searches source text and never invokes `FsCatalogAdapter` through `CatalogPort`. Consequently, the five public operations have no happy-path or error-path adapter coverage, and regressions such as forwarding a hard-coded/wrong track ID would still pass. Add behavioral tests that call the adapter with a validated `TrackId` and verify both the resulting path/report and representative errors.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalog_gen/adapter_tests.rs",
-              "line": 3,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:9cd9af6950dfbf0fa24783677e4b4ebf0323493322273e1c66acb14f2186742b",
-          "at": "2026-07-24T02:10:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The adapter tests exercise only failure paths for `add`, `import`, and `cite`. Those failures occur at invalid-layer validation, so they do not prove that these public methods forward the requested `TrackId`, operate on its catalogue, or return successful reports. Add happy-path calls for all three operations as required for public APIs.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/catalog_gen/adapter_tests.rs",
-              "line": 77,
-              "category": "testing"
-            },
-            {
-              "message": "`read_optional_signals` is tested for an absent file and a symlink error, but never for an existing document returning `Ok(Some(_))`. A regression in the adapter-specific `Ok(true)` branch could therefore make present signal documents appear absent and weaken the pre-review gate without failing these tests.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/impl_catalog_signal_reader.rs",
-              "line": 228,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:4374a056b3ea47bda2d576a170579ad7581b190036c40e9587074f6975d662e1",
-          "at": "2026-07-24T02:15:59Z"
+          "hash": "rvw1:sha256:105d1b01f7b5d1413f80fe5a47d31d1225c2d37f345955b29f33efedd2d36deb",
+          "at": "2026-07-23T15:49:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d900c11acbf0406afaf476fc83ba1114cfe8d5c5496503bdd73883cf66500b43",
-          "at": "2026-07-24T02:21:19Z"
+          "hash": "rvw1:sha256:105d1b01f7b5d1413f80fe5a47d31d1225c2d37f345955b29f33efedd2d36deb",
+          "at": "2026-07-23T15:52:01Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:68874861698771ba90afb1dab64b38a473f588b18759153a12626ed1578ed943",
-          "at": "2026-07-24T03:56:12Z"
+          "hash": "rvw1:sha256:3b6c26799c4f0e9fc2839b5b18f67d9e50c5d4eebd0da4ad6c7b78928a99069d",
+          "at": "2026-07-23T16:25:44Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:68874861698771ba90afb1dab64b38a473f588b18759153a12626ed1578ed943",
-          "at": "2026-07-24T04:00:21Z"
+          "hash": "rvw1:sha256:3b6c26799c4f0e9fc2839b5b18f67d9e50c5d4eebd0da4ad6c7b78928a99069d",
+          "at": "2026-07-23T16:28:29Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
-          "at": "2026-07-24T06:16:56Z"
+          "hash": "rvw1:sha256:1172b3a4c9a8487a4afabb5ab90448b5b0ea506f41c42208130e23889e0282a4",
+          "at": "2026-07-23T17:24:17Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
-          "at": "2026-07-24T06:17:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
-          "at": "2026-07-24T06:53:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
-          "at": "2026-07-24T07:18:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
-          "at": "2026-07-24T07:54:01Z"
+          "hash": "rvw1:sha256:1172b3a4c9a8487a4afabb5ab90448b5b0ea506f41c42208130e23889e0282a4",
+          "at": "2026-07-23T17:25:26Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
-          "at": "2026-07-24T07:56:08Z"
+          "hash": "rvw1:sha256:1172b3a4c9a8487a4afabb5ab90448b5b0ea506f41c42208130e23889e0282a4",
+          "at": "2026-07-23T17:27:10Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:81b27aef294d6eb8a69e91508d4b6662eab35c80e689f19df905171cc1d46308",
-          "at": "2026-07-24T08:53:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:81b27aef294d6eb8a69e91508d4b6662eab35c80e689f19df905171cc1d46308",
-          "at": "2026-07-24T08:57:18Z"
+          "hash": "rvw1:sha256:b4248bab77558271f12a56c5bbec4bb08da1e9da2c30364c593f63b4845b7b5d",
+          "at": "2026-07-23T17:52:26Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:81b27aef294d6eb8a69e91508d4b6662eab35c80e689f19df905171cc1d46308",
-          "at": "2026-07-24T08:59:23Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a0285404624e26037c45b2718892ec4a50cd2604f8a7c631a1e1915c385788d6",
-          "at": "2026-07-24T02:03:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`timestamp_now()` samples `chrono::Utc::now()` directly, introducing an ambient, unmockable runtime dependency into the primary adapter. This violates the `cli_driver` boundary: drivers should only translate input, invoke one injected application service, and render its outcome without direct infrastructure access. Acquire the timestamp through the appropriate injected boundary and pass the validated value into the snapshot command.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/adr_baseline.rs",
-              "line": 306,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:a0285404624e26037c45b2718892ec4a50cd2604f8a7c631a1e1915c385788d6",
-          "at": "2026-07-24T02:12:00Z"
+          "hash": "rvw1:sha256:b4248bab77558271f12a56c5bbec4bb08da1e9da2c30364c593f63b4845b7b5d",
+          "at": "2026-07-23T17:54:16Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:abe2f62ef0d93a77d66be5fa8cf8cba93731a998bb04a9efdf1b890702c40507",
-          "at": "2026-07-24T03:56:08Z"
+          "hash": "rvw1:sha256:6cf5e717c1d339d920658cc4a57680adbb04e82473705723ad446e1f77dc2022",
+          "at": "2026-07-24T02:04:16Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:abe2f62ef0d93a77d66be5fa8cf8cba93731a998bb04a9efdf1b890702c40507",
-          "at": "2026-07-24T04:00:15Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AdrBaselineSnapshotInput::try_from` embeds the kind/reason compatibility matrix in the primary adapter (`Init/Cite/NonSemanticFix` require no reason; `NewAdr/Escalation` require one). This is business validation/domain policy that belongs in the injected use-case service; the driver should translate the validated input and delegate it, as the prior implementation and `AdrBaselineInteractor` contract indicate. Move this legality check back to the usecase boundary (or pass a passive DTO through).",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/adr_baseline.rs",
-              "line": 179,
-              "category": "business logic in primary adapter"
-            }
-          ],
-          "hash": "rvw1:sha256:c8f4ed96fbdec446fba56f204dcf576f0c011b17c49ac43ce8d1dbfb8222a634",
-          "at": "2026-07-24T06:17:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The primary adapter now owns the ADR snapshot kind/reason compatibility rule in `AdrBaselineSnapshotInput::try_from` (lines 179–192), rejecting combinations before invoking `AdrBaselineService`. This is business validation that the usecase interactor is documented and designed to own; it also changes the previous behavior where the service received the command and produced the rendered validation error. Keep the adapter as a lossless translation and leave this legality check in the usecase.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/adr_baseline.rs",
-              "line": 179,
-              "category": "business logic in primary adapter"
-            }
-          ],
-          "hash": "rvw1:sha256:c8f4ed96fbdec446fba56f204dcf576f0c011b17c49ac43ce8d1dbfb8222a634",
-          "at": "2026-07-24T06:17:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`AdrBaselineSnapshotInput::try_from` embeds the ADR kind/reason compatibility matrix in the primary adapter, rejecting invalid combinations before invoking `AdrBaselineService`. This is business validation/domain policy that belongs in the usecase; the driver should translate the input and delegate it so the application service remains the single owner of this rule and its error mapping.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/adr_baseline.rs",
-              "line": 179,
-              "category": "business logic in primary adapter"
-            }
-          ],
-          "hash": "rvw1:sha256:2ad3d150ac6c24d795ad1b2a7b81517879b2c8836e441ccbe13f5c889b34c3e5",
-          "at": "2026-07-24T06:53:29Z"
+          "hash": "rvw1:sha256:6cf5e717c1d339d920658cc4a57680adbb04e82473705723ad446e1f77dc2022",
+          "at": "2026-07-24T02:13:56Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2ad3d150ac6c24d795ad1b2a7b81517879b2c8836e441ccbe13f5c889b34c3e5",
-          "at": "2026-07-24T07:18:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54e011738af91f171244a53c872c360d7cf395e39ad3fe33cc543cb97b61acef",
-          "at": "2026-07-24T07:53:58Z"
+          "hash": "rvw1:sha256:c814a809265b8133107500c27d5d24fe5865cc0ba279a766562e37adc6ffca68",
+          "at": "2026-07-24T03:56:05Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:54e011738af91f171244a53c872c360d7cf395e39ad3fe33cc543cb97b61acef",
-          "at": "2026-07-24T07:57:28Z"
+          "hash": "rvw1:sha256:c814a809265b8133107500c27d5d24fe5865cc0ba279a766562e37adc6ffca68",
+          "at": "2026-07-24T04:01:01Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:76c0eb8fe380bf0fc5a25679da2bbedcbd6c671242189dc883be29e08c127d53",
-          "at": "2026-07-24T08:52:46Z"
+          "hash": "rvw1:sha256:1bb9b422c8475afcd552d3a93f964ccc42f453df6d280c81e2c21ebb59f745cd",
+          "at": "2026-07-24T06:17:00Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:76c0eb8fe380bf0fc5a25679da2bbedcbd6c671242189dc883be29e08c127d53",
-          "at": "2026-07-24T08:56:48Z"
+          "hash": "rvw1:sha256:1bb9b422c8475afcd552d3a93f964ccc42f453df6d280c81e2c21ebb59f745cd",
+          "at": "2026-07-24T06:17:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e803add1ef875fcdb8817516ab2d2e8ca058fdea7ef39c82fd6b2aa568eea46b",
+          "at": "2026-07-24T06:53:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20b0f43fb397be40ee4c5e66798bf04b0fbaf81db235bc5822a911de0022af12",
+          "at": "2026-07-24T07:18:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ecc33078dbaaadd4ccfa8aee2ed254456736e3b03ef8bbac85c1d7a0374ae072",
+          "at": "2026-07-24T07:54:09Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:76c0eb8fe380bf0fc5a25679da2bbedcbd6c671242189dc883be29e08c127d53",
-          "at": "2026-07-24T08:59:38Z"
+          "hash": "rvw1:sha256:ecc33078dbaaadd4ccfa8aee2ed254456736e3b03ef8bbac85c1d7a0374ae072",
+          "at": "2026-07-24T07:56:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0120e9b44b42877f2e344f1860fc1ff223312bb59f976873fe5c10cac332ea9",
+          "at": "2026-07-24T08:52:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0120e9b44b42877f2e344f1860fc1ff223312bb59f976873fe5c10cac332ea9",
+          "at": "2026-07-24T08:57:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d0120e9b44b42877f2e344f1860fc1ff223312bb59f976873fe5c10cac332ea9",
+          "at": "2026-07-24T09:00:09Z"
         }
       ]
     },
@@ -1655,6 +1281,394 @@
           "findings": [],
           "hash": "rvw1:sha256:9d400737eca62ebdcebb174a5f3321d4db0dd2ef1723967e0fdd0190e37ff989",
           "at": "2026-07-24T09:01:02Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:820d80a918fead0d127604d5129fd076dcd41c3e4759c3ca734a8634064ac8a5",
+          "at": "2026-07-23T13:31:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 assigns compatibility-shim and intermediate `*ServiceImpl` deletion to the final convergence track, but D5 says each command-context track cannot complete while a compatibility facade or reverse delegation remains. Thus either the earlier tracks must already perform this deletion, leaving no such implementation work for final convergence, or they remain incomplete until that later track and are not independently complete. Assign deletion unambiguously to the context tracks and make final convergence verification-only, or explicitly redefine the permitted intermediate state and per-track completion condition.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+              "line": 69,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:820d80a918fead0d127604d5129fd076dcd41c3e4759c3ca734a8634064ac8a5",
+          "at": "2026-07-23T13:35:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ceac4a93213aa46f6229e48b990b1ce751ba4a0e0f0faf23f83547b8275cb95e",
+          "at": "2026-07-23T13:48:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ceac4a93213aa46f6229e48b990b1ce751ba4a0e0f0faf23f83547b8275cb95e",
+          "at": "2026-07-23T13:51:37Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bbff49630d1d395d993994d985925ae968d1d5cddfdcaad0e0671c5b7d41b620",
+          "at": "2026-07-24T02:04:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new CLI-owned dispatch path lacks a successful behavioral test. Current tests only inspect source text/resolvers or fail before driver dispatch on an invalid `items_dir`; none verify that `Snapshot` reaches the wired driver and preserves success output, exit code, and ledger/baseline persistence. Add a temporary-repository round-trip test covering the successful snapshot path, as required by the briefing’s external-contract checklist.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/adr_baseline.rs",
+              "line": 138,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:bbff49630d1d395d993994d985925ae968d1d5cddfdcaad0e0671c5b7d41b620",
+          "at": "2026-07-24T02:11:59Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84ab3818904671d9f615d831c0e9bd9b19420999c38dafea6e93dc1aec91c87d",
+          "at": "2026-07-24T03:56:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:84ab3818904671d9f615d831c0e9bd9b19420999c38dafea6e93dc1aec91c87d",
+          "at": "2026-07-24T04:00:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
+          "at": "2026-07-24T06:16:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
+          "at": "2026-07-24T06:17:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
+          "at": "2026-07-24T06:53:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
+          "at": "2026-07-24T07:18:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
+          "at": "2026-07-24T07:54:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
+          "at": "2026-07-24T07:56:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01b048c72a5428a334fbdfacece3216f90812bc54d7e4aa2804da80601e125a3",
+          "at": "2026-07-24T08:52:35Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0285404624e26037c45b2718892ec4a50cd2604f8a7c631a1e1915c385788d6",
+          "at": "2026-07-24T02:03:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`timestamp_now()` samples `chrono::Utc::now()` directly, introducing an ambient, unmockable runtime dependency into the primary adapter. This violates the `cli_driver` boundary: drivers should only translate input, invoke one injected application service, and render its outcome without direct infrastructure access. Acquire the timestamp through the appropriate injected boundary and pass the validated value into the snapshot command.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/adr_baseline.rs",
+              "line": 306,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:a0285404624e26037c45b2718892ec4a50cd2604f8a7c631a1e1915c385788d6",
+          "at": "2026-07-24T02:12:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abe2f62ef0d93a77d66be5fa8cf8cba93731a998bb04a9efdf1b890702c40507",
+          "at": "2026-07-24T03:56:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abe2f62ef0d93a77d66be5fa8cf8cba93731a998bb04a9efdf1b890702c40507",
+          "at": "2026-07-24T04:00:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrBaselineSnapshotInput::try_from` embeds the kind/reason compatibility matrix in the primary adapter (`Init/Cite/NonSemanticFix` require no reason; `NewAdr/Escalation` require one). This is business validation/domain policy that belongs in the injected use-case service; the driver should translate the validated input and delegate it, as the prior implementation and `AdrBaselineInteractor` contract indicate. Move this legality check back to the usecase boundary (or pass a passive DTO through).",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/adr_baseline.rs",
+              "line": 179,
+              "category": "business logic in primary adapter"
+            }
+          ],
+          "hash": "rvw1:sha256:c8f4ed96fbdec446fba56f204dcf576f0c011b17c49ac43ce8d1dbfb8222a634",
+          "at": "2026-07-24T06:17:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The primary adapter now owns the ADR snapshot kind/reason compatibility rule in `AdrBaselineSnapshotInput::try_from` (lines 179–192), rejecting combinations before invoking `AdrBaselineService`. This is business validation that the usecase interactor is documented and designed to own; it also changes the previous behavior where the service received the command and produced the rendered validation error. Keep the adapter as a lossless translation and leave this legality check in the usecase.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/adr_baseline.rs",
+              "line": 179,
+              "category": "business logic in primary adapter"
+            }
+          ],
+          "hash": "rvw1:sha256:c8f4ed96fbdec446fba56f204dcf576f0c011b17c49ac43ce8d1dbfb8222a634",
+          "at": "2026-07-24T06:17:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`AdrBaselineSnapshotInput::try_from` embeds the ADR kind/reason compatibility matrix in the primary adapter, rejecting invalid combinations before invoking `AdrBaselineService`. This is business validation/domain policy that belongs in the usecase; the driver should translate the input and delegate it so the application service remains the single owner of this rule and its error mapping.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/adr_baseline.rs",
+              "line": 179,
+              "category": "business logic in primary adapter"
+            }
+          ],
+          "hash": "rvw1:sha256:2ad3d150ac6c24d795ad1b2a7b81517879b2c8836e441ccbe13f5c889b34c3e5",
+          "at": "2026-07-24T06:53:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ad3d150ac6c24d795ad1b2a7b81517879b2c8836e441ccbe13f5c889b34c3e5",
+          "at": "2026-07-24T07:18:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54e011738af91f171244a53c872c360d7cf395e39ad3fe33cc543cb97b61acef",
+          "at": "2026-07-24T07:53:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54e011738af91f171244a53c872c360d7cf395e39ad3fe33cc543cb97b61acef",
+          "at": "2026-07-24T07:57:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76c0eb8fe380bf0fc5a25679da2bbedcbd6c671242189dc883be29e08c127d53",
+          "at": "2026-07-24T08:52:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76c0eb8fe380bf0fc5a25679da2bbedcbd6c671242189dc883be29e08c127d53",
+          "at": "2026-07-24T08:56:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:76c0eb8fe380bf0fc5a25679da2bbedcbd6c671242189dc883be29e08c127d53",
+          "at": "2026-07-24T08:59:38Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9cd9af6950dfbf0fa24783677e4b4ebf0323493322273e1c66acb14f2186742b",
+          "at": "2026-07-24T02:03:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new test only searches source text and never invokes `FsCatalogAdapter` through `CatalogPort`. Consequently, the five public operations have no happy-path or error-path adapter coverage, and regressions such as forwarding a hard-coded/wrong track ID would still pass. Add behavioral tests that call the adapter with a validated `TrackId` and verify both the resulting path/report and representative errors.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/adapter_tests.rs",
+              "line": 3,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:9cd9af6950dfbf0fa24783677e4b4ebf0323493322273e1c66acb14f2186742b",
+          "at": "2026-07-24T02:10:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The adapter tests exercise only failure paths for `add`, `import`, and `cite`. Those failures occur at invalid-layer validation, so they do not prove that these public methods forward the requested `TrackId`, operate on its catalogue, or return successful reports. Add happy-path calls for all three operations as required for public APIs.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/catalog_gen/adapter_tests.rs",
+              "line": 77,
+              "category": "testing"
+            },
+            {
+              "message": "`read_optional_signals` is tested for an absent file and a symlink error, but never for an existing document returning `Ok(Some(_))`. A regression in the adapter-specific `Ok(true)` branch could therefore make present signal documents appear absent and weaken the pre-review gate without failing these tests.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/impl_catalog_signal_reader.rs",
+              "line": 228,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:4374a056b3ea47bda2d576a170579ad7581b190036c40e9587074f6975d662e1",
+          "at": "2026-07-24T02:15:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d900c11acbf0406afaf476fc83ba1114cfe8d5c5496503bdd73883cf66500b43",
+          "at": "2026-07-24T02:21:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68874861698771ba90afb1dab64b38a473f588b18759153a12626ed1578ed943",
+          "at": "2026-07-24T03:56:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:68874861698771ba90afb1dab64b38a473f588b18759153a12626ed1578ed943",
+          "at": "2026-07-24T04:00:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
+          "at": "2026-07-24T06:16:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
+          "at": "2026-07-24T06:17:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
+          "at": "2026-07-24T06:53:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
+          "at": "2026-07-24T07:18:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
+          "at": "2026-07-24T07:54:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:77eb8d089a6bcce6e1e3d6d5f61d2e7ab28755a0e657e7e4c711cd6ca11938e4",
+          "at": "2026-07-24T07:56:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81b27aef294d6eb8a69e91508d4b6662eab35c80e689f19df905171cc1d46308",
+          "at": "2026-07-24T08:53:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81b27aef294d6eb8a69e91508d4b6662eab35c80e689f19df905171cc1d46308",
+          "at": "2026-07-24T08:57:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:81b27aef294d6eb8a69e91508d4b6662eab35c80e689f19df905171cc1d46308",
+          "at": "2026-07-24T08:59:23Z"
         }
       ]
     },
