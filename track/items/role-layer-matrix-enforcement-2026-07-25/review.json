@@ -1,42 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c3fc55ffe221d9e516b7ae2dbb59ba2f5ef539801e74197e0a754fe14f860a73",
-          "at": "2026-07-25T07:39:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c3fc55ffe221d9e516b7ae2dbb59ba2f5ef539801e74197e0a754fe14f860a73",
-          "at": "2026-07-25T07:42:35Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e201a8a1783321e4a94600eee6c6e34b478b9af8f4852fc1a9bbc8af46f8516",
-          "at": "2026-07-25T07:39:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e201a8a1783321e4a94600eee6c6e34b478b9af8f4852fc1a9bbc8af46f8516",
-          "at": "2026-07-25T07:45:16Z"
-        }
-      ]
-    },
     "impl-plan": {
       "rounds": [
         {
@@ -110,6 +74,24 @@
           "findings": [],
           "hash": "rvw1:sha256:e10159d15c01c6df207e881f2c298e2e871a87adad95cbf1f46672920ee9cb50",
           "at": "2026-07-25T08:33:05Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3fc55ffe221d9e516b7ae2dbb59ba2f5ef539801e74197e0a754fe14f860a73",
+          "at": "2026-07-25T07:39:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3fc55ffe221d9e516b7ae2dbb59ba2f5ef539801e74197e0a754fe14f860a73",
+          "at": "2026-07-25T07:42:35Z"
         }
       ]
     },
@@ -320,6 +302,83 @@
           "findings": [],
           "hash": "rvw1:sha256:286f3142434d4c7c8768effe0f53db5e1d9ed191a019e54db78451a0ca966e6c",
           "at": "2026-07-25T08:26:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new instruction claims `libs/infrastructure/tests/catalogue_lint_shipped_config.rs` fails when `config.json` and `ddd-strict.json` diverge, but the test only parses each file independently and never compares their structures. This gives maintainers false assurance about the stated synchronization invariant; add an explicit equality assertion or remove the claim.",
+              "severity": "P1",
+              "file": ".claude/skills/architecture-customizer/SKILL.md",
+              "line": 43,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6a1524053e2827f011b600836b2eb515d45fd20aa72649cf4bfba8f0acdf9597",
+          "at": "2026-07-25T08:42:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new instruction claims the shipped-config regression test fails when `config.json` and `ddd-strict.json` diverge, but `libs/infrastructure/tests/catalogue_lint_shipped_config.rs` only loads each file independently and asserts each has rules; it never compares the two configurations. This creates a false synchronization guarantee. Add an explicit structural equality assertion or remove the claim.",
+              "severity": "P1",
+              "file": ".claude/skills/architecture-customizer/SKILL.md",
+              "line": 43,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:34e0260a1e66a140e6e515345f3b9819d82b24e3d44239d68d296e89d3a24536",
+          "at": "2026-07-25T08:44:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb3e310c6b6f8b761e9990957d2f62a006027c63b49ac75979addb50b42cee12",
+          "at": "2026-07-25T08:45:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "追加した同期要件が、この skill の検証手順に接続されていません。Step 5 の `fmt`、`check-layers`、`verify-arch-docs`、`cargo deny` は catalogue-lint config を比較しないため、片方だけ更新しても workflow が成功します。構造的一致を検査するテストが実行されるよう、Step 5 に `cargo make ci` または対象テストを追加してください。",
+              "severity": "P1",
+              "file": ".claude/skills/architecture-customizer/SKILL.md",
+              "line": 38,
+              "category": "validation-gap"
+            }
+          ],
+          "hash": "rvw1:sha256:cb3e310c6b6f8b761e9990957d2f62a006027c63b49ac75979addb50b42cee12",
+          "at": "2026-07-25T08:50:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:743e218079c5e2796075041f1a455712bb52f408c880dfcb00b2ad090f041ddf",
+          "at": "2026-07-25T08:53:59Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e201a8a1783321e4a94600eee6c6e34b478b9af8f4852fc1a9bbc8af46f8516",
+          "at": "2026-07-25T07:39:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e201a8a1783321e4a94600eee6c6e34b478b9af8f4852fc1a9bbc8af46f8516",
+          "at": "2026-07-25T07:45:16Z"
         }
       ]
     },
