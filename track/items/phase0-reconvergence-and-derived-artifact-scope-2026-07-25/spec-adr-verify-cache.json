@@ -1,0 +1,419 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "c42f5f652a48c0a7136cf7476bc1850704e7211889da4d04165c0cd824c577f4",
+      "evidence_hash": "d0dbb8d85c827b78d279f734ab4f0b388ee38b2c5ee2d844f54f1709d1481cf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "承認前の収束段階へ戻し、手順 2 と同じ review loop を再開する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "Phase 0 で user 承認後の ADR 文面に修正が入った場合、承認前の収束段階へ戻して review loop と修正後全文の再承認を経ることで、修正前の承認を再利用せずに裁定境界を閉じる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "b124febbee2da6e6c7fdc277e1cdc7ea63bdca8afa1285e5a5f6dd9a44ae2f06",
+      "evidence_hash": "62f9ef1546c19f10fdf643a83b676a38e858d2aea42f61d536a3f0e7d376e47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/review-scope.json` の `review_operational` に `track/items/<track-id>/obligations.json` を加え、scope 分類の対象外とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "型カタログから機械導出される obligations.json を review_operational として扱い、再導出だけで内容レビューを失効させない一方、書き手が明示的に作成する test-bindings.json はレビュー対象に維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0715-derived-obligation-artifact-review-scope.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "416766056c9e73abfbb8705649ef6f8ee820e10f2f9c8e6e9f07d64a8143057c",
+      "evidence_hash": "d0dbb8d85c827b78d279f734ab4f0b388ee38b2c5ee2d844f54f1709d1481cf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 0 で user が収束文面を承認した後、その文面に修正が入る場合は、承認済みの状態を維持したまま通常のガーディアン・レーンを継続しない。承認前の収束段階へ戻し、手順 2 と同じ review loop を再開する。\n\n再開した review loop で findings を収束させた後、修正後の収束文面を user へ再度提示して承認を得る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "knowledge/conventions/pre-track-adr-authoring.md を、Phase 0 の user 承認後に修正が加わった ADR を承認前の収束 loop へ戻し、収束後に修正後全文への user 再承認を要求する規範の正として更新する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "9a1e0b63c7188408414afb696e804dc2ac6a110d6c5d955419c9827831776a92",
+      "evidence_hash": "d0dbb8d85c827b78d279f734ab4f0b388ee38b2c5ee2d844f54f1709d1481cf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 0 で user が収束文面を承認した後、その文面に修正が入る場合は、承認済みの状態を維持したまま通常のガーディアン・レーンを継続しない。承認前の収束段階へ戻し、手順 2 と同じ review loop を再開する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "Phase 0 の再収束を案内する workflow SSoT と対応する command / skill adapter を、前記 convention を規範の正として参照する記述へ同期し、独自の手順再記述や承認済み状態のまま guardian lane を継続する経路を残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "26488e241e18412be714ca7d35f9e0e2d9eca0f8e7f3dae53d6e3ddf2e77d8b7",
+      "evidence_hash": "62f9ef1546c19f10fdf643a83b676a38e858d2aea42f61d536a3f0e7d376e47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/review-scope.json` の `review_operational` に `track/items/<track-id>/obligations.json` を加え、scope 分類の対象外とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": ".harness/config/review-scope.json の review_operational に track ごとの obligations.json を加え、同成果物を内容レビューのスコープ分類から除外する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0715-derived-obligation-artifact-review-scope.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "9e5e44d8173b743e448d61aa6180c0f9853953f4c122a15f9f2c928e6fb86ef9",
+      "evidence_hash": "62f9ef1546c19f10fdf643a83b676a38e858d2aea42f61d536a3f0e7d376e47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`test-bindings.json` はこの決定の対象外とし、レビュー対象のまま残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "test-bindings.json を review_operational へ加えること、または test-bindings.json の内容レビューを免除することは本 track の対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0715-derived-obligation-artifact-review-scope.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "949ea3c77584d3b0e8c2d62d1c4d7eb8f0c1b64e36fbd06654635583d79aeb66",
+      "evidence_hash": "62f9ef1546c19f10fdf643a83b676a38e858d2aea42f61d536a3f0e7d376e47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/review-scope.json` の `review_operational` に `track/items/<track-id>/obligations.json` を加え、scope 分類の対象外とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "commit gate の test-obligation check、.harness/config/signal-gates.json、または adr_user signal 評価を変更することは本 track の対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0715-derived-obligation-artifact-review-scope.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "fe6e072fbb10bda5c3d5ecce1eb1c0d15a75cfd64f3d16adaaca13632e0d9299",
+      "evidence_hash": "d0dbb8d85c827b78d279f734ab4f0b388ee38b2c5ee2d844f54f1709d1481cf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "具体的な収束手順と Phase 0 境界処理は `knowledge/conventions/pre-track-adr-authoring.md` を規範の正とし、workflow SSoT は同 convention に委ねる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "承認記録の ADR front-matter 所在、Phase 0 境界刻印、commit gate の ADR byte 照合、または adjudication-ready 経路を変更することは本 track の対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "8a41488f0c2c1df4800008e6a75b6236342314144c017151cc1727786958a957",
+      "evidence_hash": "d0dbb8d85c827b78d279f734ab4f0b388ee38b2c5ee2d844f54f1709d1481cf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "修正が意味変更か、または守護者が決定保存的と判定したかを問わず、修正前の承認を修正後の文面へ流用しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "修正が意味変更か、guardian が決定保存的と判定したかを問わず、承認後に変更された文面へ修正前の user 承認を流用してはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "ba22663314670b2f2724b9d0399a2c140cb4fc0c684fd94282d64d8f6462d5fc",
+      "evidence_hash": "d0dbb8d85c827b78d279f734ab4f0b388ee38b2c5ee2d844f54f1709d1481cf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "具体的な収束手順と Phase 0 境界処理は `knowledge/conventions/pre-track-adr-authoring.md` を規範の正とし、workflow SSoT は同 convention に委ねる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "再収束の具体的手順と Phase 0 境界処理は pre-track-adr-authoring convention を唯一の規範の正とし、workflow SSoT と command / skill adapter はその規範を重複して定義しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "d13aaef28841891078e494fc74f90307577ffedcb0b98ac6bafe087c9fc54e29",
+      "evidence_hash": "62f9ef1546c19f10fdf643a83b676a38e858d2aea42f61d536a3f0e7d376e47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "判定基準は成果物の重要度ではなく、その内容が機械導出であるかに置く。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "review_operational への分類基準は成果物の重要度ではなく、その内容が機械導出であることとし、明示的 authoring を含む test-bindings.json へ拡張してはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0715-derived-obligation-artifact-review-scope.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "606dc2f0592e1ea235f9113dab7bd678129348e5e64ac1ed689f4cba72e69c3e",
+      "evidence_hash": "d0dbb8d85c827b78d279f734ab4f0b388ee38b2c5ee2d844f54f1709d1481cf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "承認前の収束段階へ戻し、手順 2 と同じ review loop を再開する。\n\n再開した review loop で findings を収束させた後、修正後の収束文面を user へ再度提示して承認を得る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "pre-track-adr-authoring convention は、user 承認後に ADR 文面が修正された場合に承認前の収束 loop を再開し、findings の収束後に修正後の全体を user へ再提示して再承認を得ることを定める。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e3dfed9757f76631bd6cc7e1dde89987a8c8e0befbc4a5205605db106df1375a",
+      "evidence_hash": "d0dbb8d85c827b78d279f734ab4f0b388ee38b2c5ee2d844f54f1709d1481cf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 0 で user が収束文面を承認した後、その文面に修正が入る場合は、承認済みの状態を維持したまま通常のガーディアン・レーンを継続しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "Phase 0 の再収束を記述する workflow SSoT と対応する command / skill adapter は pre-track-adr-authoring convention を参照し、承認済みの状態を維持したまま通常の guardian lane を継続する手順を指示しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "064dbfcd490236201857788c37972bbabefdec86ae749065656a770d4f7321ba",
+      "evidence_hash": "d0dbb8d85c827b78d279f734ab4f0b388ee38b2c5ee2d844f54f1709d1481cf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "修正後の収束文面を user へ再度提示して承認を得る。修正が意味変更か、または守護者が決定保存的と判定したかを問わず、修正前の承認を修正後の文面へ流用しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "再収束した修正後の ADR 文面は、修正前の user 承認を流用せず、user の再承認を得るまで Phase 0 裁定境界を閉じない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "eda63624d8b6881e0a2bac3f78dd684cf1a2e04e9fd89993fe713739e954bd94",
+      "evidence_hash": "62f9ef1546c19f10fdf643a83b676a38e858d2aea42f61d536a3f0e7d376e47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/review-scope.json` の `review_operational` に `track/items/<track-id>/obligations.json` を加え、scope 分類の対象外とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": ".harness/config/review-scope.json の review_operational は track/items/<track-id>/obligations.json に対応する pattern を含み、obligations.json は内容レビューのスコープへ分類されない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0715-derived-obligation-artifact-review-scope.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e34eeda641a8922b7c34d833b3d89957b354fbba0f88305cdb5fab13e8ffe082",
+      "evidence_hash": "62f9ef1546c19f10fdf643a83b676a38e858d2aea42f61d536a3f0e7d376e47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`test-bindings.json` はこの決定の対象外とし、レビュー対象のまま残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "review_operational に test-bindings.json の pattern は追加されず、test-bindings.json は内容レビューの対象として残る。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0715-derived-obligation-artifact-review-scope.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "b27c99a50c1ac309f3c1c0fc6a98de62680fd5a5551f5863a9c17fc098606b47",
+      "evidence_hash": "62f9ef1546c19f10fdf643a83b676a38e858d2aea42f61d536a3f0e7d376e47c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/config/review-scope.json` の `review_operational` に `track/items/<track-id>/obligations.json` を加え、scope 分類の対象外とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "変更後も commit gate の test-obligation check は維持され、obligations.json の review_operational 分類は同 check の実行を変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0715-derived-obligation-artifact-review-scope.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "27768972581a24a965a7e9f00b90414224bf04bef10a39aa603a7921c94fbfc5",
+      "evidence_hash": "d0dbb8d85c827b78d279f734ab4f0b388ee38b2c5ee2d844f54f1709d1481cf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "具体的な収束手順と Phase 0 境界処理は `knowledge/conventions/pre-track-adr-authoring.md` を規範の正とし、workflow SSoT は同 convention に委ねる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "変更後も承認記録は ADR front-matter にあり、境界刻印、commit gate の byte 照合、adjudication-ready 経路はいずれも従来の扱いを維持する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "decision_id": "D1"
+        }
+      }
+    }
+  ]
+}

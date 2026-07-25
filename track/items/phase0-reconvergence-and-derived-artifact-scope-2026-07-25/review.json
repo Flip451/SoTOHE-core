@@ -100,6 +100,136 @@
           "at": "2026-07-25T08:57:06Z"
         }
       ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0565c0777401d3113c8f38a393e7c4d17eeeef1a3c81d546a5c322deea65cb9",
+          "at": "2026-07-25T10:02:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0565c0777401d3113c8f38a393e7c4d17eeeef1a3c81d546a5c322deea65cb9",
+          "at": "2026-07-25T10:05:07Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d10797f06d05b03f1f24aa4b76de66b84c981eb38bfb03aa7d841d8bc156796",
+          "at": "2026-07-25T10:02:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d10797f06d05b03f1f24aa4b76de66b84c981eb38bfb03aa7d841d8bc156796",
+          "at": "2026-07-25T10:05:29Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c8accf47afd807f903cd0f95c33af97f16f342776c94bb073245c34ba3b1feb",
+          "at": "2026-07-25T10:02:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c8accf47afd807f903cd0f95c33af97f16f342776c94bb073245c34ba3b1feb",
+          "at": "2026-07-25T10:04:57Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T1 description includes upstream behavioral restatement: “to make the convention the Phase 0 post-approval reconvergence source of truth.” Keep only target, operation, and anchor cites; see no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/phase0-reconvergence-and-derived-artifact-scope-2026-07-25/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T2 description includes upstream behavioral restatement: “with the convention-owned Phase 0 reconvergence route.” Keep only target, operation, and anchor cites; see no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/phase0-reconvergence-and-derived-artifact-scope-2026-07-25/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T3 description includes upstream behavioral restatement: “with the convention-owned Phase 0 reconvergence route.” Keep only target, operation, and anchor cites; see no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/phase0-reconvergence-and-derived-artifact-scope-2026-07-25/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T4 description includes upstream behavioral restatement: “for the operational obligations artifact boundary.” Keep only target, operation, and anchor cites; see no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/phase0-reconvergence-and-derived-artifact-scope-2026-07-25/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:9e5d8df271edad6d67f9b5024c054996ee2982d8b441cd036b3bea8749319b92",
+          "at": "2026-07-25T10:02:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5b0acc00db5581f879ca56fa6fce66f519e995f1d941b6d82241dad4ba4acdc",
+          "at": "2026-07-25T10:05:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T1 is not executable as written: “its maintained maintainer-guidance surfaces” does not identify the files or symbols to update, so the implementer must invent the task boundary. Enumerate those targets explicitly while retaining the existing anchor cites.",
+              "severity": "P1",
+              "file": "track/items/phase0-reconvergence-and-derived-artifact-scope-2026-07-25/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T4 does not identify the file or test symbol that owns “review-scope classification regression coverage.” Several review-classification test locations exist, so an implementer cannot determine the intended change boundary from this description. Name the regression-test target explicitly.",
+              "severity": "P1",
+              "file": "track/items/phase0-reconvergence-and-derived-artifact-scope-2026-07-25/impl-plan.json",
+              "line": 24,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:a5b0acc00db5581f879ca56fa6fce66f519e995f1d941b6d82241dad4ba4acdc",
+          "at": "2026-07-25T10:08:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ba1da5241c9a0c4edbfbefbf4872cd11ace8a432cc8c605df44c83576d4bde4",
+          "at": "2026-07-25T10:11:50Z"
+        }
+      ]
     }
   }
 }
