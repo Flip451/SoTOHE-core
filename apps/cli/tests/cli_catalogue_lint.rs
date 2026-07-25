@@ -122,6 +122,123 @@ const CATALOGUE_NO_INVARIANTS: &str = r#"{
   "functions": {}
 }"#;
 
+/// The shipped Primary Adapter signature boundary, isolated for an end-to-end
+/// semantic regression. Application boundary models are intentionally absent
+/// from the forbidden set; domain state and secondary-boundary roles remain
+/// forbidden.
+const PRIMARY_ADAPTER_BOUNDARY_RULE: &str = r#"{
+  "schema_version": 1,
+  "rules": [
+    {
+      "target_roles": ["PrimaryAdapter"],
+      "kind": {
+        "NoRoleInMethodSignature": {
+          "forbidden_roles": [
+            "Entity",
+            "AggregateRoot",
+            "Repository",
+            "SecondaryPort",
+            "SecondaryAdapter"
+          ]
+        }
+      }
+    }
+  ]
+}"#;
+
+const PRIMARY_ADAPTER_APPLICATION_MODELS_CATALOGUE: &str = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "CreateOrderCommand": {
+      "action": "add",
+      "role": { "Command": {} },
+      "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+      "methods": [],
+      "module_path": "",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "OrderQuery": {
+      "action": "add",
+      "role": { "Query": {} },
+      "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+      "methods": [],
+      "module_path": "",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "OrderResponse": {
+      "action": "add",
+      "role": { "Dto": {} },
+      "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+      "methods": [],
+      "module_path": "",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "OrderDriver": {
+      "action": "add",
+      "role": { "PrimaryAdapter": {} },
+      "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [
+            {"name": "command", "ty": "CreateOrderCommand"},
+            {"name": "query", "ty": "OrderQuery"}
+          ],
+          "returns": "OrderResponse"
+        }
+      ],
+      "module_path": "",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
+const PRIMARY_ADAPTER_DOMAIN_ENTITY_CATALOGUE: &str = r#"{
+  "schema_version": 5,
+  "crate_name": "domain",
+  "layer": "domain",
+  "types": {
+    "Order": {
+      "action": "add",
+      "role": { "Entity": { "identity": { "method_name": "id" } } },
+      "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+      "methods": [
+        {"name": "id", "receiver": "&self", "params": [], "returns": "u64"}
+      ],
+      "module_path": "",
+      "spec_refs": [],
+      "informal_grounds": []
+    },
+    "OrderDriver": {
+      "action": "add",
+      "role": { "PrimaryAdapter": {} },
+      "kind": {"kind": "struct", "shape": {"kind": "plain"}},
+      "methods": [
+        {
+          "name": "execute",
+          "receiver": "&self",
+          "params": [{"name": "order", "ty": "Order"}],
+          "returns": "()"
+        }
+      ],
+      "module_path": "",
+      "spec_refs": [],
+      "informal_grounds": []
+    }
+  },
+  "traits": {},
+  "functions": {}
+}"#;
+
 /// Lint config (schema_version 1) mirroring the two ADR D7 default
 /// `ForbidPrimitiveInTypes` rules shipped in `.harness/catalogue-lint/config.json`
 /// (T007), scoped to the single `domain` layer this fixture suite declares as
@@ -492,6 +609,56 @@ fn test_catalogue_lint_check_active_track_forbid_primitive_in_types_default_rule
         "expected exactly 2 violations: DtoFixture's bare String field ('label') must \
          NOT violate, since Dto is excluded from the named_field/variant_field rule\n\
          stdout: {stdout}\nstderr: {stderr}"
+    );
+}
+
+#[test]
+fn test_catalogue_lint_check_active_track_primary_adapter_application_models_are_allowed() {
+    let root_dir = tempfile::tempdir().unwrap();
+    let root = root_dir.path();
+
+    write(&root.join("architecture-rules.json"), RULES_JSON);
+    write(
+        &root.join("track/items/test-track/domain-types.json"),
+        PRIMARY_ADAPTER_APPLICATION_MODELS_CATALOGUE,
+    );
+    let rules_file = root.join("primary-adapter-boundary.json");
+    write(&rules_file, PRIMARY_ADAPTER_BOUNDARY_RULE);
+
+    let output = run_catalogue_lint_impl(root, Some(&rules_file));
+    assert!(
+        output.status.success(),
+        "Command, Query, and Dto are valid PrimaryAdapter boundary models\nstdout: {}\nstderr: {}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+}
+
+#[test]
+fn test_catalogue_lint_check_active_track_primary_adapter_entity_is_rejected() {
+    let root_dir = tempfile::tempdir().unwrap();
+    let root = root_dir.path();
+
+    write(&root.join("architecture-rules.json"), RULES_JSON);
+    write(
+        &root.join("track/items/test-track/domain-types.json"),
+        PRIMARY_ADAPTER_DOMAIN_ENTITY_CATALOGUE,
+    );
+    let rules_file = root.join("primary-adapter-boundary.json");
+    write(&rules_file, PRIMARY_ADAPTER_BOUNDARY_RULE);
+
+    let output = run_catalogue_lint_impl(root, Some(&rules_file));
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    let report = format!("{stdout}\n{stderr}");
+    assert!(
+        !output.status.success(),
+        "Entity exposure must remain forbidden\nstdout: {stdout}\nstderr: {stderr}"
+    );
+    assert!(
+        report.contains("NoRoleInMethodSignature on OrderDriver")
+            && report.contains("forbidden role 'Entity'"),
+        "the real CLI must report the retained Entity boundary violation\n{report}"
     );
 }
 

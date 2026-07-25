@@ -15,11 +15,12 @@ Violations of the role statement above are always reportable. The following prio
   forces an `std::io::Read` dependency the syn scanner cannot see (e.g., via
   a re-export), or a generic constraint that lets infrastructure leak into
   usecase. Cite `coding-principles.md` §Usecase Layer Purity.
-- **implicit time / env / process dependency**: a function that calls a port
-  whose only implementation reads `SystemTime` / `env::var()` / spawns a
-  process without that being a documented port contract (the port is
-  effectively a fig leaf over an impure call). Time / env / process values
-  must be parameters to the usecase entrypoint, not retrieved inside.
+- **implicit time / env / process dependency**: a function that reads
+  `SystemTime` / `env::var()` or spawns a process directly, or calls an
+  undocumented abstraction that merely hides the same runtime access.
+  User-supplied time belongs in the usecase entrypoint; execution time,
+  randomness, and generated identifiers must be acquired through explicit
+  usecase-owned secondary ports whose runtime adapters are injected.
 - **business logic leak**: a calculation, branching, or decision that belongs
   in `domain` (e.g., a comparison that should be a domain method on a
   Newtype) executed in usecase. Cite `coding-principles.md` §Usecase Layer

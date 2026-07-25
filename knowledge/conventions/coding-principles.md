@@ -61,7 +61,7 @@ usecase 層は純粋なオーケストレーターであり、実行環境へ直
 | 禁止 | 正しい対処 |
 |---|---|
 | `std::fs::*` / `std::net::*` / `std::process::*` / `std::io::*` / `std::env::*` | CLI または infrastructure adapter が扱い、typed input / port 経由で渡す |
-| `chrono::Utc::now()` / `std::time::SystemTime` / `std::time::Instant` | 時刻を usecase entrypoint の引数として受け取る |
+| `chrono::Utc::now()` / `std::time::SystemTime` / `std::time::Instant` | ユーザー指定の時刻は usecase entrypoint の typed input として受け取り、実行時刻は usecase 所有の Clock port から取得する |
 | `println!` / `eprintln!` / `print!` / `eprint!` | `Result<T, E>` を返し、CLI が表示と exit code を担う |
 
 `sotp verify usecase-purity` は syn AST により上記のパターンを検査する。現行の強制強度は CI blocking である — 違反は error finding として検出され (exit 1)、`cargo make ci` の依存 gate (`verify-usecase-purity-local`) を失敗させる。強制の緩和 (gate からの除外等) は採用者が ADR で判断する。async runtime の採用も ADR の決定事項である。
