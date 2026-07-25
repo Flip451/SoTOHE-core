@@ -49,6 +49,11 @@ cleanup() {
 trap cleanup EXIT
 
 git -c core.hooksPath=/dev/null init -b main
+if ! git var GIT_AUTHOR_IDENT >/dev/null 2>&1 \
+  || ! git var GIT_COMMITTER_IDENT >/dev/null 2>&1; then
+  echo "[ERROR] cargo make init requires a Git author and committer identity. Configure user.name and user.email with git config --global, or provide GIT_AUTHOR_* and GIT_COMMITTER_* before retrying." >&2
+  exit 1
+fi
 cargo generate-lockfile
 git add -A
 git -c core.hooksPath=/dev/null commit -m "Initial commit"

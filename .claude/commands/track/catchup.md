@@ -2,43 +2,23 @@
 description: Set up the development environment and catch up on project state.
 ---
 
-Onboard a new contributor or refresh the local development environment.
+> Operational SSoT: `.harness/workflows/track/catchup.md` — provider-independent workflow
+> behavior lives there. This file is the Claude Code adapter and defines only invocation,
+> Claude-specific tool constraints, and report presentation.
 
-This command combines environment setup with project context loading.
+## Invocation
 
-## Execution
+User invokes this command as `/track:catchup`. No arguments are required.
 
-### Phase 1: Environment bootstrap
+## Claude Code invocation constraints
 
-Run `cargo make bootstrap` and monitor its output step by step.
+- Execute the sequence in the workflow SSoT with Claude Code tools.
+- When the workflow directs track-workflow setup, invoke `/track:setup`.
+- Do not start implementation work, stage files, create commits, or push branches.
 
-If any step fails:
-- Diagnose the root cause from the error output
-- Suggest a concrete fix (e.g., install missing tool, fix Docker config)
-- After the user applies the fix, rerun `cargo make bootstrap` (idempotent — completed steps finish instantly)
+## Report format
 
-### Phase 2: Track workflow setup
-
-After bootstrap succeeds, execute the full `/track:setup` command.
-This delegates all setup checks to setup.md — do not duplicate them here.
-
-### Phase 3: Project state briefing
-
-Summarize the current project state for the newcomer:
-1. Read `track/registry.md` — list active and completed tracks
-2. Resolve the current track: if the current git branch matches `track/<id>`, use that track. Otherwise, use the latest materialized active track (non-archived, non-done, `branch != null`). If no materialized active track exists, fall back to the latest branchless planning-only track.
-3. Read the current track's `spec.md` and `plan.md` if one exists
-4. Read `knowledge/adr/README.md` — note recent pre-track ADRs (tech stack / product-policy decisions)
-5. Show recent git log (last 10 commits) for context
-6. Read `knowledge/conventions/README.md` — list active convention docs
-
-## Output format
-
-1. Environment status: each bootstrap step (pass/fail)
-2. Track workflow status: initialized / already set up
-3. Project briefing:
-   - Active tracks and their status
-   - Current tech stack decisions
-   - Active conventions
-   - Recent commit history (1-line summary)
-4. Suggested next actions for the newcomer
+1. Environment command selected and its pass/fail status.
+2. Track workflow setup status: initialized / already set up.
+3. Project briefing: active tracks, current tech-stack decisions, active conventions, and recent commit history.
+4. Suggested next actions for the contributor.

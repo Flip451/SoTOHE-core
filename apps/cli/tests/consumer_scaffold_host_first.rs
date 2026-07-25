@@ -239,7 +239,7 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
         .expect("Git must be available on PATH");
     let enclosing_repository = export_parent.path().join("enclosing-repository");
     let global_git_config = export_parent.path().join("gitconfig");
-    fs::write(&global_git_config, "").unwrap();
+    fs::write(&global_git_config, "[user]\n\tuseConfigOnly = true\n").unwrap();
     fs::create_dir_all(&enclosing_repository).unwrap();
     for (args, writes_outer_file) in [
         (["init", "-b", "main"].as_slice(), false),
@@ -267,7 +267,11 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
 
     let scaffold = enclosing_repository.join("scaffold");
     export_scaffold(&scaffold);
-    fs::write(&global_git_config, "[core]\n\thooksPath = .githooks\n").unwrap();
+    fs::write(
+        &global_git_config,
+        "[user]\n\tuseConfigOnly = true\n[core]\n\thooksPath = .githooks\n",
+    )
+    .unwrap();
     let shim_dir = export_parent.path().join("init-test-shim");
     fs::create_dir_all(&shim_dir).unwrap();
 
@@ -298,10 +302,11 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
     .unwrap();
     fs::set_permissions(&sotp_shim, fs::Permissions::from_mode(0o755)).unwrap();
 
-    let run = || {
+    let run = |with_identity: bool| {
         let shimmed_path =
             format!("{}:{}", shim_dir.display(), std::env::var("PATH").unwrap_or_default());
-        Command::new(&real_cargo)
+        let mut command = Command::new(&real_cargo);
+        command
             .args(["make", "init"])
             .current_dir(&scaffold)
             .env("PATH", shimmed_path)
@@ -310,16 +315,61 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
             .env("REAL_GIT", &real_git)
             .env("GIT_CONFIG_NOSYSTEM", "1")
             .env("GIT_CONFIG_GLOBAL", &global_git_config)
-            .env("GIT_CONFIG_COUNT", "0")
-            .env("GIT_AUTHOR_NAME", "Scaffold Test")
-            .env("GIT_AUTHOR_EMAIL", "scaffold-test@example.invalid")
-            .env("GIT_COMMITTER_NAME", "Scaffold Test")
-            .env("GIT_COMMITTER_EMAIL", "scaffold-test@example.invalid")
-            .output()
-            .unwrap()
+            .env("GIT_CONFIG_COUNT", "0");
+        if with_identity {
+            command
+                .env("GIT_AUTHOR_NAME", "Scaffold Test")
+                .env("GIT_AUTHOR_EMAIL", "scaffold-test@example.invalid")
+                .env("GIT_COMMITTER_NAME", "Scaffold Test")
+                .env("GIT_COMMITTER_EMAIL", "scaffold-test@example.invalid");
+        } else {
+            command
+                .env_remove("GIT_AUTHOR_NAME")
+                .env_remove("GIT_AUTHOR_EMAIL")
+                .env_remove("GIT_COMMITTER_NAME")
+                .env_remove("GIT_COMMITTER_EMAIL")
+                .env_remove("EMAIL");
+        }
+        command.output().unwrap()
     };
 
-    let first = run();
+    let missing_identity = run(false);
+    assert!(!missing_identity.status.success(), "an unconfigured host must fail closed");
+    assert!(
+        String::from_utf8_lossy(&missing_identity.stderr)
+            .contains("requires a Git author and committer identity")
+    );
+    assert!(
+        !scaffold.join(".git").exists(),
+        "identity failure must roll back the repository created for identity resolution"
+    );
+    assert!(
+        !scaffold.join("Cargo.lock").exists(),
+        "identity preflight must not generate a lockfile"
+    );
+    let missing_identity_trace = fs::read_to_string(&trace).unwrap_or_default();
+    assert!(
+        missing_identity_trace.contains("git -c core.hooksPath=/dev/null init -b main"),
+        "identity validation must use Git's repository-aware identity resolution: {missing_identity_trace}"
+    );
+    for command_after_identity_check in [
+        "cargo generate-lockfile",
+        "git add -A",
+        "git -c core.hooksPath=/dev/null commit",
+        "cargo make bootstrap",
+    ] {
+        assert!(
+            !missing_identity_trace.contains(command_after_identity_check),
+            "identity failure must stop before {command_after_identity_check}: {missing_identity_trace}"
+        );
+    }
+    assert!(
+        missing_identity_trace.contains("git var GIT_AUTHOR_IDENT"),
+        "identity validation must defer to Git's own author resolution: {missing_identity_trace}"
+    );
+    fs::remove_file(&trace).unwrap();
+
+    let first = run(true);
     assert!(
         first.status.success(),
         "first initialization must succeed\nstderr: {}\ntrace: {}",
@@ -330,6 +380,8 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
         fs::read_to_string(&trace).unwrap().lines().map(str::to_owned).collect::<Vec<_>>();
     let expected_sequence = [
         "git -c core.hooksPath=/dev/null init -b main",
+        "git var GIT_AUTHOR_IDENT",
+        "git var GIT_COMMITTER_IDENT",
         "cargo generate-lockfile",
         "git add -A",
         "git -c core.hooksPath=/dev/null commit -m Initial commit",
@@ -372,7 +424,7 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
     let lockfile = fs::read_to_string(scaffold.join("Cargo.lock")).unwrap();
     fs::remove_file(&trace).unwrap();
 
-    let repeat = run();
+    let repeat = run(true);
     assert!(!repeat.status.success(), "repeat initialization must fail closed");
     assert!(
         String::from_utf8_lossy(&repeat.stderr)
@@ -417,6 +469,39 @@ fn test_exported_readme_directs_first_setup_to_init() {
     assert!(
         !initial_setup.lines().any(|line| line.trim_start().starts_with("cargo make bootstrap")),
         "the exported initial-setup instructions must not bypass init with bootstrap"
+    );
+}
+
+#[test]
+fn test_exported_onboarding_distinguishes_first_init_from_later_bootstrap() {
+    let development_environment = exported_file(".claude/rules/dev-environment.md");
+    assert!(development_environment.contains(
+        "cargo make init # newly exported scaffold: create the repository and run bootstrap once"
+    ));
+    assert!(development_environment.contains(
+        "For an already initialized repository (including the source repository), use `cargo make bootstrap`."
+    ));
+
+    let catchup_adapter = exported_file(".claude/commands/track/catchup.md");
+    assert!(catchup_adapter.contains("Operational SSoT: `.harness/workflows/track/catchup.md`"));
+    assert!(
+        !catchup_adapter.contains("cargo make init")
+            && !catchup_adapter.contains("cargo make bootstrap"),
+        "the catchup adapter must delegate command selection to its workflow SSoT"
+    );
+
+    let catchup_workflow = exported_file(".harness/workflows/track/catchup.md");
+    assert!(
+        catchup_workflow.contains(
+            "- When the current directory has no `.git` metadata, it is a newly exported scaffold. Run\n  `cargo make init`; it creates the repository, generates the lockfile, makes the initial\n  commit, and runs bootstrap."
+        ),
+        "the catchup workflow must direct a newly exported scaffold to init"
+    );
+    assert!(
+        catchup_workflow.contains(
+            "- When the current directory already has `.git` metadata, it is an initialized repository. Run\n  `cargo make bootstrap`."
+        ),
+        "the catchup workflow must direct an initialized repository to bootstrap"
     );
 }
 
