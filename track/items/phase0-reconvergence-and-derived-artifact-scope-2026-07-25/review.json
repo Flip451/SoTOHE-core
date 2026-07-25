@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0565c0777401d3113c8f38a393e7c4d17eeeef1a3c81d546a5c322deea65cb9",
+          "at": "2026-07-25T10:02:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0565c0777401d3113c8f38a393e7c4d17eeeef1a3c81d546a5c322deea65cb9",
+          "at": "2026-07-25T10:05:07Z"
+        }
+      ]
+    },
     "harness-policy": {
       "rounds": [
         {
@@ -144,6 +162,172 @@
         }
       ]
     },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ce9f7d4f27c0f6b665e56b4c5c2e1557c8d6db936c986fe2c98e0ddfdefeacd",
+          "at": "2026-07-25T07:56:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "「user 裁定へ戻す条件は…対立が解消しない場合に限る」は、直後の「`adjudication-ready` 経路の扱いは現行のまま」と矛盾します。現行経路は守護者との対立だけでなく、新決定が必要な finding も user-present hearing へ送ります。承認後に新決定が必要と判明した場合、それを user に戻すのか除外するのかが決定できません。",
+              "severity": "P1 (MEDIUM)",
+              "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+              "line": 41,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:0ce9f7d4f27c0f6b665e56b4c5c2e1557c8d6db936c986fe2c98e0ddfdefeacd",
+          "at": "2026-07-25T08:02:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 embeds extensive workflow/implementation procedure (adr-editor/adr-diagnoser actions, rollback behavior, user-routing conditions, front-matter application, boundary stamps, and gate handling) instead of recording only the policy decision. This operational detail obscures the decision and belongs in the convention/workflow SSoT; delegate to those documents rather than prescribing it here.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+              "line": 34,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:2a59bd44f0a76670c22086a60b79cb26924641331862735c7231beb3e2fe171c",
+          "at": "2026-07-25T08:07:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "承認後の fresh review finding を通常レーンで user 裁定なしに適用可能とする決定は、`pre-track-adr-authoring.md` の Phase 0 手順3（承認済み文面への意味変更が必要な finding は自己解決せず user 裁定へ戻す）および入力 ADR の意味は user に属するという既存方針と矛盾する。Consequences でも承認済み文面の意味変更が guardian 判定だけで採用されうることを認めており、Phase 0 の裁定境界を実質的に弱めている。承認後に通常レーンへ戻せるのは非意味的修正または決定保存的な修正に限定し、意味変更は従来どおり user 裁定または delta 候補へ送る必要がある。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+              "line": 35,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:dd9cddb5593283b08bdbbd536f9d3d5832f174989aa4a7b9b1ea82daf66f615e",
+          "at": "2026-07-25T08:13:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 permits meaning-changing edits to an already user-approved ADR to be adopted through guardian review without renewed user adjudication. This contradicts the existing Phase 0 boundary and ADR decision-freeze policy: only non-semantic or decision-preserving edits may remain in the in-place lane; edits that alter the effective decision must be restored and sent to user adjudication (or a delta/hearing path). The Negative consequence explicitly confirms this unsafe behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+              "line": 45,
+              "category": "inconsistent decisions"
+            }
+          ],
+          "hash": "rvw1:sha256:dd9cddb5593283b08bdbbd536f9d3d5832f174989aa4a7b9b1ea82daf66f615e",
+          "at": "2026-07-25T08:22:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e781a5ba1cb146b17cb60e3e97b7d41dba65f14b5d90c08669f5e35eaf7e530e",
+          "at": "2026-07-25T08:34:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR の実際の決定は「承認後に修正が入ったら承認前へ戻して再収束する」ですが、索引タイトルは「通常のガーディアン・レーンで処理する」と逆の内容を示しています。リンク先 ADR の現タイトル／D1 に合わせて索引ラベルを更新してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/README.md",
+              "line": 179,
+              "category": "broken narrative reference"
+            }
+          ],
+          "hash": "rvw1:sha256:e781a5ba1cb146b17cb60e3e97b7d41dba65f14b5d90c08669f5e35eaf7e530e",
+          "at": "2026-07-25T08:38:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eab008d4d33315bcbf9a181393891b3d3b8aa2a7bdcb40584df700b5f9de9170",
+          "at": "2026-07-25T08:57:06Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The regression test hard-codes the current track ID in both the `TrackId` and file paths, so it depends on this track's temporary state and will become brittle when the track is archived or renamed. Use a stable fixture-style track ID independent of the active track.",
+              "severity": "P1",
+              "file": "libs/infrastructure/tests/review_scope_shipped_config.rs",
+              "line": 81,
+              "category": "test reliability"
+            }
+          ],
+          "hash": "rvw1:sha256:fa980e2aa73c1cdc958e2c905bd2c1d62753c0f94cb0eedfe65fc7d9fd9bc5c5",
+          "at": "2026-07-25T10:37:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The regression test hard-codes the current track ID in its `TrackId` and paths, making it dependent on temporary track state and brittle when the track is renamed or archived. Use a stable fixture-style track ID instead.",
+              "severity": "P1",
+              "file": "libs/infrastructure/tests/review_scope_shipped_config.rs",
+              "line": 81,
+              "category": "test reliability"
+            }
+          ],
+          "hash": "rvw1:sha256:bdd46b2cb4aea2ee60b35910603434bf9dc5bd410ba004948c504d9be81a18ad",
+          "at": "2026-07-25T10:38:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdd46b2cb4aea2ee60b35910603434bf9dc5bd410ba004948c504d9be81a18ad",
+          "at": "2026-07-25T10:39:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdd46b2cb4aea2ee60b35910603434bf9dc5bd410ba004948c504d9be81a18ad",
+          "at": "2026-07-25T10:40:54Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c8accf47afd807f903cd0f95c33af97f16f342776c94bb073245c34ba3b1feb",
+          "at": "2026-07-25T10:02:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c8accf47afd807f903cd0f95c33af97f16f342776c94bb073245c34ba3b1feb",
+          "at": "2026-07-25T10:04:57Z"
+        }
+      ]
+    },
     "spec": {
       "rounds": [
         {
@@ -264,190 +448,20 @@
           "findings": [],
           "hash": "rvw1:sha256:7b908815bf1579b802eb49e770f4f1faf537cb4584b7b992cfdf7a12db111d00",
           "at": "2026-07-25T10:43:37Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The regression test hard-codes the current track ID in both the `TrackId` and file paths, so it depends on this track's temporary state and will become brittle when the track is archived or renamed. Use a stable fixture-style track ID independent of the active track.",
-              "severity": "P1",
-              "file": "libs/infrastructure/tests/review_scope_shipped_config.rs",
-              "line": 81,
-              "category": "test reliability"
-            }
-          ],
-          "hash": "rvw1:sha256:fa980e2aa73c1cdc958e2c905bd2c1d62753c0f94cb0eedfe65fc7d9fd9bc5c5",
-          "at": "2026-07-25T10:37:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The regression test hard-codes the current track ID in its `TrackId` and paths, making it dependent on temporary track state and brittle when the track is renamed or archived. Use a stable fixture-style track ID instead.",
-              "severity": "P1",
-              "file": "libs/infrastructure/tests/review_scope_shipped_config.rs",
-              "line": 81,
-              "category": "test reliability"
-            }
-          ],
-          "hash": "rvw1:sha256:bdd46b2cb4aea2ee60b35910603434bf9dc5bd410ba004948c504d9be81a18ad",
-          "at": "2026-07-25T10:38:22Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bdd46b2cb4aea2ee60b35910603434bf9dc5bd410ba004948c504d9be81a18ad",
-          "at": "2026-07-25T10:39:01Z"
+          "hash": "rvw1:sha256:bf2ad921b0627ecfae0621ccb64fe1f94e0e39e244769a1ae97c3a4ab0c5e857",
+          "at": "2026-07-25T11:13:48Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bdd46b2cb4aea2ee60b35910603434bf9dc5bd410ba004948c504d9be81a18ad",
-          "at": "2026-07-25T10:40:54Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c8accf47afd807f903cd0f95c33af97f16f342776c94bb073245c34ba3b1feb",
-          "at": "2026-07-25T10:02:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c8accf47afd807f903cd0f95c33af97f16f342776c94bb073245c34ba3b1feb",
-          "at": "2026-07-25T10:04:57Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ce9f7d4f27c0f6b665e56b4c5c2e1557c8d6db936c986fe2c98e0ddfdefeacd",
-          "at": "2026-07-25T07:56:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "「user 裁定へ戻す条件は…対立が解消しない場合に限る」は、直後の「`adjudication-ready` 経路の扱いは現行のまま」と矛盾します。現行経路は守護者との対立だけでなく、新決定が必要な finding も user-present hearing へ送ります。承認後に新決定が必要と判明した場合、それを user に戻すのか除外するのかが決定できません。",
-              "severity": "P1 (MEDIUM)",
-              "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
-              "line": 41,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:0ce9f7d4f27c0f6b665e56b4c5c2e1557c8d6db936c986fe2c98e0ddfdefeacd",
-          "at": "2026-07-25T08:02:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1 embeds extensive workflow/implementation procedure (adr-editor/adr-diagnoser actions, rollback behavior, user-routing conditions, front-matter application, boundary stamps, and gate handling) instead of recording only the policy decision. This operational detail obscures the decision and belongs in the convention/workflow SSoT; delegate to those documents rather than prescribing it here.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
-              "line": 34,
-              "category": "decision obscured by excess detail"
-            }
-          ],
-          "hash": "rvw1:sha256:2a59bd44f0a76670c22086a60b79cb26924641331862735c7231beb3e2fe171c",
-          "at": "2026-07-25T08:07:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "承認後の fresh review finding を通常レーンで user 裁定なしに適用可能とする決定は、`pre-track-adr-authoring.md` の Phase 0 手順3（承認済み文面への意味変更が必要な finding は自己解決せず user 裁定へ戻す）および入力 ADR の意味は user に属するという既存方針と矛盾する。Consequences でも承認済み文面の意味変更が guardian 判定だけで採用されうることを認めており、Phase 0 の裁定境界を実質的に弱めている。承認後に通常レーンへ戻せるのは非意味的修正または決定保存的な修正に限定し、意味変更は従来どおり user 裁定または delta 候補へ送る必要がある。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
-              "line": 35,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:dd9cddb5593283b08bdbbd536f9d3d5832f174989aa4a7b9b1ea82daf66f615e",
-          "at": "2026-07-25T08:13:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D1 permits meaning-changing edits to an already user-approved ADR to be adopted through guardian review without renewed user adjudication. This contradicts the existing Phase 0 boundary and ADR decision-freeze policy: only non-semantic or decision-preserving edits may remain in the in-place lane; edits that alter the effective decision must be restored and sent to user adjudication (or a delta/hearing path). The Negative consequence explicitly confirms this unsafe behavior.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
-              "line": 45,
-              "category": "inconsistent decisions"
-            }
-          ],
-          "hash": "rvw1:sha256:dd9cddb5593283b08bdbbd536f9d3d5832f174989aa4a7b9b1ea82daf66f615e",
-          "at": "2026-07-25T08:22:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e781a5ba1cb146b17cb60e3e97b7d41dba65f14b5d90c08669f5e35eaf7e530e",
-          "at": "2026-07-25T08:34:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "ADR の実際の決定は「承認後に修正が入ったら承認前へ戻して再収束する」ですが、索引タイトルは「通常のガーディアン・レーンで処理する」と逆の内容を示しています。リンク先 ADR の現タイトル／D1 に合わせて索引ラベルを更新してください。",
-              "severity": "P1",
-              "file": "knowledge/adr/README.md",
-              "line": 179,
-              "category": "broken narrative reference"
-            }
-          ],
-          "hash": "rvw1:sha256:e781a5ba1cb146b17cb60e3e97b7d41dba65f14b5d90c08669f5e35eaf7e530e",
-          "at": "2026-07-25T08:38:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eab008d4d33315bcbf9a181393891b3d3b8aa2a7bdcb40584df700b5f9de9170",
-          "at": "2026-07-25T08:57:06Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b0565c0777401d3113c8f38a393e7c4d17eeeef1a3c81d546a5c322deea65cb9",
-          "at": "2026-07-25T10:02:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b0565c0777401d3113c8f38a393e7c4d17eeeef1a3c81d546a5c322deea65cb9",
-          "at": "2026-07-25T10:05:07Z"
+          "hash": "rvw1:sha256:bf2ad921b0627ecfae0621ccb64fe1f94e0e39e244769a1ae97c3a4ab0c5e857",
+          "at": "2026-07-25T11:15:58Z"
         }
       ]
     }
