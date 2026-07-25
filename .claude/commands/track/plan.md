@@ -15,7 +15,9 @@ User invokes this command as `/track:plan`. `$ARGUMENTS`:
 
 ## Claude Code invocation constraints
 
-- **Progress tracking**: use `TaskCreate` to register Phase 0–3 steps + Termination as tasks.
+- **Progress tracking**: when `TaskCreate` is available, use it to register Phase 0–3 steps
+  and Termination as tasks. When it is unavailable, report the same phase boundaries and
+  termination progress in text and continue the workflow.
 - **Timestamps**: `date -u +"%Y-%m-%dT%H:%M:%SZ"` (ISO 8601 UTC) — manual input is forbidden.
 - **Phase 0**: invoke `/track:init`, `/track:review`, then `/track:commit`; their transition
   rules and inputs are owned by the plan workflow SSoT.

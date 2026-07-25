@@ -2,28 +2,36 @@
 
 ## Toolchain
 
-The distributed scaffold is host-first. `rust-toolchain.toml` selects the required Rust
-toolchain (including rustfmt and clippy); install `cargo-make` before running its tasks.
-Docker is optional: change the single `extend` target in `Makefile.toml` from
-`Makefile.host.toml` to `Makefile.docker.toml` when an isolated toolchain is needed.
+An exported scaffold is host-first. `rust-toolchain.toml` selects the required Rust toolchain
+(including rustfmt and clippy); install `cargo-make` before running its tasks. Docker is optional
+there: change the single `extend` target in `Makefile.toml` from `Makefile.host.toml` to
+`Makefile.docker.toml` when an isolated toolchain is needed. The SoTOHE-core source repository
+uses Docker Compose for `cargo make bootstrap` and its default quality gates.
 
 ```bash
 rustup show
 cargo install --locked cargo-make --version 0.37.24
-cargo make bootstrap
+cargo make init # newly exported scaffold: create the repository and run bootstrap once
 ```
 
-`bootstrap` installs the pinned `cargo-nextest` and `cargo-deny` tools with `--locked`,
-installs `bin/sotp` when a transplanted binary is unavailable, configures local hooks, and
-runs the repository gate. It does not add a separate tool-version preflight.
+For an already initialized repository (including the source repository), use `cargo make bootstrap`.
+Its behavior is determined by the repository kind. In an exported scaffold, it installs the pinned `cargo-nextest` and
+`cargo-deny` tools with `--locked`, installs `bin/sotp` when a transplanted binary is unavailable,
+configures local hooks, and runs the host-first repository gate. In the SoTOHE-core source
+repository, it requires Docker and Docker Compose, builds `bin/sotp` from the working tree,
+configures the runtime and local hooks, and runs the Docker-backed repository gate; it does not
+perform the exported scaffold's auxiliary-tool installation or fallback `install-sotp` step.
+Neither variant adds a separate tool-version preflight.
 
 ## Task Runner: cargo-make
 
-`Makefile.toml` owns the current task table. Use `cargo make --list-all-steps` for discovery;
-the workflow-stable commands below work in both the source repository and an exported scaffold.
+`Makefile.toml` owns the current task table. Use `cargo make --list-all-steps` for discovery.
+`init` is a one-time command for a newly exported scaffold; the remaining workflow-stable
+commands below work in both the source repository and an exported scaffold.
 
 ```bash
-cargo make bootstrap    # install pinned auxiliary tools, provision sotp, and run CI
+cargo make init         # newly exported scaffold: run once before other workflow tasks
+cargo make bootstrap    # environment-specific bootstrap; see the distinction above
 cargo make fmt-check    # verify formatting
 cargo make clippy       # lint with warnings denied
 cargo make test         # run cargo-nextest

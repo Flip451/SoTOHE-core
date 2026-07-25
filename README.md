@@ -58,7 +58,7 @@ track 作業には `/adr:add <slug>` で ADR を作り
 
 このテンプレートを使うには以下が必要:
 
-- **Rust toolchain + cargo-make** — `rust-toolchain.toml` が Rust / rustfmt / clippy を固定する。host で `cargo make bootstrap` を実行する
+- **Rust toolchain + cargo-make** — `rust-toolchain.toml` が Rust / rustfmt / clippy を固定する。未初期化の export ツリーでは host で `cargo make init` を実行する
 - **Docker（任意）** — 既定の品質ゲートと CI は host toolchain で実行する。隔離環境を選ぶ場合だけ `Makefile.toml` の extend 参照先を `Makefile.docker.toml` に切り替える
 - **`bin/sotp` の入手** — 以下 2 経路のいずれか (詳細は「はじめ方」参照)
   - a. SoTOHE-core を clone → `sotp template export` を実行すると、出力ツリーに `bin/sotp` が移植された状態で完結する (タグ非依存、初回導入向け)
@@ -77,17 +77,17 @@ track 作業には `/adr:add <slug>` で ADR を作り
 
 ### 初回セットアップ
 
-以下は `sotp template export` で生成された出力ツリーでの初回セットアップ手順である。まず `cargo-make` を host に導入し、固定 toolchain 上で bootstrap を実行する。
+以下は `sotp template export` で生成された出力ツリーでの初回セットアップ手順である。まず `cargo-make` を host に導入し、固定 toolchain 上で `init` を実行する。
 
-出力ツリーでの `bin/sotp` 入手には 2 経路がある。デフォルトの分岐条件はテンプレート利用者が意識せず自動で選ばれる (出力ツリーの `cargo make bootstrap` Step 3 で判定される):
+出力ツリーでの `bin/sotp` 入手には 2 経路がある。デフォルトの分岐条件はテンプレート利用者が意識せず自動で選ばれる (`cargo make init` が内部で実行する `cargo make bootstrap` の Step 3 で判定される):
 
-- **経路 a (初回導入 / タグ非依存)**: SoTOHE-core を clone → build して `sotp template export` を出力ツリーに実行すると、実行中の自バイナリが出力ツリーの `bin/sotp` に移植される (実行権限保持のコピー)。出力ツリーで `cargo make bootstrap` を実行すると、Step 3 は `bin/sotp` が既に存在することを検出し、`install-sotp` を呼ばずに完結する。公開リポジトリに sotp タグが 1 本もなくてもこの経路は成立する。
+- **経路 a (初回導入 / タグ非依存)**: SoTOHE-core を clone → build して `sotp template export` を出力ツリーに実行すると、実行中の自バイナリが出力ツリーの `bin/sotp` に移植される (実行権限保持のコピー)。出力ツリーで `cargo make init` を実行すると、Step 3 は `bin/sotp` が既に存在することを検出し、`install-sotp` を呼ばずに完結する。公開リポジトリに sotp タグが 1 本もなくてもこの経路は成立する。
 - **経路 b (更新 / 別ホスト再導入)**: 出力ツリーに `bin/sotp` が存在しない (または起動に失敗する) 場合、Step 3 は `cargo make install-sotp` を呼び、`.harness/config/sotp-version.json` の固定タグから `cargo install --git ... --tag ... --locked` で `bin/sotp` を導入する。別ホストへの再導入や sotp バージョンの更新はこの経路で行う。
 
 ```bash
 # 出力ツリーのターミナルで:
 cargo install --locked cargo-make --version 0.37.24
-cargo make bootstrap      # pinned auxiliary tools + bin/sotp 入手 (経路 a/b を自動判定) + host CI
+cargo make init           # Git 初期化 + lockfile / 初回 commit + bootstrap (aux tools / bin/sotp / host CI)
 ```
 
 ```text
