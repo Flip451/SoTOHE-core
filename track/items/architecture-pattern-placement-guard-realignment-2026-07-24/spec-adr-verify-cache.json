@@ -486,7 +486,7 @@
     },
     {
       "claim_hash": "2a1b1f9092beecd46b08ffc511ae1986a541870ad527299ce53d4017d7c6c3d2",
-      "evidence_hash": "7b8d725f86a6b06ebf91a6985a28a31dd44a7b92967fce7a56d53f5c3ea8d265",
+      "evidence_hash": "826c4557c7332f2e92a74b637d2c90a73c9ea98563aba9d90b954e1a94023489",
       "verdict": {
         "kind": "pass",
         "citation": "D11 が選定する代表的な enforcement 機構の変更と ADR baseline の型配置・境界型・Clock 配置の是正は、コマンドおよびサブコマンド、引数とオプションの意味、終了状態、標準出力・標準エラー出力、機械可読出力の構造を含む外部観測可能な CLI 契約を変更してはならない。"
@@ -877,7 +877,7 @@
     },
     {
       "claim_hash": "f7ce7e3227ccb9ea23fada92d70c77ab89a603339ca7177d813338af8074ba57",
-      "evidence_hash": "7b8d725f86a6b06ebf91a6985a28a31dd44a7b92967fce7a56d53f5c3ea8d265",
+      "evidence_hash": "826c4557c7332f2e92a74b637d2c90a73c9ea98563aba9d90b954e1a94023489",
       "verdict": {
         "kind": "pass",
         "citation": "D11 が選定する代表的な enforcement 機構の変更と ADR baseline の型配置・境界型・Clock 配置の是正は、コマンドおよびサブコマンド、引数とオプションの意味、終了状態、標準出力・標準エラー出力、機械可読出力の構造を含む外部観測可能な CLI 契約を変更してはならない。"
