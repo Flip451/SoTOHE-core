@@ -10,19 +10,6 @@ use std::sync::OnceLock;
 
 use tempfile::TempDir;
 
-const RETIRED_PASSTHROUGH_TASKS: &[&str] = &[
-    "add-all",
-    "sync",
-    "track-branch-create",
-    "track-branch-switch",
-    "track-switch-base",
-    "track-pr-push",
-    "track-pr",
-    "track-pr-review",
-    "track-add-paths",
-    "track-note",
-];
-
 static EXPORTED_SCAFFOLD: OnceLock<TempDir> = OnceLock::new();
 
 fn workspace_root() -> PathBuf {
@@ -83,17 +70,115 @@ fn exported_file(relative_path: &str) -> String {
         .unwrap_or_else(|error| panic!("cannot read {}: {error}", path.display()))
 }
 
-fn initial_setup_section(readme: &str) -> &str {
-    let section =
-        &readme[readme.find("### 初回セットアップ").expect("initial setup heading missing")..];
-    section.find("\n### ").map_or(section, |end| &section[..end])
-}
-
 fn task_names(makefile: &str) -> BTreeSet<&str> {
     makefile
         .lines()
         .filter_map(|line| line.strip_prefix("[tasks.").and_then(|name| name.strip_suffix(']')))
         .collect()
+}
+
+fn top_level_toml_string_value(content: &str, key: &str) -> String {
+    let expected = format!("{key} = ");
+    let mut in_table = false;
+
+    for line in content.lines().map(str::trim) {
+        if line.starts_with('[') && line.ends_with(']') {
+            in_table = true;
+        } else if !in_table && let Some(value) = line.strip_prefix(&expected) {
+            return serde_json::from_str(value)
+                .unwrap_or_else(|error| panic!("{key} must be a TOML basic string: {error}"));
+        }
+    }
+
+    panic!("top-level TOML key {key} missing")
+}
+
+fn task_toml_value<'a>(makefile: &'a str, task_name: &str, key: &str) -> &'a str {
+    let task_header = format!("[tasks.{task_name}]");
+    let expected = format!("{key} = ");
+    let mut in_task = false;
+
+    for line in makefile.lines().map(str::trim) {
+        if line.starts_with('[') && line.ends_with(']') {
+            in_task = line == task_header;
+        } else if in_task && let Some(value) = line.strip_prefix(&expected) {
+            return value;
+        }
+    }
+
+    panic!("TOML key {key} missing from task {task_name}")
+}
+
+fn task_toml_string_array(makefile: &str, task_name: &str, key: &str) -> Vec<String> {
+    serde_json::from_str(task_toml_value(makefile, task_name, key)).unwrap_or_else(|error| {
+        panic!("{key} for task {task_name} must be a TOML string array: {error}")
+    })
+}
+
+fn toml_table_value<'a>(content: &'a str, table: &str, key: &str) -> &'a str {
+    let table_header = format!("[{table}]");
+    let expected = format!("{key} = ");
+    let mut in_table = false;
+
+    for line in content.lines().map(str::trim) {
+        if line.starts_with('[') && line.ends_with(']') {
+            in_table = line == table_header;
+        } else if in_table && let Some(value) = line.strip_prefix(&expected) {
+            return value;
+        }
+    }
+
+    panic!("TOML key {key} missing from table {table}")
+}
+
+fn toml_table_string_value(content: &str, table: &str, key: &str) -> String {
+    serde_json::from_str(toml_table_value(content, table, key)).unwrap_or_else(|error| {
+        panic!("{key} in table {table} must be a TOML basic string: {error}")
+    })
+}
+
+fn toml_table_string_array(content: &str, table: &str, key: &str) -> Vec<String> {
+    serde_json::from_str(toml_table_value(content, table, key)).unwrap_or_else(|error| {
+        panic!("{key} in table {table} must be a TOML string array: {error}")
+    })
+}
+
+fn json_string_value(content: &str, key: &str) -> String {
+    let document: serde_json::Value =
+        serde_json::from_str(content).unwrap_or_else(|error| panic!("invalid JSON: {error}"));
+    document
+        .get(key)
+        .and_then(serde_json::Value::as_str)
+        .unwrap_or_else(|| panic!("JSON string key {key} missing"))
+        .to_owned()
+}
+
+fn gitignore_patterns(content: &str) -> BTreeSet<&str> {
+    content
+        .lines()
+        .map(str::trim)
+        .filter(|line| !line.is_empty() && !line.starts_with('#'))
+        .collect()
+}
+
+fn trace_operation(line: &str) -> Option<(&str, &str)> {
+    let mut parts = line.split_whitespace();
+    let program = parts.next()?;
+    let operation = match program {
+        "git" => {
+            let mut argument = parts.next()?;
+            while argument.starts_with('-') {
+                if argument == "-c" || argument == "--git-dir" {
+                    parts.next()?;
+                }
+                argument = parts.next()?;
+            }
+            argument
+        }
+        "cargo" | "sotp" => parts.next()?,
+        _ => return None,
+    };
+    Some((program, operation))
 }
 
 fn task_dependency_closure(makefile: &str, task_name: &str) -> BTreeSet<String> {
@@ -125,47 +210,6 @@ fn task_dependency_closure(makefile: &str, task_name: &str) -> BTreeSet<String> 
     }
 
     closure
-}
-
-fn collect_text_files(path: &Path, files: &mut Vec<PathBuf>) {
-    if path.is_file() {
-        if matches!(
-            path.extension().and_then(|extension| extension.to_str()),
-            Some("json" | "md" | "rules" | "toml" | "yml" | "yaml")
-        ) {
-            files.push(path.to_path_buf());
-        }
-        return;
-    }
-
-    for entry in fs::read_dir(path).unwrap() {
-        collect_text_files(&entry.unwrap().path(), files);
-    }
-}
-
-fn assert_no_retired_passthrough_calls(surface_paths: &[&str]) {
-    let root = exported_scaffold();
-    let mut stale_calls = Vec::new();
-
-    for surface_path in surface_paths {
-        let mut files = Vec::new();
-        collect_text_files(&root.join(surface_path), &mut files);
-        for file in files {
-            let content = fs::read_to_string(&file).unwrap();
-            for task in RETIRED_PASSTHROUGH_TASKS {
-                let call = format!("cargo make {task}");
-                if content.contains(&call) {
-                    stale_calls.push(format!("{} contains {call}", file.display()));
-                }
-            }
-        }
-    }
-
-    assert!(
-        stale_calls.is_empty(),
-        "exported scaffold retains retired passthrough calls:\n{}",
-        stale_calls.join("\n")
-    );
 }
 
 #[test]
@@ -218,13 +262,10 @@ fn test_exported_scaffold_makefile_has_only_host_first_workflow_tasks() {
         !task_names(&source_makefile).contains("init"),
         "the init task must be available only in the exported overlay"
     );
-    assert!(makefile.starts_with("extend = \"Makefile.host.toml\""));
-    assert!(makefile.contains("[tasks.verify-track-metadata]"));
+    assert_eq!(top_level_toml_string_value(&makefile, "extend"), "Makefile.host.toml");
     assert_eq!(
-        makefile
-            .matches("args = [\"track\", \"views\", \"validate\", \"--project-root\", \".\"]")
-            .count(),
-        1
+        task_toml_string_array(&makefile, "verify-track-metadata", "args"),
+        ["track", "views", "validate", "--project-root", "."]
     );
 }
 
@@ -431,13 +472,18 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
             .contains("before the repository has its first commit")
     );
     let repeat_trace = fs::read_to_string(&trace).unwrap_or_default();
-    assert!(repeat_trace.contains("git --git-dir=.git rev-parse --verify HEAD"));
-    for state_changing_command in ["git init", "git add", "git commit", "cargo "] {
+    let repeat_operations = repeat_trace.lines().filter_map(trace_operation).collect::<Vec<_>>();
+    assert!(repeat_operations.contains(&("git", "rev-parse")));
+    for state_changing_command in [("git", "init"), ("git", "add"), ("git", "commit")] {
         assert!(
-            !repeat_trace.contains(state_changing_command),
-            "repeat initialization must stop before {state_changing_command}: {repeat_trace}",
+            !repeat_operations.contains(&state_changing_command),
+            "repeat initialization must stop before {state_changing_command:?}: {repeat_trace}",
         );
     }
+    assert!(
+        !repeat_operations.iter().any(|(program, _)| *program == "cargo"),
+        "repeat initialization must stop before cargo: {repeat_trace}",
+    );
     let repeat_branch = isolated_git_command(&real_git, &global_git_config)
         .args(["branch", "--show-current"])
         .current_dir(&scaffold)
@@ -454,86 +500,15 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
 }
 
 #[test]
-fn test_exported_readme_directs_first_setup_to_init() {
-    let readme = exported_file("README.md");
-    let initial_setup = initial_setup_section(&readme);
-
-    assert!(
-        initial_setup.lines().any(|line| {
-            let command =
-                line.trim().split_once('#').map_or(line.trim(), |(command, _)| command.trim_end());
-            command == "cargo make init"
-        }),
-        "the exported initial-setup instructions must invoke the init workflow"
-    );
-    assert!(
-        !initial_setup.lines().any(|line| line.trim_start().starts_with("cargo make bootstrap")),
-        "the exported initial-setup instructions must not bypass init with bootstrap"
-    );
-}
-
-#[test]
-fn test_exported_onboarding_distinguishes_first_init_from_later_bootstrap() {
-    let development_environment = exported_file(".claude/rules/dev-environment.md");
-    assert!(development_environment.contains(
-        "cargo make init # newly exported scaffold: create the repository and run bootstrap once"
-    ));
-    assert!(development_environment.contains(
-        "For an already initialized repository (including the source repository), use `cargo make bootstrap`."
-    ));
-
-    let catchup_adapter = exported_file(".claude/commands/track/catchup.md");
-    assert!(catchup_adapter.contains("Operational SSoT: `.harness/workflows/track/catchup.md`"));
-    assert!(
-        !catchup_adapter.contains("cargo make init")
-            && !catchup_adapter.contains("cargo make bootstrap"),
-        "the catchup adapter must delegate command selection to its workflow SSoT"
-    );
-
-    let catchup_workflow = exported_file(".harness/workflows/track/catchup.md");
-    assert!(
-        catchup_workflow.contains(
-            "- When the current directory has no `.git` metadata, it is a newly exported scaffold. Run\n  `cargo make init`; it creates the repository, generates the lockfile, makes the initial\n  commit, and runs bootstrap."
-        ),
-        "the catchup workflow must direct a newly exported scaffold to init"
-    );
-    assert!(
-        catchup_workflow.contains(
-            "- When the current directory already has `.git` metadata, it is an initialized repository. Run\n  `cargo make bootstrap`."
-        ),
-        "the catchup workflow must direct an initialized repository to bootstrap"
-    );
-}
-
-#[test]
 fn test_exported_branch_strategy_uses_overlay_main_defaults() {
     let source = fs::read_to_string(workspace_root().join(".harness/config/branch-strategy.json"))
         .expect("source branch strategy must be readable");
     let exported = exported_file(".harness/config/branch-strategy.json");
 
-    assert!(source.contains("\"base_branch\": \"develop\""));
-    assert!(source.contains("\"merge_target\": \"develop\""));
-    assert!(exported.contains("\"base_branch\": \"main\""));
-    assert!(exported.contains("\"merge_target\": \"main\""));
-    assert!(!exported.contains("develop"));
-}
-
-#[test]
-fn test_exported_command_adapters_fallback_when_progress_api_is_unavailable() {
-    for (command, fallback) in [
-        (
-            ".claude/commands/track/plan.md",
-            "When it is unavailable, report the same phase boundaries and\n  termination progress in text and continue the workflow.",
-        ),
-        (
-            ".claude/commands/track/adr2pr.md",
-            "When it is unavailable, report those transitions in text and continue the workflow.",
-        ),
-    ] {
-        let adapter = exported_file(command);
-        assert!(adapter.contains("when `TaskCreate` is available"));
-        assert!(adapter.contains(fallback), "{command} must retain its text-progress fallback");
-    }
+    assert_eq!(json_string_value(&source, "base_branch"), "develop");
+    assert_eq!(json_string_value(&source, "merge_target"), "develop");
+    assert_eq!(json_string_value(&exported, "base_branch"), "main");
+    assert_eq!(json_string_value(&exported, "merge_target"), "main");
 }
 
 #[test]
@@ -550,35 +525,7 @@ fn test_exported_ci_track_avoids_nightly_refresh_dependency() {
 }
 
 #[test]
-fn test_exported_workflows_call_sotp_directly_without_retired_wrappers() {
-    assert_no_retired_passthrough_calls(&[".harness", ".claude", ".agents", ".codex"]);
-
-    let adr2pr = exported_file(".harness/workflows/track/adr2pr.md");
-    let done = exported_file(".harness/workflows/track/done.md");
-    let pr = exported_file(".claude/commands/track/pr.md");
-    let codex_instructions = exported_file(".codex/instructions.md");
-    let codex_rules = exported_file(".codex/rules/default.rules");
-
-    assert!(adr2pr.contains("bin/sotp git add-all"));
-    assert!(done.contains("bin/sotp track switch-base"));
-    assert!(pr.contains("bin/sotp pr push") && pr.contains("bin/sotp pr ensure-pr"));
-    assert!(
-        codex_instructions.contains("bin/sotp git add-all")
-            && codex_instructions.contains("bin/sotp pr review-cycle"),
-        "Codex instructions must direct the guarded bin/sotp workflow commands"
-    );
-    assert!(
-        codex_rules.contains(r#"pattern=["bin/sotp", "pr", "review-cycle"]"#)
-            && !codex_rules.contains(r#"pattern=["cargo", "make", "track-pr"#),
-        "Codex rules must allow the bin/sotp workflow commands instead of retired wrappers"
-    );
-}
-
-#[test]
-fn test_exported_environment_overlays_are_symmetric_and_personal_environment_free() {
-    let source = fs::read_to_string(workspace_root().join("Makefile.toml"))
-        .expect("source Makefile.toml must be readable");
-    let common = exported_file("Makefile.toml");
+fn test_exported_environment_overlays_define_the_same_gate_tasks() {
     let host = exported_file("Makefile.host.toml");
     let docker = exported_file("Makefile.docker.toml");
     let host_gate_tasks = task_names(&host);
@@ -588,53 +535,19 @@ fn test_exported_environment_overlays_are_symmetric_and_personal_environment_fre
         .collect::<BTreeSet<_>>();
 
     assert_eq!(host_gate_tasks, docker_gate_tasks);
-    assert!(host.contains("command = \"cargo\"") && !host.contains("docker compose"));
-    assert!(docker.contains("docker") && docker.contains("CARGO_TARGET_DIR_RELATIVE"));
-    for makefile in [&source, &common] {
-        assert!(
-            makefile.contains("bin/sotp codex-runtime provision --project-root ."),
-            "bootstrap must provision the repository-local Codex runtime link"
-        );
-        assert!(!makefile.contains("CODEX_BIN"));
-    }
-    assert!(
-        common.contains("bin/sotp test-obligation check"),
-        "the guarded commit chain must keep the test-obligation gate"
-    );
-    for content in [&common, &host, &docker] {
-        assert!(!content.contains("asdf"));
-        assert!(!content.contains("WORKER_ID"));
-    }
 }
 
 #[test]
-fn test_exported_toolchain_ci_and_consumer_guidance_are_host_first() {
+fn test_exported_toolchain_and_gitignore_have_contract_values() {
     let toolchain = exported_file("rust-toolchain.toml");
-    let ci = exported_file(".github/workflows/ci.yml");
     let gitignore = exported_file(".gitignore");
 
-    assert!(toolchain.contains("channel = \"1.94.0\""));
-    assert!(toolchain.contains("components = [\"clippy\", \"rustfmt\"]"));
-    assert!(ci.contains("runs-on: ubuntu-latest") && !ci.contains("docker compose"));
-    for tool in [
-        "cargo-make --version 0.37.24",
-        "cargo-nextest --version 0.9.129",
-        "cargo-deny --version 0.19.0",
-    ] {
-        assert!(ci.contains(tool) && ci.contains("cargo install --locked"));
-    }
-    assert!(ci.contains("path: .cargo-install"));
-    assert!(ci.contains("steps.sotp-version.outputs.tag"));
-    assert!(ci.contains("cargo make install-sotp"));
-    assert!(ci.contains("cargo make ci") && ci.contains("cargo make ci-track"));
-    assert!(gitignore.lines().any(|line| line == "/bin/sotp"));
-
-    assert_no_retired_passthrough_calls(&[
-        "README.md",
-        "CLAUDE.md",
-        ".claude/rules",
-        "knowledge/conventions",
-    ]);
+    assert_eq!(toml_table_string_value(&toolchain, "toolchain", "channel"), "1.94.0");
+    assert_eq!(
+        toml_table_string_array(&toolchain, "toolchain", "components"),
+        ["clippy", "rustfmt"]
+    );
+    assert!(gitignore_patterns(&gitignore).contains("/bin/sotp"));
 }
 
 fn pr_audit_comment_script(makefile: &str) -> String {

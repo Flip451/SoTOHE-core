@@ -74,119 +74,322 @@
           "findings": [],
           "hash": "rvw1:sha256:fea3e68ad0ab5dd0591a02e88ef45742d06715328fb909843a505a5b2fe4dd5d",
           "at": "2026-07-24T21:05:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41325db640243e687202f22dc2e8e28447852577b48ef9a75678edaa1afb1e02",
+          "at": "2026-07-25T01:31:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:41325db640243e687202f22dc2e8e28447852577b48ef9a75678edaa1afb1e02",
+          "at": "2026-07-25T01:32:46Z"
         }
       ]
     },
-    "harness-policy": {
+    "other": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d0d9332afcacd54c7763e8ead4760bf0f197edbbe725c9a429e6bfa809892538",
-          "at": "2026-07-24T21:46:21Z"
+          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
+          "at": "2026-07-24T21:26:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d0d9332afcacd54c7763e8ead4760bf0f197edbbe725c9a429e6bfa809892538",
-          "at": "2026-07-24T21:50:40Z"
+          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
+          "at": "2026-07-24T21:28:25Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "前提条件の説明が初回セットアップ手順と矛盾しています。未初期化の export ツリーで `cargo make bootstrap` を実行するよう案内しており、`init` を経由しないため Git ルート依存で失敗します。ここも `cargo make init` に更新してください。",
+              "message": "`set -e` stops on failure but does not clean up state created by earlier steps. If `cargo generate-lockfile` fails, the exported directory is left as an initialized Git repository; if `git commit` fails, it is left with staged files. This contradicts the checklist requirement that intermediate failures not leave a half-initialized state and makes recovery/retry behavior ambiguous.",
               "severity": "P1",
-              "file": "README.md",
-              "line": 61,
-              "category": "command wiring"
+              "file": "overlay/Makefile.toml",
+              "line": 23,
+              "category": "error-handling"
             }
           ],
-          "hash": "rvw1:sha256:aa54dc7acea468112e96ee6f54b922b04215ba35adad5d09f459b2d152255480",
-          "at": "2026-07-24T23:22:22Z"
+          "hash": "rvw1:sha256:3ead8632997c3ba77d9eea5a7f591d5653acfb6fe61707a5d5d2c9f1d8a73944",
+          "at": "2026-07-24T21:46:18Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7e6bbae324ee43f54fc7208b2d54f10ac4434437ab188c9d037cb9fa36c861ad",
-          "at": "2026-07-24T23:23:29Z"
+          "hash": "rvw1:sha256:0218d0e9f93b2bc856b4142a3be20308cede5eee19dca3ca3f902f4373b97e05",
+          "at": "2026-07-24T21:49:14Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7e6bbae324ee43f54fc7208b2d54f10ac4434437ab188c9d037cb9fa36c861ad",
-          "at": "2026-07-24T23:27:16Z"
+          "hash": "rvw1:sha256:0218d0e9f93b2bc856b4142a3be20308cede5eee19dca3ca3f902f4373b97e05",
+          "at": "2026-07-24T21:52:48Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d688c5148761c508541ddb3f9d81110107f8256379e527e1c23b5f29c582a23c",
-          "at": "2026-07-25T00:06:28Z"
+          "hash": "rvw1:sha256:b60c3b677f746b68791b3faa9e3f2c7e5b84662fd235ff99ffa98abe32b6e4f2",
+          "at": "2026-07-24T22:06:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b60c3b677f746b68791b3faa9e3f2c7e5b84662fd235ff99ffa98abe32b6e4f2",
+          "at": "2026-07-24T22:07:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7c81d2d0597a9d9f7a02b6ed067b9970f33336864c19b5b3565e95b2883b1ad",
+          "at": "2026-07-24T23:22:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7c81d2d0597a9d9f7a02b6ed067b9970f33336864c19b5b3565e95b2883b1ad",
+          "at": "2026-07-24T23:26:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cdba9dcc1cd46fa8afd2a766eded074670520f0be1416f049c987dcdea90327",
+          "at": "2026-07-24T23:47:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cdba9dcc1cd46fa8afd2a766eded074670520f0be1416f049c987dcdea90327",
+          "at": "2026-07-24T23:49:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The precheck only reads `user.name`/`user.email` from global config and ignores Git's other config scopes and supported email fallback. A valid identity can therefore be rejected even though `git commit` would succeed. Use Git's actual identity resolution for the check.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 33,
+              "category": "incorrect-identity-resolution"
+            }
+          ],
+          "hash": "rvw1:sha256:db48260db51e83a1bcde08dda04de097ebdb7ac12d6a2bbafd436f60d0f02360",
+          "at": "2026-07-25T00:06:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:763b95f39705819521d0695449646b25add692173fce984a95c97872187837fd",
+          "at": "2026-07-25T00:10:38Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new `init`/`bootstrap` selection and retry behavior are provider-independent workflow logic, but this Claude adapter has no opening Operational SSoT reference and `.harness/workflows/track/catchup.md` does not exist. The harness-policy adapter/SSoT rule requires command selection, sequencing, and failure recovery to live in a workflow SSoT, leaving this file only invocation constraints and reporting. Move this flow into a workflow SSoT and reference it from the adapter.",
+              "message": "This preflight runs before the target has a `.git` directory, so Git cannot activate identity settings from global `includeIf \"gitdir:...\"` or `includeIf \"onbranch:...\"` blocks. After `git init -b main`, the actual commit would activate those blocks and could succeed, while the preflight incorrectly rejects the same setup. Validate identity in the initialized repository under rollback protection, before generating the lockfile, or otherwise account for conditional includes.",
               "severity": "P1",
-              "file": ".claude/commands/track/catchup.md",
-              "line": 13,
-              "category": "adapter-SSoT synchronization"
+              "file": "overlay/Makefile.toml",
+              "line": 34,
+              "category": "incorrect-identity-resolution"
             }
           ],
-          "hash": "rvw1:sha256:d688c5148761c508541ddb3f9d81110107f8256379e527e1c23b5f29c582a23c",
-          "at": "2026-07-25T00:12:28Z"
+          "hash": "rvw1:sha256:763b95f39705819521d0695449646b25add692173fce984a95c97872187837fd",
+          "at": "2026-07-25T00:25:43Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The Claude adapter still duplicates workflow logic by defining the `init` versus `bootstrap` selection condition, while `.harness/workflows/track/catchup.md` already owns that decision. This violates the thin-adapter contract and can drift from the SSoT; keep only the workflow reference and Claude-specific invocation/tool constraints here.",
+              "message": "The identity check now runs after `git init`, so the prerequisite check itself performs a filesystem side effect and briefly creates `.git` before rejecting an invalid identity. This violates the stated requirement that identity validation precede side-effecting initialization. Move the `git var` checks before `git init`; retain the rollback trap for later failures.",
               "severity": "P1",
-              "file": ".claude/commands/track/catchup.md",
-              "line": 17,
-              "category": "responsibility-boundary"
+              "file": "overlay/Makefile.toml",
+              "line": 52,
+              "category": "precondition-ordering"
             }
           ],
-          "hash": "rvw1:sha256:8f1650c6b11b4474caf295738c9861285c0cf6ab25425baea942f3077f4e6e20",
-          "at": "2026-07-25T00:23:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:50605cb7aaf7db4479fd1ccaf143cc406caa23ad99b6b1fa5430cedfafafa99f",
-          "at": "2026-07-25T00:53:48Z"
+          "hash": "rvw1:sha256:9daa1614c59f01c317726e2f2bad7e300a01c253bc017433b8484e712180156e",
+          "at": "2026-07-25T00:53:16Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The new source-repository branch makes the following `bootstrap` description inaccurate. The source `Makefile.toml` bootstrap requires Docker/Docker Compose, builds `bin/sotp` from the working tree, and does not run the exported scaffold's pinned auxiliary-tool or fallback `install-sotp` steps. Consequently, a source contributor is told Docker is optional and that this command installs local tools, but it instead fails without Docker. Qualify the bootstrap behavior and prerequisites by environment.",
+              "message": "These `git var` calls run before the target repository exists, so they do not use the same configuration context as the later commit. When the scaffold is inside another repository, Git can read identity from the parent `.git/config` and pass this check; after `git init`, the fresh nested repository hides that config and `git commit` still fails and rolls everything back. Conversely, identity supplied through a conditional include matching the new repository is unavailable during this check. Validate in the initialized target repository under rollback protection, before lockfile generation, so failure still leaves no artifacts.",
               "severity": "P1",
-              "file": ".claude/rules/dev-environment.md",
-              "line": 16,
-              "category": "convention contradiction"
+              "file": "overlay/Makefile.toml",
+              "line": 33,
+              "category": "incorrect-identity-resolution"
             }
           ],
-          "hash": "rvw1:sha256:50605cb7aaf7db4479fd1ccaf143cc406caa23ad99b6b1fa5430cedfafafa99f",
-          "at": "2026-07-25T00:56:32Z"
+          "hash": "rvw1:sha256:f41daf79544b54fde19607cc72b78435da43735e6f6634cfc9619548acdefe8e",
+          "at": "2026-07-25T00:56:13Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d84cbdc5b78c91809f5ba4eb5b452799b4cce4cb7905728b4c19646276b49455",
-          "at": "2026-07-25T00:59:47Z"
+          "hash": "rvw1:sha256:9daa1614c59f01c317726e2f2bad7e300a01c253bc017433b8484e712180156e",
+          "at": "2026-07-25T01:00:49Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
+          "at": "2026-07-24T21:26:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
+          "at": "2026-07-24T21:30:18Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description restates upstream behavior contracts (fail-closed repeat execution, initialization ordering, and bootstrap) in prose; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description restates upstream branch defaults and maintainer-boundary behavior in prose; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 15,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 description restates the TaskCreate fallback behavior contract in prose; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 description restates the first-run behavior contract instead of only identifying the grouped implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 35,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 description restates the exported-configuration behavior contract instead of only identifying the grouped implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 44,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 description restates the host-independent progress behavior contract instead of only identifying the grouped implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 53,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:e2bd02961a7de7310c8a82f88c9ae6311eee972e303002f818aa29b63ecb7df7",
+          "at": "2026-07-24T21:26:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe388f3fbe5e4ab0b298006678fb7c2c9c5bcc3f664306c59b4f7a0ccb656e59",
+          "at": "2026-07-24T21:28:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe388f3fbe5e4ab0b298006678fb7c2c9c5bcc3f664306c59b4f7a0ccb656e59",
+          "at": "2026-07-24T21:32:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:caeb8c7b736c9bfc0431e04a8776eb553f11757bd42f1e7bc7719dcac6e8e9df",
+          "at": "2026-07-24T21:45:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:caeb8c7b736c9bfc0431e04a8776eb553f11757bd42f1e7bc7719dcac6e8e9df",
+          "at": "2026-07-24T21:48:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
+          "at": "2026-07-24T22:14:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
+          "at": "2026-07-24T22:16:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
+          "at": "2026-07-24T22:18:27Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a73284093017ebd4af5abd3638493e3abd671e5fc6682b15ab8a1d1179e0b63a",
+          "at": "2026-07-24T21:26:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a73284093017ebd4af5abd3638493e3abd671e5fc6682b15ab8a1d1179e0b63a",
+          "at": "2026-07-24T21:29:07Z"
         }
       ]
     },
@@ -439,308 +642,155 @@
           "findings": [],
           "hash": "rvw1:sha256:b30d56404bc647321520ba5e730de67249ba822f7abdd1bff8676e1f5cc36933",
           "at": "2026-07-25T01:04:00Z"
-        }
-      ]
-    },
-    "impl-plan": {
-      "rounds": [
+        },
         {
           "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfff11e4b971722d2a1049d40f14b7daa520242f3cbf135723cad595c1f5e8f8",
+          "at": "2026-07-25T01:31:31Z"
+        },
+        {
+          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "T001 description restates upstream behavior contracts (fail-closed repeat execution, initialization ordering, and bootstrap) in prose; retain only target + operation + anchor cite.",
+              "message": "ADR D1 requires deleting raw substring assertions even for machine-readable files, but this JSON check—and the remaining Makefile/TOML/YAML checks at lines 161–168 and 436–474—still use `contains`/`starts_with`/`matches` without interpreting the file structure. These are the same contractless assertions this change is intended to remove; delete them or bind contract-backed checks to parsed elements and values.",
               "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 6,
-              "category": "upstream restatement"
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 402,
+              "category": "ADR conformance"
             },
             {
-              "message": "T002 description restates upstream branch defaults and maintainer-boundary behavior in prose; retain only target + operation + anchor cite.",
+              "message": "The repeat-run guard searches for `git init` and `git commit`, but the trace format established by this test is `git -c core.hooksPath=/dev/null init ...` and `git -c core.hooksPath=/dev/null commit ...`; neither contains the searched token. A repeat execution can therefore reach these state-changing operations without this assertion detecting it. Match the actual command form or parse trace lines by operation.",
               "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 15,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T003 description restates the TaskCreate fallback behavior contract in prose; retain only target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 24,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S1 description restates the first-run behavior contract instead of only identifying the grouped implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 35,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S2 description restates the exported-configuration behavior contract instead of only identifying the grouped implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 44,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S3 description restates the host-independent progress behavior contract instead of only identifying the grouped implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 53,
-              "category": "upstream restatement"
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 375,
+              "category": "test coverage"
             }
           ],
-          "hash": "rvw1:sha256:e2bd02961a7de7310c8a82f88c9ae6311eee972e303002f818aa29b63ecb7df7",
-          "at": "2026-07-24T21:26:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fe388f3fbe5e4ab0b298006678fb7c2c9c5bcc3f664306c59b4f7a0ccb656e59",
-          "at": "2026-07-24T21:28:36Z"
+          "hash": "rvw1:sha256:cfff11e4b971722d2a1049d40f14b7daa520242f3cbf135723cad595c1f5e8f8",
+          "at": "2026-07-25T01:35:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:fe388f3fbe5e4ab0b298006678fb7c2c9c5bcc3f664306c59b4f7a0ccb656e59",
-          "at": "2026-07-24T21:32:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:caeb8c7b736c9bfc0431e04a8776eb553f11757bd42f1e7bc7719dcac6e8e9df",
-          "at": "2026-07-24T21:45:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:caeb8c7b736c9bfc0431e04a8776eb553f11757bd42f1e7bc7719dcac6e8e9df",
-          "at": "2026-07-24T21:48:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
-          "at": "2026-07-24T22:14:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
-          "at": "2026-07-24T22:16:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
-          "at": "2026-07-24T22:18:27Z"
+          "hash": "rvw1:sha256:13edcddf225fa60e6ab67d89d344d716864cf0b3f4074254c513d793729feda6",
+          "at": "2026-07-25T01:40:38Z"
         }
       ]
     },
-    "spec": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
-          "at": "2026-07-24T21:26:13Z"
+          "hash": "rvw1:sha256:d0d9332afcacd54c7763e8ead4760bf0f197edbbe725c9a429e6bfa809892538",
+          "at": "2026-07-24T21:46:21Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
-          "at": "2026-07-24T21:30:18Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a73284093017ebd4af5abd3638493e3abd671e5fc6682b15ab8a1d1179e0b63a",
-          "at": "2026-07-24T21:26:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a73284093017ebd4af5abd3638493e3abd671e5fc6682b15ab8a1d1179e0b63a",
-          "at": "2026-07-24T21:29:07Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
-          "at": "2026-07-24T21:26:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
-          "at": "2026-07-24T21:28:25Z"
+          "hash": "rvw1:sha256:d0d9332afcacd54c7763e8ead4760bf0f197edbbe725c9a429e6bfa809892538",
+          "at": "2026-07-24T21:50:40Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "`set -e` stops on failure but does not clean up state created by earlier steps. If `cargo generate-lockfile` fails, the exported directory is left as an initialized Git repository; if `git commit` fails, it is left with staged files. This contradicts the checklist requirement that intermediate failures not leave a half-initialized state and makes recovery/retry behavior ambiguous.",
+              "message": "前提条件の説明が初回セットアップ手順と矛盾しています。未初期化の export ツリーで `cargo make bootstrap` を実行するよう案内しており、`init` を経由しないため Git ルート依存で失敗します。ここも `cargo make init` に更新してください。",
               "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 23,
-              "category": "error-handling"
+              "file": "README.md",
+              "line": 61,
+              "category": "command wiring"
             }
           ],
-          "hash": "rvw1:sha256:3ead8632997c3ba77d9eea5a7f591d5653acfb6fe61707a5d5d2c9f1d8a73944",
-          "at": "2026-07-24T21:46:18Z"
+          "hash": "rvw1:sha256:aa54dc7acea468112e96ee6f54b922b04215ba35adad5d09f459b2d152255480",
+          "at": "2026-07-24T23:22:22Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0218d0e9f93b2bc856b4142a3be20308cede5eee19dca3ca3f902f4373b97e05",
-          "at": "2026-07-24T21:49:14Z"
+          "hash": "rvw1:sha256:7e6bbae324ee43f54fc7208b2d54f10ac4434437ab188c9d037cb9fa36c861ad",
+          "at": "2026-07-24T23:23:29Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0218d0e9f93b2bc856b4142a3be20308cede5eee19dca3ca3f902f4373b97e05",
-          "at": "2026-07-24T21:52:48Z"
+          "hash": "rvw1:sha256:7e6bbae324ee43f54fc7208b2d54f10ac4434437ab188c9d037cb9fa36c861ad",
+          "at": "2026-07-24T23:27:16Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b60c3b677f746b68791b3faa9e3f2c7e5b84662fd235ff99ffa98abe32b6e4f2",
-          "at": "2026-07-24T22:06:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b60c3b677f746b68791b3faa9e3f2c7e5b84662fd235ff99ffa98abe32b6e4f2",
-          "at": "2026-07-24T22:07:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7c81d2d0597a9d9f7a02b6ed067b9970f33336864c19b5b3565e95b2883b1ad",
-          "at": "2026-07-24T23:22:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7c81d2d0597a9d9f7a02b6ed067b9970f33336864c19b5b3565e95b2883b1ad",
-          "at": "2026-07-24T23:26:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4cdba9dcc1cd46fa8afd2a766eded074670520f0be1416f049c987dcdea90327",
-          "at": "2026-07-24T23:47:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4cdba9dcc1cd46fa8afd2a766eded074670520f0be1416f049c987dcdea90327",
-          "at": "2026-07-24T23:49:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The precheck only reads `user.name`/`user.email` from global config and ignores Git's other config scopes and supported email fallback. A valid identity can therefore be rejected even though `git commit` would succeed. Use Git's actual identity resolution for the check.",
-              "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 33,
-              "category": "incorrect-identity-resolution"
-            }
-          ],
-          "hash": "rvw1:sha256:db48260db51e83a1bcde08dda04de097ebdb7ac12d6a2bbafd436f60d0f02360",
-          "at": "2026-07-25T00:06:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:763b95f39705819521d0695449646b25add692173fce984a95c97872187837fd",
-          "at": "2026-07-25T00:10:38Z"
+          "hash": "rvw1:sha256:d688c5148761c508541ddb3f9d81110107f8256379e527e1c23b5f29c582a23c",
+          "at": "2026-07-25T00:06:28Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "This preflight runs before the target has a `.git` directory, so Git cannot activate identity settings from global `includeIf \"gitdir:...\"` or `includeIf \"onbranch:...\"` blocks. After `git init -b main`, the actual commit would activate those blocks and could succeed, while the preflight incorrectly rejects the same setup. Validate identity in the initialized repository under rollback protection, before generating the lockfile, or otherwise account for conditional includes.",
+              "message": "The new `init`/`bootstrap` selection and retry behavior are provider-independent workflow logic, but this Claude adapter has no opening Operational SSoT reference and `.harness/workflows/track/catchup.md` does not exist. The harness-policy adapter/SSoT rule requires command selection, sequencing, and failure recovery to live in a workflow SSoT, leaving this file only invocation constraints and reporting. Move this flow into a workflow SSoT and reference it from the adapter.",
               "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 34,
-              "category": "incorrect-identity-resolution"
+              "file": ".claude/commands/track/catchup.md",
+              "line": 13,
+              "category": "adapter-SSoT synchronization"
             }
           ],
-          "hash": "rvw1:sha256:763b95f39705819521d0695449646b25add692173fce984a95c97872187837fd",
-          "at": "2026-07-25T00:25:43Z"
+          "hash": "rvw1:sha256:d688c5148761c508541ddb3f9d81110107f8256379e527e1c23b5f29c582a23c",
+          "at": "2026-07-25T00:12:28Z"
         },
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The identity check now runs after `git init`, so the prerequisite check itself performs a filesystem side effect and briefly creates `.git` before rejecting an invalid identity. This violates the stated requirement that identity validation precede side-effecting initialization. Move the `git var` checks before `git init`; retain the rollback trap for later failures.",
+              "message": "The Claude adapter still duplicates workflow logic by defining the `init` versus `bootstrap` selection condition, while `.harness/workflows/track/catchup.md` already owns that decision. This violates the thin-adapter contract and can drift from the SSoT; keep only the workflow reference and Claude-specific invocation/tool constraints here.",
               "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 52,
-              "category": "precondition-ordering"
+              "file": ".claude/commands/track/catchup.md",
+              "line": 17,
+              "category": "responsibility-boundary"
             }
           ],
-          "hash": "rvw1:sha256:9daa1614c59f01c317726e2f2bad7e300a01c253bc017433b8484e712180156e",
-          "at": "2026-07-25T00:53:16Z"
+          "hash": "rvw1:sha256:8f1650c6b11b4474caf295738c9861285c0cf6ab25425baea942f3077f4e6e20",
+          "at": "2026-07-25T00:23:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50605cb7aaf7db4479fd1ccaf143cc406caa23ad99b6b1fa5430cedfafafa99f",
+          "at": "2026-07-25T00:53:48Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "These `git var` calls run before the target repository exists, so they do not use the same configuration context as the later commit. When the scaffold is inside another repository, Git can read identity from the parent `.git/config` and pass this check; after `git init`, the fresh nested repository hides that config and `git commit` still fails and rolls everything back. Conversely, identity supplied through a conditional include matching the new repository is unavailable during this check. Validate in the initialized target repository under rollback protection, before lockfile generation, so failure still leaves no artifacts.",
+              "message": "The new source-repository branch makes the following `bootstrap` description inaccurate. The source `Makefile.toml` bootstrap requires Docker/Docker Compose, builds `bin/sotp` from the working tree, and does not run the exported scaffold's pinned auxiliary-tool or fallback `install-sotp` steps. Consequently, a source contributor is told Docker is optional and that this command installs local tools, but it instead fails without Docker. Qualify the bootstrap behavior and prerequisites by environment.",
               "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 33,
-              "category": "incorrect-identity-resolution"
+              "file": ".claude/rules/dev-environment.md",
+              "line": 16,
+              "category": "convention contradiction"
             }
           ],
-          "hash": "rvw1:sha256:f41daf79544b54fde19607cc72b78435da43735e6f6634cfc9619548acdefe8e",
-          "at": "2026-07-25T00:56:13Z"
+          "hash": "rvw1:sha256:50605cb7aaf7db4479fd1ccaf143cc406caa23ad99b6b1fa5430cedfafafa99f",
+          "at": "2026-07-25T00:56:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:9daa1614c59f01c317726e2f2bad7e300a01c253bc017433b8484e712180156e",
-          "at": "2026-07-25T01:00:49Z"
+          "hash": "rvw1:sha256:d84cbdc5b78c91809f5ba4eb5b452799b4cce4cb7905728b4c19646276b49455",
+          "at": "2026-07-25T00:59:47Z"
         }
       ]
     }
