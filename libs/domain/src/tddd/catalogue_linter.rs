@@ -10,7 +10,7 @@
 //! - `RoleKind` — payload-free discriminant covering `DataRole` /
 //!   `ContractRole` variants for use in rule targeting.
 //! - `RuleTarget` — selector that specifies which role(s) a rule applies to.
-//! - `CatalogueLinterRuleKind` — 12-variant enum of rule categories (D15).
+//! - `CatalogueLinterRuleKind` — 14-variant enum of rule categories (D15).
 //! - `CatalogueLinterRule` — value object with `target: RuleTarget` and
 //!   `kind: CatalogueLinterRuleKind`; constructed via `CatalogueLinterRule::new`.
 //! - `CatalogueLinterRuleError` — error type for constructor rejections.
@@ -135,12 +135,12 @@ pub enum RolePayloadField {
 }
 
 // ---------------------------------------------------------------------------
-// CatalogueLinterRuleKind — 15-variant rule category enum
+// CatalogueLinterRuleKind — 14-variant rule category enum
 // ---------------------------------------------------------------------------
 
 /// Classifies what invariant a catalogue linter rule asserts (D15).
 ///
-/// 15 variants: 12 data-carrying + 3 unit rules.
+/// 14 variants: 12 data-carrying + 2 unit rules.
 ///
 /// Payloads use `RolePayloadField` for structured field-name references
 /// (validated by construction), and `String` / `Vec<String>` / `Vec<RoleKind>`
@@ -258,10 +258,6 @@ pub enum CatalogueLinterRuleKind {
         positions: NonEmptyVec<PrimitiveOccurrencePosition>,
     },
 
-    /// Rule requires every domain-layer ValueObject to be referenced by the
-    /// signature of a different domain catalogue entry.
-    DomainValueObjectInboundReferenceRequired,
-
     /// Rule constrains a composition root's public catalogue surface to
     /// zero-argument PrimaryAdapter wiring accessors.
     CompositionRootPureDi,
@@ -285,9 +281,6 @@ impl CatalogueLinterRuleKind {
             Self::NoPublicField => "NoPublicField",
             Self::ForbiddenMethodReceiver { .. } => "ForbiddenMethodReceiver",
             Self::ForbidPrimitiveInTypes { .. } => "ForbidPrimitiveInTypes",
-            Self::DomainValueObjectInboundReferenceRequired => {
-                "DomainValueObjectInboundReferenceRequired"
-            }
             Self::CompositionRootPureDi => "CompositionRootPureDi",
         }
     }
@@ -412,7 +405,6 @@ impl CatalogueLinterRule {
     /// that method-signature scanning cannot enforce, when a rule other than
     /// `KindLayerConstraint` or `ForbidPrimitiveInTypes` targets a
     /// `FunctionRole` discriminant, or when
-    /// `DomainValueObjectInboundReferenceRequired` excludes `ValueObject`, or
     /// `CompositionRootPureDi` does not target only `CompositionRoot`.
     pub fn new(
         target: RuleTarget,
@@ -460,13 +452,6 @@ impl CatalogueLinterRule {
             | CatalogueLinterRuleKind::NoPublicField
             | CatalogueLinterRuleKind::ForbiddenMethodReceiver { .. }
             | CatalogueLinterRuleKind::ForbidPrimitiveInTypes { .. } => {}
-            CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired => {
-                if !target.matches(RoleKind::ValueObject) {
-                    return Err(CatalogueLinterRuleError::InvalidRuleConfig(FreeText::new(
-                        "DomainValueObjectInboundReferenceRequired must target ValueObject",
-                    )));
-                }
-            }
             CatalogueLinterRuleKind::NoRoleInMethodSignature { forbidden_roles } => {
                 if let Some(function_role) = forbidden_roles
                     .as_slice()
@@ -816,11 +801,11 @@ mod tests {
     }
 
     // ------------------------------------------------------------------
-    // CatalogueLinterRuleKind — 15 variants exist and discriminant_name works
+    // CatalogueLinterRuleKind — 14 variants exist and discriminant_name works
     // ------------------------------------------------------------------
 
     #[test]
-    fn test_catalogue_linter_rule_kind_has_15_variants_with_distinct_names() {
+    fn test_catalogue_linter_rule_kind_has_14_variants_with_distinct_names() {
         let permitted = NonEmptyVec::new(layer("domain"), vec![]);
         let required_traits = NonEmptyVec::new(TypeRef::new("PartialEq").unwrap(), vec![]);
         let forbidden_roles = NonEmptyVec::new(RoleKind::Repository, vec![]);
@@ -856,10 +841,9 @@ mod tests {
                 layers: NonEmptyVec::new(layer("domain"), vec![]),
                 positions: NonEmptyVec::new(PrimitiveOccurrencePosition::NamedField, vec![]),
             },
-            CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired,
             CatalogueLinterRuleKind::CompositionRootPureDi,
         ];
-        assert_eq!(kinds.len(), 15, "must have exactly 15 variants");
+        assert_eq!(kinds.len(), 14, "must have exactly 14 variants");
 
         let names: Vec<&str> = kinds.iter().map(|k| k.discriminant_name()).collect();
         let expected = [
@@ -876,7 +860,6 @@ mod tests {
             "NoPublicField",
             "ForbiddenMethodReceiver",
             "ForbidPrimitiveInTypes",
-            "DomainValueObjectInboundReferenceRequired",
             "CompositionRootPureDi",
         ];
         assert_eq!(names, expected);
@@ -1594,56 +1577,6 @@ mod tests {
         }
     }
 
-    #[test]
-    fn test_domain_value_object_inbound_reference_required_rejects_all_contact_actions() {
-        for action in [ItemAction::Add, ItemAction::Modify, ItemAction::Reference] {
-            let mut doc = make_doc("domain");
-            doc.insert_type(
-                TypeName::new("BoundaryValue").unwrap(),
-                TypeEntry::new(
-                    action,
-                    DataRole::value_object(),
-                    unit_struct_kind(),
-                    vec![],
-                    vec![],
-                    vec![],
-                    ModulePath::root(),
-                    None,
-                    vec![],
-                    vec![],
-                ),
-            );
-
-            let violations = run_rule(
-                &doc,
-                RuleTarget::new(vec![RoleKind::ValueObject]),
-                CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired,
-            );
-            assert_eq!(violations.len(), 1, "action {action:?} must be checked");
-            assert_eq!(violations[0].rule_kind(), "DomainValueObjectInboundReferenceRequired");
-        }
-    }
-
-    #[test]
-    fn test_domain_value_object_inbound_reference_required_accepts_other_domain_signature() {
-        let mut doc = make_doc("domain");
-        doc.insert_type(TypeName::new("Money").unwrap(), make_type_entry(DataRole::value_object()));
-        doc.insert_type(
-            TypeName::new("Price").unwrap(),
-            make_type_entry_with_methods(
-                DataRole::Entity { identity: identity_accessor("id"), invariants: vec![] },
-                vec![method_shared_ref_no_params("amount", "Money")],
-            ),
-        );
-
-        let violations = run_rule(
-            &doc,
-            RuleTarget::new(vec![RoleKind::ValueObject]),
-            CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired,
-        );
-        assert!(violations.is_empty(), "a different domain signature consumes Money");
-    }
-
     // ------------------------------------------------------------------
     // CatalogueLinterRule::new — happy path and rejection cases
     // ------------------------------------------------------------------
@@ -1669,24 +1602,6 @@ mod tests {
         .unwrap();
         assert_eq!(rule.kind().discriminant_name(), "KindLayerConstraint");
         assert_eq!(rule.target().target_roles(), &[RoleKind::EventPolicy]);
-    }
-
-    #[test]
-    fn test_linter_rule_new_inbound_reference_rule_rejects_target_without_value_object() {
-        let result = CatalogueLinterRule::new(
-            RuleTarget::new(vec![RoleKind::Entity]),
-            CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired,
-        );
-
-        assert!(
-            matches!(
-                &result,
-                Err(CatalogueLinterRuleError::InvalidRuleConfig(msg))
-                    if msg.as_str().contains("DomainValueObjectInboundReferenceRequired")
-                        && msg.as_str().contains("ValueObject")
-            ),
-            "expected InvalidRuleConfig for a target that excludes ValueObject, got: {result:?}"
-        );
     }
 
     #[test]
@@ -2731,6 +2646,92 @@ mod tests {
         assert_eq!(violations[0].rule_kind(), "NoRoleInMethodSignature");
         assert_eq!(violations[0].entry_name(), "MyValue");
         assert!(violations[0].message().contains("entity_ref"));
+    }
+
+    #[test]
+    fn test_primary_adapter_signature_allows_usecase_boundary_contracts() {
+        let mut doc = make_doc("cli_driver");
+        doc.insert_type(
+            TypeName::new("CreateCommand").unwrap(),
+            make_type_entry(DataRole::Command),
+        );
+        doc.insert_type(TypeName::new("LookupQuery").unwrap(), make_type_entry(DataRole::Query));
+        doc.insert_type(TypeName::new("CreateResponse").unwrap(), make_type_entry(DataRole::Dto));
+        doc.insert_type(
+            TypeName::new("CreateDriver").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::PrimaryAdapter,
+                vec![method_with_params(
+                    "handle",
+                    Some(SelfReceiver::SharedRef),
+                    vec![("command", "CreateCommand"), ("query", "LookupQuery")],
+                    "CreateResponse",
+                )],
+            ),
+        );
+
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::PrimaryAdapter]),
+            CatalogueLinterRuleKind::NoRoleInMethodSignature {
+                forbidden_roles: NonEmptyVec::new(
+                    RoleKind::Entity,
+                    vec![
+                        RoleKind::AggregateRoot,
+                        RoleKind::Repository,
+                        RoleKind::SecondaryPort,
+                        RoleKind::SecondaryAdapter,
+                    ],
+                ),
+            },
+        );
+
+        assert!(violations.is_empty(), "usecase boundary contracts must be allowed");
+    }
+
+    #[test]
+    fn test_primary_adapter_signature_rejects_entity_and_aggregate_root_exposure() {
+        let mut doc = make_doc("cli_driver");
+        doc.insert_type(
+            TypeName::new("Order").unwrap(),
+            make_type_entry(DataRole::Entity {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+            }),
+        );
+        doc.insert_type(
+            TypeName::new("Orders").unwrap(),
+            make_type_entry(DataRole::AggregateRoot {
+                identity: identity_accessor("id"),
+                invariants: vec![],
+                exclusive_members: vec![],
+                shared_value_objects: vec![],
+                emits: vec![],
+            }),
+        );
+        doc.insert_type(
+            TypeName::new("OrderDriver").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::PrimaryAdapter,
+                vec![method_with_params(
+                    "handle",
+                    Some(SelfReceiver::SharedRef),
+                    vec![("order", "Order")],
+                    "Orders",
+                )],
+            ),
+        );
+
+        let violations = run_rule(
+            &doc,
+            RuleTarget::new(vec![RoleKind::PrimaryAdapter]),
+            CatalogueLinterRuleKind::NoRoleInMethodSignature {
+                forbidden_roles: NonEmptyVec::new(RoleKind::Entity, vec![RoleKind::AggregateRoot]),
+            },
+        );
+
+        assert_eq!(violations.len(), 2, "both prohibited domain roles must be rejected");
+        assert!(violations.iter().all(|violation| violation.entry_name() == "OrderDriver"));
     }
 
     // ===========================================================================

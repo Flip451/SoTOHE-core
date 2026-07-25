@@ -151,8 +151,6 @@ pub enum LintRuleKind {
         layers: NonEmptyVec<LayerId>,
         positions: NonEmptyVec<PrimitiveOccurrencePosition>,
     },
-    /// Rule requires domain ValueObjects to have an inbound domain reference.
-    DomainValueObjectInboundReferenceRequired,
     /// Rule constrains CompositionRoot public surfaces to pure-DI wiring accessors.
     CompositionRootPureDi,
 }
@@ -405,9 +403,6 @@ fn lint_rule_spec_to_domain(spec: LintRuleSpec) -> Result<CatalogueLinterRule, C
         }
         LintRuleKind::ForbidPrimitiveInTypes { primitives, layers, positions } => {
             CatalogueLinterRuleKind::ForbidPrimitiveInTypes { primitives, layers, positions }
-        }
-        LintRuleKind::DomainValueObjectInboundReferenceRequired => {
-            CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired
         }
         LintRuleKind::CompositionRootPureDi => CatalogueLinterRuleKind::CompositionRootPureDi,
     };
@@ -831,7 +826,7 @@ mod tests {
     // ------------------------------------------------------------------
 
     #[test]
-    fn test_lint_rule_spec_to_domain_converts_all_15_kinds() {
+    fn test_lint_rule_spec_to_domain_converts_all_14_kinds() {
         let specs: Vec<LintRuleSpec> = vec![
             LintRuleSpec {
                 target_roles: vec![],
@@ -906,21 +901,96 @@ mod tests {
                 },
             },
             LintRuleSpec {
-                target_roles: vec!["ValueObject".to_owned()],
-                kind: LintRuleKind::DomainValueObjectInboundReferenceRequired,
-            },
-            LintRuleSpec {
                 target_roles: vec!["CompositionRoot".to_owned()],
                 kind: LintRuleKind::CompositionRootPureDi,
             },
         ];
-        assert_eq!(specs.len(), 15, "must cover all 15 LintRuleKind variants");
+        assert_eq!(specs.len(), 14, "must cover all 14 LintRuleKind variants");
         for spec in specs {
-            let kind_name = format!("{:?}", spec.kind).split(' ').next().unwrap().to_owned();
+            let expected_target_roles = match spec.target_roles.as_slice() {
+                [] => vec![],
+                [role] if role == "EventPolicy" => vec![RoleKind::EventPolicy],
+                [role] if role == "AggregateRoot" => vec![RoleKind::AggregateRoot],
+                [role] if role == "ValueObject" => vec![RoleKind::ValueObject],
+                [role] if role == "CompositionRoot" => vec![RoleKind::CompositionRoot],
+                other => panic!("unexpected target roles in conversion fixture: {other:?}"),
+            };
+            let expected_kind = match &spec.kind {
+                LintRuleKind::FieldEmpty { target_field } => {
+                    CatalogueLinterRuleKind::FieldEmpty { target_field: *target_field }
+                }
+                LintRuleKind::FieldNonEmpty { target_field } => {
+                    CatalogueLinterRuleKind::FieldNonEmpty { target_field: *target_field }
+                }
+                LintRuleKind::KindLayerConstraint { permitted_layers } => {
+                    CatalogueLinterRuleKind::KindLayerConstraint {
+                        permitted_layers: permitted_layers.clone(),
+                    }
+                }
+                LintRuleKind::ReferencedRoleConstraint { target_field, expected_role } => {
+                    CatalogueLinterRuleKind::ReferencedRoleConstraint {
+                        target_field: *target_field,
+                        expected_role: *expected_role,
+                    }
+                }
+                LintRuleKind::TraitImplRequired { required_traits } => {
+                    CatalogueLinterRuleKind::TraitImplRequired {
+                        required_traits: required_traits.clone(),
+                    }
+                }
+                LintRuleKind::NoRoleInMethodSignature { forbidden_roles } => {
+                    CatalogueLinterRuleKind::NoRoleInMethodSignature {
+                        forbidden_roles: forbidden_roles.clone(),
+                    }
+                }
+                LintRuleKind::MethodReferenceSignature { target_field } => {
+                    CatalogueLinterRuleKind::MethodReferenceSignature {
+                        target_field: *target_field,
+                    }
+                }
+                LintRuleKind::AccessorSignatureRequired { target_field } => {
+                    CatalogueLinterRuleKind::AccessorSignatureRequired {
+                        target_field: *target_field,
+                    }
+                }
+                LintRuleKind::FieldElementUniqueAcrossEntries { target_field } => {
+                    CatalogueLinterRuleKind::FieldElementUniqueAcrossEntries {
+                        target_field: *target_field,
+                    }
+                }
+                LintRuleKind::NoExternalReferenceInMethods { target_field } => {
+                    CatalogueLinterRuleKind::NoExternalReferenceInMethods {
+                        target_field: *target_field,
+                    }
+                }
+                LintRuleKind::NoPublicField => CatalogueLinterRuleKind::NoPublicField,
+                LintRuleKind::ForbiddenMethodReceiver { forbidden_receiver } => {
+                    CatalogueLinterRuleKind::ForbiddenMethodReceiver {
+                        forbidden_receiver: *forbidden_receiver,
+                    }
+                }
+                LintRuleKind::ForbidPrimitiveInTypes { primitives, layers, positions } => {
+                    CatalogueLinterRuleKind::ForbidPrimitiveInTypes {
+                        primitives: primitives.clone(),
+                        layers: layers.clone(),
+                        positions: positions.clone(),
+                    }
+                }
+                LintRuleKind::CompositionRootPureDi => {
+                    CatalogueLinterRuleKind::CompositionRootPureDi
+                }
+            };
             let result = lint_rule_spec_to_domain(spec);
-            assert!(
-                result.is_ok(),
-                "conversion failed for kind starting with {kind_name}: {result:?}"
+            let rule = result.expect("every declared LintRuleKind fixture must convert");
+            assert_eq!(
+                rule.target().target_roles(),
+                expected_target_roles,
+                "conversion must preserve the typed target-role selection"
+            );
+            assert_eq!(
+                rule.kind(),
+                &expected_kind,
+                "conversion must preserve the typed rule variant and payload"
             );
         }
     }

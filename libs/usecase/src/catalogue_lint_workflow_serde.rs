@@ -33,7 +33,6 @@ enum LintRuleKindWire {
     NoPublicField,
     ForbiddenMethodReceiver { forbidden_receiver: String },
     ForbidPrimitiveInTypes { primitives: Vec<String>, layers: Vec<String>, positions: Vec<String> },
-    DomainValueObjectInboundReferenceRequired,
     CompositionRootPureDi,
 }
 
@@ -125,9 +124,6 @@ impl From<&LintRuleKind> for LintRuleKindWire {
                         .map(str::to_owned)
                         .collect(),
                 }
-            }
-            LintRuleKind::DomainValueObjectInboundReferenceRequired => {
-                Self::DomainValueObjectInboundReferenceRequired
             }
             LintRuleKind::CompositionRootPureDi => Self::CompositionRootPureDi,
         }
@@ -234,9 +230,6 @@ fn lint_rule_kind_from_wire(wire: LintRuleKindWire) -> Result<LintRuleKind, Cata
                 parse_primitive_occurrence_position(&value)
             })?;
             Ok(LintRuleKind::ForbidPrimitiveInTypes { primitives, layers, positions })
-        }
-        LintRuleKindWire::DomainValueObjectInboundReferenceRequired => {
-            Ok(LintRuleKind::DomainValueObjectInboundReferenceRequired)
         }
         LintRuleKindWire::CompositionRootPureDi => Ok(LintRuleKind::CompositionRootPureDi),
     }

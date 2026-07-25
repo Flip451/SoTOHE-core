@@ -31,6 +31,14 @@ Violations of the role statement above are always reportable. The following prio
   a usecase application service, not inlined in the Driver. A Driver may call
   render-only helpers (formatters, table builders) freely — those are not
   interactor calls.
+- **boundary exposure violation**: a Driver may use usecase `Command`, `Query`,
+  boundary DTO, and usecase `ValueObject` types in its public signatures for
+  transport translation. Report direct domain `ValueObject` / `Entity` /
+  `AggregateRoot` exposure,
+  infrastructure type exposure, or transport-specific types leaking into the
+  usecase boundary. Determine `ValueObject` placement from R1 semantic evidence;
+  the role-only catalogue lint intentionally cannot make that distinction. Cite
+  `type-designer-kind-selection.md` R1.
 
 ## What NOT to report
 

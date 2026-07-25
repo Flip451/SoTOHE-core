@@ -1,13 +1,13 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-24T11:35:39Z",
+  "generated_at": "2026-07-25T00:26:21Z",
   "declaration_hash": "202413accd01857a5ecc8927aefd28a175f5b068b9d27bc5d58124da292d9e37",
-  "implementation_input_hash": "a954ed5c64f2e8bf3ab65b5a7c4ebd1654a7c4b015a377d76c9cdb4af165f09d",
+  "implementation_input_hash": "52b9d05b9a1c8d1dccf483570edc82d69b469e54bd952b2e63c754bae4bcd561",
   "signals": [
     {
       "type_name": "AdrBaselineDriver",
       "kind_tag": "primary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     }
   ]

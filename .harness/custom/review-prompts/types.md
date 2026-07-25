@@ -60,6 +60,12 @@ spec_refs/role/action mismatch.
   (`AC-NN` / `IN-NN` / `CN-NN` / spec element id) accompanies it — the field
   must reference upstream behaviour by anchor cite, not reproduce it. Cite
   `knowledge/conventions/no-upstream-restatement.md`.
+- **unsupported semantic placement**: a domain candidate whose recorded evidence
+  does not establish ubiquitous language, invariant ownership, stable meaning
+  across application operations, and independence from persistence / CLI /
+  workflow concerns; or a reviewer treats absent same-track inbound references
+  as sufficient rejection. Inbound references are supporting evidence only.
+  Cite `type-designer-kind-selection.md` R1.
 
 ### Cross-layer contract findings
 
@@ -143,11 +149,12 @@ spec_refs/role/action mismatch.
 
 ### CQRS findings
 
-- **command / query method mixing in one type**: a domain service or usecase
-  interactor whose declared methods both mutate state and return non-trivial
-  read models from the same method, when separation would make the contract
-  clearer. Cite `knowledge/conventions/coding-principles.md` if a CQRS rule is
-  documented; otherwise flag as a clarity concern.
+- **unsupported CQRS split**: a Command / Query separation without a
+  reviewable record of an operation-specific asymmetry in side effects,
+  collaborators, errors, consistency boundaries, or read/write models. A
+  read/write label alone is not enough. Do not require a split merely because
+  an asymmetry exists; R1 makes that evidence necessary for a split, not
+  sufficient to mandate one. Cite `type-designer-kind-selection.md` R1.
 - **port whose name suggests one side but signature does the other**: e.g.,
   a port named `<Thing>Reader` whose declared methods mutate, or a `<Thing>Writer`
   that primarily reads. The catalogue is the contract; misleading names lock

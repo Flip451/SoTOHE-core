@@ -100,13 +100,9 @@
           "forbidden_roles": [
             "Entity",
             "AggregateRoot",
-            "ValueObject",
             "Repository",
             "SecondaryPort",
-            "UseCase",
-            "Interactor",
-            "Command",
-            "Query"
+            "SecondaryAdapter"
           ]
         }
       }

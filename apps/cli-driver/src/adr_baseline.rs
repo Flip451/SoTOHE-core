@@ -6,9 +6,9 @@ use std::sync::Arc;
 use usecase::adr_baseline::{
     AdrBaselineCheckOutcome, AdrBaselineCommand, AdrBaselineQuery, AdrBaselineQueryOutput,
     AdrBaselineQueryService, AdrBaselineService, AdrBaselineSnapshotKind,
-    AdrBaselineTimestampError, AdrBaselineValidationError, AdrSourceFileName,
+    AdrBaselineValidationError, AdrSourceFileName,
 };
-use usecase::{NonEmptyString, Timestamp, TrackId, ValidationError};
+use usecase::{NonEmptyString, TrackId, ValidationError};
 
 use crate::render::CommandOutcome;
 
@@ -230,43 +230,33 @@ pub enum AdrBaselineInput {
 pub struct AdrBaselineDriver {
     command_service: Arc<dyn AdrBaselineService>,
     query_service: Arc<dyn AdrBaselineQueryService>,
-    timestamp_provider: fn() -> Result<Timestamp, AdrBaselineTimestampError>,
 }
 
 impl AdrBaselineDriver {
-    /// Creates an ADR baseline driver from its application services and timestamp provider.
+    /// Creates an ADR baseline driver from its application services.
     #[must_use]
     pub fn new(
         command_service: Arc<dyn AdrBaselineService>,
         query_service: Arc<dyn AdrBaselineQueryService>,
-        timestamp_provider: fn() -> Result<Timestamp, AdrBaselineTimestampError>,
     ) -> Self {
-        Self { command_service, query_service, timestamp_provider }
+        Self { command_service, query_service }
     }
 
     /// Maps one validated CLI request to the matching use-case operation.
     #[must_use]
     pub fn handle(&self, input: AdrBaselineInput) -> CommandOutcome {
         match input {
-            AdrBaselineInput::Snapshot { track_id, source, kind } => {
-                let timestamp = match (self.timestamp_provider)() {
-                    Ok(timestamp) => timestamp,
-                    Err(error) => {
-                        return CommandOutcome::failure(Some(error.to_string()));
-                    }
-                };
-                self.command_service
-                    .execute(AdrBaselineCommand::Snapshot {
-                        track_id: track_id.value,
-                        source: source.value,
-                        kind: kind.into(),
-                        timestamp,
-                    })
-                    .map(|output| {
-                        CommandOutcome::success(Some(format!("ADR baseline snapshot: {output:?}")))
-                    })
-                    .unwrap_or_else(|error| CommandOutcome::failure(Some(error.to_string())))
-            }
+            AdrBaselineInput::Snapshot { track_id, source, kind } => self
+                .command_service
+                .execute(AdrBaselineCommand::Snapshot {
+                    track_id: track_id.value,
+                    source: source.value,
+                    kind: kind.into(),
+                })
+                .map(|output| {
+                    CommandOutcome::success(Some(format!("ADR baseline snapshot: {output:?}")))
+                })
+                .unwrap_or_else(|error| CommandOutcome::failure(Some(error.to_string()))),
             AdrBaselineInput::Restore { track_id, source } => self
                 .command_service
                 .execute(AdrBaselineCommand::Restore {
@@ -370,16 +360,6 @@ mod tests {
         }
     }
 
-    fn fixed_timestamp_provider() -> Result<Timestamp, AdrBaselineTimestampError> {
-        Ok(Timestamp::new("2026-07-16T00:00:00Z").unwrap())
-    }
-
-    fn invalid_timestamp_provider() -> Result<Timestamp, AdrBaselineTimestampError> {
-        Err(AdrBaselineTimestampError::InvalidTimestamp(
-            Timestamp::new("not-a-timestamp").unwrap_err(),
-        ))
-    }
-
     #[test]
     fn test_adr_baseline_inputs_reject_invalid_track_and_source_values() {
         assert!("Invalid Track".parse::<TrackIdInput>().is_err());
@@ -391,11 +371,7 @@ mod tests {
     #[test]
     fn test_adr_baseline_driver_snapshot_maps_typed_input_losslessly() {
         let service = Arc::new(RecordingCommandService { recorded: Mutex::new(Vec::new()) });
-        let driver = AdrBaselineDriver::new(
-            service.clone(),
-            Arc::new(NoopQueryService),
-            fixed_timestamp_provider,
-        );
+        let driver = AdrBaselineDriver::new(service.clone(), Arc::new(NoopQueryService));
         let outcome = driver.handle(AdrBaselineInput::Snapshot {
             track_id: "test-track".parse().unwrap(),
             source: "decision.md".parse().unwrap(),
@@ -408,11 +384,10 @@ mod tests {
         let recorded = service.recorded.lock().unwrap();
         assert!(matches!(
             recorded.as_slice(),
-            [AdrBaselineCommand::Snapshot { track_id, source, kind: AdrBaselineSnapshotKind::NewAdr(reason), timestamp }]
+            [AdrBaselineCommand::Snapshot { track_id, source, kind: AdrBaselineSnapshotKind::NewAdr(reason) }]
                 if track_id.as_ref() == "test-track"
                     && source.as_str() == "decision.md"
                     && reason.as_ref() == "approved by user"
-                    && timestamp.as_str() == "2026-07-16T00:00:00Z"
         ));
     }
 
@@ -421,11 +396,7 @@ mod tests {
         let command_service =
             Arc::new(RecordingCommandService { recorded: Mutex::new(Vec::new()) });
         let query_service = Arc::new(RecordingQueryService { recorded: Mutex::new(Vec::new()) });
-        let driver = AdrBaselineDriver::new(
-            command_service.clone(),
-            query_service.clone(),
-            fixed_timestamp_provider,
-        );
+        let driver = AdrBaselineDriver::new(command_service.clone(), query_service.clone());
 
         let review_outcome = driver.handle(AdrBaselineInput::CheckReview {
             track_id: "review-track".parse().unwrap(),
@@ -464,79 +435,10 @@ mod tests {
     }
 
     #[test]
-    fn test_adr_baseline_driver_renders_clock_error_without_calling_service() {
-        let service = Arc::new(RecordingCommandService { recorded: Mutex::new(Vec::new()) });
-        let driver = AdrBaselineDriver::new(
-            service.clone(),
-            Arc::new(NoopQueryService),
-            invalid_timestamp_provider,
-        );
-        let outcome = driver.handle(AdrBaselineInput::Snapshot {
-            track_id: "test-track".parse().unwrap(),
-            source: "decision.md".parse().unwrap(),
-            kind: AdrBaselineSnapshotInput::Init,
-        });
-
-        assert_eq!(outcome.exit_code, 1);
-        assert_eq!(outcome.stdout, None);
-        assert_eq!(outcome.stderr.as_deref(), Some("invalid timestamp: not-a-timestamp"));
-        assert!(service.recorded.lock().unwrap().is_empty());
-    }
-
-    #[test]
-    fn test_adr_baseline_driver_routes_only_to_injected_services() {
-        let source = include_str!("adr_baseline.rs");
-        let driver_source = source
-            .split("pub struct AdrBaselineDriver")
-            .nth(1)
-            .unwrap()
-            .split("fn render_query_outcome")
-            .next()
-            .unwrap();
-
-        assert!(driver_source.contains("Arc<dyn AdrBaselineService>"));
-        assert!(driver_source.contains("Arc<dyn AdrBaselineQueryService>"));
-        assert!(
-            driver_source.contains(
-                "timestamp_provider: fn() -> Result<Timestamp, AdrBaselineTimestampError>"
-            )
-        );
-        assert!(driver_source.contains("self.command_service"));
-        assert!(driver_source.contains(".query_service"));
-        for forbidden_runtime_path in [
-            "AdrBaselineCompositionRoot",
-            "adr_baseline_driver(",
-            "FsAdrBaseline",
-            "infrastructure::",
-            "AdrBaselineClockReading",
-            "ServiceImpl",
-            "CompatibilityShim",
-            "CompatService",
-            "std::fs::",
-            "std::process::",
-            "std::net::",
-            "std::io::",
-            "println!",
-            "eprintln!",
-            "print!",
-            "eprint!",
-        ] {
-            assert!(
-                !driver_source.contains(forbidden_runtime_path),
-                "primary adapter must not execute or reverse-delegate through {forbidden_runtime_path}"
-            );
-        }
-    }
-
-    #[test]
-    fn test_adr_baseline_driver_new_handle_preserves_rendering_and_injected_clock() {
+    fn test_adr_baseline_driver_new_handle_preserves_rendering() {
         let command_service =
             Arc::new(RecordingCommandService { recorded: Mutex::new(Vec::new()) });
-        let driver = AdrBaselineDriver::new(
-            command_service.clone(),
-            Arc::new(PassingQueryService),
-            fixed_timestamp_provider,
-        );
+        let driver = AdrBaselineDriver::new(command_service.clone(), Arc::new(PassingQueryService));
 
         let snapshot_outcome = driver.handle(AdrBaselineInput::Snapshot {
             track_id: "test-track".parse().unwrap(),
@@ -551,8 +453,7 @@ mod tests {
         assert_eq!(snapshot_outcome.exit_code, 1);
         assert!(matches!(
             command_service.recorded.lock().unwrap().as_slice(),
-            [AdrBaselineCommand::Snapshot { timestamp, .. }]
-                if timestamp.as_str() == "2026-07-16T00:00:00Z"
+            [AdrBaselineCommand::Snapshot { .. }]
         ));
 
         let check_outcome = driver
@@ -563,42 +464,31 @@ mod tests {
     }
 
     #[test]
-    fn test_adr_baseline_snapshot_input_is_passive_reason_aware_dto() {
-        let source = include_str!("adr_baseline.rs");
-        let dto_source = source
-            .split("pub enum AdrBaselineSnapshotInput")
-            .nth(1)
-            .unwrap()
-            .split("/// Resolved ADR baseline operations")
-            .next()
-            .unwrap();
+    fn test_adr_baseline_snapshot_input_converts_reason_aware_dto_losslessly() {
+        let cases = [
+            (AdrBaselineSnapshotInput::Init, AdrBaselineSnapshotKind::Init),
+            (AdrBaselineSnapshotInput::Cite, AdrBaselineSnapshotKind::Cite),
+            (
+                AdrBaselineSnapshotInput::NewAdr(
+                    NonEmptyString::try_new("approved by user".to_owned()).unwrap(),
+                ),
+                AdrBaselineSnapshotKind::NewAdr(
+                    NonEmptyString::try_new("approved by user".to_owned()).unwrap(),
+                ),
+            ),
+            (AdrBaselineSnapshotInput::NonSemanticFix, AdrBaselineSnapshotKind::NonSemanticFix),
+            (
+                AdrBaselineSnapshotInput::Escalation(
+                    NonEmptyString::try_new("decision needs review".to_owned()).unwrap(),
+                ),
+                AdrBaselineSnapshotKind::Escalation(
+                    NonEmptyString::try_new("decision needs review".to_owned()).unwrap(),
+                ),
+            ),
+        ];
 
-        for required_variant in [
-            "Init,",
-            "Cite,",
-            "NewAdr(NonEmptyString)",
-            "NonSemanticFix,",
-            "Escalation(NonEmptyString)",
-        ] {
-            assert!(dto_source.contains(required_variant));
-        }
-        for forbidden_runtime_path in [
-            "AdrBaselineDriver",
-            "AdrBaselineService",
-            "AdrBaselineQueryService",
-            "AdrBaselineCompositionRoot",
-            "ServiceImpl",
-            "CompatibilityShim",
-            "CompatService",
-            "std::fs::",
-            "std::process::",
-            "std::net::",
-            "std::io::",
-        ] {
-            assert!(
-                !dto_source.contains(forbidden_runtime_path),
-                "snapshot DTO must not retain or call runtime path {forbidden_runtime_path}"
-            );
+        for (input, expected) in cases {
+            assert_eq!(AdrBaselineSnapshotKind::from(input), expected);
         }
     }
 }

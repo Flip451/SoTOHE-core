@@ -1,4 +1,200 @@
 {
   "track_id": "architecture-pattern-placement-guard-realignment-2026-07-24",
-  "records": []
+  "records": [
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CatalogueLinterRuleKind", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "IN-01"}},
+      "reason": "This ValueObject enum represents deterministic catalogue-lint rule discriminants; it contains no candidate-classification behavior for ubiquitous language, invariants, stable cross-operation meaning, or delivery/persistence independence. That semantic-placement intersection is guarded by catalogue grounding and semantic review of the actual candidate, not by an enum test."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CatalogueLinterRuleKind", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "IN-02"}},
+      "reason": "This enum does not classify domain candidates or execute an inbound-reference rejection. The relevant change is structural absence of that rule from the rule vocabulary; exhaustive Rust matching and the configuration codec's unknown-variant rejection guard that absence, while semantic review owns the domain-versus-usecase-boundary judgment."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CatalogueLinterRuleKind", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "IN-07"}},
+      "tests": [{"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_catalogue_linter_rule_kind_has_14_variants_with_distinct_names"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "CatalogueLinterRuleKind", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "AC-01"}},
+      "reason": "This enum only declares deterministic linter rule shapes; it cannot prove that a domain candidate is placed by semantic grounds or that the grounds are reviewable. Catalogue reference signals and semantic review of the candidate and its recorded grounds are the actual guards for that acceptance criterion."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CatalogueLinterRuleKind", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "AC-05"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::tddd::fs_lint_config_loader::tests", "test_name": "test_shipped_config_and_preset_decode_to_identical_narrowed_primary_adapter_rules"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_catalogue_linter_rule_kind_has_14_variants_with_distinct_names"},
+        {"layer": "usecase", "module_path": "usecase::catalogue_lint_workflow::tests", "test_name": "test_lint_rule_spec_to_domain_converts_all_14_kinds"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CatalogueLinterRuleKind", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "AC-06"}},
+      "tests": [
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_primary_adapter_signature_allows_usecase_boundary_contracts"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_primary_adapter_signature_rejects_entity_and_aggregate_root_exposure"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "CatalogueLinterRuleKind", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "AC-07"}},
+      "tests": [
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_catalogue_linter_rule_kind_has_14_variants_with_distinct_names"},
+        {"layer": "usecase", "module_path": "usecase::adr_baseline::tests", "test_name": "test_adr_baseline_snapshot_uses_clock_port_timestamp"},
+        {"layer": "cli_composition", "module_path": "cli_composition::adr_baseline::tests", "test_name": "adr_baseline_composition_root_is_wiring_only"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "LintRuleKind", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "IN-01"}},
+      "reason": "This usecase boundary DTO carries lint-rule data for conversion; it contains no candidate-classification behavior for ubiquitous language, invariants, stable cross-operation meaning, or delivery/persistence independence. Semantic placement is guarded by catalogue grounding and semantic review of the actual candidate, not by DTO conversion tests."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "LintRuleKind", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "IN-02"}},
+      "reason": "This DTO carries known lint-rule variants but neither classifies candidates nor executes an inbound-reference rejection. Exhaustive conversion and serde unknown-variant rejection guard the structural rule vocabulary; semantic review owns the domain-versus-usecase-boundary judgment."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "LintRuleKind", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "IN-07"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::catalogue_lint_workflow::tests", "test_name": "test_lint_rule_spec_to_domain_converts_all_14_kinds"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "LintRuleKind", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "AC-01"}},
+      "reason": "The DTO's declared conversion boundary cannot prove semantic domain placement or reviewable classification grounds. Catalogue reference signals and semantic review of the candidate and its recorded grounds are the actual guards for this acceptance criterion."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "LintRuleKind", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "AC-05"}},
+      "reason": "Agreement among convention, role matrix, config, preset, tests, guidance, and reviewer briefing is a cross-artifact property, not behavior of this usecase DTO. Catalogue reference signals and the types-scope review are the non-test guards for that agreement."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "LintRuleKind", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "AC-06"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::catalogue_lint_workflow::tests", "test_name": "test_lint_rule_spec_to_domain_converts_all_14_kinds"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_primary_adapter_signature_allows_usecase_boundary_contracts"},
+        {"layer": "domain", "module_path": "domain::tddd::catalogue_linter::tests", "test_name": "test_primary_adapter_signature_rejects_entity_and_aggregate_root_exposure"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "LintRuleKind", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "AC-07"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::catalogue_lint_workflow::tests", "test_name": "test_lint_rule_spec_to_domain_converts_all_14_kinds"},
+        {"layer": "usecase", "module_path": "usecase::adr_baseline::tests", "test_name": "test_adr_baseline_snapshot_uses_clock_port_timestamp"},
+        {"layer": "cli_composition", "module_path": "cli_composition::adr_baseline::tests", "test_name": "adr_baseline_composition_root_is_wiring_only"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "AdrBaselineInteractor", "obligation_kind": "result", "item_identifier": "entry"},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::adr_baseline::tests", "test_name": "test_adr_baseline_snapshot_uses_clock_port_timestamp"},
+        {"layer": "usecase", "module_path": "usecase::adr_baseline::tests", "test_name": "test_adr_baseline_snapshot_propagates_clock_port_failure"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "ClockPort", "obligation_kind": "contract", "item_identifier": "trait_method:now"},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::adr_baseline::tests", "test_name": "test_adr_baseline_snapshot_uses_clock_port_timestamp"},
+        {"layer": "usecase", "module_path": "usecase::adr_baseline::tests", "test_name": "test_adr_baseline_snapshot_propagates_clock_port_failure"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "SystemClockAdapter", "obligation_kind": "contract_conformance", "item_identifier": "trait_impl:usecase::adr_baseline::ClockPort"},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::adr_baseline::tests", "test_name": "test_system_clock_adapter_now_returns_valid_timestamp"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AdrBaselineCommand", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "IN-05"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::adr_baseline::tests", "test_name": "test_adr_baseline_driver_snapshot_maps_typed_input_losslessly"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AdrBaselineCommand", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "AC-03"}},
+      "tests": [
+        {"layer": "cli_driver", "module_path": "cli_driver::adr_baseline::tests", "test_name": "test_adr_baseline_driver_snapshot_maps_typed_input_losslessly"},
+        {"layer": "usecase", "module_path": "usecase::adr_baseline::tests", "test_name": "test_adr_baseline_snapshot_uses_clock_port_timestamp"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AdrBaselineCommand", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "AC-07"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::adr_baseline::tests", "test_name": "test_adr_baseline_driver_snapshot_maps_typed_input_losslessly"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AdrBaselineError", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "IN-04"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::adr_baseline::tests", "test_name": "test_adr_baseline_snapshot_propagates_clock_port_failure"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AdrBaselineError", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "IN-05"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::adr_baseline::tests", "test_name": "test_adr_baseline_snapshot_propagates_clock_port_failure"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AdrBaselineError", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "AC-03"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::adr_baseline::tests", "test_name": "test_adr_baseline_snapshot_propagates_clock_port_failure"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AdrBaselineError", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "AC-07"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::adr_baseline::tests", "test_name": "test_adr_baseline_snapshot_propagates_clock_port_failure"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AdrBaselineDriver", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "IN-03"}},
+      "tests": [
+        {"layer": "cli_driver", "module_path": "cli_driver::adr_baseline::tests", "test_name": "test_adr_baseline_driver_snapshot_maps_typed_input_losslessly"},
+        {"layer": "cli_driver", "module_path": "cli_driver::adr_baseline::tests", "test_name": "test_adr_baseline_driver_query_variants_delegate_losslessly_to_injected_service"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AdrBaselineDriver", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "IN-04"}},
+      "tests": [
+        {"layer": "cli_driver", "module_path": "cli_driver::adr_baseline::tests", "test_name": "test_adr_baseline_driver_new_handle_preserves_rendering"},
+        {"layer": "usecase", "module_path": "usecase::adr_baseline::tests", "test_name": "test_adr_baseline_snapshot_uses_clock_port_timestamp"},
+        {"layer": "usecase", "module_path": "usecase::adr_baseline::tests", "test_name": "test_adr_baseline_snapshot_propagates_clock_port_failure"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AdrBaselineDriver", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "IN-05"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::adr_baseline::tests", "test_name": "test_adr_baseline_driver_new_handle_preserves_rendering"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AdrBaselineDriver", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "AC-02"}},
+      "tests": [
+        {"layer": "cli_driver", "module_path": "cli_driver::adr_baseline::tests", "test_name": "test_adr_baseline_driver_snapshot_maps_typed_input_losslessly"},
+        {"layer": "cli_driver", "module_path": "cli_driver::adr_baseline::tests", "test_name": "test_adr_baseline_driver_query_variants_delegate_losslessly_to_injected_service"},
+        {"layer": "cli_driver", "module_path": "cli_driver::adr_baseline::tests", "test_name": "test_adr_baseline_driver_new_handle_preserves_rendering"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AdrBaselineDriver", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "AC-03"}},
+      "tests": [{"layer": "cli_driver", "module_path": "cli_driver::adr_baseline::tests", "test_name": "test_adr_baseline_driver_new_handle_preserves_rendering"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "AdrBaselineDriver", "anchor_id": {"file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json", "element_id": "AC-07"}},
+      "tests": [
+        {"layer": "cli_driver", "module_path": "cli_driver::adr_baseline::tests", "test_name": "test_adr_baseline_driver_snapshot_maps_typed_input_losslessly"},
+        {"layer": "cli_driver", "module_path": "cli_driver::adr_baseline::tests", "test_name": "test_adr_baseline_driver_new_handle_preserves_rendering"},
+        {"layer": "usecase", "module_path": "usecase::adr_baseline::tests", "test_name": "test_adr_baseline_snapshot_propagates_clock_port_failure"}
+      ]
+    }
+  ]
 }

@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| SystemClockAdapter | secondary_adapter | add | impl ClockPort | 🟡 | 🔵 |
+| SystemClockAdapter | secondary_adapter | add | impl ClockPort | 🔵 | 🔵 |
 

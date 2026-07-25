@@ -4,5 +4,5 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| AdrBaselineDriver | primary_adapter | modify | — | 🟡 | 🔵 |
+| AdrBaselineDriver | primary_adapter | modify | — | 🔵 | 🔵 |
 

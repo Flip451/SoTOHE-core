@@ -1,6 +1,39 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a60b35d9f7a506e8019f8ea91117470de96a1dccd90941ab3efc285d068eafec",
+          "at": "2026-07-25T00:10:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The architecture guard is still source-text based rather than semantic. In particular, forbidding the substring `timestamp` makes a harmless comment such as “does not retain a timestamp provider” fail CI, while aliases or differently named helpers can hide the same forbidden dependency. Whitespace normalization does not fix these false positives/negatives. Replace this with an AST/layer check or collaborator-based behavioral test.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/adr_baseline.rs",
+              "line": 447,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:a60b35d9f7a506e8019f8ea91117470de96a1dccd90941ab3efc285d068eafec",
+          "at": "2026-07-25T00:21:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6256e6438f0751631db9d3286613503d5044aaac967347a75f4effb7539a33c5",
+          "at": "2026-07-25T00:26:52Z"
+        }
+      ]
+    },
     "other": {
       "rounds": [
         {
@@ -30,125 +63,73 @@
           "findings": [],
           "hash": "rvw1:sha256:4d30ff9aadada504d471b4c49db7a86f72f6a22ad3e0551cd100a4641e837a26",
           "at": "2026-07-24T17:38:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:43e788cb8fd93ee9e18dfdf401328ac75190fc94f8703a8b4d59efc6052cc6a4",
+          "at": "2026-07-25T00:10:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:43e788cb8fd93ee9e18dfdf401328ac75190fc94f8703a8b4d59efc6052cc6a4",
+          "at": "2026-07-25T00:23:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6457eec2cc444cfd20741605ae3344937ea3dd5e7df6388197ffd3f280c832c",
+          "at": "2026-07-25T01:07:51Z"
         }
       ]
     },
-    "types": {
+    "adr": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`domain::CatalogueLinterRuleKind`'s `docs` field restates design rationale and behavior (semantic ownership across decoding/evaluation and `discriminant_name` semantics) instead of referring to the upstream contract by anchor only.",
-              "severity": "P1",
-              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/domain-types.json",
-              "line": 91,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`usecase::LintRuleKind`'s `docs` field restates the layer-placement rationale and conversion behavior instead of using an anchor-only reference to the upstream contract.",
-              "severity": "P1",
-              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
-              "line": 1139,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:450290dd43e07c5b67025d6515abb4a9b5f732fee1ff9074585f5ef402476238",
-          "at": "2026-07-24T11:19:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::AdrBaselineCommand` docs restate the behavioral contract that snapshot timestamps are acquired by the interactor rather than the primary adapter; this should reference the upstream spec/ADR anchor without reproducing the contract.",
-              "severity": "P1",
-              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
-              "line": 246,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`usecase::AdrBaselineInteractor` docs restate the snapshot-time policy and restore behavior instead of referring to the upstream contract by anchor.",
-              "severity": "P1",
-              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
-              "line": 375,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`cli_driver::AdrBaselineDriver` docs restate the architectural responsibility split and timestamp-removal behavior instead of using an anchor-only upstream reference.",
-              "severity": "P1",
-              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/cli_driver-types.json",
-              "line": 10,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`cli_composition::AdrBaselineCompositionRoot` docs restate the wiring change and injected-clock behavior instead of using an anchor-only upstream reference.",
-              "severity": "P1",
-              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/cli_composition-types.json",
-              "line": 10,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`infrastructure::SystemClockAdapter` docs restate the adapter's clock sampling and error-conversion behavior instead of using an anchor-only upstream reference.",
-              "severity": "P1",
-              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/infrastructure-types.json",
-              "line": 31,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`usecase::AdrBaselineError` docs restate the clock-dependency behavior represented by the error envelope instead of referring to the upstream contract by anchor.",
-              "severity": "P1",
-              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
-              "line": 315,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:ccd87d272c2ad3828d38e73c65861b3dbe32c92a466c044ef244c9a8f15cefdf",
-          "at": "2026-07-24T11:30:58Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e9ad01129230b6a4743808ae4a490f1b875a0117a55c9435a09ad8a75b943270",
-          "at": "2026-07-24T17:16:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::ClockPort`’s `docs` restates the upstream ownership and timing contract—usecase-owned sampling when `AdrBaselineInteractor` makes the write decision—instead of referencing the relevant spec anchors without reproducing their behavior. This violates `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
-              "line": 203,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:e9ad01129230b6a4743808ae4a490f1b875a0117a55c9435a09ad8a75b943270",
-          "at": "2026-07-24T17:23:38Z"
+          "hash": "rvw1:sha256:2d010ac64b74d391df1e7709cd9c202bc96da4617f216ff1288555b313553105",
+          "at": "2026-07-24T10:12:24Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ba71c0f2273e72f718c5d42a40a7c1514cf12a034ff0439c3a4de9a77a51a5dd",
-          "at": "2026-07-24T17:32:30Z"
+          "hash": "rvw1:sha256:2d010ac64b74d391df1e7709cd9c202bc96da4617f216ff1288555b313553105",
+          "at": "2026-07-24T10:16:29Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cf994521ad019d1e56b5da7d8a053c6eeeeb8f26dafa0bb9a1326b1c6ce01df0",
-          "at": "2026-07-24T19:47:58Z"
+          "hash": "rvw1:sha256:2d010ac64b74d391df1e7709cd9c202bc96da4617f216ff1288555b313553105",
+          "at": "2026-07-24T10:24:36Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cf994521ad019d1e56b5da7d8a053c6eeeeb8f26dafa0bb9a1326b1c6ce01df0",
-          "at": "2026-07-24T19:51:27Z"
+          "hash": "rvw1:sha256:2d010ac64b74d391df1e7709cd9c202bc96da4617f216ff1288555b313553105",
+          "at": "2026-07-24T10:27:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e4eb9b806c09e3c377e70ddcf7781be92184f3e81d9a1d9054a56c907457b93",
+          "at": "2026-07-24T18:18:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e4eb9b806c09e3c377e70ddcf7781be92184f3e81d9a1d9054a56c907457b93",
+          "at": "2026-07-24T18:21:22Z"
         }
       ]
     },
@@ -271,6 +252,315 @@
           "findings": [],
           "hash": "rvw1:sha256:e34b86485f19377711d1d85ef8971aaaa8d42c6a4ea09a3d5237cd8b3465f2c3",
           "at": "2026-07-24T11:33:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`Response` が usecase 境界型として許可されていますが、v5 の DataRole 一覧および R1 配置表に `Response` role が存在せず、catalogue で宣言・検証する方法が定義されていません。`Command`/`Query` と同様に明示的な role を追加するか、既存の `Dto`/別の契約へ統一しないと、type-designer と cli_driver の guidance が実行可能な契約になっていません。",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 59,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8f6bb2b13ef0b18a2559b38d1abe0e4091bd137478f1701b7149dfa3f527fdd1",
+          "at": "2026-07-25T00:11:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f10bee098c984f5a96d503970c6fafd7e6b0a71afa77221cba54c17e44661a9b",
+          "at": "2026-07-25T00:14:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PrimaryAdapter` の `NoRoleInMethodSignature` から `ValueObject` を削除したため、domain 層の ValueObject を cli_driver の公開メソッドシグネチャに直接露出できるようになっています。追加された guidance は Command / Query / boundary Dto の参照だけを許可し、domain ValueObject の漏出を許可していないため、文書上の境界ルールと決定的 lint enforcement が不整合です（同じ設定が preset にも反映されています）。",
+              "severity": "P1",
+              "file": ".harness/catalogue-lint/config.json",
+              "line": 102,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f10bee098c984f5a96d503970c6fafd7e6b0a71afa77221cba54c17e44661a9b",
+          "at": "2026-07-25T00:16:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d2713411ea0e7477569d484cdb3b56399e431c50b95ec6ae68d2cb170be59af",
+          "at": "2026-07-25T00:18:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PrimaryAdapter` の guidance は domain `ValueObject` の直接露出を禁止し、usecase `ValueObject` のみ許可していますが、`NoRoleInMethodSignature` の `forbidden_roles` から `ValueObject` を削除したため、その区別を決定的に enforcement できません。role 名だけでなく参照先 entry の layer を判定できる仕組みがない限り、domain VO が cli_driver の公開シグネチャへ漏出します（同じ不整合が preset にもあります）。",
+              "severity": "P1",
+              "file": ".harness/catalogue-lint/config.json",
+              "line": 100,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:0e58605f1c49cf78ec4b8bf61b3837707166ba935b283fbdc8738e9569e5d94e",
+          "at": "2026-07-25T00:19:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abfb0cff4fdfdbec611d3af2fc46105f5a87ed97bcc7d00b630e4b447570edb5",
+          "at": "2026-07-25T00:21:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The convention and capability define asymmetry only as a necessary condition for choosing a Command/Query split; they do not require every asymmetric pair to be split. This review rule additionally rejects a combined contract whenever such asymmetry exists, turning that condition into a mandatory split and potentially rejecting designs allowed by R1/D7. Remove the merge clause, or first establish the stronger requirement in the upstream convention/spec.",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/types.md",
+              "line": 152,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:abfb0cff4fdfdbec611d3af2fc46105f5a87ed97bcc7d00b630e4b447570edb5",
+          "at": "2026-07-25T00:57:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b77dee54766a47d4a491eb4df7ade13a17b142acba7ef850c094bf9bc4c25f73",
+          "at": "2026-07-25T00:59:47Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::CatalogueLinterRuleKind`'s `docs` field restates design rationale and behavior (semantic ownership across decoding/evaluation and `discriminant_name` semantics) instead of referring to the upstream contract by anchor only.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/domain-types.json",
+              "line": 91,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::LintRuleKind`'s `docs` field restates the layer-placement rationale and conversion behavior instead of using an anchor-only reference to the upstream contract.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
+              "line": 1139,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:450290dd43e07c5b67025d6515abb4a9b5f732fee1ff9074585f5ef402476238",
+          "at": "2026-07-24T11:19:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::AdrBaselineCommand` docs restate the behavioral contract that snapshot timestamps are acquired by the interactor rather than the primary adapter; this should reference the upstream spec/ADR anchor without reproducing the contract.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
+              "line": 246,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::AdrBaselineInteractor` docs restate the snapshot-time policy and restore behavior instead of referring to the upstream contract by anchor.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
+              "line": 375,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`cli_driver::AdrBaselineDriver` docs restate the architectural responsibility split and timestamp-removal behavior instead of using an anchor-only upstream reference.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/cli_driver-types.json",
+              "line": 10,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`cli_composition::AdrBaselineCompositionRoot` docs restate the wiring change and injected-clock behavior instead of using an anchor-only upstream reference.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/cli_composition-types.json",
+              "line": 10,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`infrastructure::SystemClockAdapter` docs restate the adapter's clock sampling and error-conversion behavior instead of using an anchor-only upstream reference.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/infrastructure-types.json",
+              "line": 31,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::AdrBaselineError` docs restate the clock-dependency behavior represented by the error envelope instead of referring to the upstream contract by anchor.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
+              "line": 315,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:ccd87d272c2ad3828d38e73c65861b3dbe32c92a466c044ef244c9a8f15cefdf",
+          "at": "2026-07-24T11:30:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9ad01129230b6a4743808ae4a490f1b875a0117a55c9435a09ad8a75b943270",
+          "at": "2026-07-24T17:16:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::ClockPort`’s `docs` restates the upstream ownership and timing contract—usecase-owned sampling when `AdrBaselineInteractor` makes the write decision—instead of referencing the relevant spec anchors without reproducing their behavior. This violates `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/usecase-types.json",
+              "line": 203,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:e9ad01129230b6a4743808ae4a490f1b875a0117a55c9435a09ad8a75b943270",
+          "at": "2026-07-24T17:23:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba71c0f2273e72f718c5d42a40a7c1514cf12a034ff0439c3a4de9a77a51a5dd",
+          "at": "2026-07-24T17:32:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf994521ad019d1e56b5da7d8a053c6eeeeb8f26dafa0bb9a1326b1c6ce01df0",
+          "at": "2026-07-24T19:47:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf994521ad019d1e56b5da7d8a053c6eeeeb8f26dafa0bb9a1326b1c6ce01df0",
+          "at": "2026-07-24T19:51:27Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The fixture creates only `track/items` and invokes `check-review` for a nonexistent track, but the CLI resolves the track through `resolve_for_read` before reaching the ADR-baseline driver. This causes an early track-resolution error instead of the asserted `PrimaryInitUnavailable` outcome, so the test does not exercise the intended public contract and fails against the current implementation. Create a valid track fixture (with metadata) while keeping the ADR ledger empty.",
+              "severity": "P1",
+              "file": "apps/cli/tests/adr_baseline_cli_contract.rs",
+              "line": 12,
+              "category": "incorrect test fixture / missing contract coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:97e5f9b917bd6c262f3ff67449bc4090111457e585ec8cbcaad3a7177cb77170",
+          "at": "2026-07-25T00:11:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The metadata fixture omits the required/semantically significant `branch: null` field used by the repository’s branchless integration fixtures. With an explicit `--track-id`, track resolution may reject the fixture or apply branch-guard behavior before the ADR-baseline driver is reached, so the test is not deterministic across environments. Add `\"branch\": null` to make the missing-track fixture explicitly branchless.",
+              "severity": "P1",
+              "file": "apps/cli/tests/adr_baseline_cli_contract.rs",
+              "line": 24,
+              "category": "nondeterministic fixture"
+            }
+          ],
+          "hash": "rvw1:sha256:252e4348a65df2e7e27b20896f29b9e968a4b4dcbc1bafca37e685a5acf299a4",
+          "at": "2026-07-25T00:14:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7be41742d2669aa73234df6c057e6e2de7d5248665f297687cbb65182d1a85a",
+          "at": "2026-07-25T00:16:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7be41742d2669aa73234df6c057e6e2de7d5248665f297687cbb65182d1a85a",
+          "at": "2026-07-25T00:21:19Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8dc5f41e329d9328f61a695137e96c8edb55f3cbc035def87e525ac2eafb1f8",
+          "at": "2026-07-25T00:11:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b8dc5f41e329d9328f61a695137e96c8edb55f3cbc035def87e525ac2eafb1f8",
+          "at": "2026-07-25T00:21:49Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4962bcf2a34011601530b68b8a6b350fbdc83ad50c3350c2e2725016967658c",
+          "at": "2026-07-25T00:10:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a4962bcf2a34011601530b68b8a6b350fbdc83ad50c3350c2e2725016967658c",
+          "at": "2026-07-25T00:21:37Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b92dd7818f1392506b146967b61a3581ed6a8d797ff7f36880a3f247728e0179",
+          "at": "2026-07-25T00:10:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b92dd7818f1392506b146967b61a3581ed6a8d797ff7f36880a3f247728e0179",
+          "at": "2026-07-25T00:20:46Z"
         }
       ]
     },
@@ -404,52 +694,177 @@
           "findings": [],
           "hash": "rvw1:sha256:f313b12dbce03d91d540ecec1d8e44fecc981c7500bbdeec469c33db83392876",
           "at": "2026-07-24T20:05:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001–T007 descriptions restate upstream behavior contracts in prose (for example, identifier preservation and tuple fallback in T001, CQRS/Primary Adapter rules in T002–T003, clock/error semantics in T004–T006, and CLI-observable outcomes in T007). Reduce each to target + operation + anchor cite per no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The plan summary restates upstream goals and acceptance behavior, including GO-01/GO-02 delivery claims and AC-08/AC-09 preservation details. Keep the summary as task/anchor traceability rather than repeating design rationale or behavior contracts.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The plan section descriptions repeat upstream behavior contracts, including normalization/fallback behavior, policy semantics, clock/error behavior, and CLI output expectations. Replace these with target + operation + anchor cite only.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 52,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:bcd6b34f6c9a750b4b17bafbf13a9e5771635628ba96277db9a1a24f742cb7e9",
+          "at": "2026-07-25T00:10:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db01dfc67f54946487a1aa98f8f110e05224cc95518d9e0d088e4bcaf90ab12e",
+          "at": "2026-07-25T00:16:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 is non-executable: “Update type-design conventions, capability guidance, and reviewer prompts…” names artifact classes but no target file or symbol. The executor must invent which convention, capability, and prompts are in scope; add their exact paths while retaining the operation and anchor cites.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 11,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003 is non-executable: “catalogue-lint domain and usecase rules, configuration, presets, fixtures, and regression tests” does not identify any target file or symbol despite spanning several layers and configuration artifacts. Add the exact paths or symbols so the task boundary is unambiguous.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 16,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T005 is non-executable because “infrastructure ADR-baseline clock adapter, exports, and unit tests” identifies neither a file nor an exact symbol. Name the relevant infrastructure paths or `SystemClockAdapter` target so the executor need not infer the boundary.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 26,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T006 is non-executable: “ADR-baseline driver and composition-root clock wiring” supplies no target file or exact symbol. Name the CLI-driver and CLI-composition paths or the affected symbols before the anchor cites.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 31,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T007 is non-executable because it does not name the integration-test files or test symbols to add. “ADR-baseline clock-flow and CLI-contract integration tests” leaves the executor to invent their locations; include the two exact test paths while retaining the operation and anchors.",
+              "severity": "P1",
+              "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/impl-plan.json",
+              "line": 36,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:db01dfc67f54946487a1aa98f8f110e05224cc95518d9e0d088e4bcaf90ab12e",
+          "at": "2026-07-25T00:22:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b6753c661c2e8a5dcdcf150449564ac8f0b6371c70ad130187eb500a7dc7730a",
+          "at": "2026-07-25T00:31:46Z"
         }
       ]
     },
-    "adr": {
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2d010ac64b74d391df1e7709cd9c202bc96da4617f216ff1288555b313553105",
-          "at": "2026-07-24T10:12:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2d010ac64b74d391df1e7709cd9c202bc96da4617f216ff1288555b313553105",
-          "at": "2026-07-24T10:16:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2d010ac64b74d391df1e7709cd9c202bc96da4617f216ff1288555b313553105",
-          "at": "2026-07-24T10:24:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2d010ac64b74d391df1e7709cd9c202bc96da4617f216ff1288555b313553105",
-          "at": "2026-07-24T10:27:20Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The version-1 config DTO does not use `#[serde(deny_unknown_fields)]` and omits `schema_version`, so the full decode silently accepts unknown top-level fields (including future/typoed keys). This violates the fail-closed versioned-schema boundary and can allow incompatible configuration to be treated as valid. Include the validated schema field in a strict DTO (or otherwise explicitly reject unknown top-level fields).",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/fs_lint_config_loader.rs",
+              "line": 34,
+              "category": "serde codec break"
+            }
+          ],
+          "hash": "rvw1:sha256:1a803b54679949423ccb4bbffa538ddd2554fa44316825240d1aed15da296b98",
+          "at": "2026-07-25T00:10:50Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0e4eb9b806c09e3c377e70ddcf7781be92184f3e81d9a1d9054a56c907457b93",
-          "at": "2026-07-24T18:18:45Z"
+          "hash": "rvw1:sha256:aba4617ae477a18de1156bf1a8c3c65f31c832ba83ede9e5fafe7ce9b6e83502",
+          "at": "2026-07-25T00:14:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Synthetic parameter names are not checked against existing identifiers. For example, `fn f((left, right): Pair, arg_0: Tail)` is exported with two parameters named `arg_0`, corrupting the catalogue signature. Reserve all original valid names and choose deterministic collision-free fallback names.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/schema_export/extract.rs",
+              "line": 260,
+              "category": "schema-export correctness"
+            },
+            {
+              "message": "The loader reads an arbitrarily large `--rules-file` entirely into memory before validating it. A large file can exhaust memory and terminate the process. Enforce a maximum config size using metadata plus a bounded reader, rejecting oversized input with a typed error.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/fs_lint_config_loader.rs",
+              "line": 67,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:aba4617ae477a18de1156bf1a8c3c65f31c832ba83ede9e5fafe7ce9b6e83502",
+          "at": "2026-07-25T00:23:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`File::open` follows symlinks and accepts non-regular files without validation. A symlinked default lint config can redirect enforcement to externally mutable rules, while a FIFO/device can block despite the byte limit. Follow the fail-closed pattern in `scope_config_loader.rs`: inspect with `symlink_metadata`, reject symlinks and non-regular files, then open the validated path.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/fs_lint_config_loader.rs",
+              "line": 71,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:6e90b0bdcc3e588c495c2cb8e52957bc002fb25e8577e249f876ee325f48b6a7",
+          "at": "2026-07-25T00:40:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The symlink guard checks only the final path component. `symlink_metadata()` follows symlinked parent directories, and Unix `O_NOFOLLOW` also protects only the final component, so a path such as `linked-dir/config.json` can still redirect lint enforcement to an external file. Reject symlinks across every component using the `reject_symlinks_below` pattern from `scope_config_loader.rs`, and add a symlinked-parent regression test.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/fs_lint_config_loader.rs",
+              "line": 79,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:ef3321aa5fe96aaea5e68113d9498b01f99cc45fe68db9a3fc60013f632f7e4d",
+          "at": "2026-07-25T00:45:31Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:0e4eb9b806c09e3c377e70ddcf7781be92184f3e81d9a1d9054a56c907457b93",
-          "at": "2026-07-24T18:21:22Z"
+          "hash": "rvw1:sha256:e6b4055dd104a659c4b7d2dae9254ba6e4bc7d25f7bc40ead4e51cbc9807bf16",
+          "at": "2026-07-25T00:54:45Z"
         }
       ]
     }
