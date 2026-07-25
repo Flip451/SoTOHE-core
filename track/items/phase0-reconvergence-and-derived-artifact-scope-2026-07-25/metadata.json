@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "phase0-reconvergence-and-derived-artifact-scope-2026-07-25",
+  "title": "Phase 0 Reconvergence Lane and Derived-Artifact Review Scope",
+  "branch": "track/phase0-reconvergence-and-derived-artifact-scope-2026-07-25",
+  "created_at": "2026-07-25T07:53:01Z",
+  "updated_at": "2026-07-25T07:53:01Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

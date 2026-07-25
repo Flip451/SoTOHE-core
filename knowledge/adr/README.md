@@ -176,6 +176,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [ADR-baseline の review 入口検査を init 刻印の存在確認のみに縮小する](2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md) | Proposed | 2026-07-17 |
 | [adr2pr 終端に ADR baseline diff の PR コメント投稿フェーズを追加](2026-07-18-0340-adr2pr-baseline-diff-comment.md) | Proposed | 2026-07-18 |
 | [入力決定と pipeline 産決定の二箱分離](2026-07-19-0616-two-box-decision-separation.md) | Proposed | 2026-07-19 |
+| [Phase 0 承認後に修正が入った場合は承認前へ戻して再収束する](2026-07-25-0716-phase0-post-approval-reconvergence-lane.md) | Proposed | 2026-07-25 |
 
 ### ドキュメント運用
 
@@ -269,3 +270,4 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [内容レビューの SoT 別スコープ化](2026-06-30-1549-per-sot-review-scope.md) | — | 2026-06-30 |
 | [レビュー負荷軽減 — findings 全件報告と下流 artifact の再記述禁止](2026-07-02-1600-review-load-batch-findings-no-restatement.md) | — | 2026-07-02 |
 | [レビュー指示書のカテゴリ閉列挙を半開形式へ改める](2026-07-23-0109-review-briefing-open-category-format.md) | Proposed | 2026-07-23 |
+| [機械導出される義務成果物を review 運用成果物として扱う](2026-07-25-0715-derived-obligation-artifact-review-scope.md) | Proposed | 2026-07-25 |
