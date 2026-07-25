@@ -47,10 +47,8 @@ Sub-workflows used:
 Before executing the state machine, register the following items as a task list so progress
 stays visible across phases and back-and-forth loops:
 
-1. Phase 0 — invoke `init` workflow, then the ADR-baseline `review` loop (stamp-free
-   in-place convergence with per-edit guardian judgment) through user adjudication, the
-   boundary review-refinement stamp, staging, and the ADR-baseline commit (closing the
-   Phase 0 adjudication boundary)
+1. Phase 0 — invoke `init`, ADR-baseline `review`, and ADR-baseline `commit` in that order,
+   following `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`
 2. Phase 1 loop — invoke `spec-design` workflow, evaluate spec → ADR signal, escalate on 🔴
    (delta-candidate lane — the input box is frozen after the boundary)
 3. Phase 2 loop — invoke `type-design` workflow, evaluate type → spec signal per layer, escalate on 🔴
@@ -86,7 +84,7 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
 
 | Phase | Workflow | Writer capability | Gate |
 |-------|----------|-------------------|------|
-| 0 | `init` → `review` → `commit` | orchestrator (direct) | init identity, ADR-baseline `zero_findings` or adjudication-ready → user adjudication → final `zero_findings`, and ADR-baseline commit |
+| 0 | `init` → `review` → `commit` | orchestrator (direct) | the governing convention's Phase 0 gates, then ADR-baseline commit |
 | 1 | `spec-design` | spec-designer | spec → ADR signal (🔵🟡🔴) |
 | 2 | `type-design` | type-designer | type → spec signal, per layer (🔵🟡🔴) |
 | 3 | `impl-plan` | impl-planner | task-coverage binary gate (OK / ERROR) |
@@ -97,36 +95,12 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
    the direct ADR source filename to designate. `init` records that exact filename through its
    `--kind init` snapshot step; that ledger record becomes the primary designation. On ERROR,
    stop and report.
-2. Invoke the `review` workflow for the ADR baseline. During the loop, input-box ADRs are
-   converged in place: adr-editor applies each fix, adr-diagnoser judges the applied edit
-   immediately (decision-preserved → retained; decision-breaking → reverted, with the
-   alternative / no-change rationale relayed verbatim to the reviewer). Do not stamp during
-   the loop. On `zero_findings` or the Phase 0 `adjudication-ready` exception, present the init-stamp diff, every guardian-withheld
-   proposal, and every hearing-required proposal with its grounds to the user for the Phase 0 adjudication required by
-   `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`. Present the
-   diff content itself in the user-visible chat body (changed hunks verbatim or faithfully
-   summarized hunk by hunk); tool output or file references alone do not satisfy the
-   presentation requirement.
-3. After approval: when the adjudication decided a NEW decision in the hearing (including
-   a semantic need on a post-merge input ADR), first have adr-editor implement the hearing
-   (append to the pre-merge input ADR, or author the new ADR file with hearing-grounded
-   `user_decision_ref`), obtain `hearing-conformant` from its conformance re-audit, and only
-   then init-stamp any new file so it joins the input box. A `deviating` verdict reverts the
-   edit and returns to the user; it never stamps. Then, for every input-box source whose
-   converged text differs from that source's own init record, have
-   adr-editor apply the approval `user_decision_ref` to the affected decisions, pass the
-   adr-diagnoser re-audit, reconverge the current hash through a fresh review (findings
-   that would change the adjudicated text semantically return to the user), then record one
-   boundary review-refinement stamp for each such source — its required reason carries only
-   the self-contained refinement explanation and the guardian verdict summary (transitional measure until the
-   review-refinement kind is implemented: use the existing escalation kind with the reason
-   opening declaring a review-refinement record). When a source's converged text equals its
-   own init record, no extra stamp is made for that source. The boundary stamps change the protected baseline ledger,
-   so re-run the review workflow to `zero_findings` after the stamp (or after confirming no
-   stamp was needed) before staging; this refreshes the review hash against the final Phase 0
-   operational artifacts.
-4. Run `bin/sotp git add-all` and invoke the `commit` workflow for the ADR baseline. The
-   commit gate's byte comparison uses the just-recorded boundary stamp (or init). Its
+2. Invoke the `review` workflow for the ADR baseline, then follow
+   `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権` for Phase 0
+   convergence, user adjudication, and boundary-stamp preparation — up to but excluding the
+   ADR-baseline commit, which step 3 performs. That convention is the sole normative source
+   for this phase; do not restate or alter its procedure here.
+3. Run `bin/sotp git add-all` and invoke the `commit` workflow for the ADR baseline. Its
    success closes the Phase 0 adjudication boundary; the input box is frozen from here to
    track end. Mark Phase 0 `completed` only after that guarded commit succeeds; then
    proceed to Phase 1. The commit workflow owns its message and other commit preconditions.
@@ -225,7 +199,7 @@ capability's domain expert judgment. Each capability is the domain expert for it
 
 | Gate style | Phases | Signals |
 |------------|--------|---------|
-| ADR-baseline review + user adjudication + commit | Phase 0 after `init` | `zero_findings` → adjudicate → stamp as required → commit |
+| ADR-baseline review + user adjudication + commit | Phase 0 after `init` | `knowledge/conventions/pre-track-adr-authoring.md` の手順に従い → commit |
 | SoT Chain signal (🔵🟡🔴) | Phase 1, Phase 2 | Blue = pass, Yellow = warn + proceed, Red = escalate |
 | Binary check (OK / ERROR) | Phase 0 `init`, Phase 3 | OK = pass, ERROR = re-invoke or stop |
 

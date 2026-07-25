@@ -46,12 +46,11 @@ or failure-recovery procedures here.
 
 ### (4) Autonomy boundary (Phase 0 user approval)
 
-- The workflow SSoT's fully-autonomous constraint carries one mandated exception per
-  `knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権: when the
-  Phase 0 ADR-baseline review reaches `zero_findings`, STOP and escalate to the user with the
-  init-stamp diff and any guardian-withheld proposals for approval. Only after the user
-  approves may the post-approval stamp and the ADR-baseline commit proceed. The only other
-  pause is inherited from the delegated `$track-pr-review` workflow: recording Accepted
+- The workflow SSoT's autonomy constraint yields to the Phase 0 interaction boundary governed
+  by `knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権. That
+  convention is the sole normative source for Phase 0; this skill states no procedure of its
+  own for that phase. The only
+  other pause is inherited from the delegated `$track-pr-review` workflow: recording Accepted
   Deviations at its terminal state requires that workflow's explicit user approval. No other
   step pauses for user confirmation; the invocation-time input acquisition (skill note 1)
   happens before Step 1 begins and is outside this pause accounting.

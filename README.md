@@ -113,6 +113,8 @@ cargo make init           # Git 初期化 + lockfile / 初回 commit + bootstrap
 
    引数は両方とも任意で、省略した値は会話文脈から解決され、`/track:init` へ渡す前に user が 1 回確認する（候補が複数なら選択を、候補がなければ値の直接指定を求める）。明示指定時はその値が優先される。このコマンドは `/track:init`（主 ADR を designation する init baseline 記録を含む）→ ADR baseline の `/track:review` / `/track:commit` → `/track:spec-design` / `/track:type-design` / `/track:impl-plan` → 計画 artifact の review / commit → `/track:full-cycle` → `/track:pr-review` を順に実行し、PR を開いた状態で停止する。baseline 不一致や必要な刻印の欠落は review、commit、PR CI で block される。
 
+   Phase 0 では、user が収束した ADR 文面を承認した後にその文面が修正される場合、以前の承認は修正後の文面に引き継がれない。workflow は承認前の収束 loop に戻り、findings を収束させた修正後の全文を user へ再提示して再承認を得てから裁定境界を閉じる。詳細な規範は `knowledge/conventions/pre-track-adr-authoring.md` を参照する。
+
 ### コマンドを個別に使う場合
 
 ```text

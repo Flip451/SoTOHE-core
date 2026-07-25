@@ -1,0 +1,527 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0ce9f7d4f27c0f6b665e56b4c5c2e1557c8d6db936c986fe2c98e0ddfdefeacd",
+          "at": "2026-07-25T07:56:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "「user 裁定へ戻す条件は…対立が解消しない場合に限る」は、直後の「`adjudication-ready` 経路の扱いは現行のまま」と矛盾します。現行経路は守護者との対立だけでなく、新決定が必要な finding も user-present hearing へ送ります。承認後に新決定が必要と判明した場合、それを user に戻すのか除外するのかが決定できません。",
+              "severity": "P1 (MEDIUM)",
+              "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+              "line": 41,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:0ce9f7d4f27c0f6b665e56b4c5c2e1557c8d6db936c986fe2c98e0ddfdefeacd",
+          "at": "2026-07-25T08:02:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 embeds extensive workflow/implementation procedure (adr-editor/adr-diagnoser actions, rollback behavior, user-routing conditions, front-matter application, boundary stamps, and gate handling) instead of recording only the policy decision. This operational detail obscures the decision and belongs in the convention/workflow SSoT; delegate to those documents rather than prescribing it here.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+              "line": 34,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:2a59bd44f0a76670c22086a60b79cb26924641331862735c7231beb3e2fe171c",
+          "at": "2026-07-25T08:07:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "承認後の fresh review finding を通常レーンで user 裁定なしに適用可能とする決定は、`pre-track-adr-authoring.md` の Phase 0 手順3（承認済み文面への意味変更が必要な finding は自己解決せず user 裁定へ戻す）および入力 ADR の意味は user に属するという既存方針と矛盾する。Consequences でも承認済み文面の意味変更が guardian 判定だけで採用されうることを認めており、Phase 0 の裁定境界を実質的に弱めている。承認後に通常レーンへ戻せるのは非意味的修正または決定保存的な修正に限定し、意味変更は従来どおり user 裁定または delta 候補へ送る必要がある。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+              "line": 35,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:dd9cddb5593283b08bdbbd536f9d3d5832f174989aa4a7b9b1ea82daf66f615e",
+          "at": "2026-07-25T08:13:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 permits meaning-changing edits to an already user-approved ADR to be adopted through guardian review without renewed user adjudication. This contradicts the existing Phase 0 boundary and ADR decision-freeze policy: only non-semantic or decision-preserving edits may remain in the in-place lane; edits that alter the effective decision must be restored and sent to user adjudication (or a delta/hearing path). The Negative consequence explicitly confirms this unsafe behavior.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+              "line": 45,
+              "category": "inconsistent decisions"
+            }
+          ],
+          "hash": "rvw1:sha256:dd9cddb5593283b08bdbbd536f9d3d5832f174989aa4a7b9b1ea82daf66f615e",
+          "at": "2026-07-25T08:22:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e781a5ba1cb146b17cb60e3e97b7d41dba65f14b5d90c08669f5e35eaf7e530e",
+          "at": "2026-07-25T08:34:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR の実際の決定は「承認後に修正が入ったら承認前へ戻して再収束する」ですが、索引タイトルは「通常のガーディアン・レーンで処理する」と逆の内容を示しています。リンク先 ADR の現タイトル／D1 に合わせて索引ラベルを更新してください。",
+              "severity": "P1",
+              "file": "knowledge/adr/README.md",
+              "line": 179,
+              "category": "broken narrative reference"
+            }
+          ],
+          "hash": "rvw1:sha256:e781a5ba1cb146b17cb60e3e97b7d41dba65f14b5d90c08669f5e35eaf7e530e",
+          "at": "2026-07-25T08:38:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eab008d4d33315bcbf9a181393891b3d3b8aa2a7bdcb40584df700b5f9de9170",
+          "at": "2026-07-25T08:57:06Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The regression test hard-codes the current track ID in both the `TrackId` and file paths, so it depends on this track's temporary state and will become brittle when the track is archived or renamed. Use a stable fixture-style track ID independent of the active track.",
+              "severity": "P1",
+              "file": "libs/infrastructure/tests/review_scope_shipped_config.rs",
+              "line": 81,
+              "category": "test reliability"
+            }
+          ],
+          "hash": "rvw1:sha256:fa980e2aa73c1cdc958e2c905bd2c1d62753c0f94cb0eedfe65fc7d9fd9bc5c5",
+          "at": "2026-07-25T10:37:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The regression test hard-codes the current track ID in its `TrackId` and paths, making it dependent on temporary track state and brittle when the track is renamed or archived. Use a stable fixture-style track ID instead.",
+              "severity": "P1",
+              "file": "libs/infrastructure/tests/review_scope_shipped_config.rs",
+              "line": 81,
+              "category": "test reliability"
+            }
+          ],
+          "hash": "rvw1:sha256:bdd46b2cb4aea2ee60b35910603434bf9dc5bd410ba004948c504d9be81a18ad",
+          "at": "2026-07-25T10:38:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdd46b2cb4aea2ee60b35910603434bf9dc5bd410ba004948c504d9be81a18ad",
+          "at": "2026-07-25T10:39:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdd46b2cb4aea2ee60b35910603434bf9dc5bd410ba004948c504d9be81a18ad",
+          "at": "2026-07-25T10:40:54Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0565c0777401d3113c8f38a393e7c4d17eeeef1a3c81d546a5c322deea65cb9",
+          "at": "2026-07-25T10:02:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b0565c0777401d3113c8f38a393e7c4d17eeeef1a3c81d546a5c322deea65cb9",
+          "at": "2026-07-25T10:05:07Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c8accf47afd807f903cd0f95c33af97f16f342776c94bb073245c34ba3b1feb",
+          "at": "2026-07-25T10:02:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c8accf47afd807f903cd0f95c33af97f16f342776c94bb073245c34ba3b1feb",
+          "at": "2026-07-25T10:04:57Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03c5fd6830eb3d6aa93de90ba3c8a90862bff44c948ae638515760b25da785a9",
+          "at": "2026-07-25T10:37:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "境界刻印後の final review gate が失われています。旧 workflow は review-refinement 刻印後（刻印不要の場合もその確認後）に、最終的な Phase 0 operational artifacts を対象として review を再度 zero_findings まで通してから staging するよう定めていました。しかし、唯一の手順源となったこの convention は刻印から直接 ADR-baseline commit へ進むため、刻印前の review 結果のまま commit できます。刻印後・staging 前の fresh review を手順 4 に移してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 54,
+              "category": "gate-consistency"
+            },
+            {
+              "message": "`Fully autonomous` 制約が Phase 0 の必須 user interaction と矛盾しています。ここでは全 step で user confirmation を禁止していますが、同 workflow の Constraint 5 と governing convention は Phase 0 の裁定・再承認で停止するよう要求します。今回、旧 Constraint 5 にあった「Constraint 2 の例外」という明示が削除されたため、この制約に従う実行者は user 承認を飛ばして staging し得ます。Constraint 2 を convention-defined Phase 0 interaction と継承した pr-review 承認で明示的に修飾してください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 258,
+              "category": "workflow-contradiction"
+            },
+            {
+              "message": "convention を唯一の規範源と宣言した直後に、承認前ループへの復帰・旧承認の不使用・全文再承認という手順を再定義しています。同じ重複が plan workflow、両 Claude adapter、両 Codex skill にも残っており、T2/T3 の「参照のみ」に反して複数の normative contract を維持する状態です。workflow 固有の呼出順序だけを残し、これら 6 ファイルの Phase 0 手順文は convention 参照へ縮退してください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 103,
+              "category": "responsibility-boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:03c5fd6830eb3d6aa93de90ba3c8a90862bff44c948ae638515760b25da785a9",
+          "at": "2026-07-25T10:42:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f3ba4e26bb80d9424f2b504d9db612bee5b52d19a1e980fa90781ba46c86d7b",
+          "at": "2026-07-25T10:46:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "境界刻印後の final review が ADR 文面の修正を要求した場合の合法な回復経路がありません。この手順は先行手順へ戻るよう指示しますが、同時に review-refinement 刻印を input-box source ごとに「一度だけ」と制限しています。既存刻印後に ADR を修正すると最新 ledger copy と current bytes が不一致になり、2 回目の刻印は禁止されるため `check-commit` を通せません。既存刻印をどう supersede するか、または同等の sanctioned recovery を規範として定義してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 54,
+              "category": "convention-contradiction"
+            },
+            {
+              "message": "Phase 0 gate の要約が新しい post-stamp final review と同期していません。この表は `zero_findings → adjudicate → stamp → commit` と指示し、convention の Good example も刻印から直接 commit へ進んでいますが、手順 4 は刻印後に fresh review を zero_findings まで通すことを必須化しました。実行者が要約に従って final review を飛ばさないよう、gate 表と example の両方へ post-stamp zero_findings を追加してください。",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 202,
+              "category": "workflow-sync"
+            }
+          ],
+          "hash": "rvw1:sha256:5f3ba4e26bb80d9424f2b504d9db612bee5b52d19a1e980fa90781ba46c86d7b",
+          "at": "2026-07-25T10:49:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "境界刻印後の final review が ADR 文面の修正を要求した場合、Phase 0 を完了できません。この手順は先行する収束・再承認へ戻るよう指示しますが、同じ規範は review-refinement 刻印を source ごとに一度だけと制限しています。既存刻印後に ADR を修正すると current bytes が最新 ledger copy と不一致になり、2 回目の刻印は禁止されるため `check-commit` を通せません。既存刻印を supersede する sanctioned recovery、または同等の一貫した境界処理を定義してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 54,
+              "category": "convention-contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:7418fa3d21ce901bf03379c7ce9c3fbd1917181c513756c4598e17dde627a453",
+          "at": "2026-07-25T10:53:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 0716 D1 explicitly leaves boundary stamping unchanged, but this procedure now allows another review-refinement stamp for the same source after each failed final-review attempt. That changes the established once-per-source ledger contract and exceeds the track’s approved scope. Preserve the existing stamping semantics or obtain an ADR decision authorizing the multi-stamp recovery path.",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 54,
+              "category": "decision-conformance"
+            }
+          ],
+          "hash": "rvw1:sha256:44562b8881916417792b539ac5067d258dac3fd8c43a8036c4f9e0317561007d",
+          "at": "2026-07-25T10:58:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 4 forbids an additional boundary stamp after the final review sends execution back to the pre-approval loop. That loop can change the ADR text after the existing review-refinement stamp, leaving the ledger stamp/hash stale; the subsequent byte-comparison commit gate can then fail or, worse, lack a stamp representing the final user-approved text. Recompute/replace the per-source boundary stamp after the final reconvergence, or explicitly invalidate and recreate it before staging.",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 54,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:662198791470be12d1d6f9ff6aca3e5d4b12357f3ec03399e5b6bd38097572cb",
+          "at": "2026-07-25T10:59:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The convention still forbids any additional boundary stamp after final review sends execution back to the pre-approval loop. That loop may change ADR text after the existing review-refinement stamp, leaving the ledger stamp/hash stale and causing the commit byte-comparison gate to reject the final user-approved text (or leaving no stamp for it). The boundary-stamp lifecycle must be defined so the final approved text is stamped before staging.",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 54,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:f8cab49c7c100cfc938988595a0058e79014accc7f92b70f960bfb221187e481",
+          "at": "2026-07-25T11:01:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dd62522b1a8df6ff2aa22d973e0b5d7dd8dbeb68a9c015c1f69d37487029e834",
+          "at": "2026-07-25T11:03:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b45260eb81a6e2866381a14a7da6a73d1ae900360aef196997ac58c209b9add6",
+          "at": "2026-07-25T11:08:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3404d58aa308eaeac32ce33105aed3bb167fbdad47c45b32d978883e4ab24458",
+          "at": "2026-07-25T11:24:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3404d58aa308eaeac32ce33105aed3bb167fbdad47c45b32d978883e4ab24458",
+          "at": "2026-07-25T11:29:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "手順3に追加された「本文修正の前に承認 `user_decision_ref` を承認前の grounding へ復元する」という要件は、ADR 0716 D1 が定める再収束・再承認の範囲を超えており、復元先となる具体的な grounding や復元方法も定義されていません。既存の front-matter 根拠を何へ置換・削除するかが不明なため、実装者ごとに異なる状態を作り、承認記録の所在を front-matter に置く既存決定とも衝突し得ます。D1 にないこの追加機構を規範化するなら ADR で明示的に決定し、そうでなければ「承認済み状態を解除して手順2へ戻る」など既存決定に対応する表現へ修正してください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 53,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6aab139316b57c1e13c0e7038554a19ca3a16938d7d167f555a1e025208ae4ad",
+          "at": "2026-07-25T11:48:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:36a6415ed3b50b55b4a9a47941930b8ff8861b223eb18730148ac75674deab9b",
+          "at": "2026-07-25T11:51:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "「承認前の grounding へ復元」しても 🔵 を防げません。通常の pre-track ADR は承認前から `user_decision_ref` を持ち得るため、その値へ戻した後に本文を変更しても、`review_finding_ref` がなければ evaluator は引き続き 🔵 と判定します。本文修正前に `review_finding_ref` など必ず非承認状態へ落とす grounding を要求し、再承認後だけ昇格させる必要があります。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 53,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:36a6415ed3b50b55b4a9a47941930b8ff8861b223eb18730148ac75674deab9b",
+          "at": "2026-07-25T11:56:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8c0dd3f3f189ce77d6b1b21f873d8abb8534b881a0cf4dfa1bcaab9c14fc5b2a",
+          "at": "2026-07-25T11:59:45Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d10797f06d05b03f1f24aa4b76de66b84c981eb38bfb03aa7d841d8bc156796",
+          "at": "2026-07-25T10:02:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0d10797f06d05b03f1f24aa4b76de66b84c981eb38bfb03aa7d841d8bc156796",
+          "at": "2026-07-25T10:05:29Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T1 description includes upstream behavioral restatement: “to make the convention the Phase 0 post-approval reconvergence source of truth.” Keep only target, operation, and anchor cites; see no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/phase0-reconvergence-and-derived-artifact-scope-2026-07-25/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T2 description includes upstream behavioral restatement: “with the convention-owned Phase 0 reconvergence route.” Keep only target, operation, and anchor cites; see no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/phase0-reconvergence-and-derived-artifact-scope-2026-07-25/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T3 description includes upstream behavioral restatement: “with the convention-owned Phase 0 reconvergence route.” Keep only target, operation, and anchor cites; see no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/phase0-reconvergence-and-derived-artifact-scope-2026-07-25/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T4 description includes upstream behavioral restatement: “for the operational obligations artifact boundary.” Keep only target, operation, and anchor cites; see no-upstream-restatement.md.",
+              "severity": "P1",
+              "file": "track/items/phase0-reconvergence-and-derived-artifact-scope-2026-07-25/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:9e5d8df271edad6d67f9b5024c054996ee2982d8b441cd036b3bea8749319b92",
+          "at": "2026-07-25T10:02:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a5b0acc00db5581f879ca56fa6fce66f519e995f1d941b6d82241dad4ba4acdc",
+          "at": "2026-07-25T10:05:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T1 is not executable as written: “its maintained maintainer-guidance surfaces” does not identify the files or symbols to update, so the implementer must invent the task boundary. Enumerate those targets explicitly while retaining the existing anchor cites.",
+              "severity": "P1",
+              "file": "track/items/phase0-reconvergence-and-derived-artifact-scope-2026-07-25/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T4 does not identify the file or test symbol that owns “review-scope classification regression coverage.” Several review-classification test locations exist, so an implementer cannot determine the intended change boundary from this description. Name the regression-test target explicitly.",
+              "severity": "P1",
+              "file": "track/items/phase0-reconvergence-and-derived-artifact-scope-2026-07-25/impl-plan.json",
+              "line": 24,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:a5b0acc00db5581f879ca56fa6fce66f519e995f1d941b6d82241dad4ba4acdc",
+          "at": "2026-07-25T10:08:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1ba1da5241c9a0c4edbfbefbf4872cd11ace8a432cc8c605df44c83576d4bde4",
+          "at": "2026-07-25T10:11:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-06 is mapped to T4, but T4 only updates `review-scope.json` and adds a classification regression test; it specifies no validation that the commit-gate `test-obligation check` remains unchanged. Add an explicit validation step or remap the criterion.",
+              "severity": "P1",
+              "file": "track/items/phase0-reconvergence-and-derived-artifact-scope-2026-07-25/impl-plan.json",
+              "line": 31,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:4f783dbaa1a5b45c15b10ca7ec25884271d1c598cc0346d9c59df1363ed4d9bf",
+          "at": "2026-07-25T10:36:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b908815bf1579b802eb49e770f4f1faf537cb4584b7b992cfdf7a12db111d00",
+          "at": "2026-07-25T10:40:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b908815bf1579b802eb49e770f4f1faf537cb4584b7b992cfdf7a12db111d00",
+          "at": "2026-07-25T10:43:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf2ad921b0627ecfae0621ccb64fe1f94e0e39e244769a1ae97c3a4ab0c5e857",
+          "at": "2026-07-25T11:13:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bf2ad921b0627ecfae0621ccb64fe1f94e0e39e244769a1ae97c3a4ab0c5e857",
+          "at": "2026-07-25T11:15:58Z"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T1",
+      "description": "Update `knowledge/conventions/pre-track-adr-authoring.md`; synchronize the maintainer guidance in `CLAUDE.md` and the user guidance in `README.md` with that convention. IN-01, CN-01, CN-02, OS-03, AC-01, AC-03, AC-07.",
+      "status": "done",
+      "commit_hash": "3b8d4480"
+    },
+    {
+      "id": "T2",
+      "description": "Update `.harness/workflows/track/plan.md`, `.claude/commands/track/plan.md`, and `.agents/skills/track-plan/SKILL.md` to reference the governing convention. IN-02, CN-01, CN-02, OS-03, AC-02, AC-03, AC-07.",
+      "status": "done",
+      "commit_hash": "3b8d4480"
+    },
+    {
+      "id": "T3",
+      "description": "Update `.harness/workflows/track/adr2pr.md`, `.claude/commands/track/adr2pr.md`, and `.agents/skills/track-adr2pr/SKILL.md` to reference the governing convention. IN-02, CN-01, CN-02, OS-03, AC-02, AC-03, AC-07.",
+      "status": "done",
+      "commit_hash": "3b8d4480"
+    },
+    {
+      "id": "T4",
+      "description": "Update `.harness/config/review-scope.json`; add `test_shipped_review_scope_classifies_obligations_as_operational_and_test_bindings_as_content` to `libs/infrastructure/tests/review_scope_shipped_config.rs`; run `cargo make ci-track` to confirm the unchanged commit-gate `test-obligation check` still executes. IN-03, OS-01, OS-02, CN-03, AC-04, AC-05, AC-06.",
+      "status": "done",
+      "commit_hash": "3b8d4480"
+    }
+  ],
+  "plan": {
+    "summary": [
+      "GO-01: T1, T2, T3.",
+      "GO-02: T4."
+    ],
+    "sections": [
+      {
+        "id": "phase0-convention",
+        "title": "Phase 0 reconvergence convention",
+        "description": [
+          "Update the convention and its maintained guidance surfaces. IN-01, CN-01, CN-02, OS-03, AC-01, AC-03, AC-07."
+        ],
+        "task_ids": [
+          "T1"
+        ]
+      },
+      {
+        "id": "phase0-workflow-adapters",
+        "title": "Phase 0 workflow delegation and adapters",
+        "description": [
+          "Update the plan and adr2pr workflow surfaces to reference the convention. IN-02, CN-01, CN-02, OS-03, AC-02, AC-03, AC-07."
+        ],
+        "task_ids": [
+          "T2",
+          "T3"
+        ]
+      },
+      {
+        "id": "review-operational-classification",
+        "title": "Derived obligation review classification",
+        "description": [
+          "Update the review-scope configuration and its regression coverage. IN-03, OS-01, OS-02, CN-03, AC-04, AC-05, AC-06."
+        ],
+        "task_ids": [
+          "T4"
+        ]
+      }
+    ]
+  }
+}

@@ -21,6 +21,9 @@ User invokes this command as `/track:plan`. `$ARGUMENTS`:
 - **Timestamps**: `date -u +"%Y-%m-%dT%H:%M:%SZ"` (ISO 8601 UTC) — manual input is forbidden.
 - **Phase 0**: invoke `/track:init`, `/track:review`, then `/track:commit`; their transition
   rules and inputs are owned by the plan workflow SSoT.
+- **Phase 0 governing convention**: apply
+  `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権` as the sole
+  normative source for Phase 0. This adapter states no procedure of its own for that phase.
 - **Phase writer dispatch** — write the phase briefing, then invoke the matching
   `bin/sotp capability exec <capability> --host claude --briefing-file <path>` command. The
   dispatcher resolves the capability's provider internally from
