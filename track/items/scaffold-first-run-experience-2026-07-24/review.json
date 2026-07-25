@@ -1,6 +1,24 @@
 {
   "schema_version": 2,
   "scopes": {
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
+          "at": "2026-07-24T21:26:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
+          "at": "2026-07-24T21:30:18Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -88,308 +106,6 @@
           "findings": [],
           "hash": "rvw1:sha256:41325db640243e687202f22dc2e8e28447852577b48ef9a75678edaa1afb1e02",
           "at": "2026-07-25T01:32:46Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
-          "at": "2026-07-24T21:26:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
-          "at": "2026-07-24T21:28:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`set -e` stops on failure but does not clean up state created by earlier steps. If `cargo generate-lockfile` fails, the exported directory is left as an initialized Git repository; if `git commit` fails, it is left with staged files. This contradicts the checklist requirement that intermediate failures not leave a half-initialized state and makes recovery/retry behavior ambiguous.",
-              "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 23,
-              "category": "error-handling"
-            }
-          ],
-          "hash": "rvw1:sha256:3ead8632997c3ba77d9eea5a7f591d5653acfb6fe61707a5d5d2c9f1d8a73944",
-          "at": "2026-07-24T21:46:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0218d0e9f93b2bc856b4142a3be20308cede5eee19dca3ca3f902f4373b97e05",
-          "at": "2026-07-24T21:49:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0218d0e9f93b2bc856b4142a3be20308cede5eee19dca3ca3f902f4373b97e05",
-          "at": "2026-07-24T21:52:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b60c3b677f746b68791b3faa9e3f2c7e5b84662fd235ff99ffa98abe32b6e4f2",
-          "at": "2026-07-24T22:06:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b60c3b677f746b68791b3faa9e3f2c7e5b84662fd235ff99ffa98abe32b6e4f2",
-          "at": "2026-07-24T22:07:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7c81d2d0597a9d9f7a02b6ed067b9970f33336864c19b5b3565e95b2883b1ad",
-          "at": "2026-07-24T23:22:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f7c81d2d0597a9d9f7a02b6ed067b9970f33336864c19b5b3565e95b2883b1ad",
-          "at": "2026-07-24T23:26:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4cdba9dcc1cd46fa8afd2a766eded074670520f0be1416f049c987dcdea90327",
-          "at": "2026-07-24T23:47:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4cdba9dcc1cd46fa8afd2a766eded074670520f0be1416f049c987dcdea90327",
-          "at": "2026-07-24T23:49:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The precheck only reads `user.name`/`user.email` from global config and ignores Git's other config scopes and supported email fallback. A valid identity can therefore be rejected even though `git commit` would succeed. Use Git's actual identity resolution for the check.",
-              "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 33,
-              "category": "incorrect-identity-resolution"
-            }
-          ],
-          "hash": "rvw1:sha256:db48260db51e83a1bcde08dda04de097ebdb7ac12d6a2bbafd436f60d0f02360",
-          "at": "2026-07-25T00:06:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:763b95f39705819521d0695449646b25add692173fce984a95c97872187837fd",
-          "at": "2026-07-25T00:10:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This preflight runs before the target has a `.git` directory, so Git cannot activate identity settings from global `includeIf \"gitdir:...\"` or `includeIf \"onbranch:...\"` blocks. After `git init -b main`, the actual commit would activate those blocks and could succeed, while the preflight incorrectly rejects the same setup. Validate identity in the initialized repository under rollback protection, before generating the lockfile, or otherwise account for conditional includes.",
-              "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 34,
-              "category": "incorrect-identity-resolution"
-            }
-          ],
-          "hash": "rvw1:sha256:763b95f39705819521d0695449646b25add692173fce984a95c97872187837fd",
-          "at": "2026-07-25T00:25:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The identity check now runs after `git init`, so the prerequisite check itself performs a filesystem side effect and briefly creates `.git` before rejecting an invalid identity. This violates the stated requirement that identity validation precede side-effecting initialization. Move the `git var` checks before `git init`; retain the rollback trap for later failures.",
-              "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 52,
-              "category": "precondition-ordering"
-            }
-          ],
-          "hash": "rvw1:sha256:9daa1614c59f01c317726e2f2bad7e300a01c253bc017433b8484e712180156e",
-          "at": "2026-07-25T00:53:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "These `git var` calls run before the target repository exists, so they do not use the same configuration context as the later commit. When the scaffold is inside another repository, Git can read identity from the parent `.git/config` and pass this check; after `git init`, the fresh nested repository hides that config and `git commit` still fails and rolls everything back. Conversely, identity supplied through a conditional include matching the new repository is unavailable during this check. Validate in the initialized target repository under rollback protection, before lockfile generation, so failure still leaves no artifacts.",
-              "severity": "P1",
-              "file": "overlay/Makefile.toml",
-              "line": 33,
-              "category": "incorrect-identity-resolution"
-            }
-          ],
-          "hash": "rvw1:sha256:f41daf79544b54fde19607cc72b78435da43735e6f6634cfc9619548acdefe8e",
-          "at": "2026-07-25T00:56:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9daa1614c59f01c317726e2f2bad7e300a01c253bc017433b8484e712180156e",
-          "at": "2026-07-25T01:00:49Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
-          "at": "2026-07-24T21:26:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:621e03d23dc8018b3bbe6c399920708de0bc1b2cca42f1fa4a3bb3689301fb78",
-          "at": "2026-07-24T21:30:18Z"
-        }
-      ]
-    },
-    "impl-plan": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001 description restates upstream behavior contracts (fail-closed repeat execution, initialization ordering, and bootstrap) in prose; retain only target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T002 description restates upstream branch defaults and maintainer-boundary behavior in prose; retain only target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 15,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T003 description restates the TaskCreate fallback behavior contract in prose; retain only target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 24,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S1 description restates the first-run behavior contract instead of only identifying the grouped implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 35,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S2 description restates the exported-configuration behavior contract instead of only identifying the grouped implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 44,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "Section S3 description restates the host-independent progress behavior contract instead of only identifying the grouped implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
-              "line": 53,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:e2bd02961a7de7310c8a82f88c9ae6311eee972e303002f818aa29b63ecb7df7",
-          "at": "2026-07-24T21:26:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fe388f3fbe5e4ab0b298006678fb7c2c9c5bcc3f664306c59b4f7a0ccb656e59",
-          "at": "2026-07-24T21:28:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fe388f3fbe5e4ab0b298006678fb7c2c9c5bcc3f664306c59b4f7a0ccb656e59",
-          "at": "2026-07-24T21:32:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:caeb8c7b736c9bfc0431e04a8776eb553f11757bd42f1e7bc7719dcac6e8e9df",
-          "at": "2026-07-24T21:45:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:caeb8c7b736c9bfc0431e04a8776eb553f11757bd42f1e7bc7719dcac6e8e9df",
-          "at": "2026-07-24T21:48:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
-          "at": "2026-07-24T22:14:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
-          "at": "2026-07-24T22:16:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
-          "at": "2026-07-24T22:18:27Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a73284093017ebd4af5abd3638493e3abd671e5fc6682b15ab8a1d1179e0b63a",
-          "at": "2026-07-24T21:26:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a73284093017ebd4af5abd3638493e3abd671e5fc6682b15ab8a1d1179e0b63a",
-          "at": "2026-07-24T21:29:07Z"
         }
       ]
     },
@@ -678,6 +394,312 @@
           "findings": [],
           "hash": "rvw1:sha256:13edcddf225fa60e6ab67d89d344d716864cf0b3f4074254c513d793729feda6",
           "at": "2026-07-25T01:40:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:726f32069dc39bc3a2bdbd0e14873b1edfb60c343abbbad5ce594f4a668db10c",
+          "at": "2026-07-25T01:54:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "現在の exported `init` は identity 検査を `git init` より先に実行するため、identity 不足時の trace に `git init` は現れず、この assert は必ず失敗します。成功時の `expected_sequence` も同じく逆順のままです。両方を現行の実行順序と整合させない限り、この統合テストは追加された rollback/index 検査まで到達できません。",
+              "severity": "P1",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 394,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:726f32069dc39bc3a2bdbd0e14873b1edfb60c343abbbad5ce594f4a668db10c",
+          "at": "2026-07-25T01:58:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "既存 lockfile のケースは失敗後の状態しか確認しておらず、注入した bootstrap 失敗経路へ到達したことを確認していません。たとえば `init` が既存 `Cargo.lock` を理由に bootstrap 前で拒否する回帰でも、`.git` はなく内容も元のままなのでこの検査は合格します。各失敗実行について trace の `cargo make bootstrap` または `simulated bootstrap failure` の stderr を assert してください。",
+              "severity": "P1",
+              "file": "apps/cli/tests/consumer_scaffold_host_first.rs",
+              "line": 431,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:6271fe39e5619e4b64421b1372edd7bf8acf18d7d89fa3948d696f9ebb38a692",
+          "at": "2026-07-25T02:01:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8cac94ff8e4e2de1886a776f27a937866d24a978f2e24e664120643302408845",
+          "at": "2026-07-25T02:02:28Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
+          "at": "2026-07-24T21:26:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b568d7eced149468e4b31d88d8019947a2106b16e105e2a48804f6995f61c028",
+          "at": "2026-07-24T21:28:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`set -e` stops on failure but does not clean up state created by earlier steps. If `cargo generate-lockfile` fails, the exported directory is left as an initialized Git repository; if `git commit` fails, it is left with staged files. This contradicts the checklist requirement that intermediate failures not leave a half-initialized state and makes recovery/retry behavior ambiguous.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 23,
+              "category": "error-handling"
+            }
+          ],
+          "hash": "rvw1:sha256:3ead8632997c3ba77d9eea5a7f591d5653acfb6fe61707a5d5d2c9f1d8a73944",
+          "at": "2026-07-24T21:46:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0218d0e9f93b2bc856b4142a3be20308cede5eee19dca3ca3f902f4373b97e05",
+          "at": "2026-07-24T21:49:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0218d0e9f93b2bc856b4142a3be20308cede5eee19dca3ca3f902f4373b97e05",
+          "at": "2026-07-24T21:52:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b60c3b677f746b68791b3faa9e3f2c7e5b84662fd235ff99ffa98abe32b6e4f2",
+          "at": "2026-07-24T22:06:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b60c3b677f746b68791b3faa9e3f2c7e5b84662fd235ff99ffa98abe32b6e4f2",
+          "at": "2026-07-24T22:07:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7c81d2d0597a9d9f7a02b6ed067b9970f33336864c19b5b3565e95b2883b1ad",
+          "at": "2026-07-24T23:22:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f7c81d2d0597a9d9f7a02b6ed067b9970f33336864c19b5b3565e95b2883b1ad",
+          "at": "2026-07-24T23:26:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cdba9dcc1cd46fa8afd2a766eded074670520f0be1416f049c987dcdea90327",
+          "at": "2026-07-24T23:47:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4cdba9dcc1cd46fa8afd2a766eded074670520f0be1416f049c987dcdea90327",
+          "at": "2026-07-24T23:49:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The precheck only reads `user.name`/`user.email` from global config and ignores Git's other config scopes and supported email fallback. A valid identity can therefore be rejected even though `git commit` would succeed. Use Git's actual identity resolution for the check.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 33,
+              "category": "incorrect-identity-resolution"
+            }
+          ],
+          "hash": "rvw1:sha256:db48260db51e83a1bcde08dda04de097ebdb7ac12d6a2bbafd436f60d0f02360",
+          "at": "2026-07-25T00:06:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:763b95f39705819521d0695449646b25add692173fce984a95c97872187837fd",
+          "at": "2026-07-25T00:10:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This preflight runs before the target has a `.git` directory, so Git cannot activate identity settings from global `includeIf \"gitdir:...\"` or `includeIf \"onbranch:...\"` blocks. After `git init -b main`, the actual commit would activate those blocks and could succeed, while the preflight incorrectly rejects the same setup. Validate identity in the initialized repository under rollback protection, before generating the lockfile, or otherwise account for conditional includes.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 34,
+              "category": "incorrect-identity-resolution"
+            }
+          ],
+          "hash": "rvw1:sha256:763b95f39705819521d0695449646b25add692173fce984a95c97872187837fd",
+          "at": "2026-07-25T00:25:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The identity check now runs after `git init`, so the prerequisite check itself performs a filesystem side effect and briefly creates `.git` before rejecting an invalid identity. This violates the stated requirement that identity validation precede side-effecting initialization. Move the `git var` checks before `git init`; retain the rollback trap for later failures.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 52,
+              "category": "precondition-ordering"
+            }
+          ],
+          "hash": "rvw1:sha256:9daa1614c59f01c317726e2f2bad7e300a01c253bc017433b8484e712180156e",
+          "at": "2026-07-25T00:53:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "These `git var` calls run before the target repository exists, so they do not use the same configuration context as the later commit. When the scaffold is inside another repository, Git can read identity from the parent `.git/config` and pass this check; after `git init`, the fresh nested repository hides that config and `git commit` still fails and rolls everything back. Conversely, identity supplied through a conditional include matching the new repository is unavailable during this check. Validate in the initialized target repository under rollback protection, before lockfile generation, so failure still leaves no artifacts.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 33,
+              "category": "incorrect-identity-resolution"
+            }
+          ],
+          "hash": "rvw1:sha256:f41daf79544b54fde19607cc72b78435da43735e6f6634cfc9619548acdefe8e",
+          "at": "2026-07-25T00:56:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9daa1614c59f01c317726e2f2bad7e300a01c253bc017433b8484e712180156e",
+          "at": "2026-07-25T01:00:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`conventions update-index` now mutates `knowledge/conventions/README.md` before the initial commit, but the EXIT cleanup restores only `.git` and `Cargo.lock`. If the commit or bootstrap later fails—or the index writer partially writes before failing—the failed initialization leaves the convention index modified, creating a new partial-state window. Snapshot and restore the index through the same cleanup trap.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 66,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:49cf4b27101002691a30ee92f145c1e174cc53ecfe41aaf25770611239a70de2",
+          "at": "2026-07-25T01:57:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The EXIT trap is armed before the convention-index existence check. If an existing `Cargo.lock` causes `mktemp` or `cp` to fail first, cleanup still sees `had_convention_index=false` and deletes an existing `knowledge/conventions/README.md` even though initialization never modified it. Capture both targets' original existence before any fallible snapshot operation, or track whether each target was actually mutated.",
+              "severity": "P0",
+              "file": "overlay/Makefile.toml",
+              "line": 66,
+              "category": "data_corruption"
+            },
+            {
+              "message": "A snapshot path becomes nonempty as soon as `mktemp` succeeds, before `cp` has completed. If either snapshot copy fails after writing zero or partial data, the EXIT trap copies that invalid snapshot over the original `Cargo.lock` or convention index, corrupting user data. Use a separate readiness flag set only after each copy succeeds and never restore from an incomplete snapshot.",
+              "severity": "P0",
+              "file": "overlay/Makefile.toml",
+              "line": 71,
+              "category": "data_corruption"
+            },
+            {
+              "message": "Bare `mktemp` honors `TMPDIR`; when it points inside the scaffold, both snapshots are visible to `git add -A`. The initial commit then includes the temporary files, and their post-bootstrap removal leaves a dirty working tree with tracked deletions. Ensure snapshots are outside the worktree or cannot be staged.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 87,
+              "category": "temp_file_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:8f1339e923017616992d44a6d90ee5fc11260b0d27a534e83133b1787c5cc28d",
+          "at": "2026-07-25T02:02:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`set +e` makes restoration failures silent, and the corresponding snapshots are then deleted unconditionally. If either restore `cp` fails, initialization still claims rollback succeeded and removes the only copy of the original content, leaving the generated lockfile or convention index in place without a recovery artifact. Check each restore result, report rollback failure, and only remove a snapshot after its restoration succeeds.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 49,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:c7939b05f99aaa7fa342438314c8a6548003d4a1d41dde1426f114da0162b4ae",
+          "at": "2026-07-25T02:06:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`mktemp -p` is a GNU-specific option and is not accepted by BSD/macOS `mktemp`. Because exported scaffolds contain the convention index, every `cargo make init` reaches this command and fails before Git initialization on those hosts. Use the portable explicit-template form, such as `mktemp /tmp/sotp-init.XXXXXX`, already used elsewhere in the repository.",
+              "severity": "P1",
+              "file": "overlay/Makefile.toml",
+              "line": 105,
+              "category": "portability"
+            }
+          ],
+          "hash": "rvw1:sha256:c25899b61f9a67a0ae4cfedfd7e1bf82bcc1c12c90bf8ebff735ded7bc9c46f2",
+          "at": "2026-07-25T02:09:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8b2332b640846dc6304ba944b054f146640268c5fcece6bf5de12a7b11dc874f",
+          "at": "2026-07-25T02:10:59Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a73284093017ebd4af5abd3638493e3abd671e5fc6682b15ab8a1d1179e0b63a",
+          "at": "2026-07-24T21:26:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a73284093017ebd4af5abd3638493e3abd671e5fc6682b15ab8a1d1179e0b63a",
+          "at": "2026-07-24T21:29:07Z"
         }
       ]
     },
@@ -791,6 +813,109 @@
           "findings": [],
           "hash": "rvw1:sha256:d84cbdc5b78c91809f5ba4eb5b452799b4cce4cb7905728b4c19646276b49455",
           "at": "2026-07-25T00:59:47Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 description restates upstream behavior contracts (fail-closed repeat execution, initialization ordering, and bootstrap) in prose; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 description restates upstream branch defaults and maintainer-boundary behavior in prose; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 15,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 description restates the TaskCreate fallback behavior contract in prose; retain only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 description restates the first-run behavior contract instead of only identifying the grouped implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 35,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 description restates the exported-configuration behavior contract instead of only identifying the grouped implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 44,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 description restates the host-independent progress behavior contract instead of only identifying the grouped implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/scaffold-first-run-experience-2026-07-24/impl-plan.json",
+              "line": 53,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:e2bd02961a7de7310c8a82f88c9ae6311eee972e303002f818aa29b63ecb7df7",
+          "at": "2026-07-24T21:26:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe388f3fbe5e4ab0b298006678fb7c2c9c5bcc3f664306c59b4f7a0ccb656e59",
+          "at": "2026-07-24T21:28:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe388f3fbe5e4ab0b298006678fb7c2c9c5bcc3f664306c59b4f7a0ccb656e59",
+          "at": "2026-07-24T21:32:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:caeb8c7b736c9bfc0431e04a8776eb553f11757bd42f1e7bc7719dcac6e8e9df",
+          "at": "2026-07-24T21:45:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:caeb8c7b736c9bfc0431e04a8776eb553f11757bd42f1e7bc7719dcac6e8e9df",
+          "at": "2026-07-24T21:48:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
+          "at": "2026-07-24T22:14:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
+          "at": "2026-07-24T22:16:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:172fe75927034d316e58158516860e4812f3148b8f0d84cdab4fb88ae38320d3",
+          "at": "2026-07-24T22:18:27Z"
         }
       ]
     }

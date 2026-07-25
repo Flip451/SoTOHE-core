@@ -31,34 +31,105 @@ if [ -e .git ]; then
 fi
 
 had_lockfile=false
+lockfile_snapshot=
+lockfile_snapshot_ready=false
+had_convention_index=false
+convention_index_snapshot=
+convention_index_snapshot_ready=false
+
 if [ -e Cargo.lock ]; then
   had_lockfile=true
+fi
+if [ -e knowledge/conventions/README.md ]; then
+  had_convention_index=true
 fi
 
 cleanup() {
   status=$?
+  set +e
   if [ "$status" -ne 0 ]; then
-    rm -rf .git
-    if [ "$had_lockfile" = false ]; then
-      rm -f Cargo.lock
+    rollback_complete=true
+    if ! rm -rf .git; then
+      rollback_complete=false
+      echo "[ERROR] initialization rollback could not remove .git." >&2
     fi
-    echo "[ERROR] initialization failed; created Git state has been rolled back." >&2
+    if [ "$had_lockfile" = true ]; then
+      if [ "$lockfile_snapshot_ready" = true ]; then
+        if cp "$lockfile_snapshot" Cargo.lock; then
+          if ! rm -f "$lockfile_snapshot"; then
+            rollback_complete=false
+            echo "[ERROR] initialization rollback restored Cargo.lock but could not remove its snapshot: $lockfile_snapshot" >&2
+          fi
+        else
+          rollback_complete=false
+          echo "[ERROR] initialization rollback could not restore Cargo.lock; its snapshot remains at $lockfile_snapshot" >&2
+        fi
+      elif [ -n "$lockfile_snapshot" ] && ! rm -f "$lockfile_snapshot"; then
+        rollback_complete=false
+        echo "[ERROR] initialization rollback could not remove the incomplete Cargo.lock snapshot: $lockfile_snapshot" >&2
+      fi
+    elif ! rm -f Cargo.lock; then
+      rollback_complete=false
+      echo "[ERROR] initialization rollback could not remove Cargo.lock." >&2
+    fi
+    if [ "$had_convention_index" = true ]; then
+      if [ "$convention_index_snapshot_ready" = true ]; then
+        if cp "$convention_index_snapshot" knowledge/conventions/README.md; then
+          if ! rm -f "$convention_index_snapshot"; then
+            rollback_complete=false
+            echo "[ERROR] initialization rollback restored the convention index but could not remove its snapshot: $convention_index_snapshot" >&2
+          fi
+        else
+          rollback_complete=false
+          echo "[ERROR] initialization rollback could not restore the convention index; its snapshot remains at $convention_index_snapshot" >&2
+        fi
+      elif [ -n "$convention_index_snapshot" ] && ! rm -f "$convention_index_snapshot"; then
+        rollback_complete=false
+        echo "[ERROR] initialization rollback could not remove the incomplete convention-index snapshot: $convention_index_snapshot" >&2
+      fi
+    elif ! rm -f knowledge/conventions/README.md; then
+      rollback_complete=false
+      echo "[ERROR] initialization rollback could not remove the convention index." >&2
+    fi
+    if [ "$rollback_complete" = true ]; then
+      echo "[ERROR] initialization failed; created Git state has been rolled back." >&2
+    else
+      echo "[ERROR] initialization failed; rollback was incomplete." >&2
+    fi
   fi
   exit "$status"
 }
 trap cleanup EXIT
 
-git -c core.hooksPath=/dev/null init -b main
+if [ "$had_lockfile" = true ]; then
+  lockfile_snapshot="$(mktemp /tmp/sotp-init-lockfile.XXXXXX)"
+  cp Cargo.lock "$lockfile_snapshot"
+  lockfile_snapshot_ready=true
+fi
+if [ "$had_convention_index" = true ]; then
+  convention_index_snapshot="$(mktemp /tmp/sotp-init-convention-index.XXXXXX)"
+  cp knowledge/conventions/README.md "$convention_index_snapshot"
+  convention_index_snapshot_ready=true
+fi
+
 if ! git var GIT_AUTHOR_IDENT >/dev/null 2>&1 \
   || ! git var GIT_COMMITTER_IDENT >/dev/null 2>&1; then
   echo "[ERROR] cargo make init requires a Git author and committer identity. Configure user.name and user.email with git config --global, or provide GIT_AUTHOR_* and GIT_COMMITTER_* before retrying." >&2
   exit 1
 fi
+git -c core.hooksPath=/dev/null init -b main
 cargo generate-lockfile
+bin/sotp conventions update-index
 git add -A
 git -c core.hooksPath=/dev/null commit -m "Initial commit"
 cargo make bootstrap
 trap - EXIT
+if [ -n "$lockfile_snapshot" ]; then
+  rm -f "$lockfile_snapshot"
+fi
+if [ -n "$convention_index_snapshot" ]; then
+  rm -f "$convention_index_snapshot"
+fi
 ''']
 
 [tasks.bootstrap]

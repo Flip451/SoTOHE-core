@@ -329,7 +329,7 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
     let cargo_shim = shim_dir.join("cargo");
     fs::write(
         &cargo_shim,
-        "#!/bin/sh\ncase \"$1 $2\" in\n  'generate-lockfile ') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" && printf 'generated lockfile\\n' > Cargo.lock ;;\n  'make bootstrap') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\"; exec \"$REAL_CARGO\" make bootstrap ;;\n  'make install-aux-tools'|'make ci') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" ;;\n  *) printf 'unexpected cargo command: %s\\n' \"$*\" >&2; exit 64 ;;\nesac\n",
+        "#!/bin/sh\ncase \"$1 $2\" in\n  'generate-lockfile ') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" && printf 'generated lockfile\\n' > Cargo.lock ;;\n  'make bootstrap') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\"; if [ \"${FAIL_BOOTSTRAP:-0}\" = 1 ]; then echo 'simulated bootstrap failure' >&2; exit 72; fi; exec \"$REAL_CARGO\" make bootstrap ;;\n  'make install-aux-tools'|'make ci') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" ;;\n  *) printf 'unexpected cargo command: %s\\n' \"$*\" >&2; exit 64 ;;\nesac\n",
     )
     .unwrap();
     fs::set_permissions(&cargo_shim, fs::Permissions::from_mode(0o755)).unwrap();
@@ -338,12 +338,12 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
     let sotp_shim = scaffold.join("bin/sotp");
     fs::write(
         &sotp_shim,
-        "#!/bin/sh\nprintf 'sotp %s\\n' \"$*\" >> \"$INIT_TRACE\"\nif [ \"$1 $2 $3\" = \"hook dispatch git-ref-update\" ]; then\n  echo 'initial commit must not run inherited hooks' >&2\n  exit 73\nfi\n",
+        "#!/bin/sh\nprintf 'sotp %s\\n' \"$*\" >> \"$INIT_TRACE\"\nif [ \"$1 $2\" = \"conventions update-index\" ]; then\n  printf 'generated convention index\\n' > knowledge/conventions/README.md\nfi\nif [ \"$1 $2 $3\" = \"hook dispatch git-ref-update\" ]; then\n  echo 'initial commit must not run inherited hooks' >&2\n  exit 73\nfi\n",
     )
     .unwrap();
     fs::set_permissions(&sotp_shim, fs::Permissions::from_mode(0o755)).unwrap();
 
-    let run = |with_identity: bool| {
+    let run = |with_identity: bool, fail_bootstrap: bool| {
         let shimmed_path =
             format!("{}:{}", shim_dir.display(), std::env::var("PATH").unwrap_or_default());
         let mut command = Command::new(&real_cargo);
@@ -356,7 +356,8 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
             .env("REAL_GIT", &real_git)
             .env("GIT_CONFIG_NOSYSTEM", "1")
             .env("GIT_CONFIG_GLOBAL", &global_git_config)
-            .env("GIT_CONFIG_COUNT", "0");
+            .env("GIT_CONFIG_COUNT", "0")
+            .env("FAIL_BOOTSTRAP", if fail_bootstrap { "1" } else { "0" });
         if with_identity {
             command
                 .env("GIT_AUTHOR_NAME", "Scaffold Test")
@@ -374,7 +375,7 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
         command.output().unwrap()
     };
 
-    let missing_identity = run(false);
+    let missing_identity = run(false, false);
     assert!(!missing_identity.status.success(), "an unconfigured host must fail closed");
     assert!(
         String::from_utf8_lossy(&missing_identity.stderr)
@@ -390,8 +391,8 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
     );
     let missing_identity_trace = fs::read_to_string(&trace).unwrap_or_default();
     assert!(
-        missing_identity_trace.contains("git -c core.hooksPath=/dev/null init -b main"),
-        "identity validation must use Git's repository-aware identity resolution: {missing_identity_trace}"
+        !missing_identity_trace.contains("git -c core.hooksPath=/dev/null init -b main"),
+        "identity validation must reject the host before Git initialization: {missing_identity_trace}"
     );
     for command_after_identity_check in [
         "cargo generate-lockfile",
@@ -410,7 +411,46 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
     );
     fs::remove_file(&trace).unwrap();
 
-    let first = run(true);
+    let failed_without_lockfile = run(true, true);
+    assert!(
+        !failed_without_lockfile.status.success(),
+        "bootstrap failure must fail initialization"
+    );
+    assert!(
+        !scaffold.join(".git").exists(),
+        "bootstrap failure must remove the repository it created"
+    );
+    assert!(
+        !scaffold.join("Cargo.lock").exists(),
+        "bootstrap failure without a pre-existing lockfile must not leave one behind"
+    );
+    assert!(
+        fs::read_to_string(&trace).unwrap_or_default().contains("cargo make bootstrap"),
+        "the injected bootstrap failure must be reached"
+    );
+    fs::remove_file(&trace).unwrap();
+
+    let original_lockfile = "pre-existing lockfile\n";
+    fs::write(scaffold.join("Cargo.lock"), original_lockfile).unwrap();
+    let failed_with_lockfile = run(true, true);
+    assert!(!failed_with_lockfile.status.success(), "bootstrap failure must fail initialization");
+    assert!(
+        !scaffold.join(".git").exists(),
+        "bootstrap failure must remove the repository it created"
+    );
+    assert_eq!(
+        fs::read_to_string(scaffold.join("Cargo.lock")).unwrap(),
+        original_lockfile,
+        "bootstrap failure must restore the pre-existing lockfile exactly"
+    );
+    assert!(
+        fs::read_to_string(&trace).unwrap_or_default().contains("cargo make bootstrap"),
+        "the injected bootstrap failure must be reached"
+    );
+    fs::remove_file(&trace).unwrap();
+    fs::remove_file(scaffold.join("Cargo.lock")).unwrap();
+
+    let first = run(true, false);
     assert!(
         first.status.success(),
         "first initialization must succeed\nstderr: {}\ntrace: {}",
@@ -420,10 +460,11 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
     let trace_lines =
         fs::read_to_string(&trace).unwrap().lines().map(str::to_owned).collect::<Vec<_>>();
     let expected_sequence = [
-        "git -c core.hooksPath=/dev/null init -b main",
         "git var GIT_AUTHOR_IDENT",
         "git var GIT_COMMITTER_IDENT",
+        "git -c core.hooksPath=/dev/null init -b main",
         "cargo generate-lockfile",
+        "sotp conventions update-index",
         "git add -A",
         "git -c core.hooksPath=/dev/null commit -m Initial commit",
         "cargo make bootstrap",
@@ -452,6 +493,29 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
         .unwrap();
     assert!(committed_lockfile.status.success());
     assert_eq!(String::from_utf8_lossy(&committed_lockfile.stdout), "generated lockfile\n");
+    let committed_convention_index = isolated_git_command(&real_git, &global_git_config)
+        .args(["show", "HEAD:knowledge/conventions/README.md"])
+        .current_dir(&scaffold)
+        .output()
+        .unwrap();
+    assert!(committed_convention_index.status.success());
+    let regenerated_convention_index =
+        fs::read_to_string(scaffold.join("knowledge/conventions/README.md")).unwrap();
+    assert_eq!(
+        String::from_utf8_lossy(&committed_convention_index.stdout),
+        regenerated_convention_index
+    );
+    let worktree_status = isolated_git_command(&real_git, &global_git_config)
+        .args(["status", "--porcelain"])
+        .current_dir(&scaffold)
+        .output()
+        .unwrap();
+    assert!(worktree_status.status.success());
+    assert!(
+        worktree_status.stdout.is_empty(),
+        "initialization must not leave generated convention-index changes uncommitted: {}",
+        String::from_utf8_lossy(&worktree_status.stdout)
+    );
     let hooks_path = isolated_git_command(&real_git, &global_git_config)
         .args(["config", "--local", "core.hooksPath"])
         .current_dir(&scaffold)
@@ -465,7 +529,7 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
     let lockfile = fs::read_to_string(scaffold.join("Cargo.lock")).unwrap();
     fs::remove_file(&trace).unwrap();
 
-    let repeat = run(true);
+    let repeat = run(true, false);
     assert!(!repeat.status.success(), "repeat initialization must fail closed");
     assert!(
         String::from_utf8_lossy(&repeat.stderr)
