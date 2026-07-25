@@ -329,13 +329,17 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
     let cargo_shim = shim_dir.join("cargo");
     fs::write(
         &cargo_shim,
-        "#!/bin/sh\ncase \"$1 $2\" in\n  'generate-lockfile ') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" && printf 'generated lockfile\\n' > Cargo.lock ;;\n  'make bootstrap') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\"; if [ \"${FAIL_BOOTSTRAP:-0}\" = 1 ]; then echo 'simulated bootstrap failure' >&2; exit 72; fi; exec \"$REAL_CARGO\" make bootstrap ;;\n  'make install-aux-tools'|'make ci') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" ;;\n  *) printf 'unexpected cargo command: %s\\n' \"$*\" >&2; exit 64 ;;\nesac\n",
+        "#!/bin/sh\ncase \"$1 $2\" in\n  'generate-lockfile ') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" && printf 'generated lockfile\\n' > Cargo.lock ;;\n  'make install-sotp') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\"; cp \"$RUNNABLE_SOTP\" bin/sotp; chmod +x bin/sotp ;;\n  'make bootstrap') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\"; if [ \"${FAIL_BOOTSTRAP:-0}\" = 1 ]; then echo 'simulated bootstrap failure' >&2; exit 72; fi; exec \"$REAL_CARGO\" make bootstrap ;;\n  'make install-aux-tools'|'make ci') printf 'cargo %s\\n' \"$*\" >> \"$INIT_TRACE\" ;;\n  *) printf 'unexpected cargo command: %s\\n' \"$*\" >&2; exit 64 ;;\nesac\n",
     )
     .unwrap();
     fs::set_permissions(&cargo_shim, fs::Permissions::from_mode(0o755)).unwrap();
 
     let trace = shim_dir.join("init.trace");
-    let sotp_shim = scaffold.join("bin/sotp");
+    let installed_sotp = scaffold.join("bin/sotp");
+    if installed_sotp.exists() {
+        fs::remove_file(&installed_sotp).unwrap();
+    }
+    let sotp_shim = export_parent.path().join("runnable-sotp");
     fs::write(
         &sotp_shim,
         "#!/bin/sh\nprintf 'sotp %s\\n' \"$*\" >> \"$INIT_TRACE\"\nif [ \"$1 $2\" = \"conventions update-index\" ]; then\n  printf 'generated convention index\\n' > knowledge/conventions/README.md\nfi\nif [ \"$1 $2 $3\" = \"hook dispatch git-ref-update\" ]; then\n  echo 'initial commit must not run inherited hooks' >&2\n  exit 73\nfi\n",
@@ -354,6 +358,7 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
             .env("INIT_TRACE", &trace)
             .env("REAL_CARGO", &real_cargo)
             .env("REAL_GIT", &real_git)
+            .env("RUNNABLE_SOTP", &sotp_shim)
             .env("GIT_CONFIG_NOSYSTEM", "1")
             .env("GIT_CONFIG_GLOBAL", &global_git_config)
             .env("GIT_CONFIG_COUNT", "0")
@@ -389,6 +394,7 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
         !scaffold.join("Cargo.lock").exists(),
         "identity preflight must not generate a lockfile"
     );
+    assert!(!installed_sotp.exists(), "identity preflight must not install the transplanted CLI");
     let missing_identity_trace = fs::read_to_string(&trace).unwrap_or_default();
     assert!(
         !missing_identity_trace.contains("git -c core.hooksPath=/dev/null init -b main"),
@@ -396,6 +402,7 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
     );
     for command_after_identity_check in [
         "cargo generate-lockfile",
+        "cargo make install-sotp",
         "git add -A",
         "git -c core.hooksPath=/dev/null commit",
         "cargo make bootstrap",
@@ -410,6 +417,9 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
         "identity validation must defer to Git's own author resolution: {missing_identity_trace}"
     );
     fs::remove_file(&trace).unwrap();
+    if installed_sotp.exists() {
+        fs::remove_file(&installed_sotp).unwrap();
+    }
 
     let failed_without_lockfile = run(true, true);
     assert!(
@@ -429,6 +439,7 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
         "the injected bootstrap failure must be reached"
     );
     fs::remove_file(&trace).unwrap();
+    fs::remove_file(&installed_sotp).unwrap();
 
     let original_lockfile = "pre-existing lockfile\n";
     fs::write(scaffold.join("Cargo.lock"), original_lockfile).unwrap();
@@ -449,6 +460,7 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
     );
     fs::remove_file(&trace).unwrap();
     fs::remove_file(scaffold.join("Cargo.lock")).unwrap();
+    fs::remove_file(&installed_sotp).unwrap();
 
     let first = run(true, false);
     assert!(
@@ -464,6 +476,7 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
         "git var GIT_COMMITTER_IDENT",
         "git -c core.hooksPath=/dev/null init -b main",
         "cargo generate-lockfile",
+        "cargo make install-sotp",
         "sotp conventions update-index",
         "git add -A",
         "git -c core.hooksPath=/dev/null commit -m Initial commit",
@@ -478,6 +491,10 @@ fn test_exported_init_task_succeeds_with_global_hooks_path_and_repeat_rejects() 
     assert!(
         !trace_lines.iter().any(|line| line == "sotp hook dispatch git-ref-update"),
         "the initial commit must bypass inherited hooks: {trace_lines:?}",
+    );
+    assert!(
+        installed_sotp.is_file(),
+        "a missing transplanted CLI must be restored before the convention index is generated"
     );
     let branch_output = isolated_git_command(&real_git, &global_git_config)
         .args(["branch", "--show-current"])

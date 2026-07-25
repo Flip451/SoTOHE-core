@@ -119,6 +119,9 @@ if ! git var GIT_AUTHOR_IDENT >/dev/null 2>&1 \
 fi
 git -c core.hooksPath=/dev/null init -b main
 cargo generate-lockfile
+if ! [ -x bin/sotp ] || ! bin/sotp --help >/dev/null 2>&1; then
+  cargo make install-sotp
+fi
 bin/sotp conventions update-index
 git add -A
 git -c core.hooksPath=/dev/null commit -m "Initial commit"
