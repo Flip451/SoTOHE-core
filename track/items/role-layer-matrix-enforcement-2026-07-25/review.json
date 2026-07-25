@@ -1,79 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a34b585d5dd8566e86df5af5febbcaf3bbfdf127957db6e4ea9670493a57e383",
-          "at": "2026-07-25T07:39:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a34b585d5dd8566e86df5af5febbcaf3bbfdf127957db6e4ea9670493a57e383",
-          "at": "2026-07-25T07:43:39Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fe504c253e15cb8e5fdb0042003ec46657f271428a07d98e9ce4851b2da3b9c4",
-          "at": "2026-07-25T06:01:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "ADR 0045 limits its “no new mechanism” boundary to assertions over prose without a machine-readable contract, and explicitly preserves parsed structural checks of configuration keys and values. It therefore does not support rejecting a rule-presence contract for this machine-readable lint config. Remove this citation or ground Alternative H in an applicable decision; its current rejection rationale is unsupported.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
-              "line": 120,
-              "category": "broken narrative reference"
-            }
-          ],
-          "hash": "rvw1:sha256:fe504c253e15cb8e5fdb0042003ec46657f271428a07d98e9ce4851b2da3b9c4",
-          "at": "2026-07-25T06:03:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:907aef4af8d3614920e91fb8169be584ce965327d6a35403eedc1e47f80e9e58",
-          "at": "2026-07-25T06:14:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D2 embeds downstream review procedure rather than only recording the architectural decision: requiring placement rationale in `docs` or a track review record and requiring the reviewer to reconcile it constrains review/documentation workflow. This is scope leakage into the ADR and should be delegated to the relevant convention or spec.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
-              "line": 50,
-              "category": "scope leakage into ADR body"
-            },
-            {
-              "message": "D4 contains excessive implementation-level test and type details (`production adapter`, two-file structural matching, Rust literal assertions, and enum decode behavior). These operational verification mechanics obscure the decision about keeping config as the single source of truth and should be delegated to the relevant testing/convention artifact.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
-              "line": 61,
-              "category": "decision obscured by excess detail"
-            }
-          ],
-          "hash": "rvw1:sha256:c60e402fd9b041ed3197bce7d3d2a48fb374105e5c8b58da9879af0805aa18bc",
-          "at": "2026-07-25T06:29:42Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -89,6 +16,118 @@
           "findings": [],
           "hash": "rvw1:sha256:c3fc55ffe221d9e516b7ae2dbb59ba2f5ef539801e74197e0a754fe14f860a73",
           "at": "2026-07-25T07:42:35Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e201a8a1783321e4a94600eee6c6e34b478b9af8f4852fc1a9bbc8af46f8516",
+          "at": "2026-07-25T07:39:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e201a8a1783321e4a94600eee6c6e34b478b9af8f4852fc1a9bbc8af46f8516",
+          "at": "2026-07-25T07:45:16Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`regression-coverage` の section description は「allowed and rejected active-track role-layer declarations」を散文で再記述しており、上流 spec の挙動契約の restatement です。impl-plan の section description は target + operation + anchor cite に限定してください（`knowledge/conventions/no-upstream-restatement.md`）。",
+              "severity": "P1",
+              "file": "track/items/role-layer-matrix-enforcement-2026-07-25/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:9047c92fbd5635da6c33b6b832dd18840c7a87291c0d4a2ef63572c268f8133e",
+          "at": "2026-07-25T07:39:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b2847c31f19fd91ee5d8c8ed60dbed240adbd27d1664259374d78401f7b99bdb",
+          "at": "2026-07-25T07:41:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 claims CN-02/AC-05 coverage but omits `libs/infrastructure/src/tddd/fs_lint_config_loader.rs`. Its existing shipped-config test still asserts that `DomainValueObjectInboundReferenceRequired` is absent and hard-codes the expected PrimaryAdapter rules, so completing the two named test files would leave the prohibited rule-specific regression contract intact. Add this test module to T003 and reduce its shipped-config assertions to production-loader decoding and config/preset equality.",
+              "severity": "P1",
+              "file": "track/items/role-layer-matrix-enforcement-2026-07-25/impl-plan.json",
+              "line": 18,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:b2847c31f19fd91ee5d8c8ed60dbed240adbd27d1664259374d78401f7b99bdb",
+          "at": "2026-07-25T07:45:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2888064bc5822eb6b750cb28d4f669e1a7609a765b8f69d96b79e7c77ee0f50",
+          "at": "2026-07-25T07:47:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18df082d5fd5945bae294f0c617d94f87ca8a43f1edac53b57b43dbc3b7260a0",
+          "at": "2026-07-25T08:10:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18df082d5fd5945bae294f0c617d94f87ca8a43f1edac53b57b43dbc3b7260a0",
+          "at": "2026-07-25T08:15:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e10159d15c01c6df207e881f2c298e2e871a87adad95cbf1f46672920ee9cb50",
+          "at": "2026-07-25T08:30:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e10159d15c01c6df207e881f2c298e2e871a87adad95cbf1f46672920ee9cb50",
+          "at": "2026-07-25T08:33:05Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a34b585d5dd8566e86df5af5febbcaf3bbfdf127957db6e4ea9670493a57e383",
+          "at": "2026-07-25T07:39:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a34b585d5dd8566e86df5af5febbcaf3bbfdf127957db6e4ea9670493a57e383",
+          "at": "2026-07-25T07:43:39Z"
         }
       ]
     },
@@ -284,6 +323,61 @@
         }
       ]
     },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe504c253e15cb8e5fdb0042003ec46657f271428a07d98e9ce4851b2da3b9c4",
+          "at": "2026-07-25T06:01:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 0045 limits its “no new mechanism” boundary to assertions over prose without a machine-readable contract, and explicitly preserves parsed structural checks of configuration keys and values. It therefore does not support rejecting a rule-presence contract for this machine-readable lint config. Remove this citation or ground Alternative H in an applicable decision; its current rejection rationale is unsupported.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+              "line": 120,
+              "category": "broken narrative reference"
+            }
+          ],
+          "hash": "rvw1:sha256:fe504c253e15cb8e5fdb0042003ec46657f271428a07d98e9ce4851b2da3b9c4",
+          "at": "2026-07-25T06:03:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:907aef4af8d3614920e91fb8169be584ce965327d6a35403eedc1e47f80e9e58",
+          "at": "2026-07-25T06:14:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 embeds downstream review procedure rather than only recording the architectural decision: requiring placement rationale in `docs` or a track review record and requiring the reviewer to reconcile it constrains review/documentation workflow. This is scope leakage into the ADR and should be delegated to the relevant convention or spec.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+              "line": 50,
+              "category": "scope leakage into ADR body"
+            },
+            {
+              "message": "D4 contains excessive implementation-level test and type details (`production adapter`, two-file structural matching, Rust literal assertions, and enum decode behavior). These operational verification mechanics obscure the decision about keeping config as the single source of truth and should be delegated to the relevant testing/convention artifact.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+              "line": 61,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:c60e402fd9b041ed3197bce7d3d2a48fb374105e5c8b58da9879af0805aa18bc",
+          "at": "2026-07-25T06:29:42Z"
+        }
+      ]
+    },
     "cli": {
       "rounds": [
         {
@@ -314,86 +408,6 @@
           "findings": [],
           "hash": "rvw1:sha256:c3e4a626fbbd65e4eb3848b5bcdd930d8d6fad7ddfd0ad8c90c17d0ecbfbf814",
           "at": "2026-07-25T08:17:32Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e201a8a1783321e4a94600eee6c6e34b478b9af8f4852fc1a9bbc8af46f8516",
-          "at": "2026-07-25T07:39:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e201a8a1783321e4a94600eee6c6e34b478b9af8f4852fc1a9bbc8af46f8516",
-          "at": "2026-07-25T07:45:16Z"
-        }
-      ]
-    },
-    "impl-plan": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`regression-coverage` の section description は「allowed and rejected active-track role-layer declarations」を散文で再記述しており、上流 spec の挙動契約の restatement です。impl-plan の section description は target + operation + anchor cite に限定してください（`knowledge/conventions/no-upstream-restatement.md`）。",
-              "severity": "P1",
-              "file": "track/items/role-layer-matrix-enforcement-2026-07-25/impl-plan.json",
-              "line": 42,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:9047c92fbd5635da6c33b6b832dd18840c7a87291c0d4a2ef63572c268f8133e",
-          "at": "2026-07-25T07:39:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b2847c31f19fd91ee5d8c8ed60dbed240adbd27d1664259374d78401f7b99bdb",
-          "at": "2026-07-25T07:41:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T003 claims CN-02/AC-05 coverage but omits `libs/infrastructure/src/tddd/fs_lint_config_loader.rs`. Its existing shipped-config test still asserts that `DomainValueObjectInboundReferenceRequired` is absent and hard-codes the expected PrimaryAdapter rules, so completing the two named test files would leave the prohibited rule-specific regression contract intact. Add this test module to T003 and reduce its shipped-config assertions to production-loader decoding and config/preset equality.",
-              "severity": "P1",
-              "file": "track/items/role-layer-matrix-enforcement-2026-07-25/impl-plan.json",
-              "line": 18,
-              "category": "task-coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:b2847c31f19fd91ee5d8c8ed60dbed240adbd27d1664259374d78401f7b99bdb",
-          "at": "2026-07-25T07:45:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d2888064bc5822eb6b750cb28d4f669e1a7609a765b8f69d96b79e7c77ee0f50",
-          "at": "2026-07-25T07:47:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18df082d5fd5945bae294f0c617d94f87ca8a43f1edac53b57b43dbc3b7260a0",
-          "at": "2026-07-25T08:10:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:18df082d5fd5945bae294f0c617d94f87ca8a43f1edac53b57b43dbc3b7260a0",
-          "at": "2026-07-25T08:15:06Z"
         }
       ]
     },
