@@ -1,0 +1,419 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "333fc8d47138b58b40791da9c31b68a9725e5b454c6dca06a07c755c33c4cca8",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "これにより role × 層の逸脱は、起草者の自制ではなくゲートで止まる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "R1 の role × 層配置規約に反するカタログ宣言を、起草者の自己規律ではなく active track の catalogue lint が検出・拒否し、ValueObject の配置根拠を review 可能な記録として残せるようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "333fc8d47138b58b40791da9c31b68a9725e5b454c6dca06a07c755c33c4cca8",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ValueObject` の domain / usecase / infrastructure をいずれも `△` とし、既定の住所を置かない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "R1 の role × 層配置規約に反するカタログ宣言を、起草者の自己規律ではなく active track の catalogue lint が検出・拒否し、ValueObject の配置根拠を review 可能な記録として残せるようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "6cbc1ca5ef3d124850e77611fbe56ef86752e1694d227ac08685a2d6ec09466f",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`✗` とされた層はこの宣言の補集合として機械的に禁止される。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "active track の catalogue lint は、R1 で各 role に許可された layer だけを受理し、許可外の role × layer 宣言を error として拒否する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "743c4f041abdfd81030b2784d794fd5410bc4a3b42b0f385872db67f3ff34bca",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`domain / usecase / infrastructure をいずれも `△` とし、既定の住所を置かない。`"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "ValueObject は domain、usecase、infrastructure のいずれに配置しても、配置の意味論的根拠を docs または track の review record に残し、reviewer がその根拠を照合できる。cli、cli_driver、cli_composition への配置は catalogue lint で拒否される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "99548c6df63ec10652291425238847e6b7d6dc7586674e5e9aefad5c1aebeb51",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出荷 lint config に対する回帰検査は、production adapter を通してデコードできることと、出荷 config と preset が構造として一致することの 2 点に限る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "出荷 catalogue-lint config と strict preset は同じ規則集合を提供し、production adapter によりいずれもデコード可能であることを回帰検査で確認できる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "48ef47d73397290b2eb2ca31216e81f19e86df07931f84a875bb693c116c5d32",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`✓` と `△` の区別は機械判定しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "ValueObject の配置が `✓` か `△` かを lint が判定したり、根拠の意味論的妥当性を機械的に判定したりすることは対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "6121eec5072f1d2b063dd3c6eb9d4660a62b8297dac13125f2b1858c050e1ece",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "過去 track の成果物は当時の判断の歴史的記録であって、現行規則への適合対象ではない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "過去 track の catalogue を新しい role × layer 規則へ遡及適用、移行、または適合監査することは対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "7c11d201738e2bc5e72e0af685bcc1d98ac03a924a6d4bd7b1f9f6f46197119d",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`grandfathered` に相当するフラグも、既存宣言のための段階監査レーンも新設しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-03",
+          "text_label": "grandfathered その他の適用除外フラグ、既存宣言用の段階的監査経路、または例外経路を新設することは対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "9ffbbb2cf273140b2a9f4dca660a39fa20aacb16372a1bf8aa134513ffbdbcf6",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "これにより role × 層の逸脱は、起草者の自制ではなくゲートで止まる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-04",
+          "text_label": "crate topology、外部観測可能な CLI 契約、または application boundary 内側への transport 型漏出を catalogue lint で追加検査することは対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "9ffbbb2cf273140b2a9f4dca660a39fa20aacb16372a1bf8aa134513ffbdbcf6",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`✓` と `△` の区別は機械判定しない。\n本決定は根拠の記録義務とレビューの判定基準としてのみ働く。\ncli / cli_driver / cli_composition は `✗` のままとし、その禁止は D1 によって機構化される。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-04",
+          "text_label": "crate topology、外部観測可能な CLI 契約、または application boundary 内側への transport 型漏出を catalogue lint で追加検査することは対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "ee5b0903725f4e88416126410abfc146c24ba8bce1f33a943b41ac1149e72c9a",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "lint 方針の正は config ファイルであり、検査がその内容を再記述すると正が二つに割れる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "role × layer の許可方針は出荷 lint config を唯一の正とし、規則一覧や許可値を Rust test のリテラルへ写経して二重に維持してはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "955d645217889aa85608dec9b59f71bbac4bd397f4275cddee26df0427d11305",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出荷 lint config に対する回帰検査は、production adapter を通してデコードできることと、出荷 config と preset が構造として一致することの 2 点に限る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "出荷 config の回帰検査は production adapter でのデコード可能性と config・preset の構造的一致に限り、特定 rule の存在や規則集合を別契約として検査してはならない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "9bcb795f06d1d8b59e83011663a19d37fd7701c9c6ae5c6c560dd2ea2d580e4b",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue lint の対象はアクティブ track である。\n過去 track の成果物は当時の判断の歴史的記録であって、現行規則への適合対象ではない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "role × layer 制約の適用対象は active track の catalogue lint に限り、歴史的 track artifact を現在の規則に適合させるための特別扱いを設けない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "79f0cec20e881d17149f2b3192f65f9fdc1cb489d34e195dced3100386a92e30",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "R1 マトリクスで `✓` または `△` とされた層を、role ごとに `permitted_layers` として lint config に宣言する。\\n`✗` とされた層はこの宣言の補集合として機械的に禁止される。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "R1 の全 role について、許可 layer の宣言が catalogue lint の出荷 config に存在し、許可外 layer を指定した active-track catalogue は lint error となる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "216ebe6272dfec9e32422ae9b89fc233d87e495eb7af7ec55c10833944e74f5a",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対象は単一層限定の role に限らない。複数層に置ける role も含めて全 role に宣言を置き、層制約を持たない role をゼロにする。これにより role × 層の逸脱は、起草者の自制ではなくゲートで止まる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "複数 layer へ置ける role を含め、R1 で `✗` の role × layer 組合せを持つ active-track catalogue は lint error となり、許可された組合せは layer constraint によって拒否されない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "8c16439a83e6338a96136f81995bd8ee566f65912cd06d5f0cc4616d4a4b57d0",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`ValueObject` の domain / usecase / infrastructure をいずれも `△` とし、既定の住所を置かない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "ValueObject の domain、usecase、infrastructure 配置は layer constraint で受理され、配置根拠を docs または track review record で reviewer が確認できる。一方で cli、cli_driver、cli_composition 配置は lint error となる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "62937a0b44bc71c35ffc4f80546bba45750965ba6f377b0624bb623155d46c5f",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出荷 lint config に対する回帰検査は、production adapter を通してデコードできることと、出荷 config と preset が構造として一致することの 2 点に限る。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "出荷 config と strict preset は production adapter でそれぞれデコードでき、両者から得た規則集合は構造として一致する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "119e77ef47bc2107c9f0d93ac85f01aa74faa70e1b9ca53310873a5fec4ca163",
+      "evidence_hash": "2b56ab47eca428a72516d9c9ba53170429d53e7c635a8c009d1facf5d1c607c5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "config の値を Rust のリテラルへ書き写して照合する assert は置かない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "出荷 config の回帰検査は config の規則値を Rust リテラルで再記述せず、撤去済み rule 種別の不在を個別 assertion として追加しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+          "decision_id": "D4"
+        }
+      }
+    }
+  ]
+}
