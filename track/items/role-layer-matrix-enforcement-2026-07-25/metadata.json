@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "role-layer-matrix-enforcement-2026-07-25",
+  "title": "role × 層マトリクスを機構で強制し ValueObject の層勾配を是正する",
+  "branch": "track/role-layer-matrix-enforcement-2026-07-25",
+  "created_at": "2026-07-25T05:58:00Z",
+  "updated_at": "2026-07-25T05:58:00Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

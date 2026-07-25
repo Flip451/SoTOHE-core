@@ -23,7 +23,7 @@
 
 #![allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command;
 
 fn sotp_bin() -> Command {
@@ -57,6 +57,20 @@ const RULES_JSON: &str = r#"{
         "schema_export": {"method": "rustdoc", "targets": ["domain"]}
       }
     }
+  ]
+}"#;
+
+/// All TDDD-enabled layers, used when exercising a role's actual permitted
+/// layers from the shipped `KindLayerConstraint` rules.
+const ALL_LAYERS_RULES_JSON: &str = r#"{
+  "version": 2,
+  "layers": [
+    {"crate":"domain","path":"libs/domain","may_depend_on":[],"deny_reason":"fixture","tddd":{"enabled":true,"catalogue_file":"domain-types.json","schema_export":{"method":"rustdoc","targets":["domain"]}}},
+    {"crate":"usecase","path":"libs/usecase","may_depend_on":[],"deny_reason":"fixture","tddd":{"enabled":true,"catalogue_file":"usecase-types.json","schema_export":{"method":"rustdoc","targets":["usecase"]}}},
+    {"crate":"infrastructure","path":"libs/infrastructure","may_depend_on":[],"deny_reason":"fixture","tddd":{"enabled":true,"catalogue_file":"infrastructure-types.json","schema_export":{"method":"rustdoc","targets":["infrastructure"]}}},
+    {"crate":"cli","path":"apps/cli","may_depend_on":[],"deny_reason":"fixture","tddd":{"enabled":true,"catalogue_file":"cli-types.json","schema_export":{"method":"rustdoc","targets":["cli"]}}},
+    {"crate":"cli_composition","path":"apps/cli-composition","may_depend_on":[],"deny_reason":"fixture","tddd":{"enabled":true,"catalogue_file":"cli_composition-types.json","schema_export":{"method":"rustdoc","targets":["cli_composition"]}}},
+    {"crate":"cli_driver","path":"apps/cli-driver","may_depend_on":[],"deny_reason":"fixture","tddd":{"enabled":true,"catalogue_file":"cli_driver-types.json","schema_export":{"method":"rustdoc","targets":["cli_driver"]}}}
   ]
 }"#;
 
@@ -341,6 +355,92 @@ const CATALOGUE_WITH_FORBID_PRIMITIVE_FIXTURES: &str = r#"{
 fn write(path: &Path, content: &str) {
     std::fs::create_dir_all(path.parent().unwrap()).unwrap();
     std::fs::write(path, content).unwrap();
+}
+
+fn shipped_config_path() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("../..").join(".harness/catalogue-lint/config.json")
+}
+
+/// Derive a focused fixture config from the shipped configuration. The spawned
+/// CLI still decodes this file through the production loader; this test only
+/// narrows the rule set so unrelated role invariants do not obscure the layer
+/// matrix result.
+fn shipped_value_object_layer_fixture() -> (String, Vec<String>, Vec<String>) {
+    let path = shipped_config_path();
+    let mut config: serde_json::Value = serde_json::from_slice(
+        &std::fs::read(&path).unwrap_or_else(|error| panic!("read {}: {error}", path.display())),
+    )
+    .unwrap_or_else(|error| panic!("parse {}: {error}", path.display()));
+    let rules = config["rules"]
+        .as_array_mut()
+        .unwrap_or_else(|| panic!("{} must contain a rules array", path.display()));
+    let value_object_layers = rules
+        .iter()
+        .find_map(|rule| {
+            let targets_value_object = rule["target_roles"]
+                .as_array()
+                .is_some_and(|roles| roles.iter().any(|role| role == "ValueObject"));
+            targets_value_object
+                .then(|| rule["kind"]["KindLayerConstraint"]["permitted_layers"].as_array())
+                .flatten()
+        })
+        .unwrap_or_else(|| panic!("{path:?} must contain a ValueObject KindLayerConstraint rule"))
+        .iter()
+        .map(|layer| {
+            layer
+                .as_str()
+                .unwrap_or_else(|| panic!("ValueObject permitted layer must be a string"))
+                .to_owned()
+        })
+        .collect::<Vec<_>>();
+    rules.retain(|rule| rule["kind"].get("KindLayerConstraint").is_some());
+    assert!(!rules.is_empty(), "shipped config must contain KindLayerConstraint rules");
+    let fixture_layers = serde_json::from_str::<serde_json::Value>(ALL_LAYERS_RULES_JSON)
+        .expect("all-layer architecture fixture must be valid JSON")["layers"]
+        .as_array()
+        .expect("all-layer architecture fixture must contain layers")
+        .iter()
+        .map(|layer| {
+            layer["crate"]
+                .as_str()
+                .unwrap_or_else(|| panic!("fixture layer crate must be a string"))
+                .to_owned()
+        })
+        .collect::<Vec<_>>();
+    let forbidden_layers = fixture_layers
+        .iter()
+        .filter(|layer| !value_object_layers.contains(*layer))
+        .cloned()
+        .collect::<Vec<_>>();
+
+    assert!(!value_object_layers.is_empty(), "ValueObject must permit at least one fixture layer");
+    assert!(!forbidden_layers.is_empty(), "ValueObject must forbid at least one fixture layer");
+
+    (
+        serde_json::to_string(&config).expect("focused KindLayerConstraint config must serialize"),
+        value_object_layers,
+        forbidden_layers,
+    )
+}
+
+fn write_empty_catalogues_for_all_layers(root: &Path) {
+    for layer in ["domain", "usecase", "infrastructure", "cli", "cli_composition", "cli_driver"] {
+        write(
+            &root.join(format!("track/items/test-track/{layer}-types.json")),
+            &format!(
+                r#"{{"schema_version":5,"crate_name":"{layer}","layer":"{layer}","types":{{}},"traits":{{}},"functions":{{}}}}"#
+            ),
+        );
+    }
+}
+
+fn write_value_object_catalogue(root: &Path, layer: &str) {
+    write(
+        &root.join(format!("track/items/test-track/{layer}-types.json")),
+        &format!(
+            r#"{{"schema_version":5,"crate_name":"{layer}","layer":"{layer}","types":{{"PlacementValue":{{"action":"add","role":{{"ValueObject":{{}}}},"kind":{{"kind":"struct","shape":{{"kind":"plain"}}}},"methods":[],"module_path":"","spec_refs":[],"informal_grounds":[]}}}},"traits":{{}},"functions":{{}}}}"#
+        ),
+    );
 }
 
 /// Shared implementation for `sotp catalogue-lint check-active-track` invocations.
@@ -660,6 +760,60 @@ fn test_catalogue_lint_check_active_track_primary_adapter_entity_is_rejected() {
             && report.contains("forbidden role 'Entity'"),
         "the real CLI must report the retained Entity boundary violation\n{report}"
     );
+}
+
+#[test]
+fn test_catalogue_lint_check_active_track_value_object_permitted_layers_are_allowed() {
+    let root_dir = tempfile::tempdir().unwrap();
+    let root = root_dir.path();
+    let rules_file = root.join("kind-layer-constraints.json");
+    let (rules, permitted_layers, _) = shipped_value_object_layer_fixture();
+
+    write(&root.join("architecture-rules.json"), ALL_LAYERS_RULES_JSON);
+    write_empty_catalogues_for_all_layers(root);
+    for layer in permitted_layers {
+        write_value_object_catalogue(root, &layer);
+    }
+    write(&rules_file, &rules);
+
+    let output = run_catalogue_lint_impl(root, Some(&rules_file));
+    assert!(
+        output.status.success(),
+        "the shipped ValueObject constraint must permit its three R1 layers\nstdout: {}\nstderr: {}",
+        String::from_utf8_lossy(&output.stdout),
+        String::from_utf8_lossy(&output.stderr)
+    );
+}
+
+#[test]
+fn test_catalogue_lint_check_active_track_value_object_forbidden_layer_is_rejected() {
+    let (rules, _, forbidden_layers) = shipped_value_object_layer_fixture();
+
+    for layer in forbidden_layers {
+        let root_dir = tempfile::tempdir().unwrap();
+        let root = root_dir.path();
+        let rules_file = root.join("kind-layer-constraints.json");
+
+        write(&root.join("architecture-rules.json"), ALL_LAYERS_RULES_JSON);
+        write_empty_catalogues_for_all_layers(root);
+        write_value_object_catalogue(root, &layer);
+        write(&rules_file, &rules);
+
+        let output = run_catalogue_lint_impl(root, Some(&rules_file));
+        let report = format!(
+            "{}\n{}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+        assert!(
+            !output.status.success(),
+            "the shipped ValueObject constraint must reject forbidden layer {layer}\n{report}"
+        );
+        assert!(
+            report.contains("KindLayerConstraint on PlacementValue") && report.contains(&layer),
+            "the CLI must report the ValueObject layer violation for {layer}\n{report}"
+        );
+    }
 }
 
 // ---------------------------------------------------------------------------

@@ -35,6 +35,12 @@ Define which crates may depend on which crates.
 2. Update `architecture-rules.json` first (this is the SSoT consumed by `bin/sotp verify layers`).
 3. Update layer policy in `deny.toml` (`deny = [...]` wrappers).
 4. Update `Makefile.toml` task names if any crates were renamed.
+5. Update the layer ids in `.harness/catalogue-lint/config.json` and
+   `.harness/catalogue-lint/presets/ddd-strict.json` together. Every role carries a
+   `KindLayerConstraint` whose `permitted_layers` matches layer ids literally, so a rename
+   leaves every role permitting only the old ids and `bin/sotp catalogue-lint
+   check-active-track` rejects valid entries across the whole matrix. The two files must stay
+   structurally equal.
 
 ## Step 3: Update Crates
 
@@ -64,6 +70,7 @@ cargo fmt --all -- --check
 cargo make check-layers       # internally calls bin/sotp verify layers against architecture-rules.json
 cargo make verify-arch-docs
 cargo deny check -D warnings
+cargo make ci                 # runs the shipped catalogue-lint configuration regression tests
 ```
 
 If any command fails, fix architecture rules before implementation work.

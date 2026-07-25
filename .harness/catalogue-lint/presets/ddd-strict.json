@@ -54,6 +54,22 @@
       "kind": { "NoRoleInMethodSignature": { "forbidden_roles": ["Entity", "AggregateRoot"] } }
     },
     {
+      "target_roles": ["ValueObject"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["domain", "usecase", "infrastructure"] } }
+    },
+    {
+      "target_roles": ["Entity"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["domain"] } }
+    },
+    {
+      "target_roles": ["AggregateRoot"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["domain"] } }
+    },
+    {
+      "target_roles": ["DomainService"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["domain", "usecase"] } }
+    },
+    {
       "target_roles": ["EventPolicy"],
       "kind": { "ReferencedRoleConstraint": { "target_field": "reacts_to", "expected_role": "DomainEvent" } }
     },
@@ -68,6 +84,34 @@
     {
       "target_roles": ["EventPolicy"],
       "kind": { "NoRoleInMethodSignature": { "forbidden_roles": ["Repository", "UseCase"] } }
+    },
+    {
+      "target_roles": ["DomainEvent"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["domain"] } }
+    },
+    {
+      "target_roles": ["Specification"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["domain"] } }
+    },
+    {
+      "target_roles": ["Factory"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["domain", "usecase", "infrastructure"] } }
+    },
+    {
+      "target_roles": ["UseCase"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["usecase"] } }
+    },
+    {
+      "target_roles": ["Interactor"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["usecase"] } }
+    },
+    {
+      "target_roles": ["Command"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["usecase"] } }
+    },
+    {
+      "target_roles": ["Query"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["usecase"] } }
     },
     {
       "target_roles": ["ValueObject"],
@@ -122,6 +166,30 @@
     {
       "target_roles": ["ErrorType"],
       "kind": { "KindLayerConstraint": { "permitted_layers": ["domain", "usecase", "infrastructure", "cli", "cli_composition"] } }
+    },
+    {
+      "target_roles": ["SecondaryAdapter"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["infrastructure"] } }
+    },
+    {
+      "target_roles": ["SpecificationPort"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["domain"] } }
+    },
+    {
+      "target_roles": ["SecondaryPort"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["domain", "usecase"] } }
+    },
+    {
+      "target_roles": ["ApplicationService"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["usecase"] } }
+    },
+    {
+      "target_roles": ["Repository"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["domain"] } }
+    },
+    {
+      "target_roles": ["UseCaseFunction"],
+      "kind": { "KindLayerConstraint": { "permitted_layers": ["usecase"] } }
     },
     {
       "target_roles": [],
