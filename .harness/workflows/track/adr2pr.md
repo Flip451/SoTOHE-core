@@ -98,10 +98,11 @@ baseline. At this stage `spec.md` does not exist yet (created in Step 5). The `r
 workflow scopes to what exists: `plan.md`, `metadata.json`, and the ADR files in the working
 tree. The absence of `spec.md` does not block the review.
 
-The Phase 0 convergence loop, user adjudication, post-approval reconvergence, and adjudication
-boundary closure are governed exclusively by
+The Phase 0 convergence loop, user adjudication, post-approval reconvergence, and
+boundary-stamp preparation are governed exclusively by
 `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`; do not restate
-or alter that procedure here.
+or alter that procedure here. This step stops before the ADR-baseline commit — Steps 3-4
+stage and perform the single commit that closes the adjudication boundary.
 
 **Step 3: Stage**
 

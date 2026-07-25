@@ -97,8 +97,9 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
    stop and report.
 2. Invoke the `review` workflow for the ADR baseline, then follow
    `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権` for Phase 0
-   convergence, user adjudication, and boundary closure. That convention is the sole
-   normative source for this phase; do not restate or alter its procedure here.
+   convergence, user adjudication, and boundary-stamp preparation — up to but excluding the
+   ADR-baseline commit, which step 3 performs. That convention is the sole normative source
+   for this phase; do not restate or alter its procedure here.
 3. Run `bin/sotp git add-all` and invoke the `commit` workflow for the ADR baseline. Its
    success closes the Phase 0 adjudication boundary; the input box is frozen from here to
    track end. Mark Phase 0 `completed` only after that guarded commit succeeds; then
