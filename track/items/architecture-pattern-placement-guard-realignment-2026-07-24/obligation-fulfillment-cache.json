@@ -15,13 +15,13 @@
         "item_identifier": "voluntary:IN-07"
       },
       "key": {
-        "bound_tests_set_hash": "f7a1283710cc202ad0136e346bb1f425335bd41cbf4814c182e981eeadbb07f5",
-        "declaration_hash": "440ef885dc2bf0948c9c171431f6d453af2267d13163d9a372e84e3ef83cebe1",
+        "bound_tests_set_hash": "d2810d617c588c08dd466c6ce78f645a4a06e7c933c00a482fe0d4fc4e1a6ae7",
+        "declaration_hash": "7b9cb5ebeadbc10b12280a4208989181bf6662f8b413c4dad567fe9de62a4b7e",
         "anchor_text_hash": "8bddc59f7182ec0f2600227915f583334425dbc6cb4920988adca52286739c37"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(kinds.len(), 14, \"must have exactly 14 variants\");\n\nassert_eq!(names, expected);"
+        "citation": "assert_eq!(kinds.len(), 15, \"must have exactly 15 variants\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -39,8 +39,8 @@
         "item_identifier": "voluntary:AC-05"
       },
       "key": {
-        "bound_tests_set_hash": "a43933d80fe0bef3fc7a7980df6a2cf3e77c843fbb109bbc2cbd4e094a6d70fe",
-        "declaration_hash": "440ef885dc2bf0948c9c171431f6d453af2267d13163d9a372e84e3ef83cebe1",
+        "bound_tests_set_hash": "b68d635219139140f424074ede88208af38c4e2a412446492f6907401baacf08",
+        "declaration_hash": "7b9cb5ebeadbc10b12280a4208989181bf6662f8b413c4dad567fe9de62a4b7e",
         "anchor_text_hash": "185240cccb157593ed987f45e81ce4bef1ff1b83e336ae53c665a3c926b64639"
       },
       "verdict": {
@@ -64,12 +64,12 @@
       },
       "key": {
         "bound_tests_set_hash": "d7b35b09ab5f8208144536bed50e0e6a32aa12547c0cb37417c34a7e564b6c82",
-        "declaration_hash": "440ef885dc2bf0948c9c171431f6d453af2267d13163d9a372e84e3ef83cebe1",
+        "declaration_hash": "7b9cb5ebeadbc10b12280a4208989181bf6662f8b413c4dad567fe9de62a4b7e",
         "anchor_text_hash": "28aad2e955458d9cfb0379a928c40a9d1c0c84e61c2ced4f652538377c3b922f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(violations.is_empty(), \"usecase boundary contracts must be allowed\"); ... assert_eq!(violations.len(), 2, \"both prohibited domain roles must be rejected\");"
+        "citation": "assert_eq!(violations.len(), 2, \"both prohibited domain roles must be rejected\");\n        assert!(violations.iter().all(|violation| violation.entry_name() == \"OrderDriver\"));"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -87,13 +87,13 @@
         "item_identifier": "voluntary:AC-07"
       },
       "key": {
-        "bound_tests_set_hash": "f86fe4ab4dc205a76aa9a53139175798c0b822ecec90467da66802b22523d54c",
-        "declaration_hash": "440ef885dc2bf0948c9c171431f6d453af2267d13163d9a372e84e3ef83cebe1",
+        "bound_tests_set_hash": "4a900a07da8b3c6780e16a350b9eae2a8a7779f15c80456c47dfdef155c22064",
+        "declaration_hash": "7b9cb5ebeadbc10b12280a4208989181bf6662f8b413c4dad567fe9de62a4b7e",
         "anchor_text_hash": "2b1f3f306348d4d3209cbb0a97c172b2456c22c7132ec49fc8781d871b9c3123"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(kinds.len(), 14, \"must have exactly 14 variants\");\n\n        let names: Vec<&str> = kinds.iter().map(|k| k.discriminant_name()).collect();\n        let expected = [\n            \"FieldEmpty\",\n            \"FieldNonEmpty\",\n            \"KindLayerConstraint\",\n            \"ReferencedRoleConstraint\",\n            \"TraitImplRequired\",\n            \"NoRoleInMethodSignature\",\n            \"MethodReferenceSignature\",\n            \"AccessorSignatureRequired\",\n            \"FieldElementUniqueAcrossEntries\",\n            \"NoExternalReferenceInMethods\",\n            \"NoPublicField\",\n            \"ForbiddenMethodReceiver\",\n            \"ForbidPrimitiveInTypes\",\n            \"CompositionRootPureDi\",\n        ];\n        assert_eq!(names, expected);"
+        "citation": "assert_eq!(kinds.len(), 15, \"must have exactly 15 variants\");\n\nlet names: Vec<&str> = kinds.iter().map(|k| k.discriminant_name()).collect();\nlet expected = [\n    \"FieldEmpty\",\n    \"FieldNonEmpty\",\n    \"KindLayerConstraint\",\n    \"ReferencedRoleConstraint\",\n    \"TraitImplRequired\",\n    \"NoRoleInMethodSignature\",\n    \"NoLayerInMethodSignature\",\n    \"MethodReferenceSignature\",\n    \"AccessorSignatureRequired\",\n    \"FieldElementUniqueAcrossEntries\",\n    \"NoExternalReferenceInMethods\",\n    \"NoPublicField\",\n    \"ForbiddenMethodReceiver\",\n    \"ForbidPrimitiveInTypes\",\n    \"CompositionRootPureDi\",\n];\nassert_eq!(names, expected);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -111,8 +111,8 @@
         "item_identifier": "voluntary:IN-07"
       },
       "key": {
-        "bound_tests_set_hash": "643449a3496f12ddeab459507acf4b1a08f1edb2ef5453dd1408bc52e7f79a9b",
-        "declaration_hash": "8d8ce12dba38433130fe4b334c673e06b653cde803a2cdae1dce8d50d6e4aa42",
+        "bound_tests_set_hash": "9ce618462b7c7fec5f7c3c7415a0dff3f32da674338129e17d66b304e1dbcbfb",
+        "declaration_hash": "53f3d25168d85a0dc6d4bb2caf9d89a70d8e68f3338343914db6797089c4b802",
         "anchor_text_hash": "8bddc59f7182ec0f2600227915f583334425dbc6cb4920988adca52286739c37"
       },
       "verdict": {
@@ -135,13 +135,13 @@
         "item_identifier": "voluntary:AC-06"
       },
       "key": {
-        "bound_tests_set_hash": "382a6587bbee9f49f94eff86db02f616781b87fe73b7bb81a3c7d12653819130",
-        "declaration_hash": "8d8ce12dba38433130fe4b334c673e06b653cde803a2cdae1dce8d50d6e4aa42",
+        "bound_tests_set_hash": "842a80eb855786fa39110a3196f09c8629459760fc9e1f8045013c33afa71907",
+        "declaration_hash": "53f3d25168d85a0dc6d4bb2caf9d89a70d8e68f3338343914db6797089c4b802",
         "anchor_text_hash": "28aad2e955458d9cfb0379a928c40a9d1c0c84e61c2ced4f652538377c3b922f"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n                rule.kind(),\n                &expected_kind,\n                \"conversion must preserve the typed rule variant and payload\"\n            );"
+        "citation": "assert_eq!(specs.len(), 15, \"must cover all 15 LintRuleKind variants\");\n        for spec in specs { ... assert_eq!(rule.kind(), &expected_kind, \"conversion must preserve the typed rule variant and payload\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -159,13 +159,13 @@
         "item_identifier": "voluntary:AC-07"
       },
       "key": {
-        "bound_tests_set_hash": "5862e5620dc07d4c375499475c1560bb0d32d88fad8b5077c753d817a09d11d3",
-        "declaration_hash": "8d8ce12dba38433130fe4b334c673e06b653cde803a2cdae1dce8d50d6e4aa42",
+        "bound_tests_set_hash": "21a86e10eb1ac584bdbc116077dc19eb00551a1a137287637212f24edb413bae",
+        "declaration_hash": "53f3d25168d85a0dc6d4bb2caf9d89a70d8e68f3338343914db6797089c4b802",
         "anchor_text_hash": "2b1f3f306348d4d3209cbb0a97c172b2456c22c7132ec49fc8781d871b9c3123"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(rule.kind(),\n                &expected_kind,\n                \"conversion must preserve the typed rule variant and payload\"\n            );"
+        "citation": "assert_eq!(rule.kind(),\n                    &expected_kind,\n                    \"conversion must preserve the typed rule variant and payload\"\n                );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },

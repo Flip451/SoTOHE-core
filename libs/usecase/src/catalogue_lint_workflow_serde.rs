@@ -26,6 +26,7 @@ enum LintRuleKindWire {
     ReferencedRoleConstraint { target_field: String, expected_role: String },
     TraitImplRequired { required_traits: Vec<String> },
     NoRoleInMethodSignature { forbidden_roles: Vec<String> },
+    NoLayerInMethodSignature { forbidden_layers: Vec<String> },
     MethodReferenceSignature { target_field: String },
     AccessorSignatureRequired { target_field: String },
     FieldElementUniqueAcrossEntries { target_field: String },
@@ -90,6 +91,15 @@ impl From<&LintRuleKind> for LintRuleKindWire {
                         .as_slice()
                         .iter()
                         .map(|role| role.variant_name().to_owned())
+                        .collect(),
+                }
+            }
+            LintRuleKind::NoLayerInMethodSignature { forbidden_layers } => {
+                Self::NoLayerInMethodSignature {
+                    forbidden_layers: forbidden_layers
+                        .as_slice()
+                        .iter()
+                        .map(ToString::to_string)
                         .collect(),
                 }
             }
@@ -188,6 +198,15 @@ fn lint_rule_kind_from_wire(wire: LintRuleKindWire) -> Result<LintRuleKind, Cata
                 parse_role_kind(&value)
             })?;
             Ok(LintRuleKind::NoRoleInMethodSignature { forbidden_roles })
+        }
+        LintRuleKindWire::NoLayerInMethodSignature { forbidden_layers } => {
+            let forbidden_layers =
+                parse_non_empty(forbidden_layers, "forbidden_layers", |value| {
+                    LayerId::try_new(value.clone()).map_err(|error| {
+                        CatalogueLintError(format!("invalid layer_id '{value}': {error}"))
+                    })
+                })?;
+            Ok(LintRuleKind::NoLayerInMethodSignature { forbidden_layers })
         }
         LintRuleKindWire::MethodReferenceSignature { target_field } => {
             Ok(LintRuleKind::MethodReferenceSignature {

@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-25T00:09:35Z",
-  "declaration_hash": "d797415bbda8a7e52309ecc04507c261b271070ea07d25cc362620cfe68b6fe7",
-  "implementation_input_hash": "8c93ce9ce1d53bdbc1da5a02dc7fe9a8d44a6a0b3339819533458c6fdd6c0596",
+  "generated_at": "2026-07-25T03:04:28Z",
+  "declaration_hash": "3907a9cc575178cc98df1377cc2428ade089b145662973196ed69a97bde93cef",
+  "implementation_input_hash": "1e6db89b296b2e6a275de97756b23295cdd0b0bcae4a8bbb87686d8a6699be1f",
   "signals": [
     {
       "type_name": "AdrBaselineCommand",

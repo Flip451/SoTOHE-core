@@ -147,7 +147,7 @@
       }
     },
     {
-      "claim_hash": "5d0d121680b113f78412472b4540e6274d7962f4008fd3069c11907653bd6fce",
+      "claim_hash": "17789dcde84431fa32cffd7dbb14c2b00e19bc85892ebff59a341f2f1bd22286",
       "evidence_hash": "4b49cfb50730cc2757c69e8715eea267bce5d4467aeaef21b7671cb680d0dcfc",
       "verdict": {
         "kind": "pass",
@@ -171,11 +171,11 @@
       }
     },
     {
-      "claim_hash": "5d0d121680b113f78412472b4540e6274d7962f4008fd3069c11907653bd6fce",
+      "claim_hash": "17789dcde84431fa32cffd7dbb14c2b00e19bc85892ebff59a341f2f1bd22286",
       "evidence_hash": "7b102efc53bf020d5335c21d7db26b59d4c5cdc3f86fcbd7a1b75d1791df0956",
       "verdict": {
         "kind": "pass",
-        "citation": "same-track domain-internal inbound reference を domain model での利用を示す補助シグナルとして維持する一方、その不在だけで domain 配置を拒否せず"
+        "citation": "same-track domain-internal inbound reference を domain model での利用を示す補助シグナルとして維持する一方、その不在だけで domain 配置を拒否せず、application boundary にのみ意味を持つ値は usecase boundary model として扱う。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -195,11 +195,11 @@
       }
     },
     {
-      "claim_hash": "5d0d121680b113f78412472b4540e6274d7962f4008fd3069c11907653bd6fce",
+      "claim_hash": "17789dcde84431fa32cffd7dbb14c2b00e19bc85892ebff59a341f2f1bd22286",
       "evidence_hash": "bdc0d089968b477c07c2604daf46a09ea0ac2a3ac8e0897877b4d2b8f9228a0b",
       "verdict": {
         "kind": "pass",
-        "citation": "lint は決定的な構造的不変条件を、semantic review は記録済み根拠による domain 分類を検証する。"
+        "citation": "catalogue-lint configuration と distributed preset、関連テスト、type-designer guidance、および reviewer briefing を同期して更新し、lint は決定的な構造的不変条件を、semantic review は記録済み根拠による domain 分類を検証する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -219,7 +219,7 @@
       }
     },
     {
-      "claim_hash": "5d0d121680b113f78412472b4540e6274d7962f4008fd3069c11907653bd6fce",
+      "claim_hash": "17789dcde84431fa32cffd7dbb14c2b00e19bc85892ebff59a341f2f1bd22286",
       "evidence_hash": "6e8fc2684858de64393b72972e1f3294c8e75f314a599abc0ed052514f739ecc",
       "verdict": {
         "kind": "pass",
@@ -243,7 +243,7 @@
       }
     },
     {
-      "claim_hash": "5d0d121680b113f78412472b4540e6274d7962f4008fd3069c11907653bd6fce",
+      "claim_hash": "17789dcde84431fa32cffd7dbb14c2b00e19bc85892ebff59a341f2f1bd22286",
       "evidence_hash": "700ef921a6cc92a63e436f45fa1211f8ff1d0b6a92dfb07ca49aaaa55682d173",
       "verdict": {
         "kind": "pass",
@@ -267,7 +267,7 @@
       }
     },
     {
-      "claim_hash": "5d0d121680b113f78412472b4540e6274d7962f4008fd3069c11907653bd6fce",
+      "claim_hash": "17789dcde84431fa32cffd7dbb14c2b00e19bc85892ebff59a341f2f1bd22286",
       "evidence_hash": "92b6e1231682a0da2d929fe09df44604d9591bc95c082c9522677f32a099cce1",
       "verdict": {
         "kind": "pass",
@@ -291,7 +291,7 @@
       }
     },
     {
-      "claim_hash": "5d0d121680b113f78412472b4540e6274d7962f4008fd3069c11907653bd6fce",
+      "claim_hash": "17789dcde84431fa32cffd7dbb14c2b00e19bc85892ebff59a341f2f1bd22286",
       "evidence_hash": "e368d7301642dba0780e1fb8f03ffb54361d68c1722bed3aac3cd63e328d2450",
       "verdict": {
         "kind": "pass",

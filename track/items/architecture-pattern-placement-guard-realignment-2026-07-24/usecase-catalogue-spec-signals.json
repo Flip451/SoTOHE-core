@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "d797415bbda8a7e52309ecc04507c261b271070ea07d25cc362620cfe68b6fe7",
+  "catalogue_declaration_hash": "3907a9cc575178cc98df1377cc2428ade089b145662973196ed69a97bde93cef",
   "signals": [
     {
       "type_name": "AdrBaselineCommand",
@@ -25,7 +25,7 @@
     {
       "type_name": "LintRuleKind",
       "signal": "blue",
-      "entry_hash": "8f27707f74b6d730908879dabfa129f3f0e7bd7a944bf9957feb9afb35dae0fe"
+      "entry_hash": "7c06f02a745823bcc174ae18b486ebcb0677f1d3638fb07fcebb090440108ba3"
     },
     {
       "type_name": "AdrBaselineService",

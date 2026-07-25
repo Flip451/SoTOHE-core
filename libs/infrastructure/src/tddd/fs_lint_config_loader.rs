@@ -380,5 +380,23 @@ mod tests {
             ],
             "PrimaryAdapter must forbid only the narrowed structural boundary roles"
         );
+
+        let forbidden_layers = config
+            .rules()
+            .iter()
+            .find_map(|rule| match (&rule.target_roles[..], &rule.kind) {
+                (_, LintRuleKind::NoLayerInMethodSignature { forbidden_layers })
+                    if rule.target_roles == ["PrimaryAdapter"] =>
+                {
+                    Some(forbidden_layers)
+                }
+                _ => None,
+            })
+            .expect("shipped config must enforce the PrimaryAdapter layer boundary");
+        assert_eq!(
+            forbidden_layers.as_slice().iter().map(AsRef::as_ref).collect::<Vec<&str>>(),
+            ["infrastructure"],
+            "PrimaryAdapter must reject every infrastructure-layer signature type"
+        );
     }
 }

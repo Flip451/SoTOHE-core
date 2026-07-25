@@ -165,6 +165,21 @@ fn test_shipped_primary_adapter_boundary_allows_application_models_only() {
         }
         other => panic!("expected NoRoleInMethodSignature, got {other:?}"),
     }
+
+    let layer_rule = config
+        .rules()
+        .iter()
+        .find(|rule| {
+            rule.target_roles == ["PrimaryAdapter"]
+                && matches!(rule.kind, LintRuleKind::NoLayerInMethodSignature { .. })
+        })
+        .expect("config.json must prohibit infrastructure-layer signature types");
+    match &layer_rule.kind {
+        LintRuleKind::NoLayerInMethodSignature { forbidden_layers } => {
+            assert_eq!(forbidden_layers.as_slice(), [LayerId::try_new("infrastructure").unwrap()]);
+        }
+        other => panic!("expected NoLayerInMethodSignature, got {other:?}"),
+    }
 }
 
 // ---------------------------------------------------------------------------

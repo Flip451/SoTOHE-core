@@ -16,12 +16,12 @@
       },
       "key": {
         "waived_reason_hash": "5a6e243a44eb5825a24eef883274543c44cf18dfdcd419137159b072493242c3",
-        "declaration_hash": "440ef885dc2bf0948c9c171431f6d453af2267d13163d9a372e84e3ef83cebe1",
+        "declaration_hash": "7b9cb5ebeadbc10b12280a4208989181bf6662f8b413c4dad567fe9de62a4b7e",
         "anchor_text_hash": "c1c200ef1cef77330eb77117e458ee82b3996e132ad67cc1cd3858115b3abc90"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Rule-kind enum; placement and behavior are defined by the cited spec anchors. Primitive rationale: opaque presentation label."
+        "citation": "domain concept の配置を、ユビキタス言語、不変条件、複数 operation を越えた意味の安定性、および delivery・persistence 都合からの独立性を主基準として判定する。"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -40,12 +40,12 @@
       },
       "key": {
         "waived_reason_hash": "4a340c970cc80975a7100c432d866053c431ecbd295bd45158eadb331701d439",
-        "declaration_hash": "440ef885dc2bf0948c9c171431f6d453af2267d13163d9a372e84e3ef83cebe1",
+        "declaration_hash": "7b9cb5ebeadbc10b12280a4208989181bf6662f8b413c4dad567fe9de62a4b7e",
         "anchor_text_hash": "0ae748ff036e7a44f637abf4f99f131f83ace2131ae1d0461fde427f7e6a4f43"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Rule-kind enum; placement and behavior are defined by the cited spec anchors."
+        "citation": "その不在だけで domain 配置を拒否せず"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -64,12 +64,12 @@
       },
       "key": {
         "waived_reason_hash": "d4f7832f0bfb1a6b1d7827abec4ce0179325c8e2b367af2b31231c386c342f8c",
-        "declaration_hash": "440ef885dc2bf0948c9c171431f6d453af2267d13163d9a372e84e3ef83cebe1",
+        "declaration_hash": "7b9cb5ebeadbc10b12280a4208989181bf6662f8b413c4dad567fe9de62a4b7e",
         "anchor_text_hash": "6302d82a5cdda9376d624027e125234a5f09be0c2231118f0cee091895a74005"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "意味論上 domain concept と判断される場合は適切な domain role へ配置でき、分類根拠を review 可能な形で記録する"
+        "citation": "\"Rule-kind enum; placement and behavior are defined by the cited spec anchors.\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -88,12 +88,12 @@
       },
       "key": {
         "waived_reason_hash": "12d3f986b5a5cc68da1758fb3edd774f01cf982161f842cbc6d5a31a45e6a082",
-        "declaration_hash": "8d8ce12dba38433130fe4b334c673e06b653cde803a2cdae1dce8d50d6e4aa42",
+        "declaration_hash": "53f3d25168d85a0dc6d4bb2caf9d89a70d8e68f3338343914db6797089c4b802",
         "anchor_text_hash": "c1c200ef1cef77330eb77117e458ee82b3996e132ad67cc1cd3858115b3abc90"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "Usecase boundary DTO; placement and conversion behavior are defined by the cited spec anchors."
+        "citation": "\"Usecase boundary DTO; placement and conversion behavior are defined by the cited spec anchors.\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -112,12 +112,12 @@
       },
       "key": {
         "waived_reason_hash": "d3f27292abb19e4217dde98f5ac847173dee247d944e3e410b424c8ffb6212f2",
-        "declaration_hash": "8d8ce12dba38433130fe4b334c673e06b653cde803a2cdae1dce8d50d6e4aa42",
+        "declaration_hash": "53f3d25168d85a0dc6d4bb2caf9d89a70d8e68f3338343914db6797089c4b802",
         "anchor_text_hash": "0ae748ff036e7a44f637abf4f99f131f83ace2131ae1d0461fde427f7e6a4f43"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "その不在だけで domain 配置を拒否せず"
+        "citation": "Usecase boundary DTO; placement and conversion behavior are defined by the cited spec anchors."
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -136,7 +136,7 @@
       },
       "key": {
         "waived_reason_hash": "ba5d071d8ef0579028d6d5216f2e2798640c60d9245ea73750f1f87ce6982b8a",
-        "declaration_hash": "8d8ce12dba38433130fe4b334c673e06b653cde803a2cdae1dce8d50d6e4aa42",
+        "declaration_hash": "53f3d25168d85a0dc6d4bb2caf9d89a70d8e68f3338343914db6797089c4b802",
         "anchor_text_hash": "6302d82a5cdda9376d624027e125234a5f09be0c2231118f0cee091895a74005"
       },
       "verdict": {
@@ -160,12 +160,12 @@
       },
       "key": {
         "waived_reason_hash": "12edbaa03955cc2c09c9cb87af8266f71babeff5a8f9bede3e29b34fb591c300",
-        "declaration_hash": "8d8ce12dba38433130fe4b334c673e06b653cde803a2cdae1dce8d50d6e4aa42",
+        "declaration_hash": "53f3d25168d85a0dc6d4bb2caf9d89a70d8e68f3338343914db6797089c4b802",
         "anchor_text_hash": "185240cccb157593ed987f45e81ce4bef1ff1b83e336ae53c665a3c926b64639"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "\"Usecase boundary DTO; placement and conversion behavior are defined by the cited spec anchors.\""
+        "citation": "\"同じ配置・境界判断を表現し、文書だけまたは lint だけが新規則へ進む不整合を残さない\""
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }

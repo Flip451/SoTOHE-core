@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-24T20:24:17Z",
-  "declaration_hash": "6172f5761fd39ccdb192cdc3df740133fcf04a211efd02d22559cc950410143a",
-  "implementation_input_hash": "d446e559e213120d8083b05a80fc6c5e17bf15bfc69b428a0c52f5c92f25915d",
+  "generated_at": "2026-07-25T03:41:09Z",
+  "declaration_hash": "48521046658b2dd00e56093de4b999b05421c23ad6191d181b39a5b0081abe88",
+  "implementation_input_hash": "a52155e22a182a93cd60843a9d56dcbb68315a404f2fc1316fbd46cbadca55f0",
   "signals": [
     {
       "type_name": "CatalogueLinterRuleKind",

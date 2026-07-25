@@ -140,7 +140,7 @@ pub enum RolePayloadField {
 
 /// Classifies what invariant a catalogue linter rule asserts (D15).
 ///
-/// 14 variants: 12 data-carrying + 2 unit rules.
+/// 15 variants: 13 data-carrying + 2 unit rules.
 ///
 /// Payloads use `RolePayloadField` for structured field-name references
 /// (validated by construction), and `String` / `Vec<String>` / `Vec<RoleKind>`
@@ -188,6 +188,14 @@ pub enum CatalogueLinterRuleKind {
     NoRoleInMethodSignature {
         /// Roles that must not appear in any method parameter or return type.
         forbidden_roles: NonEmptyVec<RoleKind>,
+    },
+
+    /// Rule asserts that no method signature contains a type declared in a
+    /// forbidden layer.
+    NoLayerInMethodSignature {
+        /// Layers whose declared types and traits must not appear in any
+        /// method parameter or return type.
+        forbidden_layers: NonEmptyVec<LayerId>,
     },
 
     /// Rule asserts that the method referenced by `target_field` exists in the
@@ -274,6 +282,7 @@ impl CatalogueLinterRuleKind {
             Self::ReferencedRoleConstraint { .. } => "ReferencedRoleConstraint",
             Self::TraitImplRequired { .. } => "TraitImplRequired",
             Self::NoRoleInMethodSignature { .. } => "NoRoleInMethodSignature",
+            Self::NoLayerInMethodSignature { .. } => "NoLayerInMethodSignature",
             Self::MethodReferenceSignature { .. } => "MethodReferenceSignature",
             Self::AccessorSignatureRequired { .. } => "AccessorSignatureRequired",
             Self::FieldElementUniqueAcrossEntries { .. } => "FieldElementUniqueAcrossEntries",
@@ -445,6 +454,7 @@ impl CatalogueLinterRule {
             | CatalogueLinterRuleKind::KindLayerConstraint { .. }
             | CatalogueLinterRuleKind::ReferencedRoleConstraint { .. }
             | CatalogueLinterRuleKind::TraitImplRequired { .. }
+            | CatalogueLinterRuleKind::NoLayerInMethodSignature { .. }
             | CatalogueLinterRuleKind::MethodReferenceSignature { .. }
             | CatalogueLinterRuleKind::AccessorSignatureRequired { .. }
             | CatalogueLinterRuleKind::FieldElementUniqueAcrossEntries { .. }
@@ -578,6 +588,9 @@ mod eval;
 
 #[path = "catalogue_linter_eval_primitives.rs"]
 mod eval_primitives;
+
+#[path = "catalogue_linter_eval_layer_signature.rs"]
+mod eval_layer_signature;
 
 /// Re-export so that consumers of `catalogue_linter` see `evaluate_catalogue_lint`
 /// at the expected path without knowing about the `eval` submodule.
@@ -801,11 +814,11 @@ mod tests {
     }
 
     // ------------------------------------------------------------------
-    // CatalogueLinterRuleKind — 14 variants exist and discriminant_name works
+    // CatalogueLinterRuleKind — 15 variants exist and discriminant_name works
     // ------------------------------------------------------------------
 
     #[test]
-    fn test_catalogue_linter_rule_kind_has_14_variants_with_distinct_names() {
+    fn test_catalogue_linter_rule_kind_has_15_variants_with_distinct_names() {
         let permitted = NonEmptyVec::new(layer("domain"), vec![]);
         let required_traits = NonEmptyVec::new(TypeRef::new("PartialEq").unwrap(), vec![]);
         let forbidden_roles = NonEmptyVec::new(RoleKind::Repository, vec![]);
@@ -820,6 +833,9 @@ mod tests {
             },
             CatalogueLinterRuleKind::TraitImplRequired { required_traits },
             CatalogueLinterRuleKind::NoRoleInMethodSignature { forbidden_roles },
+            CatalogueLinterRuleKind::NoLayerInMethodSignature {
+                forbidden_layers: NonEmptyVec::new(layer("infrastructure"), vec![]),
+            },
             CatalogueLinterRuleKind::MethodReferenceSignature {
                 target_field: RolePayloadField::Invariants,
             },
@@ -843,7 +859,7 @@ mod tests {
             },
             CatalogueLinterRuleKind::CompositionRootPureDi,
         ];
-        assert_eq!(kinds.len(), 14, "must have exactly 14 variants");
+        assert_eq!(kinds.len(), 15, "must have exactly 15 variants");
 
         let names: Vec<&str> = kinds.iter().map(|k| k.discriminant_name()).collect();
         let expected = [
@@ -853,6 +869,7 @@ mod tests {
             "ReferencedRoleConstraint",
             "TraitImplRequired",
             "NoRoleInMethodSignature",
+            "NoLayerInMethodSignature",
             "MethodReferenceSignature",
             "AccessorSignatureRequired",
             "FieldElementUniqueAcrossEntries",
@@ -4175,6 +4192,237 @@ mod tests {
         assert_eq!(violations[0].entry_name(), "MyDto");
         assert!(violations[0].message().contains("OrderRepo"));
         assert!(violations[0].message().contains("Repository"));
+    }
+
+    #[test]
+    fn test_cross_layer_no_layer_in_method_signature_rejects_infrastructure_dto() {
+        let infrastructure_layer = layer("infrastructure");
+        let driver_layer = layer("cli_driver");
+
+        let mut infrastructure_doc = CatalogueDocument::new(
+            3,
+            CrateName::new("infrastructure").unwrap(),
+            infrastructure_layer.clone(),
+        );
+        infrastructure_doc
+            .insert_type(TypeName::new("StoredOrderDto").unwrap(), make_type_entry(DataRole::Dto));
+
+        let mut driver_doc =
+            CatalogueDocument::new(3, CrateName::new("cli_driver").unwrap(), driver_layer.clone());
+        driver_doc.insert_type(
+            TypeName::new("OrderDriver").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::PrimaryAdapter,
+                vec![method_with_params(
+                    "handle",
+                    Some(SelfReceiver::SharedRef),
+                    vec![("stored", "infrastructure::StoredOrderDto")],
+                    "()",
+                )],
+            ),
+        );
+
+        let mut all = BTreeMap::new();
+        all.insert(infrastructure_layer.clone(), infrastructure_doc);
+        all.insert(driver_layer.clone(), driver_doc);
+
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::PrimaryAdapter]),
+            CatalogueLinterRuleKind::NoLayerInMethodSignature {
+                forbidden_layers: NonEmptyVec::new(infrastructure_layer, vec![]),
+            },
+        )
+        .unwrap();
+        let violations =
+            evaluate_catalogue_lint(&[rule], &all, &driver_layer, &StubPrimitiveScanner).unwrap();
+
+        assert_eq!(violations.len(), 1);
+        assert_eq!(violations[0].rule_kind(), "NoLayerInMethodSignature");
+        assert!(violations[0].message().contains("infrastructure"));
+        assert!(violations[0].message().contains("StoredOrderDto"));
+    }
+
+    #[test]
+    fn test_cross_layer_no_layer_in_method_signature_checks_contract_role_methods() {
+        let infrastructure_layer = layer("infrastructure");
+        let usecase_layer = layer("usecase");
+
+        let mut infrastructure_doc = CatalogueDocument::new(
+            3,
+            CrateName::new("infrastructure").unwrap(),
+            infrastructure_layer.clone(),
+        );
+        infrastructure_doc
+            .insert_type(TypeName::new("StoredOrderDto").unwrap(), make_type_entry(DataRole::Dto));
+
+        let mut usecase_doc =
+            CatalogueDocument::new(3, CrateName::new("usecase").unwrap(), usecase_layer.clone());
+        usecase_doc.insert_trait(
+            TraitName::new("OrderService").unwrap(),
+            make_trait_entry_with_methods(
+                ContractRole::ApplicationService,
+                vec![method_with_params(
+                    "execute",
+                    Some(SelfReceiver::SharedRef),
+                    vec![("stored", "infrastructure::StoredOrderDto")],
+                    "()",
+                )],
+            ),
+        );
+
+        let all = BTreeMap::from([
+            (infrastructure_layer.clone(), infrastructure_doc),
+            (usecase_layer.clone(), usecase_doc),
+        ]);
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::ApplicationService]),
+            CatalogueLinterRuleKind::NoLayerInMethodSignature {
+                forbidden_layers: NonEmptyVec::new(infrastructure_layer, vec![]),
+            },
+        )
+        .unwrap();
+
+        let violations =
+            evaluate_catalogue_lint(&[rule], &all, &usecase_layer, &StubPrimitiveScanner).unwrap();
+
+        assert_eq!(violations.len(), 1);
+        assert_eq!(violations[0].entry_name(), "OrderService");
+        assert!(violations[0].message().contains("StoredOrderDto"));
+    }
+
+    #[test]
+    fn test_no_layer_in_method_signature_matches_compact_rust_identifier_boundaries() {
+        let infrastructure_layer = layer("infrastructure");
+        let driver_layer = layer("cli_driver");
+
+        let mut infrastructure_doc = CatalogueDocument::new(
+            3,
+            CrateName::new("infrastructure").unwrap(),
+            infrastructure_layer.clone(),
+        );
+        infrastructure_doc
+            .insert_type(TypeName::new("StoredOrderDto").unwrap(), make_type_entry(DataRole::Dto));
+
+        let mut driver_doc =
+            CatalogueDocument::new(3, CrateName::new("cli_driver").unwrap(), driver_layer.clone());
+        driver_doc.insert_type(
+            TypeName::new("OrderDriver").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::PrimaryAdapter,
+                vec![
+                    method_with_params(
+                        "iterator",
+                        Some(SelfReceiver::SharedRef),
+                        vec![("items", "Iterator<Item=StoredOrderDto>")],
+                        "()",
+                    ),
+                    method_with_params(
+                        "callback",
+                        Some(SelfReceiver::SharedRef),
+                        vec![("callback", "fn()->StoredOrderDto")],
+                        "()",
+                    ),
+                ],
+            ),
+        );
+
+        let all = BTreeMap::from([
+            (infrastructure_layer.clone(), infrastructure_doc),
+            (driver_layer.clone(), driver_doc),
+        ]);
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::PrimaryAdapter]),
+            CatalogueLinterRuleKind::NoLayerInMethodSignature {
+                forbidden_layers: NonEmptyVec::new(infrastructure_layer, vec![]),
+            },
+        )
+        .unwrap();
+
+        let violations =
+            evaluate_catalogue_lint(&[rule], &all, &driver_layer, &StubPrimitiveScanner).unwrap();
+
+        assert_eq!(violations.len(), 2);
+        assert!(violations.iter().any(|violation| violation.message().contains("Item=")));
+        assert!(violations.iter().any(|violation| violation.message().contains("fn()->")));
+    }
+
+    #[test]
+    fn test_no_layer_in_method_signature_does_not_attribute_external_qualified_collision() {
+        let infrastructure_layer = layer("infrastructure");
+        let driver_layer = layer("cli_driver");
+
+        let mut infrastructure_doc = CatalogueDocument::new(
+            3,
+            CrateName::new("infrastructure").unwrap(),
+            infrastructure_layer.clone(),
+        );
+        infrastructure_doc
+            .insert_type(TypeName::new("SharedDto").unwrap(), make_type_entry(DataRole::Dto));
+
+        let mut driver_doc =
+            CatalogueDocument::new(3, CrateName::new("cli_driver").unwrap(), driver_layer.clone());
+        driver_doc.insert_type(TypeName::new("SharedDto").unwrap(), make_type_entry(DataRole::Dto));
+        driver_doc.insert_type(
+            TypeName::new("OrderDriver").unwrap(),
+            make_type_entry_with_methods(
+                DataRole::PrimaryAdapter,
+                vec![
+                    method_with_params(
+                        "external",
+                        Some(SelfReceiver::SharedRef),
+                        vec![("input", "vendor::SharedDto")],
+                        "()",
+                    ),
+                    method_with_params(
+                        "infrastructure",
+                        Some(SelfReceiver::SharedRef),
+                        vec![("input", "infrastructure::SharedDto")],
+                        "()",
+                    ),
+                ],
+            ),
+        );
+
+        let all = BTreeMap::from([
+            (infrastructure_layer.clone(), infrastructure_doc),
+            (driver_layer.clone(), driver_doc),
+        ]);
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::PrimaryAdapter]),
+            CatalogueLinterRuleKind::NoLayerInMethodSignature {
+                forbidden_layers: NonEmptyVec::new(infrastructure_layer, vec![]),
+            },
+        )
+        .unwrap();
+
+        let violations =
+            evaluate_catalogue_lint(&[rule], &all, &driver_layer, &StubPrimitiveScanner).unwrap();
+
+        assert_eq!(violations.len(), 1);
+        assert!(violations[0].message().contains("infrastructure::SharedDto"));
+    }
+
+    #[test]
+    fn test_no_layer_in_method_signature_unknown_forbidden_layer_returns_error() {
+        let driver_layer = layer("cli_driver");
+        let missing_layer = layer("infrastructure");
+        let driver_doc =
+            CatalogueDocument::new(3, CrateName::new("cli_driver").unwrap(), driver_layer.clone());
+        let all = BTreeMap::from([(driver_layer.clone(), driver_doc)]);
+        let rule = CatalogueLinterRule::new(
+            RuleTarget::new(vec![RoleKind::PrimaryAdapter]),
+            CatalogueLinterRuleKind::NoLayerInMethodSignature {
+                forbidden_layers: NonEmptyVec::new(missing_layer.clone(), vec![]),
+            },
+        )
+        .unwrap();
+
+        let result = evaluate_catalogue_lint(&[rule], &all, &driver_layer, &StubPrimitiveScanner);
+
+        assert!(
+            matches!(result, Err(CatalogueLinterError::UnknownLayer { ref layer_id }) if layer_id == &missing_layer),
+            "expected UnknownLayer for missing forbidden layer, got: {result:?}"
+        );
     }
 
     #[test]

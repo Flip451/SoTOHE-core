@@ -447,20 +447,32 @@
               "kind": "struct"
             }
           },
-          {
-            "name": "NoRoleInMethodSignature",
-            "payload": {
-              "fields": [
-                {
-                  "name": "forbidden_roles",
-                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::catalogue_linter::RoleKind>"
-                }
-              ],
-              "kind": "struct"
+      {
+        "name": "NoRoleInMethodSignature",
+        "payload": {
+          "fields": [
+            {
+              "name": "forbidden_roles",
+              "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::catalogue_linter::RoleKind>"
             }
-          },
-          {
-            "name": "MethodReferenceSignature",
+          ],
+          "kind": "struct"
+        }
+      },
+      {
+        "name": "NoLayerInMethodSignature",
+        "payload": {
+          "fields": [
+            {
+              "name": "forbidden_layers",
+              "ty": "domain::tddd::catalogue_v2::NonEmptyVec<domain::tddd::LayerId>"
+            }
+          ],
+          "kind": "struct"
+        }
+      },
+      {
+        "name": "MethodReferenceSignature",
             "payload": {
               "fields": [
                 {

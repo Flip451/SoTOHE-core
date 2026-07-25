@@ -11,7 +11,7 @@
 use std::collections::BTreeMap;
 
 use super::super::RoleKind;
-use super::super::helpers::{bare_name_in_type_ref, entry_role_kind};
+use super::super::helpers::{entry_role_kind, identifier_name_in_str};
 use crate::tddd::catalogue_v2::CatalogueDocument;
 use crate::tddd::catalogue_v2::roles::ItemAction;
 use crate::tddd::layer_id::LayerId;
@@ -192,28 +192,7 @@ pub(super) fn layer_qualified_name_in_sig(sig_type: &str, layer_id: &str, bare_n
 /// from the set of valid preceding characters, so a path-qualified reference
 /// like `domain::Foo` does not count as an unqualified occurrence of `Foo`.
 pub(super) fn bare_name_unqualified_in_sig(sig_type: &str, bare_name: &str) -> bool {
-    if sig_type == bare_name {
-        return true;
-    }
-    // Same as bare_name_in_type_ref but without `:` in start_chars.
-    let start_chars: &[char] = &['<', ',', ' ', '(', '[', '&', '*', '+'];
-    let end_chars: &[char] = &['>', ',', ' ', ')', ']', '<', ';', ':', '+'];
-    let mut rest = sig_type;
-    while let Some(pos) = rest.find(bare_name) {
-        let before_ok =
-            pos == 0 || rest[..pos].chars().next_back().is_some_and(|c| start_chars.contains(&c));
-        let after_pos = pos + bare_name.len();
-        let after_ok = after_pos == rest.len()
-            || rest[after_pos..].chars().next().is_some_and(|c| end_chars.contains(&c));
-        if before_ok && after_ok {
-            return true;
-        }
-        if after_pos >= rest.len() {
-            break;
-        }
-        rest = &rest[after_pos..];
-    }
-    false
+    identifier_name_in_str(sig_type, bare_name, |before| !before.ends_with("::"))
 }
 
 /// Returns `true` if the signature token `sig_type` contains an occurrence of
@@ -238,7 +217,7 @@ pub(super) fn bare_name_unqualified_in_sig(sig_type: &str, bare_name: &str) -> b
 ///    `bare_name`, only the target layer's entry is attributed — other layers
 ///    are suppressed. If no layer owns it or the target layer does not carry it,
 ///    all catalogue entries with a matching bare name are candidates.
-pub(super) fn sig_type_contains_entry(
+pub(in crate::tddd::catalogue_linter) fn sig_type_contains_entry(
     sig_type: &str,
     bare_name: &str,
     cat_layer_id: &LayerId,
@@ -264,7 +243,7 @@ pub(super) fn sig_type_contains_entry(
     }
 
     // Rule 3: unqualified bare-name match — apply target-layer-first priority.
-    if !bare_name_in_type_ref(sig_type, bare_name) {
+    if !bare_name_unqualified_in_sig(sig_type, bare_name) {
         return false;
     }
 

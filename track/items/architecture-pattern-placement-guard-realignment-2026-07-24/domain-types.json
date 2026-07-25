@@ -195,20 +195,32 @@
               "kind": "struct"
             }
           },
-          {
-            "name": "NoRoleInMethodSignature",
-            "payload": {
-              "fields": [
-                {
-                  "name": "forbidden_roles",
-                  "ty": "NonEmptyVec<RoleKind>"
-                }
-              ],
-              "kind": "struct"
+      {
+        "name": "NoRoleInMethodSignature",
+        "payload": {
+          "fields": [
+            {
+              "name": "forbidden_roles",
+              "ty": "NonEmptyVec<RoleKind>"
             }
-          },
-          {
-            "name": "MethodReferenceSignature",
+          ],
+          "kind": "struct"
+        }
+      },
+      {
+        "name": "NoLayerInMethodSignature",
+        "payload": {
+          "fields": [
+            {
+              "name": "forbidden_layers",
+              "ty": "NonEmptyVec<LayerId>"
+            }
+          ],
+          "kind": "struct"
+        }
+      },
+      {
+        "name": "MethodReferenceSignature",
             "payload": {
               "fields": [
                 {

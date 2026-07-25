@@ -108,6 +108,10 @@
       }
     },
     {
+      "target_roles": ["PrimaryAdapter"],
+      "kind": { "NoLayerInMethodSignature": { "forbidden_layers": ["infrastructure"] } }
+    },
+    {
       "target_roles": ["Dto"],
       "kind": { "KindLayerConstraint": { "permitted_layers": ["usecase", "infrastructure", "cli", "cli_driver"] } }
     },

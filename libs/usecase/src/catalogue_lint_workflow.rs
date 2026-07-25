@@ -126,6 +126,9 @@ pub enum LintRuleKind {
     /// Rule asserts that no method signature contains a type with a forbidden
     /// role.
     NoRoleInMethodSignature { forbidden_roles: NonEmptyVec<RoleKind> },
+    /// Rule asserts that no method signature contains a type declared in a
+    /// forbidden layer.
+    NoLayerInMethodSignature { forbidden_layers: NonEmptyVec<LayerId> },
     /// Rule asserts that the method referenced by `target_field` exists in the
     /// entry's public method set and satisfies the expected signature.
     MethodReferenceSignature { target_field: RolePayloadField },
@@ -384,6 +387,9 @@ fn lint_rule_spec_to_domain(spec: LintRuleSpec) -> Result<CatalogueLinterRule, C
         }
         LintRuleKind::NoRoleInMethodSignature { forbidden_roles } => {
             CatalogueLinterRuleKind::NoRoleInMethodSignature { forbidden_roles }
+        }
+        LintRuleKind::NoLayerInMethodSignature { forbidden_layers } => {
+            CatalogueLinterRuleKind::NoLayerInMethodSignature { forbidden_layers }
         }
         LintRuleKind::MethodReferenceSignature { target_field } => {
             CatalogueLinterRuleKind::MethodReferenceSignature { target_field }
@@ -826,7 +832,7 @@ mod tests {
     // ------------------------------------------------------------------
 
     #[test]
-    fn test_lint_rule_spec_to_domain_converts_all_14_kinds() {
+    fn test_lint_rule_spec_to_domain_converts_all_15_kinds() {
         let specs: Vec<LintRuleSpec> = vec![
             LintRuleSpec {
                 target_roles: vec![],
@@ -859,6 +865,12 @@ mod tests {
                 target_roles: vec!["EventPolicy".to_owned()],
                 kind: LintRuleKind::NoRoleInMethodSignature {
                     forbidden_roles: NonEmptyVec::new(RoleKind::Repository, vec![]),
+                },
+            },
+            LintRuleSpec {
+                target_roles: vec!["EventPolicy".to_owned()],
+                kind: LintRuleKind::NoLayerInMethodSignature {
+                    forbidden_layers: NonEmptyVec::new(layer("infrastructure"), vec![]),
                 },
             },
             LintRuleSpec {
@@ -905,7 +917,7 @@ mod tests {
                 kind: LintRuleKind::CompositionRootPureDi,
             },
         ];
-        assert_eq!(specs.len(), 14, "must cover all 14 LintRuleKind variants");
+        assert_eq!(specs.len(), 15, "must cover all 15 LintRuleKind variants");
         for spec in specs {
             let expected_target_roles = match spec.target_roles.as_slice() {
                 [] => vec![],
@@ -941,6 +953,11 @@ mod tests {
                 LintRuleKind::NoRoleInMethodSignature { forbidden_roles } => {
                     CatalogueLinterRuleKind::NoRoleInMethodSignature {
                         forbidden_roles: forbidden_roles.clone(),
+                    }
+                }
+                LintRuleKind::NoLayerInMethodSignature { forbidden_layers } => {
+                    CatalogueLinterRuleKind::NoLayerInMethodSignature {
+                        forbidden_layers: forbidden_layers.clone(),
                     }
                 }
                 LintRuleKind::MethodReferenceSignature { target_field } => {
@@ -1038,6 +1055,7 @@ mod tests {
             serde_json::json!({ "KindLayerConstraint": { "permitted_layers": [] } }),
             serde_json::json!({ "TraitImplRequired": { "required_traits": [] } }),
             serde_json::json!({ "NoRoleInMethodSignature": { "forbidden_roles": [] } }),
+            serde_json::json!({ "NoLayerInMethodSignature": { "forbidden_layers": [] } }),
             serde_json::json!({ "FieldNonEmpty": { "target_field": "" } }),
             serde_json::json!({ "FieldEmpty": { "target_field": "emit" } }),
             serde_json::json!({ "ForbiddenMethodReceiver": { "forbidden_receiver": "&mutself" } }),
