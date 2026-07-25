@@ -1,0 +1,172 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c103d2e991715d59ea728f51052e78c0a52fe0ccaf01653bdfa27d7fa58e51b",
+          "at": "2026-07-25T06:10:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c103d2e991715d59ea728f51052e78c0a52fe0ccaf01653bdfa27d7fa58e51b",
+          "at": "2026-07-25T06:18:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 0 gate text still requires a post-adjudication fresh review before staging, contradicting the updated Phase 0 procedure in the same workflow, which states that the boundary stamp is written only under `adr-baseline/`, does not change the scope hash, and requires only `review check-approved` confirmation. This stale gate can incorrectly force an unnecessary review round after approval.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 246,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "The Codex adapter still describes Phase 0 approval as permitting a “post-approval stamp” but does not state the new invariant that approval leaves ADR text and front-matter untouched and that the ledger stamp is the sole approval record. Since this adapter is an operational entry point for the workflow SSoT, it leaves the old front-matter/post-approval-edit semantics available to Codex execution and is inconsistent with the updated convention and workflow.",
+              "severity": "P1",
+              "file": ".agents/skills/track-adr2pr/SKILL.md",
+              "line": 53,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:f9860e330bbe87bca21ec55eebb4a3c1bf5047d24f6994f51444f5efbf53b6e9",
+          "at": "2026-07-25T06:43:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:037edf57996ff38804ce847b110e0ec0fd43ee864a80efbacf6ea23ae4c18176",
+          "at": "2026-07-25T06:47:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "An `adjudication-ready` round intentionally retains ADR findings and is not `check-approved`; the review SSoT requires resuming the ordinary loop after adjudication. This gate instead skips a fresh round whenever the ruling leaves ADR bytes unchanged, then invokes a check guaranteed to fail. Keep the no-extra-round optimization only for the already-`zero_findings` path; `adjudication-ready` must re-review to final `zero_findings`.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 246,
+              "category": "workflow-consistency"
+            },
+            {
+              "message": "Step 3 begins “After approval” and then edits or creates ADR text for a hearing decision. This violates the new prohibition on post-approval edits and bypasses review of the implemented text. Implement and re-audit the hearing decision before converged-text approval, resume review to final `zero_findings`, and only then close the boundary.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 110,
+              "category": "workflow-consistency"
+            },
+            {
+              "message": "The Codex adapter only pauses when Phase 0 reaches `zero_findings`, omitting the workflow SSoT’s `adjudication-ready` terminal state. That is precisely where guardian-withheld and hearing-required proposals remain, so Codex can miss the mandatory user adjudication. Remove this duplicated workflow condition or synchronize it with both terminal states.",
+              "severity": "P1",
+              "file": ".agents/skills/track-adr2pr/SKILL.md",
+              "line": 51,
+              "category": "adapter-ssot"
+            },
+            {
+              "message": "Making the ledger stamp the sole approval record reverses merged ADR decisions without a superseding/refining ADR. `2026-07-16-2001-adr-decision-freeze.md` D6/D7 explicitly assign approval provenance to front-matter refs and exclude it from ledger reasons, and `2026-07-17-1203-...` D1 repeats that contract; D2 merely makes this convention the workflow SSoT. Record the new user ruling in a durable ADR before changing the convention and workflows, otherwise the live policy and decision history conflict.",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 52,
+              "category": "source-of-truth"
+            }
+          ],
+          "hash": "rvw1:sha256:037edf57996ff38804ce847b110e0ec0fd43ee864a80efbacf6ea23ae4c18176",
+          "at": "2026-07-25T06:53:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9036e8d0844c3de3f44c0316863971dffc56970f536b0250fcf68e4c25ea738f",
+          "at": "2026-07-25T07:08:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`obligations.json` を `Other` から `review_operational` へ移し、内容レビューと hash invalidation を恒久的に迂回させる新しい review policy に、対応する ADR decision がありません。既存の per-SoT review-scope ADR D2 は未割当 artifact を `Other` とし、新種 artifact の割当変更を再検討条件にしています。`test-bindings.json` との区別を含む判断を ADR に記録してから設定へ反映してください。",
+              "severity": "P1",
+              "file": ".harness/config/review-scope.json",
+              "line": 90,
+              "category": "decision-grounding"
+            },
+            {
+              "message": "承認後の fresh review で生じた意味的編集を通常の guardian lane で採用し、guardian と reviewer の対立時だけ user に戻す変更は、Phase 0 の裁定境界を変える workflow decision です。しかし根拠は一時 briefing 内の user 指示だけで、`knowledge/conventions/adr.md` が workflow 変更に要求する永続 ADR decision がありません。既存 ADR が記録する収束→user 承認→刻印の流れを amend/supersede する ADR を追加し、その後 convention と workflow SSoT を追随させてください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 51,
+              "category": "convention-contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9036e8d0844c3de3f44c0316863971dffc56970f536b0250fcf68e4c25ea738f",
+          "at": "2026-07-25T07:13:35Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe504c253e15cb8e5fdb0042003ec46657f271428a07d98e9ce4851b2da3b9c4",
+          "at": "2026-07-25T06:01:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 0045 limits its “no new mechanism” boundary to assertions over prose without a machine-readable contract, and explicitly preserves parsed structural checks of configuration keys and values. It therefore does not support rejecting a rule-presence contract for this machine-readable lint config. Remove this citation or ground Alternative H in an applicable decision; its current rejection rationale is unsupported.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+              "line": 120,
+              "category": "broken narrative reference"
+            }
+          ],
+          "hash": "rvw1:sha256:fe504c253e15cb8e5fdb0042003ec46657f271428a07d98e9ce4851b2da3b9c4",
+          "at": "2026-07-25T06:03:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:907aef4af8d3614920e91fb8169be584ce965327d6a35403eedc1e47f80e9e58",
+          "at": "2026-07-25T06:14:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 embeds downstream review procedure rather than only recording the architectural decision: requiring placement rationale in `docs` or a track review record and requiring the reviewer to reconcile it constrains review/documentation workflow. This is scope leakage into the ADR and should be delegated to the relevant convention or spec.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+              "line": 50,
+              "category": "scope leakage into ADR body"
+            },
+            {
+              "message": "D4 contains excessive implementation-level test and type details (`production adapter`, two-file structural matching, Rust literal assertions, and enum decode behavior). These operational verification mechanics obscure the decision about keeping config as the single source of truth and should be delegated to the relevant testing/convention artifact.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+              "line": 61,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:c60e402fd9b041ed3197bce7d3d2a48fb374105e5c8b58da9879af0805aa18bc",
+          "at": "2026-07-25T06:29:42Z"
+        }
+      ]
+    }
+  }
+}

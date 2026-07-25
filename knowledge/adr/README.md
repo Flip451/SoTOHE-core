@@ -136,6 +136,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [DDD・Clean Architectureに整合する型配置と境界依存の再調整](2026-07-24-1001-architecture-pattern-placement-guard-realignment.md) | Proposed | 2026-07-24 |
 | [型配置是正における CLI 契約の維持](2026-07-25-0313-architecture-pattern-placement-cli-contract-preservation.md) | Proposed | 2026-07-25 |
 | [型契約パイプラインの規範と機構を実挙動に整合させる](2026-07-23-0113-type-contract-pipeline-consistency.md) | Proposed | 2026-07-23 |
+| [role × 層マトリクスを機構で強制し ValueObject の層勾配を是正する](2026-07-25-0538-role-layer-matrix-enforcement.md) | Proposed | 2026-07-25 |
 
 ### トラック・ワークフロー
 
