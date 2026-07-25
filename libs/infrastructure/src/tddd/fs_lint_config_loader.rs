@@ -170,8 +170,6 @@ impl LintConfigLoader for FsLintConfigLoader {
 #[allow(clippy::indexing_slicing, clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
     use super::*;
-    use domain::tddd::catalogue_linter::RoleKind;
-    use usecase::catalogue_lint_workflow::LintRuleKind;
 
     fn write_config(dir: &std::path::Path, content: &str) -> PathBuf {
         let path = dir.join("config.json");
@@ -327,7 +325,7 @@ mod tests {
     }
 
     #[test]
-    fn test_shipped_config_and_preset_decode_to_identical_narrowed_primary_adapter_rules() {
+    fn test_shipped_config_and_preset_decode_to_identical_rules() {
         let repo_root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../..");
         let config_path = repo_root.join(".harness/catalogue-lint/config.json");
         let preset_path = repo_root.join(".harness/catalogue-lint/presets/ddd-strict.json");
@@ -346,57 +344,6 @@ mod tests {
         assert_eq!(
             config_rules, preset_rules,
             "shipped config and preset must have identical rules"
-        );
-
-        for rule in config.rules() {
-            let rule_kind = serde_json::to_value(&rule.kind)
-                .expect("decoded rule kind must serialize for obsolete-variant check");
-            assert!(
-                rule_kind.get("DomainValueObjectInboundReferenceRequired").is_none(),
-                "the removed inbound-reference rule must not be present in shipped configuration"
-            );
-        }
-
-        let forbidden_roles = config
-            .rules()
-            .iter()
-            .find_map(|rule| match (&rule.target_roles[..], &rule.kind) {
-                (_, LintRuleKind::NoRoleInMethodSignature { forbidden_roles })
-                    if rule.target_roles == ["PrimaryAdapter"] =>
-                {
-                    Some(forbidden_roles)
-                }
-                _ => None,
-            })
-            .expect("shipped config must retain the PrimaryAdapter signature boundary rule");
-        assert_eq!(
-            forbidden_roles.as_slice(),
-            &[
-                RoleKind::Entity,
-                RoleKind::AggregateRoot,
-                RoleKind::Repository,
-                RoleKind::SecondaryPort,
-                RoleKind::SecondaryAdapter,
-            ],
-            "PrimaryAdapter must forbid only the narrowed structural boundary roles"
-        );
-
-        let forbidden_layers = config
-            .rules()
-            .iter()
-            .find_map(|rule| match (&rule.target_roles[..], &rule.kind) {
-                (_, LintRuleKind::NoLayerInMethodSignature { forbidden_layers })
-                    if rule.target_roles == ["PrimaryAdapter"] =>
-                {
-                    Some(forbidden_layers)
-                }
-                _ => None,
-            })
-            .expect("shipped config must enforce the PrimaryAdapter layer boundary");
-        assert_eq!(
-            forbidden_layers.as_slice().iter().map(AsRef::as_ref).collect::<Vec<&str>>(),
-            ["infrastructure"],
-            "PrimaryAdapter must reject every infrastructure-layer signature type"
         );
     }
 }

@@ -40,7 +40,7 @@
 
 | role (v5) | domain | usecase | infrastructure | cli | cli_composition | cli_driver | 配置根拠 |
 |---|---|---|---|---|---|---|---|
-| `ValueObject` (DataRole) | △ | ✓ | △ | ✗ | ✗ | ✗ | domain 配置はユビキタス言語、不変条件、複数 operation を越えた意味の安定性、persistence/CLI/workflow 都合からの独立性で判断する。domain-internal inbound 参照は補助証拠であり必須条件ではない |
+| `ValueObject` (DataRole) | △ | △ | △ | ✗ | ✗ | ✗ | 配置はユビキタス言語、不変条件、複数 operation を越えた意味の安定性、persistence/CLI/workflow 都合からの独立性で判断する。domain-internal inbound 参照は補助証拠であり必須条件ではない |
 | `Entity` (DataRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | entity は domain 概念。他層での使用は domain leak |
 | `AggregateRoot` (DataRole) | ✓ | ✗ | ✗ | ✗ | ✗ | ✗ | aggregate root は domain 概念 |
 | `DomainService` (DataRole) | ✓ | △ | ✗ | ✗ | ✗ | ✗ | domain knowledge を集約する behavior 中心 struct。usecase は trans-domain な application logic で要根拠 |
@@ -64,9 +64,11 @@
 | `FreeFunction` (FunctionRole) | ✓ | ✓ | ✓ | ✓ | ✗ | ✓ | layer-flexible (top-level pub fn)。cli_composition は配線を CompositionRoot のメソッドとして書くため pub free function が生じない |
 | `UseCaseFunction` (FunctionRole) | ✗ | **✓ ONLY** | ✗ | ✗ | ✗ | ✗ | use-case entrypoint function。usecase 層 |
 
-凡例: `✓` = OK, `△` = 要根拠 (default ではない、docs フィールドに根拠を記録)、`✗` = forbidden, `**ONLY**` = この層以外で使うことを禁止
+凡例: `✓` = OK, `△` = 要根拠 (default ではない、docs フィールドに根拠を記録。`ValueObject` は docs または review 可能な track 記録)、`✗` = forbidden, `**ONLY**` = この層以外で使うことを禁止
 
-`ValueObject` の domain 配置は、ユビキタス言語、不変条件の所有、複数 application operation を越えた意味の安定性、persistence・CLI・workflow 都合からの独立性を根拠として決める。same-track domain-internal inbound reference は domain model での利用を示す補助証拠として記録してよいが、その不在だけで拒否してはならない。application boundary にのみ意味を持つ値は usecase の `Dto` / `Command` / `Query` / `ValueObject` として置く。semantic classification の根拠は catalogue の `docs` または track の review 記録に残し、catalogue lint はこの分類を機械判定しない。
+R1 の全 role には、出荷 catalogue-lint config の `KindLayerConstraint` がある。各 rule の `permitted_layers` は表の `✓` と `△` の層を許可し、その補集合である `✗` を active track で拒否する。lint は `✓` と `△` の区別や根拠の妥当性を機械判定しない。
+
+`ValueObject` は domain / usecase / infrastructure のいずれへ置く場合も、ユビキタス言語、不変条件の所有、複数 application operation を越えた意味の安定性、persistence・CLI・workflow 都合からの独立性を根拠として決める。same-track domain-internal inbound reference は domain model での利用を示す補助証拠として記録してよいが、その不在だけで拒否してはならない。application boundary にのみ意味を持つ値は usecase の `Dto` / `Command` / `Query` / `ValueObject` として置く。配置の semantic classification と根拠は catalogue の `docs` または track の review 記録に残し、reviewer が照合する。
 
 `✗` または **ONLY** を破る role × layer 選択は、`bin/sotp signal calc-impl-catalog` の signal 評価以前に **role 違反** として draft 段階で却下する。
 
@@ -321,8 +323,9 @@ type-designer 自身および reviewer は draft 段階で以下を確認する:
 ## Enforcement
 
 - 第一線: catalogue を起草する agent の定義で本 convention の reading + compliance を義務付ける
-- 第二線: track ごとの reviewer briefing (`tmp/reviewer-runtime/briefing-{scope}.md`) で本 convention を参照し、R1〜R10 の checklist を review 観点として明示する。`.harness/custom/review-prompts/<scope>.md` は利用者所有の severity policy であり、framework methodology の enforcement source にはしない
-- 第三線: `bin/sotp signal calc-impl-catalog` の signal 評価 (catalogue → spec の trace integrity)。role 違反は signal 評価より先に draft 段階で却下するため、検証の網としては最終 backstop の位置づけ
+- 第二線: `bin/sotp catalogue-lint check-active-track` が、出荷 catalogue-lint config の `KindLayerConstraint` で active track の R1 forbidden role × layer 組合せを signal 評価より先に reject する。これは config を消費する lint gate であり、将来候補の codec validation とは別の機構である
+- 第三線: track ごとの reviewer briefing (`tmp/reviewer-runtime/briefing-{scope}.md`) で本 convention を参照し、R1〜R10 の checklist を review 観点として明示する。`.harness/custom/review-prompts/<scope>.md` は利用者所有の severity policy であり、framework methodology の enforcement source にはしない
+- 第四線: `bin/sotp signal calc-impl-catalog` の signal 評価 (catalogue → spec の trace integrity)。role 違反は第二線で signal 評価より先に draft 段階で却下するため、検証の網としては最終 backstop の位置づけ
 
 将来の自動化候補: catalogue codec (`libs/infrastructure/src/tddd/catalogue_document_codec/`) で R1 layer-role マトリクスを machine-readable に表現し、`bin/sotp` の codec validation で reject する (`forbidden` 組合せ → codec error)。
 

@@ -60,12 +60,14 @@ spec_refs/role/action mismatch.
   (`AC-NN` / `IN-NN` / `CN-NN` / spec element id) accompanies it — the field
   must reference upstream behaviour by anchor cite, not reproduce it. Cite
   `knowledge/conventions/no-upstream-restatement.md`.
-- **unsupported semantic placement**: a domain candidate whose recorded evidence
-  does not establish ubiquitous language, invariant ownership, stable meaning
-  across application operations, and independence from persistence / CLI /
-  workflow concerns; or a reviewer treats absent same-track inbound references
-  as sufficient rejection. Inbound references are supporting evidence only.
-  Cite `type-designer-kind-selection.md` R1.
+- **unsupported semantic placement**: a `ValueObject` placed in domain, usecase,
+  or infrastructure whose `docs` or reviewable track record does not establish
+  the semantic grounds for that placement: ubiquitous language, invariant
+  ownership, stable meaning across application operations, and independence
+  from persistence / CLI / workflow concerns as applicable. A reviewer must
+  not treat absent same-track domain-internal inbound references as sufficient
+  rejection; they are supporting evidence only. Cite
+  `type-designer-kind-selection.md` R1.
 
 ### Cross-layer contract findings
 
