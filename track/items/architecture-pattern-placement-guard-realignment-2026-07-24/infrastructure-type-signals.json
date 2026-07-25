@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-25T00:50:58Z",
+  "generated_at": "2026-07-25T02:39:34Z",
   "declaration_hash": "e27cdc50544dc10378ce3f35b41536eb07895fd182bd48404717a836cd425ac9",
-  "implementation_input_hash": "2e7c656c2c35007ab6bb310537d0d9e76eadaedcfad9d4710b0312d8015d10ca",
+  "implementation_input_hash": "5907da441a8968b71a6adbc3fa23c00f21a22bbea1c9248b9596f816900589ae",
   "signals": [
     {
       "type_name": "SystemClockAdapter",

@@ -37,7 +37,6 @@ struct LintConfigVersionProbe {
 /// ```
 ///
 #[derive(serde::Deserialize)]
-#[serde(deny_unknown_fields)]
 struct LintConfigFile {
     #[serde(rename = "schema_version")]
     _schema_version: u32,
@@ -286,16 +285,13 @@ mod tests {
     }
 
     #[test]
-    fn test_load_unknown_top_level_field_returns_parse_error() {
+    fn test_load_unknown_top_level_field_preserves_forward_compatibility() {
         let dir = tempfile::tempdir().unwrap();
         let path =
             write_config(dir.path(), r#"{ "schema_version": 1, "rules": [], "unexpected": true }"#);
         let loader = FsLintConfigLoader::new(path);
-        let err = loader.load().unwrap_err();
-        assert!(
-            matches!(&err, LintConfigLoaderError::ParseError { .. }),
-            "expected ParseError, got: {err:?}"
-        );
+        let config = loader.load().expect("unknown optional top-level fields must be ignored");
+        assert!(config.rules().is_empty());
     }
 
     #[test]
