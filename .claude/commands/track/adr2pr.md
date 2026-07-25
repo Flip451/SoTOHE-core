@@ -36,6 +36,9 @@ filename is recorded as that track's init baseline.
   `--resume` only when continuing the same assignment (`.claude/rules/orchestration.md`).
 - **Interaction boundaries**: honor the workflow SSoT's user-interaction and terminal-state
   rules; this adapter does not restate them.
+- **Phase 0 governing convention**: apply
+  `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権` as the sole
+  normative source for Phase 0. This adapter states no procedure of its own for that phase.
 - **Staging**: `bin/sotp git add-all`
 - **Commit**: write to `tmp/track-commit/commit-message.txt`, then `cargo make track-commit-message`
 - **Terminal audit comment**: use only the workflow SSoT's approved wrapper; do not invoke

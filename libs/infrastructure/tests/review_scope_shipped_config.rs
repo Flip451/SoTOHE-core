@@ -16,7 +16,7 @@
 use std::path::{Path, PathBuf};
 
 use domain::TrackId;
-use domain::review_v2::{MainScopeName, ScopeName};
+use domain::review_v2::{FilePath, MainScopeName, ScopeName};
 use infrastructure::review_v2::load_v2_scope_config;
 
 fn repo_root() -> PathBuf {
@@ -69,4 +69,32 @@ fn test_shipped_review_scope_layer_groups_match_arch_rules() {
             "architecture-rules.json layer '{crate_name}' has no matching review-scope group"
         );
     }
+}
+
+/// The derived obligations artifact is operational, but the author-written
+/// test bindings remain in content review.
+#[test]
+fn test_shipped_review_scope_classifies_obligations_as_operational_and_test_bindings_as_content() {
+    let root = repo_root();
+    let scope_path = root.join(".harness/config/review-scope.json");
+    let fixture_track_id = "review-scope-regression-fixture";
+    let track_id = TrackId::try_new(fixture_track_id).unwrap();
+    let config = load_v2_scope_config(&scope_path, &track_id, &root).unwrap();
+
+    let obligations =
+        FilePath::new(format!("track/items/{fixture_track_id}/obligations.json")).unwrap();
+    let test_bindings =
+        FilePath::new(format!("track/items/{fixture_track_id}/test-bindings.json")).unwrap();
+
+    let classified = config.classify(&[obligations.clone(), test_bindings.clone()]);
+
+    assert!(
+        !classified.values().any(|files| files.contains(&obligations)),
+        "derived obligations.json must be excluded as review-operational"
+    );
+    assert_eq!(
+        classified.get(&ScopeName::Other).map(Vec::as_slice),
+        Some([test_bindings].as_slice()),
+        "author-written test-bindings.json must remain in content review"
+    );
 }

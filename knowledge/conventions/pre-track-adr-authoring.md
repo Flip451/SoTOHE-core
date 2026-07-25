@@ -48,13 +48,18 @@ ADR の意味は user に属する。track が ADR を扱う全期間につい�
 
 1. **init 刻印**: track init が持ち込み時点の ADR を ledger に init 種別で刻印する。「track に何を持ち込んだか」の記録であり、user が見る diff の基準点。
 2. **in-place 収束ループ**: baseline review の findings への修正は、**意味変更を含めて** adr-editor が working tree に適用する。**適用直後に adr-diagnoser が適用済み編集 (concrete diff) を監査する** — 決定を保存する編集のみ採用し、決定を壊すと判定された変更は編集前の文面へ戻す。その際守護者は保全代案または修正不要理由を提示し、orchestrator はそれをレビュアーへそのまま還流する。レビュアーが所見を維持して対立が解消しない場合だけ、orchestrator は裁定せずその対立を手順 3 の user 裁定へ載せる。**ループ中は ledger に一切書き込まない** — 中間刻印は禁止。init 記録との乖離は「レビュー中の draft」を意味する正常状態である。新決定が必要な場合も delta 候補は作らない — user 同席の hearing で決定内容を裁定し、adr-editor がその hearing 内容を実装する (既存 pre-merge 入力 ADR への追記、または post-merge 入力 ADR の場合は hearing の決定を記録する新 ADR ファイルの起草。grounds は hearing を指す `user_decision_ref`)。新 ADR ファイルは orchestrator が init 刻印して入力箱に加え、fresh review の再収束が境界 commit 前にそれを覆う。
-3. **zero_findings / adjudication-ready 到達 → user 裁定**: 全 required scope が zero_findings に至ったら、またはすべての **required** 非 ADR scope が zero_findings（approved / not-required は阻害しない）で ADR scope に残る **すべて** の finding が (a) 守護者の差し止めた決定対立かつ保全代案 / 修正不要理由を記録している、または (b) lifecycle を問わず新決定が必要で user-present hearing を必要とする、場合は review workflow を **adjudication-ready** として停止し、user に (a) init 刻印との diff、(b) 守護者が差し止めた提案・hearing-required 提案とその根拠を提示して裁定を仰ぐ。adjudication-ready は commit 許可ではなく、この user 裁定だけの到達点である。この提示は user が実際に読める形で行う — diff の内容 (変更 hunk の原文、または hunk 単位の忠実な要約) を裁定依頼と同じ chat 本文に明示する。tool 出力・ファイル path 参照・添付だけによる提示は裁定依頼の前提を満たさない。finding 単位で user を割り込ませない — user がレビューするのは収束後の全体である。承認後、adr-editor が承認 `user_decision_ref` を対象 decision に適用し、adr-diagnoser が承認 ref を含む文面を再監査し、fresh review で current hash を zero_findings に再収束させる。再収束中に user 裁定済み文面の意味変更が必要な finding が出た場合は自己解決せず user 裁定へ戻す。
+3. **zero_findings / adjudication-ready 到達 → user 裁定**: 全 required scope が zero_findings に至ったら、またはすべての **required** 非 ADR scope が zero_findings（approved / not-required は阻害しない）で ADR scope に残る **すべて** の finding が (a) 守護者の差し止めた決定対立かつ保全代案 / 修正不要理由を記録している、または (b) lifecycle を問わず新決定が必要で user-present hearing を必要とする、場合は review workflow を **adjudication-ready** として停止し、user に (a) init 刻印との diff、(b) 守護者が差し止めた提案・hearing-required 提案とその根拠を提示して裁定を仰ぐ。adjudication-ready は commit 許可ではなく、この user 裁定だけの到達点である。この提示は user が実際に読める形で行う — diff の内容 (変更 hunk の原文、または hunk 単位の忠実な要約) を裁定依頼と同じ chat 本文に明示する。tool 出力・ファイル path 参照・添付だけによる提示は裁定依頼の前提を満たさない。finding 単位で user を割り込ませない — user がレビューするのは収束後の全体である。承認後、adr-editor が承認 `user_decision_ref` を対象 decision に適用し、adr-diagnoser が承認 ref を含む文面を再監査し、fresh review で current hash を zero_findings に再収束させる。
+
+   **承認後の再収束**: user が収束文面を承認した後、その ADR 文面に修正を加える必要が生じた場合は、承認済みの状態を維持したまま通常の guardian lane を継続してはならない。修正が意味変更か、adr-diagnoser が決定保存的と判定するものかを問わず、前の承認を修正後の文面へ流用してはならない。手順 2 の承認前 in-place 収束ループへ戻し、findings を収束させる。修正後の収束文面の**全体**を user へ再提示して新たな承認を得るまで、Phase 0 裁定境界を閉じない。新たな承認後はこの手順 3 冒頭の承認 ref 適用・再監査・fresh review を完了し、その current hash が zero_findings に再収束してから手順 4 へ進む。したがって boundary stamp は、最終 user 承認済み本文の再収束より前に行わない。
 4. **境界を閉じる**: 収束文面が init 文面から変わっている場合、orchestrator は **review-refinement 刻印** (review による精緻化の user 承認記録) を一度だけ行う。reason には「review が何を精緻化したか」の自己完結説明と守護者判定要旨のみを記す — 承認 ref は front-matter、hash は ledger field に置き、reason へ重複させない。収束文面が init と同一なら追加刻印は行わない。その後 ADR-baseline commit を成立させる — byte 照合を通過した commit の成立で裁定境界が閉じる。**経過措置**: review-refinement kind の実装まで、既存の escalation kind に reason 冒頭で review-refinement 記録である旨を明記して代用する。これが新規 escalation 刻印の唯一の例外である。
 
    ここでの「一度だけ」は track 全体で一回ではなく、**各 input-box source ごと**に
    その source 自身の init 記録から収束文面が変わった場合に一回を意味する。hearing
    起草 ADR を含む全 input-box source を走査し、一 source の刻印で別 source の byte
-   照合を代替してはならない。
+   照合を代替してはならない。手順 3 の承認後の再収束はすべてこの唯一の刻印**前**に
+   完了させる。刻印後の同一 source に再び review / 修正が必要になっても、本手順は
+   追加の review-refinement 刻印を許可しない。境界を閉じるために許される同一 source
+   の次操作は、この刻印と byte 一致する ADR-baseline commit のみである。
 5. Phase 0 で pipeline を止めて user に届けてよいのは、上記裁定と「先へ進めない設計欠陥」のみ。
 
 新 ADR を hearing で起草した場合、adr-diagnoser が hearing 内容への忠実性を
@@ -88,7 +93,7 @@ ADR の意味は user に属する。track が ADR を扱う全期間につい�
 ## Examples
 
 - Good: user が `knowledge/adr/<date>-<slug>.md` を作成 → `/track:plan "feature X"` を invoke → `/track:plan` が ADR 存在を確認して Phase 0 (init) に進む。
-- Good: Phase 0 の baseline review が意味変更を含む修正で zero_findings に収束 → user が init 刻印との diff を裁定して承認 → 承認 ref 適用・再監査・fresh review 再収束 → review-refinement 刻印 (経過措置: escalation kind 代用) → ADR-baseline commit で境界を閉じる。
+- Good: Phase 0 の baseline review が意味変更を含む修正で zero_findings に収束 → user が init 刻印との diff を裁定して承認 → 承認 ref 適用・再監査・fresh review 中に修正が必要になる → 承認前の in-place 収束ループへ戻る → 修正後の全文を user が再承認 → 承認 ref 適用・再監査・fresh review を再収束 → review-refinement 刻印 (経過措置: escalation kind 代用) → ADR-baseline commit で境界を閉じる。
 - Good: Phase 1 (spec) で signal 🔴 が ADR 側の意味変更を要求 → adr-editor が delta 候補を起草 → 入庫判定 (c) で決定修正提案として入庫 → spec が入庫済み draft を cite して 🔴 解消 → 🟡 のまま merge 段階で user が採用/棄却。
 - Good: 入庫判定が (b) — 決定を保つ代替文面が存在 → 候補を削除して代案を起点へ返す → 起点が代案で解決。
 - Bad: `/track:plan "feature X"` を実行、内部で ADR を自動生成 (spec に合わせて decision を後付けする rationalization の温床になる)。
@@ -111,6 +116,7 @@ ADR の意味は user に属する。track が ADR を扱う全期間につい�
 - [ ] `/track:plan` 起動前に ADR が `knowledge/adr/` に存在するか (厳密モード条件を満たすか)
 - [ ] track 内の ADR 修正で main が直接編集せず adr-editor を経由しているか
 - [ ] Phase 0 の baseline review ループ中に ledger へ書き込んでいないか (中間刻印禁止)
+- [ ] user 承認後に ADR 文面へ修正が入る場合、前の承認を流用せず承認前の収束ループへ戻り、修正後の全文を再提示して再承認を得ているか
 - [ ] 裁定境界後に入力箱 ADR を in-place で意味編集していないか (意味変更は delta 候補へ)
 - [ ] delta 候補の入庫判定 (三択) と、意味/非意味の分類を adr-diagnoser に委ねているか (orchestrator の自己裁定なし)
 - [ ] 入庫前の候補を下流成果物が cite していないか
