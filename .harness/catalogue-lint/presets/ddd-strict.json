@@ -82,10 +82,6 @@
       "kind": "NoPublicField"
     },
     {
-      "target_roles": ["ValueObject"],
-      "kind": "DomainValueObjectInboundReferenceRequired"
-    },
-    {
       "target_roles": ["CompositionRoot"],
       "kind": { "KindLayerConstraint": { "permitted_layers": ["cli_composition"] } }
     },
@@ -104,16 +100,16 @@
           "forbidden_roles": [
             "Entity",
             "AggregateRoot",
-            "ValueObject",
             "Repository",
             "SecondaryPort",
-            "UseCase",
-            "Interactor",
-            "Command",
-            "Query"
+            "SecondaryAdapter"
           ]
         }
       }
+    },
+    {
+      "target_roles": ["PrimaryAdapter"],
+      "kind": { "NoLayerInMethodSignature": { "forbidden_layers": ["infrastructure"] } }
     },
     {
       "target_roles": ["Dto"],

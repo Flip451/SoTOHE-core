@@ -18,6 +18,7 @@
 
 use std::path::{Path, PathBuf};
 
+use domain::RoleKind;
 use domain::tddd::LayerId;
 use domain::tddd::primitive_occurrence_scanner::{PrimitiveName, PrimitiveOccurrencePosition};
 use infrastructure::tddd::fs_lint_config_loader::FsLintConfigLoader;
@@ -132,6 +133,53 @@ fn test_ddd_strict_preset_loads_successfully_via_fs_lint_config_loader() {
     let loader = FsLintConfigLoader::new(preset_path());
     let config = loader.load().expect("presets/ddd-strict.json must load as a valid LintConfig");
     assert!(!config.rules().is_empty(), "presets/ddd-strict.json must declare at least one rule");
+}
+
+#[test]
+fn test_shipped_primary_adapter_boundary_allows_application_models_only() {
+    let loader = FsLintConfigLoader::new(config_path());
+    let config = loader.load().expect("config.json must load as a valid LintConfig");
+    let rule = config
+        .rules()
+        .iter()
+        .find(|rule| {
+            rule.target_roles == ["PrimaryAdapter"]
+                && matches!(rule.kind, LintRuleKind::NoRoleInMethodSignature { .. })
+        })
+        .expect("config.json must declare the PrimaryAdapter signature boundary");
+
+    match &rule.kind {
+        LintRuleKind::NoRoleInMethodSignature { forbidden_roles } => {
+            assert_eq!(
+                forbidden_roles.as_slice(),
+                [
+                    RoleKind::Entity,
+                    RoleKind::AggregateRoot,
+                    RoleKind::Repository,
+                    RoleKind::SecondaryPort,
+                    RoleKind::SecondaryAdapter,
+                ],
+                "PrimaryAdapter may reference application Command/Query/Dto models, but must \
+                 continue to reject domain state and secondary-boundary roles"
+            );
+        }
+        other => panic!("expected NoRoleInMethodSignature, got {other:?}"),
+    }
+
+    let layer_rule = config
+        .rules()
+        .iter()
+        .find(|rule| {
+            rule.target_roles == ["PrimaryAdapter"]
+                && matches!(rule.kind, LintRuleKind::NoLayerInMethodSignature { .. })
+        })
+        .expect("config.json must prohibit infrastructure-layer signature types");
+    match &layer_rule.kind {
+        LintRuleKind::NoLayerInMethodSignature { forbidden_layers } => {
+            assert_eq!(forbidden_layers.as_slice(), [LayerId::try_new("infrastructure").unwrap()]);
+        }
+        other => panic!("expected NoLayerInMethodSignature, got {other:?}"),
+    }
 }
 
 // ---------------------------------------------------------------------------

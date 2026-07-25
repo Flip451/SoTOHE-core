@@ -18,12 +18,7 @@ use thiserror::Error;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AdrBaselineCommand {
     /// Record a new append-only snapshot.
-    Snapshot {
-        track_id: TrackId,
-        source: AdrSourceFileName,
-        kind: AdrBaselineSnapshotKind,
-        timestamp: Timestamp,
-    },
+    Snapshot { track_id: TrackId, source: AdrSourceFileName, kind: AdrBaselineSnapshotKind },
     /// Restore the latest recorded snapshot to the ADR source file.
     Restore { track_id: TrackId, source: AdrSourceFileName },
 }
@@ -137,6 +132,12 @@ pub enum AdrBaselineTimestampError {
     InvalidTimestamp(ValidationError),
 }
 
+/// Secondary port for obtaining the timestamp of a snapshot operation.
+pub trait ClockPort: Send + Sync {
+    /// Returns the current validated timestamp.
+    fn now(&self) -> Result<Timestamp, AdrBaselineTimestampError>;
+}
+
 /// Failure envelope for snapshot and restore commands.
 #[derive(Debug, Clone, PartialEq, Eq, Error)]
 pub enum AdrBaselineError {
@@ -146,6 +147,9 @@ pub enum AdrBaselineError {
     /// The source adapter failed.
     #[error(transparent)]
     Source(AdrBaselineSourceError),
+    /// The clock adapter failed to provide a timestamp.
+    #[error(transparent)]
+    Clock(AdrBaselineTimestampError),
 }
 
 /// Operational failure for a read-only freeze check.
@@ -235,6 +239,7 @@ pub trait AdrBaselineQueryService: Send + Sync {
 pub struct AdrBaselineInteractor {
     store: Arc<dyn AdrBaselineStorePort>,
     source: Arc<dyn AdrBaselineSourcePort>,
+    clock: Arc<dyn ClockPort>,
 }
 
 impl AdrBaselineInteractor {
@@ -243,21 +248,23 @@ impl AdrBaselineInteractor {
     pub fn new(
         store: Arc<dyn AdrBaselineStorePort>,
         source: Arc<dyn AdrBaselineSourcePort>,
+        clock: Arc<dyn ClockPort>,
     ) -> Self {
-        Self { store, source }
+        Self { store, source, clock }
     }
 }
 
 impl AdrBaselineService for AdrBaselineInteractor {
     fn execute(&self, command: AdrBaselineCommand) -> Result<AdrBaselineOutput, AdrBaselineError> {
         match command {
-            AdrBaselineCommand::Snapshot { track_id, source, kind, timestamp } => {
+            AdrBaselineCommand::Snapshot { track_id, source, kind } => {
                 let bytes = if kind.uses_fork_point() {
                     self.source.fork_point_bytes(&track_id, &source)
                 } else {
                     self.source.working_bytes(&source)
                 }
                 .map_err(AdrBaselineError::Source)?;
+                let timestamp = self.clock.now().map_err(AdrBaselineError::Clock)?;
                 let entry = self
                     .store
                     .snapshot(&track_id, &source, bytes, kind, timestamp)
@@ -503,6 +510,20 @@ mod tests {
             Ok(self.state.clone())
         }
     }
+
+    struct FixedClock {
+        result: Result<Timestamp, AdrBaselineTimestampError>,
+    }
+
+    impl ClockPort for FixedClock {
+        fn now(&self) -> Result<Timestamp, AdrBaselineTimestampError> {
+            self.result.clone()
+        }
+    }
+
+    fn clock(timestamp: &str) -> Arc<dyn ClockPort> {
+        Arc::new(FixedClock { result: Ok(Timestamp::new(timestamp).unwrap()) })
+    }
     struct Store {
         entries: Mutex<Vec<AdrBaselineLedgerEntry>>,
     }
@@ -632,6 +653,7 @@ mod tests {
                 cited: Vec::new(),
                 state: AdrBaselineSourceState::ExistingAtForkPoint,
             }),
+            clock("2026-07-16T00:00:00Z"),
         );
         let result = interactor.execute(AdrBaselineCommand::Snapshot {
             track_id: track(),
@@ -639,7 +661,6 @@ mod tests {
             kind: AdrBaselineSnapshotKind::NewAdr(
                 NonEmptyString::try_new("approved by user".to_owned()).unwrap(),
             ),
-            timestamp: Timestamp::new("2026-07-16T00:00:00Z").unwrap(),
         });
         assert!(matches!(
             result,
@@ -669,13 +690,13 @@ mod tests {
                 cited: Vec::new(),
                 state: AdrBaselineSourceState::ExistingAtForkPoint,
             }),
+            clock("2026-07-16T00:00:00Z"),
         );
         let result = interactor
             .execute(AdrBaselineCommand::Snapshot {
                 track_id: track(),
                 source: source(),
                 kind: AdrBaselineSnapshotKind::Cite,
-                timestamp: timestamp.clone(),
             })
             .unwrap();
         assert!(
@@ -684,7 +705,8 @@ mod tests {
     }
 
     #[test]
-    fn test_adr_baseline_snapshot_uses_explicit_timestamp_without_clock_port() {
+    fn test_adr_baseline_snapshot_uses_clock_port_timestamp() {
+        let timestamp = Timestamp::new("2026-07-16T00:00:00Z").unwrap();
         let interactor = AdrBaselineInteractor::new(
             Arc::new(Store { entries: Mutex::new(Vec::new()) }),
             Arc::new(Source {
@@ -693,18 +715,44 @@ mod tests {
                 cited: Vec::new(),
                 state: AdrBaselineSourceState::ExistingAtForkPoint,
             }),
+            Arc::new(FixedClock { result: Ok(timestamp.clone()) }),
         );
 
         let result = interactor.execute(AdrBaselineCommand::Snapshot {
             track_id: track(),
             source: source(),
             kind: AdrBaselineSnapshotKind::Init,
-            timestamp: Timestamp::new("2026-07-16T00:00:00Z").unwrap(),
         });
         assert!(matches!(
             result,
-            Ok(AdrBaselineOutput::SnapshotRecorded(AdrBaselineLedgerEntry::Init { .. }))
+            Ok(AdrBaselineOutput::SnapshotRecorded(AdrBaselineLedgerEntry::Init { timestamp: actual, .. }))
+                if actual == timestamp
         ));
+    }
+
+    #[test]
+    fn test_adr_baseline_snapshot_propagates_clock_port_failure() {
+        let clock_error = AdrBaselineTimestampError::InvalidTimestamp(
+            Timestamp::new("not-a-timestamp").unwrap_err(),
+        );
+        let interactor = AdrBaselineInteractor::new(
+            Arc::new(Store { entries: Mutex::new(Vec::new()) }),
+            Arc::new(Source {
+                working: b"current".to_vec(),
+                fork: b"fork".to_vec(),
+                cited: Vec::new(),
+                state: AdrBaselineSourceState::ExistingAtForkPoint,
+            }),
+            Arc::new(FixedClock { result: Err(clock_error.clone()) }),
+        );
+
+        let result = interactor.execute(AdrBaselineCommand::Snapshot {
+            track_id: track(),
+            source: source(),
+            kind: AdrBaselineSnapshotKind::Init,
+        });
+
+        assert_eq!(result, Err(AdrBaselineError::Clock(clock_error)));
     }
 
     #[test]
@@ -727,13 +775,13 @@ mod tests {
                 cited: Vec::new(),
                 state: AdrBaselineSourceState::ExistingAtForkPoint,
             }),
+            Arc::new(FixedClock { result: Ok(expected_timestamp.clone()) }),
         );
 
         let result = interactor.execute(AdrBaselineCommand::Snapshot {
             track_id: expected_track.clone(),
             source: expected_source.clone(),
             kind: expected_kind.clone(),
-            timestamp: expected_timestamp.clone(),
         });
 
         assert!(matches!(result, Ok(AdrBaselineOutput::SnapshotRecorded(_))));
@@ -763,6 +811,7 @@ mod tests {
                 cited: Vec::new(),
                 state: AdrBaselineSourceState::ExistingAtForkPoint,
             }),
+            clock("2026-07-16T00:00:00Z"),
         );
 
         let result = interactor.execute(AdrBaselineCommand::Restore {
@@ -781,7 +830,7 @@ mod tests {
     }
 
     #[test]
-    fn test_adr_baseline_usecase_path_uses_only_source_and_store_ports() {
+    fn test_adr_baseline_usecase_path_uses_only_declared_secondary_ports() {
         let source = include_str!("adr_baseline.rs");
         let production_source = source.split("#[cfg(test)]").next().unwrap();
         let snapshot_kind_source = production_source
@@ -804,6 +853,7 @@ mod tests {
             "matches!(self, Self::Cite)",
             "self.source.fork_point_bytes(&track_id, &source)",
             "self.source.working_bytes(&source)",
+            "self.clock.now().map_err(AdrBaselineError::Clock)",
             ".snapshot(&track_id, &source, bytes, kind, timestamp)",
             "self.store.restore(&track_id, &source)",
         ] {

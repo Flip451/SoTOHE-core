@@ -257,26 +257,24 @@ pub(super) fn has_trait_impl(
 /// `+` covers trait-object / impl-trait bounds written without spaces
 /// (`&dyn OrderRepository+Send`).
 pub(super) fn bare_name_in_type_ref(sig_type: &str, bare_name: &str) -> bool {
-    if sig_type == bare_name {
-        return true;
-    }
-    // `:` covers `::` path separators: the char immediately before the name will be `:`.
-    // `[`/`]` covers slice and array type expressions.
-    // `;` covers array length separator (`[T; N]`).
-    // `+` covers trait-object / impl-trait bounds (`&dyn Trait+Send`, `impl Trait+Sync`).
-    let start_chars: &[char] = &['<', ',', ' ', '(', '[', '&', '*', ':', '+'];
-    let end_chars: &[char] = &['>', ',', ' ', ')', ']', '<', ';', ':', '+'];
-    let mut rest = sig_type;
-    while let Some(pos) = rest.find(bare_name) {
-        let before_ok =
-            pos == 0 || rest[..pos].chars().next_back().is_some_and(|c| start_chars.contains(&c));
-        let after_pos = pos + bare_name.len();
+    identifier_name_in_str(sig_type, bare_name, |_| true)
+}
+
+pub(super) fn identifier_name_in_str(
+    source: &str,
+    name: &str,
+    accept_start: impl Fn(&str) -> bool,
+) -> bool {
+    let mut rest = source;
+    while let Some(pos) = rest.find(name) {
+        let before = &rest[..pos];
+        let before_ok = before.chars().next_back().is_none_or(|c| !c.is_alphanumeric() && c != '_');
+        let after_pos = pos + name.len();
         let after_ok = after_pos == rest.len()
-            || rest[after_pos..].chars().next().is_some_and(|c| end_chars.contains(&c));
-        if before_ok && after_ok {
+            || rest[after_pos..].chars().next().is_some_and(|c| !c.is_alphanumeric() && c != '_');
+        if before_ok && after_ok && accept_start(before) {
             return true;
         }
-        // Advance past this occurrence to avoid infinite loop.
         if after_pos >= rest.len() {
             break;
         }

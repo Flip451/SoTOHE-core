@@ -15,11 +15,14 @@ use sha2::{Digest as _, Sha256};
 use usecase::adr_baseline::{
     AdrBaselineCheckOutcome, AdrBaselineQuery, AdrBaselineQueryInteractor, AdrBaselineQueryOutput,
     AdrBaselineQueryService, AdrBaselineSnapshotKind, AdrBaselineSourcePort, AdrBaselineStorePort,
-    AdrBaselineStoreReadPort, AdrBaselineTimestampError,
+    AdrBaselineStoreReadPort, ClockPort,
 };
 
 use super::store::write_ledger_record;
-use super::{FsAdrBaselineStore, FsGitAdrBaselineSource, decode_ledger_line, encode_ledger_entry};
+use super::{
+    FsAdrBaselineStore, FsGitAdrBaselineSource, SystemClockAdapter, decode_ledger_line,
+    encode_ledger_entry,
+};
 
 const TRACK_ITEMS: &str = "track/items";
 const BASELINE_DIR: &str = "adr-baseline";
@@ -53,19 +56,20 @@ fn entry() -> AdrBaselineLedgerEntry {
 }
 
 #[test]
-fn test_adr_baseline_timestamp_provider_uses_scoped_error_and_shared_timestamp_source() {
-    let timestamp: Result<Timestamp, AdrBaselineTimestampError> = super::timestamp_now();
-    assert!(timestamp.is_ok());
+fn test_system_clock_adapter_now_returns_valid_timestamp() {
+    let timestamp = SystemClockAdapter.now().unwrap();
+    assert!(Timestamp::new(timestamp.as_str().to_owned()).is_ok());
 
     let source = include_str!("../adr_baseline.rs");
+    assert!(source.contains("impl ClockPort for SystemClockAdapter"));
     assert!(
         source.contains(
             "crate::timestamp_now().map_err(AdrBaselineTimestampError::InvalidTimestamp)"
         )
     );
 
-    let provider_source = source
-        .split("pub fn timestamp_now")
+    let adapter_source = source
+        .split("pub struct SystemClockAdapter")
         .nth(1)
         .unwrap()
         .split("/// Serde-facing representation")
@@ -90,8 +94,8 @@ fn test_adr_baseline_timestamp_provider_uses_scoped_error_and_shared_timestamp_s
         "eprint!",
     ] {
         assert!(
-            !provider_source.contains(forbidden_path),
-            "ADR baseline timestamp provider must only delegate to the shared source, not {forbidden_path}"
+            !adapter_source.contains(forbidden_path),
+            "system clock adapter must only provide the clock port, not {forbidden_path}"
         );
     }
 }

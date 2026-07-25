@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "track_id": "architecture-pattern-placement-guard-realignment-2026-07-24",
+  "entries": {
+    "T001": [],
+    "T002": [],
+    "T003": [
+      {"layer": "domain", "entry_key": "CatalogueLinterRule"},
+      {"layer": "domain", "entry_key": "CatalogueLinterRuleKind"},
+      {"layer": "usecase", "entry_key": "LintRuleKind"}
+    ],
+    "T004": [
+      {"layer": "usecase", "entry_key": "AdrBaselineCommand"},
+      {"layer": "usecase", "entry_key": "AdrBaselineError"},
+      {"layer": "usecase", "entry_key": "AdrBaselineService"},
+      {"layer": "usecase", "entry_key": "AdrBaselineStorePort"},
+      {"layer": "usecase", "entry_key": "AdrBaselineTimestampError"},
+      {"layer": "usecase", "entry_key": "AdrBaselineInteractor"},
+      {"layer": "usecase", "entry_key": "ClockPort"}
+    ],
+    "T005": [
+      {"layer": "infrastructure", "entry_key": "SystemClockAdapter"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::adr_baseline::timestamp_now"}
+    ],
+    "T006": [
+      {"layer": "cli_driver", "entry_key": "AdrBaselineDriver"},
+      {"layer": "cli_composition", "entry_key": "AdrBaselineCompositionRoot"}
+    ],
+    "T007": []
+  }
+}

@@ -840,6 +840,55 @@ mod tests {
         assert_eq!(params[1].ty.as_str(), "String");
     }
 
+    #[test]
+    fn test_extract_params_preserves_valid_identifier_names() {
+        let sig = rustdoc_types::FunctionSignature {
+            inputs: vec![("valid_name_7".to_string(), simple("Input"))],
+            output: None,
+            is_c_variadic: false,
+        };
+
+        let params = extract_params(&sig).unwrap();
+
+        assert_eq!(params[0].name.as_str(), "valid_name_7");
+        assert_eq!(params[0].ty.as_str(), "Input");
+    }
+
+    #[test]
+    fn test_extract_params_replaces_tuple_pattern_with_stable_positional_name() {
+        let sig = rustdoc_types::FunctionSignature {
+            inputs: vec![
+                ("(left, right)".to_string(), simple("Pair")),
+                ("tail".to_string(), simple("Tail")),
+            ],
+            output: None,
+            is_c_variadic: false,
+        };
+
+        let params = extract_params(&sig).unwrap();
+
+        assert_eq!(params[0].name.as_str(), "arg_0");
+        assert_eq!(params[0].ty.as_str(), "Pair");
+        assert_eq!(params[1].name.as_str(), "tail");
+    }
+
+    #[test]
+    fn test_extract_params_avoids_collision_with_valid_identifier() {
+        let sig = rustdoc_types::FunctionSignature {
+            inputs: vec![
+                ("(left, right)".to_string(), simple("Pair")),
+                ("arg_0".to_string(), simple("Tail")),
+            ],
+            output: None,
+            is_c_variadic: false,
+        };
+
+        let params = extract_params(&sig).unwrap();
+
+        assert_eq!(params[0].name.as_str(), "arg_0_1");
+        assert_eq!(params[1].name.as_str(), "arg_0");
+    }
+
     // --- T006 (S4): build_trait_origins / resolve_trait_origin unit tests ---
 
     /// Helper: build a minimal `rustdoc_types::Crate` for testing `build_trait_origins`

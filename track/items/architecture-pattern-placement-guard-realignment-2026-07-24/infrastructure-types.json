@@ -1,0 +1,64 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::adr_baseline::timestamp_now": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "SystemClockAdapter",
+      "trait_ref": "usecase::adr_baseline::ClockPort"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "SystemClockAdapter": {
+      "action": "add",
+      "docs": "System-clock secondary adapter.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "adr_baseline",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        }
+      ]
+    }
+  }
+}

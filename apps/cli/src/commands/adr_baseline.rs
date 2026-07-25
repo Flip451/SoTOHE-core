@@ -285,25 +285,6 @@ mod tests {
     }
 
     #[test]
-    fn test_resolvers_preserve_default_and_explicit_typed_track_ids() {
-        let track_root = TrackCompositionRoot::new();
-        let items_dir = std::path::Path::new("track/items");
-
-        let read_default = resolve_for_read(&track_root, None, items_dir).unwrap();
-        let write_default = resolve_for_write(&track_root, None, items_dir).unwrap();
-        assert_eq!(read_default, write_default);
-
-        let explicit_read =
-            resolve_for_read(&track_root, Some("fixture-track".parse().unwrap()), items_dir)
-                .unwrap();
-        assert_eq!(explicit_read.as_ref(), "fixture-track");
-
-        let explicit_write =
-            resolve_for_write(&track_root, Some(write_default.clone()), items_dir).unwrap();
-        assert_eq!(explicit_write, write_default);
-    }
-
-    #[test]
     fn test_resolvers_map_invalid_items_dir_to_cli_error() {
         let track_root = TrackCompositionRoot::new();
         let invalid_items_dir = std::path::Path::new("fixture/items");

@@ -1,0 +1,23 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-25T04:03:56Z",
+  "declaration_hash": "e27cdc50544dc10378ce3f35b41536eb07895fd182bd48404717a836cd425ac9",
+  "implementation_input_hash": "306d0b47c6ead19a8ec90da82aba0f3c07cdc406a520dcb8c7ec4f7e913a975d",
+  "signals": [
+    {
+      "type_name": "SystemClockAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ClockPort"
+      ]
+    },
+    {
+      "type_name": "infrastructure::adr_baseline::timestamp_now",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    }
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "layer": "cli_composition",
+  "entries": [
+    {
+      "claim_hash": "c12719c00ed89fbf72745086a4a811fdedbcbd89547f1529c7d128c779c73979",
+      "evidence_hash": "c2b47ee5c25362448693ee1b5186d785d764dfbf53c8b7675323361f7548a28f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition-only wiring で実行経路を成立させる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "ADR baseline の snapshot 時刻取得を、usecase の ClockPort を Interactor が呼び出す形へ是正し、Primary Adapter から timestamp provider を除去し、infrastructure clock adapter と composition-only wiring で実行経路を成立させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c12719c00ed89fbf72745086a4a811fdedbcbd89547f1529c7d128c779c73979",
+      "evidence_hash": "ab40a9c4dd8ed356f29b4d313a2af09bec3c5cbe7eecc8308ea6f5bbd1ca7933",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition root だけがそれらを配線する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "ADR baseline snapshot の時刻は Interactor が ClockPort から取得し、Primary Adapter は timestamp provider を保持せず、system clock adapter は infrastructure にあり、composition root だけがそれらを配線する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c12719c00ed89fbf72745086a4a811fdedbcbd89547f1529c7d128c779c73979",
+      "evidence_hash": "e368d7301642dba0780e1fb8f03ffb54361d68c1722bed3aac3cd63e328d2450",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ADR baseline の型配置・boundary・Clock correction は新規則に即時適合する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "representative enforcement changes と ADR baseline の型配置・boundary・Clock correction は新規則に即時適合する。"
+        }
+      }
+    }
+  ]
+}

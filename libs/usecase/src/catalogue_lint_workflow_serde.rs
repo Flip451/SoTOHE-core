@@ -26,6 +26,7 @@ enum LintRuleKindWire {
     ReferencedRoleConstraint { target_field: String, expected_role: String },
     TraitImplRequired { required_traits: Vec<String> },
     NoRoleInMethodSignature { forbidden_roles: Vec<String> },
+    NoLayerInMethodSignature { forbidden_layers: Vec<String> },
     MethodReferenceSignature { target_field: String },
     AccessorSignatureRequired { target_field: String },
     FieldElementUniqueAcrossEntries { target_field: String },
@@ -33,7 +34,6 @@ enum LintRuleKindWire {
     NoPublicField,
     ForbiddenMethodReceiver { forbidden_receiver: String },
     ForbidPrimitiveInTypes { primitives: Vec<String>, layers: Vec<String>, positions: Vec<String> },
-    DomainValueObjectInboundReferenceRequired,
     CompositionRootPureDi,
 }
 
@@ -94,6 +94,15 @@ impl From<&LintRuleKind> for LintRuleKindWire {
                         .collect(),
                 }
             }
+            LintRuleKind::NoLayerInMethodSignature { forbidden_layers } => {
+                Self::NoLayerInMethodSignature {
+                    forbidden_layers: forbidden_layers
+                        .as_slice()
+                        .iter()
+                        .map(ToString::to_string)
+                        .collect(),
+                }
+            }
             LintRuleKind::MethodReferenceSignature { target_field } => {
                 Self::MethodReferenceSignature { target_field: target_field.to_string() }
             }
@@ -125,9 +134,6 @@ impl From<&LintRuleKind> for LintRuleKindWire {
                         .map(str::to_owned)
                         .collect(),
                 }
-            }
-            LintRuleKind::DomainValueObjectInboundReferenceRequired => {
-                Self::DomainValueObjectInboundReferenceRequired
             }
             LintRuleKind::CompositionRootPureDi => Self::CompositionRootPureDi,
         }
@@ -193,6 +199,15 @@ fn lint_rule_kind_from_wire(wire: LintRuleKindWire) -> Result<LintRuleKind, Cata
             })?;
             Ok(LintRuleKind::NoRoleInMethodSignature { forbidden_roles })
         }
+        LintRuleKindWire::NoLayerInMethodSignature { forbidden_layers } => {
+            let forbidden_layers =
+                parse_non_empty(forbidden_layers, "forbidden_layers", |value| {
+                    LayerId::try_new(value.clone()).map_err(|error| {
+                        CatalogueLintError(format!("invalid layer_id '{value}': {error}"))
+                    })
+                })?;
+            Ok(LintRuleKind::NoLayerInMethodSignature { forbidden_layers })
+        }
         LintRuleKindWire::MethodReferenceSignature { target_field } => {
             Ok(LintRuleKind::MethodReferenceSignature {
                 target_field: parse_role_payload_field(&target_field)?,
@@ -234,9 +249,6 @@ fn lint_rule_kind_from_wire(wire: LintRuleKindWire) -> Result<LintRuleKind, Cata
                 parse_primitive_occurrence_position(&value)
             })?;
             Ok(LintRuleKind::ForbidPrimitiveInTypes { primitives, layers, positions })
-        }
-        LintRuleKindWire::DomainValueObjectInboundReferenceRequired => {
-            Ok(LintRuleKind::DomainValueObjectInboundReferenceRequired)
         }
         LintRuleKindWire::CompositionRootPureDi => Ok(LintRuleKind::CompositionRootPureDi),
     }

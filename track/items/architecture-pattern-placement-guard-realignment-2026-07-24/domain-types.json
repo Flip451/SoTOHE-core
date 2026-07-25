@@ -1,0 +1,362 @@
+{
+  "crate_name": "domain",
+  "functions": {},
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "CatalogueLinterRuleKind",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueLinterRuleKind",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueLinterRuleKind",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueLinterRuleKind",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueLinterRule",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueLinterRule",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueLinterRule",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogueLinterRule",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CatalogueLinterRule": {
+      "action": "reference",
+      "docs": "Baseline-identical validated rule value retained as the domain-internal owner of CatalogueLinterRuleKind and as an explicit semantic inbound edge.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "target",
+              "ty": "RuleTarget"
+            },
+            {
+              "name": "kind",
+              "ty": "CatalogueLinterRuleKind"
+            }
+          ],
+          "returns": "core::result::Result<Self, CatalogueLinterRuleError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "target",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&RuleTarget"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "kind",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&CatalogueLinterRuleKind"
+        }
+      ],
+      "module_path": "tddd::catalogue_linter",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        }
+      ]
+    },
+    "CatalogueLinterRuleKind": {
+      "action": "modify",
+      "docs": "Rule-kind enum; placement and behavior are defined by the cited spec anchors. Primitive rationale: opaque presentation label.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "FieldEmpty",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "FieldNonEmpty",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "KindLayerConstraint",
+            "payload": {
+              "fields": [
+                {
+                  "name": "permitted_layers",
+                  "ty": "NonEmptyVec<LayerId>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ReferencedRoleConstraint",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                },
+                {
+                  "name": "expected_role",
+                  "ty": "RoleKind"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TraitImplRequired",
+            "payload": {
+              "fields": [
+                {
+                  "name": "required_traits",
+                  "ty": "NonEmptyVec<TypeRef>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+      {
+        "name": "NoRoleInMethodSignature",
+        "payload": {
+          "fields": [
+            {
+              "name": "forbidden_roles",
+              "ty": "NonEmptyVec<RoleKind>"
+            }
+          ],
+          "kind": "struct"
+        }
+      },
+      {
+        "name": "NoLayerInMethodSignature",
+        "payload": {
+          "fields": [
+            {
+              "name": "forbidden_layers",
+              "ty": "NonEmptyVec<LayerId>"
+            }
+          ],
+          "kind": "struct"
+        }
+      },
+      {
+        "name": "MethodReferenceSignature",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "AccessorSignatureRequired",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "FieldElementUniqueAcrossEntries",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoExternalReferenceInMethods",
+            "payload": {
+              "fields": [
+                {
+                  "name": "target_field",
+                  "ty": "RolePayloadField"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoPublicField",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ForbiddenMethodReceiver",
+            "payload": {
+              "fields": [
+                {
+                  "name": "forbidden_receiver",
+                  "ty": "SelfReceiver"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ForbidPrimitiveInTypes",
+            "payload": {
+              "fields": [
+                {
+                  "name": "primitives",
+                  "ty": "NonEmptyVec<PrimitiveName>"
+                },
+                {
+                  "name": "layers",
+                  "ty": "NonEmptyVec<LayerId>"
+                },
+                {
+                  "name": "positions",
+                  "ty": "NonEmptyVec<PrimitiveOccurrencePosition>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CompositionRootPureDi",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "discriminant_name",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&'static str"
+        }
+      ],
+      "module_path": "tddd::catalogue_linter",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "IN-07",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        }
+      ]
+    }
+  }
+}

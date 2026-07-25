@@ -14,16 +14,15 @@ use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::{ContentHash, NonEmptyString, Timestamp};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use thiserror::Error;
-use usecase::adr_baseline::AdrBaselineTimestampError;
+use usecase::adr_baseline::{AdrBaselineTimestampError, ClockPort};
 
-/// Returns a current UTC timestamp for the ADR baseline command path.
-///
-/// # Errors
-///
-/// Returns [`AdrBaselineTimestampError::InvalidTimestamp`] when the shared infrastructure
-/// timestamp source cannot construct a valid domain timestamp.
-pub fn timestamp_now() -> Result<Timestamp, AdrBaselineTimestampError> {
-    crate::timestamp_now().map_err(AdrBaselineTimestampError::InvalidTimestamp)
+/// Infrastructure adapter that supplies the current system timestamp.
+pub struct SystemClockAdapter;
+
+impl ClockPort for SystemClockAdapter {
+    fn now(&self) -> Result<Timestamp, AdrBaselineTimestampError> {
+        crate::timestamp_now().map_err(AdrBaselineTimestampError::InvalidTimestamp)
+    }
 }
 
 /// Serde-facing representation of one typed ledger entry.

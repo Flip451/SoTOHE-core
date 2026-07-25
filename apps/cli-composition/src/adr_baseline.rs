@@ -21,10 +21,12 @@ impl AdrBaselineCompositionRoot {
     }
 
     pub fn adr_baseline_driver(&self, project_root: std::path::PathBuf) -> AdrBaselineDriver {
-        use infrastructure::adr_baseline::{FsAdrBaselineStore, FsGitAdrBaselineSource};
+        use infrastructure::adr_baseline::{
+            FsAdrBaselineStore, FsGitAdrBaselineSource, SystemClockAdapter,
+        };
         use usecase::adr_baseline::{
             AdrBaselineInteractor, AdrBaselineQueryInteractor, AdrBaselineSourcePort,
-            AdrBaselineStorePort, AdrBaselineStoreReadPort,
+            AdrBaselineStorePort, AdrBaselineStoreReadPort, ClockPort,
         };
 
         let store = Arc::new(FsAdrBaselineStore::from(project_root.clone()));
@@ -32,16 +34,13 @@ impl AdrBaselineCompositionRoot {
         let command_service = Arc::new(AdrBaselineInteractor::new(
             store.clone() as Arc<dyn AdrBaselineStorePort>,
             source.clone() as Arc<dyn AdrBaselineSourcePort>,
+            Arc::new(SystemClockAdapter) as Arc<dyn ClockPort>,
         ));
         let query_service = Arc::new(AdrBaselineQueryInteractor::new(
             store as Arc<dyn AdrBaselineStoreReadPort>,
             source as Arc<dyn AdrBaselineSourcePort>,
         ));
-        AdrBaselineDriver::new(
-            command_service,
-            query_service,
-            infrastructure::adr_baseline::timestamp_now,
-        )
+        AdrBaselineDriver::new(command_service, query_service)
     }
 }
 
@@ -65,10 +64,9 @@ mod tests {
         for wired_component in [
             "FsAdrBaselineStore::from(project_root.clone())",
             "FsGitAdrBaselineSource::from(project_root)",
-            "infrastructure::adr_baseline::timestamp_now",
+            "SystemClockAdapter",
             "AdrBaselineInteractor::new(",
             "AdrBaselineQueryInteractor::new(",
-            "infrastructure::adr_baseline::timestamp_now,",
         ] {
             assert!(
                 production_source.contains(wired_component),
@@ -77,7 +75,7 @@ mod tests {
         }
         assert!(
             !production_source.contains("timestamp_now()"),
-            "composition root must inject, not invoke, the timestamp provider"
+            "composition root must wire, not invoke, the clock adapter"
         );
         assert!(
             !production_source.contains("AdrBaselineRequest"),
