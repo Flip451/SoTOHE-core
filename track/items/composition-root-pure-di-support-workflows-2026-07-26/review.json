@@ -1,186 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "impl-plan": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T001's description names a workflow/path concept but no target file or symbol; an executor must invent the file boundary.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
-              "line": 6,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T002's description names a workflow/path concept but no target file or symbol; an executor must invent the file boundary.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
-              "line": 12,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T003's description names a route and layers but no target file or symbol; an executor must invent the implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
-              "line": 18,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T004's description names CLI execution paths but no target file or symbol; an executor must invent the implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
-              "line": 24,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T005's description names the TestObligation route but no target file or symbol; an executor must invent the implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
-              "line": 30,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T006's description names CLI paths and handlers but no target file or symbol; an executor must invent the implementation boundary.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
-              "line": 36,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "T007's description names a shared export-block edit but no target file or symbol; an executor must invent the exact edit boundary.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
-              "line": 42,
-              "category": "task description non-executable"
-            },
-            {
-              "message": "Section descriptions S1-S4 restate upstream design rationale/behavior (self-hosting, replacement-route ordering, boundary extraction, and deferred cleanup) instead of containing only target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
-              "line": 57,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:1a22dd0b451e66a7849b04e3062841a7a06a9cf4b2263052f7b27374c56a31f9",
-          "at": "2026-07-26T10:04:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a57c2eb8c2990dc29209c4f3734594d471d6f0e731aed2c6af1ff5d41043024d",
-          "at": "2026-07-26T10:17:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T007 leaks explicitly excluded work into this track: it removes public re-exports from `apps/cli-composition/src/lib.rs`, while `spec.json` OUT-02 reserves physical deletion of now-unreferenced compatibility definitions and exports for the Final convergence track. Remove T007 and its S4/coverage references, or revise the upstream scope through the appropriate planning workflow.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
-              "line": 42,
-              "category": "out_of_scope leak into a task"
-            }
-          ],
-          "hash": "rvw1:sha256:a57c2eb8c2990dc29209c4f3734594d471d6f0e731aed2c6af1ff5d41043024d",
-          "at": "2026-07-26T10:22:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "T006 explicitly removes `TestObligationCompositionRoot::{discover,current_branch}`, but its contract omits the `cli_composition/TestObligationCompositionRoot` catalogue entry and attributes that modified entry only to T005. This leaves T006's claimed root modification untracked; attribute the entry to T006 as well (or move the root modification wholly into its attributed task).",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/task-contract.json",
-              "line": 23,
-              "category": "task-contract attribution mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:a0fa68157457b8afd0ba2e57fc938ca16226537254e642a3c5159ee802525ed1",
-          "at": "2026-07-26T10:28:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:081e1afaf41a9864ac79ae5c72f8149b6d616046ed27359b9e1786d864a3f254",
-          "at": "2026-07-26T10:30:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:63377a498939e33192b95a21a32e97c7d02990484ec334c3c3b3c0aa09d7e4b3",
-          "at": "2026-07-26T10:50:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1672da1dba7f56c248e9bd72cb4df20735cd051e2a5f01bd6ba85b0dc35f7e73",
-          "at": "2026-07-26T11:29:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a404d01969ff53d5c5929553c2ff8c9ac1f08c891a2b3b19083115ba017de83",
-          "at": "2026-07-26T13:50:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The current spec still defines TestObligation in IN-01, AC-04, AC-05, and AC-06, but this coverage map omits AC-04 entirely and maps the other elements only to T001–T004, none of which targets TestObligation. Restore TestObligation task coverage or complete the upstream spec rescope before approving this plan.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/task-coverage.json",
-              "line": 19,
-              "category": "task-coverage gap"
-            },
-            {
-              "message": "`plan.summary` claims T001–T004 cover GO-01 and GO-02, although the current GO-01 explicitly includes TestObligation and no remaining task addresses that context. The goal traceability is therefore implausible until the upstream rescope is applied or a TestObligation task is restored.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
-              "line": 31,
-              "category": "task-coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:7a404d01969ff53d5c5929553c2ff8c9ac1f08c891a2b3b19083115ba017de83",
-          "at": "2026-07-26T13:54:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7a404d01969ff53d5c5929553c2ff8c9ac1f08c891a2b3b19083115ba017de83",
-          "at": "2026-07-26T13:55:10Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dbfbcbdcb8a1c03e3c84df97657a57fec3c1e86f00a7742857200007092b0fb6",
-          "at": "2026-07-26T10:04:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dbfbcbdcb8a1c03e3c84df97657a57fec3c1e86f00a7742857200007092b0fb6",
-          "at": "2026-07-26T10:06:12Z"
-        }
-      ]
-    },
     "types": {
       "rounds": [
         {
@@ -511,6 +331,236 @@
           "findings": [],
           "hash": "rvw1:sha256:3901e08b8bb252d3d8ca53e38fdf7781014f4f0bda7098e5d5ad8ded2e68b582",
           "at": "2026-07-26T13:54:49Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87f9090d887c800cd281b8d6022f3517baa00e21b21fb03a8b00bc215907343d",
+          "at": "2026-07-26T14:31:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87f9090d887c800cd281b8d6022f3517baa00e21b21fb03a8b00bc215907343d",
+          "at": "2026-07-26T14:35:19Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ade5f289fd5b0e9214ea71e56e18df4efd96d0e1cd3ad7c446af5262bc715e7f",
+          "at": "2026-07-26T14:31:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ade5f289fd5b0e9214ea71e56e18df4efd96d0e1cd3ad7c446af5262bc715e7f",
+          "at": "2026-07-26T14:33:44Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's description names a workflow/path concept but no target file or symbol; an executor must invent the file boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T002's description names a workflow/path concept but no target file or symbol; an executor must invent the file boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003's description names a route and layers but no target file or symbol; an executor must invent the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 18,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T004's description names CLI execution paths but no target file or symbol; an executor must invent the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 24,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T005's description names the TestObligation route but no target file or symbol; an executor must invent the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 30,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T006's description names CLI paths and handlers but no target file or symbol; an executor must invent the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 36,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T007's description names a shared export-block edit but no target file or symbol; an executor must invent the exact edit boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 42,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "Section descriptions S1-S4 restate upstream design rationale/behavior (self-hosting, replacement-route ordering, boundary extraction, and deferred cleanup) instead of containing only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 57,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:1a22dd0b451e66a7849b04e3062841a7a06a9cf4b2263052f7b27374c56a31f9",
+          "at": "2026-07-26T10:04:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a57c2eb8c2990dc29209c4f3734594d471d6f0e731aed2c6af1ff5d41043024d",
+          "at": "2026-07-26T10:17:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 leaks explicitly excluded work into this track: it removes public re-exports from `apps/cli-composition/src/lib.rs`, while `spec.json` OUT-02 reserves physical deletion of now-unreferenced compatibility definitions and exports for the Final convergence track. Remove T007 and its S4/coverage references, or revise the upstream scope through the appropriate planning workflow.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 42,
+              "category": "out_of_scope leak into a task"
+            }
+          ],
+          "hash": "rvw1:sha256:a57c2eb8c2990dc29209c4f3734594d471d6f0e731aed2c6af1ff5d41043024d",
+          "at": "2026-07-26T10:22:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 explicitly removes `TestObligationCompositionRoot::{discover,current_branch}`, but its contract omits the `cli_composition/TestObligationCompositionRoot` catalogue entry and attributes that modified entry only to T005. This leaves T006's claimed root modification untracked; attribute the entry to T006 as well (or move the root modification wholly into its attributed task).",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/task-contract.json",
+              "line": 23,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:a0fa68157457b8afd0ba2e57fc938ca16226537254e642a3c5159ee802525ed1",
+          "at": "2026-07-26T10:28:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:081e1afaf41a9864ac79ae5c72f8149b6d616046ed27359b9e1786d864a3f254",
+          "at": "2026-07-26T10:30:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63377a498939e33192b95a21a32e97c7d02990484ec334c3c3b3c0aa09d7e4b3",
+          "at": "2026-07-26T10:50:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1672da1dba7f56c248e9bd72cb4df20735cd051e2a5f01bd6ba85b0dc35f7e73",
+          "at": "2026-07-26T11:29:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a404d01969ff53d5c5929553c2ff8c9ac1f08c891a2b3b19083115ba017de83",
+          "at": "2026-07-26T13:50:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The current spec still defines TestObligation in IN-01, AC-04, AC-05, and AC-06, but this coverage map omits AC-04 entirely and maps the other elements only to T001–T004, none of which targets TestObligation. Restore TestObligation task coverage or complete the upstream spec rescope before approving this plan.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/task-coverage.json",
+              "line": 19,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "`plan.summary` claims T001–T004 cover GO-01 and GO-02, although the current GO-01 explicitly includes TestObligation and no remaining task addresses that context. The goal traceability is therefore implausible until the upstream rescope is applied or a TestObligation task is restored.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 31,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:7a404d01969ff53d5c5929553c2ff8c9ac1f08c891a2b3b19083115ba017de83",
+          "at": "2026-07-26T13:54:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a404d01969ff53d5c5929553c2ff8c9ac1f08c891a2b3b19083115ba017de83",
+          "at": "2026-07-26T13:55:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:989993af6d7c03dda6aba0400568c82c53be8ec1ba54494dba53c03895e3488c",
+          "at": "2026-07-26T14:31:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:989993af6d7c03dda6aba0400568c82c53be8ec1ba54494dba53c03895e3488c",
+          "at": "2026-07-26T14:34:25Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbfbcbdcb8a1c03e3c84df97657a57fec3c1e86f00a7742857200007092b0fb6",
+          "at": "2026-07-26T10:04:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbfbcbdcb8a1c03e3c84df97657a57fec3c1e86f00a7742857200007092b0fb6",
+          "at": "2026-07-26T10:06:12Z"
         }
       ]
     },

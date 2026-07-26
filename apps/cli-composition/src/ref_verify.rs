@@ -158,9 +158,60 @@ mod tests {
 
     use super::RefVerifyCompositionRoot;
     use crate::{
-        CommandOutcome, RefVerifyCheckApprovedInput, RefVerifyRunInput,
-        test_support::repo_root_for_tests,
+        CommandOutcome, RefVerifyChainFilter, RefVerifyCheckApprovedInput, RefVerifyResultsInput,
+        RefVerifyRunInput, RefVerifyVerdictFilter, test_support::repo_root_for_tests,
     };
+    use cli_driver::ref_verify::{
+        RefVerifyChainSelect, RefVerifyCheckApprovedInput as DriverCheckApprovedInput,
+        RefVerifyInput, RefVerifyResultsInput as DriverResultsInput,
+        RefVerifyRunInput as DriverRunInput, RefVerifyVerdictSelect,
+    };
+
+    fn run_via_driver(
+        input: RefVerifyRunInput,
+    ) -> Result<CommandOutcome, crate::error::CompositionError> {
+        let driver_input = DriverRunInput { track_id: input.track_id, items_dir: input.items_dir };
+        Ok(RefVerifyCompositionRoot::new()
+            .ref_verify_driver()
+            .handle(RefVerifyInput::Run(driver_input)))
+    }
+
+    fn check_approved_via_driver(
+        input: RefVerifyCheckApprovedInput,
+    ) -> Result<CommandOutcome, crate::error::CompositionError> {
+        let driver_input =
+            DriverCheckApprovedInput { track_id: input.track_id, items_dir: input.items_dir };
+        Ok(RefVerifyCompositionRoot::new()
+            .ref_verify_driver()
+            .handle(RefVerifyInput::CheckApproved(driver_input)))
+    }
+
+    fn results_via_driver(
+        input: RefVerifyResultsInput,
+    ) -> Result<CommandOutcome, crate::error::CompositionError> {
+        let chain = match input.chain {
+            RefVerifyChainFilter::Chain1 => RefVerifyChainSelect::Chain1,
+            RefVerifyChainFilter::Chain2 => RefVerifyChainSelect::Chain2,
+            RefVerifyChainFilter::All => RefVerifyChainSelect::All,
+        };
+        let verdict = match input.verdict {
+            RefVerifyVerdictFilter::FailPending => RefVerifyVerdictSelect::FailPending,
+            RefVerifyVerdictFilter::Pass => RefVerifyVerdictSelect::Pass,
+            RefVerifyVerdictFilter::Fail => RefVerifyVerdictSelect::Fail,
+            RefVerifyVerdictFilter::Pending => RefVerifyVerdictSelect::Pending,
+            RefVerifyVerdictFilter::All => RefVerifyVerdictSelect::All,
+        };
+        let driver_input = DriverResultsInput {
+            track_id: input.track_id,
+            items_dir: input.items_dir,
+            chain,
+            layer: input.layer,
+            verdict,
+        };
+        Ok(RefVerifyCompositionRoot::new()
+            .ref_verify_driver()
+            .handle(RefVerifyInput::Results(driver_input)))
+    }
 
     fn with_env_var<T>(key: &'static str, value: OsString, run: impl FnOnce() -> T) -> T {
         let previous = std::env::var_os(key);
@@ -371,9 +422,7 @@ mod tests {
         let fake_claude_dir = write_fake_claude_into_path_dir(project_root);
 
         with_fake_track_branch_and_path(project_root, track_id, &fake_claude_dir, || {
-            RefVerifyCompositionRoot::new()
-                .ref_verify_run(RefVerifyRunInput { track_id: track_id.to_owned(), items_dir })
-                .unwrap()
+            run_via_driver(RefVerifyRunInput { track_id: track_id.to_owned(), items_dir }).unwrap()
         })
     }
 
@@ -513,12 +562,11 @@ exit 64
 
     #[test]
     fn test_ref_verify_check_approved_invalid_track_id_returns_error() {
-        let outcome = RefVerifyCompositionRoot::new()
-            .ref_verify_check_approved(RefVerifyCheckApprovedInput {
-                track_id: "../outside".to_owned(),
-                items_dir: repo_root_for_tests().join("track").join("items"),
-            })
-            .unwrap();
+        let outcome = check_approved_via_driver(RefVerifyCheckApprovedInput {
+            track_id: "../outside".to_owned(),
+            items_dir: repo_root_for_tests().join("track").join("items"),
+        })
+        .unwrap();
         let msg = outcome.stderr.as_deref().unwrap_or_default();
         assert_eq!(outcome.exit_code, 1, "invalid track id must fail, got: {outcome:?}");
         assert!(
@@ -530,12 +578,10 @@ exit 64
     #[test]
     fn test_ref_verify_check_approved_outside_repo_items_dir_returns_error() {
         let dir = tempfile::tempdir().unwrap();
-        let result = RefVerifyCompositionRoot::new().ref_verify_check_approved(
-            RefVerifyCheckApprovedInput {
-                track_id: "my-track".to_owned(),
-                items_dir: dir.path().to_path_buf(),
-            },
-        );
+        let result = check_approved_via_driver(RefVerifyCheckApprovedInput {
+            track_id: "my-track".to_owned(),
+            items_dir: dir.path().to_path_buf(),
+        });
         let outcome = result.unwrap();
         let msg = outcome.stderr.as_deref().unwrap_or_default();
         assert_eq!(outcome.exit_code, 1, "outside items_dir must fail, got: {outcome:?}");
@@ -555,7 +601,7 @@ exit 64
         write_pass_cache_for_first_chain1_pair(&items_dir, track_id);
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            check_approved_via_driver(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
@@ -590,7 +636,7 @@ exit 64
         write_pass_cache_for_first_chain1_pair(&items_dir, track_id);
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            check_approved_via_driver(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
@@ -616,7 +662,7 @@ exit 64
         write_chain1_fixture(&items_dir, track_id);
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            check_approved_via_driver(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
@@ -657,7 +703,7 @@ exit 64
         );
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            check_approved_via_driver(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
@@ -688,7 +734,7 @@ exit 64
         .unwrap();
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            check_approved_via_driver(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
@@ -712,7 +758,7 @@ exit 64
         write_chain1_fixture(&items_dir, track_id);
 
         let outcome = with_fake_git_branch(&project_root, "not-the-track", || {
-            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            check_approved_via_driver(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir,
             })
@@ -765,8 +811,7 @@ exit 64
         .unwrap();
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            RefVerifyCompositionRoot::new()
-                .ref_verify_run(RefVerifyRunInput { track_id: track_id.to_owned(), items_dir })
+            run_via_driver(RefVerifyRunInput { track_id: track_id.to_owned(), items_dir })
         })
         .unwrap();
         let msg = outcome.stderr.as_deref().unwrap_or_default();
@@ -802,8 +847,7 @@ exit 64
 
         let outcome =
             with_fake_track_branch_and_path(&project_root, track_id, &fake_claude_dir, || {
-                RefVerifyCompositionRoot::new()
-                    .ref_verify_run(RefVerifyRunInput { track_id: track_id.to_owned(), items_dir })
+                run_via_driver(RefVerifyRunInput { track_id: track_id.to_owned(), items_dir })
                     .unwrap()
             });
 
@@ -826,12 +870,11 @@ exit 64
         std::fs::create_dir_all(items_dir.join(track_id)).unwrap();
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            RefVerifyCompositionRoot::new()
-                .ref_verify_check_approved(RefVerifyCheckApprovedInput {
-                    track_id: track_id.to_owned(),
-                    items_dir,
-                })
-                .unwrap()
+            check_approved_via_driver(RefVerifyCheckApprovedInput {
+                track_id: track_id.to_owned(),
+                items_dir,
+            })
+            .unwrap()
         });
 
         assert_eq!(outcome.exit_code, 0, "Phase 0 check-approved must pass: {outcome:?}");
@@ -871,12 +914,11 @@ exit 64
 
         let outcome =
             with_fake_track_branch_and_path(&project_root, track_id, &fake_claude_dir, || {
-                RefVerifyCompositionRoot::new()
-                    .ref_verify_run(RefVerifyRunInput {
-                        track_id: track_id.to_owned(),
-                        items_dir: items_dir.clone(),
-                    })
-                    .unwrap()
+                run_via_driver(RefVerifyRunInput {
+                    track_id: track_id.to_owned(),
+                    items_dir: items_dir.clone(),
+                })
+                .unwrap()
             });
 
         assert_eq!(
@@ -912,12 +954,11 @@ exit 64
 
     #[test]
     fn test_ref_verify_run_invalid_track_id_returns_error() {
-        let outcome = RefVerifyCompositionRoot::new()
-            .ref_verify_run(RefVerifyRunInput {
-                track_id: "../outside".to_owned(),
-                items_dir: repo_root_for_tests().join("track").join("items"),
-            })
-            .unwrap();
+        let outcome = run_via_driver(RefVerifyRunInput {
+            track_id: "../outside".to_owned(),
+            items_dir: repo_root_for_tests().join("track").join("items"),
+        })
+        .unwrap();
         let msg = outcome.stderr.as_deref().unwrap_or_default();
         assert_eq!(outcome.exit_code, 1, "invalid track id must fail, got: {outcome:?}");
         assert!(
@@ -929,12 +970,11 @@ exit 64
     #[test]
     fn test_ref_verify_run_outside_repo_items_dir_returns_error() {
         let dir = tempfile::tempdir().unwrap();
-        let outcome = RefVerifyCompositionRoot::new()
-            .ref_verify_run(RefVerifyRunInput {
-                track_id: "my-track".to_owned(),
-                items_dir: dir.path().to_path_buf(),
-            })
-            .unwrap();
+        let outcome = run_via_driver(RefVerifyRunInput {
+            track_id: "my-track".to_owned(),
+            items_dir: dir.path().to_path_buf(),
+        })
+        .unwrap();
         let msg = outcome.stderr.as_deref().unwrap_or_default();
         assert_eq!(outcome.exit_code, 1, "outside items_dir must fail, got: {outcome:?}");
         assert!(
@@ -1080,7 +1120,7 @@ exit 64
 
         // check_approved must detect that pair Q (adr-beta.md) is not covered.
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            RefVerifyCompositionRoot::new().ref_verify_check_approved(RefVerifyCheckApprovedInput {
+            check_approved_via_driver(RefVerifyCheckApprovedInput {
                 track_id: track_id.to_owned(),
                 items_dir: items_dir.clone(),
             })
@@ -1119,15 +1159,14 @@ exit 64
         write_chain1_fixture(&items_dir, track_id);
 
         let outcome = with_fake_track_branch(&project_root, track_id, || {
-            RefVerifyCompositionRoot::new()
-                .ref_verify_results(RefVerifyResultsInput {
-                    track_id: track_id.to_owned(),
-                    items_dir: items_dir.clone(),
-                    chain: RefVerifyChainFilter::All,
-                    layer: "all".to_owned(),
-                    verdict: RefVerifyVerdictFilter::FailPending,
-                })
-                .unwrap()
+            results_via_driver(RefVerifyResultsInput {
+                track_id: track_id.to_owned(),
+                items_dir: items_dir.clone(),
+                chain: RefVerifyChainFilter::All,
+                layer: "all".to_owned(),
+                verdict: RefVerifyVerdictFilter::FailPending,
+            })
+            .unwrap()
         });
 
         assert_eq!(outcome.exit_code, 0, "ref_verify_results must always exit 0: {outcome:?}");
