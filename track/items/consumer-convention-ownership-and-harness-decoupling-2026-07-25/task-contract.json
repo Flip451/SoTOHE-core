@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "track_id": "consumer-convention-ownership-and-harness-decoupling-2026-07-25",
+  "entries": {
+    "T001": [
+      { "layer": "usecase", "entry_key": "ConventionDocumentPath" },
+      { "layer": "usecase", "entry_key": "ConventionDocumentPathError" },
+      { "layer": "usecase", "entry_key": "ConventionResolveError" }
+    ],
+    "T002": [
+      { "layer": "usecase", "entry_key": "ConventionRequirement" },
+      { "layer": "usecase", "entry_key": "ConventionResolution" },
+      { "layer": "usecase", "entry_key": "ResolveConventionsQuery" },
+      { "layer": "usecase", "entry_key": "CapabilityName" }
+    ],
+    "T003": [
+      { "layer": "usecase", "entry_key": "ConventionRequirementPort" },
+      { "layer": "usecase", "entry_key": "usecase::conventions_resolve::select_required_conventions" }
+    ],
+    "T004": [
+      { "layer": "usecase", "entry_key": "ConventionResolveService" },
+      { "layer": "usecase", "entry_key": "ConventionResolveInteractor" }
+    ],
+    "T005": [
+      { "layer": "infrastructure", "entry_key": "CapabilityIdField" },
+      { "layer": "infrastructure", "entry_key": "ConventionFrontMatterDto" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::conventions_resolve::parse_convention_front_matter" }
+    ],
+    "T006": [
+      { "layer": "infrastructure", "entry_key": "FsConventionRequirementAdapter" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::conventions_resolve::scan_convention_requirements" }
+    ],
+    "T007": [
+      { "layer": "cli_driver", "entry_key": "ConventionResolveInput" },
+      { "layer": "cli_driver", "entry_key": "ConventionResolveDriver" },
+      { "layer": "cli_driver", "entry_key": "CapabilityNameArg" }
+    ],
+    "T008": [
+      { "layer": "cli", "entry_key": "ConventionsCommand" },
+      { "layer": "cli_composition", "entry_key": "ConventionsCompositionRoot" },
+      { "layer": "cli_driver", "entry_key": "ConventionsDriver" }
+    ],
+    "T009": [
+      { "layer": "usecase", "entry_key": "DisciplineText" },
+      { "layer": "usecase", "entry_key": "CapabilityExecError" },
+      { "layer": "usecase", "entry_key": "CapabilityFailureDetail" },
+      { "layer": "usecase", "entry_key": "CapabilityFilePath" }
+    ],
+    "T010": [
+      { "layer": "usecase", "entry_key": "CapabilityExecInteractor" }
+    ],
+    "T011": [
+      { "layer": "usecase", "entry_key": "CapabilityExecInteractor" }
+    ],
+    "T012": [],
+    "T013": [],
+    "T014": [],
+    "T015": [],
+    "T032": [],
+    "T016": [],
+    "T017": [],
+    "T018": [],
+    "T019": [],
+    "T020": [],
+    "T021": [],
+    "T022": [],
+    "T023": [],
+    "T024": [],
+    "T025": [
+      { "layer": "usecase", "entry_key": "CheckConventionShippingQuery" },
+      { "layer": "usecase", "entry_key": "ConventionShippingVerdict" },
+      { "layer": "usecase", "entry_key": "ConventionShippingCheckError" }
+    ],
+    "T026": [
+      { "layer": "usecase", "entry_key": "ConventionInventoryPort" },
+      { "layer": "usecase", "entry_key": "usecase::template_conventions::select_unsupplied_conventions" }
+    ],
+    "T027": [
+      { "layer": "usecase", "entry_key": "ConventionShippingCheckService" },
+      { "layer": "usecase", "entry_key": "ConventionShippingCheckInteractor" }
+    ],
+    "T028": [
+      { "layer": "infrastructure", "entry_key": "infrastructure::template_conventions::list_convention_documents" },
+      { "layer": "infrastructure", "entry_key": "FsConventionInventoryAdapter" }
+    ],
+    "T029": [
+      { "layer": "cli_driver", "entry_key": "ConventionShippingCheckInput" },
+      { "layer": "cli_driver", "entry_key": "ConventionShippingCheckDriver" },
+      { "layer": "cli_driver", "entry_key": "TemplateDriver" }
+    ],
+    "T030": [
+      { "layer": "cli", "entry_key": "TemplateCommand" },
+      { "layer": "cli", "entry_key": "TemplateConventionShippingArgs" },
+      { "layer": "cli", "entry_key": "TemplateExportArgs" },
+      { "layer": "cli_composition", "entry_key": "TemplateCompositionRoot" }
+    ],
+    "T031": []
+  }
+}

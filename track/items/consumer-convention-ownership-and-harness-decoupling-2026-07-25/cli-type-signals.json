@@ -1,0 +1,47 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-26T07:43:52Z",
+  "declaration_hash": "6afe494b827c76638256d9ba8a82b91de6e4f59da325c1f903e4b0e11fbf558d",
+  "implementation_input_hash": "20d04b50f8b1b4fc9e679fd17cef448812723ced6d64acfbc1052491cd726115",
+  "signals": [
+    {
+      "type_name": "ConventionsCommand",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "FromArgMatches",
+        "Subcommand"
+      ]
+    },
+    {
+      "type_name": "TemplateCommand",
+      "kind_tag": "enum",
+      "signal": "yellow",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "FromArgMatches",
+        "Subcommand"
+      ]
+    },
+    {
+      "type_name": "TemplateConventionShippingArgs",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Args",
+        "Debug",
+        "FromArgMatches"
+      ]
+    },
+    {
+      "type_name": "TemplateExportArgs",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "layer": "cli_composition",
+  "entries": [
+    {
+      "claim_hash": "7e21abe3315c22ce1234fd6875e15c4b579c0af4b7342ab1330054cba66efb29",
+      "evidence_hash": "63e9be7c117f9eeb84db396f2bfb4fd38eab6798f16ec111cd2df8c4558f861f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "読み取り専用コマンド `bin/sotp conventions resolve --capability <capability-id>` を導入し、`knowledge/conventions/**/*.md` を走査して `required_for` の要素が指定 capability ID と完全一致する文書の repository-relative path を、重複なく安定順の機械可読な正本として返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "ConventionsCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "読み取り専用コマンド `bin/sotp conventions resolve --capability <capability-id>` を導入し、`knowledge/conventions/**/*.md` を走査して `required_for` の要素が指定 capability ID と完全一致する文書の repository-relative path を、重複なく安定順の機械可読な正本として返す。人間向け表示を持つ場合も同じ解決結果からレンダーする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7e21abe3315c22ce1234fd6875e15c4b579c0af4b7342ab1330054cba66efb29",
+      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "ConventionsCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "29d6f2d217caa32a35762f47ffa46e6d685a184ecdcbb5c160af6ac847ff05cc",
+      "evidence_hash": "9bfbdc0f7e66ed29f02c319bbc93fe9c583cfd6c1fbed44aa7fc064eefe76d5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "template smoke に、export 済み tree を対象として overlay 以外の source convention が出荷されていないことを検査する項目を持たせる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "template smoke に、export 済み tree を対象として overlay 以外の source convention が出荷されていないことを検査する項目を持たせる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "29d6f2d217caa32a35762f47ffa46e6d685a184ecdcbb5c160af6ac847ff05cc",
+      "evidence_hash": "8563e18e331d206dafbfcfd110fa00de1c3ef16050c4c5051318b028b0503613",
+      "verdict": {
+        "kind": "pass",
+        "citation": "template smoke が export 済み tree に対して overlay 以外の source convention の非出荷を検査し、変更後のリポジトリで成功する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "template smoke が export 済み tree に対して overlay 以外の source convention の非出荷を検査し、変更後のリポジトリで成功する。散文から convention path を抽出する dead-reference 検査は追加されていない。"
+        }
+      }
+    }
+  ]
+}

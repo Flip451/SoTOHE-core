@@ -1,0 +1,542 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "consumer 規約の所有権分離と harness 固定依存の撤去",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "consumer が所有する規約と harness が所有する実行契約・schema を path で判別できる出荷境界へ分離し、テンプレート出力側の `knowledge/conventions/` の内容が overlay からの供給だけで決まる状態にする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "capability が consumer 規約を固定ファイル名ではなく project-owned な frontmatter metadata 経由で取得できるようにする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "canonical dispatch 境界で consumer 規約の解決を一度だけ行い、その解決結果が外部 provider 実行と in-host 委譲の双方で実行主体へ届く状態にする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D6"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "`.harness/config/template-boundary.json` で `knowledge/conventions` をディレクトリ単位の `overlay` 一件として分類し、既存のファイル単位 `include` / `exclude` エントリ群を置き換える。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "D2 の移動表に列挙された各文書を、表が指定する `.harness/policies/` または `.harness/reference/` の target path へ移す。`impl-delegation-arch-guard.md` は provider 非依存の委譲手順と architecture guard の実行責務を `.harness/policies/implementation-delegation.md` へ分割し、残余は既存の所有先に残す。`workflow-ceremony-minimization.md` は source 側にのみ残す。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "`.harness/policies` と `.harness/reference` の分類エントリを `.harness/config/template-boundary.json` に新設し、未分類 path による export の fail-closed 拒否を発生させずに両ディレクトリを出荷できるようにする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "初期 overlay として `overlay/knowledge/conventions/` に `coding-principles.md`、`testing.md`、`security.md`、`prefer-type-safe-abstractions.md`、`type-designer-kind-selection.md` と `README.md` を consumer-neutral な内容で供給する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-05",
+        "text": "読み取り専用コマンド `bin/sotp conventions resolve --capability <capability-id>` を導入し、`knowledge/conventions/**/*.md` を走査して `required_for` の要素が指定 capability ID と完全一致する文書の repository-relative path を、重複なく安定順の機械可読な正本として返す。人間向け表示を持つ場合も同じ解決結果からレンダーする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "IN-06",
+        "text": "`required_for` の capability ID を非空文字列の完全一致だけで解決し、`.harness/capabilities/` や `agent-profiles.json` への登録有無を検証しない open-ended な値として扱う。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "IN-07",
+        "text": "`bin/sotp capability exec <capability> --host <host> --briefing-file <path>` が実行主体を決定する前に対象 capability ID で resolver を一度だけ実行し、解決した規約 path と全文書を読む義務を、`executed` では provider prompt／実行入力へ注入し、`delegate-in-host` では返却 payload の `discipline` に含める。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D6"
+          }
+        ]
+      },
+      {
+        "id": "IN-08",
+        "text": "type design の責務を、role 語彙と catalogue schema (`.harness/reference/`)、汎用的な選定・生成・注釈手順 (`.harness/capabilities/type-designer.md`)、機械制約 (`architecture-rules.json` と catalogue lint)、`required_for: [type-designer]` を持つ consumer convention (project 固有の選定規則) へ分解し、role × layer マトリクス本体を consumer convention 側に置く。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D8"
+          }
+        ]
+      },
+      {
+        "id": "IN-09",
+        "text": "移行前に include されていた convention への track 成果物以外からの live reference を全件監査し、harness 共通契約・単一 SSoT への吸収・resolver 注入への置換・非規範的参照の削除・source-only 参照の除去という D9 の分類に従って移行する。review CLI と `.harness/custom/review-prompts/` の固定 convention 参照も監査対象とし、resolver 注入以外の手段で解消する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D9"
+          }
+        ]
+      },
+      {
+        "id": "IN-10",
+        "text": "同一変更集合の中で、`.harness/workflows/`、`.harness/capabilities/`、`.harness/custom/`、`.agents/`、`.claude/`、top-level entry document、設定、script、production source、test fixture、overlay を含む surviving live surface の参照を、新しい `.harness` path、resolver 経由、または自己完結した実行条件へ更新する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D10"
+          }
+        ]
+      },
+      {
+        "id": "IN-11",
+        "text": "template smoke に、export 済み tree を対象として overlay 以外の source convention が出荷されていないことを検査する項目を持たせる。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D10"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OUT-01",
+        "text": "既存の convention 作成・更新・削除・索引機能 (`conventions add` / `update-index` / `verify-index`) の存廃、再設計、または仕様変更は対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D4"
+          }
+        ]
+      },
+      {
+        "id": "OUT-02",
+        "text": "review 用 CLI、scope ごとの briefing 合成、および `typed-pipeline` capability への resolver 注入は対象外とする。scope ごとに consumer convention を自動選択する代替機構も本変更に含めない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D6"
+          },
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D9"
+          }
+        ]
+      },
+      {
+        "id": "OUT-03",
+        "text": "`spec.json` 等の track 成果物に記録された `convention_refs` を dispatcher が探索・解決・合成することは対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D7"
+          }
+        ]
+      },
+      {
+        "id": "OUT-04",
+        "text": "workflow／capability／entry document の散文から convention path を抽出する dead-reference 検査と、そのためだけの新たな契約や再発検出機構の導入は対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D10"
+          }
+        ]
+      },
+      {
+        "id": "OUT-05",
+        "text": "移動前 path の stub、redirect document、alias の作成は対象外とする。`track/items/**`、`track/archive/**`、および現行手順として参照されていない既存 ADR／research note の旧 path は遡及更新せず、dead live reference として扱わない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D10"
+          }
+        ]
+      },
+      {
+        "id": "OUT-06",
+        "text": "未登録・タイプミスの capability ID を resolver が error へ変換すること、および typo と未使用 custom capability を機械的に区別する診断の導入は対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "OUT-07",
+        "text": "dispatcher を経由しない Agent／skill の直接起動を supported entrypoint として追加すること、およびそこへ同等の規約解決 preflight を別実装することは対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+            "anchor": "D6"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "分類は入れ子にできないため、`knowledge/conventions` はディレクトリ単位の `overlay` 一件で表現する。`exclude` は overlay からの供給経路を持たないため採らない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "consumer が削除すると workflow または capability の意味が変わる実行契約や schema を overlay convention に置いてはならない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "`.harness/workflows/` に policy／reference 文書を混在させず、workflow は必要な `.harness/policies/` / `.harness/reference/` 文書を直接参照する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "overlay 版の規約は SoTOHE-core の crate 名、内部 path、JST 運用を含まない consumer-neutral な初期値とし、利用者が改稿・改名・削除できる project-owned rule として供給する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "dispatcher が注入するのは resolver が `required_for` に対して返した project-wide convention だけとし、host orchestrator は resolver を再実行せず、規約本文を独自に要約しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D6"
+        },
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "CN-06",
+      "text": "D6 対象 capability は consumer convention の固定ファイル名も、その文書内の固定節見出しも参照しない。実行結果が project-wide convention を根拠として示す場合は、その実行で resolver が返した実際の文書 path を使う。harness 自身が所有する policy／reference への固定参照はこの禁止対象ではない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D7"
+        },
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D8"
+        }
+      ]
+    },
+    {
+      "id": "CN-07",
+      "text": "「参照を文章に置き換える」移行は D9 の分類 2 または 4 の場合だけに行う。複数箇所で共有する規範を各 consumer へ複製したり、consumer が変更すべき規約を harness 文面へ固定化したりしてはならない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D9"
+        }
+      ]
+    },
+    {
+      "id": "CN-08",
+      "text": "harness が所有するのは role 語彙、`KindLayerConstraint` という rule 種別と検査意味論、および type-designer が lint gate を通す義務までとし、role × layer マトリクスの層値と本体は consumer 所有の規約に置く。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D8"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "`.harness/config/template-boundary.json` に `knowledge/conventions` の `overlay` エントリが一件だけ存在し、`knowledge/conventions/` 配下のファイル単位エントリが残っていない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "export 済み tree の `knowledge/conventions/` の内容が `overlay/knowledge/conventions/` の供給内容と一致し、overlay に含まれない source convention は出荷されない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D1"
+        },
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "D2 の移動表の各行について、文書が target path に存在し移動元 path には存在しない。`.harness/policies/implementation-delegation.md` は provider 非依存の委譲手順と architecture guard の実行責務を持ち、layer 名・role × layer 配置・利用プロジェクトが選択する設計方針を含まない。`workflow-ceremony-minimization.md` は source 側に存在し、export 済み tree には存在しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "`.harness/policies` と `.harness/reference` が `.harness/config/template-boundary.json` で分類されており、両ディレクトリ配下のファイルを含む export が未分類 path による fail-closed 拒否なしに成功する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "初期 overlay の `knowledge/conventions/` は D3 が列挙する 5 規約と `README.md` だけを含み、`enforce-by-mechanism.md`、`filesystem-persistence-guard.md`、`language-policy.md`、`typed-deserialization.md` を含まない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D3"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-08",
+      "text": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "`.harness/capabilities/` にも `agent-profiles.json` にも登録されていない非空 capability ID を指定した resolve が error にならず、その ID を `required_for` に持つ文書を解決結果として返す。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "`orchestrator-output` capability の dispatch において、`CAPABILITY_EXEC_OUTCOME: executed` では解決した規約 path と全文書を読む義務が provider の実行入力に含まれ、`CAPABILITY_EXEC_OUTCOME: delegate-in-host` では同じ義務が返却 payload の `discipline` に含まれることを、両経路それぞれについて確認できる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "AC-11",
+      "text": "dispatch 一回あたり resolver の実行は一度だけであり、その実行は実行主体の決定より前に行われる。`typed-pipeline` capability の dispatch では resolver 注入が行われない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D6"
+        }
+      ]
+    },
+    {
+      "id": "AC-12",
+      "text": "dispatcher が注入する規約は resolver の解決結果だけであり、track 成果物の `convention_refs` を読み取らない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "AC-13",
+      "text": "`.harness/capabilities/type-designer.md` を含む D6 対象 capability の手順は、consumer convention の固定ファイル名も固定節見出しも参照せず、resolver が返した convention 群を読む形で project 固有規則を確認する。resolver が 0 件を返す状態でもその確認手順は error にならない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D8"
+        }
+      ]
+    },
+    {
+      "id": "AC-14",
+      "text": "role × layer マトリクス本体は `required_for: [type-designer]` を持つ consumer convention に存在し、出荷 catalogue-lint config の `permitted_layers` はその写像として整合する。harness 側 reference にはマトリクス本体が存在しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D8"
+        }
+      ]
+    },
+    {
+      "id": "AC-15",
+      "text": "移行前に include されていた convention への track 成果物以外の live reference が、D9 の 5 分類のいずれかに従って移行済みであり、review CLI と `.harness/custom/review-prompts/` に consumer 所有規約への固定参照が残らない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D9"
+        }
+      ]
+    },
+    {
+      "id": "AC-16",
+      "text": "`.harness/workflows/`、`.harness/capabilities/`、`.harness/custom/`、`.agents/`、`.claude/`、top-level entry document、設定、script、production source、test fixture、overlay の surviving live surface に、移動済み convention の旧 path への参照が残っていない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D10"
+        }
+      ]
+    },
+    {
+      "id": "AC-17",
+      "text": "移動前 path に stub、redirect document、alias が存在せず、`track/items/**`、`track/archive/**`、既存 ADR／research note の旧 path が変更されていない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D10"
+        }
+      ]
+    },
+    {
+      "id": "AC-18",
+      "text": "template smoke が export 済み tree に対して overlay 以外の source convention の非出荷を検査し、変更後のリポジトリで成功する。散文から convention path を抽出する dead-reference 検査は追加されていない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+          "anchor": "D10"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/testing.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/enforce-by-mechanism.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/no-backward-compat.md",
+      "anchor": "Rules"
+    }
+  ],
+  "signals": {
+    "blue": 47,
+    "yellow": 0,
+    "red": 0
+  }
+}

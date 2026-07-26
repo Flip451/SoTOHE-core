@@ -1,6 +1,323 @@
 {
   "schema_version": 2,
   "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 embeds an operational resolver command, output contract, and exhaustive fail-closed validation behavior. This obscures the architectural decision; delegate these implementation/schema details to the capability or harness contract and retain only the ownership/discovery decision.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+              "line": 182,
+              "category": "decision obscured by excess detail"
+            },
+            {
+              "message": "D6 specifies dispatcher entrypoint mechanics, outcome-specific payload wiring, host/provider delegation behavior, and prohibited alternate paths. This is workflow/capability contract detail that obscures the decision and should be delegated to the relevant SSoT.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+              "line": 216,
+              "category": "decision obscured by excess detail"
+            },
+            {
+              "message": "D10 prescribes template smoke checks, dead-reference detection exclusions, historical-path exemptions, and review-based enforcement. These are operational gate and workflow rules rather than the architectural decision, so they should be removed or delegated to the relevant harness/review SSoT.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+              "line": 318,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:ef82da4637235a25b71dedcd8da6afb79155b1429b889174c62d88513cd3293d",
+          "at": "2026-07-25T18:19:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d53babc0228fe679d7ffdfaf69f976588a2a3bf4f058e36e1bdc23fcf628030",
+          "at": "2026-07-25T18:45:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 mandates one directory-level `overlay` classification and explicitly rejects `exclude` because it cannot supply overlay content, but its closing summary says the replacement is directory `exclude` + overlay. These instructions are incompatible and could cause the initial conventions to be omitted. Change the summary to directory `overlay` or otherwise align it with the preceding decision.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+              "line": 109,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "The Negative consequence still embeds the dispatcher outcome identifiers `executed` and `delegate-in-host` in an operational conformance-test prescription. This is precisely the mechanism detail the accepted repair delegates away and it obscures the provider-neutral D6 decision. Retain the requirement for both external execution and in-host delegation, but remove the concrete outcome names and test-wiring terminology.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+              "line": 395,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:7d53babc0228fe679d7ffdfaf69f976588a2a3bf4f058e36e1bdc23fcf628030",
+          "at": "2026-07-25T18:49:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:acc50369797a7197797b856cac729eaf92a4a6078939c3bc98552888ae5048c7",
+          "at": "2026-07-25T18:55:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:acc50369797a7197797b856cac729eaf92a4a6078939c3bc98552888ae5048c7",
+          "at": "2026-07-25T18:57:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42b4f6cc56ae53c2d62876ef99e82479f96e98035e52e7dda533052eecf3cd17",
+          "at": "2026-07-26T03:23:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42b4f6cc56ae53c2d62876ef99e82479f96e98035e52e7dda533052eecf3cd17",
+          "at": "2026-07-26T03:25:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:105f38ed745129ade57a91bea3c81703438169da84fdee2e390e312ca873becf",
+          "at": "2026-07-26T04:00:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56dae89d5b16f54bcb6b905f9e268580b9ff4299ef77d46bc526e7e4d09b73c0",
+          "at": "2026-07-26T04:32:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d979015324a16df45f9a0f6ae8f71db386c0a9463aaaf1ba00afd88f97aba3b",
+          "at": "2026-07-26T05:14:57Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The IN-10/AC-16 mapping is not load-bearing. T013 omits live references in `.claude/commands/track/setup.md` and `.harness/capabilities/spec-designer.md`; T014 omits `.harness/workflows/track/{diagnose,review,plan}.md`; T015 omits several `.harness/workflows/` and `.claude/commands/track/` references; and T017 omits `.claude/skills/architecture-customizer/SKILL.md` plus old-path comments in `apps/cli` and `apps/cli-composition`. No later task owns these rewrites, so the plan can complete with dead live references in violation of AC-16. Add the exact targets to the carrier tasks.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/task-coverage.json",
+              "line": 13,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T002 restates IN-06/AC-09 by explaining nonempty-only validation and the absence of registration checks. Reduce it to target, operation, and anchor cites per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 repeats AC-08's zero-match empty-result behavior in prose. Cite AC-08 without restating its expected result, per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 repeats AC-07/AC-08 by enumerating YAML, array-shape, empty-ID, and missing-frontmatter behavior. Keep only the codec targets, implementation/test operations, and anchors per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 30,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T007 restates IN-05 and OUT-01 by specifying the canonical machine-readable result, human rendering, and unchanged write-side behavior. Replace that behavioral prose with the existing anchors per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T008 repeats OUT-01's unchanged add/update-index/verify-index contract. The task should name the command/composition changes and cite OUT-01 rather than restating it, per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 48,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T010 restates IN-07 and AC-10/AC-11 by spelling out resolver timing, single execution, provider delivery, and dispatch-stop behavior. Retain the affected symbols and implementation/test operations, and leave the behavior to the anchors per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 60,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T011 reproduces AC-10 through AC-12 almost verbatim for delegate-in-host, typed-pipeline, and convention_refs behavior. Name the concrete conformity-test target and cite those anchors without restating their assertions, per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 66,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T018 restates AC-13/AC-14 and CN-08, including zero-result behavior and matrix ownership/consistency requirements. Reduce the description to its file operations and anchor cites per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 108,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T019 repeats D9/CN-07's migration alternatives and prohibitions against duplicated or harness-fixed consumer rules. Keep the reference-removal/update operations and cite the anchors instead, per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 114,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T020 restates CN-07 and OUT-04 by explaining when references become self-contained comments and explicitly prohibiting a prose dead-reference detector. Leave those requirements to the cited anchors per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 120,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T021 repeats CN-04/AC-14 by describing consumer neutrality, prohibited SoTOHE-specific content, and the consumer's ability to rewrite or delete the rule. Retain the overlay target/creation operation and anchor cites only, per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 126,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T023 restates AC-05 by specifying the exact allowed overlay contents and index behavior in prose. Name the files and creation operation, then rely on the cited anchors per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 138,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T024 repeats CN-01 and the associated fail-closed behavior, including the explicit rejection of `exclude`. Keep the boundary-manifest replacement and dependency operation, and cite the anchors without re-explaining them per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 144,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T031 restates OUT-04 by saying no prose dead-reference check is added, along with upstream non-regression behavior. Reduce it to the Makefile target operation, dependencies, and anchor cites per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 186,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `resolver-delivery` repeats OUT-01's unchanged write-side convention behavior. Remove that sentence and retain the task grouping plus anchors per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 222,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `dispatch-injection` restates AC-10 through AC-12 by listing executed/delegate behavior, typed-pipeline non-injection, and convention_refs non-reading. The section should summarize targets/operations and cite the anchors only, per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 231,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `ownership-reference-migration` repeats D9's ownership-based migration rationale and rejection of mechanical path replacement. Remove the rationale and retain the grouped operations plus anchors per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 249,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:d060bfb6d5a10fd801c43d8da37db584a0ed9d33f2b30e4683c7f55bcc57b687",
+          "at": "2026-07-26T07:31:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.summary` maps GO-01 only to `T012-T024, T031, T032`, leaving T025-T030 with no goal traceability even though those tasks implement the non-shipping command required by IN-11/AC-18 and consumed by T031. Restore T025-T030 to GO-01's task set.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 199,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "The IN-09/AC-15 mapping remains incomplete for outbound references inside documents being moved by T012-T015/T032. For example, `adr.md`, `track-lifecycle.md`, `sot-reentry-sequencing.md`, `pre-track-adr-authoring.md`, `no-upstream-restatement.md`, and `responsibility-boundary.md` reference source-only `workflow-ceremony-minimization.md` or `enforce-by-mechanism.md`; after relocation these shipped harness documents would point to files absent from the export. T020 covers production source/fixtures but not these moved documents. Assign their migration to the relevant move tasks or T020.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/task-coverage.json",
+              "line": 12,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "The batching instruction says code-scope tasks may be bundled, contradicting the 500-line ceiling: T001+T002 already estimate 525 usecase lines, while T001-T004, T009-T011, T025-T027, and T005+T006 exceed it substantially. Replace `code scope 側は ... 束ねてよい` with explicit separate-batch constraints for these same-scope groups.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 201,
+              "category": "batch-size infeasibility"
+            },
+            {
+              "message": "T007 still restates IN-05's behavior contract in the sentence requiring the human display to render from the same machine-readable result. Keep the driver/render operation and anchor cite without repeating the expected relationship, per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T011 names test scenarios but no target file or implementation symbol; `CapabilityExecInteractor` appears only indirectly through task-contract/section context. Name the concrete test target so the task is independently executable.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 66,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T011's second sentence re-explains the cross-path non-divergence and prompt non-duplication contract instead of leaving those expectations to AC-10/CN-05. Retain the test operation and anchor cites only, per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 66,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:3487e13df864e45916b74c6bd911670d2e9a95018c300eaee17836586b256966",
+          "at": "2026-07-26T08:00:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f26bc1743af21972dd6d1e6a181b86c73f141953ee7cb697ada588ec7799a95b",
+          "at": "2026-07-26T08:17:19Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d1fabd0b486d7d11a3e8c08f3825da08f5661e2d17441480c94f2a08fbda6b78",
+          "at": "2026-07-26T07:21:18Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -226,114 +543,96 @@
         }
       ]
     },
-    "adr": {
+    "spec": {
       "rounds": [
         {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D4 embeds an operational resolver command, output contract, and exhaustive fail-closed validation behavior. This obscures the architectural decision; delegate these implementation/schema details to the capability or harness contract and retain only the ownership/discovery decision.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
-              "line": 182,
-              "category": "decision obscured by excess detail"
-            },
-            {
-              "message": "D6 specifies dispatcher entrypoint mechanics, outcome-specific payload wiring, host/provider delegation behavior, and prohibited alternate paths. This is workflow/capability contract detail that obscures the decision and should be delegated to the relevant SSoT.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
-              "line": 216,
-              "category": "decision obscured by excess detail"
-            },
-            {
-              "message": "D10 prescribes template smoke checks, dead-reference detection exclusions, historical-path exemptions, and review-based enforcement. These are operational gate and workflow rules rather than the architectural decision, so they should be removed or delegated to the relevant harness/review SSoT.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
-              "line": 318,
-              "category": "decision obscured by excess detail"
-            }
-          ],
-          "hash": "rvw1:sha256:ef82da4637235a25b71dedcd8da6afb79155b1429b889174c62d88513cd3293d",
-          "at": "2026-07-25T18:19:31Z"
-        },
-        {
-          "type": "fast",
+          "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7d53babc0228fe679d7ffdfaf69f976588a2a3bf4f058e36e1bdc23fcf628030",
-          "at": "2026-07-25T18:45:33Z"
-        },
+          "hash": "rvw1:sha256:66c1bb19af42ec729b5ad27871aeb1ed88e7cda4c298be7b1ddaa6ad4a33b2e8",
+          "at": "2026-07-26T07:22:58Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "D1 mandates one directory-level `overlay` classification and explicitly rejects `exclude` because it cannot supply overlay content, but its closing summary says the replacement is directory `exclude` + overlay. These instructions are incompatible and could cause the initial conventions to be omitted. Change the summary to directory `overlay` or otherwise align it with the preceding decision.",
+              "message": "`cli::ConventionsCommand.docs` repeats IN-06/AC-09’s whitespace rejection and no-registration behavior in prose. Per `no-upstream-restatement.md`, retain only the changed symbol/operation and rely on `spec_refs` for that contract.",
               "severity": "P1",
-              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
-              "line": 109,
-              "category": "inconsistent decisions within the same ADR"
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli-types.json",
+              "line": 69,
+              "category": "upstream restatement"
             },
             {
-              "message": "The Negative consequence still embeds the dispatcher outcome identifiers `executed` and `delegate-in-host` in an operational conformance-test prescription. This is precisely the mechanism detail the accepted repair delegates away and it obscures the provider-neutral D6 decision. Retain the requirement for both external execution and in-host delegation, but remove the concrete outcome names and test-wiring terminology.",
+              "message": "`cli::ConventionsCommand::Resolve` orders its mirror fields as `capability, project_root`, while `cli_driver::ConventionResolveInput` and `usecase::ResolveConventionsQuery` use `project_root, capability`. No language-level constraint documents the divergence; align this command/input mirror chain.",
               "severity": "P1",
-              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
-              "line": 395,
-              "category": "decision obscured by excess detail"
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli-types.json",
+              "line": 131,
+              "category": "mirror chain divergence"
+            },
+            {
+              "message": "The docs for `cli_driver::CapabilityNameArg`, `cli_driver::ConventionResolveDriver`, `cli_driver::ConventionResolveInput`, and `cli_driver::ConventionShippingCheckDriver` reproduce upstream validation, empty-result, fail-closed, rendering, and shipping-check behavior. Replace those paraphrases with concise symbol/operation descriptions plus the existing anchors, retaining only local adapter-design rationale.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli_driver-types.json",
+              "line": 106,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `infrastructure::conventions_resolve::parse_convention_front_matter`, `infrastructure::conventions_resolve::scan_convention_requirements`, `infrastructure::template_conventions::list_convention_documents`, `infrastructure::CapabilityIdField`, and `infrastructure::ConventionFrontMatterDto` restate AC-07/AC-08/AC-18 failure and empty-state contracts. Reference those anchors instead of duplicating their behavior in catalogue prose.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `usecase::conventions_resolve::select_required_conventions`, `usecase::template_conventions::select_unsupplied_conventions`, `usecase::ConventionInventoryPort`, `usecase::ConventionRequirementPort`, and `usecase::ConventionResolveService` reproduce exact-match, ordering, empty-result, one-way comparison, failure, and no-write behavior from the spec. Reduce them to downstream type/operation descriptions and anchor references.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::ConventionInventoryPort::list_conventions` and `usecase::ConventionRequirementPort::scan_requirements` are synchronous contracts for filesystem tree walking and file reads, but neither entry acknowledges why blocking I/O is intentional. Declare the appropriate async color or document the deliberate synchronous CLI boundary.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 468,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "The docs for `usecase::CapabilityExecError`, `usecase::CapabilityExecInteractor`, `usecase::CapabilityName`, and `usecase::DisciplineText` reproduce IN-06/IN-07, AC-09–AC-12, and CN-05 behavior such as execution ordering, both dispatch routes, and prohibition of re-resolution. Replace the duplicated contract with anchor citations while retaining type-local rationale.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 621,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `usecase::ConventionRequirement`, `usecase::ConventionResolution`, `usecase::ConventionResolveError`, `usecase::ConventionResolveInteractor`, `usecase::ConventionShippingCheckError`, `usecase::ConventionShippingVerdict`, and `usecase::ResolveConventionsQuery` restate AC-06–AC-09/AC-18 behavior, including complete failure lists and normal-empty states. Keep the structural/type rationale, but refer to the existing anchors for behavioral details.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 1044,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::ConventionShippingCheckError::DocumentPathRejected.source` accepts the entire `ConventionResolveError`, admitting impossible states such as `FrontMatterUnparseable` or `DocumentUnreadable` even though the shipping inventory reads no contents and can only fail path validation here. Use a path-specific error or payload so those states are unrepresentable.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 1275,
+              "category": "state-shape smell"
             }
           ],
-          "hash": "rvw1:sha256:7d53babc0228fe679d7ffdfaf69f976588a2a3bf4f058e36e1bdc23fcf628030",
-          "at": "2026-07-25T18:49:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:acc50369797a7197797b856cac729eaf92a4a6078939c3bc98552888ae5048c7",
-          "at": "2026-07-25T18:55:29Z"
+          "hash": "rvw1:sha256:989eba9bb04151e45ec82494b45bbb41b0d65dfeaae3c880114b811264696f5c",
+          "at": "2026-07-26T07:32:12Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:acc50369797a7197797b856cac729eaf92a4a6078939c3bc98552888ae5048c7",
-          "at": "2026-07-25T18:57:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:42b4f6cc56ae53c2d62876ef99e82479f96e98035e52e7dda533052eecf3cd17",
-          "at": "2026-07-26T03:23:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:42b4f6cc56ae53c2d62876ef99e82479f96e98035e52e7dda533052eecf3cd17",
-          "at": "2026-07-26T03:25:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:105f38ed745129ade57a91bea3c81703438169da84fdee2e390e312ca873becf",
-          "at": "2026-07-26T04:00:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:56dae89d5b16f54bcb6b905f9e268580b9ff4299ef77d46bc526e7e4d09b73c0",
-          "at": "2026-07-26T04:32:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7d979015324a16df45f9a0f6ae8f71db386c0a9463aaaf1ba00afd88f97aba3b",
-          "at": "2026-07-26T05:14:57Z"
+          "hash": "rvw1:sha256:8786fbceffe0cb5ca416c19092206868ae4deef11ba7fb121e73a0f4588a00e3",
+          "at": "2026-07-26T07:58:05Z"
         }
       ]
     },

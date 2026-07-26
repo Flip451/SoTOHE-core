@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "dba3aa5c63394d571c9c9031f445a23d47b7e9bff51d106dd481897d141dafa6",
+  "signals": [
+    {
+      "type_name": "CapabilityExecError",
+      "signal": "blue",
+      "entry_hash": "f918ebca4ac4130a84aafa3402e8d24847d9107784ed4d18fac6c5573ca77eec"
+    },
+    {
+      "type_name": "CapabilityExecInteractor",
+      "signal": "blue",
+      "entry_hash": "81e621868aaf571659ffe694ccc3df307f826a4048641912667064eaa887a41c"
+    },
+    {
+      "type_name": "CapabilityFailureDetail",
+      "signal": "blue",
+      "entry_hash": "4a00e7889d9a09843a493d25d1eb4ec9c4f5f0bab8c87f230e3c021a846d49c1"
+    },
+    {
+      "type_name": "CapabilityFilePath",
+      "signal": "blue",
+      "entry_hash": "3981569511fec7c4f2c97b43d4ff46d9dd959336416fe8e6c2bd7fae44df9bde"
+    },
+    {
+      "type_name": "CapabilityName",
+      "signal": "blue",
+      "entry_hash": "6f264a6c6029af426af266877a440670e1235d8c90a805b5ad6e067d9a2dab97"
+    },
+    {
+      "type_name": "CheckConventionShippingQuery",
+      "signal": "blue",
+      "entry_hash": "6f0162fece62587d1c6cd5434ada1bfa8381cef6cd00f09a9711543683ad9176"
+    },
+    {
+      "type_name": "ConventionDocumentPath",
+      "signal": "blue",
+      "entry_hash": "a951e7236de0037e508259e0edfc72df6cea233dbd1e2168b362574ab5cf1572"
+    },
+    {
+      "type_name": "ConventionDocumentPathError",
+      "signal": "blue",
+      "entry_hash": "ced1c0dde3fc93e8cc30aca3b1138e27b16c5f002b73552884d44d98e17369eb"
+    },
+    {
+      "type_name": "ConventionRequirement",
+      "signal": "blue",
+      "entry_hash": "d19f82c7eb2febfe24e1b6b117763fe601f3276e52d54eb56264286c4595c10b"
+    },
+    {
+      "type_name": "ConventionResolution",
+      "signal": "blue",
+      "entry_hash": "5209c65eaffc220aa380beddb3a8428f119b430badf3fe46a1fc6705aff37d12"
+    },
+    {
+      "type_name": "ConventionResolveError",
+      "signal": "blue",
+      "entry_hash": "a5f77bf47356a64a91be7fda95247702cefa365d517682f68ca9d98e202533df"
+    },
+    {
+      "type_name": "ConventionResolveInteractor",
+      "signal": "blue",
+      "entry_hash": "d1622283a9cf568bbcf9f746c66bc18149eb6c7043d3b48db9263da6a96159f8"
+    },
+    {
+      "type_name": "ConventionShippingCheckError",
+      "signal": "blue",
+      "entry_hash": "6a1cd167de55fa175e4e111932c3e52193a97623c8d734d1916e551bffb90f61"
+    },
+    {
+      "type_name": "ConventionShippingCheckInteractor",
+      "signal": "blue",
+      "entry_hash": "d790ae9fe766c51f257b9e24356c026184d2f4248dfe17b34d4aef1a9a1bb4ff"
+    },
+    {
+      "type_name": "ConventionShippingVerdict",
+      "signal": "blue",
+      "entry_hash": "8de1079a8be3d9427a1b771a843cdcc7ccefd380a21e0e08653179d9d64d4e77"
+    },
+    {
+      "type_name": "DisciplineText",
+      "signal": "blue",
+      "entry_hash": "4c524ef58d97d9f61133da85ab9e3166d3d8c9ed07a115e218a2db0d366b424f"
+    },
+    {
+      "type_name": "ResolveConventionsQuery",
+      "signal": "blue",
+      "entry_hash": "8945fefec9f939e1dbd91448ec495945865dfade90524ee99955448c01ce69e8"
+    },
+    {
+      "type_name": "ConventionInventoryPort",
+      "signal": "blue",
+      "entry_hash": "9dd8e94bf7e40ec9ffb5361da4da1c05b174531dcab342fa46e640e0f9cfc8e4"
+    },
+    {
+      "type_name": "ConventionRequirementPort",
+      "signal": "blue",
+      "entry_hash": "c4779028d95d253224e14d8e630580c194d4c47764172da0d61f8b5fb07452ab"
+    },
+    {
+      "type_name": "ConventionResolveService",
+      "signal": "blue",
+      "entry_hash": "7480709bd6331941d780ee24868992c52d537d810d0ab190adfdb20dff417bf7"
+    },
+    {
+      "type_name": "ConventionShippingCheckService",
+      "signal": "blue",
+      "entry_hash": "86f51f8ce920fe2dd2b3a0dcf824198de21cb9218e9d7aa971298c1511fb8ee5"
+    },
+    {
+      "type_name": "usecase::conventions_resolve::select_required_conventions",
+      "signal": "blue",
+      "entry_hash": "74373786011253477ec1cdd48cd54312701e6ed49b12491d54e2bf41091e7124"
+    },
+    {
+      "type_name": "usecase::template_conventions::select_unsupplied_conventions",
+      "signal": "blue",
+      "entry_hash": "70e00a417c55ae27527713540d83547f5f9ab048671d599a538ba76e8b8f6f01"
+    }
+  ]
+}

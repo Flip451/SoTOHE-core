@@ -1,0 +1,1524 @@
+{
+  "crate_name": "usecase",
+  "functions": {
+    "usecase::conventions_resolve::select_required_conventions": {
+      "action": "add",
+      "docs": "Pure aggregation step of convention resolution (AC-06, AC-08). A `FreeFunction` rather than an interactor method because it holds no state and needs no injected dependency (R2), which is also what makes the matching rule exercisable without filesystem input. Placed in usecase rather than inside the scanning adapter so that the seam falls between reading documents and selecting among them: either side can then be replaced or tested without the other, and the selection rule is not reachable from an adapter that could quietly vary it.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "requirements",
+          "ty": "&[ConventionRequirement]"
+        },
+        {
+          "name": "capability",
+          "ty": "&CapabilityName"
+        }
+      ],
+      "returns": "ConventionResolution",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "usecase::template_conventions::select_unsupplied_conventions": {
+      "action": "add",
+      "docs": "Pure comparison step of the shipping check (IN-11, AC-18). A `FreeFunction` at the same seam and for the same reasons as `select_required_conventions`: no state, no dependency (R2), and testable without either tree on disk. The offending documents it reports are deduplicated and stably ordered — a local commitment the spec does not require, made here so a failing smoke run is reproducible and diffable rather than dependent on directory-walk order. The comparison is deliberately one-directional — a document the overlay supplies but the exported tree lacks is outside this function's contract — because a symmetric diff would produce a second finding class the verdict type has no variant for and this track states no rule about.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "shipped",
+          "ty": "&[ConventionDocumentPath]"
+        },
+        {
+          "name": "supplied",
+          "ty": "&[ConventionDocumentPath]"
+        }
+      ],
+      "returns": "ConventionShippingVerdict",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "requirements",
+              "ty": "std::sync::Arc<dyn ConventionRequirementPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "ConventionResolveInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<Self, ConventionDocumentPathError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&std::path::Path"
+        }
+      ],
+      "type_name": "ConventionDocumentPath"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "document",
+              "ty": "ConventionDocumentPath"
+            },
+            {
+              "name": "required_for",
+              "ty": "Vec<CapabilityName>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "document",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&ConventionDocumentPath"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "requires",
+          "params": [
+            {
+              "name": "capability",
+              "ty": "&CapabilityName"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "type_name": "ConventionRequirement"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "from_matches",
+          "params": [
+            {
+              "name": "matches",
+              "ty": "Vec<ConventionDocumentPath>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "documents",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&[ConventionDocumentPath]"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_empty",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "type_name": "ConventionResolution"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "inventory",
+              "ty": "std::sync::Arc<dyn ConventionInventoryPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "ConventionShippingCheckInteractor"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "ConventionDocumentPath",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ConventionDocumentPath",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ConventionDocumentPath",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ConventionDocumentPath",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ConventionDocumentPath",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "for_type": "ConventionDocumentPath",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "for_type": "ConventionDocumentPath",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ConventionRequirement",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ConventionRequirement",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ConventionRequirement",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ConventionRequirement",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ConventionResolution",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ConventionResolution",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ConventionResolution",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ConventionResolution",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ConventionResolution",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "ResolveConventionsQuery",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ResolveConventionsQuery",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ResolveConventionsQuery",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ResolveConventionsQuery",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ConventionResolveError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ConventionResolveError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ConventionResolveError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ConventionResolveInteractor",
+      "trait_ref": "ConventionResolveService"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityName",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityFailureDetail",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityFailureDetail",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityFailureDetail",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityFailureDetail",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityFailureDetail",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityFilePath",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityFilePath",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityFilePath",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityFilePath",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "CapabilityFilePath",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "DisciplineText",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "DisciplineText",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "DisciplineText",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "modify",
+      "for_type": "DisciplineText",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "modify",
+      "for_type": "CapabilityExecInteractor",
+      "trait_ref": "CapabilityExecService"
+    },
+    {
+      "for_type": "ConventionShippingVerdict",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ConventionShippingVerdict",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ConventionShippingVerdict",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ConventionShippingVerdict",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ConventionShippingCheckError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ConventionShippingCheckError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ConventionShippingCheckError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ConventionShippingCheckInteractor",
+      "trait_ref": "ConventionShippingCheckService"
+    },
+    {
+      "for_type": "CheckConventionShippingQuery",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CheckConventionShippingQuery",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CheckConventionShippingQuery",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CheckConventionShippingQuery",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ConventionDocumentPathError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ConventionDocumentPathError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ConventionDocumentPathError",
+      "trait_ref": "core::error::Error"
+    }
+  ],
+  "traits": {
+    "ConventionInventoryPort": {
+      "action": "add",
+      "docs": "Read-only driven port that lists the convention documents a given tree ships, identified tree-relative so the exported tree and the overlay tree yield comparable values. Deliberately not the existing `ConventionRequirementPort`: that port's contract is to decode `required_for` front matter and it fails closed on malformed YAML, which would let an unrelated document defect masquerade as a shipping violation. Placed in usecase rather than domain by R1's port tie-break — listing a tree's documents is a technical capability the application orchestration needs, not an invariant of a domain aggregate. The method is synchronous by decision, not by omission: this workspace has no ambient async runtime, the port is called twice in a short-lived CLI process with nothing to overlap, and every sibling filesystem port in this layer is synchronous, so an async color would force a runtime into the composition root for concurrency no caller could use. IN-11, AC-18.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "list_conventions",
+          "params": [
+            {
+              "name": "tree_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<ConventionDocumentPath>, ConventionShippingCheckError>"
+        }
+      ],
+      "module_path": "template_conventions",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "ConventionRequirementPort": {
+      "action": "add",
+      "docs": "Read-only driven port producing one `ConventionRequirement` per scanned document (IN-05, AC-06, AC-07). Placed in usecase rather than domain by R1's port tie-break, as with `ConventionInventoryPort`: scanning a tree is a technical capability the orchestration needs, not a domain invariant. Synchronous by the same decision — no ambient runtime, one call per process invocation, no async sibling port in this layer — so the blocking filesystem read is the deliberate CLI-boundary choice rather than an unstated default.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "scan_requirements",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Vec<ConventionRequirement>, ConventionResolveError>"
+        }
+      ],
+      "module_path": "conventions_resolve",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "ConventionResolveService": {
+      "action": "add",
+      "docs": "Primary port for read-only convention resolution (IN-05, AC-06). It is a trait rather than a free function precisely because it has two independent drivers — the `conventions resolve` CLI adapter and the capability dispatcher's preflight — and the dispatcher must hold it as `Arc<dyn …>`, which is R2's stated exception to folding a single-operation service into a function.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve",
+          "params": [
+            {
+              "name": "query",
+              "ty": "ResolveConventionsQuery"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ConventionResolution, ConventionResolveError>"
+        }
+      ],
+      "module_path": "conventions_resolve",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "ConventionShippingCheckService": {
+      "action": "add",
+      "docs": "Primary port for the read-only non-shipping check (IN-11, AC-18). Separate from `TemplateExportService` rather than a second method on it, on R1's required CQRS-separation evidence: the two operations are asymmetric on side effects (this one writes nothing), collaborators (one read-only inventory port vs the manifest / export / transplant ports), and read/write model (a verdict over an already-produced tree vs an export report). The check also runs after an export, against its output, so folding it in would put a consumer of the export inside the export's own consistency boundary.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "check",
+          "params": [
+            {
+              "name": "query",
+              "ty": "CheckConventionShippingQuery"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ConventionShippingVerdict, ConventionShippingCheckError>"
+        }
+      ],
+      "module_path": "template_conventions",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    }
+  },
+  "types": {
+    "CapabilityExecError": {
+      "action": "modify",
+      "docs": "Reports fail-closed profile, source, preflight, or provider dispatch failures. This track adds the `ConventionResolutionFailed` variant for the resolver preflight (AC-11). Its `source` carries the typed `ConventionResolveError` rather than a flattened summary, so the failing condition survives the layer boundary instead of arriving as prose; its construction owner is the interactor's preflight step, which holds both payload fields at failure time.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ProfileResolution",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "CapabilityName"
+                },
+                {
+                  "name": "detail",
+                  "ty": "CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ExecutionModeRejected",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "CapabilityName"
+                },
+                {
+                  "name": "mode",
+                  "ty": "ExecutionMode"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ModelMissing",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "CapabilityName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "EffortMissing",
+            "payload": {
+              "fields": [
+                "CapabilityName"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnsupportedProvider",
+            "payload": {
+              "fields": [
+                {
+                  "name": "provider",
+                  "ty": "ProviderName"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "SourceValidation",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "CapabilityFilePath"
+                },
+                {
+                  "name": "detail",
+                  "ty": "CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "AdapterPreflight",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "CapabilityName"
+                },
+                {
+                  "name": "provider",
+                  "ty": "ProviderName"
+                },
+                {
+                  "name": "detail",
+                  "ty": "CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DispatchFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "provider",
+                  "ty": "ProviderName"
+                },
+                {
+                  "name": "detail",
+                  "ty": "CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ConventionResolutionFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "CapabilityName"
+                },
+                {
+                  "name": "source",
+                  "ty": "ConventionResolveError"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "capability_exec",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "CapabilityExecInteractor": {
+      "action": "modify",
+      "docs": "Pure application-layer coordinator for generic capability dispatch. This track injects `ConventionResolveService` as a fourth dependency (AC-10, AC-11, AC-12). The seam falls here rather than in the two route branches because the interactor is the one point both outcomes pass through: resolving once above the branch is what makes a single value reach either route, whereas resolving inside each branch would place the same rule in two sites with nothing but review keeping them equal. The resolved value is composed into `DisciplineText` rather than passed alongside it, so the two routes share one representation by construction.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "profile",
+              "ty": "Arc<dyn CapabilityProfilePort>"
+            },
+            {
+              "name": "source",
+              "ty": "Arc<dyn CapabilitySourcePort>"
+            },
+            {
+              "name": "conventions",
+              "ty": "Arc<dyn ConventionResolveService>"
+            },
+            {
+              "name": "providers",
+              "ty": "Vec<Arc<dyn CapabilityProviderPort>>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-12",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "CapabilityFailureDetail": {
+      "action": "reference",
+      "docs": "Baseline-identical opaque diagnostic-text value object, reused unchanged as the detail payload of the convention-resolution failure variants instead of minting a second diagnostic newtype; declared here only to expose those edges.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-07",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "CapabilityFilePath": {
+      "action": "reference",
+      "docs": "Baseline-identical briefing-path value object, unchanged by this track; declared to keep the `CapabilityExecError::SourceValidation` edge visible next to the newly added resolution-failure variant.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "path",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_path",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&std::path::Path"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "CapabilityName": {
+      "action": "reference",
+      "docs": "Baseline-identical non-empty capability identifier, reused unchanged instead of minting a new newtype for this track (design self-check 12): its sole invariant is non-emptiness, which is exactly the invariant IN-06 asks this identifier to carry, and a stronger one would be unsatisfiable for an open-ended value. Declared here so its edges into the new query, port, and resolver entries stay visible.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Result<Self, ValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "module_path": "dry_write_driver::failure_details",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "CheckConventionShippingQuery": {
+      "action": "add",
+      "docs": "Read-only request naming the two trees the check compares (IN-11, AC-18). Both fields stay `PathBuf`: a tree root is a caller-chosen filesystem location with no invariant of its own, so it is the truly-opaque case R9 permits — the constrained concept in this slice is the document identity inside a tree, which is typed as `ConventionDocumentPath`. This also matches the neighbouring `TemplateExportCommand` fields. A separate `Query` from `TemplateExportCommand` because it names an already-produced tree plus its overlay, not the four inputs an export consumes.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "exported_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "overlay_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "template_conventions",
+      "role": {
+        "Query": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ConventionDocumentPath": {
+      "action": "add",
+      "docs": "Repository-relative path of a convention document. It owns one invariant — the path stays inside `knowledge/conventions/` — and its constructor is the single site that establishes it (AC-07), so no other layer re-checks and none can skip it. A `tuple`-shape newtype over `PathBuf` rather than a raw path (R9), with the constructor failure extracted as `ConventionDocumentPathError` so the resolver and the shipping check can each admit exactly that rejection and nothing more. Placed in usecase rather than domain under R1's tests: its meaning is stable across two independent application operations — the resolver and the shipping check — which is why it is not a per-operation `Dto`; but the invariant it owns is a fact about one repository directory layout, so it is not independent of delivery and workflow concerns and is not domain language. `Ord` is declared because the stable ordering both operations rely on is an ordering of these values, owned here rather than re-derived by each consumer.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "conventions_resolve",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ConventionDocumentPathError": {
+      "action": "add",
+      "docs": "Construction failure of `ConventionDocumentPath`, extracted as its own type so that every consumer of that constructor names exactly the states its call can produce. Both `ConventionResolveError` and `ConventionShippingCheckError` compose it rather than each restating the rejection; without the extraction the shipping check — which reads no document contents — would have had to carry the resolver's whole error surface and admit content-parse states it cannot reach. An enum rather than a struct because the constructor is the single validation site for this path concept and further rejection reasons belong here as sibling variants; today it has exactly one. AC-07.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "OutsideConventionRoot",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "conventions_resolve",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-07",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ConventionRequirement": {
+      "action": "add",
+      "docs": "One scanned convention document paired with the capability identifiers its front matter declares (IN-05, AC-06, AC-08). A plain struct exposing a `requires` predicate rather than an enum over declares / does-not-declare, because an empty declaration list is an ordinary value of the same shape: splitting it into variants would make every caller re-join the two cases before it could match, and would let the empty case drift into meaning an error. Placed in usecase rather than domain by the same reading as `ConventionDocumentPath` — stable across the scan and the match, but existing only because documents carry front matter, which is a delivery-format concern rather than domain language.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "conventions_resolve",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ConventionResolution": {
+      "action": "add",
+      "docs": "Canonical resolver result (IN-05, AC-06, AC-08). A struct with a `Default` rather than an enum — the opposite choice from `ConventionShippingVerdict` — because the empty result is an ordinary value of the same shape that every consumer handles uniformly, whereas a verdict's violating case must carry a payload its conforming case does not have. Being a success value by construction, the empty case cannot be reached through the error type at all. The type owns the deduplication and ordering guarantee, so no consumer re-sorts and none can disagree about the order; placed in usecase for the same reason as its element type.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "conventions_resolve",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ConventionResolveError": {
+      "action": "add",
+      "docs": "The structural fail-closed conditions of convention resolution, one variant each (AC-07). The normal empty states are deliberately absent from this enum: they are values of `ConventionResolution`, so no caller can confuse `nothing matched` with `resolution failed`, and no variant exists for them to drift into. Construction owners: `ConventionDocumentPath::try_new` owns the path rejection and reaches this enum only through the composed `ConventionDocumentPathError`, so the rejection has one definition rather than a copy per parent error; the infrastructure front-matter codec owns `FrontMatterUnparseable`, `RequiredForNotStringArray`, and `EmptyCapabilityId`; the infrastructure directory scan owns `DocumentUnreadable`. Every payload is data its owner possesses at failure time.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "FrontMatterUnparseable",
+            "payload": {
+              "fields": [
+                {
+                  "name": "document",
+                  "ty": "ConventionDocumentPath"
+                },
+                {
+                  "name": "detail",
+                  "ty": "CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "RequiredForNotStringArray",
+            "payload": {
+              "fields": [
+                {
+                  "name": "document",
+                  "ty": "ConventionDocumentPath"
+                },
+                {
+                  "name": "detail",
+                  "ty": "CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "EmptyCapabilityId",
+            "payload": {
+              "fields": [
+                {
+                  "name": "document",
+                  "ty": "ConventionDocumentPath"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DocumentPathOutsideRoot",
+            "payload": {
+              "fields": [
+                {
+                  "name": "source",
+                  "ty": "ConventionDocumentPathError"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DocumentUnreadable",
+            "payload": {
+              "fields": [
+                {
+                  "name": "document",
+                  "ty": "ConventionDocumentPath"
+                },
+                {
+                  "name": "detail",
+                  "ty": "CapabilityFailureDetail"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "conventions_resolve",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-07",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ConventionResolveInteractor": {
+      "action": "add",
+      "docs": "Implements `ConventionResolveService` by scanning through the injected `ConventionRequirementPort` and delegating to `select_required_conventions` (IN-05, AC-06, AC-08). An `Interactor` rather than a free function only because it carries an injected dependency — R2's stated exception; it holds nothing else, so the type adds no state of its own and every field stays private.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "conventions_resolve",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ConventionShippingCheckError": {
+      "action": "add",
+      "docs": "The structural fail-closed conditions of the shipping check, one variant each (IN-11, AC-18). A detected violation is deliberately not among them: non-overlay documents in the export are the check's normal finding and are carried by `ConventionShippingVerdict`, so this enum stays reserved for states in which the question could not be answered at all. `ConventionRootMissing` exists so an exported tree with no conventions directory fails rather than passing vacuously — that is the shape the tree takes if the boundary classification is edited away from `overlay`, which is the mutation this check is here to catch. `DocumentPathRejected` composes `ConventionDocumentPathError` rather than the whole `ConventionResolveError`: this check reads no document contents, so the content-parse conditions are unreachable on this path and must not be representable in its error type. Construction owner for all three variants: the infrastructure inventory (`list_convention_documents`, reached through `FsConventionInventoryAdapter`); every payload is data that walk possesses at failure time.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ConventionRootMissing",
+            "payload": {
+              "fields": [
+                {
+                  "name": "tree_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TreeUnreadable",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "domain::tddd::catalogue_linter::FreeText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DocumentPathRejected",
+            "payload": {
+              "fields": [
+                {
+                  "name": "tree_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "source",
+                  "ty": "ConventionDocumentPathError"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "template_conventions",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ConventionShippingCheckInteractor": {
+      "action": "add",
+      "docs": "Implements `ConventionShippingCheckService` by inventorying both trees through the one injected `ConventionInventoryPort` and delegating the comparison to `select_unsupplied_conventions` (IN-11, AC-18). Taking a single port instance rather than one per side is the load-bearing choice: it makes it impossible for the two sides of the comparison to be walked by different rules, which would produce a difference that is an artefact of the walk rather than of what ships. An `Interactor` for the same R2 reason as `ConventionResolveInteractor`, and it holds nothing beyond that port.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "template_conventions",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ConventionShippingVerdict": {
+      "action": "add",
+      "docs": "Outcome of the shipping comparison (IN-11, AC-18). An enum rather than a report struct holding a possibly-empty list, so a violating verdict carrying no offending document is unrepresentable; the violating variant therefore takes `NonEmptyVec`, the workspace's existing non-empty collection value object, rather than a second one minted here (design self-check 12). The offending documents travel as the typed paths themselves rather than a count, so no consumer can report the violation without being able to name it. A `ValueObject` in usecase rather than domain: unlike `ConventionDocumentPath` it has no meaning outside the one application operation that produces it, and R1 places such boundary values in usecase.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Conforming",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "UnsuppliedDocumentsShipped",
+            "payload": {
+              "fields": [
+                {
+                  "name": "documents",
+                  "ty": "domain::tddd::catalogue_v2::NonEmptyVec<ConventionDocumentPath>"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "template_conventions",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "DisciplineText": {
+      "action": "modify",
+      "docs": "Usecase-layer validated technical policy-text value; not domain language — its invariant is non-emptiness of a technical text, and it carries no ubiquitous-language meaning. This track adds `with_conventions` (AC-10, CN-05) as the one site that renders a resolution into the text: because both dispatch outcomes then carry the same composed value, the routes are structurally incapable of differing rather than kept equal by review. The method takes `&ConventionResolution` rather than a pre-rendered string precisely so the rendering cannot happen anywhere else, and it is infallible because `self` is already non-empty and appending cannot make it empty.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, CapabilityInputValidationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_conventions",
+          "params": [
+            {
+              "name": "conventions",
+              "ty": "&ConventionResolution"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Self"
+        }
+      ],
+      "module_path": "capability_exec",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-07",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "CN-05",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ResolveConventionsQuery": {
+      "action": "add",
+      "docs": "Read-only request naming the capability whose required conventions are wanted and the project root to scan (IN-05, IN-06, AC-09). A separate `Query` from the existing write-side `ConventionsService` inputs on R1's required CQRS-separation evidence: the operations are asymmetric on side effects (none vs document and index writes), collaborators (the read-only scan port vs the mutating document port), and read/write model (`ConventionResolution` vs an index rewrite). The capability is `CapabilityName` rather than a string because non-emptiness is a real invariant of the value (R9). Field order mirrors `cli_driver::ConventionResolveInput` and `cli::ConventionsCommand::Resolve` exactly; the CLI variant is the fixed point of that chain, because clap renders declaration order in `--help` and every sibling variant of that enum places `project_root` last.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "CapabilityName"
+            },
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "conventions_resolve",
+      "role": {
+        "Query": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    }
+  }
+}

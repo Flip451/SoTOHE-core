@@ -1,0 +1,126 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {},
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "ConventionsCompositionRoot",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "TemplateCompositionRoot",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TemplateCompositionRoot",
+      "trait_ref": "core::default::Default"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "ConventionsCompositionRoot": {
+      "action": "modify",
+      "docs": "Composition root for the `conventions` command family. This track adds `conventions_resolve_driver`, wiring `FsConventionRequirementAdapter` into `ConventionResolveInteractor` and injecting that into `ConventionResolveDriver`; the existing write-side wiring is unchanged. Pure DI only — no resolution or scanning logic lives here.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "conventions_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::conventions::ConventionsDriver"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "conventions_resolve_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::conventions_resolve::ConventionResolveDriver"
+        }
+      ],
+      "module_path": "conventions",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "TemplateCompositionRoot": {
+      "action": "modify",
+      "docs": "Composition root for the `template` command family. This track adds `convention_shipping_check_driver`, wiring `FsConventionInventoryAdapter` into `ConventionShippingCheckInteractor` and injecting that into `ConventionShippingCheckDriver`; the existing export wiring is unchanged. Pure DI only — the check's tree walking and set comparison live in infrastructure and usecase respectively, never here.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "template_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::template_export::TemplateDriver"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "convention_shipping_check_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::template_conventions::ConventionShippingCheckDriver"
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-26T07:43:51Z",
+  "declaration_hash": "f94bd35beefbfe78b4869a6a1b22ec31f0e12ba3217c5504a17d04ca3209bc31",
+  "implementation_input_hash": "b5c3b55e58746e1b44a49cb30383b977bbe303714cd25bbf3ace72e466f79425",
+  "signals": [
+    {
+      "type_name": "CapabilityIdField",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Deserialize<'de>",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ConventionFrontMatterDto",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Debug",
+        "Default",
+        "Deserialize<'de>"
+      ]
+    },
+    {
+      "type_name": "FsConventionInventoryAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "ConventionInventoryPort",
+        "Default"
+      ]
+    },
+    {
+      "type_name": "FsConventionRequirementAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "ConventionRequirementPort",
+        "Default"
+      ]
+    },
+    {
+      "type_name": "infrastructure::conventions_resolve::parse_convention_front_matter",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::conventions_resolve::scan_convention_requirements",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": false
+    },
+    {
+      "type_name": "infrastructure::template_conventions::list_convention_documents",
+      "kind_tag": "free_function",
+      "signal": "yellow",
+      "found_type": false
+    }
+  ]
+}

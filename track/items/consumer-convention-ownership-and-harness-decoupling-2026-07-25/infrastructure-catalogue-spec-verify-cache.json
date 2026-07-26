@@ -1,0 +1,462 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "42689c20e9ee40dd770259ed918daeff3626c652b0c0a170546a1b698ebe73ca",
+      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityIdField"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "42689c20e9ee40dd770259ed918daeff3626c652b0c0a170546a1b698ebe73ca",
+      "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityIdField"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "42689c20e9ee40dd770259ed918daeff3626c652b0c0a170546a1b698ebe73ca",
+      "evidence_hash": "decd39340e72acb94d6d3a285b7ed8fab04cd85ddff66dfaf30e0f50ef461b8f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/capabilities/`にも`agent-profiles.json`にも登録されていない非空 capability ID を指定した resolve が error にならず、その ID を `required_for` に持つ文書を解決結果として返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CapabilityIdField"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "`.harness/capabilities/` にも `agent-profiles.json` にも登録されていない非空 capability ID を指定した resolve が error にならず、その ID を `required_for` に持つ文書を解決結果として返す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "68473f6e6c0f11c16f128cbebd80e115ec547512147b24e0a0a258b692a749cd",
+      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ConventionFrontMatterDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "68473f6e6c0f11c16f128cbebd80e115ec547512147b24e0a0a258b692a749cd",
+      "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`required_for` に空文字または空白だけの capability ID がある場合"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ConventionFrontMatterDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "68473f6e6c0f11c16f128cbebd80e115ec547512147b24e0a0a258b692a749cd",
+      "evidence_hash": "290d0251ec52368b3c0579660a5e2e80bb8bdafe9a8a6ba536eab6926854545f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ConventionFrontMatterDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "517364d9dea5d43a231b3a10c8f358e9dead291faf9756dd3ccb42f8bad31767",
+      "evidence_hash": "9bfbdc0f7e66ed29f02c319bbc93fe9c583cfd6c1fbed44aa7fc064eefe76d5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "template smoke に、export 済み tree を対象として overlay 以外の source convention が出荷されていないことを検査する項目を持たせる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsConventionInventoryAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "template smoke に、export 済み tree を対象として overlay 以外の source convention が出荷されていないことを検査する項目を持たせる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "517364d9dea5d43a231b3a10c8f358e9dead291faf9756dd3ccb42f8bad31767",
+      "evidence_hash": "8563e18e331d206dafbfcfd110fa00de1c3ef16050c4c5051318b028b0503613",
+      "verdict": {
+        "kind": "pass",
+        "citation": "template smoke が export 済み tree に対して overlay 以外の source convention の非出荷を検査し、変更後のリポジトリで成功する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsConventionInventoryAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "template smoke が export 済み tree に対して overlay 以外の source convention の非出荷を検査し、変更後のリポジトリで成功する。散文から convention path を抽出する dead-reference 検査は追加されていない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bafa61d4e29e069bbbc8c165b4cef942f80f92ebd5f03eb350bb79761fc81ae1",
+      "evidence_hash": "63e9be7c117f9eeb84db396f2bfb4fd38eab6798f16ec111cd2df8c4558f861f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "読み取り専用コマンド `bin/sotp conventions resolve --capability <capability-id>` を導入し、`knowledge/conventions/**/*.md` を走査して `required_for` の要素が指定 capability ID と完全一致する文書の repository-relative path を、重複なく安定順の機械可読な正本として返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsConventionRequirementAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "読み取り専用コマンド `bin/sotp conventions resolve --capability <capability-id>` を導入し、`knowledge/conventions/**/*.md` を走査して `required_for` の要素が指定 capability ID と完全一致する文書の repository-relative path を、重複なく安定順の機械可読な正本として返す。人間向け表示を持つ場合も同じ解決結果からレンダーする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bafa61d4e29e069bbbc8c165b4cef942f80f92ebd5f03eb350bb79761fc81ae1",
+      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsConventionRequirementAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bafa61d4e29e069bbbc8c165b4cef942f80f92ebd5f03eb350bb79761fc81ae1",
+      "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsConventionRequirementAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ffb60564942a6b0352b7fa7eebdce0eaf4b0bfb056cffd0a74bc5c383a08b8be",
+      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::conventions_resolve::parse_convention_front_matter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ffb60564942a6b0352b7fa7eebdce0eaf4b0bfb056cffd0a74bc5c383a08b8be",
+      "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::conventions_resolve::parse_convention_front_matter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ffb60564942a6b0352b7fa7eebdce0eaf4b0bfb056cffd0a74bc5c383a08b8be",
+      "evidence_hash": "290d0251ec52368b3c0579660a5e2e80bb8bdafe9a8a6ba536eab6926854545f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::conventions_resolve::parse_convention_front_matter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fe13957828be17b6f99f9037ac24951df58a38ef25b8224aa404279d4588149b",
+      "evidence_hash": "63e9be7c117f9eeb84db396f2bfb4fd38eab6798f16ec111cd2df8c4558f861f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "読み取り専用コマンド `bin/sotp conventions resolve --capability <capability-id>` を導入し、`knowledge/conventions/**/*.md` を走査して `required_for` の要素が指定 capability ID と完全一致する文書の repository-relative path を、重複なく安定順の機械可読な正本として返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::conventions_resolve::scan_convention_requirements"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "読み取り専用コマンド `bin/sotp conventions resolve --capability <capability-id>` を導入し、`knowledge/conventions/**/*.md` を走査して `required_for` の要素が指定 capability ID と完全一致する文書の repository-relative path を、重複なく安定順の機械可読な正本として返す。人間向け表示を持つ場合も同じ解決結果からレンダーする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fe13957828be17b6f99f9037ac24951df58a38ef25b8224aa404279d4588149b",
+      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::conventions_resolve::scan_convention_requirements"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "fe13957828be17b6f99f9037ac24951df58a38ef25b8224aa404279d4588149b",
+      "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対象文書を読み取れない場合"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::conventions_resolve::scan_convention_requirements"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f87ad518a0785bac0b21806bac2f1c769119b79dc3f4f7697e22f604941e1b1b",
+      "evidence_hash": "9bfbdc0f7e66ed29f02c319bbc93fe9c583cfd6c1fbed44aa7fc064eefe76d5d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "template smoke に、export 済み tree を対象として overlay 以外の source convention が出荷されていないことを検査する項目を持たせる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::template_conventions::list_convention_documents"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-11",
+          "text_label": "template smoke に、export 済み tree を対象として overlay 以外の source convention が出荷されていないことを検査する項目を持たせる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f87ad518a0785bac0b21806bac2f1c769119b79dc3f4f7697e22f604941e1b1b",
+      "evidence_hash": "8563e18e331d206dafbfcfd110fa00de1c3ef16050c4c5051318b028b0503613",
+      "verdict": {
+        "kind": "pass",
+        "citation": "template smoke が export 済み tree に対して overlay 以外の source convention の非出荷を検査し、変更後のリポジトリで成功する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::template_conventions::list_convention_documents"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-18",
+          "text_label": "template smoke が export 済み tree に対して overlay 以外の source convention の非出荷を検査し、変更後のリポジトリで成功する。散文から convention path を抽出する dead-reference 検査は追加されていない。"
+        }
+      }
+    }
+  ]
+}

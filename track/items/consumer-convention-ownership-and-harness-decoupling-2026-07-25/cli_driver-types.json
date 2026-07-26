@@ -1,0 +1,375 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::conventions_resolve::ConventionResolveService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ConventionResolveInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "type_name": "ConventionResolveDriver"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::template_conventions::ConventionShippingCheckService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ConventionShippingCheckInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "type_name": "ConventionShippingCheckDriver"
+    }
+  ],
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "ConventionResolveInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ConventionResolveInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ConventionResolveInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ConventionResolveInput",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ConventionShippingCheckInput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ConventionShippingCheckInput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ConventionShippingCheckInput",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ConventionShippingCheckInput",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CapabilityNameArg": {
+      "action": "reference",
+      "docs": "Baseline-identical CLI-boundary mirror of a validated capability name, reused unchanged rather than minting a second mirror or accepting a raw argument string (design self-check 12): its existing parse-time rejection is exactly the invariant IN-06 requires of this argument, so no new type would add anything.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "capability",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ConventionResolveDriver": {
+      "action": "add",
+      "docs": "Primary adapter for `conventions resolve` (IN-05, AC-06, AC-08). It renders from the returned `ConventionResolution` and holds no second representation, so display and machine output cannot disagree; only the resolver's error type can produce a failure outcome, which is what keeps the empty result on the success path here rather than by a rendering convention. Introduced as its own driver rather than a branch of the existing write-side conventions driver for two reasons: widening that driver would change the public constructor of the add / update-index / verify-index surface, which this track does not touch, and resolve is driven by its own application service, whose separation evidence is recorded on `ResolveConventionsQuery`.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "conventions_resolve",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ConventionResolveInput": {
+      "action": "add",
+      "docs": "Typed input for the read-only `conventions resolve` command (IN-05, IN-06, AC-06, AC-09). The capability is held as the boundary mirror `CapabilityNameArg` rather than an argument string, so the non-empty invariant is established once at the parse boundary and the driver has nothing left to re-validate — the usual R9 serde/CLI-boundary mirror pattern, since the validated usecase type cannot itself implement clap's parsing trait. Field order mirrors `cli::ConventionsCommand::Resolve` and `usecase::ResolveConventionsQuery` exactly; the CLI variant is the fixed point of that chain.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "capability",
+              "ty": "CapabilityNameArg"
+            },
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "conventions_resolve",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ConventionShippingCheckDriver": {
+      "action": "add",
+      "docs": "Primary adapter for the non-shipping check (IN-11, AC-18). It maps the two verdict variants and the error type onto the process outcome and adds no rule of its own; because the verdict's violating variant carries the offending paths, the rendered failure necessarily names them rather than summarising a count. Introduced as its own driver rather than a second branch of `TemplateDriver` because widening that driver would change the public constructor of the export surface, and the check is driven by its own application service, whose separation evidence is recorded on `ConventionShippingCheckService`.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "template_conventions",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ConventionShippingCheckInput": {
+      "action": "add",
+      "docs": "Typed input for the read-only non-shipping check (IN-11, AC-18). Both fields stay `PathBuf`: a tree root is the truly-opaque case R9 permits — a caller-chosen filesystem location with no invariant of its own — while the invariant that does matter, staying inside `knowledge/conventions/`, belongs to the document paths the inventory produces and is owned by `ConventionDocumentPath`. Field names and order mirror `cli::TemplateConventionShippingArgs` and `usecase::CheckConventionShippingQuery`.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "exported_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "overlay_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "template_conventions",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ConventionsDriver": {
+      "action": "reference",
+      "docs": "Baseline-identical write-side conventions driver, unchanged by this track; declared so the composition root's existing wiring accessor still resolves to a declared primary adapter alongside the newly added read-only resolve accessor.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "std::sync::Arc<dyn usecase::conventions::ConventionsService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "ConventionsInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "conventions",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "TemplateDriver": {
+      "action": "reference",
+      "docs": "Baseline-identical export driver, unchanged by this track; declared so the template composition root's existing `template_driver` accessor still resolves to a declared primary adapter alongside the newly added check accessor.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "Arc<dyn TemplateExportService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "TemplateInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    }
+  }
+}
