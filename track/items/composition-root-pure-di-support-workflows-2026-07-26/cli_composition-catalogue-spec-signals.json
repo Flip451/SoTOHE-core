@@ -1,5 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "73195bcbc1efed6e699d825b92988bc24e2ab755f33ea8d9ce7ec2240de382a2",
-  "signals": []
+  "catalogue_declaration_hash": "3b2352e4a62de71f915571b65de22861f3a624a5caa1f56348ca80fe7b520b6a",
+  "signals": [
+    {
+      "type_name": "cli_composition::verify::execute_catalogue_spec_refs",
+      "signal": "blue",
+      "entry_hash": "dc34b1ec88653b50da5054272ca3d33ca4d91ab03e2e47adce307653ee4417cd"
+    }
+  ]
 }

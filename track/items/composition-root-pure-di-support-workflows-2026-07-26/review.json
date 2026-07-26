@@ -1,6 +1,223 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbfbcbdcb8a1c03e3c84df97657a57fec3c1e86f00a7742857200007092b0fb6",
+          "at": "2026-07-26T10:04:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbfbcbdcb8a1c03e3c84df97657a57fec3c1e86f00a7742857200007092b0fb6",
+          "at": "2026-07-26T10:06:12Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1d4f89fa65f02fe7ff29b6159ec5c3e8dc9780e6ee6002153a2860a08bdb87d",
+          "at": "2026-07-26T10:04:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1d4f89fa65f02fe7ff29b6159ec5c3e8dc9780e6ee6002153a2860a08bdb87d",
+          "at": "2026-07-26T10:08:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2700ec4258a8ffa2563e6dd700bf76ffd1f76773bce418b682cd431c4aa89aa",
+          "at": "2026-07-26T13:09:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2700ec4258a8ffa2563e6dd700bf76ffd1f76773bce418b682cd431c4aa89aa",
+          "at": "2026-07-26T13:11:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The spec is internally inconsistent about the Support workflow set: GO-01 names four workflows including TestObligation, but IN-01, AC-05, and AC-06 scope and verify only three (RefVerify, SemanticDup, Verify). Consequently the stated goal has no deterministic acceptance coverage for TestObligation.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json",
+              "line": 47,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:9ebb8eb9a6f7dea7b76f86f28a9c795216a516823bc53b299544340980c65920",
+          "at": "2026-07-26T13:50:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The current spec narrows the lane to only three workflows (IN-01, AC-05, and AC-06), omitting TestObligation even though the briefing and design intent require RefVerify, SemanticDup, TestObligation, and Verify. This leaves the declared scope and acceptance contract inconsistent with the required Support-workflow lane and omits TestObligation's migration behavior entirely.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json",
+              "line": 47,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9ebb8eb9a6f7dea7b76f86f28a9c795216a516823bc53b299544340980c65920",
+          "at": "2026-07-26T13:55:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The current spec has not applied the documented rescope: it still includes TestObligation in IN-01 and requires TestObligation behavior in AC-04, AC-05, and AC-06, while the briefing explicitly defines this lane as only RefVerify, SemanticDup, and Verify and says TestObligation must be absent from every element. This contradicts the declared lane boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json",
+              "line": 47,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:95075d5949a135cd38b44b13ad8df84ba4a234a1bc0293b5cba6bd3ae97b3df0",
+          "at": "2026-07-26T13:56:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ebb8eb9a6f7dea7b76f86f28a9c795216a516823bc53b299544340980c65920",
+          "at": "2026-07-26T13:58:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ebb8eb9a6f7dea7b76f86f28a9c795216a516823bc53b299544340980c65920",
+          "at": "2026-07-26T14:00:04Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87f9090d887c800cd281b8d6022f3517baa00e21b21fb03a8b00bc215907343d",
+          "at": "2026-07-26T14:31:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:87f9090d887c800cd281b8d6022f3517baa00e21b21fb03a8b00bc215907343d",
+          "at": "2026-07-26T14:35:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18ef6978f5ee07a029d3dc2644881ca44257cfee15f7107849329bc2883cf95b",
+          "at": "2026-07-26T14:47:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18ef6978f5ee07a029d3dc2644881ca44257cfee15f7107849329bc2883cf95b",
+          "at": "2026-07-26T14:50:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18ef6978f5ee07a029d3dc2644881ca44257cfee15f7107849329bc2883cf95b",
+          "at": "2026-07-26T15:00:13Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ade5f289fd5b0e9214ea71e56e18df4efd96d0e1cd3ad7c446af5262bc715e7f",
+          "at": "2026-07-26T14:31:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ade5f289fd5b0e9214ea71e56e18df4efd96d0e1cd3ad7c446af5262bc715e7f",
+          "at": "2026-07-26T14:33:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_catalogue_spec_refs` remains a public composition free function and delegates to `VerifyDriver::handle(...)`, so it is still an application-flow entry point rather than pure DI. Move this handoff to `VerifyCompositionRoot::verify_driver()` and the CLI layer; the compatibility definition’s existence is accepted, but its invocation leak is not.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/verify.rs",
+              "line": 49,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:1e090d1ddbabd6c29f55a604d34b5db9c43d05aad2876f0883782f5ea4b8fc65",
+          "at": "2026-07-26T14:47:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`execute_catalogue_spec_refs` is still a public free-function composition entry point. Even dormant, this violates the composition-boundary rule; compatibility retention permits the definition to remain only as an accepted convergence deviation, not as a compliant API surface.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/verify.rs",
+              "line": 45,
+              "category": "public free-function composition entry point"
+            },
+            {
+              "message": "The retained compatibility function still performs application execution in composition: it calls the infrastructure verifier and constructs `CommandOutcome`/user-facing output. This violates pure-DI separation even though the live CLI path is dormant-free; the function must be removed or moved behind the driver/use-case route during the planned convergence.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/verify.rs",
+              "line": 55,
+              "category": "invoke leak"
+            }
+          ],
+          "hash": "rvw1:sha256:7a6b0b5e89eb8f075eb0fb6b038bb776d981a8781e8ebecfcd5068f9521a1f0a",
+          "at": "2026-07-26T15:00:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8882dbff3594ed07c1eced0a951f3831dc997ee45b87b7a058c6392fe7db5330",
+          "at": "2026-07-26T15:45:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8882dbff3594ed07c1eced0a951f3831dc997ee45b87b7a058c6392fe7db5330",
+          "at": "2026-07-26T15:47:52Z"
+        }
+      ]
+    },
     "types": {
       "rounds": [
         {
@@ -331,42 +548,20 @@
           "findings": [],
           "hash": "rvw1:sha256:3901e08b8bb252d3d8ca53e38fdf7781014f4f0bda7098e5d5ad8ded2e68b582",
           "at": "2026-07-26T13:54:49Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:87f9090d887c800cd281b8d6022f3517baa00e21b21fb03a8b00bc215907343d",
-          "at": "2026-07-26T14:31:56Z"
+          "hash": "rvw1:sha256:c75679293a0bfe27273d8ffe19639b1fbf5c22d37bef4238fe4d0dd0872f8e1d",
+          "at": "2026-07-26T15:45:53Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:87f9090d887c800cd281b8d6022f3517baa00e21b21fb03a8b00bc215907343d",
-          "at": "2026-07-26T14:35:19Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ade5f289fd5b0e9214ea71e56e18df4efd96d0e1cd3ad7c446af5262bc715e7f",
-          "at": "2026-07-26T14:31:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ade5f289fd5b0e9214ea71e56e18df4efd96d0e1cd3ad7c446af5262bc715e7f",
-          "at": "2026-07-26T14:33:44Z"
+          "hash": "rvw1:sha256:c75679293a0bfe27273d8ffe19639b1fbf5c22d37bef4238fe4d0dd0872f8e1d",
+          "at": "2026-07-26T15:47:52Z"
         }
       ]
     },
@@ -543,115 +738,34 @@
           "findings": [],
           "hash": "rvw1:sha256:989993af6d7c03dda6aba0400568c82c53be8ec1ba54494dba53c03895e3488c",
           "at": "2026-07-26T14:34:25Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:dbfbcbdcb8a1c03e3c84df97657a57fec3c1e86f00a7742857200007092b0fb6",
-          "at": "2026-07-26T10:04:29Z"
+          "hash": "rvw1:sha256:11297bec2c9b79ac46549d696ef14c40e2878410022722a2755f0a6b45ae6cdc",
+          "at": "2026-07-26T14:47:24Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:dbfbcbdcb8a1c03e3c84df97657a57fec3c1e86f00a7742857200007092b0fb6",
-          "at": "2026-07-26T10:06:12Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
+          "hash": "rvw1:sha256:11297bec2c9b79ac46549d696ef14c40e2878410022722a2755f0a6b45ae6cdc",
+          "at": "2026-07-26T14:49:17Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a1d4f89fa65f02fe7ff29b6159ec5c3e8dc9780e6ee6002153a2860a08bdb87d",
-          "at": "2026-07-26T10:04:42Z"
+          "hash": "rvw1:sha256:afc6329277d20b901bc1e0921b17eac24320ba47ebd742f1c8fc34a599098d85",
+          "at": "2026-07-26T15:46:48Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:a1d4f89fa65f02fe7ff29b6159ec5c3e8dc9780e6ee6002153a2860a08bdb87d",
-          "at": "2026-07-26T10:08:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2700ec4258a8ffa2563e6dd700bf76ffd1f76773bce418b682cd431c4aa89aa",
-          "at": "2026-07-26T13:09:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2700ec4258a8ffa2563e6dd700bf76ffd1f76773bce418b682cd431c4aa89aa",
-          "at": "2026-07-26T13:11:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The spec is internally inconsistent about the Support workflow set: GO-01 names four workflows including TestObligation, but IN-01, AC-05, and AC-06 scope and verify only three (RefVerify, SemanticDup, Verify). Consequently the stated goal has no deterministic acceptance coverage for TestObligation.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json",
-              "line": 47,
-              "category": "missing AC coverage for a stated goal"
-            }
-          ],
-          "hash": "rvw1:sha256:9ebb8eb9a6f7dea7b76f86f28a9c795216a516823bc53b299544340980c65920",
-          "at": "2026-07-26T13:50:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The current spec narrows the lane to only three workflows (IN-01, AC-05, and AC-06), omitting TestObligation even though the briefing and design intent require RefVerify, SemanticDup, TestObligation, and Verify. This leaves the declared scope and acceptance contract inconsistent with the required Support-workflow lane and omits TestObligation's migration behavior entirely.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json",
-              "line": 47,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:9ebb8eb9a6f7dea7b76f86f28a9c795216a516823bc53b299544340980c65920",
-          "at": "2026-07-26T13:55:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The current spec has not applied the documented rescope: it still includes TestObligation in IN-01 and requires TestObligation behavior in AC-04, AC-05, and AC-06, while the briefing explicitly defines this lane as only RefVerify, SemanticDup, and Verify and says TestObligation must be absent from every element. This contradicts the declared lane boundary.",
-              "severity": "P1",
-              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json",
-              "line": 47,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:95075d5949a135cd38b44b13ad8df84ba4a234a1bc0293b5cba6bd3ae97b3df0",
-          "at": "2026-07-26T13:56:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9ebb8eb9a6f7dea7b76f86f28a9c795216a516823bc53b299544340980c65920",
-          "at": "2026-07-26T13:58:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9ebb8eb9a6f7dea7b76f86f28a9c795216a516823bc53b299544340980c65920",
-          "at": "2026-07-26T14:00:04Z"
+          "hash": "rvw1:sha256:afc6329277d20b901bc1e0921b17eac24320ba47ebd742f1c8fc34a599098d85",
+          "at": "2026-07-26T15:48:26Z"
         }
       ]
     }
