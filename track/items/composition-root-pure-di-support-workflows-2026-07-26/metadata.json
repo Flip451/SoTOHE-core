@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "composition-root-pure-di-support-workflows-2026-07-26",
+  "title": "Support workflow composition roots への純 DI 移行 (RefVerify / SemanticDup / TestObligation / Verify)",
+  "branch": "track/composition-root-pure-di-support-workflows-2026-07-26",
+  "created_at": "2026-07-26T09:04:45Z",
+  "updated_at": "2026-07-26T09:04:45Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}
