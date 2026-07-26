@@ -438,6 +438,184 @@
           "test_name": "test_resolve_conventions_query_capability_rejects_only_empty_or_blank_identifiers"
         }
       ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ConventionRequirementPort",
+        "item_identifier": "trait_method:scan_requirements",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_scan_requirements_yields_one_requirement_per_scanned_document"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_scan_requirements_scans_the_caller_supplied_project_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_scan_requirements_surfaces_every_fail_closed_condition_as_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_scan_requirements_succeeds_for_a_scan_meeting_none_of_those_conditions"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_scan_requirements_reads_through_a_shared_receiver_across_threads"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_convention_requirement_port_bound_implies_send_and_sync"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "usecase::conventions_resolve::select_required_conventions",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_returns_the_documents_declaring_the_capability"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_applies_no_normalization_of_its_own"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_returns_the_canonical_resolution_not_the_scan_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_with_no_matching_document_returns_an_empty_success"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_treats_documents_declaring_nothing_as_ordinary_input"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_is_pure_over_the_already_scanned_input"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionRequirementPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "reason": "ConventionRequirementPort's declared surface is a single read: scan_requirements(&self, project_root: &Path) -> Result<Vec<ConventionRequirement>, ConventionResolveError>. IN-05 promises the command's returned value — the repository-relative paths of the documents whose required_for exactly matches a named capability id, without duplicates and in stable order. That promise is not expressible through this signature. The method receives no capability id, so it has no term to match against; it returns each scanned document paired with what that document declares rather than a path list, so there is nothing here to deduplicate or order, and Vec guarantees neither. A stand-in implementation can only hand back what the test gave it, so a test bound here would show the arrangement of the test rather than the anchor's promise. Matching, deduplication, and ordering are verified on the selection and result surfaces that produce them, and the scan itself at the adapter that performs it."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionRequirementPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "ConventionRequirementPort declares one method, scan_requirements(&self, project_root: &Path) -> Result<Vec<ConventionRequirement>, ConventionResolveError>. AC-06 promises two things of the command: that the paths it returns are exactly those whose required_for contains the named id, without duplicates and in stable order, and that resolving creates, updates, deletes, and indexes nothing. Neither half is expressible at this declaration. The signature takes no capability id and yields scanned documents rather than paths, so the matching, deduplication, and ordering have no expression here. The read-only half does not follow from the signature either: &self denies the caller an exclusive borrow, but says nothing about what an implementation may do to the filesystem it reads, so a test asserting read-only-ness at this declaration would assert a property the declaration does not carry. Both halves are verified on the selection and result surfaces and at the adapter that performs the read."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionRequirementPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_scan_requirements_surfaces_every_fail_closed_condition_as_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_scan_requirements_succeeds_for_a_scan_meeting_none_of_those_conditions"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::conventions_resolve::select_required_conventions",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_returns_the_documents_declaring_the_capability"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_applies_no_normalization_of_its_own"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_returns_the_canonical_resolution_not_the_scan_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_is_pure_over_the_already_scanned_input"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "usecase::conventions_resolve::select_required_conventions",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_with_no_matching_document_returns_an_empty_success"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_treats_documents_declaring_nothing_as_ordinary_input"
+        }
+      ]
     }
   ]
 }

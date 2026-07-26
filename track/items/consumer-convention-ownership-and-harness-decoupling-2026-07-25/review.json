@@ -1,103 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dbe367c68bed86e7fea58223a20538f9eeb9771e93bb54ed6179796b9d9aa0e4",
-          "at": "2026-07-26T03:17:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dbe367c68bed86e7fea58223a20538f9eeb9771e93bb54ed6179796b9d9aa0e4",
-          "at": "2026-07-26T03:28:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9bebd6728c8c48f44bf2be0ee0b6047909aaf054834d8b751a500af6f8128853",
-          "at": "2026-07-26T03:36:04Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eb7bf0dc230b9dc29f7b7693e381b5b94e69030e49697713b72a3bd98ecbdf74",
-          "at": "2026-07-26T03:17:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eb7bf0dc230b9dc29f7b7693e381b5b94e69030e49697713b72a3bd98ecbdf74",
-          "at": "2026-07-26T03:28:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:07eeb94d7cee9fda1026616a3b6b64b15713a9a08eddbec49acaf18c24be30ce",
-          "at": "2026-07-26T08:41:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ef43c487a62b52b64b5cf0e0e0da08137a9aae00a3e0aba4e036bbb7a50e9927",
-          "at": "2026-07-26T08:56:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`requires()` compares `CapabilityName` values, but `CapabilityName::try_new` stores a trimmed `NonEmptyString`. Consequently, `required_for: [\" reviewer \"]` matches a query for `reviewer`, violating IN-06/AC-06’s non-empty, exact-string matching contract. Preserve non-blank identifiers without normalization (and cover whitespace near-misses).",
-              "severity": "P0",
-              "file": "libs/usecase/src/conventions_resolve/mod.rs",
-              "line": 187,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:cd626c6438308172164c24c9581e1875a15348dd90fbe01e2f353b18790c47dd",
-          "at": "2026-07-26T09:23:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce6b0aa92f9f525dda1e08236d756f573ebfdb557b6c3fee410e4b838087a67c",
-          "at": "2026-07-26T10:12:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ae1c4e91f8c841867350940cf111eb84d0c589929ac2cc92fca2dfa87aede890",
-          "at": "2026-07-26T11:06:01Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:66c1bb19af42ec729b5ad27871aeb1ed88e7cda4c298be7b1ddaa6ad4a33b2e8",
-          "at": "2026-07-26T07:22:58Z"
-        }
-      ]
-    },
     "adr": {
       "rounds": [
         {
@@ -458,6 +361,66 @@
           "findings": [],
           "hash": "rvw1:sha256:c80a80b2a3120b92a9a2c37b4ced9644247d3ff521dda6109845b9af26acad13",
           "at": "2026-07-26T10:30:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1e09eb0d9bbce7e4f9d0195fad25bd56f4d61fec5cae29a13c6475c9558188e1",
+          "at": "2026-07-26T11:39:33Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d1fabd0b486d7d11a3e8c08f3825da08f5661e2d17441480c94f2a08fbda6b78",
+          "at": "2026-07-26T07:21:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8e933b4dbd8f05a9ea40997a7d833950b212250175a61fbdde2d2c7bbee1a58",
+          "at": "2026-07-26T08:57:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f9122d87b1c0d18d8546e6762ec530fcbf6858f3c6ea42c8f2f931296e90021",
+          "at": "2026-07-26T09:23:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2083d23210a7311d553aca58901d6c2b8e112375005917b0755c30555c1bf4e2",
+          "at": "2026-07-26T10:10:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bca2ae803f3e5742b6807467e7c97e1632fea978951d61811369feda38563f71",
+          "at": "2026-07-26T11:06:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2284860ba18eb3edc185a55ead43f9653e4ac97f9f3bacbcf78b86ceb0d06243",
+          "at": "2026-07-26T11:40:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2284860ba18eb3edc185a55ead43f9653e4ac97f9f3bacbcf78b86ceb0d06243",
+          "at": "2026-07-26T11:43:26Z"
         }
       ]
     },
@@ -592,6 +555,74 @@
           "findings": [],
           "hash": "rvw1:sha256:ba478df54f9527318e8e31482f5875bf6710d6e54ed157c01d28d6753920a7e8",
           "at": "2026-07-26T10:44:31Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb7bf0dc230b9dc29f7b7693e381b5b94e69030e49697713b72a3bd98ecbdf74",
+          "at": "2026-07-26T03:17:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb7bf0dc230b9dc29f7b7693e381b5b94e69030e49697713b72a3bd98ecbdf74",
+          "at": "2026-07-26T03:28:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:07eeb94d7cee9fda1026616a3b6b64b15713a9a08eddbec49acaf18c24be30ce",
+          "at": "2026-07-26T08:41:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ef43c487a62b52b64b5cf0e0e0da08137a9aae00a3e0aba4e036bbb7a50e9927",
+          "at": "2026-07-26T08:56:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`requires()` compares `CapabilityName` values, but `CapabilityName::try_new` stores a trimmed `NonEmptyString`. Consequently, `required_for: [\" reviewer \"]` matches a query for `reviewer`, violating IN-06/AC-06’s non-empty, exact-string matching contract. Preserve non-blank identifiers without normalization (and cover whitespace near-misses).",
+              "severity": "P0",
+              "file": "libs/usecase/src/conventions_resolve/mod.rs",
+              "line": 187,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cd626c6438308172164c24c9581e1875a15348dd90fbe01e2f353b18790c47dd",
+          "at": "2026-07-26T09:23:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce6b0aa92f9f525dda1e08236d756f573ebfdb557b6c3fee410e4b838087a67c",
+          "at": "2026-07-26T10:12:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae1c4e91f8c841867350940cf111eb84d0c589929ac2cc92fca2dfa87aede890",
+          "at": "2026-07-26T11:06:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbd7cf8e063c764244ef7fec15d993d3a794dce630e874865599bc27af35e48d",
+          "at": "2026-07-26T11:37:23Z"
         }
       ]
     },
@@ -795,42 +826,39 @@
         }
       ]
     },
-    "other": {
+    "spec": {
       "rounds": [
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d1fabd0b486d7d11a3e8c08f3825da08f5661e2d17441480c94f2a08fbda6b78",
-          "at": "2026-07-26T07:21:18Z"
+          "hash": "rvw1:sha256:66c1bb19af42ec729b5ad27871aeb1ed88e7cda4c298be7b1ddaa6ad4a33b2e8",
+          "at": "2026-07-26T07:22:58Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbe367c68bed86e7fea58223a20538f9eeb9771e93bb54ed6179796b9d9aa0e4",
+          "at": "2026-07-26T03:17:53Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d8e933b4dbd8f05a9ea40997a7d833950b212250175a61fbdde2d2c7bbee1a58",
-          "at": "2026-07-26T08:57:23Z"
+          "hash": "rvw1:sha256:dbe367c68bed86e7fea58223a20538f9eeb9771e93bb54ed6179796b9d9aa0e4",
+          "at": "2026-07-26T03:28:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:2f9122d87b1c0d18d8546e6762ec530fcbf6858f3c6ea42c8f2f931296e90021",
-          "at": "2026-07-26T09:23:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2083d23210a7311d553aca58901d6c2b8e112375005917b0755c30555c1bf4e2",
-          "at": "2026-07-26T10:10:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bca2ae803f3e5742b6807467e7c97e1632fea978951d61811369feda38563f71",
-          "at": "2026-07-26T11:06:00Z"
+          "hash": "rvw1:sha256:9bebd6728c8c48f44bf2be0ee0b6047909aaf054834d8b751a500af6f8128853",
+          "at": "2026-07-26T03:36:04Z"
         }
       ]
     }

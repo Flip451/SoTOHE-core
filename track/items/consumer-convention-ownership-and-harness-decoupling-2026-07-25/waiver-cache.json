@@ -1,4 +1,53 @@
 {
   "track_id": "consumer-convention-ownership-and-harness-decoupling-2026-07-25",
-  "entries": []
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "ConventionRequirementPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionRequirementPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:scan_requirements"
+      },
+      "key": {
+        "waived_reason_hash": "ed2632220a77c1e8f75cd33b1cfcfeeee9421f712e9788660e134796a8936840",
+        "declaration_hash": "34288b614a17b6a468af9b109bd2838a14ace7a85a93d7f977002d135910ceda",
+        "anchor_text_hash": "8fcacd3517663b65642147deac44f3bcb1b164d156190aeb2d42d310057f95f2"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitEntry ... methods: [MethodDeclaration { name: MethodName(Identifier(\"scan_requirements\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"project_root\")), ty: TypeRef(\"&std::path::Path\") }], returns: TypeRef(\"Result<Vec<ConventionRequirement>, ConventionResolveError>\")"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionRequirementPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionRequirementPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:scan_requirements"
+      },
+      "key": {
+        "waived_reason_hash": "5905413e994c647af0c634452713e5d28d103ced157cbeb9c2a464d20203b2a0",
+        "declaration_hash": "34288b614a17b6a468af9b109bd2838a14ace7a85a93d7f977002d135910ceda",
+        "anchor_text_hash": "dd5ea67e02f9b406d53b2e0a770895986e169be79549fdc8440e7f7be2e7a86d"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitEntry { action: Add, role: SecondaryPort, methods: [MethodDeclaration { name: MethodName(Identifier(\"scan_requirements\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"project_root\")), ty: TypeRef(\"&std::path::Path\") }], returns: TypeRef(\"Result<Vec<ConventionRequirement>, ConventionResolveError>\")"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ]
 }

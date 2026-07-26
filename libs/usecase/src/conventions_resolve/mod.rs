@@ -3,17 +3,22 @@
 //!
 //! This module owns the identity of a convention document path, the capability
 //! identifier both sides of the match are compared as, the request that names
-//! what to resolve, the scanned-document and result values, and the
-//! fail-closed conditions of resolution (spec `IN-05`, `IN-06`, `AC-06`,
-//! `AC-07`, `AC-08`, `AC-09`).
+//! what to resolve, the scanned-document and result values, the fail-closed
+//! conditions of resolution, the port that scans documents, and the pure
+//! selection among them (spec `IN-05`, `IN-06`, `AC-06`, `AC-07`, `AC-08`,
+//! `AC-09`).
 
 mod capability_id;
+mod requirement_port;
 #[cfg(test)]
 mod resolve_error_tests;
+#[cfg(test)]
+mod selection_tests;
 
 use std::path::{Component, Path, PathBuf};
 
 pub use capability_id::{ConventionCapabilityId, ConventionCapabilityIdError};
+pub use requirement_port::ConventionRequirementPort;
 
 use crate::capability_exec::CapabilityFailureDetail;
 
@@ -234,6 +239,41 @@ impl ConventionResolution {
     pub fn is_empty(&self) -> bool {
         self.documents.is_empty()
     }
+}
+
+/// Selects the scanned documents that declare `capability` (`AC-06`, `AC-08`).
+///
+/// A free function rather than an interactor method because it holds no state
+/// and needs no injected dependency, which is also what makes the selection
+/// exercisable without any filesystem input: everything it decides on is
+/// already in `requirements`.
+///
+/// Whether a document declares the capability is
+/// [`ConventionRequirement::requires`]' decision, taken unchanged — nothing is
+/// normalized on either side here. The matches are handed to
+/// [`ConventionResolution::from_matches`], so the deduplication and ordering
+/// the result guarantees are the ones this function returns, and the scan's
+/// order does not reach the caller.
+///
+/// The return type is not a `Result`: matching no document is the ordinary
+/// empty resolution (`AC-08`), not a failure.
+///
+/// Defined here rather than in a sibling module because a free function is
+/// catalogued under the module that defines it, and a `pub use` re-export does
+/// not fold it back; its tests live in the `selection_tests` sibling so that
+/// only the small production half adds to this module's length.
+#[must_use]
+pub fn select_required_conventions(
+    requirements: &[ConventionRequirement],
+    capability: &ConventionCapabilityId,
+) -> ConventionResolution {
+    ConventionResolution::from_matches(
+        requirements
+            .iter()
+            .filter(|requirement| requirement.requires(capability))
+            .map(|requirement| requirement.document().clone())
+            .collect(),
+    )
 }
 
 #[cfg(test)]

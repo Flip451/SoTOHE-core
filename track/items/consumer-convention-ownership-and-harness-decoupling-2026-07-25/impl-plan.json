@@ -10,12 +10,13 @@
     {
       "id": "T002",
       "description": "`ConventionRequirement`、`ConventionResolution`、`ResolveConventionsQuery` に加えて、照合語としての capability 識別子 `ConventionCapabilityId` とその構築失敗型 `ConventionCapabilityIdError`(単一 unit variant `Blank`) を実装する。`ConventionRequirement::new` / `requires` と `ResolveConventionsQuery.capability` は照合の両辺を `ConventionCapabilityId` で受ける retype として行い、`CapabilityName` からの一方向 bridge `From<&CapabilityName>` を同 task で実装する(逆変換は作らない)。この 2 型と対応する test は `libs/usecase/src/conventions_resolve/capability_id.rs` に置き、`mod.rs` から `pub use` で再公開する: catalogue が宣言する module path `conventions_resolve` を保ったまま `mod.rs` を `architecture-rules.json` の `module_limits.max_lines` 内に収めるためで、既存行の移動は伴わない。Size estimate — usecase: ~160 prod + ~265 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#IN-06`, `#AC-06`, `#AC-07`, `#AC-08`, `#AC-09`.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "5203752c11af8f5b258f3bcb107140201997324f"
     },
     {
       "id": "T003",
       "description": "driven port `ConventionRequirementPort` と、照合語 `&ConventionCapabilityId` を受け取る純関数 `select_required_conventions` を実装する。port の contract obligation と関数の logic obligation を同一 task で果たし、filesystem 入力を使わずにテストする。実装と test は `libs/usecase/src/conventions_resolve/` 配下の sibling module に置き、`mod.rs` から再公開して catalogue が宣言する module path `conventions_resolve` を保ったまま `module_limits.max_lines` 内に収める(T002 と同じ形)。Size estimate — usecase: ~60 prod + ~200 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#AC-06`, `#AC-08`.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T004",

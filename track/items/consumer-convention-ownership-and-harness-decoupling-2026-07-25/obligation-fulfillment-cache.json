@@ -456,6 +456,150 @@
         "citation": "assert_eq!(query.capability, unregistered);\n        assert_eq!(query.capability.as_str(), \"consumer-house-style\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionRequirementPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionRequirementPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:scan_requirements"
+      },
+      "key": {
+        "bound_tests_set_hash": "4da23394305075141b6ce05e24c78efc412e12fc1e4bd47263df6d9f1abd4f61",
+        "declaration_hash": "34288b614a17b6a468af9b109bd2838a14ace7a85a93d7f977002d135910ceda",
+        "anchor_text_hash": "61e23c842a132a3f831815dd2009b0b313ec41cb213e430597061cefb5396046"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let conditions: [fn() -> ConventionResolveError; 5] = [ ... ];\n\nlet Err(surfaced) = result else {\n    panic!(\"a fail-closed condition must reach the caller as an error\");\n};"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "usecase::conventions_resolve::select_required_conventions",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "usecase::conventions_resolve::select_required_conventions",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "d0843da712cd2f038e41cbf792303b5395d7740105c9523dae3db978d13b0faa",
+        "declaration_hash": "12cdd5ac37e3f757c17f4abb5182b3bee1c60b747812d0340f3f40e9544d9c3e",
+        "anchor_text_hash": "dd5ea67e02f9b406d53b2e0a770895986e169be79549fdc8440e7f7be2e7a86d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(paths(&from_one), [\"knowledge/conventions/adr.md\", \"knowledge/conventions/rust/naming.md\", \"knowledge/conventions/testing.md\"]); assert_eq!(from_one, from_other, \"two scan orders over the same matches select the same value\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "usecase::conventions_resolve::select_required_conventions",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "usecase::conventions_resolve::select_required_conventions",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "d0843da712cd2f038e41cbf792303b5395d7740105c9523dae3db978d13b0faa",
+        "declaration_hash": "12cdd5ac37e3f757c17f4abb5182b3bee1c60b747812d0340f3f40e9544d9c3e",
+        "anchor_text_hash": "486f63b9202b00a5430da3e17ceb9f8515cfd41a84b6fbe614e4adb119f9562a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(resolved.is_empty());\n    assert_eq!(\n        resolved,\n        ConventionResolution::default(),\n        \"a capability matching zero documents is an ordinary empty result; the signature offers \\\n         no failure for it to become\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionRequirementPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionRequirementPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:scan_requirements"
+      },
+      "key": {
+        "bound_tests_set_hash": "c7d10a7f4b1535ce1792a344cec343bd36a4fcddd649e1e58b8c2fa6b6912a73",
+        "declaration_hash": "34288b614a17b6a468af9b109bd2838a14ace7a85a93d7f977002d135910ceda",
+        "anchor_text_hash": "61e23c842a132a3f831815dd2009b0b313ec41cb213e430597061cefb5396046"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = port.scan_requirements(Path::new(\"/srv/consumer-project\"));\n\n            let Err(surfaced) = result else {\n                panic!(\"a fail-closed condition must reach the caller as an error\");\n            };"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "usecase::conventions_resolve::select_required_conventions",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "usecase::conventions_resolve::select_required_conventions",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "ee8d0a95d05fb4c86bb5e5a4107a31a75bc47ab111cdd03b3a6cafe51bc1ca03",
+        "declaration_hash": "12cdd5ac37e3f757c17f4abb5182b3bee1c60b747812d0340f3f40e9544d9c3e",
+        "anchor_text_hash": "dd5ea67e02f9b406d53b2e0a770895986e169be79549fdc8440e7f7be2e7a86d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"paths(&from_one),\\n        [\\n            \\\"knowledge/conventions/adr.md\\\",\\n            \\\"knowledge/conventions/rust/naming.md\\\",\\n            \\\"knowledge/conventions/testing.md\\\",\\n        ]\"; \"assert_eq!(from_one, from_other, \\\"two scan orders over the same matches select the same value\\\")\"; \"assert_eq!(requirements, before,\\n        \\\"the requirements are borrowed and left as they were: the selection creates, updates and \\n         deletes nothing\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "usecase::conventions_resolve::select_required_conventions",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "usecase::conventions_resolve::select_required_conventions",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "faaa50e8c992e58ed21ef9e5a02bc1451db061a0187a5c49ec05052bb2427c43",
+        "declaration_hash": "12cdd5ac37e3f757c17f4abb5182b3bee1c60b747812d0340f3f40e9544d9c3e",
+        "anchor_text_hash": "486f63b9202b00a5430da3e17ceb9f8515cfd41a84b6fbe614e4adb119f9562a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(resolved.is_empty());\n    assert_eq!(\n        resolved,\n        ConventionResolution::default(),\n        \"a capability matching zero documents is an ordinary empty result; the signature offers \\\n         no failure for it to become\"\n    );\n\n    assert!(resolved.is_empty());\n    assert_eq!(\n        select_required_conventions(&[], &capability(\"implementer\")),\n        resolved,\n        \"a scan that found nothing to declare and a scan that found nothing at all select the \\\n         same empty result\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     }
   ]
 }

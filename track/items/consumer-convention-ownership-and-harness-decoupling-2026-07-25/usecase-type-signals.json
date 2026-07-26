@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T11:04:29Z",
+  "generated_at": "2026-07-26T11:30:58Z",
   "declaration_hash": "0cbeb49612e024ab862faa7d010da3f628ddc7ccc3f34c6b7df42c27bbfe3356",
-  "implementation_input_hash": "28cfe9300ac3f0d3555616d5aff773e527c5c2f2c67c56d1512648f76b566754",
+  "implementation_input_hash": "8378d418a6b7c172350a74fbd2824546e746215e600f256d22c2d5955a4f0dcc",
   "signals": [
     {
       "type_name": "CapabilityExecError",
@@ -108,8 +108,8 @@
     {
       "type_name": "ConventionRequirementPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ConventionResolution",
@@ -215,8 +215,8 @@
     {
       "type_name": "usecase::conventions_resolve::select_required_conventions",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "usecase::template_conventions::select_unsupplied_conventions",

@@ -34,7 +34,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | ConventionInventoryPort | secondary_port | add | fn list_conventions(&self, tree_root: &std::path::Path) -> Result<Vec<ConventionDocumentPath>, ConventionShippingCheckError> | 🟡 | 🔵 |
-| ConventionRequirementPort | secondary_port | add | fn scan_requirements(&self, project_root: &std::path::Path) -> Result<Vec<ConventionRequirement>, ConventionResolveError> | 🟡 | 🔵 |
+| ConventionRequirementPort | secondary_port | add | fn scan_requirements(&self, project_root: &std::path::Path) -> Result<Vec<ConventionRequirement>, ConventionResolveError> | 🔵 | 🔵 |
 
 ## Application Services
 
@@ -62,6 +62,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| usecase::conventions_resolve::select_required_conventions | free_function | add | fn(requirements: &[ConventionRequirement], capability: &ConventionCapabilityId) -> ConventionResolution | 🟡 | 🔵 |
+| usecase::conventions_resolve::select_required_conventions | free_function | add | fn(requirements: &[ConventionRequirement], capability: &ConventionCapabilityId) -> ConventionResolution | 🔵 | 🔵 |
 | usecase::template_conventions::select_unsupplied_conventions | free_function | add | fn(shipped: &[ConventionDocumentPath], supplied: &[ConventionDocumentPath]) -> ConventionShippingVerdict | 🟡 | 🔵 |
 
