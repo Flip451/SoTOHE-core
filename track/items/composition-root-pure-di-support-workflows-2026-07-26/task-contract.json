@@ -5,13 +5,6 @@
     "T001": [],
     "T002": [
       { "layer": "cli_composition", "entry_key": "cli_composition::verify::execute_catalogue_spec_refs" }
-    ],
-    "T003": [
-      { "layer": "usecase", "entry_key": "SemanticDupDriverInteractor" },
-      { "layer": "usecase", "entry_key": "SemanticDupDriverPort" },
-      { "layer": "usecase", "entry_key": "SemanticDupDriverService" },
-      { "layer": "infrastructure", "entry_key": "SemanticDupDriverAdapter" }
-    ],
-    "T004": []
+    ]
   }
 }

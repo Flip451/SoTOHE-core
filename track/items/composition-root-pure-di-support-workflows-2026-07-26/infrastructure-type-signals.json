@@ -1,18 +1,7 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T13:42:16Z",
-  "declaration_hash": "bfa69bd30376f566a76c1be8d7581ddf3d7cce3e29f3b178e770fc2fef8b1a6e",
+  "generated_at": "2026-07-26T23:09:13Z",
+  "declaration_hash": "14e274c5ae3fc63e9cf97db30e0517fde338c52be9cc7814057366a23c9b97fe",
   "implementation_input_hash": "eea709596722fd39f859b9a0392317f8b626d1baa233bc0531e6b6354ae9029f",
-  "signals": [
-    {
-      "type_name": "SemanticDupDriverAdapter",
-      "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "Default",
-        "SemanticDupDriverPort"
-      ]
-    }
-  ]
+  "signals": []
 }

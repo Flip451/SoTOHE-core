@@ -2,7 +2,7 @@
   "schema_version": 1,
   "entries": [
     {
-      "claim_hash": "f6505c6fed1e6019dbedf9253778552050c1f352f057bdfbc165dfb2ad94db7e",
+      "claim_hash": "7cda6fbdb01e11209694f4bd6c1488578681c89b3b1dc0073ccab569e6e0cef8",
       "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
       "verdict": {
         "kind": "pass",
@@ -13,7 +13,7 @@
         "data": {
           "section": "goal",
           "element_id": "GO-01",
-          "text_label": "RefVerify、SemanticDup、Verify の Support workflows を、この track 単独でレビュー可能かつ CI-green のまま統合できる純 DI migration delivery unit として完了する。"
+          "text_label": "RefVerify、Verify の Support workflows を、この track 単独でレビュー可能かつ CI-green のまま統合できる純 DI migration delivery unit として完了する。"
         }
       },
       "evidence_origin": {
@@ -25,53 +25,7 @@
       }
     },
     {
-      "claim_hash": "f6505c6fed1e6019dbedf9253778552050c1f352f057bdfbc165dfb2ad94db7e",
-      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
-      "verdict": {
-        "kind": "pass",
-        "citation": "**Support workflows**: RefVerify、SemanticDup、TestObligation、Verify"
-      },
-      "claim_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "goal",
-          "element_id": "GO-01",
-          "text_label": "RefVerify、SemanticDup、Verify の Support workflows を、この track 単独でレビュー可能かつ CI-green のまま統合できる純 DI migration delivery unit として完了する。"
-        }
-      },
-      "evidence_origin": {
-        "kind": "adr_decision",
-        "data": {
-          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
-          "decision_id": "D3"
-        }
-      }
-    },
-    {
-      "claim_hash": "f6505c6fed1e6019dbedf9253778552050c1f352f057bdfbc165dfb2ad94db7e",
-      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
-      "verdict": {
-        "kind": "pass",
-        "citation": "各 track は独立して CI green を満たす。未統合 track の変更を暗黙に前提とする実装は認めない。"
-      },
-      "claim_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "goal",
-          "element_id": "GO-01",
-          "text_label": "RefVerify、SemanticDup、Verify の Support workflows を、この track 単独でレビュー可能かつ CI-green のまま統合できる純 DI migration delivery unit として完了する。"
-        }
-      },
-      "evidence_origin": {
-        "kind": "adr_decision",
-        "data": {
-          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
-          "decision_id": "D7"
-        }
-      }
-    },
-    {
-      "claim_hash": "ca69b18830bab51ccd69676da6eb995daa2fd894af9d5cd59485cdc5ae0b2430",
+      "claim_hash": "5778338dc8a6087daf2f18201a128cf0c272fcef7f09ffa6abac32f43763205b",
       "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
       "verdict": {
         "kind": "pass",
@@ -82,7 +36,7 @@
         "data": {
           "section": "goal",
           "element_id": "GO-02",
-          "text_label": "各 Support workflow の composition-root execution path を、外部観測可能な CLI 契約を保った純 DI 境界へ収束させる。"
+          "text_label": "RefVerify、Verify の Support workflow composition-root execution path を、外部観測可能な CLI 契約を保った純 DI 境界へ収束させる。"
         }
       },
       "evidence_origin": {
@@ -94,7 +48,7 @@
       }
     },
     {
-      "claim_hash": "ca69b18830bab51ccd69676da6eb995daa2fd894af9d5cd59485cdc5ae0b2430",
+      "claim_hash": "5778338dc8a6087daf2f18201a128cf0c272fcef7f09ffa6abac32f43763205b",
       "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
       "verdict": {
         "kind": "pass",
@@ -105,7 +59,7 @@
         "data": {
           "section": "goal",
           "element_id": "GO-02",
-          "text_label": "各 Support workflow の composition-root execution path を、外部観測可能な CLI 契約を保った純 DI 境界へ収束させる。"
+          "text_label": "RefVerify、Verify の Support workflow composition-root execution path を、外部観測可能な CLI 契約を保った純 DI 境界へ収束させる。"
         }
       },
       "evidence_origin": {
@@ -117,18 +71,18 @@
       }
     },
     {
-      "claim_hash": "ca69b18830bab51ccd69676da6eb995daa2fd894af9d5cd59485cdc5ae0b2430",
+      "claim_hash": "5778338dc8a6087daf2f18201a128cf0c272fcef7f09ffa6abac32f43763205b",
       "evidence_hash": "ed8ed710494e91b279b5f8f2d88caae71ac7f3aa2ebfcdf1afdc8171637bdb9a",
       "verdict": {
         "kind": "pass",
-        "citation": "composition root の仕事は「secondary adapter・interactor・driver の構築と配線、および配線済み driver の引き渡し」のみとする。 composition root の公開面に実行メソッド（リクエストを受けて結果を返すメソッド）を置くことを、interactor 呼び出し・driver 呼び出しの別を問わず禁止と明文化する。"
+        "citation": "composition root の仕事は「secondary adapter・interactor・driver の構築と配線、および配線済み driver の引き渡し」のみとする。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "goal",
           "element_id": "GO-02",
-          "text_label": "各 Support workflow の composition-root execution path を、外部観測可能な CLI 契約を保った純 DI 境界へ収束させる。"
+          "text_label": "RefVerify、Verify の Support workflow composition-root execution path を、外部観測可能な CLI 契約を保った純 DI 境界へ収束させる。"
         }
       },
       "evidence_origin": {
@@ -140,7 +94,7 @@
       }
     },
     {
-      "claim_hash": "21df71d0246d96bac7decf413d2cf05fbba03eac522af81457ea9fd2aad0720a",
+      "claim_hash": "f7d5710956537e79804c65679cdfb45483a1d0060ca27fcfd05bd055c62a0a76",
       "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
       "verdict": {
         "kind": "pass",
@@ -151,7 +105,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-01",
-          "text_label": "RefVerify、SemanticDup、Verify の三つの Support workflow command 文脈を、この track の純 DI 化対象とする。"
+          "text_label": "RefVerify、Verify の二つの Support workflow command 文脈を、この track の純 DI 化対象とする。"
         }
       },
       "evidence_origin": {
@@ -462,29 +416,6 @@
       }
     },
     {
-      "claim_hash": "cf65a6cf3f34fbeca3a9cc13cb63e624b303f99050bf8512e6e5fcd5ff5d3a70",
-      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
-      "verdict": {
-        "kind": "pass",
-        "citation": "構造変更の前後で、同じ入力に対して同じ外部観測可能な結果を返すことを統合テストで保証する。"
-      },
-      "claim_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "constraint",
-          "element_id": "CN-04",
-          "text_label": "SemanticDup の外部契約維持は semantic-dup feature を有効にした統合テストで実証する。"
-        }
-      },
-      "evidence_origin": {
-        "kind": "adr_decision",
-        "data": {
-          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
-          "decision_id": "D4"
-        }
-      }
-    },
-    {
       "claim_hash": "5d1f04969b2643d71d7396a363a11a0f272e6e98e71518142a4efe3497c9c497",
       "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
       "verdict": {
@@ -531,30 +462,7 @@
       }
     },
     {
-      "claim_hash": "643f8576b7ea37c752f7a0713a04fe5d9336fc862eb03fc2a110cb1e3f3bb911",
-      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
-      "verdict": {
-        "kind": "pass",
-        "citation": "担当文脈の実行経路は driver → usecase interactor → port の一方向かつ単一の経路へ収束させる。"
-      },
-      "claim_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-03",
-          "text_label": "SemanticDup は semantic-dup feature 有効時に、composition 内の SemanticDupDriverPort implementation または composition execution methods を経由せず、single one-way execution path で index build、check、find similar、index measure quality を実行する。"
-        }
-      },
-      "evidence_origin": {
-        "kind": "adr_decision",
-        "data": {
-          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
-          "decision_id": "D5"
-        }
-      }
-    },
-    {
-      "claim_hash": "3e29231c88d8f14463cf9fd93a4b86d580777f032e612425c86d73d7de43f42d",
+      "claim_hash": "03bf07ddcfc145b4a509b08626b6457d0290260d81b9306188c4000c51c1aa80",
       "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
       "verdict": {
         "kind": "pass",
@@ -565,7 +473,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-05",
-          "text_label": "三つの Support workflow の各 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+          "text_label": "RefVerify、Verify の各 Support workflow execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
         }
       },
       "evidence_origin": {
@@ -577,7 +485,7 @@
       }
     },
     {
-      "claim_hash": "adcbff78ee004246d973a34b9b0b3915f5740cb248aefa8396f46db9b9eed6bd",
+      "claim_hash": "cf967b82d5286eb0181354a26b2cb8d95f46a7b7ac114aa0b886dfb50bca5a15",
       "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
       "verdict": {
         "kind": "pass",
@@ -588,7 +496,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "統合テストは、RefVerify、SemanticDup、Verify の各所有 command 文脈について、同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。"
+          "text_label": "統合テストは、RefVerify、Verify の各所有 command 文脈について、同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。"
         }
       },
       "evidence_origin": {
@@ -600,7 +508,7 @@
       }
     },
     {
-      "claim_hash": "a990c83bb9a419750d26a9f4d36ad9ff8ff783a7fa43c415fb809046ad954de6",
+      "claim_hash": "9f41e8286c4c8b7c508dc956ae71c35725d0e1d36901851f205b11cc5ceabc70",
       "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
       "verdict": {
         "kind": "pass",
@@ -611,7 +519,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-07",
-          "text_label": "この slice は他の未統合 migration track を必要とせず、CI-green を維持して統合できる。"
+          "text_label": "この slice は、canonical review results が zero_findings を報告し、他の未統合 migration track を必要とせず CI-green を維持して統合できる。"
         }
       },
       "evidence_origin": {
@@ -623,7 +531,7 @@
       }
     },
     {
-      "claim_hash": "a990c83bb9a419750d26a9f4d36ad9ff8ff783a7fa43c415fb809046ad954de6",
+      "claim_hash": "9f41e8286c4c8b7c508dc956ae71c35725d0e1d36901851f205b11cc5ceabc70",
       "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
       "verdict": {
         "kind": "pass",
@@ -634,7 +542,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-07",
-          "text_label": "この slice は他の未統合 migration track を必要とせず、CI-green を維持して統合できる。"
+          "text_label": "この slice は、canonical review results が zero_findings を報告し、他の未統合 migration track を必要とせず CI-green を維持して統合できる。"
         }
       },
       "evidence_origin": {

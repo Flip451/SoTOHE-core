@@ -37,41 +37,9 @@ subgraph domain["domain"]
 end
 subgraph usecase["usecase"]
   direction TB
-  subgraph usecase_usecase_module_semantic_dup_driver["usecase::semantic_dup_driver"]
-    direction TB
-  subgraph T43_usecase_usecase_SemanticDupDriverInteractor["semantic_dup_driver::SemanticDupDriverInteractor"]
-    direction TB
-    T43_usecase_usecase_SemanticDupDriverInteractor__self[SemanticDupDriverInteractor]
-    T43_usecase_usecase_SemanticDupDriverInteractor_new([new])
-  end
-  subgraph R37_usecase_usecase_SemanticDupDriverPort["semantic_dup_driver::SemanticDupDriverPort"]
-    direction TB
-    R37_usecase_usecase_SemanticDupDriverPort__self[SemanticDupDriverPort]
-    R37_usecase_usecase_SemanticDupDriverPort_find_similar([find_similar])
-    R37_usecase_usecase_SemanticDupDriverPort_index_build([index_build])
-    R37_usecase_usecase_SemanticDupDriverPort_index_measure_quality([index_measure_quality])
-    R37_usecase_usecase_SemanticDupDriverPort_dup_check([dup_check])
-  end
-  subgraph R40_usecase_usecase_SemanticDupDriverService["semantic_dup_driver::SemanticDupDriverService"]
-    direction TB
-    R40_usecase_usecase_SemanticDupDriverService__self[SemanticDupDriverService]
-    R40_usecase_usecase_SemanticDupDriverService_find_similar([find_similar])
-    R40_usecase_usecase_SemanticDupDriverService_index_build([index_build])
-    R40_usecase_usecase_SemanticDupDriverService_index_measure_quality([index_measure_quality])
-    R40_usecase_usecase_SemanticDupDriverService_dup_check([dup_check])
-  end
-  end
 end
 subgraph infrastructure["infrastructure"]
   direction TB
-  subgraph infrastructure_infrastructure_module_semantic_dup["infrastructure::semantic_dup"]
-    direction TB
-  subgraph T54_infrastructure_infrastructure_SemanticDupDriverAdapter["semantic_dup::driver_adapter::SemanticDupDriverAdapter"]
-    direction TB
-    T54_infrastructure_infrastructure_SemanticDupDriverAdapter__self[SemanticDupDriverAdapter]
-    T54_infrastructure_infrastructure_SemanticDupDriverAdapter_new([new])
-  end
-  end
 end
 subgraph cli_driver["cli_driver"]
   direction TB
@@ -82,23 +50,4 @@ end
 subgraph cli["cli"]
   direction TB
 end
-T43_usecase_usecase_SemanticDupDriverInteractor_new --o R37_usecase_usecase_SemanticDupDriverPort__self
-T43_usecase_usecase_SemanticDupDriverInteractor_new --> T43_usecase_usecase_SemanticDupDriverInteractor__self
-T43_usecase_usecase_SemanticDupDriverInteractor__self -.impl.-> R40_usecase_usecase_SemanticDupDriverService__self
-T54_infrastructure_infrastructure_SemanticDupDriverAdapter_new --> T54_infrastructure_infrastructure_SemanticDupDriverAdapter__self
-T54_infrastructure_infrastructure_SemanticDupDriverAdapter__self -.impl.-> R37_usecase_usecase_SemanticDupDriverPort__self
-class T43_usecase_usecase_SemanticDupDriverInteractor_new method_node
-class T43_usecase_usecase_SemanticDupDriverInteractor__self interactor
-class R37_usecase_usecase_SemanticDupDriverPort_find_similar method_node
-class R37_usecase_usecase_SemanticDupDriverPort_index_build method_node
-class R37_usecase_usecase_SemanticDupDriverPort_index_measure_quality method_node
-class R37_usecase_usecase_SemanticDupDriverPort_dup_check method_node
-class R37_usecase_usecase_SemanticDupDriverPort__self secondary_port
-class R40_usecase_usecase_SemanticDupDriverService_find_similar method_node
-class R40_usecase_usecase_SemanticDupDriverService_index_build method_node
-class R40_usecase_usecase_SemanticDupDriverService_index_measure_quality method_node
-class R40_usecase_usecase_SemanticDupDriverService_dup_check method_node
-class R40_usecase_usecase_SemanticDupDriverService__self app_service
-class T54_infrastructure_infrastructure_SemanticDupDriverAdapter_new method_node
-class T54_infrastructure_infrastructure_SemanticDupDriverAdapter__self secondary_adapter
 ```

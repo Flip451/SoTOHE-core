@@ -5,25 +5,17 @@
   "goal": [
     {
       "id": "GO-01",
-      "text": "RefVerify、SemanticDup、Verify の Support workflows を、この track 単独でレビュー可能かつ CI-green のまま統合できる純 DI migration delivery unit として完了する。",
+      "text": "RefVerify、Verify の Support workflows を、この track 単独でレビュー可能かつ CI-green のまま統合できる純 DI migration delivery unit として完了する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
           "anchor": "D2"
-        },
-        {
-          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
-          "anchor": "D3"
-        },
-        {
-          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
-          "anchor": "D7"
         }
       ]
     },
     {
       "id": "GO-02",
-      "text": "各 Support workflow の composition-root execution path を、外部観測可能な CLI 契約を保った純 DI 境界へ収束させる。",
+      "text": "RefVerify、Verify の Support workflow composition-root execution path を、外部観測可能な CLI 契約を保った純 DI 境界へ収束させる。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
@@ -44,7 +36,7 @@
     "in_scope": [
       {
         "id": "IN-01",
-        "text": "RefVerify、SemanticDup、Verify の三つの Support workflow command 文脈を、この track の純 DI 化対象とする。",
+        "text": "RefVerify、Verify の二つの Support workflow command 文脈を、この track の純 DI 化対象とする。",
         "adr_refs": [
           {
             "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
@@ -156,16 +148,6 @@
           "anchor": "D9"
         }
       ]
-    },
-    {
-      "id": "CN-04",
-      "text": "SemanticDup の外部契約維持は semantic-dup feature を有効にした統合テストで実証する。",
-      "adr_refs": [
-        {
-          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
-          "anchor": "D4"
-        }
-      ]
     }
   ],
   "acceptance_criteria": [
@@ -190,18 +172,8 @@
       ]
     },
     {
-      "id": "AC-03",
-      "text": "SemanticDup は semantic-dup feature 有効時に、composition 内の SemanticDupDriverPort implementation または composition execution methods を経由せず、single one-way execution path で index build、check、find similar、index measure quality を実行する。",
-      "adr_refs": [
-        {
-          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
-          "anchor": "D5"
-        }
-      ]
-    },
-    {
       "id": "AC-05",
-      "text": "三つの Support workflow の各 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+      "text": "RefVerify、Verify の各 Support workflow execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
@@ -211,7 +183,7 @@
     },
     {
       "id": "AC-06",
-      "text": "統合テストは、RefVerify、SemanticDup、Verify の各所有 command 文脈について、同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。",
+      "text": "統合テストは、RefVerify、Verify の各所有 command 文脈について、同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
@@ -221,7 +193,7 @@
     },
     {
       "id": "AC-07",
-      "text": "この slice は他の未統合 migration track を必要とせず、CI-green を維持して統合できる。",
+      "text": "この slice は、canonical review results が zero_findings を報告し、他の未統合 migration track を必要とせず CI-green を維持して統合できる。",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
@@ -261,7 +233,7 @@
     }
   ],
   "signals": {
-    "blue": 18,
+    "blue": 16,
     "yellow": 0,
     "red": 0
   }
