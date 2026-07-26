@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "fd5b1dcb49ec2c48f794d71e9625f9981313a383f65a2d32bb811b973b1be88e",
+  "signals": [
+    {
+      "type_name": "PrCommand",
+      "signal": "blue",
+      "entry_hash": "37115de33292151a21f528917b3902dbfb951bb6015a440f790048bd80d8a66e"
+    },
+    {
+      "type_name": "PrCommandInteractor",
+      "signal": "blue",
+      "entry_hash": "bbd10028bc2fb6912929a725e347bed6ebb01378704e9eb9924dfb54544d58db"
+    },
+    {
+      "type_name": "PrCommandOutput",
+      "signal": "blue",
+      "entry_hash": "08fb7aab292671559d9259d09cc09406a130ba8fe639ac199f713a448064d47b"
+    },
+    {
+      "type_name": "PrIdentifier",
+      "signal": "blue",
+      "entry_hash": "1acaeb102a7c264137f3cf44961296a319fdee18386f19b4898e175dc1bb05f0"
+    },
+    {
+      "type_name": "PrPollIntervalSeconds",
+      "signal": "blue",
+      "entry_hash": "ce110ea03df40d620bb958d4f5583a1ec9ff77adc7ac5ee775eaacabb3ff9b8b"
+    },
+    {
+      "type_name": "PrPollTimeoutSeconds",
+      "signal": "blue",
+      "entry_hash": "f015373a3bd2d05f73647c80cb5a541cabf290521772b9f8f3c06f4e52df70b4"
+    },
+    {
+      "type_name": "PrReviewCycleMode",
+      "signal": "blue",
+      "entry_hash": "346167aa3647ef9a285b4e4a4c4618163e906154e77cab19b3d3f5b1f590613a"
+    },
+    {
+      "type_name": "SignalCommand",
+      "signal": "blue",
+      "entry_hash": "7f623062b899a0bd1e95f6abab53b7ec69cbe130aee5d3a7fa99ec5c3af451d5"
+    },
+    {
+      "type_name": "SignalCommandInteractor",
+      "signal": "blue",
+      "entry_hash": "b4dadc23b891729081d388f80c213a87c22756ea614a3e9e740aa4d8ed7291a9"
+    },
+    {
+      "type_name": "SignalCommandOutput",
+      "signal": "blue",
+      "entry_hash": "868ddb5cf804c82c6a6ab03cd47317f6ccf57a93b133af4755983cca0a6c3af8"
+    },
+    {
+      "type_name": "PrCommandPort",
+      "signal": "blue",
+      "entry_hash": "1dc685f21a3cc639fbe6d033c5a339acde9c8a976013f58d3e512488873d1673"
+    },
+    {
+      "type_name": "SignalCommandPort",
+      "signal": "blue",
+      "entry_hash": "16532684037c9c800ba948828570705b5bed61662317661796a1d42922f784dc"
+    }
+  ]
+}

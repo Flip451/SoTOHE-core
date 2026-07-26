@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "track_id": "pr-signal-pure-di-2026-07-26",
+  "entries": {
+    "T001": [
+      {
+        "layer": "usecase",
+        "entry_key": "PrCommand"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "PrCommandInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "PrCommandPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "PrCommandOutput"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "PrIdentifier"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "PrPollIntervalSeconds"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "PrPollTimeoutSeconds"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "PrReviewCycleMode"
+      }
+    ],
+    "T002": [
+      {
+        "layer": "usecase",
+        "entry_key": "SignalCommand"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalCommandInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalCommandPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalCommandOutput"
+      }
+    ],
+    "T003": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "SystemPrCommandAdapter"
+      }
+    ],
+    "T004": [
+      {
+        "layer": "infrastructure",
+        "entry_key": "SystemSignalCommandAdapter"
+      }
+    ],
+    "T005": [
+      {
+        "layer": "cli_driver",
+        "entry_key": "PrDriver"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "PrCompositionRoot"
+      }
+    ],
+    "T006": [
+      {
+        "layer": "cli_driver",
+        "entry_key": "SignalDriver"
+      },
+      {
+        "layer": "cli_composition",
+        "entry_key": "SignalCompositionRoot"
+      }
+    ],
+    "T007": []
+  }
+}

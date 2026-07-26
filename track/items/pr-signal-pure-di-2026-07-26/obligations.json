@@ -1,0 +1,309 @@
+{
+  "track_id": "pr-signal-pure-di-2026-07-26",
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "PrCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "PrCommandInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of PrCommandInteractor",
+      "declaration_hash": "d7313d327f9a8a1a5a037ab52af7260209e31e4d7c76de348fbb129b593aed07",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "PrIdentifier",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:non_empty_pr_identifier"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "PrIdentifier"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "ValueObject"
+      },
+      "brief": "Author a boundary test covering 'invariant:non_empty_pr_identifier' of PrIdentifier",
+      "declaration_hash": "45ff22aeefe386107c7c3ad3adb44939da0b7eb9a64d020d9f0bf9f38e163a5c",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "PrPollIntervalSeconds",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:positive_poll_interval"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "PrPollIntervalSeconds"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "ValueObject"
+      },
+      "brief": "Author a boundary test covering 'invariant:positive_poll_interval' of PrPollIntervalSeconds",
+      "declaration_hash": "62ba7d5dce7e14b2dd92e07461e2a27cc642d3634e12632918ba4b50b6bdd559",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "PrPollTimeoutSeconds",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:positive_poll_timeout"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "PrPollTimeoutSeconds"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "ValueObject"
+      },
+      "brief": "Author a boundary test covering 'invariant:positive_poll_timeout' of PrPollTimeoutSeconds",
+      "declaration_hash": "aefeaebc8646d84df593a4698e914a360ba000973e444570761a6f77b4132c86",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SignalCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "SignalCommandInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of SignalCommandInteractor",
+      "declaration_hash": "79774c68d37cf0f940ac6409f423bddedf3280845ae056c2b2c2a29c17bc5b8b",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-02"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "PrCommandPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "PrCommandPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:execute' of PrCommandPort",
+      "declaration_hash": "790babd669b598fdbaea6958bcc41730273a1ca8520cf8a893dd94c7e021e50a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SignalCommandPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "SignalCommandPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:execute' of SignalCommandPort",
+      "declaration_hash": "d7138ae76ebab594c1e2fce04a130a38be0a65635c3f07443278f30945c78385",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-02"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pr::PrCommandPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "SystemPrCommandAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::pr::PrCommandPort' of SystemPrCommandAdapter",
+      "declaration_hash": "2e70c060ac01e921a5be20756e6e79d8298d6419ca166ac3a61451c2313c5f86",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalCommandPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "SystemSignalCommandAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::signal_service::SignalCommandPort' of SystemSignalCommandAdapter",
+      "declaration_hash": "ae4369c153ce02cfc3762d2eac1738827189818544720e968649dd8440c60eee",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-02"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      ]
+    }
+  ]
+}

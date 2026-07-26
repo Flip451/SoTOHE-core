@@ -1,0 +1,115 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "SystemPrCommandAdapter"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "SystemSignalCommandAdapter"
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "SystemPrCommandAdapter",
+      "trait_ref": "usecase::pr::PrCommandPort"
+    },
+    {
+      "for_type": "SystemSignalCommandAdapter",
+      "trait_ref": "usecase::signal_service::SignalCommandPort"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "SystemPrCommandAdapter": {
+      "action": "add",
+      "docs": "System secondary adapter that owns the existing PR filesystem, Git, GitHub, terminal, and polling execution behind the typed usecase::pr::PrCommandPort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "pr",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "SystemSignalCommandAdapter": {
+      "action": "add",
+      "docs": "System secondary adapter that owns the existing Signal filesystem, Git, rustdoc, and gate execution behind the typed usecase::signal_service::SignalCommandPort; its private optional context preserves isolated test-workspace wiring without exposing infrastructure state.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "signal",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    }
+  }
+}

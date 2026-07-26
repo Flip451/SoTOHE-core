@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "5c321eda200e59754c0ca015ddb7396866d103529a3f9ddd7b748dc0d7ca94e4",
+  "signals": [
+    {
+      "type_name": "SystemPrCommandAdapter",
+      "signal": "blue",
+      "entry_hash": "40c0b6925d9888b60985a84a7cd97378d0fd60c5343db6da24d1a281c7faddd8"
+    },
+    {
+      "type_name": "SystemSignalCommandAdapter",
+      "signal": "blue",
+      "entry_hash": "3290c22efa252e2560d284cb712f5fcf6070f127f6177d1820279820920cb8c5"
+    }
+  ]
+}

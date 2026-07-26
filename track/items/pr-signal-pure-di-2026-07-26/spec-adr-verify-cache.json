@@ -1,0 +1,580 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "2cb87d3ef66f9efffc90cfbb36f234d0bbfac222ce20341e4e32ca7d4f69cb06",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "担当文脈の実行経路は driver → usecase interactor → port の一方向かつ単一の経路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "PR と Signal の command 文脈を、composition root が配線済み driver を引き渡すだけの純 DI 実行経路へ移行する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "12a34e0d41aa5d3a02a52219825bb893fbf59624e17ab3a65268fe4785257758",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 track は、単独でレビュー可能であり、CI を green に保ったまま統合できなければならない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "PR / Signal migration slice を、未統合の migration track に依存せず CI green のまま統合可能にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "12a34e0d41aa5d3a02a52219825bb893fbf59624e17ab3a65268fe4785257758",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 track は独立して CI green を満たす。未統合 track の変更を暗黙に前提とする実装は認めない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "PR / Signal migration slice を、未統合の migration track に依存せず CI green のまま統合可能にする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "8dcf34a8102975ce8d8a50de2988a1181c59f86de90aab97fbeaafb06b8cff1a",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "依存関係や所有ファイルの重なりが判明した場合は D2 の範囲内で再分割できるが、同一 command 文脈の責務を不自然に分断してはならない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "8dcf34a8102975ce8d8a50de2988a1181c59f86de90aab97fbeaafb06b8cff1a",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "担当文脈の実行経路は driver → usecase interactor → port の一方向かつ単一の経路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "c6182d533586523fcf6b085d30c9d82bd5b0f532c672c70cc58b179ad57cff6d",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「Collaboration workflows: PR、Review、Signal」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "Signal command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "c6182d533586523fcf6b085d30c9d82bd5b0f532c672c70cc58b179ad57cff6d",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "担当文脈の実行経路は driver → usecase interactor → port の一方向かつ単一の経路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "Signal command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "161b6a8faa37361829d1aeee4ebc106dd1774e0ee227bb609782b6350a8d555f",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "\"3. **Collaboration workflows**: PR、Review、Signal\""
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-01",
+          "text_label": "Review を含む PR / Signal 以外の command 文脈の純 DI 化は本 track の対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "ca7c0ad2fad47d174d8b88db945fb8123a6daecf2dd769fb18210f37f106d406",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "**Final convergence**: 互換 shim と中間 `*ServiceImpl` の削除、全体 lint、文書と export の同期"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "参照されなくなった compatibility shim、中間 ServiceImpl、export の物理削除と、リポジトリ全体の最終収束判定は Final convergence track の対象とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "ca7c0ad2fad47d174d8b88db945fb8123a6daecf2dd769fb18210f37f106d406",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "参照されなくなった互換定義・export の物理削除は Final convergence track が一括して担い、それまでは新規利用を禁止する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-02",
+          "text_label": "参照されなくなった compatibility shim、中間 ServiceImpl、export の物理削除と、リポジトリ全体の最終収束判定は Final convergence track の対象とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "029c066c80689137b4916d7a1dc65752516fe61fffff5e348fa8c270d98b1468",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本イニシアチブでは crate topology を変更しない。Interactor と Application Service は、`libs/usecase` 内の適切な command 文脈 module に配置し、同じ application boundary の中で役割を分離する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-03",
+          "text_label": "Interactor と Application Service を別 crate に分離する変更、その他の crate topology 変更は本 track の対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "1f890a690003232453dc1b4c3dfcc07d19bbb8cd4b06d35635b650a936b21d7e",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "未統合 track の変更を暗黙に前提とする実装は認めない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OUT-04",
+          "text_label": "他 track が所有する command 文脈、共通 policy surface、または共有変更を暗黙に前提とする実装は本 track の対象外とする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "376bdef532b858bedd41e8c19cbbec310957ec27e3cc6e250436d2ca3aaa27cb",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "純 DI 化の各 track は、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。構造変更の前後で、同じ入力に対して同じ外部観測可能な結果を返すことを統合テストで保証する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "PR と Signal の構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "030b409db577b1061216b84de0dda5de3394bc16ee7145e3fa92f334e792f78f",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 track は、単独でレビュー可能であり、CI を green に保ったまま統合できなければならない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "各統合単位は CI green を保ち、未統合の migration track の実装を暗黙に前提としない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "030b409db577b1061216b84de0dda5de3394bc16ee7145e3fa92f334e792f78f",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 track は独立して CI green を満たす。未統合 track の変更を暗黙に前提とする実装は認めない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "各統合単位は CI green を保ち、未統合の migration track の実装を暗黙に前提としない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "0c2548b9882e27a9bbe33e63b6c8cb45daec4c7da625646cc84603173c102993",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本イニシアチブでは crate topology を変更しない。Interactor と Application Service は、`libs/usecase` 内の適切な command 文脈 module に配置し、同じ application boundary の中で役割を分離する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "crate topology を維持し、Interactor と Application Service は libs/usecase 内の同一 application boundary で役割を分離する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D9"
+        }
+      }
+    },
+    {
+      "claim_hash": "50742c8a86837f2c87ac7973e35ecaaf2e17d4d31b08bc449e936019d57e4850",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 command 文脈 track は担当実行経路から互換 shim と中間 `*ServiceImpl` への参照・呼出し・逆委譲をすべて除去し、driver → usecase interactor → port の単一路を成立させた時点で完了できる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "f51af405346c57cef55ade1fe27daebb632c25fa438c2ed8c7480e909dcdfb7a",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 track は担当する command 文脈について、composition root から次の責務をすべて除去する。\n\n- command 実行ロジック\n- `CommandOutcome` の生成\n- filesystem、process、network、terminal への直接 I/O\n- usecase から composition root へ戻る逆委譲"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "PR の composition root は command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、または usecase から composition への逆委譲を残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "a132c3d22933c83b48a2c185452c8931926cff21a5c4871f7e736e75fed6966b",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 track は担当する command 文脈について、composition root から次の責務をすべて除去する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "Signal の composition root は command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、または usecase から composition への逆委譲を残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "40e038088bdf7e70d31454feb69d2a0f448f70d8f7d6fe6df5eb536f5fd4e36c",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "担当文脈の実行経路は driver → usecase interactor → port の一方向かつ単一の経路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "7fa566ecb219a7005318bbed63fd5ede0ec2a9006c5817290c880a538172161c",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 command 文脈 track は担当実行経路から互換 shim と中間 `*ServiceImpl` への参照・呼出し・逆委譲をすべて除去し、driver → usecase interactor → port の単一路を成立させた時点で完了できる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "PR と Signal の担当 execution path は SignalServiceImpl および signal shim への runtime 参照・呼出し・逆委譲を残さない。物理削除は要求しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "992ec168a7eaa861e0626069e1783c3a188866a62fef2256e12945a4c6895b0d",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "純 DI 化の各 track は、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。構造変更の前後で、同じ入力に対して同じ外部観測可能な結果を返すことを統合テストで保証する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "統合テストは、PR と Signal の各 command 文脈について、同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "78678ffff36f77c47726d30b39bbf1d92af7ea7e0c7cc453f89ca9e6949da805",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 track は、単独でレビュー可能であり、CI を green に保ったまま統合できなければならない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "この PR / Signal slice は単独で CI green を維持して統合でき、他の未統合 migration track の実装を必要としない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "78678ffff36f77c47726d30b39bbf1d92af7ea7e0c7cc453f89ca9e6949da805",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 track は独立して CI green を満たす。未統合 track の変更を暗黙に前提とする実装は認めない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "この PR / Signal slice は単独で CI green を維持して統合でき、他の未統合 migration track の実装を必要としない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "3913cb5de1ece43eefcb5572fb552804eab8236462db3dd7c24924b82f288d65",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 command 文脈 track は担当実行経路から互換 shim と中間 `*ServiceImpl` への参照・呼出し・逆委譲をすべて除去し、driver → usecase interactor → port の単一路を成立させた時点で完了できる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D5"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,798 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "37115de33292151a21f528917b3902dbfb951bb6015a440f790048bd80d8a66e",
+      "evidence_hash": "8dcf34a8102975ce8d8a50de2988a1181c59f86de90aab97fbeaafb06b8cff1a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "37115de33292151a21f528917b3902dbfb951bb6015a440f790048bd80d8a66e",
+      "evidence_hash": "40e038088bdf7e70d31454feb69d2a0f448f70d8f7d6fe6df5eb536f5fd4e36c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "37115de33292151a21f528917b3902dbfb951bb6015a440f790048bd80d8a66e",
+      "evidence_hash": "50742c8a86837f2c87ac7973e35ecaaf2e17d4d31b08bc449e936019d57e4850",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bbd10028bc2fb6912929a725e347bed6ebb01378704e9eb9924dfb54544d58db",
+      "evidence_hash": "8dcf34a8102975ce8d8a50de2988a1181c59f86de90aab97fbeaafb06b8cff1a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrCommandInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bbd10028bc2fb6912929a725e347bed6ebb01378704e9eb9924dfb54544d58db",
+      "evidence_hash": "40e038088bdf7e70d31454feb69d2a0f448f70d8f7d6fe6df5eb536f5fd4e36c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrCommandInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bbd10028bc2fb6912929a725e347bed6ebb01378704e9eb9924dfb54544d58db",
+      "evidence_hash": "50742c8a86837f2c87ac7973e35ecaaf2e17d4d31b08bc449e936019d57e4850",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrCommandInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "08fb7aab292671559d9259d09cc09406a130ba8fe639ac199f713a448064d47b",
+      "evidence_hash": "376bdef532b858bedd41e8c19cbbec310957ec27e3cc6e250436d2ca3aaa27cb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR と Signal の構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrCommandOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "PR と Signal の構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1acaeb102a7c264137f3cf44961296a319fdee18386f19b4898e175dc1bb05f0",
+      "evidence_hash": "8dcf34a8102975ce8d8a50de2988a1181c59f86de90aab97fbeaafb06b8cff1a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrIdentifier"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1acaeb102a7c264137f3cf44961296a319fdee18386f19b4898e175dc1bb05f0",
+      "evidence_hash": "40e038088bdf7e70d31454feb69d2a0f448f70d8f7d6fe6df5eb536f5fd4e36c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR driver は closure による command 実行注入を typed driven port に置き換え"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrIdentifier"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ce110ea03df40d620bb958d4f5583a1ec9ff77adc7ac5ee775eaacabb3ff9b8b",
+      "evidence_hash": "8dcf34a8102975ce8d8a50de2988a1181c59f86de90aab97fbeaafb06b8cff1a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrPollIntervalSeconds"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ce110ea03df40d620bb958d4f5583a1ec9ff77adc7ac5ee775eaacabb3ff9b8b",
+      "evidence_hash": "40e038088bdf7e70d31454feb69d2a0f448f70d8f7d6fe6df5eb536f5fd4e36c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrPollIntervalSeconds"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f015373a3bd2d05f73647c80cb5a541cabf290521772b9f8f3c06f4e52df70b4",
+      "evidence_hash": "8dcf34a8102975ce8d8a50de2988a1181c59f86de90aab97fbeaafb06b8cff1a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition root に実行責務を残さない一方向・単一路へ移行する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrPollTimeoutSeconds"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f015373a3bd2d05f73647c80cb5a541cabf290521772b9f8f3c06f4e52df70b4",
+      "evidence_hash": "40e038088bdf7e70d31454feb69d2a0f448f70d8f7d6fe6df5eb536f5fd4e36c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrPollTimeoutSeconds"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "346167aa3647ef9a285b4e4a4c4618163e906154e77cab19b3d3f5b1f590613a",
+      "evidence_hash": "8dcf34a8102975ce8d8a50de2988a1181c59f86de90aab97fbeaafb06b8cff1a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrReviewCycleMode"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "346167aa3647ef9a285b4e4a4c4618163e906154e77cab19b3d3f5b1f590613a",
+      "evidence_hash": "40e038088bdf7e70d31454feb69d2a0f448f70d8f7d6fe6df5eb536f5fd4e36c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrReviewCycleMode"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7f623062b899a0bd1e95f6abab53b7ec69cbe130aee5d3a7fa99ec5c3af451d5",
+      "evidence_hash": "c6182d533586523fcf6b085d30c9d82bd5b0f532c672c70cc58b179ad57cff6d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "Signal command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7f623062b899a0bd1e95f6abab53b7ec69cbe130aee5d3a7fa99ec5c3af451d5",
+      "evidence_hash": "a132c3d22933c83b48a2c185452c8931926cff21a5c4871f7e736e75fed6966b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal の composition root は command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、または usecase から composition への逆委譲を残さない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "Signal の composition root は command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、または usecase から composition への逆委譲を残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7f623062b899a0bd1e95f6abab53b7ec69cbe130aee5d3a7fa99ec5c3af451d5",
+      "evidence_hash": "7fa566ecb219a7005318bbed63fd5ede0ec2a9006c5817290c880a538172161c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR と Signal の担当 execution path は SignalServiceImpl および signal shim への runtime 参照・呼出し・逆委譲を残さない。物理削除は要求しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "PR と Signal の担当 execution path は SignalServiceImpl および signal shim への runtime 参照・呼出し・逆委譲を残さない。物理削除は要求しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7f623062b899a0bd1e95f6abab53b7ec69cbe130aee5d3a7fa99ec5c3af451d5",
+      "evidence_hash": "50742c8a86837f2c87ac7973e35ecaaf2e17d4d31b08bc449e936019d57e4850",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b4dadc23b891729081d388f80c213a87c22756ea614a3e9e740aa4d8ed7291a9",
+      "evidence_hash": "c6182d533586523fcf6b085d30c9d82bd5b0f532c672c70cc58b179ad57cff6d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalCommandInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "Signal command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b4dadc23b891729081d388f80c213a87c22756ea614a3e9e740aa4d8ed7291a9",
+      "evidence_hash": "a132c3d22933c83b48a2c185452c8931926cff21a5c4871f7e736e75fed6966b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal の composition root は command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、または usecase から composition への逆委譲を残さない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalCommandInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "Signal の composition root は command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、または usecase から composition への逆委譲を残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b4dadc23b891729081d388f80c213a87c22756ea614a3e9e740aa4d8ed7291a9",
+      "evidence_hash": "7fa566ecb219a7005318bbed63fd5ede0ec2a9006c5817290c880a538172161c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR と Signal の担当 execution path は SignalServiceImpl および signal shim への runtime 参照・呼出し・逆委譲を残さない。物理削除は要求しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalCommandInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "PR と Signal の担当 execution path は SignalServiceImpl および signal shim への runtime 参照・呼出し・逆委譲を残さない。物理削除は要求しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b4dadc23b891729081d388f80c213a87c22756ea614a3e9e740aa4d8ed7291a9",
+      "evidence_hash": "50742c8a86837f2c87ac7973e35ecaaf2e17d4d31b08bc449e936019d57e4850",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalCommandInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "868ddb5cf804c82c6a6ab03cd47317f6ccf57a93b133af4755983cca0a6c3af8",
+      "evidence_hash": "376bdef532b858bedd41e8c19cbbec310957ec27e3cc6e250436d2ca3aaa27cb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SignalCommandOutput"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "PR と Signal の構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1dc685f21a3cc639fbe6d033c5a339acde9c8a976013f58d3e512488873d1673",
+      "evidence_hash": "8dcf34a8102975ce8d8a50de2988a1181c59f86de90aab97fbeaafb06b8cff1a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PrCommandPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1dc685f21a3cc639fbe6d033c5a339acde9c8a976013f58d3e512488873d1673",
+      "evidence_hash": "40e038088bdf7e70d31454feb69d2a0f448f70d8f7d6fe6df5eb536f5fd4e36c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PrCommandPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1dc685f21a3cc639fbe6d033c5a339acde9c8a976013f58d3e512488873d1673",
+      "evidence_hash": "50742c8a86837f2c87ac7973e35ecaaf2e17d4d31b08bc449e936019d57e4850",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PrCommandPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1dc685f21a3cc639fbe6d033c5a339acde9c8a976013f58d3e512488873d1673",
+      "evidence_hash": "376bdef532b858bedd41e8c19cbbec310957ec27e3cc6e250436d2ca3aaa27cb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR と Signal の構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PrCommandPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "PR と Signal の構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "16532684037c9c800ba948828570705b5bed61662317661796a1d42922f784dc",
+      "evidence_hash": "c6182d533586523fcf6b085d30c9d82bd5b0f532c672c70cc58b179ad57cff6d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SignalCommandPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "Signal command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "16532684037c9c800ba948828570705b5bed61662317661796a1d42922f784dc",
+      "evidence_hash": "a132c3d22933c83b48a2c185452c8931926cff21a5c4871f7e736e75fed6966b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal の composition root は command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、または usecase から composition への逆委譲を残さない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SignalCommandPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "Signal の composition root は command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、または usecase から composition への逆委譲を残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "16532684037c9c800ba948828570705b5bed61662317661796a1d42922f784dc",
+      "evidence_hash": "7fa566ecb219a7005318bbed63fd5ede0ec2a9006c5817290c880a538172161c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR と Signal の担当 execution path は SignalServiceImpl および signal shim への runtime 参照・呼出し・逆委譲を残さない。物理削除は要求しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SignalCommandPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "PR と Signal の担当 execution path は SignalServiceImpl および signal shim への runtime 参照・呼出し・逆委譲を残さない。物理削除は要求しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "16532684037c9c800ba948828570705b5bed61662317661796a1d42922f784dc",
+      "evidence_hash": "50742c8a86837f2c87ac7973e35ecaaf2e17d4d31b08bc449e936019d57e4850",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SignalCommandPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "16532684037c9c800ba948828570705b5bed61662317661796a1d42922f784dc",
+      "evidence_hash": "376bdef532b858bedd41e8c19cbbec310957ec27e3cc6e250436d2ca3aaa27cb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR と Signal の構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SignalCommandPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "PR と Signal の構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        }
+      }
+    }
+  ]
+}

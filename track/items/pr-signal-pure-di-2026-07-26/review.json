@@ -1,0 +1,352 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The usecase catalogue references `PrCommandOutput` and `SignalCommandOutput` in `PrCommandPort.execute` and `SignalCommandPort.execute`, but neither output type is declared in any of the six in-scope catalogues. This leaves the secondary-port contract without a declared return type/shape and omits the post-change public types that the drivers and adapters consume.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+              "line": 289,
+              "category": "missing companion type declaration"
+            }
+          ],
+          "hash": "rvw1:sha256:0e2ee19a2cb372c22f30a5418d81fae50ff98c34646cc3d4904456babc77eeff",
+          "at": "2026-07-26T09:53:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7d88a0cfcfc70a11698e231aefb425d988c06e976141e99225d0fb6f918c8b1",
+          "at": "2026-07-26T10:07:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`PrCommandPort::execute` performs filesystem, Git/GitHub, terminal, and polling I/O through `SystemPrCommandAdapter`, but is declared synchronous and the entry docs do not acknowledge an intentional blocking/synchronous CLI boundary. Document that choice or make the port async to avoid adapter-level color rework.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+              "line": 304,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "`SignalCommandPort::execute` covers filesystem, Git, rustdoc, and gate I/O through `SystemSignalCommandAdapter`, but is declared synchronous without docs establishing that blocking execution is intentional. Document the synchronous CLI model or expose an async contract.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+              "line": 346,
+              "category": "sync/async color mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:b7d88a0cfcfc70a11698e231aefb425d988c06e976141e99225d0fb6f918c8b1",
+          "at": "2026-07-26T10:20:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::PrCommandPort` の docs は同期境界の選択を記録する範囲を越え、CN-01 の「既存の command sequencing と observable behavior を維持する」という上流の挙動・理由を散文で再記述しています。同期・blocking の型ローカルな選択だけを残し、上流契約は既存の `spec_refs` の CN-01 参照に委ねてください。",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+              "line": 299,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::SignalCommandPort` の docs も、CN-01 の挙動維持契約と migration scope を散文で再説明しています。`no-upstream-restatement.md` に従い、同期・blocking を意図した port であることだけを記録し、挙動契約は `spec_refs` の CN-01 参照に集約してください。",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+              "line": 345,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:26fc6e2753206d46cac441a275b5c0ae601c18a3c6db51affbf86ba7901fed19",
+          "at": "2026-07-26T10:30:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a0ade845237e143417a1c7e144683f51c61070cac09293d054bf047d27eed494",
+          "at": "2026-07-26T10:40:45Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.summary[0]` restates the upstream dependency-order rationale instead of limiting the plan section to target, operation, and anchor cites.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 47,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`T001` includes the upstream behavioral/rationale restatement “while retaining the current live PR path”; keep the executable target/operation and anchor cites, but remove the restatement.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 5,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`T002` includes the upstream behavioral/rationale restatement “while retaining the current live Signal path”; keep the executable target/operation and anchor cites, but remove the restatement.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`T003` includes the upstream cutover-order rationale “without switching composition yet”; keep the executable target/operation and anchor cites, but remove the restatement.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 19,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`T004` includes the upstream cutover-order rationale “without switching composition yet”; keep the executable target/operation and anchor cites, but remove the restatement.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 26,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`T005` restates the upstream self-hosting/observable-behavior contract (“proving the self-hosted ... paths remain operational”); retain only the target, operation, and anchor cites.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 33,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`T006` restates the upstream compatibility and self-hosting contract (“retaining their compatibility definitions” and “prove the self-hosted ... path remains operational”); retain only the target, operation, and anchor cites.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 40,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`T007` restates upstream contract behavior (“arguments, stdout, stderr, exit code, and persistence” and live-reference requirements); retain only the target, operation, and anchor cites.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 47,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The section descriptions `pr-typed-boundary`, `signal-typed-boundary`, `pr-cutover`, `signal-cutover`, and `contract-evidence-and-surface-cleanup` restate upstream design rationale and behavior in prose. They should contain only the section target/operation and anchor cites.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 59,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:2b208dbed097cbb16ddac376ace86961f85c0ed31d7e44fb44b7643769358b42",
+          "at": "2026-07-26T09:53:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Task descriptions T001 and T002 restate the upstream live-path behavior contract (“retaining the current live PR/Signal path”). Remove that rationale while retaining target, operation, and anchor cites.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 5,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Task descriptions T003 and T004 restate the upstream cutover-order rationale (“without switching composition yet”). Remove that rationale while retaining target, operation, and anchor cites.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 19,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Task descriptions T005 and T006 restate upstream behavior and self-hosting contracts (“proving/prove the self-hosted ... paths remain operational” and compatibility retention). Remove those restatements while retaining target, operation, and anchor cites.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 33,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Task T007 and the plan section `contract-evidence-and-surface-cleanup` restate the upstream CLI contract and live-reference requirements in prose. Keep the executable test/removal operations and anchor cites, but remove the behavior-contract restatement.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 47,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Plan summary item 1 and the section descriptions `pr-typed-boundary`, `signal-typed-boundary`, `pr-cutover`, and `signal-cutover` restate upstream design rationale and dependency behavior. Plan sections should contain only target, operation, and anchor cites.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 47,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:70c6a926041031c60f71bcb03a99444fc7fdab6e7d94478fcf54b1f82faf8299",
+          "at": "2026-07-26T09:57:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's task description claims adding `PrCommand` and validated PR value objects, but `task-contract.json` also attributes `usecase/PrCommandOutput`, which is not described as added or modified. Add the output type to the task description or move its attribution.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/task-contract.json",
+              "line": 18,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T002's task description claims adding `SignalCommand` and `SignalCommandInteractor`, but `task-contract.json` also attributes `usecase/SignalCommandOutput`, which is not described as added or modified. Add the output type to the task description or move its attribution.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/task-contract.json",
+              "line": 38,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:5314366d99bc76039c20c062d26cd9b13f6ab659a12e43e4ca553a04e4000529",
+          "at": "2026-07-26T10:07:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49b2fce5ea31d22f3dbc1550ce3b07b51a3d32ed83049013dd39c8e28e33abec",
+          "at": "2026-07-26T10:09:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 says to add `PrCommandOutput` and `PrCommandInteractor`, but its attributed catalogue entries mark them as `reference` and `modify`, respectively; both symbols already exist. Keep the reference attribution, but change T001 and section `pr-typed-boundary` to reuse `PrCommandOutput` and modify the existing interactor rather than creating them.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 6,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T002 says to add `SignalCommandOutput`, although its attributed catalogue entry is `action: reference` and the symbol already exists. Keep the carrier attribution but make the task explicitly reuse/reference this output type.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 12,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T007 explicitly removes three `cli-composition` re-exports, but OUT-02 reserves physical deletion of exports for the Final convergence track; citing OUT-02 does not authorize the excluded work. Remove this deletion step from T007 and section `contract-evidence-and-surface-cleanup`.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 42,
+              "category": "out_of_scope leak into a task"
+            },
+            {
+              "message": "`plan.summary` only mentions T001–T007 and provides no GO-01 or GO-02 mappings. Because goals cannot be represented in `task-coverage.json`, this field is the sole goal-to-task traceability record and must explicitly map both goals to their carrier tasks.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 49,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "AC-07 maps only to T006, whose description contains wiring and removal work but no validation step. T007 owns the Signal CLI integration and live-reference evidence yet is not mapped to AC-07, leaving this acceptance criterion without credible validation coverage. Add explicit AC-07 validation to T006 or map an appropriate validation step in T007.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/task-coverage.json",
+              "line": 93,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:49b2fce5ea31d22f3dbc1550ce3b07b51a3d32ed83049013dd39c8e28e33abec",
+          "at": "2026-07-26T10:16:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 identifies only work kinds—“PR and Signal CLI integration tests” and “a live-reference check”—without naming a target file or symbol. Because T007 intentionally has no catalogue attribution and multiple CLI test surfaces exist, the executor must invent the placement and boundary. Specify the exact test/check paths or symbols while retaining the anchor cites.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 42,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T007 and section `contract-evidence-and-surface-cleanup` restate OUT-02 in prose with “leave physical compatibility-surface deletion to the Final convergence track.” Under `knowledge/conventions/no-upstream-restatement.md`, retain the OUT-02 anchor and remove this repeated upstream contract clause.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:e17ce5458b0ffcb76b32211beb6475c50c62eed09b60e53da086f5ceea95980a",
+          "at": "2026-07-26T10:21:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e82e957ef618aff7d6fd5bb67d1e4f60fed396b0da2f2599f4367d0c220df529",
+          "at": "2026-07-26T10:25:05Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 is not fully covered: AC-03 verifies the driver → usecase interactor → port pure-DI path only for PR, while no acceptance criterion deterministically verifies the equivalent Signal execution path. AC-02 and AC-04 only constrain the Signal composition root and legacy references, so a Signal path that still bypasses the intended typed DI route could satisfy all current ACs.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+              "line": 178,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:6d2c560fd3dd4457435338a1d54be327e7a567a6e8729f2352af124d0504fc39",
+          "at": "2026-07-26T09:54:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:841bcd1f1e90e5553c5ce308d71062b36fc5d99097c141e0e923ced5f6a77a83",
+          "at": "2026-07-26T09:57:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60f97e9ca6dbaf0b5b6bdd2639f0d2cf4f9182a6baa9a65e612f01d56a6a1d22",
+          "at": "2026-07-26T10:10:01Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b664926990f7a39da5a12601181fff146ef27746e40ffded219a16d3718085d7",
+          "at": "2026-07-26T09:53:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b664926990f7a39da5a12601181fff146ef27746e40ffded219a16d3718085d7",
+          "at": "2026-07-26T09:55:28Z"
+        }
+      ]
+    }
+  }
+}

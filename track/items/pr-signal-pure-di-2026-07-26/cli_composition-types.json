@@ -1,0 +1,121 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {},
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "PrCompositionRoot",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "SignalCompositionRoot",
+      "trait_ref": "core::default::Default"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "PrCompositionRoot": {
+      "action": "modify",
+      "docs": "Pure DI composition root for the PR command family; its public surface only constructs and returns the fully wired PrDriver.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "pr_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::pr::PrDriver"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "pr",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "SignalCompositionRoot": {
+      "action": "modify",
+      "docs": "Pure DI composition root for the Signal command family; its public surface only constructs and returns the fully wired SignalDriver.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "signal_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::signal::SignalDriver"
+        }
+      ],
+      "module_path": "signal",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    }
+  }
+}
