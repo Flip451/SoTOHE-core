@@ -1,0 +1,125 @@
+{
+  "track_id": "consumer-convention-ownership-and-harness-decoupling-2026-07-25",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "ConventionDocumentPath",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionDocumentPath",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "595d60ac6d1cf1b8a6ce204df62096cd33fc183c68f18025144c3fff7dd0dba9",
+        "declaration_hash": "c6a55fa5be4a33fb5749241c35046494cec77002b292543e1a8b6d69520bd2d7",
+        "anchor_text_hash": "8fcacd3517663b65642147deac44f3bcb1b164d156190aeb2d42d310057f95f2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(resolved.to_string(), \"knowledge/conventions/testing.md\");\n\npaths.sort();\n\nassert_eq!(\n            ordered,\n            [\n                \"knowledge/conventions/adr.md\",\n                \"knowledge/conventions/rust/naming.md\",\n                \"knowledge/conventions/testing.md\",\n            ]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionDocumentPath",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionDocumentPath",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "ab4a49687f5afeecd876c10dd6350705b7374ec6777c9677a89b870d40c94997",
+        "declaration_hash": "c6a55fa5be4a33fb5749241c35046494cec77002b292543e1a8b6d69520bd2d7",
+        "anchor_text_hash": "dd5ea67e02f9b406d53b2e0a770895986e169be79549fdc8440e7f7be2e7a86d"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "paths.sort();\n\n        let ordered: Vec<String> = paths.iter().map(ToString::to_string).collect();\n        assert_eq!(\n            ordered,\n            [\n                \"knowledge/conventions/adr.md\",\n                \"knowledge/conventions/rust/naming.md\",\n                \"knowledge/conventions/testing.md\",\n            ]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionDocumentPath",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionDocumentPath",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "96ef5b6d370e5f284468daad7f30b1302ee4865014634f1be1d27b8c87e1f02b",
+        "declaration_hash": "c6a55fa5be4a33fb5749241c35046494cec77002b292543e1a8b6d69520bd2d7",
+        "anchor_text_hash": "61e23c842a132a3f831815dd2009b0b313ec41cb213e430597061cefb5396046"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            matches!(result, Err(ConventionDocumentPathError::OutsideConventionRoot { .. })),\n            \"a parent-directory component can leave the convention root, so it is rejected\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionDocumentPathError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionDocumentPathError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "a3d520279d2b14f377fd87579a6975bbae5ab0f7b620a5563073a1b7fe2f9a9d",
+        "declaration_hash": "74b8e86dbcac058357bc17f687c8c303a3577de1b8d07b6c23226e0e320f1913",
+        "anchor_text_hash": "61e23c842a132a3f831815dd2009b0b313ec41cb213e430597061cefb5396046"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            matches!(result, Err(ConventionDocumentPathError::OutsideConventionRoot { .. })),\n            \"a parent-directory component can leave the convention root, so it is rejected\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionResolveError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionResolveError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "8fddfa241dd986d0738200169d3cc17a1d8d98c8d6ea84bace99ae00a35ee303",
+        "declaration_hash": "8d70c0c7b6b9069bc0766f21ec39fe016596649d10e47e493789bdff2523aaac",
+        "anchor_text_hash": "61e23c842a132a3f831815dd2009b0b313ec41cb213e430597061cefb5396046"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let conditions = [\n            ConventionResolveError::FrontMatterUnparseable {\n                document: document(\"knowledge/conventions/front-matter.md\"),\n                detail: CapabilityFailureDetail::new(\"unexpected token at line 2\"),\n            },\n            ConventionResolveError::RequiredForNotStringArray {\n                document: document(\"knowledge/conventions/required-for.md\"),\n                detail: CapabilityFailureDetail::new(\"expected a sequence of strings\"),\n            },\n            ConventionResolveError::EmptyCapabilityId {\n                document: document(\"knowledge/conventions/empty-capability-id.md\"),\n            },\n            ConventionResolveError::DocumentPathOutsideRoot { source: outside_root },\n            ConventionResolveError::DocumentUnreadable {\n                document: document(\"knowledge/conventions/unreadable.md\"),\n                detail: CapabilityFailureDetail::new(\"permission denied\"),\n            },\n        ];"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ]
+}

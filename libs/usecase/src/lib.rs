@@ -27,6 +27,7 @@ pub mod codex_runtime;
 pub mod commit_hash_persistence;
 pub mod contract_map_workflow;
 pub mod conventions;
+pub mod conventions_resolve;
 pub mod d4_orchestration;
 pub mod demo;
 pub mod disk_maintenance;

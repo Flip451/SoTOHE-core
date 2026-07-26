@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T07:46:25Z",
+  "generated_at": "2026-07-26T08:55:35Z",
   "declaration_hash": "dba3aa5c63394d571c9c9031f445a23d47b7e9bff51d106dd481897d141dafa6",
-  "implementation_input_hash": "328b7ea2682359327c8b29a28d21f05270cd9473086b8f30d3af5d44176e2778",
+  "implementation_input_hash": "ef441558584eba54126c98b263960553e4f57b0b113cd8aae68f3f465507590e",
   "signals": [
     {
       "type_name": "CapabilityExecError",
@@ -39,9 +39,9 @@
     {
       "type_name": "ConventionDocumentPath",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Display",
@@ -54,9 +54,9 @@
     {
       "type_name": "ConventionDocumentPathError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
@@ -102,9 +102,9 @@
     {
       "type_name": "ConventionResolveError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
