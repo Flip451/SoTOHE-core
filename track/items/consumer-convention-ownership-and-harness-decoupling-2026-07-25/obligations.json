@@ -17,7 +17,7 @@
         "role": "Interactor"
       },
       "brief": "Author a result test covering 'entry' of CapabilityExecInteractor",
-      "declaration_hash": "1e69fdefe21c620cc7c09274be182c4546d570c095c93d2c0a75a5521cb80135",
+      "declaration_hash": "e69087b1051b1c36468c1996a0551a50ec8c381da2c196955304c407e27b09dd",
       "spec_refs": [
         {
           "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
@@ -113,7 +113,7 @@
         "role": "FreeFunction"
       },
       "brief": "Author a logic test covering 'entry' of usecase::conventions_resolve::select_required_conventions",
-      "declaration_hash": "8247df3493fcf560395b86d8c5aeafc6a379ff256d9b7bc5199221b38ad890a2",
+      "declaration_hash": "12cdd5ac37e3f757c17f4abb5182b3bee1c60b747812d0340f3f40e9544d9c3e",
       "spec_refs": [
         {
           "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
@@ -317,7 +317,7 @@
         "role": "FreeFunction"
       },
       "brief": "Author a logic test covering 'entry' of infrastructure::conventions_resolve::scan_convention_requirements",
-      "declaration_hash": "95aac06aef480866547313e8ecc97259c820892c3bc3d3f9cf2a69b1e09aa122",
+      "declaration_hash": "cbb75972d3ba4409ea9bb76933c76061b66e65dfba2467d3f05d1303508a186f",
       "spec_refs": [
         {
           "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
@@ -349,7 +349,7 @@
         "role": "FreeFunction"
       },
       "brief": "Author a logic test covering 'entry' of infrastructure::template_conventions::list_convention_documents",
-      "declaration_hash": "c84cc1ae048ba33e234c2ee9672d4f42888276c72e358351dbb85f7abfc91c94",
+      "declaration_hash": "b66942a4da413425ff78d4901f91aba3f0b30ad53bc3ba04c417bd79c9537a70",
       "spec_refs": [
         {
           "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",

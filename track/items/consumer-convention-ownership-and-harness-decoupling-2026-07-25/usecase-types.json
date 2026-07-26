@@ -13,7 +13,7 @@
         },
         {
           "name": "capability",
-          "ty": "&CapabilityName"
+          "ty": "&ConventionCapabilityId"
         }
       ],
       "returns": "ConventionResolution",
@@ -114,7 +114,7 @@
             },
             {
               "name": "required_for",
-              "ty": "Vec<CapabilityName>"
+              "ty": "Vec<ConventionCapabilityId>"
             }
           ],
           "returns": "Self"
@@ -134,7 +134,7 @@
           "params": [
             {
               "name": "capability",
-              "ty": "&CapabilityName"
+              "ty": "&ConventionCapabilityId"
             }
           ],
           "receiver": "&self",
@@ -192,6 +192,31 @@
         }
       ],
       "type_name": "ConventionShippingCheckInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "impl Into<String>"
+            }
+          ],
+          "returns": "Result<Self, ConventionCapabilityIdError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "ConventionCapabilityId"
     }
   ],
   "layer": "usecase",
@@ -466,6 +491,42 @@
     },
     {
       "for_type": "ConventionDocumentPathError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ConventionCapabilityId",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ConventionCapabilityId",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ConventionCapabilityId",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ConventionCapabilityId",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ConventionCapabilityId",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ConventionCapabilityId",
+      "trait_ref": "core::convert::From<&CapabilityName>"
+    },
+    {
+      "for_type": "ConventionCapabilityIdError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ConventionCapabilityIdError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "ConventionCapabilityIdError",
       "trait_ref": "core::error::Error"
     }
   ],
@@ -788,7 +849,7 @@
     },
     "CapabilityExecInteractor": {
       "action": "modify",
-      "docs": "Pure application-layer coordinator for generic capability dispatch. This track injects `ConventionResolveService` as a fourth dependency (AC-10, AC-11, AC-12). The seam falls here rather than in the two route branches because the interactor is the one point both outcomes pass through: resolving once above the branch is what makes a single value reach either route, whereas resolving inside each branch would place the same rule in two sites with nothing but review keeping them equal. The resolved value is composed into `DisciplineText` rather than passed alongside it, so the two routes share one representation by construction.",
+      "docs": "Pure application-layer coordinator for generic capability dispatch. This track injects `ConventionResolveService` as a fourth dependency (AC-10, AC-11, AC-12). The seam falls here rather than in the two route branches because the interactor is the one point both outcomes pass through: resolving once above the branch is what makes a single value reach either route, whereas resolving inside each branch would place the same rule in two sites with nothing but review keeping them equal. The resolved value is composed into `DisciplineText` rather than passed alongside it, so the two routes share one representation by construction. The preflight query names the dispatched capability as a `ConventionCapabilityId` obtained through `From<&CapabilityName>`: this is the single site in the workspace where a profile lookup key becomes a matching term, and it is infallible because the key is already a trimmed non-empty string.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -939,7 +1000,7 @@
     },
     "CapabilityName": {
       "action": "reference",
-      "docs": "Baseline-identical non-empty capability identifier, reused unchanged instead of minting a new newtype for this track (design self-check 12): its sole invariant is non-emptiness, which is exactly the invariant IN-06 asks this identifier to carry, and a stronger one would be unsatisfiable for an open-ended value. Declared here so its edges into the new query, port, and resolver entries stay visible.",
+      "docs": "Baseline-identical capability lookup key into `agent-profiles.json`, unchanged by this track; declared so its edges into the dispatch failure variants stay visible. It is explicitly not the identifier the resolution slice matches on: its constructor trims the supplied value, which is a defensible tolerance for a lookup key and is relied on by the existing dispatch, review, and dry-write callers, but under it a matching comparison would be normalize-then-compare. Reusing it here was the earlier reading of design self-check 12 and it was wrong — the invariants of a lookup key and of an exact-match term differ. `ConventionCapabilityId` carries the latter, and this type reaches it only through the one-directional `From<&CapabilityName>` bridge.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -977,7 +1038,7 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-06",
+          "anchor": "IN-07",
           "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
         }
       ]
@@ -1019,9 +1080,72 @@
         }
       ]
     },
+    "ConventionCapabilityId": {
+      "action": "add",
+      "docs": "Capability identifier in its matching-term role (IN-06, AC-06, AC-09). A `tuple`-shape newtype rather than a raw `String` (R9), with `try_new` as the single enforcing site of AC-07's blank-identifier condition: the field is private, so every producer of the value — the infrastructure front-matter DTO's `into_requirement` and the CLI boundary mirror alike — reaches it through this constructor, and each of those sites only translates the resulting `ConventionCapabilityIdError` into its own error vocabulary rather than re-deciding the rejection. Design self-check 12's reuse candidate was `CapabilityName`, and the reuse was rejected: that type's constructor trims the value it is handed, a tolerance its existing dispatch, review, and dry-write callers rely on, so its invariant is a lookup key's rather than a matching term's — two different invariants over the same-looking string, and therefore two types. Both sides of the comparison, the scanned document and the resolve query, carry this one, so there is no site left at which the other invariant could stand in for it. `From<&CapabilityName>` is the single sanctioned bridge from the lookup key and is total, since a `CapabilityName` already holds a trimmed non-empty string; there is deliberately no conversion the other way, so a matching term cannot be handed back to a profile lookup. Placed in usecase rather than domain under R1's tests, as with `ConventionDocumentPath`: its meaning is stable across two independent operations, the resolve command and the capability-exec preflight, which is why it is not a per-operation `Dto`; but it exists because convention documents carry front matter, a delivery-format concern rather than ubiquitous domain language.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "conventions_resolve",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ConventionCapabilityIdError": {
+      "action": "add",
+      "docs": "Construction failure of `ConventionCapabilityId`, extracted as its own type for the same reason as its sibling `ConventionDocumentPathError`: every consumer of that constructor then admits exactly this rejection rather than inheriting the resolver's whole error surface. `Blank` is a unit variant because the variant name is the whole of the diagnosis and echoing the rejected value back would add nothing to it; that payload asymmetry is also why `ConventionResolveError::EmptyCapabilityId` names the offending document instead of composing this error, whereas `DocumentPathOutsideRoot` does compose the path rejection, whose payload is the rejected path itself. An enum rather than a struct because further rejection reasons for this identifier concept belong here as sibling variants; today it carries exactly one. Construction owner: `ConventionCapabilityId::try_new` (AC-07), which holds nothing at failure time beyond the fact of the rejection.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Blank",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "conventions_resolve",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-07",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
     "ConventionDocumentPath": {
       "action": "add",
-      "docs": "Repository-relative path of a convention document. It owns one invariant — the path stays inside `knowledge/conventions/` — and its constructor is the single site that establishes it (AC-07), so no other layer re-checks and none can skip it. A `tuple`-shape newtype over `PathBuf` rather than a raw path (R9), with the constructor failure extracted as `ConventionDocumentPathError` so the resolver and the shipping check can each admit exactly that rejection and nothing more. Placed in usecase rather than domain under R1's tests: its meaning is stable across two independent application operations — the resolver and the shipping check — which is why it is not a per-operation `Dto`; but the invariant it owns is a fact about one repository directory layout, so it is not independent of delivery and workflow concerns and is not domain language. `Ord` is declared because the stable ordering both operations rely on is an ordering of these values, owned here rather than re-derived by each consumer.",
+      "docs": "Repository-relative path of a convention document. It owns one invariant — the path stays inside `knowledge/conventions/` — and `try_new` is the single enforcing site of it (AC-07): the field is private, so the resolver's scan and the shipping inventory both reach the value through this constructor, and each only lifts the resulting `ConventionDocumentPathError` into its own error type rather than re-deciding the rejection. A `tuple`-shape newtype over `PathBuf` rather than a raw path (R9), with the constructor failure extracted as `ConventionDocumentPathError` so the resolver and the shipping check can each admit exactly that rejection and nothing more. Placed in usecase rather than domain under R1's tests: its meaning is stable across two independent application operations — the resolver and the shipping check — which is why it is not a per-operation `Dto`; but the invariant it owns is a fact about one repository directory layout, so it is not independent of delivery and workflow concerns and is not domain language. `Ord` is declared because the stable ordering both operations rely on is an ordering of these values, owned here rather than re-derived by each consumer.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1086,7 +1210,7 @@
     },
     "ConventionRequirement": {
       "action": "add",
-      "docs": "One scanned convention document paired with the capability identifiers its front matter declares (IN-05, AC-06, AC-08). A plain struct exposing a `requires` predicate rather than an enum over declares / does-not-declare, because an empty declaration list is an ordinary value of the same shape: splitting it into variants would make every caller re-join the two cases before it could match, and would let the empty case drift into meaning an error. Placed in usecase rather than domain by the same reading as `ConventionDocumentPath` — stable across the scan and the match, but existing only because documents carry front matter, which is a delivery-format concern rather than domain language.",
+      "docs": "One scanned convention document paired with the capability identifiers its front matter declares (IN-05, AC-06, AC-08). A plain struct exposing a `requires` predicate rather than an enum over declares / does-not-declare, because an empty declaration list is an ordinary value of the same shape: splitting it into variants would make every caller re-join the two cases before it could match, and would let the empty case drift into meaning an error. The declared identifiers are `ConventionCapabilityId`, the matching-term type, and `requires` takes the same type rather than a lookup key, so both sides of the comparison preserve their value verbatim and the predicate is a whole-value equality with nothing normalised in between. Placed in usecase rather than domain by the same reading as `ConventionDocumentPath` — stable across the scan and the match, but existing only because documents carry front matter, which is a delivery-format concern rather than domain language.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1150,7 +1274,7 @@
     },
     "ConventionResolveError": {
       "action": "add",
-      "docs": "The structural fail-closed conditions of convention resolution, one variant each (AC-07). The normal empty states are deliberately absent from this enum: they are values of `ConventionResolution`, so no caller can confuse `nothing matched` with `resolution failed`, and no variant exists for them to drift into. Construction owners: `ConventionDocumentPath::try_new` owns the path rejection and reaches this enum only through the composed `ConventionDocumentPathError`, so the rejection has one definition rather than a copy per parent error; the infrastructure front-matter codec owns `FrontMatterUnparseable`, `RequiredForNotStringArray`, and `EmptyCapabilityId`; the infrastructure directory scan owns `DocumentUnreadable`. Every payload is data its owner possesses at failure time.",
+      "docs": "The structural fail-closed conditions of convention resolution, one variant each (AC-07). The normal empty states are deliberately absent from this enum: they are values of `ConventionResolution`, so no caller can confuse `nothing matched` with `resolution failed`, and no variant exists for them to drift into. Construction owners: `parse_convention_front_matter` builds `FrontMatterUnparseable` and `RequiredForNotStringArray` and is also where those two conditions are decided; the infrastructure directory scan builds `DocumentUnreadable` and likewise decides it. The other two variants lift a decision made elsewhere. `EmptyCapabilityId` is built by `ConventionFrontMatterDto::into_requirement` from the rejection `ConventionCapabilityId::try_new` produced, and names the document because that constructor never sees one. `DocumentPathOutsideRoot` is built by the directory scan from the rejection `ConventionDocumentPath::try_new` produced, composing `ConventionDocumentPathError` unchanged — the rejected path is already inside it — so the rejection has one definition rather than a copy per parent error. Both lifts are explicit — the composed errors are `#[source]` fields and this enum declares no `From` impl — so each wrap is a named site rather than an implicit `?`, matching `EmptyCapabilityId`, which could not be a conversion at all since it adds the document. Every payload is data its builder possesses at failure time.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1275,7 +1399,7 @@
     },
     "ConventionShippingCheckError": {
       "action": "add",
-      "docs": "The structural fail-closed conditions of the shipping check, one variant each (IN-11, AC-18). A detected violation is deliberately not among them: non-overlay documents in the export are the check's normal finding and are carried by `ConventionShippingVerdict`, so this enum stays reserved for states in which the question could not be answered at all. `ConventionRootMissing` exists so an exported tree with no conventions directory fails rather than passing vacuously — that is the shape the tree takes if the boundary classification is edited away from `overlay`, which is the mutation this check is here to catch. `DocumentPathRejected` composes `ConventionDocumentPathError` rather than the whole `ConventionResolveError`: this check reads no document contents, so the content-parse conditions are unreachable on this path and must not be representable in its error type. Construction owner for all three variants: the infrastructure inventory (`list_convention_documents`, reached through `FsConventionInventoryAdapter`); every payload is data that walk possesses at failure time.",
+      "docs": "The structural fail-closed conditions of the shipping check, one variant each (IN-11, AC-18). A detected violation is deliberately not among them: non-overlay documents in the export are the check's normal finding and are carried by `ConventionShippingVerdict`, so this enum stays reserved for states in which the question could not be answered at all. `ConventionRootMissing` exists so an exported tree with no conventions directory fails rather than passing vacuously — that is the shape the tree takes if the boundary classification is edited away from `overlay`, which is the mutation this check is here to catch. `DocumentPathRejected` composes `ConventionDocumentPathError` rather than the whole `ConventionResolveError`: this check reads no document contents, so the content-parse conditions are unreachable on this path and must not be representable in its error type. All three variants are built by the infrastructure inventory (`list_convention_documents`, reached through `FsConventionInventoryAdapter`), which also decides the first two. `DocumentPathRejected` it only lifts: the path rule belongs to `ConventionDocumentPath::try_new`, and what the walk adds is the `tree_root`, without which a rejection could not be attributed to the exported tree or the overlay. Every payload is data that walk possesses at failure time.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1481,7 +1605,7 @@
     },
     "ResolveConventionsQuery": {
       "action": "add",
-      "docs": "Read-only request naming the capability whose required conventions are wanted and the project root to scan (IN-05, IN-06, AC-09). A separate `Query` from the existing write-side `ConventionsService` inputs on R1's required CQRS-separation evidence: the operations are asymmetric on side effects (none vs document and index writes), collaborators (the read-only scan port vs the mutating document port), and read/write model (`ConventionResolution` vs an index rewrite). The capability is `CapabilityName` rather than a string because non-emptiness is a real invariant of the value (R9). Field order mirrors `cli_driver::ConventionResolveInput` and `cli::ConventionsCommand::Resolve` exactly; the CLI variant is the fixed point of that chain, because clap renders declaration order in `--help` and every sibling variant of that enum places `project_root` last.",
+      "docs": "Read-only request naming the capability whose required conventions are wanted and the project root to scan (IN-05, IN-06, AC-09). A separate `Query` from the existing write-side `ConventionsService` inputs on R1's required CQRS-separation evidence: the operations are asymmetric on side effects (none vs document and index writes), collaborators (the read-only scan port vs the mutating document port), and read/write model (`ConventionResolution` vs an index rewrite). The capability is `ConventionCapabilityId` rather than a string because non-blankness is a real invariant of the value (R9), and rather than the `CapabilityName` lookup key because the query side of an exact-match comparison has to preserve its value as literally as the document side does. `project_root` stays `PathBuf` for the reason recorded on `CheckConventionShippingQuery`: a caller-chosen scan root owns no invariant, and the constrained concept in this slice is the document identity inside that root, which `ConventionDocumentPath` owns. Field order mirrors `cli_driver::ConventionResolveInput` and `cli::ConventionsCommand::Resolve` exactly; the CLI variant is the fixed point of that chain, because clap renders declaration order in `--help` and every sibling variant of that enum places `project_root` last.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1489,7 +1613,7 @@
           "fields": [
             {
               "name": "capability",
-              "ty": "CapabilityName"
+              "ty": "ConventionCapabilityId"
             },
             {
               "name": "project_root",

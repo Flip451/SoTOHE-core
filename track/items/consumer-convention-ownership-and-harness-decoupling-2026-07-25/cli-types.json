@@ -66,7 +66,7 @@
   "types": {
     "ConventionsCommand": {
       "action": "modify",
-      "docs": "Convention document management subcommands. This track adds the read-only `Resolve` variant (IN-05, IN-06, AC-06, AC-09); the existing add / update-index / verify-index variants are untouched. The capability argument is typed as the boundary mirror `CapabilityNameArg` rather than `String` (R9), which is what moves the rejection of an empty identifier to parse time and leaves no unvalidated value to travel inward. This variant is the fixed point of the `Resolve` mirror chain's field order: clap renders declaration order in `--help`, and every sibling variant of this enum places `project_root` last, so `cli_driver::ConventionResolveInput` and `usecase::ResolveConventionsQuery` follow this order rather than the reverse.",
+      "docs": "Convention document management subcommands. This track adds the read-only `Resolve` variant (IN-05, IN-06, AC-06, AC-09); the existing add / update-index / verify-index variants are untouched. The capability argument is typed as the boundary mirror `ConventionCapabilityIdArg` rather than `String` (R9), so the rejection `ConventionCapabilityId::try_new` performs happens while clap is still parsing and no unvalidated value travels inward; it is that mirror rather than the `capability exec` argument's `CapabilityNameArg` because this argument is the query side of an exact-match comparison and must reach the resolver spelled exactly as the caller typed it. This variant is the fixed point of the `Resolve` mirror chain's field order: clap renders declaration order in `--help`, and every sibling variant of this enum places `project_root` last, so `cli_driver::ConventionResolveInput` and `usecase::ResolveConventionsQuery` follow this order rather than the reverse.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -129,7 +129,7 @@
               "fields": [
                 {
                   "name": "capability",
-                  "ty": "cli_driver::capability::CapabilityNameArg"
+                  "ty": "cli_driver::conventions_resolve::ConventionCapabilityIdArg"
                 },
                 {
                   "name": "project_root",

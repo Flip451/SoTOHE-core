@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityNameArg | dto | reference | — | 🔵 | 🔵 |
+| ConventionCapabilityIdArg | dto | add | — | 🟡 | 🔵 |
 | ConventionResolveInput | dto | add | — | 🟡 | 🔵 |
 | ConventionShippingCheckInput | dto | add | — | 🟡 | 🔵 |
 

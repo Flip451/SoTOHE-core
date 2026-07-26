@@ -26,88 +26,6 @@
         }
       ]
     },
-    "types": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cli::ConventionsCommand.docs` repeats IN-06/AC-09’s whitespace rejection and no-registration behavior in prose. Per `no-upstream-restatement.md`, retain only the changed symbol/operation and rely on `spec_refs` for that contract.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli-types.json",
-              "line": 69,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`cli::ConventionsCommand::Resolve` orders its mirror fields as `capability, project_root`, while `cli_driver::ConventionResolveInput` and `usecase::ResolveConventionsQuery` use `project_root, capability`. No language-level constraint documents the divergence; align this command/input mirror chain.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli-types.json",
-              "line": 131,
-              "category": "mirror chain divergence"
-            },
-            {
-              "message": "The docs for `cli_driver::CapabilityNameArg`, `cli_driver::ConventionResolveDriver`, `cli_driver::ConventionResolveInput`, and `cli_driver::ConventionShippingCheckDriver` reproduce upstream validation, empty-result, fail-closed, rendering, and shipping-check behavior. Replace those paraphrases with concise symbol/operation descriptions plus the existing anchors, retaining only local adapter-design rationale.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli_driver-types.json",
-              "line": 106,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The docs for `infrastructure::conventions_resolve::parse_convention_front_matter`, `infrastructure::conventions_resolve::scan_convention_requirements`, `infrastructure::template_conventions::list_convention_documents`, `infrastructure::CapabilityIdField`, and `infrastructure::ConventionFrontMatterDto` restate AC-07/AC-08/AC-18 failure and empty-state contracts. Reference those anchors instead of duplicating their behavior in catalogue prose.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The docs for `usecase::conventions_resolve::select_required_conventions`, `usecase::template_conventions::select_unsupplied_conventions`, `usecase::ConventionInventoryPort`, `usecase::ConventionRequirementPort`, and `usecase::ConventionResolveService` reproduce exact-match, ordering, empty-result, one-way comparison, failure, and no-write behavior from the spec. Reduce them to downstream type/operation descriptions and anchor references.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`usecase::ConventionInventoryPort::list_conventions` and `usecase::ConventionRequirementPort::scan_requirements` are synchronous contracts for filesystem tree walking and file reads, but neither entry acknowledges why blocking I/O is intentional. Declare the appropriate async color or document the deliberate synchronous CLI boundary.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 468,
-              "category": "sync/async color mismatch"
-            },
-            {
-              "message": "The docs for `usecase::CapabilityExecError`, `usecase::CapabilityExecInteractor`, `usecase::CapabilityName`, and `usecase::DisciplineText` reproduce IN-06/IN-07, AC-09–AC-12, and CN-05 behavior such as execution ordering, both dispatch routes, and prohibition of re-resolution. Replace the duplicated contract with anchor citations while retaining type-local rationale.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 621,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The docs for `usecase::ConventionRequirement`, `usecase::ConventionResolution`, `usecase::ConventionResolveError`, `usecase::ConventionResolveInteractor`, `usecase::ConventionShippingCheckError`, `usecase::ConventionShippingVerdict`, and `usecase::ResolveConventionsQuery` restate AC-06–AC-09/AC-18 behavior, including complete failure lists and normal-empty states. Keep the structural/type rationale, but refer to the existing anchors for behavioral details.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 1044,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`usecase::ConventionShippingCheckError::DocumentPathRejected.source` accepts the entire `ConventionResolveError`, admitting impossible states such as `FrontMatterUnparseable` or `DocumentUnreadable` even though the shipping inventory reads no contents and can only fail path validation here. Use a path-specific error or payload so those states are unrepresentable.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 1275,
-              "category": "state-shape smell"
-            }
-          ],
-          "hash": "rvw1:sha256:989eba9bb04151e45ec82494b45bbb41b0d65dfeaae3c880114b811264696f5c",
-          "at": "2026-07-26T07:32:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8786fbceffe0cb5ca416c19092206868ae4deef11ba7fb121e73a0f4588a00e3",
-          "at": "2026-07-26T07:58:05Z"
-        }
-      ]
-    },
     "usecase": {
       "rounds": [
         {
@@ -137,6 +55,157 @@
           "findings": [],
           "hash": "rvw1:sha256:ef43c487a62b52b64b5cf0e0e0da08137a9aae00a3e0aba4e036bbb7a50e9927",
           "at": "2026-07-26T08:56:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`requires()` compares `CapabilityName` values, but `CapabilityName::try_new` stores a trimmed `NonEmptyString`. Consequently, `required_for: [\" reviewer \"]` matches a query for `reviewer`, violating IN-06/AC-06’s non-empty, exact-string matching contract. Preserve non-blank identifiers without normalization (and cover whitespace near-misses).",
+              "severity": "P0",
+              "file": "libs/usecase/src/conventions_resolve/mod.rs",
+              "line": 187,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cd626c6438308172164c24c9581e1875a15348dd90fbe01e2f353b18790c47dd",
+          "at": "2026-07-26T09:23:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce6b0aa92f9f525dda1e08236d756f573ebfdb557b6c3fee410e4b838087a67c",
+          "at": "2026-07-26T10:12:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae1c4e91f8c841867350940cf111eb84d0c589929ac2cc92fca2dfa87aede890",
+          "at": "2026-07-26T11:06:01Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:66c1bb19af42ec729b5ad27871aeb1ed88e7cda4c298be7b1ddaa6ad4a33b2e8",
+          "at": "2026-07-26T07:22:58Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 embeds an operational resolver command, output contract, and exhaustive fail-closed validation behavior. This obscures the architectural decision; delegate these implementation/schema details to the capability or harness contract and retain only the ownership/discovery decision.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+              "line": 182,
+              "category": "decision obscured by excess detail"
+            },
+            {
+              "message": "D6 specifies dispatcher entrypoint mechanics, outcome-specific payload wiring, host/provider delegation behavior, and prohibited alternate paths. This is workflow/capability contract detail that obscures the decision and should be delegated to the relevant SSoT.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+              "line": 216,
+              "category": "decision obscured by excess detail"
+            },
+            {
+              "message": "D10 prescribes template smoke checks, dead-reference detection exclusions, historical-path exemptions, and review-based enforcement. These are operational gate and workflow rules rather than the architectural decision, so they should be removed or delegated to the relevant harness/review SSoT.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+              "line": 318,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:ef82da4637235a25b71dedcd8da6afb79155b1429b889174c62d88513cd3293d",
+          "at": "2026-07-25T18:19:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d53babc0228fe679d7ffdfaf69f976588a2a3bf4f058e36e1bdc23fcf628030",
+          "at": "2026-07-25T18:45:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 mandates one directory-level `overlay` classification and explicitly rejects `exclude` because it cannot supply overlay content, but its closing summary says the replacement is directory `exclude` + overlay. These instructions are incompatible and could cause the initial conventions to be omitted. Change the summary to directory `overlay` or otherwise align it with the preceding decision.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+              "line": 109,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "The Negative consequence still embeds the dispatcher outcome identifiers `executed` and `delegate-in-host` in an operational conformance-test prescription. This is precisely the mechanism detail the accepted repair delegates away and it obscures the provider-neutral D6 decision. Retain the requirement for both external execution and in-host delegation, but remove the concrete outcome names and test-wiring terminology.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+              "line": 395,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:7d53babc0228fe679d7ffdfaf69f976588a2a3bf4f058e36e1bdc23fcf628030",
+          "at": "2026-07-25T18:49:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:acc50369797a7197797b856cac729eaf92a4a6078939c3bc98552888ae5048c7",
+          "at": "2026-07-25T18:55:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:acc50369797a7197797b856cac729eaf92a4a6078939c3bc98552888ae5048c7",
+          "at": "2026-07-25T18:57:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42b4f6cc56ae53c2d62876ef99e82479f96e98035e52e7dda533052eecf3cd17",
+          "at": "2026-07-26T03:23:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42b4f6cc56ae53c2d62876ef99e82479f96e98035e52e7dda533052eecf3cd17",
+          "at": "2026-07-26T03:25:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:105f38ed745129ade57a91bea3c81703438169da84fdee2e390e312ca873becf",
+          "at": "2026-07-26T04:00:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56dae89d5b16f54bcb6b905f9e268580b9ff4299ef77d46bc526e7e4d09b73c0",
+          "at": "2026-07-26T04:32:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d979015324a16df45f9a0f6ae8f71db386c0a9463aaaf1ba00afd88f97aba3b",
+          "at": "2026-07-26T05:14:57Z"
         }
       ]
     },
@@ -339,146 +408,190 @@
           "findings": [],
           "hash": "rvw1:sha256:406fcf9105c948d1f45a9541e4fad8434fc9d85985c10794e71a75a274eaa4ae",
           "at": "2026-07-26T08:41:39Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
+        },
         {
-          "type": "fast",
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d841908d3084ab5e52a49ad574c74ab85870b86620aac6643b68aa25d2119aa",
+          "at": "2026-07-26T09:26:20Z"
+        },
+        {
+          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "D4 embeds an operational resolver command, output contract, and exhaustive fail-closed validation behavior. This obscures the architectural decision; delegate these implementation/schema details to the capability or harness contract and retain only the ownership/discovery decision.",
+              "message": "T002 restates IN-06/AC-06/AC-07 behavior and rationale in prose: verbatim preservation, the exact two rejected inputs, absence of normalization, and why `CapabilityName` cannot be reused. Per `knowledge/conventions/no-upstream-restatement.md`, retain the target symbols and operations but replace these behavioral explanations with anchor citations.",
               "severity": "P1",
-              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 repeats the exact-match contract by specifying whole-value equality and explicitly prohibiting trim/case folding. This is more than the permitted short identifying phrase; cite IN-06/AC-06 instead of restating their behavior.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 17,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 restates AC-06/AC-07 semantics and their rationale through the verbatim/no-normalization rules, the three failure conditions, and the unique enforcement-point explanation. Reduce this to the codec targets and operations plus the existing anchors, as required by `no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
+              "line": 27,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section `resolver-usecase-core` explains the upstream exact-match contract with the padded `\" reviewer \"` example and why normalization would violate IN-06/AC-06. Plan sections may contain task structure and anchor citations, but must not reproduce upstream behavioral rationale; remove this explanation and retain only the task allocation.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/impl-plan.json",
               "line": 182,
-              "category": "decision obscured by excess detail"
-            },
-            {
-              "message": "D6 specifies dispatcher entrypoint mechanics, outcome-specific payload wiring, host/provider delegation behavior, and prohibited alternate paths. This is workflow/capability contract detail that obscures the decision and should be delegated to the relevant SSoT.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
-              "line": 216,
-              "category": "decision obscured by excess detail"
-            },
-            {
-              "message": "D10 prescribes template smoke checks, dead-reference detection exclusions, historical-path exemptions, and review-based enforcement. These are operational gate and workflow rules rather than the architectural decision, so they should be removed or delegated to the relevant harness/review SSoT.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
-              "line": 318,
-              "category": "decision obscured by excess detail"
+              "category": "upstream restatement"
             }
           ],
-          "hash": "rvw1:sha256:ef82da4637235a25b71dedcd8da6afb79155b1429b889174c62d88513cd3293d",
-          "at": "2026-07-25T18:19:31Z"
+          "hash": "rvw1:sha256:978f8188293d2b3c8e0a712fc1a7112ffcab804ab61828c2a13298b6405a2508",
+          "at": "2026-07-26T10:13:36Z"
         },
         {
-          "type": "fast",
+          "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7d53babc0228fe679d7ffdfaf69f976588a2a3bf4f058e36e1bdc23fcf628030",
-          "at": "2026-07-25T18:45:33Z"
+          "hash": "rvw1:sha256:c80a80b2a3120b92a9a2c37b4ced9644247d3ff521dda6109845b9af26acad13",
+          "at": "2026-07-26T10:30:40Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::ConventionsCommand.docs` repeats IN-06/AC-09’s whitespace rejection and no-registration behavior in prose. Per `no-upstream-restatement.md`, retain only the changed symbol/operation and rely on `spec_refs` for that contract.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli-types.json",
+              "line": 69,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`cli::ConventionsCommand::Resolve` orders its mirror fields as `capability, project_root`, while `cli_driver::ConventionResolveInput` and `usecase::ResolveConventionsQuery` use `project_root, capability`. No language-level constraint documents the divergence; align this command/input mirror chain.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli-types.json",
+              "line": 131,
+              "category": "mirror chain divergence"
+            },
+            {
+              "message": "The docs for `cli_driver::CapabilityNameArg`, `cli_driver::ConventionResolveDriver`, `cli_driver::ConventionResolveInput`, and `cli_driver::ConventionShippingCheckDriver` reproduce upstream validation, empty-result, fail-closed, rendering, and shipping-check behavior. Replace those paraphrases with concise symbol/operation descriptions plus the existing anchors, retaining only local adapter-design rationale.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli_driver-types.json",
+              "line": 106,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `infrastructure::conventions_resolve::parse_convention_front_matter`, `infrastructure::conventions_resolve::scan_convention_requirements`, `infrastructure::template_conventions::list_convention_documents`, `infrastructure::CapabilityIdField`, and `infrastructure::ConventionFrontMatterDto` restate AC-07/AC-08/AC-18 failure and empty-state contracts. Reference those anchors instead of duplicating their behavior in catalogue prose.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `usecase::conventions_resolve::select_required_conventions`, `usecase::template_conventions::select_unsupplied_conventions`, `usecase::ConventionInventoryPort`, `usecase::ConventionRequirementPort`, and `usecase::ConventionResolveService` reproduce exact-match, ordering, empty-result, one-way comparison, failure, and no-write behavior from the spec. Reduce them to downstream type/operation descriptions and anchor references.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::ConventionInventoryPort::list_conventions` and `usecase::ConventionRequirementPort::scan_requirements` are synchronous contracts for filesystem tree walking and file reads, but neither entry acknowledges why blocking I/O is intentional. Declare the appropriate async color or document the deliberate synchronous CLI boundary.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 468,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "The docs for `usecase::CapabilityExecError`, `usecase::CapabilityExecInteractor`, `usecase::CapabilityName`, and `usecase::DisciplineText` reproduce IN-06/IN-07, AC-09–AC-12, and CN-05 behavior such as execution ordering, both dispatch routes, and prohibition of re-resolution. Replace the duplicated contract with anchor citations while retaining type-local rationale.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 621,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `usecase::ConventionRequirement`, `usecase::ConventionResolution`, `usecase::ConventionResolveError`, `usecase::ConventionResolveInteractor`, `usecase::ConventionShippingCheckError`, `usecase::ConventionShippingVerdict`, and `usecase::ResolveConventionsQuery` restate AC-06–AC-09/AC-18 behavior, including complete failure lists and normal-empty states. Keep the structural/type rationale, but refer to the existing anchors for behavioral details.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 1044,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::ConventionShippingCheckError::DocumentPathRejected.source` accepts the entire `ConventionResolveError`, admitting impossible states such as `FrontMatterUnparseable` or `DocumentUnreadable` even though the shipping inventory reads no contents and can only fail path validation here. Use a path-specific error or payload so those states are unrepresentable.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 1275,
+              "category": "state-shape smell"
+            }
+          ],
+          "hash": "rvw1:sha256:989eba9bb04151e45ec82494b45bbb41b0d65dfeaae3c880114b811264696f5c",
+          "at": "2026-07-26T07:32:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8786fbceffe0cb5ca416c19092206868ae4deef11ba7fb121e73a0f4588a00e3",
+          "at": "2026-07-26T07:58:05Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "D1 mandates one directory-level `overlay` classification and explicitly rejects `exclude` because it cannot supply overlay content, but its closing summary says the replacement is directory `exclude` + overlay. These instructions are incompatible and could cause the initial conventions to be omitted. Change the summary to directory `overlay` or otherwise align it with the preceding decision.",
+              "message": "`usecase::conventions_resolve::ConventionCapabilityId` と `ConventionCapabilityIdError` の docs は、D4／IN-06／AC-07 の許容・拒否契約（padded 値の許容、empty／whitespace-only だけの拒否、fail-closed リストが exhaustive であるため条件を追加できない理由）を散文で再記述しています。`no-upstream-restatement.md` に従い、newtype・bridge・配置・error shape のローカルな型設計根拠だけを残し、上流の挙動と理由は既存の anchor 参照に委ねてください。",
               "severity": "P1",
-              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
-              "line": 109,
-              "category": "inconsistent decisions within the same ADR"
-            },
-            {
-              "message": "The Negative consequence still embeds the dispatcher outcome identifiers `executed` and `delegate-in-host` in an operational conformance-test prescription. This is precisely the mechanism detail the accepted repair delegates away and it obscures the provider-neutral D6 decision. Retain the requirement for both external execution and in-host delegation, but remove the concrete outcome names and test-wiring terminology.",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
-              "line": 395,
-              "category": "decision obscured by excess detail"
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 1085,
+              "category": "upstream restatement"
             }
           ],
-          "hash": "rvw1:sha256:7d53babc0228fe679d7ffdfaf69f976588a2a3bf4f058e36e1bdc23fcf628030",
-          "at": "2026-07-25T18:49:41Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:acc50369797a7197797b856cac729eaf92a4a6078939c3bc98552888ae5048c7",
-          "at": "2026-07-25T18:55:29Z"
+          "hash": "rvw1:sha256:72e361584f80c8f824dcb48ec30a3c31067d4ba396933d75ec59aa864c081590",
+          "at": "2026-07-26T10:14:58Z"
         },
         {
           "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:acc50369797a7197797b856cac729eaf92a4a6078939c3bc98552888ae5048c7",
-          "at": "2026-07-25T18:57:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:42b4f6cc56ae53c2d62876ef99e82479f96e98035e52e7dda533052eecf3cd17",
-          "at": "2026-07-26T03:23:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:42b4f6cc56ae53c2d62876ef99e82479f96e98035e52e7dda533052eecf3cd17",
-          "at": "2026-07-26T03:25:51Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::conventions_resolve::ConventionCapabilityId` declares its constructor the single enforcement owner for AC-07’s blank-identifier condition, while `infrastructure::conventions_resolve::ConventionFrontMatterDto` also calls `into_requirement` the single enforcing site. The DTO only invokes the constructor and maps `ConventionCapabilityIdError` to the document-aware resolver error; describe it as the single mapping/conversion site so validation has exactly one declared owner.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+              "line": 234,
+              "category": "enforcement-owner contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a38106d3b8495f3562658e7973a542dd5a7c89828cf5d0c51b321ea024f4f20c",
+          "at": "2026-07-26T10:31:12Z"
         },
         {
           "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:105f38ed745129ade57a91bea3c81703438169da84fdee2e390e312ca873becf",
-          "at": "2026-07-26T04:00:38Z"
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::conventions_resolve::ConventionCapabilityId` は `try_new` を AC-07 の blank-identifier 条件の「single enforcing site」としていますが、`infrastructure::conventions_resolve::ConventionFrontMatterDto` も `into_requirement` を同じ条件の「single enforcing site」としています。単一の fail-closed rule に二つの owner が宣言されています。`try_new` を検証 owner、`into_requirement` を `ConventionResolveError::EmptyCapabilityId` への mapping／文書情報付加 site とするなど、責務を一意にしてください。",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+              "line": 234,
+              "category": "enforcement-owner contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a38106d3b8495f3562658e7973a542dd5a7c89828cf5d0c51b321ea024f4f20c",
+          "at": "2026-07-26T10:31:47Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:56dae89d5b16f54bcb6b905f9e268580b9ff4299ef77d46bc526e7e4d09b73c0",
-          "at": "2026-07-26T04:32:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7d979015324a16df45f9a0f6ae8f71db386c0a9463aaaf1ba00afd88f97aba3b",
-          "at": "2026-07-26T05:14:57Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d1fabd0b486d7d11a3e8c08f3825da08f5661e2d17441480c94f2a08fbda6b78",
-          "at": "2026-07-26T07:21:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d8e933b4dbd8f05a9ea40997a7d833950b212250175a61fbdde2d2c7bbee1a58",
-          "at": "2026-07-26T08:57:23Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:66c1bb19af42ec729b5ad27871aeb1ed88e7cda4c298be7b1ddaa6ad4a33b2e8",
-          "at": "2026-07-26T07:22:58Z"
+          "hash": "rvw1:sha256:ba478df54f9527318e8e31482f5875bf6710d6e54ed157c01d28d6753920a7e8",
+          "at": "2026-07-26T10:44:31Z"
         }
       ]
     },
@@ -679,6 +792,45 @@
           "findings": [],
           "hash": "rvw1:sha256:0bc369477dffa2dbc9423868fdc4134561449e98803ac397fbf3e512cb360e67",
           "at": "2026-07-26T05:08:35Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d1fabd0b486d7d11a3e8c08f3825da08f5661e2d17441480c94f2a08fbda6b78",
+          "at": "2026-07-26T07:21:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8e933b4dbd8f05a9ea40997a7d833950b212250175a61fbdde2d2c7bbee1a58",
+          "at": "2026-07-26T08:57:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2f9122d87b1c0d18d8546e6762ec530fcbf6858f3c6ea42c8f2f931296e90021",
+          "at": "2026-07-26T09:23:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2083d23210a7311d553aca58901d6c2b8e112375005917b0755c30555c1bf4e2",
+          "at": "2026-07-26T10:10:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bca2ae803f3e5742b6807467e7c97e1632fea978951d61811369feda38563f71",
+          "at": "2026-07-26T11:06:00Z"
         }
       ]
     }

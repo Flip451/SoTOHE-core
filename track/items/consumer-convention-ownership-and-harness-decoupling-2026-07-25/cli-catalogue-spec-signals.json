@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "6afe494b827c76638256d9ba8a82b91de6e4f59da325c1f903e4b0e11fbf558d",
+  "catalogue_declaration_hash": "106e9adf61de17b5d5df112a06d9a484b5a8ec656720864c736888c814c496ee",
   "signals": [
     {
       "type_name": "ConventionsCommand",
       "signal": "blue",
-      "entry_hash": "62de1de6738069e2420de696c9fa97c45fad000ab4e3ed1bc1e6ece65a141968"
+      "entry_hash": "d99d6998a1f66fb369d6ea9fd34f9be7469c0d3520285e17be39e0f771080c10"
     },
     {
       "type_name": "TemplateCommand",

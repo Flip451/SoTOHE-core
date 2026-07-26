@@ -8,10 +8,11 @@
       { "layer": "usecase", "entry_key": "ConventionResolveError" }
     ],
     "T002": [
+      { "layer": "usecase", "entry_key": "ConventionCapabilityId" },
+      { "layer": "usecase", "entry_key": "ConventionCapabilityIdError" },
       { "layer": "usecase", "entry_key": "ConventionRequirement" },
       { "layer": "usecase", "entry_key": "ConventionResolution" },
-      { "layer": "usecase", "entry_key": "ResolveConventionsQuery" },
-      { "layer": "usecase", "entry_key": "CapabilityName" }
+      { "layer": "usecase", "entry_key": "ResolveConventionsQuery" }
     ],
     "T003": [
       { "layer": "usecase", "entry_key": "ConventionRequirementPort" },
@@ -31,9 +32,9 @@
       { "layer": "infrastructure", "entry_key": "infrastructure::conventions_resolve::scan_convention_requirements" }
     ],
     "T007": [
+      { "layer": "cli_driver", "entry_key": "ConventionCapabilityIdArg" },
       { "layer": "cli_driver", "entry_key": "ConventionResolveInput" },
-      { "layer": "cli_driver", "entry_key": "ConventionResolveDriver" },
-      { "layer": "cli_driver", "entry_key": "CapabilityNameArg" }
+      { "layer": "cli_driver", "entry_key": "ConventionResolveDriver" }
     ],
     "T008": [
       { "layer": "cli", "entry_key": "ConventionsCommand" },
@@ -43,6 +44,7 @@
     "T009": [
       { "layer": "usecase", "entry_key": "DisciplineText" },
       { "layer": "usecase", "entry_key": "CapabilityExecError" },
+      { "layer": "usecase", "entry_key": "CapabilityName" },
       { "layer": "usecase", "entry_key": "CapabilityFailureDetail" },
       { "layer": "usecase", "entry_key": "CapabilityFilePath" }
     ],

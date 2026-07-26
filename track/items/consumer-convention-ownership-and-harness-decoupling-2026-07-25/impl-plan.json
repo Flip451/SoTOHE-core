@@ -4,26 +4,27 @@
     {
       "id": "T001",
       "description": "`libs/usecase/src/conventions_resolve/` を新設し、`ConventionDocumentPath`、その構築失敗型 `ConventionDocumentPathError`、`ConventionResolveError` を実装する。`ConventionDocumentPathError` の発生元は `ConventionDocumentPath::try_new` に限定し、`ConventionResolveError::DocumentPathOutsideRoot` はそれを `source` として合成する。T025 の `ConventionShippingCheckError` も同じ失敗型を合成するため、この task は resolver slice と非出荷検査 slice の共通上流になる。Size estimate — usecase: ~120 prod + ~155 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#AC-06`, `#AC-07`.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "c615cfcbd6c8847913a37af629f60851bff2c727"
     },
     {
       "id": "T002",
-      "description": "`ConventionRequirement`、`ConventionResolution`、`ResolveConventionsQuery` を実装する。capability 識別子は既存の `CapabilityName` を非空検証のみで再利用する。Size estimate — usecase: ~110 prod + ~140 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#IN-06`, `#AC-06`, `#AC-08`, `#AC-09`.",
-      "status": "todo"
+      "description": "`ConventionRequirement`、`ConventionResolution`、`ResolveConventionsQuery` に加えて、照合語としての capability 識別子 `ConventionCapabilityId` とその構築失敗型 `ConventionCapabilityIdError`(単一 unit variant `Blank`) を実装する。`ConventionRequirement::new` / `requires` と `ResolveConventionsQuery.capability` は照合の両辺を `ConventionCapabilityId` で受ける retype として行い、`CapabilityName` からの一方向 bridge `From<&CapabilityName>` を同 task で実装する(逆変換は作らない)。この 2 型と対応する test は `libs/usecase/src/conventions_resolve/capability_id.rs` に置き、`mod.rs` から `pub use` で再公開する: catalogue が宣言する module path `conventions_resolve` を保ったまま `mod.rs` を `architecture-rules.json` の `module_limits.max_lines` 内に収めるためで、既存行の移動は伴わない。Size estimate — usecase: ~160 prod + ~265 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#IN-06`, `#AC-06`, `#AC-07`, `#AC-08`, `#AC-09`.",
+      "status": "done"
     },
     {
       "id": "T003",
-      "description": "driven port `ConventionRequirementPort` と純関数 `select_required_conventions` を実装する。port の contract obligation と関数の logic obligation を同一 task で果たし、filesystem 入力を使わずにテストする。Size estimate — usecase: ~60 prod + ~200 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#AC-06`, `#AC-08`.",
+      "description": "driven port `ConventionRequirementPort` と、照合語 `&ConventionCapabilityId` を受け取る純関数 `select_required_conventions` を実装する。port の contract obligation と関数の logic obligation を同一 task で果たし、filesystem 入力を使わずにテストする。実装と test は `libs/usecase/src/conventions_resolve/` 配下の sibling module に置き、`mod.rs` から再公開して catalogue が宣言する module path `conventions_resolve` を保ったまま `module_limits.max_lines` 内に収める(T002 と同じ形)。Size estimate — usecase: ~60 prod + ~200 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#AC-06`, `#AC-08`.",
       "status": "todo"
     },
     {
       "id": "T004",
-      "description": "primary port `ConventionResolveService` と `ConventionResolveInteractor` を実装し、注入された `ConventionRequirementPort` の結果を `select_required_conventions` へ委譲する形に配線する。両者の result obligation を fake port で果たす。Size estimate — usecase: ~70 prod + ~210 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#AC-06`, `#AC-08`.",
+      "description": "primary port `ConventionResolveService` と `ConventionResolveInteractor` を実装し、注入された `ConventionRequirementPort` の結果を `select_required_conventions` へ委譲する形に配線する。両者の result obligation を fake port で果たす。実装と test は `libs/usecase/src/conventions_resolve/` 配下の sibling module に置き、`mod.rs` から再公開して module path `conventions_resolve` を保ったまま `module_limits.max_lines` 内に収める(T002・T003 と同じ形)。Size estimate — usecase: ~70 prod + ~210 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#AC-06`, `#AC-08`.",
       "status": "todo"
     },
     {
       "id": "T005",
-      "description": "`libs/infrastructure/src/conventions_resolve/` に `CapabilityIdField`、`ConventionFrontMatterDto`、`parse_convention_front_matter` を実装し、既存の crate 内 front-matter block reader を再利用する。AC-07 の 5 条件のうち YAML 解析不能・`required_for` 非文字列配列・空 capability ID の 3 件をこの codec が所有する。Size estimate — infrastructure: ~140 prod + ~230 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#AC-06`, `#AC-07`, `#AC-08`.",
+      "description": "`libs/infrastructure/src/conventions_resolve/` に `CapabilityIdField`、`ConventionFrontMatterDto`、`parse_convention_front_matter` を実装し、既存の crate 内 front-matter block reader を再利用する。AC-07 の 5 条件のうち YAML 解析不能・`required_for` 非文字列配列・空 capability ID の 3 件をこの codec が所有する。`CapabilityIdField` は wire text を `ConventionCapabilityId::try_new` へ渡し、`ConventionFrontMatterDto::into_requirement` が `ConventionCapabilityIdError` を、文書名を補って `ConventionResolveError::EmptyCapabilityId` へ写す。Size estimate — infrastructure: ~140 prod + ~230 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#AC-06`, `#AC-07`, `#AC-08`.",
       "status": "todo"
     },
     {
@@ -33,12 +34,12 @@
     },
     {
       "id": "T007",
-      "description": "`apps/cli-driver/src/conventions_resolve/` に `ConventionResolveInput` と `ConventionResolveDriver` を追加し、境界 mirror は既存の `CapabilityNameArg` を再利用する。`ConventionResolveDriver` に機械可読出力と人間向け表示の 2 つの render 経路を実装する。Size estimate — cli_driver: ~95 prod + ~140 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#IN-06`, `#AC-06`, `#AC-08`, `#AC-09`.",
+      "description": "`apps/cli-driver/src/conventions_resolve/` に `ConventionResolveInput` と `ConventionResolveDriver` を追加し、境界 mirror `ConventionCapabilityIdArg` を `capability::CapabilityNameArg` の sibling として同 module に新設する(共有 mirror である `CapabilityNameArg` は `capability exec` と共用のため retype しない)。`ConventionCapabilityIdArg` は `FromStr` で `ConventionCapabilityId` を構築して private field に保持し、非空不変条件を parse 時に一度だけ確立する。`ConventionResolveDriver` に機械可読出力と人間向け表示の 2 つの render 経路を実装する。Size estimate — cli_driver: ~130 prod + ~185 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#IN-06`, `#AC-06`, `#AC-08`, `#AC-09`.",
       "status": "todo"
     },
     {
       "id": "T008",
-      "description": "`ConventionsCommand` に `Resolve` variant を追加して `bin/sotp conventions resolve --capability <id>` を公開し、`ConventionsCompositionRoot` に `conventions_resolve_driver` accessor を追加して `FsConventionRequirementAdapter` → `ConventionResolveInteractor` → `ConventionResolveDriver` を配線する。Size estimate — cli: ~45 prod + ~60 test lines; cli_composition: ~20 prod + ~30 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#IN-06`, `#AC-06`, `#AC-09`.",
+      "description": "`ConventionsCommand` に `Resolve` variant を追加して `bin/sotp conventions resolve --capability <id>` を公開する。`capability` field は `cli_driver::conventions_resolve::ConventionCapabilityIdArg` で受け(`capability exec` が使う `CapabilityNameArg` ではない)、空識別子の拒否を parse 時に済ませる。あわせて`ConventionsCompositionRoot` に `conventions_resolve_driver` accessor を追加して `FsConventionRequirementAdapter` → `ConventionResolveInteractor` → `ConventionResolveDriver` を配線する。Size estimate — cli: ~45 prod + ~60 test lines; cli_composition: ~20 prod + ~30 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#IN-06`, `#AC-06`, `#AC-09`.",
       "status": "todo"
     },
     {
@@ -48,7 +49,7 @@
     },
     {
       "id": "T010",
-      "description": "`CapabilityExecInteractor` に `ConventionResolveService` を第 4 依存として注入し、`execute` の resolver 呼び出し位置と回数を AC-11 が要求する形に合わせて `DisciplineText` へ畳み込む。`apps/cli-composition/src/capability.rs` の配線も同 task で更新する。T009 の後に置く。Size estimate — usecase: ~50 prod + ~220 test lines; cli_composition: ~15 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-07`, `#AC-10`, `#AC-11`.",
+      "description": "`CapabilityExecInteractor` に `ConventionResolveService` を第 4 依存として注入し、`execute` の resolver 呼び出し位置と回数を AC-11 が要求する形に合わせて `DisciplineText` へ畳み込む。preflight query が名指す capability は `From<&CapabilityName>` で `ConventionCapabilityId` へ橋渡しする: これが lookup key から照合語への workspace 唯一の変換点である。`apps/cli-composition/src/capability.rs` の配線も同 task で更新する。T009 の後に置く。Size estimate — usecase: ~50 prod + ~220 test lines; cli_composition: ~15 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-07`, `#AC-10`, `#AC-11`.",
       "status": "todo"
     },
     {
@@ -166,7 +167,7 @@
     "summary": [
       "GO-01: T012-T032 (T025-T030 は非出荷検査の実装、T031 はその smoke 配線として GO-01 に属する)。GO-02: T001-T008. GO-03: T009-T011.",
       "Sizing basis: `.harness/config/review-scope.json` の `default_diff_ceiling_lines` を全 scope が継承する(per-group override なし)。scope は path 由来で、`libs/**` / `apps/**` は各 layer scope、`knowledge/conventions/**` と `.harness/**` と `CLAUDE.md` / `README.md` / `Makefile.toml` / `.claude/**` / `.codex/**` / `.agents/**` は harness-policy、`overlay/**` は other に落ちる。各 task の description に scope ごとの production + test 見積りを明示した。見積りは rename 検出が効かない数え方 (移動文書の全行を追加 + 削除として数える) を基準にしている。",
-      "Batching: ceiling は per review scope に効き、1 batch に複数 task を入れると同一 scope 分の diff が合算される。したがって全 scope を通じた規則として、同一 review scope を共有する 2 task を同一 batch に入れない。この規則の下では各 scope の batch diff が単一 task の見積りに一致し、T016 を除く全 task が ceiling 未満に収まる。個別 batch を要する同一 scope group は次の通り: usecase の T001-T004 (合算 1065、T001+T002 だけで 525)、T009-T011 (合算 665)、T025-T027 (合算 710); infrastructure の T005・T006・T028 (T005+T006 だけで 730); cli_driver の T007・T029; cli の T008・T030・T017; cli_composition の T008・T010・T030・T017; other の T021-T023 (T021+T022 だけで 710); harness-policy の T012-T020・T024・T031・T032。合算しても ceiling 未満に収まる組 (例: cli の T008+T030) も同じ規則で分ける。batch 編成のたびに合算値を計算し直す運用は誤りが混入しやすく、ceiling 逸脱は review が収束しない形でしか顕在化しないためである。review scope が 1 つも重ならない task 同士 (例: cli_driver の T007 と cli + cli_composition の T008) は同一 batch に入れてよい。",
+      "Batching: ceiling は per review scope に効き、1 batch に複数 task を入れると同一 scope 分の diff が合算される。したがって全 scope を通じた規則として、同一 review scope を共有する 2 task を同一 batch に入れない。この規則の下では各 scope の batch diff が単一 task の見積りに一致し、T016 を除く全 task が ceiling 未満に収まる。個別 batch を要する同一 scope group は次の通り: usecase の T001-T004 (合算 1240、T001+T002 だけで 700)、T009-T011 (合算 665)、T025-T027 (合算 710); infrastructure の T005・T006・T028 (T005+T006 だけで 730); cli_driver の T007・T029 (合算 550); cli の T008・T030・T017; cli_composition の T008・T010・T030・T017; other の T021-T023 (T021+T022 だけで 710); harness-policy の T012-T020・T024・T031・T032。合算しても ceiling 未満に収まる組 (例: cli の T008+T030) も同じ規則で分ける。batch 編成のたびに合算値を計算し直す運用は誤りが混入しやすく、ceiling 逸脱は review が収束しない形でしか顕在化しないためである。review scope が 1 つも重ならない task 同士 (例: cli_driver の T007 と cli + cli_composition の T008) は同一 batch に入れてよい。",
       "Dependencies: T001 → T002 → T003 → T004 は usecase 内の依存順。T005/T006 は T001-T004 の型に依存。T007 は T004、T008 は T006-T007 に依存。T009 → T010 → T011 の順で dispatcher 注入を確定させる。T012 は `.harness/policies` / `.harness/reference` の分類 entry を最初に導入するため文書移動群の先頭に置く。T013 → T014 → T015 → T032 の順で移動を積み、後続 task が先行 task の移動先 path 上の参照を書き換える。T016 は T018 より前。T024 は overlay 供給 (T021-T023) と移動 (T012-T017, T032) の完了後。非出荷検査は T025 → T026 → T027(usecase) → T028(infrastructure) → T029(cli_driver) → T030(cli + cli_composition) の順で積み、`ConventionDocumentPath` と `ConventionDocumentPathError` を共有するため T001 に依存する。T031 は T024 と T030 の双方の完了後に置く。",
       "移動と参照更新の結合: `bin/sotp verify doc-links` が検査するのは markdown link 形式の参照だけである。移動対象への link 形式参照は `.claude/rules/guardrails.md` の 1 箇所、移動対象どうしの相互 link 群、`no-backward-compat.md` と `workflow-ceremony-minimization.md` と `sot-reentry-sequencing.md` と `pre-track-adr-authoring.md` の Related Documents に限られる。そのため移動 task と参照更新 task を分けず、各移動 task が自分の移動対象への live reference を同一変更集合で更新する形にした。監査した参照面は `.harness/workflows/`、`.harness/capabilities/`、`.harness/custom/`、`.harness/briefings/`、`.harness/config/`、`.agents/`、`.claude/`、`.codex/`、top-level entry document、production source、test fixture、overlay、および source 側に残る convention 本文である。`track/items/**` / `track/archive/**` と既存 ADR / research note の旧 path は OUT-05 の対象として更新しない。",
       "移動文書自身の outbound 参照: 移動対象 13 文書の本文が持つ参照先を全件監査し、`.harness/config/template-boundary.json` の分類と初期 overlay 供給集合 (T021-T023) に照らして、移動後に export 側で解決できなくなる参照を洗い出した。該当は 8 件 — `adr.md` 1 件 (T012)、`track-lifecycle.md` 1 件 (T013)、`sot-reentry-sequencing.md` 2 件 (T014)、`pre-track-adr-authoring.md` 1 件 (T015)、`no-upstream-restatement.md` 1 件と `responsibility-boundary.md` 2 件 (T032) — で、いずれも参照先が `workflow-ceremony-minimization.md` または `enforce-by-mechanism.md` である。各件を移動元文書を運ぶ move task に割り当て、移動と同一変更集合で解消する形にした。`bash-write-guard.md`、`branch-strategy.md`、`git-notes.md`、`catalogue-schema-reference.md`、`review-protocol.md`、`task-completion-flow.md`、`impl-delegation-arch-guard.md` に該当参照はない。移動対象どうしの相互参照は各 move task の inbound 参照集合が既に所有しており、`knowledge/adr/README.md`・`track/registry.md`・`.claude/**`・`.harness/**` への参照先は出荷後も export 側に存在する。",
@@ -177,7 +178,8 @@
         "id": "resolver-usecase-core",
         "title": "Convention resolver: usecase core",
         "description": [
-          "path 検証 newtype と error 型 (T001)、走査結果・解決結果・query の値型 (T002)、driven port と純粋な選択関数 (T003)、primary port と interactor (T004) を段階的に積む。usecase scope 単独で 4 分割したのは、この slice の obligation 4 件がこの層に集中し production + test 合算が単一 task では ceiling を超えるため。",
+          "path 検証 newtype と error 型 (T001)、照合語識別子 `ConventionCapabilityId` とその失敗型・走査結果・解決結果・query の値型 (T002)、driven port と純粋な選択関数 (T003)、primary port と interactor (T004) を段階的に積む。usecase scope 単独で 4 分割したのは、この slice の obligation 4 件がこの層に集中し production + test 合算が単一 task では ceiling を超えるため。",
+          "照合語の識別子 `ConventionCapabilityId` とその失敗型は、依存する retype (`ConventionRequirement`・`ResolveConventionsQuery`) と同一変更集合にあるため新規 task を立てず T002 に吸収した。新規 2 型は `conventions_resolve/capability_id.rs` に置き、既存行を動かさない。",
           "IN-05, IN-06, AC-06 から AC-09。"
         ],
         "task_ids": [
@@ -203,7 +205,7 @@
         "id": "resolver-delivery",
         "title": "Convention resolver: CLI delivery surface",
         "description": [
-          "primary adapter (T007) と、subcommand 追加 + 合成根配線 (T008)。",
+          "primary adapter と境界 mirror `ConventionCapabilityIdArg` (T007)、subcommand 追加 + 合成根配線 (T008)。mirror は `capability exec` と共用の `CapabilityNameArg` を retype せず sibling として新設する — 照合契約を持たない command の受理値を変えないため。",
           "IN-05, IN-06, AC-06, AC-08, AC-09。"
         ],
         "task_ids": [

@@ -3,7 +3,31 @@
   "layer": "cli_driver",
   "entries": [
     {
-      "claim_hash": "39c7e46477695ec9cb0f72c5d7e507272a5d8f589aed31d4f342fbc3c4626de8",
+      "claim_hash": "715c4020399df5c783271608cc8813b70247e18842f39402ebfa7c55639fb35c",
+      "evidence_hash": "63e9be7c117f9eeb84db396f2bfb4fd38eab6798f16ec111cd2df8c4558f861f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "読み取り専用コマンド `bin/sotp conventions resolve --capability <capability-id>` を導入し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ConventionCapabilityIdArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "読み取り専用コマンド `bin/sotp conventions resolve --capability <capability-id>` を導入し、`knowledge/conventions/**/*.md` を走査して `required_for` の要素が指定 capability ID と完全一致する文書の repository-relative path を、重複なく安定順の機械可読な正本として返す。人間向け表示を持つ場合も同じ解決結果からレンダーする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "715c4020399df5c783271608cc8813b70247e18842f39402ebfa7c55639fb35c",
       "evidence_hash": "2e7e63ddcfadfcaa5712a69d6fc3f52a6825b6aeb3b7e35f56e99bb3cdeae3db",
       "verdict": {
         "kind": "pass",
@@ -14,7 +38,7 @@
         "data": {
           "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli_driver-types.json",
           "section_key": "types",
-          "entry_key": "CapabilityNameArg"
+          "entry_key": "ConventionCapabilityIdArg"
         }
       },
       "evidence_origin": {
@@ -23,6 +47,30 @@
           "section": "in_scope",
           "element_id": "IN-06",
           "text_label": "`required_for` の capability ID を非空文字列の完全一致だけで解決し、`.harness/capabilities/` や `agent-profiles.json` への登録有無を検証しない open-ended な値として扱う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "715c4020399df5c783271608cc8813b70247e18842f39402ebfa7c55639fb35c",
+      "evidence_hash": "decd39340e72acb94d6d3a285b7ed8fab04cd85ddff66dfaf30e0f50ef461b8f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/capabilities/` にも `agent-profiles.json` にも登録されていない非空 capability ID を指定した resolve が error にならず、その ID を `required_for` に持つ文書を解決結果として返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "ConventionCapabilityIdArg"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "`.harness/capabilities/` にも `agent-profiles.json` にも登録されていない非空 capability ID を指定した resolve が error にならず、その ID を `required_for` に持つ文書を解決結果として返す。"
         }
       }
     },
@@ -99,7 +147,7 @@
       }
     },
     {
-      "claim_hash": "30510b7acad2865ce99d94ff6854687e03d85387e309a63f796d9eeee0afa8a1",
+      "claim_hash": "ba8e91a1d8641d80b09652c3c12aa99c3aae4ebd94f95f6f5a7cf7f80fa9ceaf",
       "evidence_hash": "63e9be7c117f9eeb84db396f2bfb4fd38eab6798f16ec111cd2df8c4558f861f",
       "verdict": {
         "kind": "pass",
@@ -123,7 +171,7 @@
       }
     },
     {
-      "claim_hash": "30510b7acad2865ce99d94ff6854687e03d85387e309a63f796d9eeee0afa8a1",
+      "claim_hash": "ba8e91a1d8641d80b09652c3c12aa99c3aae4ebd94f95f6f5a7cf7f80fa9ceaf",
       "evidence_hash": "2e7e63ddcfadfcaa5712a69d6fc3f52a6825b6aeb3b7e35f56e99bb3cdeae3db",
       "verdict": {
         "kind": "pass",
@@ -147,7 +195,7 @@
       }
     },
     {
-      "claim_hash": "30510b7acad2865ce99d94ff6854687e03d85387e309a63f796d9eeee0afa8a1",
+      "claim_hash": "ba8e91a1d8641d80b09652c3c12aa99c3aae4ebd94f95f6f5a7cf7f80fa9ceaf",
       "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
       "verdict": {
         "kind": "pass",
@@ -171,7 +219,7 @@
       }
     },
     {
-      "claim_hash": "30510b7acad2865ce99d94ff6854687e03d85387e309a63f796d9eeee0afa8a1",
+      "claim_hash": "ba8e91a1d8641d80b09652c3c12aa99c3aae4ebd94f95f6f5a7cf7f80fa9ceaf",
       "evidence_hash": "decd39340e72acb94d6d3a285b7ed8fab04cd85ddff66dfaf30e0f50ef461b8f",
       "verdict": {
         "kind": "pass",

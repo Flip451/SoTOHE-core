@@ -35,7 +35,7 @@
     },
     "infrastructure::conventions_resolve::scan_convention_requirements": {
       "action": "add",
-      "docs": "Directory-scan seam: walks the convention tree read-only, builds a `ConventionDocumentPath` per file — which is where the path invariant is established rather than re-checked here — and hands each document's text to the codec. Single enforcing site of AC-07's unreadable-document condition. A `FreeFunction` (R2) and deliberately three seams apart from decoding and matching, so filesystem behaviour is testable without front-matter fixtures and neither neighbour can acquire a filesystem dependency. IN-05, AC-06.",
+      "docs": "Directory-scan seam: walks the convention tree read-only, builds a `ConventionDocumentPath` per file — that constructor decides the path rule, and this walk only lifts its rejection into `ConventionResolveError::DocumentPathOutsideRoot` — and hands each document's text to the codec. Single enforcing site of AC-07's unreadable-document condition. A `FreeFunction` (R2) and deliberately three seams apart from decoding and matching, so filesystem behaviour is testable without front-matter fixtures and neither neighbour can acquire a filesystem dependency. IN-05, AC-06.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -63,7 +63,7 @@
     },
     "infrastructure::template_conventions::list_convention_documents": {
       "action": "add",
-      "docs": "Tree-inventory seam: walks a tree's convention directory read-only and returns one `ConventionDocumentPath` per document, tree-relative so the exported tree and the overlay tree yield directly comparable identities rather than paths that must be normalised before comparison. Single enforcing site of all three `ConventionShippingCheckError` conditions. It reads no file contents and parses no front matter, which is what keeps a malformed document from turning a shipping question into a parse failure — and is why it does not reuse `scan_convention_requirements`, whose whole purpose is that decode. A `FreeFunction` (R2), separate from the set comparison for the same seam reason as the resolver's scan. IN-11, AC-18.",
+      "docs": "Tree-inventory seam: walks a tree's convention directory read-only and returns one `ConventionDocumentPath` per document, tree-relative so the exported tree and the overlay tree yield directly comparable identities rather than paths that must be normalised before comparison. Single enforcing site of the two tree-access conditions, `ConventionRootMissing` and `TreeUnreadable`; the third, `DocumentPathRejected`, it only lifts — `ConventionDocumentPath::try_new` decides the path rule, and what this walk adds is the `tree_root` that constructor is never told, since the same document path can be rejected while inventorying either tree. It reads no file contents and parses no front matter, which is what keeps a malformed document from turning a shipping question into a parse failure — and is why it does not reuse `scan_convention_requirements`, whose whole purpose is that decode. A `FreeFunction` (R2), separate from the set comparison for the same seam reason as the resolver's scan. IN-11, AC-18.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
@@ -199,7 +199,7 @@
   "types": {
     "CapabilityIdField": {
       "action": "add",
-      "docs": "Deserializable serde-boundary mirror of one `required_for` element — the R9 mirror-type pattern, since the validated capability identifier is a serde-free usecase value. Keeping the wire value a distinct type is what lets the two AC-07 conditions it sits between stay separately observable: a non-string element fails as a serde shape error, an empty element fails at conversion, whereas a raw `String` would collapse both into one untyped parse failure. Its single field holds unvalidated wire text and is never exposed, so no caller can mistake it for a validated identifier. AC-06, AC-09.",
+      "docs": "Deserializable serde-boundary mirror of one `required_for` element — the R9 mirror-type pattern, since the validated capability identifier is a serde-free usecase value. Keeping the wire value a distinct type is what lets the two AC-07 conditions it sits between stay separately observable: a non-string element fails as a serde shape error here, an empty element fails later when `into_requirement` hands the text to `ConventionCapabilityId::try_new`, whereas a raw `String` would collapse both into one untyped parse failure. Its single field holds unvalidated wire text and is never exposed, so no caller can mistake it for a validated identifier. That text reaches `ConventionCapabilityId::try_new` exactly as the document spelled it: this adapter performs no trimming or case folding of its own, because any normalisation here would silently decide matches that the usecase comparison is supposed to decide. AC-06, AC-09.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -231,7 +231,7 @@
     },
     "ConventionFrontMatterDto": {
       "action": "add",
-      "docs": "Serde view of a convention document's YAML front matter, carrying only the optional `required_for` list of `CapabilityIdField` mirrors. Unknown keys are tolerated by design, because consumer documents own their own metadata and this codec has no business rejecting fields it does not read. Its `Default` value is also what a document with no front-matter block decodes to, so AC-08's two absent-metadata states share one representation and no caller has to distinguish them. `into_requirement` is the single enforcing site of AC-07's empty-identifier condition, placed on the DTO because that is where the unvalidated elements are held. AC-06.",
+      "docs": "Serde view of a convention document's YAML front matter, carrying only the optional `required_for` list of `CapabilityIdField` mirrors. Unknown keys are tolerated by design, because consumer documents own their own metadata and this codec has no business rejecting fields it does not read. Its `Default` value is also what a document with no front-matter block decodes to, so AC-08's two absent-metadata states share one representation and no caller has to distinguish them. `into_requirement` does not decide the empty-identifier condition — `ConventionCapabilityId::try_new` is its enforcing site, and this method has no way to produce an identifier except by calling it. What the method owns is the translation: it maps each element's `ConventionCapabilityIdError` onto `ConventionResolveError::EmptyCapabilityId` and supplies the document, which that constructor is never handed. The conversion lives on the DTO rather than in the directory scan because this is where the unvalidated elements are held, and it takes `self` by value so no caller can keep them once the validated requirement exists. AC-06.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",

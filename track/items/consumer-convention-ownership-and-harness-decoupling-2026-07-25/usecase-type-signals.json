@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T08:55:35Z",
-  "declaration_hash": "dba3aa5c63394d571c9c9031f445a23d47b7e9bff51d106dd481897d141dafa6",
-  "implementation_input_hash": "ef441558584eba54126c98b263960553e4f57b0b113cd8aae68f3f465507590e",
+  "generated_at": "2026-07-26T11:04:29Z",
+  "declaration_hash": "0cbeb49612e024ab862faa7d010da3f628ddc7ccc3f34c6b7df42c27bbfe3356",
+  "implementation_input_hash": "28cfe9300ac3f0d3555616d5aff773e527c5c2f2c67c56d1512648f76b566754",
   "signals": [
     {
       "type_name": "CapabilityExecError",
@@ -34,6 +34,31 @@
         "Debug",
         "Eq",
         "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ConventionCapabilityId",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "From<&CapabilityName>",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ConventionCapabilityIdError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
       ]
     },
     {
@@ -71,9 +96,9 @@
     {
       "type_name": "ConventionRequirement",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -89,9 +114,9 @@
     {
       "type_name": "ConventionResolution",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Default",
@@ -178,9 +203,9 @@
     {
       "type_name": "ResolveConventionsQuery",
       "kind_tag": "query",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",

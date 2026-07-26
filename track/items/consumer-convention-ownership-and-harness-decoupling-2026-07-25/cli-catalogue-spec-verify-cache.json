@@ -3,7 +3,7 @@
   "layer": "cli",
   "entries": [
     {
-      "claim_hash": "62de1de6738069e2420de696c9fa97c45fad000ab4e3ed1bc1e6ece65a141968",
+      "claim_hash": "d99d6998a1f66fb369d6ea9fd34f9be7469c0d3520285e17be39e0f771080c10",
       "evidence_hash": "63e9be7c117f9eeb84db396f2bfb4fd38eab6798f16ec111cd2df8c4558f861f",
       "verdict": {
         "kind": "pass",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "62de1de6738069e2420de696c9fa97c45fad000ab4e3ed1bc1e6ece65a141968",
+      "claim_hash": "d99d6998a1f66fb369d6ea9fd34f9be7469c0d3520285e17be39e0f771080c10",
       "evidence_hash": "2e7e63ddcfadfcaa5712a69d6fc3f52a6825b6aeb3b7e35f56e99bb3cdeae3db",
       "verdict": {
         "kind": "pass",
@@ -51,7 +51,7 @@
       }
     },
     {
-      "claim_hash": "62de1de6738069e2420de696c9fa97c45fad000ab4e3ed1bc1e6ece65a141968",
+      "claim_hash": "d99d6998a1f66fb369d6ea9fd34f9be7469c0d3520285e17be39e0f771080c10",
       "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
       "verdict": {
         "kind": "pass",
@@ -75,7 +75,7 @@
       }
     },
     {
-      "claim_hash": "62de1de6738069e2420de696c9fa97c45fad000ab4e3ed1bc1e6ece65a141968",
+      "claim_hash": "d99d6998a1f66fb369d6ea9fd34f9be7469c0d3520285e17be39e0f771080c10",
       "evidence_hash": "decd39340e72acb94d6d3a285b7ed8fab04cd85ddff66dfaf30e0f50ef461b8f",
       "verdict": {
         "kind": "pass",

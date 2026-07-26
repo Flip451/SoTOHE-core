@@ -51,7 +51,7 @@
       }
     },
     {
-      "claim_hash": "81e621868aaf571659ffe694ccc3df307f826a4048641912667064eaa887a41c",
+      "claim_hash": "219640a86601cf16ca45ff73fcc93d39b6b3432bc0fce96d1e26d0a65fab5457",
       "evidence_hash": "7c2e11d3f81713d0229ff327beceffeb494c5078be5f829a8b7ff8c16a2e4931",
       "verdict": {
         "kind": "pass",
@@ -75,11 +75,11 @@
       }
     },
     {
-      "claim_hash": "81e621868aaf571659ffe694ccc3df307f826a4048641912667064eaa887a41c",
+      "claim_hash": "219640a86601cf16ca45ff73fcc93d39b6b3432bc0fce96d1e26d0a65fab5457",
       "evidence_hash": "ee0c03a0963c156547028e87af734df048ea4d40a636f953742c83e87e7c4a7a",
       "verdict": {
         "kind": "pass",
-        "citation": "`CAPABILITY_EXEC_OUTCOME: executed` では解決した規約 path と全文書を読む義務が provider の実行入力に含まれ、`CAPABILITY_EXEC_OUTCOME: delegate-in-host` では同じ義務が返却 payload の `discipline` に含まれる"
+        "citation": "`CAPABILITY_EXEC_OUTCOME: executed` では解決した規約 path と全文書を読む義務が provider の実行入力に含まれ、`CAPABILITY_EXEC_OUTCOME: delegate-in-host` では同じ義務が返却 payload の `discipline` に含まれることを、両経路それぞれについて確認できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -99,7 +99,7 @@
       }
     },
     {
-      "claim_hash": "81e621868aaf571659ffe694ccc3df307f826a4048641912667064eaa887a41c",
+      "claim_hash": "219640a86601cf16ca45ff73fcc93d39b6b3432bc0fce96d1e26d0a65fab5457",
       "evidence_hash": "e4c9e396f5f20f27d9e0049259cdfdb485e6036d513d12972d400f5145120f5c",
       "verdict": {
         "kind": "pass",
@@ -123,7 +123,7 @@
       }
     },
     {
-      "claim_hash": "81e621868aaf571659ffe694ccc3df307f826a4048641912667064eaa887a41c",
+      "claim_hash": "219640a86601cf16ca45ff73fcc93d39b6b3432bc0fce96d1e26d0a65fab5457",
       "evidence_hash": "8206931c895d18e648b174e93135997caa9e9013621c3f0a5285780bb63f2363",
       "verdict": {
         "kind": "pass",
@@ -195,11 +195,11 @@
       }
     },
     {
-      "claim_hash": "6f264a6c6029af426af266877a440670e1235d8c90a805b5ad6e067d9a2dab97",
-      "evidence_hash": "2e7e63ddcfadfcaa5712a69d6fc3f52a6825b6aeb3b7e35f56e99bb3cdeae3db",
+      "claim_hash": "be1baf8ee17fa11b1516763d9bf7edcce59cbdb624ced539ae8d9087740b5075",
+      "evidence_hash": "7c2e11d3f81713d0229ff327beceffeb494c5078be5f829a8b7ff8c16a2e4931",
       "verdict": {
         "kind": "pass",
-        "citation": "`required_for` の capability ID を非空文字列の完全一致だけで解決し、`.harness/capabilities/` や `agent-profiles.json` への登録有無を検証しない open-ended な値として扱う。"
+        "citation": "対象 capability ID で resolver を一度だけ実行し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -213,8 +213,8 @@
         "kind": "spec_element",
         "data": {
           "section": "in_scope",
-          "element_id": "IN-06",
-          "text_label": "`required_for` の capability ID を非空文字列の完全一致だけで解決し、`.harness/capabilities/` や `agent-profiles.json` への登録有無を検証しない open-ended な値として扱う。"
+          "element_id": "IN-07",
+          "text_label": "`bin/sotp capability exec <capability> --host <host> --briefing-file <path>` が実行主体を決定する前に対象 capability ID で resolver を一度だけ実行し、解決した規約 path と全文書を読む義務を、`executed` では provider prompt／実行入力へ注入し、`delegate-in-host` では返却 payload の `discipline` に含める。"
         }
       }
     },
@@ -267,7 +267,127 @@
       }
     },
     {
-      "claim_hash": "a951e7236de0037e508259e0edfc72df6cea233dbd1e2168b362574ab5cf1572",
+      "claim_hash": "0b58e3919a14cedc9a39e440d8a40f74d5156eb9bc22ac79b83e9133f0a1120e",
+      "evidence_hash": "2e7e63ddcfadfcaa5712a69d6fc3f52a6825b6aeb3b7e35f56e99bb3cdeae3db",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`required_for` の capability ID を非空文字列の完全一致だけで解決し、`.harness/capabilities/` や `agent-profiles.json` への登録有無を検証しない open-ended な値として扱う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ConventionCapabilityId"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "`required_for` の capability ID を非空文字列の完全一致だけで解決し、`.harness/capabilities/` や `agent-profiles.json` への登録有無を検証しない open-ended な値として扱う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0b58e3919a14cedc9a39e440d8a40f74d5156eb9bc22ac79b83e9133f0a1120e",
+      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ConventionCapabilityId"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0b58e3919a14cedc9a39e440d8a40f74d5156eb9bc22ac79b83e9133f0a1120e",
+      "evidence_hash": "decd39340e72acb94d6d3a285b7ed8fab04cd85ddff66dfaf30e0f50ef461b8f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`.harness/capabilities/` にも `agent-profiles.json` にも登録されていない非空 capability ID を指定した resolve が error にならず、その ID を `required_for` に持つ文書を解決結果として返す。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ConventionCapabilityId"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "`.harness/capabilities/` にも `agent-profiles.json` にも登録されていない非空 capability ID を指定した resolve が error にならず、その ID を `required_for` に持つ文書を解決結果として返す。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d24945ab1aa520a9612bc09ca4d88c89f87a80deeafde78704d5cdb39a38647a",
+      "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`required_for` に空文字または空白だけの capability ID がある場合"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ConventionCapabilityIdError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d24945ab1aa520a9612bc09ca4d88c89f87a80deeafde78704d5cdb39a38647a",
+      "evidence_hash": "2e7e63ddcfadfcaa5712a69d6fc3f52a6825b6aeb3b7e35f56e99bb3cdeae3db",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`required_for` の capability ID を非空文字列の完全一致だけで解決し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ConventionCapabilityIdError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-06",
+          "text_label": "`required_for` の capability ID を非空文字列の完全一致だけで解決し、`.harness/capabilities/` や `agent-profiles.json` への登録有無を検証しない open-ended な値として扱う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6b96a9d703cb42d56b87c75d7e46b4cf6b472c16b8afda622fc897f1d1849043",
       "evidence_hash": "63e9be7c117f9eeb84db396f2bfb4fd38eab6798f16ec111cd2df8c4558f861f",
       "verdict": {
         "kind": "pass",
@@ -291,7 +411,7 @@
       }
     },
     {
-      "claim_hash": "a951e7236de0037e508259e0edfc72df6cea233dbd1e2168b362574ab5cf1572",
+      "claim_hash": "6b96a9d703cb42d56b87c75d7e46b4cf6b472c16b8afda622fc897f1d1849043",
       "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
       "verdict": {
         "kind": "pass",
@@ -315,7 +435,7 @@
       }
     },
     {
-      "claim_hash": "a951e7236de0037e508259e0edfc72df6cea233dbd1e2168b362574ab5cf1572",
+      "claim_hash": "6b96a9d703cb42d56b87c75d7e46b4cf6b472c16b8afda622fc897f1d1849043",
       "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
       "verdict": {
         "kind": "pass",
@@ -363,11 +483,11 @@
       }
     },
     {
-      "claim_hash": "d19f82c7eb2febfe24e1b6b117763fe601f3276e52d54eb56264286c4595c10b",
+      "claim_hash": "c9cab56670d523f50631152ad98acfbab537f3cd0068eb7f6201574eadeda5e2",
       "evidence_hash": "63e9be7c117f9eeb84db396f2bfb4fd38eab6798f16ec111cd2df8c4558f861f",
       "verdict": {
         "kind": "pass",
-        "citation": "`knowledge/conventions/**/*.md` を走査して `required_for` の要素が指定 capability ID と完全一致する文書の repository-relative path を、重複なく安定順の機械可読な正本として返す。"
+        "citation": "`required_for` の要素が指定 capability ID と完全一致する文書の repository-relative path を、重複なく安定順の機械可読な正本として返す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -387,7 +507,7 @@
       }
     },
     {
-      "claim_hash": "d19f82c7eb2febfe24e1b6b117763fe601f3276e52d54eb56264286c4595c10b",
+      "claim_hash": "c9cab56670d523f50631152ad98acfbab537f3cd0068eb7f6201574eadeda5e2",
       "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
       "verdict": {
         "kind": "pass",
@@ -411,7 +531,7 @@
       }
     },
     {
-      "claim_hash": "d19f82c7eb2febfe24e1b6b117763fe601f3276e52d54eb56264286c4595c10b",
+      "claim_hash": "c9cab56670d523f50631152ad98acfbab537f3cd0068eb7f6201574eadeda5e2",
       "evidence_hash": "290d0251ec52368b3c0579660a5e2e80bb8bdafe9a8a6ba536eab6926854545f",
       "verdict": {
         "kind": "pass",
@@ -507,7 +627,7 @@
       }
     },
     {
-      "claim_hash": "a5f77bf47356a64a91be7fda95247702cefa365d517682f68ca9d98e202533df",
+      "claim_hash": "82a6281798e23331ef2d5214e1d6672773f52fe57888a00b14ba03d92837956d",
       "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
       "verdict": {
         "kind": "pass",
@@ -603,7 +723,7 @@
       }
     },
     {
-      "claim_hash": "6a1cd167de55fa175e4e111932c3e52193a97623c8d734d1916e551bffb90f61",
+      "claim_hash": "9327f377a1feef30892c02cf0fc984244a6706f73052c5072cc492b1a93c4499",
       "evidence_hash": "9bfbdc0f7e66ed29f02c319bbc93fe9c583cfd6c1fbed44aa7fc064eefe76d5d",
       "verdict": {
         "kind": "pass",
@@ -627,7 +747,7 @@
       }
     },
     {
-      "claim_hash": "6a1cd167de55fa175e4e111932c3e52193a97623c8d734d1916e551bffb90f61",
+      "claim_hash": "9327f377a1feef30892c02cf0fc984244a6706f73052c5072cc492b1a93c4499",
       "evidence_hash": "8563e18e331d206dafbfcfd110fa00de1c3ef16050c4c5051318b028b0503613",
       "verdict": {
         "kind": "pass",
@@ -819,7 +939,7 @@
       }
     },
     {
-      "claim_hash": "8945fefec9f939e1dbd91448ec495945865dfade90524ee99955448c01ce69e8",
+      "claim_hash": "4df29a8fffccef374a0b6ce1bbf8358da6c504cc3c0f0cdefde9446f62e65bb6",
       "evidence_hash": "63e9be7c117f9eeb84db396f2bfb4fd38eab6798f16ec111cd2df8c4558f861f",
       "verdict": {
         "kind": "pass",
@@ -843,7 +963,7 @@
       }
     },
     {
-      "claim_hash": "8945fefec9f939e1dbd91448ec495945865dfade90524ee99955448c01ce69e8",
+      "claim_hash": "4df29a8fffccef374a0b6ce1bbf8358da6c504cc3c0f0cdefde9446f62e65bb6",
       "evidence_hash": "2e7e63ddcfadfcaa5712a69d6fc3f52a6825b6aeb3b7e35f56e99bb3cdeae3db",
       "verdict": {
         "kind": "pass",
@@ -867,7 +987,7 @@
       }
     },
     {
-      "claim_hash": "8945fefec9f939e1dbd91448ec495945865dfade90524ee99955448c01ce69e8",
+      "claim_hash": "4df29a8fffccef374a0b6ce1bbf8358da6c504cc3c0f0cdefde9446f62e65bb6",
       "evidence_hash": "decd39340e72acb94d6d3a285b7ed8fab04cd85ddff66dfaf30e0f50ef461b8f",
       "verdict": {
         "kind": "pass",
@@ -1107,7 +1227,7 @@
       }
     },
     {
-      "claim_hash": "74373786011253477ec1cdd48cd54312701e6ed49b12491d54e2bf41091e7124",
+      "claim_hash": "fc882087f33cc14dac5051583394465760e87d5f8e01209bd17e2e6781655056",
       "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
       "verdict": {
         "kind": "pass",
@@ -1131,11 +1251,11 @@
       }
     },
     {
-      "claim_hash": "74373786011253477ec1cdd48cd54312701e6ed49b12491d54e2bf41091e7124",
+      "claim_hash": "fc882087f33cc14dac5051583394465760e87d5f8e01209bd17e2e6781655056",
       "evidence_hash": "290d0251ec52368b3c0579660a5e2e80bb8bdafe9a8a6ba536eab6926854545f",
       "verdict": {
         "kind": "pass",
-        "citation": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
+        "citation": "指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",

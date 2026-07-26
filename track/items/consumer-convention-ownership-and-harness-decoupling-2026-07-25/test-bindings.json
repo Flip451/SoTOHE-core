@@ -126,23 +126,316 @@
       "tests": [
         {
           "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::tests",
+          "module_path": "usecase::conventions_resolve::resolve_error_tests",
           "test_name": "test_convention_resolve_error_declares_exactly_the_five_fail_closed_conditions"
         },
         {
           "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::tests",
-          "test_name": "test_document_path_outside_root_exposes_the_path_error_as_source"
+          "module_path": "usecase::conventions_resolve::resolve_error_tests",
+          "test_name": "test_document_path_outside_root_lifts_each_constructor_rejection_as_its_source"
         },
         {
           "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::tests",
+          "module_path": "usecase::conventions_resolve::resolve_error_tests",
+          "test_name": "test_empty_capability_id_supplies_the_document_its_rejection_cannot_carry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_error_tests",
+          "test_name": "test_convention_resolve_error_declares_no_from_impl_for_either_lifted_rejection"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_error_tests",
           "test_name": "test_convention_resolve_error_display_includes_document_and_detail"
         },
         {
           "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::tests",
+          "module_path": "usecase::conventions_resolve::resolve_error_tests",
           "test_name": "test_convention_resolve_error_display_for_empty_capability_id_names_the_document"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionCapabilityId",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_accepts_a_non_blank_identifier_unchanged"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_rejects_empty_and_whitespace_only_identifiers"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_accepts_an_identifier_registered_in_no_registry"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionCapabilityId",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_preserves_surrounding_whitespace_verbatim"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_from_capability_name_carries_the_trimmed_key_value"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_requirement_requires_only_on_whole_value_capability_id_match"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionCapabilityId",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_accepts_an_identifier_registered_in_no_registry"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionCapabilityIdError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_rejects_empty_and_whitespace_only_identifiers"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_rejection_renders_the_blank_condition"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionCapabilityIdError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_rejects_empty_and_whitespace_only_identifiers"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_rejection_renders_the_blank_condition"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionRequirement",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_requirement_pairs_the_scanned_document_with_the_capabilities_it_declares"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionRequirement",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_requirement_requires_only_on_whole_value_capability_id_match"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionRequirement",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_requirement_without_declared_capabilities_requires_nothing"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolution",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_resolution_from_matches_deduplicates_repeated_documents"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_resolution_from_matches_orders_documents_independently_of_scan_order"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolution",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_resolution_from_matches_deduplicates_repeated_documents"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_resolution_from_matches_orders_documents_independently_of_scan_order"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolution",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_resolution_with_zero_matches_is_an_empty_success_value"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ResolveConventionsQuery",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_resolve_conventions_query_carries_the_requested_capability_and_project_root"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ResolveConventionsQuery",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_resolve_conventions_query_capability_rejects_only_empty_or_blank_identifiers"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ResolveConventionsQuery",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_resolve_conventions_query_accepts_a_capability_id_registered_in_no_registry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_resolve_conventions_query_capability_rejects_only_empty_or_blank_identifiers"
         }
       ]
     }

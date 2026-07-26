@@ -1,10 +1,19 @@
 //! Convention-resolution contracts shared by the read-only `conventions resolve`
 //! command and the convention non-shipping check.
 //!
-//! This module owns the identity of a convention document path and the
-//! fail-closed conditions of resolution (spec `IN-05`, `AC-06`, `AC-07`).
+//! This module owns the identity of a convention document path, the capability
+//! identifier both sides of the match are compared as, the request that names
+//! what to resolve, the scanned-document and result values, and the
+//! fail-closed conditions of resolution (spec `IN-05`, `IN-06`, `AC-06`,
+//! `AC-07`, `AC-08`, `AC-09`).
+
+mod capability_id;
+#[cfg(test)]
+mod resolve_error_tests;
 
 use std::path::{Component, Path, PathBuf};
+
+pub use capability_id::{ConventionCapabilityId, ConventionCapabilityIdError};
 
 use crate::capability_exec::CapabilityFailureDetail;
 
@@ -126,17 +135,123 @@ pub enum ConventionResolveError {
     },
 }
 
+/// Read-only request naming the capability whose required conventions are
+/// wanted and the project root to scan (`IN-05`, `IN-06`, `AC-09`).
+///
+/// The capability is a [`ConventionCapabilityId`] rather than a string because
+/// non-blankness is a real invariant of the value, and rather than the
+/// `CapabilityName` lookup key because the query side of an exact-match
+/// comparison has to preserve its value as literally as the document side
+/// does. Nothing further is asserted about it, so an identifier registered in
+/// neither `.harness/capabilities/` nor `agent-profiles.json` is an ordinary
+/// request.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ResolveConventionsQuery {
+    /// Capability whose required convention documents are wanted.
+    pub capability: ConventionCapabilityId,
+    /// Root of the project whose `knowledge/conventions/` tree is scanned.
+    pub project_root: PathBuf,
+}
+
+/// One scanned convention document paired with the capability identifiers its
+/// front matter declares (`IN-05`, `AC-06`, `AC-08`).
+///
+/// An empty declaration list is an ordinary value of this same shape: a
+/// document without front matter and a document whose front matter carries no
+/// `required_for` are both requirements that require nothing, so no consumer
+/// has to re-join those cases and neither can drift into meaning a failure.
+///
+/// The declared identifiers are [`ConventionCapabilityId`], the matching-term
+/// type, and so is the argument of [`ConventionRequirement::requires`], so both
+/// sides of the comparison preserve their value verbatim.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ConventionRequirement {
+    document: ConventionDocumentPath,
+    required_for: Vec<ConventionCapabilityId>,
+}
+
+impl ConventionRequirement {
+    /// Pairs a scanned document with the capability identifiers it declares.
+    #[must_use]
+    pub fn new(
+        document: ConventionDocumentPath,
+        required_for: Vec<ConventionCapabilityId>,
+    ) -> Self {
+        Self { document, required_for }
+    }
+
+    /// Borrows the document this requirement was scanned from.
+    #[must_use]
+    pub fn document(&self) -> &ConventionDocumentPath {
+        &self.document
+    }
+
+    /// Reports whether the document declares `capability`.
+    ///
+    /// The comparison is whole-value equality of the identifier with nothing
+    /// normalized in between, so a prefix, a suffix, a case-differing
+    /// spelling, or a padded spelling does not match.
+    #[must_use]
+    pub fn requires(&self, capability: &ConventionCapabilityId) -> bool {
+        self.required_for.contains(capability)
+    }
+}
+
+/// Canonical result of resolving the conventions required by one capability
+/// (`IN-05`, `AC-06`, `AC-08`).
+///
+/// The type owns the deduplication and stable-ordering guarantee, so no
+/// consumer re-sorts the documents and none can disagree about their order.
+/// Being a success value by construction, the zero-match case is this value
+/// with no documents — [`ConventionResolution::default`] — and is unreachable
+/// through [`ConventionResolveError`].
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
+pub struct ConventionResolution {
+    documents: Vec<ConventionDocumentPath>,
+}
+
+impl ConventionResolution {
+    /// Builds the canonical resolution from the documents that matched.
+    ///
+    /// Duplicates are removed and the documents are placed in lexicographic
+    /// path order, so the result does not depend on the order the scan
+    /// produced its matches in.
+    #[must_use]
+    pub fn from_matches(mut matches: Vec<ConventionDocumentPath>) -> Self {
+        matches.sort();
+        matches.dedup();
+        Self { documents: matches }
+    }
+
+    /// Borrows the matched documents, deduplicated and in stable order.
+    #[must_use]
+    pub fn documents(&self) -> &[ConventionDocumentPath] {
+        &self.documents
+    }
+
+    /// Reports whether the resolution matched no document.
+    #[must_use]
+    pub fn is_empty(&self) -> bool {
+        self.documents.is_empty()
+    }
+}
+
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 mod tests {
-    use std::error::Error as _;
     use std::path::{Path, PathBuf};
 
-    use super::{ConventionDocumentPath, ConventionDocumentPathError, ConventionResolveError};
-    use crate::capability_exec::CapabilityFailureDetail;
+    use super::{
+        ConventionCapabilityId, ConventionDocumentPath, ConventionDocumentPathError,
+        ConventionRequirement, ConventionResolution, ResolveConventionsQuery,
+    };
 
     fn document(path: &str) -> ConventionDocumentPath {
         ConventionDocumentPath::try_new(PathBuf::from(path)).unwrap()
+    }
+
+    fn capability(id: &str) -> ConventionCapabilityId {
+        ConventionCapabilityId::try_new(id).unwrap()
     }
 
     #[test]
@@ -251,94 +366,167 @@ mod tests {
     }
 
     #[test]
-    fn test_document_path_outside_root_exposes_the_path_error_as_source() {
-        let Err(source) = ConventionDocumentPath::try_new(PathBuf::from("knowledge/adr/README.md"))
-        else {
-            panic!("expected an OutsideConventionRoot rejection");
-        };
-        let error = ConventionResolveError::DocumentPathOutsideRoot { source };
+    fn test_convention_requirement_pairs_the_scanned_document_with_the_capabilities_it_declares() {
+        let requirement = ConventionRequirement::new(
+            document("knowledge/conventions/testing.md"),
+            vec![capability("implementer"), capability("reviewer")],
+        );
 
-        let cause = error.source().expect("the composed path rejection must be the error source");
-        assert!(matches!(
-            cause.downcast_ref::<ConventionDocumentPathError>(),
-            Some(ConventionDocumentPathError::OutsideConventionRoot { .. })
-        ));
-    }
-
-    #[test]
-    fn test_convention_resolve_error_declares_exactly_the_five_fail_closed_conditions() {
-        let escaping = PathBuf::from("knowledge/adr/README.md");
-        let Err(outside_root) = ConventionDocumentPath::try_new(escaping.clone()) else {
-            panic!("expected an OutsideConventionRoot rejection");
-        };
-        let conditions = [
-            ConventionResolveError::FrontMatterUnparseable {
-                document: document("knowledge/conventions/front-matter.md"),
-                detail: CapabilityFailureDetail::new("unexpected token at line 2"),
-            },
-            ConventionResolveError::RequiredForNotStringArray {
-                document: document("knowledge/conventions/required-for.md"),
-                detail: CapabilityFailureDetail::new("expected a sequence of strings"),
-            },
-            ConventionResolveError::EmptyCapabilityId {
-                document: document("knowledge/conventions/empty-capability-id.md"),
-            },
-            ConventionResolveError::DocumentPathOutsideRoot { source: outside_root },
-            ConventionResolveError::DocumentUnreadable {
-                document: document("knowledge/conventions/unreadable.md"),
-                detail: CapabilityFailureDetail::new("permission denied"),
-            },
-        ];
-
-        // One arm per variant and no wildcard: a sixth condition — including a
-        // variant for a normal empty resolution — stops this test compiling.
-        let concerned: Vec<PathBuf> = conditions
-            .iter()
-            .map(|condition| match condition {
-                ConventionResolveError::FrontMatterUnparseable { document, .. }
-                | ConventionResolveError::RequiredForNotStringArray { document, .. }
-                | ConventionResolveError::EmptyCapabilityId { document }
-                | ConventionResolveError::DocumentUnreadable { document, .. } => {
-                    document.as_path().to_path_buf()
-                }
-                ConventionResolveError::DocumentPathOutsideRoot {
-                    source: ConventionDocumentPathError::OutsideConventionRoot { path },
-                } => path.clone(),
-            })
-            .collect();
-
-        assert_eq!(
-            concerned,
-            [
-                PathBuf::from("knowledge/conventions/front-matter.md"),
-                PathBuf::from("knowledge/conventions/required-for.md"),
-                PathBuf::from("knowledge/conventions/empty-capability-id.md"),
-                escaping,
-                PathBuf::from("knowledge/conventions/unreadable.md"),
-            ],
-            "every condition carries the document it concerns, the escaped path through the \
-             composed constructor rejection rather than a restatement of it"
+        assert_eq!(requirement.document(), &document("knowledge/conventions/testing.md"));
+        assert!(requirement.requires(&capability("implementer")));
+        assert!(requirement.requires(&capability("reviewer")));
+        assert!(
+            !requirement.requires(&capability("researcher")),
+            "a capability the document does not declare is not required by it"
         );
     }
 
     #[test]
-    fn test_convention_resolve_error_display_includes_document_and_detail() {
-        let error = ConventionResolveError::FrontMatterUnparseable {
-            document: document("knowledge/conventions/testing.md"),
-            detail: CapabilityFailureDetail::new("unexpected token at line 2"),
-        };
+    fn test_convention_requirement_requires_only_on_whole_value_capability_id_match() {
+        let requirement = ConventionRequirement::new(
+            document("knowledge/conventions/testing.md"),
+            vec![capability("implementer")],
+        );
 
-        let rendered = error.to_string();
-        assert!(rendered.contains("knowledge/conventions/testing.md"), "{rendered}");
-        assert!(rendered.contains("unexpected token at line 2"), "{rendered}");
+        assert!(requirement.requires(&capability("implementer")));
+        // The padded spellings are the reason the matching term is not the
+        // trimming lookup key: under that key they would all normalize to the
+        // declared identifier and match it.
+        for near_miss in [
+            "implement",
+            "implementer-lead",
+            "Implementer",
+            "impl",
+            " implementer",
+            "implementer ",
+            " implementer ",
+            "implementer\t",
+        ] {
+            assert!(
+                !requirement.requires(&capability(near_miss)),
+                "'{near_miss}' is not the declared identifier, so it must not match"
+            );
+        }
     }
 
     #[test]
-    fn test_convention_resolve_error_display_for_empty_capability_id_names_the_document() {
-        let error = ConventionResolveError::EmptyCapabilityId {
-            document: document("knowledge/conventions/adr.md"),
+    fn test_convention_requirement_without_declared_capabilities_requires_nothing() {
+        // A document with no front matter and a document whose front matter
+        // carries no `required_for` both arrive here as an empty declaration
+        // list: an ordinary value, with no failure state to reach.
+        let requirement =
+            ConventionRequirement::new(document("knowledge/conventions/git-notes.md"), Vec::new());
+
+        assert_eq!(requirement.document(), &document("knowledge/conventions/git-notes.md"));
+        assert!(!requirement.requires(&capability("implementer")));
+        assert!(!requirement.requires(&capability("reviewer")));
+    }
+
+    #[test]
+    fn test_convention_resolution_from_matches_deduplicates_repeated_documents() {
+        let resolution = ConventionResolution::from_matches(vec![
+            document("knowledge/conventions/testing.md"),
+            document("knowledge/conventions/adr.md"),
+            document("knowledge/conventions/testing.md"),
+        ]);
+
+        let paths: Vec<String> = resolution.documents().iter().map(ToString::to_string).collect();
+        assert_eq!(
+            paths,
+            ["knowledge/conventions/adr.md", "knowledge/conventions/testing.md"],
+            "a document matched twice by the scan appears once in the result"
+        );
+    }
+
+    #[test]
+    fn test_convention_resolution_from_matches_orders_documents_independently_of_scan_order() {
+        let one = ConventionResolution::from_matches(vec![
+            document("knowledge/conventions/testing.md"),
+            document("knowledge/conventions/rust/naming.md"),
+            document("knowledge/conventions/adr.md"),
+        ]);
+        let other = ConventionResolution::from_matches(vec![
+            document("knowledge/conventions/adr.md"),
+            document("knowledge/conventions/testing.md"),
+            document("knowledge/conventions/rust/naming.md"),
+        ]);
+
+        let paths: Vec<String> = one.documents().iter().map(ToString::to_string).collect();
+        assert_eq!(
+            paths,
+            [
+                "knowledge/conventions/adr.md",
+                "knowledge/conventions/rust/naming.md",
+                "knowledge/conventions/testing.md",
+            ],
+            "the result is in stable repository-relative path order"
+        );
+        assert_eq!(one, other, "two scan orders over the same matches resolve to the same value");
+    }
+
+    #[test]
+    fn test_convention_resolution_with_zero_matches_is_an_empty_success_value() {
+        let resolution = ConventionResolution::from_matches(Vec::new());
+
+        assert!(resolution.is_empty());
+        assert!(resolution.documents().is_empty());
+        assert_eq!(
+            resolution,
+            ConventionResolution::default(),
+            "matching no document yields the ordinary empty result, not a failure"
+        );
+    }
+
+    #[test]
+    fn test_resolve_conventions_query_carries_the_requested_capability_and_project_root() {
+        let query = ResolveConventionsQuery {
+            capability: capability("implementer"),
+            project_root: PathBuf::from("/srv/consumer-project"),
         };
 
-        assert!(error.to_string().contains("knowledge/conventions/adr.md"));
+        assert_eq!(query.capability.as_str(), "implementer");
+        assert_eq!(query.project_root, PathBuf::from("/srv/consumer-project"));
+    }
+
+    #[test]
+    fn test_resolve_conventions_query_capability_rejects_only_empty_or_blank_identifiers() {
+        for blank in ["", "   ", "\t"] {
+            assert!(
+                ConventionCapabilityId::try_new(blank).is_err(),
+                "an empty capability id is the one rejection this value carries"
+            );
+        }
+
+        for accepted in ["implementer", "team::custom-lint", "SHOUTING_ID", "x", " padded "] {
+            let query = ResolveConventionsQuery {
+                capability: ConventionCapabilityId::try_new(accepted)
+                    .expect("a non-blank capability id is accepted as-is"),
+                project_root: PathBuf::from("."),
+            };
+            assert_eq!(
+                query.capability.as_str(),
+                accepted,
+                "the query carries the requested identifier verbatim, so the match it feeds \
+                 compares the value the caller actually named"
+            );
+        }
+    }
+
+    #[test]
+    fn test_resolve_conventions_query_accepts_a_capability_id_registered_in_no_registry() {
+        // `consumer-house-style` names no entry in `.harness/capabilities/` and
+        // none in `agent-profiles.json`. The query consults neither, so there is
+        // no state in which building the request fails for want of a
+        // registration; the identifier is carried through unchanged.
+        let unregistered = ConventionCapabilityId::try_new("consumer-house-style")
+            .expect("an identifier registered nowhere is still a valid capability id");
+
+        let query = ResolveConventionsQuery {
+            capability: unregistered.clone(),
+            project_root: PathBuf::from("/srv/consumer-project"),
+        };
+
+        assert_eq!(query.capability, unregistered);
+        assert_eq!(query.capability.as_str(), "consumer-house-style");
     }
 }

@@ -1,9 +1,22 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T07:43:51Z",
-  "declaration_hash": "56407710ad9a87e7d27e5bedbd7342d9c06090c8098b20a49b1bc7f6bc878386",
+  "generated_at": "2026-07-26T10:37:56Z",
+  "declaration_hash": "9869ef883a9ab5e60f8a8d91d90d3199f37ac84a676be6e87518477feabeb860",
   "implementation_input_hash": "52b9d05b9a1c8d1dccf483570edc82d69b469e54bd952b2e63c754bae4bcd561",
   "signals": [
+    {
+      "type_name": "ConventionCapabilityIdArg",
+      "kind_tag": "dto",
+      "signal": "yellow",
+      "found_type": false,
+      "missing_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "FromStr",
+        "PartialEq"
+      ]
+    },
     {
       "type_name": "ConventionResolveDriver",
       "kind_tag": "primary_adapter",
@@ -39,12 +52,6 @@
         "Eq",
         "PartialEq"
       ]
-    },
-    {
-      "type_name": "CapabilityNameArg",
-      "kind_tag": "dto",
-      "signal": "blue",
-      "found_type": true
     },
     {
       "type_name": "ConventionsDriver",

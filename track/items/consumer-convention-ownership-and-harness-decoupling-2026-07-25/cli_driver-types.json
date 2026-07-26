@@ -97,13 +97,33 @@
     {
       "for_type": "ConventionShippingCheckInput",
       "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ConventionCapabilityIdArg",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ConventionCapabilityIdArg",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ConventionCapabilityIdArg",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ConventionCapabilityIdArg",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ConventionCapabilityIdArg",
+      "trait_ref": "core::str::traits::FromStr"
     }
   ],
   "traits": {},
   "types": {
-    "CapabilityNameArg": {
-      "action": "reference",
-      "docs": "Baseline-identical CLI-boundary mirror of a validated capability name, reused unchanged rather than minting a second mirror or accepting a raw argument string (design self-check 12): its existing parse-time rejection is exactly the invariant IN-06 requires of this argument, so no new type would add anything.",
+    "ConventionCapabilityIdArg": {
+      "action": "add",
+      "docs": "CLI-boundary mirror of `ConventionCapabilityId` for the read-only resolve argument (IN-05, IN-06, AC-09). Introduced as a sibling of `capability::CapabilityNameArg` rather than a change to it: that mirror wraps the `agent-profiles.json` lookup key and is shared with `capability exec`, so retyping it in place would carry the matching contract into a command that does not have one and change what values that command accepts. The mirror exists at all only because the validated usecase value cannot itself implement clap's parsing trait — the usual R9 boundary-mirror pattern — and it holds that validated value in a private field. Its `FromStr` delegates to `ConventionCapabilityId::try_new`, which is the enforcing site; this mirror adds no check of its own, so the invariant reaches the driver already established rather than re-decided anywhere along the way. It is declared in `conventions_resolve` beside the driver that consumes it rather than in `capability`, so the private field is reachable without widening its visibility.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -114,13 +134,21 @@
         }
       },
       "methods": [],
-      "module_path": "capability",
+      "module_path": "conventions_resolve",
       "role": {
         "Dto": {}
       },
       "spec_refs": [
         {
+          "anchor": "IN-05",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
           "anchor": "IN-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-09",
           "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
         }
       ]
@@ -159,7 +187,7 @@
     },
     "ConventionResolveInput": {
       "action": "add",
-      "docs": "Typed input for the read-only `conventions resolve` command (IN-05, IN-06, AC-06, AC-09). The capability is held as the boundary mirror `CapabilityNameArg` rather than an argument string, so the non-empty invariant is established once at the parse boundary and the driver has nothing left to re-validate — the usual R9 serde/CLI-boundary mirror pattern, since the validated usecase type cannot itself implement clap's parsing trait. Field order mirrors `cli::ConventionsCommand::Resolve` and `usecase::ResolveConventionsQuery` exactly; the CLI variant is the fixed point of that chain.",
+      "docs": "Typed input for the read-only `conventions resolve` command (IN-05, IN-06, AC-06, AC-09). The capability is held as the boundary mirror `ConventionCapabilityIdArg` rather than an argument string — the usual R9 serde/CLI-boundary mirror pattern, since the validated usecase type cannot itself implement clap's parsing trait. That mirror carries an already-validated `ConventionCapabilityId`, established by `ConventionCapabilityId::try_new` and by nothing on this side, so the driver has nothing left to re-validate. It is that mirror rather than the shared `CapabilityNameArg` because this command's argument is the query side of an exact-match comparison, and a mirror that trims would decide matches at the CLI boundary. Field order mirrors `cli::ConventionsCommand::Resolve` and `usecase::ResolveConventionsQuery` exactly; the CLI variant is the fixed point of that chain.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -167,7 +195,7 @@
           "fields": [
             {
               "name": "capability",
-              "ty": "CapabilityNameArg"
+              "ty": "ConventionCapabilityIdArg"
             },
             {
               "name": "project_root",

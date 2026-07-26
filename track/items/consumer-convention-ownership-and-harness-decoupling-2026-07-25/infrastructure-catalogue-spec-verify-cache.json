@@ -3,7 +3,7 @@
   "layer": "infrastructure",
   "entries": [
     {
-      "claim_hash": "42689c20e9ee40dd770259ed918daeff3626c652b0c0a170546a1b698ebe73ca",
+      "claim_hash": "edd0b88003e4a313787d3054e1d4f694771163f8708cbef4e34b9518040f8946",
       "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
       "verdict": {
         "kind": "pass",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "42689c20e9ee40dd770259ed918daeff3626c652b0c0a170546a1b698ebe73ca",
+      "claim_hash": "edd0b88003e4a313787d3054e1d4f694771163f8708cbef4e34b9518040f8946",
       "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
       "verdict": {
         "kind": "pass",
@@ -51,11 +51,11 @@
       }
     },
     {
-      "claim_hash": "42689c20e9ee40dd770259ed918daeff3626c652b0c0a170546a1b698ebe73ca",
+      "claim_hash": "edd0b88003e4a313787d3054e1d4f694771163f8708cbef4e34b9518040f8946",
       "evidence_hash": "decd39340e72acb94d6d3a285b7ed8fab04cd85ddff66dfaf30e0f50ef461b8f",
       "verdict": {
         "kind": "pass",
-        "citation": "`.harness/capabilities/`にも`agent-profiles.json`にも登録されていない非空 capability ID を指定した resolve が error にならず、その ID を `required_for` に持つ文書を解決結果として返す。"
+        "citation": "`.harness/capabilities/` にも `agent-profiles.json` にも登録されていない非空 capability ID を指定した resolve が error にならず、その ID を `required_for` に持つ文書を解決結果として返す。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -75,7 +75,7 @@
       }
     },
     {
-      "claim_hash": "68473f6e6c0f11c16f128cbebd80e115ec547512147b24e0a0a258b692a749cd",
+      "claim_hash": "f5470aa78caccacca22bfd202068243a07f3700621a5182162988e77ba74bad3",
       "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
       "verdict": {
         "kind": "pass",
@@ -99,11 +99,11 @@
       }
     },
     {
-      "claim_hash": "68473f6e6c0f11c16f128cbebd80e115ec547512147b24e0a0a258b692a749cd",
+      "claim_hash": "f5470aa78caccacca22bfd202068243a07f3700621a5182162988e77ba74bad3",
       "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
       "verdict": {
         "kind": "pass",
-        "citation": "`required_for` に空文字または空白だけの capability ID がある場合"
+        "citation": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -123,7 +123,7 @@
       }
     },
     {
-      "claim_hash": "68473f6e6c0f11c16f128cbebd80e115ec547512147b24e0a0a258b692a749cd",
+      "claim_hash": "f5470aa78caccacca22bfd202068243a07f3700621a5182162988e77ba74bad3",
       "evidence_hash": "290d0251ec52368b3c0579660a5e2e80bb8bdafe9a8a6ba536eab6926854545f",
       "verdict": {
         "kind": "pass",
@@ -339,11 +339,11 @@
       }
     },
     {
-      "claim_hash": "fe13957828be17b6f99f9037ac24951df58a38ef25b8224aa404279d4588149b",
+      "claim_hash": "da4268633a31e7b7d6570efa8acb34e04752b58c65e5700fa29a476b53a8a5ce",
       "evidence_hash": "63e9be7c117f9eeb84db396f2bfb4fd38eab6798f16ec111cd2df8c4558f861f",
       "verdict": {
         "kind": "pass",
-        "citation": "読み取り専用コマンド `bin/sotp conventions resolve --capability <capability-id>` を導入し、`knowledge/conventions/**/*.md` を走査して `required_for` の要素が指定 capability ID と完全一致する文書の repository-relative path を、重複なく安定順の機械可読な正本として返す。"
+        "citation": "読み取り専用コマンド `bin/sotp conventions resolve --capability <capability-id>` を導入し、`knowledge/conventions/**/*.md` を走査して"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -363,7 +363,7 @@
       }
     },
     {
-      "claim_hash": "fe13957828be17b6f99f9037ac24951df58a38ef25b8224aa404279d4588149b",
+      "claim_hash": "da4268633a31e7b7d6570efa8acb34e04752b58c65e5700fa29a476b53a8a5ce",
       "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
       "verdict": {
         "kind": "pass",
@@ -387,7 +387,7 @@
       }
     },
     {
-      "claim_hash": "fe13957828be17b6f99f9037ac24951df58a38ef25b8224aa404279d4588149b",
+      "claim_hash": "da4268633a31e7b7d6570efa8acb34e04752b58c65e5700fa29a476b53a8a5ce",
       "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
       "verdict": {
         "kind": "pass",
@@ -411,7 +411,7 @@
       }
     },
     {
-      "claim_hash": "f87ad518a0785bac0b21806bac2f1c769119b79dc3f4f7697e22f604941e1b1b",
+      "claim_hash": "f9931a780bf3bb2f4311eda0fd3745a7b066b2f2506bbb766fac20fed8436414",
       "evidence_hash": "9bfbdc0f7e66ed29f02c319bbc93fe9c583cfd6c1fbed44aa7fc064eefe76d5d",
       "verdict": {
         "kind": "pass",
@@ -435,7 +435,7 @@
       }
     },
     {
-      "claim_hash": "f87ad518a0785bac0b21806bac2f1c769119b79dc3f4f7697e22f604941e1b1b",
+      "claim_hash": "f9931a780bf3bb2f4311eda0fd3745a7b066b2f2506bbb766fac20fed8436414",
       "evidence_hash": "8563e18e331d206dafbfcfd110fa00de1c3ef16050c4c5051318b028b0503613",
       "verdict": {
         "kind": "pass",

@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "56407710ad9a87e7d27e5bedbd7342d9c06090c8098b20a49b1bc7f6bc878386",
+  "catalogue_declaration_hash": "9869ef883a9ab5e60f8a8d91d90d3199f37ac84a676be6e87518477feabeb860",
   "signals": [
     {
-      "type_name": "CapabilityNameArg",
+      "type_name": "ConventionCapabilityIdArg",
       "signal": "blue",
-      "entry_hash": "39c7e46477695ec9cb0f72c5d7e507272a5d8f589aed31d4f342fbc3c4626de8"
+      "entry_hash": "715c4020399df5c783271608cc8813b70247e18842f39402ebfa7c55639fb35c"
     },
     {
       "type_name": "ConventionResolveDriver",
@@ -15,7 +15,7 @@
     {
       "type_name": "ConventionResolveInput",
       "signal": "blue",
-      "entry_hash": "30510b7acad2865ce99d94ff6854687e03d85387e309a63f796d9eeee0afa8a1"
+      "entry_hash": "ba8e91a1d8641d80b09652c3c12aa99c3aae4ebd94f95f6f5a7cf7f80fa9ceaf"
     },
     {
       "type_name": "ConventionShippingCheckDriver",
