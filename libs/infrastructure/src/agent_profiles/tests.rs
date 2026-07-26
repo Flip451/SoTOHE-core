@@ -99,11 +99,11 @@ fn test_resolve_execution_unsupported_provider_effort_returns_error() {
     let profiles = load_profiles(
         r#"{
             "schema_version": 1,
-            "providers": { "claude": { "label": "Claude Code" } },
+            "providers": { "gemini": { "label": "Gemini CLI" } },
             "capabilities": {
-                "implementer": {
-                    "provider": "claude",
-                    "model": "claude-opus-4-7",
+                "researcher": {
+                    "provider": "gemini",
+                    "model": "gemini-3-pro",
                     "reasoning_effort": "xhigh",
                     "execution_mode": "orchestrator-output"
                 }
@@ -112,10 +112,42 @@ fn test_resolve_execution_unsupported_provider_effort_returns_error() {
     );
 
     assert!(matches!(
-        profiles.resolve_execution(&capability("implementer"), RoundType::Final),
+        profiles.resolve_execution(&capability("researcher"), RoundType::Final),
         Err(AgentProfilesError::UnsupportedEffort(provider, ReasoningEffort::XHigh))
-            if provider.as_str() == "claude"
+            if provider.as_str() == "gemini"
     ));
+}
+
+#[test]
+fn test_resolve_execution_claude_accepts_every_effort_level() {
+    for (encoded, expected) in [
+        ("low", ReasoningEffort::Low),
+        ("medium", ReasoningEffort::Medium),
+        ("high", ReasoningEffort::High),
+        ("xhigh", ReasoningEffort::XHigh),
+        ("max", ReasoningEffort::Max),
+    ] {
+        let profiles = load_profiles(&format!(
+            r#"{{
+                "schema_version": 1,
+                "providers": {{ "claude": {{ "label": "Claude Code" }} }},
+                "capabilities": {{
+                    "implementer": {{
+                        "provider": "claude",
+                        "model": "claude-opus-5",
+                        "reasoning_effort": "{encoded}",
+                        "execution_mode": "orchestrator-output"
+                    }}
+                }}
+            }}"#
+        ));
+
+        assert!(matches!(
+            profiles.resolve_execution(&capability("implementer"), RoundType::Final),
+            Ok(ResolvedExecution::ProviderCli { provider, effort, .. })
+                if provider.as_str() == "claude" && effort == expected
+        ));
+    }
 }
 
 #[test]

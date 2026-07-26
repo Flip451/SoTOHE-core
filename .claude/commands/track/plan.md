@@ -54,7 +54,7 @@ User invokes this command as `/track:plan`. `$ARGUMENTS`:
 On completion, present:
 
 1. Per-phase gate results (🔵🟡🔴 / OK / ERROR) and final `max_retry` counters per loop.
-2. Generated track artifact paths (`metadata.json` / `spec.json` / `<layer>-types.json` / `impl-plan.json` / `task-coverage.json`).
+2. Generated track artifact paths (`metadata.json` / `spec.json` / `<layer>-types.json` / `impl-plan.json` / `task-coverage.json` / `task-contract.json`).
 3. Back-and-forth edits that occurred (target artifact and its writer).
 4. Input-box divergence triage results (if any) and the admitted delta drafts left 🟡 for
    the merge-stage adjudication — no synchronous termination decision is requested.

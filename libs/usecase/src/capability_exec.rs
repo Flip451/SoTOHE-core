@@ -328,9 +328,9 @@ pub enum ReasoningEffort {
     Medium,
     /// High reasoning effort.
     High,
-    /// Codex's maximum reasoning effort vocabulary.
+    /// Extra-high reasoning effort, above `High`.
     XHigh,
-    /// Claude's maximum reasoning effort vocabulary.
+    /// Highest supported reasoning effort.
     Max,
 }
 

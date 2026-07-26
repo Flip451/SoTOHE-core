@@ -1,5 +1,5 @@
 ---
-description: Author the track's impl-plan.json + task-coverage.json via the impl-planner subagent (Phase 3).
+description: Author the track's impl-plan.json + task-coverage.json + task-contract.json via the impl-planner subagent (Phase 3).
 ---
 
 > Operational SSoT: `.harness/workflows/track/impl-plan.md` — provider 非依存 workflow logic はそちらを参照。本ファイルは Claude Code 固有 adapter として、起動形態 / Tool 制約 / 報告形式のみを残す。
@@ -17,8 +17,8 @@ The dispatcher resolves `capabilities.impl-planner` internally from
 `.harness/config/agent-profiles.json` and either completes the dispatch or returns the
 in-host delegation instruction to follow.
 
-The subagent owns: writing `impl-plan.json` and `task-coverage.json`, and evaluating the task-coverage binary gate (OK / ERROR).
+The subagent owns: writing `impl-plan.json`, `task-coverage.json`, and `task-contract.json`, and evaluating the task-coverage binary gate (OK / ERROR).
 
 ## Report format
 
-Report: track id, `impl-plan.json` and `task-coverage.json` paths, task count, gate verdict (OK / ERROR).
+Report: track id, `impl-plan.json`, `task-coverage.json`, and `task-contract.json` paths, task count, gate verdict (OK / ERROR).

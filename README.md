@@ -64,8 +64,7 @@ track 作業には `/adr:add <slug>` で ADR を作り
   - a. SoTOHE-core を clone → `sotp template export` を実行すると、出力ツリーに `bin/sotp` が移植された状態で完結する (タグ非依存、初回導入向け)
   - b. 更新時 / 別ホスト再導入時は `.harness/config/sotp-version.json` の固定タグから `cargo install` で導入する
 - **Claude Code** — 主操作面。`/track:*` コマンドの入口
-- **Codex CLI** — 既定 profile (`default`) のレビュー担当 (`reviewer`)
-- **Gemini CLI** — 既定 profile (`default`) のリサーチ担当 (`researcher`)
+- **Codex CLI** — 既定 profile (`default`) のレビュー担当 (`reviewer`) とリサーチ担当 (`researcher`)
 
 補足:
 

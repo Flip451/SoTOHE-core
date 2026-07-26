@@ -1,6 +1,7 @@
 ---
 name: review-fix-lead
-model: claude-opus-4-7[1m]
+model: claude-opus-5
+effort: medium
 description: |
   Claude subagent adapter for review-fix-lead when routing dispatches the Claude path. Invoke via `cargo make track-local-review-fix` — never directly through the Agent tool: direct Agent-tool invocation bypasses provider / model resolution, while the wrapper is the canonical route that internally resolves them from `.harness/config/agent-profiles.json`.
 ---

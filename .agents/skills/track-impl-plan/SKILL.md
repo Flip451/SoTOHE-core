@@ -1,6 +1,6 @@
 ---
 name: track-impl-plan
-description: Use when Codex is asked to author the track's impl-plan.json and task-coverage.json via the impl-planner capability (Phase 3).
+description: Use when Codex is asked to author the track's impl-plan.json, task-coverage.json, and task-contract.json via the impl-planner capability (Phase 3).
 ---
 
 # Track-Impl-Plan (Codex skill)
@@ -19,7 +19,8 @@ or failure-recovery procedures here.
 ### (2) Sandbox constraint
 
 - Requires `--sandbox workspace-write`: the impl-planner capability writes `impl-plan.json`,
-  `task-coverage.json`, and renders `plan.md` to the working tree.
+  `task-coverage.json`, and `task-contract.json` to the working tree. `plan.md` is a derived
+  read-only view this capability must not write.
 
 ### (3) Sub-workflow and capability invocation
 

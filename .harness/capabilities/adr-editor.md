@@ -15,8 +15,8 @@ classified by `adr-diagnoser`; this capability edits, it never adjudicates.
 
 This capability is **write-only to `knowledge/adr/*.md`** (including the hand-maintained
 index rows in `knowledge/adr/README.md` for drafts it creates or deletes). It must not edit
-spec.json, type catalogues, metadata.json, impl-plan.json, task-coverage.json, or any other
-artifact.
+spec.json, type catalogues, metadata.json, impl-plan.json, task-coverage.json,
+task-contract.json, or any other artifact.
 
 ## Invocation contract
 
@@ -74,7 +74,7 @@ The briefing from the orchestrator must include:
 
 | aspect | adr-editor (this capability) | spec-designer | impl-planner | type-designer |
 |---|---|---|---|---|
-| output | `knowledge/adr/*.md` edits + draft authoring | `spec.json` + `spec.md` | `impl-plan.json` + `task-coverage.json` | `<layer>-types.json` + rendered views |
+| output | `knowledge/adr/*.md` edits + draft authoring | `spec.json` + `spec.md` | `impl-plan.json` + `task-coverage.json` + `task-contract.json` | `<layer>-types.json` + rendered views |
 | trigger | Phase 0 loop / delta lane / user-decision implementation | `/track:spec-design` (Phase 1) | `/track:impl-plan` (Phase 3) | `/track:type-design` (Phase 2) |
 | scope | working tree only, no commit, no snapshot | writes own SSoT + rendered view | writes own SSoT files | writes own SSoT + rendered views |
 
@@ -184,8 +184,8 @@ deleting a draft). Do NOT spawn further agents.
 - Use `Read`, `Grep`, `Glob` for exploration; do not use `Bash(cat/grep/head)`.
 - The single permitted git command is the read-only `git log <merge_target> -- <adr-file>`
   for pre-merge detection.
-- Do not modify spec.json, metadata.json, impl-plan.json, task-coverage.json, or any
-  catalogue file.
+- Do not modify spec.json, metadata.json, impl-plan.json, task-coverage.json,
+  task-contract.json, or any catalogue file.
 - Store reasoning in session memory, not on disk.
 
 ## Session resume

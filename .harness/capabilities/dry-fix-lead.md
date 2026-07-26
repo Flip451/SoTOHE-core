@@ -40,7 +40,7 @@ move it outward in a way that reverses dependency direction.
 Files this capability must NOT edit, regardless of DRY findings:
 
 - SoT / generated artifacts: `knowledge/adr/*.md`, `track/items/**` (spec.json / catalogues /
-  impl-plan / task-coverage / review.json / dry-check.json / rendered `*.md`),
+  impl-plan / task-coverage / task-contract / review.json / dry-check.json / rendered `*.md`),
   `.harness/config/agent-profiles.json`, `.gitignore`.
 - Any other track under `track/items/<other-track>/`.
 - Track task-state transitions through `bin/sotp track transition`; this capability has no

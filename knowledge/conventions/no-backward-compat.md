@@ -8,7 +8,7 @@ workspace の lifecycle 整合性を保ち、暫定 compatibility layer の長�
 
 ## Scope
 
-- 適用対象: track 成果物 (metadata.json / spec.json / 型カタログ / impl-plan / task-coverage)、schema
+- 適用対象: track 成果物 (metadata.json / spec.json / 型カタログ / impl-plan / task-coverage / task-contract)、schema
   定義、CI gate の規則、codec フォーマット、CLI サブコマンドの interface
 - 適用外:
   - 純粋なバグ修正 (semantic 同値だが実装誤りの訂正)

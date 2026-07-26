@@ -21,7 +21,7 @@ Read these first:
 - current `track/items/<id>/metadata.json`
 - current `track/items/<id>/spec.json`, if present
 - current `track/items/<id>/<layer>-types.json`, if present
-- current `track/items/<id>/impl-plan.json` and `track/items/<id>/task-coverage.json`, if present
+- current `track/items/<id>/impl-plan.json`, `track/items/<id>/task-coverage.json`, and `track/items/<id>/task-contract.json`, if present
 - current `track/items/<id>/spec.md` and `track/items/<id>/plan.md`, if present
 - `.claude/rules/`
 - `.codex/rules/default.rules` (the Codex-specific command-policy surface — read it when running as the Codex root host)
@@ -48,7 +48,7 @@ are thin wrappers that reference it. Read that SSoT when acting as a specialist.
 - `orchestrator`: overall workflow coordination.
 - `spec-designer`: writes `spec.json`; use the `spec-designer` skill.
 - `type-designer`: writes per-layer type catalogues; use the `type-designer` skill.
-- `impl-planner`: writes `impl-plan.json` and `task-coverage.json`; use the `impl-planner` skill.
+- `impl-planner`: writes `impl-plan.json`, `task-coverage.json`, and `task-contract.json`; use the `impl-planner` skill.
 - `adr-editor`: edits target ADRs during back-and-forth planning; use the `adr-editor` skill.
 - `implementer`: edits source code within the current task.
 - `reviewer`: reviews correctness and safety only.

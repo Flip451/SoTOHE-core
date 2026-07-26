@@ -1,6 +1,7 @@
 ---
 name: researcher
-model: claude-opus-4-7[1m]
+model: claude-opus-5
+effort: medium
 tools:
   - Read
   - Grep

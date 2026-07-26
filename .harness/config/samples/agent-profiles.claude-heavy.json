@@ -14,52 +14,52 @@
   "capabilities": {
     "orchestrator": {
       "provider": "claude",
-      "model": "claude-opus-4-7",
+      "model": "claude-opus-5",
       "reasoning_effort": "high",
       "execution_mode": "typed-pipeline"
     },
     "spec-designer": {
       "provider": "claude",
-      "model": "claude-opus-4-7[1m]",
+      "model": "claude-opus-5",
       "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "impl-planner": {
       "provider": "claude",
-      "model": "claude-opus-4-7[1m]",
-      "reasoning_effort": "high",
+      "model": "claude-opus-5",
+      "reasoning_effort": "medium",
       "execution_mode": "orchestrator-output"
     },
     "type-designer": {
       "provider": "claude",
-      "model": "claude-opus-4-7[1m]",
+      "model": "claude-opus-5",
       "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "adr-editor": {
       "provider": "claude",
-      "model": "claude-opus-4-7[1m]",
+      "model": "claude-opus-5",
       "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "implementer": {
       "provider": "claude",
-      "model": "claude-opus-4-7[1m]",
-      "reasoning_effort": "high",
+      "model": "claude-opus-5",
+      "reasoning_effort": "medium",
       "execution_mode": "orchestrator-output"
     },
     "reviewer": {
       "provider": "claude",
-      "model": "claude-opus-4-7",
-      "reasoning_effort": "max",
+      "model": "claude-opus-5",
+      "reasoning_effort": "xhigh",
       "fast_model": "claude-sonnet-5",
       "fast_reasoning_effort": "low",
       "execution_mode": "typed-pipeline"
     },
     "researcher": {
       "provider": "claude",
-      "model": "claude-opus-4-7[1m]",
-      "reasoning_effort": "high",
+      "model": "claude-opus-5",
+      "reasoning_effort": "medium",
       "execution_mode": "orchestrator-output"
     }
   }

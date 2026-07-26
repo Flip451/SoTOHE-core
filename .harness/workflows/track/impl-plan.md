@@ -7,8 +7,8 @@
 
 ## Mission
 
-Author the implementation plan for the current track — `track/items/<id>/impl-plan.json` and
-`task-coverage.json` — via the `impl-planner` capability (Phase 3). The workflow is
+Author the implementation plan for the current track — `track/items/<id>/impl-plan.json`,
+`task-coverage.json`, and `task-contract.json` — via the `impl-planner` capability (Phase 3). The workflow is
 single-shot: invoke the capability once, receive its binary gate verdict, and return. Re-invocation
 on ERROR is the caller's responsibility (`plan` workflow). The `impl-planner` capability owns
 all file writes and gate evaluation internally.
@@ -46,8 +46,9 @@ internal pipeline). The briefing must include:
 - Path(s) to the referenced ADR(s) under `knowledge/adr/`
 - Paths to related conventions under `knowledge/conventions/`
 
-The capability owns writing `track/items/<track-id>/impl-plan.json` and
-`track/items/<track-id>/task-coverage.json`, and evaluating the task-coverage binary gate
+The capability owns writing `track/items/<track-id>/impl-plan.json`,
+`track/items/<track-id>/task-coverage.json`, and `track/items/<track-id>/task-contract.json`,
+and evaluating the task-coverage binary gate
 (OK / ERROR). The workflow does not duplicate these steps.
 
 **Step 3: Receive and surface the gate verdict**
@@ -77,6 +78,7 @@ task count, and any gate error details to the caller without re-reading the outp
 
 - `track/items/<id>/impl-plan.json` (written by the capability)
 - `track/items/<id>/task-coverage.json` (written by the capability)
+- `track/items/<id>/task-contract.json` (written by the capability)
 - Binary gate verdict: **OK** or **ERROR** + error details
 - Task count (surfaced to caller from capability output)
 - No commit is created by this workflow

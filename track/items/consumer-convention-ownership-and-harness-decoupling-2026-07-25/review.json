@@ -1,0 +1,359 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbe367c68bed86e7fea58223a20538f9eeb9771e93bb54ed6179796b9d9aa0e4",
+          "at": "2026-07-26T03:17:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbe367c68bed86e7fea58223a20538f9eeb9771e93bb54ed6179796b9d9aa0e4",
+          "at": "2026-07-26T03:28:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bebd6728c8c48f44bf2be0ee0b6047909aaf054834d8b751a500af6f8128853",
+          "at": "2026-07-26T03:36:04Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eeda3bfbc723d0b3f619a5b70ec67f9afe9d5a510d311278a4dcd9d70af99a28",
+          "at": "2026-07-26T02:28:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`rollback-diagnoser` は純粋な判断レーンとして `xhigh` を割り当てる設計意図ですが、プロファイルと Claude adapter の双方で `high` になっています。これにより設計で定めた effort 配分と実際の実行設定がずれます。`reasoning_effort` と frontmatter の `effort` をともに `xhigh` に揃えてください。",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 38,
+              "category": "capability routing mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:d81de6367ee2c1c57a5df84a6cc24d1321dade9ce3a514cd21a3b70e1fe14ae1",
+          "at": "2026-07-26T02:33:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a009383d1e391715980c5bdeeb05448caecdf6fe393ad60d517e2666bef65459",
+          "at": "2026-07-26T02:42:11Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a79c1c322075a8ae3b2307a493c659fefcf795f6fcae21c7024f15830954a9c",
+          "at": "2026-07-26T02:46:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a79c1c322075a8ae3b2307a493c659fefcf795f6fcae21c7024f15830954a9c",
+          "at": "2026-07-26T02:47:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9a79c1c322075a8ae3b2307a493c659fefcf795f6fcae21c7024f15830954a9c",
+          "at": "2026-07-26T03:18:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`dry-fix-lead` を Claude に切り替えると `/track:dry-check` が必ず失敗します。正規 wrapper は `.claude/commands/track/dry-check.md:13` で Codex のみ対応し、Claude 時の Agent fallback も禁止しています。実装も `libs/infrastructure/src/dry_check/dry_fix_local/mod.rs:110` で Codex 以外を `unsupported` として拒否します。Claude dispatch sentinel を実装するまで provider を Codex に戻す必要があります。",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 92,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "`<!-- illustrative, non-canonical -->` が付いた内容を無条件で対象外にすると、任意の長さの schema/code 例が decision を埋没させても報告不能になります。これは冒頭の「concisely」原則と、77行目の「structural bloat is NOT a nit」に矛盾します。marker は例を canonical decision と誤認しないために使いつつ、量によって decision を obscuring する場合は引き続き報告可能にしてください。",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/adr.md",
+              "line": 40,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8ec1d62a3af5cd17f479a2c2ad1088679de8abfde3916e791dbfeb614c056574",
+          "at": "2026-07-26T03:48:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`track-local-dry-fix` は dispatch sentinel を出しません。現行実装は Codex を直接実行し、他 provider は fail-closed します。この記述は同ファイル29行目と実装契約に反し、存在しない sentinel を待つ誤った配線を案内します。sentinel の説明を `track-local-review-fix` のみに限定してください。",
+              "severity": "P1",
+              "file": ".claude/agents/README.md",
+              "line": 46,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:a74774fb3d92d0b72aa81b738a794c74907b0cae9650c3357174b4948cf7f86b",
+          "at": "2026-07-26T04:02:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`adr-editor` は今回 Claude に切り替わり、この明示的 tools list が実行時境界になりますが、`Write` がありません。capability SSoT は Phase 1+ の delta candidate や hearing ADR の新規ファイル作成を `Edit` / `Write` で行う契約です。`Edit` だけでは新規 ADR を作成できないため、これらの必須経路を完遂できません。",
+              "severity": "P1",
+              "file": ".claude/agents/adr-editor.md",
+              "line": 5,
+              "category": "capability_wiring"
+            },
+            {
+              "message": "書き直された対応表は `impl-planner` の成果物を `impl-plan.json` と `task-coverage.json` の2つだけとしていますが、capability SSoT と CLAUDE.md の Phase 3 契約では `task-contract.json` も必須です。同じ欠落が `impl-planner.md` の description にもあり、Claude dispatch が必須 attribution artifact を省略すると task-contract coverage / pre-review gate が停止します。",
+              "severity": "P1",
+              "file": ".claude/agents/README.md",
+              "line": 19,
+              "category": "responsibility_boundary_consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:624e2f49a8fa8e77d7280c4a48a001ac4c343d9b272d30bed394402af9ef8ffc",
+          "at": "2026-07-26T04:12:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Propagate `task-contract.json` through the `/track:impl-plan` workflow contract. This description now correctly declares three owned artifacts, but `.harness/workflows/track/impl-plan.md`, `.claude/commands/track/impl-plan.md`, and `.agents/skills/track-impl-plan/SKILL.md` still define and report only `impl-plan.json` and `task-coverage.json`. The provider adapters and workflow SSoT therefore disagree about Phase 3 outputs and the Codex adapter's write surface omits the third artifact.",
+              "severity": "P1",
+              "file": ".claude/agents/impl-planner.md",
+              "line": 15,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "Preserve the diagnoser's strict read-only boundary. `.harness/capabilities/adr-diagnoser.md:159-166` forbids editing any repository file, but this live Claude adapter permits writes under `tmp/` by saying only that nothing may be written outside it. Because the adapter exposes Bash, this weakens the provider-independent contract; diff inspection must remain non-writing.",
+              "severity": "P1",
+              "file": ".claude/agents/adr-diagnoser.md",
+              "line": 33,
+              "category": "responsibility-boundary cross"
+            },
+            {
+              "message": "Update the shipped provider documentation with the researcher switch. The active profile now routes `researcher` to Claude, while `README.md:68` still says the default researcher is Gemini; the sample default routes it to Codex, so neither default selects Gemini. Fresh consumers are therefore given a false provider prerequisite inconsistent with the routing SSoT.",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 72,
+              "category": "capability routing consistency"
+            }
+          ],
+          "hash": "rvw1:sha256:e526cc9b66d213688a78c5cc1ebcc8f59e70cc01b9a74aed36e25664dd3d17a1",
+          "at": "2026-07-26T04:22:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Codex in-host impl-planner path is not wired to the new three-artifact contract. This skill delegates to `.codex/agents/impl-planner.toml`, whose higher-priority instructions still own only `impl-plan.json` and `task-coverage.json` while claiming the capability generates `plan.md`. Under the codex-heavy profile this can omit the required `task-contract.json`, and `plan.md` ownership contradicts the capability SSoT. Update the Codex agent/skill projection and remove the `plan.md` claim.",
+              "severity": "P1",
+              "file": ".agents/skills/track-impl-plan/SKILL.md",
+              "line": 22,
+              "category": "command-wiring"
+            },
+            {
+              "message": "The new `task-contract.json` output was not propagated to the parent planning surfaces. `.harness/workflows/track/plan.md` still lists only two Phase 3 artifacts in its ownership and output sections, and `.claude/commands/track/plan.md` omits it from the final report. Consequently `/track:plan` and its child workflow now expose inconsistent artifact contracts.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/impl-plan.md",
+              "line": 10,
+              "category": "convention-consistency"
+            },
+            {
+              "message": "The blanket exemption for every prohibition or fail-closed condition contradicts the preceding removability test and the stated rule that workflow/capability SSoTs own operational detail. A duplicated operational fail-closed rule already recorded in an existing workflow can be removed from an ADR without changing any decision, but this carve-out makes such gate or recovery bloat unreportable. Limit the exemption to cases where the prohibition itself is the recorded decision.",
+              "severity": "P1",
+              "file": ".harness/custom/review-prompts/adr.md",
+              "line": 50,
+              "category": "convention-contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8ad21ed945be76709fa907e42ea26ac01a1eb2f840324a84a7d2aacfb3bc2cf0",
+          "at": "2026-07-26T04:38:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The adapter says `impl-planner` triggers a CLI render of `plan.md`, but the capability SSoT only writes the three JSON artifacts and runs `bin/sotp verify plan-artifact-refs`; it explicitly forbids writing `plan.md` and permits no view-sync command. Remove this unsupported side effect or add it to the provider-agnostic workflow/capability contract.",
+              "severity": "P1",
+              "file": ".agents/skills/track-impl-plan/SKILL.md",
+              "line": 22,
+              "category": "adapter-SSoT synchronization"
+            },
+            {
+              "message": "Switching the root orchestrator to Claude activates `.claude/rules/orchestration.md`, whose Phase 3 model, required-reading list, and impl-planner ownership still name only `impl-plan.json` and `task-coverage.json` (lines 24, 39, and 92), contradicting the newly synchronized three-artifact contract. Update that live Claude rule to include `task-contract.json`.",
+              "severity": "P1",
+              "file": ".harness/config/agent-profiles.json",
+              "line": 16,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:44c4a3fc856fb39d217830f0a5385b33bad1ce17d82d23ce63dc1eec0fa2190e",
+          "at": "2026-07-26T04:55:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0bc369477dffa2dbc9423868fdc4134561449e98803ac397fbf3e512cb360e67",
+          "at": "2026-07-26T05:08:35Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4 embeds an operational resolver command, output contract, and exhaustive fail-closed validation behavior. This obscures the architectural decision; delegate these implementation/schema details to the capability or harness contract and retain only the ownership/discovery decision.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+              "line": 182,
+              "category": "decision obscured by excess detail"
+            },
+            {
+              "message": "D6 specifies dispatcher entrypoint mechanics, outcome-specific payload wiring, host/provider delegation behavior, and prohibited alternate paths. This is workflow/capability contract detail that obscures the decision and should be delegated to the relevant SSoT.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+              "line": 216,
+              "category": "decision obscured by excess detail"
+            },
+            {
+              "message": "D10 prescribes template smoke checks, dead-reference detection exclusions, historical-path exemptions, and review-based enforcement. These are operational gate and workflow rules rather than the architectural decision, so they should be removed or delegated to the relevant harness/review SSoT.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+              "line": 318,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:ef82da4637235a25b71dedcd8da6afb79155b1429b889174c62d88513cd3293d",
+          "at": "2026-07-25T18:19:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d53babc0228fe679d7ffdfaf69f976588a2a3bf4f058e36e1bdc23fcf628030",
+          "at": "2026-07-25T18:45:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D1 mandates one directory-level `overlay` classification and explicitly rejects `exclude` because it cannot supply overlay content, but its closing summary says the replacement is directory `exclude` + overlay. These instructions are incompatible and could cause the initial conventions to be omitted. Change the summary to directory `overlay` or otherwise align it with the preceding decision.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+              "line": 109,
+              "category": "inconsistent decisions within the same ADR"
+            },
+            {
+              "message": "The Negative consequence still embeds the dispatcher outcome identifiers `executed` and `delegate-in-host` in an operational conformance-test prescription. This is precisely the mechanism detail the accepted repair delegates away and it obscures the provider-neutral D6 decision. Retain the requirement for both external execution and in-host delegation, but remove the concrete outcome names and test-wiring terminology.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md",
+              "line": 395,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:7d53babc0228fe679d7ffdfaf69f976588a2a3bf4f058e36e1bdc23fcf628030",
+          "at": "2026-07-25T18:49:41Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:acc50369797a7197797b856cac729eaf92a4a6078939c3bc98552888ae5048c7",
+          "at": "2026-07-25T18:55:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:acc50369797a7197797b856cac729eaf92a4a6078939c3bc98552888ae5048c7",
+          "at": "2026-07-25T18:57:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42b4f6cc56ae53c2d62876ef99e82479f96e98035e52e7dda533052eecf3cd17",
+          "at": "2026-07-26T03:23:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:42b4f6cc56ae53c2d62876ef99e82479f96e98035e52e7dda533052eecf3cd17",
+          "at": "2026-07-26T03:25:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:105f38ed745129ade57a91bea3c81703438169da84fdee2e390e312ca873becf",
+          "at": "2026-07-26T04:00:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56dae89d5b16f54bcb6b905f9e268580b9ff4299ef77d46bc526e7e4d09b73c0",
+          "at": "2026-07-26T04:32:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7d979015324a16df45f9a0f6ae8f71db386c0a9463aaaf1ba00afd88f97aba3b",
+          "at": "2026-07-26T05:14:57Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb7bf0dc230b9dc29f7b7693e381b5b94e69030e49697713b72a3bd98ecbdf74",
+          "at": "2026-07-26T03:17:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb7bf0dc230b9dc29f7b7693e381b5b94e69030e49697713b72a3bd98ecbdf74",
+          "at": "2026-07-26T03:28:47Z"
+        }
+      ]
+    }
+  }
+}

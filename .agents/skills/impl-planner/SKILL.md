@@ -1,7 +1,7 @@
 ---
 name: impl-planner
 sandbox: workspace-write
-description: Use when Codex is assigned the SoTOHE Phase 3 impl-planner capability. Writes impl-plan.json and task-coverage.json from the spec and type catalogues, then verifies plan artifact coverage.
+description: Use when Codex is assigned the SoTOHE Phase 3 impl-planner capability. Writes impl-plan.json, task-coverage.json, and task-contract.json from the spec and type catalogues, then verifies plan artifact coverage.
 ---
 
 # Impl-Planner (Codex skill)

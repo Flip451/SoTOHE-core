@@ -177,10 +177,10 @@ After Phase 3 OK:
 | 0 | `track/items/<id>/metadata.json` | orchestrator (direct via `init` workflow) |
 | 1 | `track/items/<id>/spec.json` + `spec.md` | `spec-designer` capability |
 | 2 | `track/items/<id>/<layer>-types.json` + baselines + views | `type-designer` capability |
-| 3 | `track/items/<id>/impl-plan.json` + `task-coverage.json` | `impl-planner` capability |
+| 3 | `track/items/<id>/impl-plan.json` + `task-coverage.json` + `task-contract.json` | `impl-planner` capability |
 
 The orchestrator does not directly write `knowledge/adr/*.md`, `spec.json`,
-`<layer>-types.json`, `impl-plan.json`, or `task-coverage.json`. Each artifact's writer
+`<layer>-types.json`, `impl-plan.json`, `task-coverage.json`, or `task-contract.json`. Each artifact's writer
 capability owns its file end-to-end.
 
 ### Sub-workflow briefing rules (no design prescription)
@@ -226,7 +226,7 @@ operations, environment-breaking changes. Artifact generation uses post-hoc revi
 - `track/items/<id>/metadata.json` (Phase 0)
 - `track/items/<id>/spec.json` + `spec.md` (Phase 1)
 - `track/items/<id>/<layer>-types.json` + views (Phase 2, per TDDD-enabled layer)
-- `track/items/<id>/impl-plan.json` + `task-coverage.json` (Phase 3)
+- `track/items/<id>/impl-plan.json` + `task-coverage.json` + `task-contract.json` (Phase 3)
 - Per-phase gate results (🔵🟡🔴 / OK / ERROR) and final `max_retry` counters
 - Back-and-forth edits that occurred (target artifact and its writer)
 - Unexpected ADR working-tree divergence triage (if any), and admitted delta drafts left 🟡 for

@@ -21,7 +21,7 @@ as active guardrails.
 
 Terms:
 
-- `track`: `metadata.json` (identity SSoT) / `spec.json` (Phase 1 behavioral contract SSoT) / `<layer>-types.json` (Phase 2 type-contract SSoT) / `impl-plan.json` + `task-coverage.json` (Phase 3 implementation plan SSoT) / `spec.md` / `plan.md` (read-only rendered views) / `observations.md` (optional manual observation log) / progress management layer
+- `track`: `metadata.json` (identity SSoT) / `spec.json` (Phase 1 behavioral contract SSoT) / `<layer>-types.json` (Phase 2 type-contract SSoT) / `impl-plan.json` + `task-coverage.json` + `task-contract.json` (Phase 3 implementation plan SSoT) / `spec.md` / `plan.md` (read-only rendered views) / `observations.md` (optional manual observation log) / progress management layer
 
 ## Source Of Truth
 
@@ -36,7 +36,7 @@ Read these first before planning or implementation:
 - `track/items/<id>/metadata.json`
 - `track/items/<id>/spec.json` (Phase 1 SSoT, if exists)
 - `track/items/<id>/<layer>-types.json` (Phase 2 SSoT, if exists)
-- `track/items/<id>/impl-plan.json` + `task-coverage.json` (Phase 3 SSoT, if exists)
+- `track/items/<id>/impl-plan.json` + `task-coverage.json` + `task-contract.json` (Phase 3 SSoT, if exists)
 - `track/items/<id>/spec.md`
 - `track/items/<id>/plan.md`
 - `track/items/<id>/observations.md` (optional — manual observation log)
@@ -89,7 +89,7 @@ Session reuse applies only when the dispatcher invokes a provider subprocess:
   - `orchestrator`: overall coordination (Claude Code or Codex, resolved from `capabilities.orchestrator.provider`)
   - `spec-designer`: behavioral contract authoring (Phase 1 spec.json writer)
   - `type-designer`: type-level contract authoring (Phase 2 `<layer>-types.json` writer, TDDD workflow)
-  - `impl-planner`: implementation plan authoring (Phase 3 impl-plan.json + task-coverage.json writer)
+  - `impl-planner`: implementation plan authoring (Phase 3 impl-plan.json + task-coverage.json + task-contract.json writer)
   - `adr-editor`: ADR back-and-forth modification (invoked by `/track:plan` when spec → ADR signal turns 🔴)
   - `implementer`: difficult Rust implementation, refactoring, performance-oriented edits
   - `reviewer`: code review, correctness analysis, idiomatic Rust checks
