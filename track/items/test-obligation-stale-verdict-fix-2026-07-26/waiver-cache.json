@@ -1,0 +1,197 @@
+{
+  "track_id": "test-obligation-stale-verdict-fix-2026-07-26",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationCheckError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "waived_reason_hash": "81e16480028120535c10e10124329b3e16668cdb7f6196879cbaf044d05b21d8",
+        "declaration_hash": "f254cd5da97a5bf7c45d62e230c2899510dd01037f35dadf8b3912ce177379d2",
+        "anchor_text_hash": "ea73875ea10c4047021f7c664d5047480ad2e6ea9d2beffc4bb775bc46243305"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Typed failures produced by the obligation check gate."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationCheckError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "waived_reason_hash": "489368d0dc7d33b42d8d4a5c6ea58d3cc5ba859ad66fe8a5a9cd415764e6a36b",
+        "declaration_hash": "f254cd5da97a5bf7c45d62e230c2899510dd01037f35dadf8b3912ce177379d2",
+        "anchor_text_hash": "f420577c5989e261f5142fcbcf8ebd99c73420803493c622d16ce7ad84c25684"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationCheckError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "cedf93319ba37556963a35c5cd1aa4ac867eac93f47053444d9053837f716d48",
+        "declaration_hash": "f254cd5da97a5bf7c45d62e230c2899510dd01037f35dadf8b3912ce177379d2",
+        "anchor_text_hash": "0637af9c7e989dc3b6ba0ec7df9f8045089d7140aba3f404335d24a691f4e184"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "`check` が当該 binding を黙殺せず、義務あり edge には voluntary binding を使えないことを示す finding と非零 exit を返す"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationCheckError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "waived_reason_hash": "4773af8977b11f0657737ea72bd465d553b1a20bdce0278d38da94bf334333c1",
+        "declaration_hash": "f254cd5da97a5bf7c45d62e230c2899510dd01037f35dadf8b3912ce177379d2",
+        "anchor_text_hash": "9398e6445efcd3a8a4b50484bb4eea078e8e190c70c12ff370ba0965ba35c104"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Typed failures produced by the obligation check gate.\"; \"methods: []\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FulfillmentCacheReevaluationReason",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FulfillmentCacheReevaluationReason",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "waived_reason_hash": "181349fd52af7e7b882fa733f8a3eac8547c7cc683bf2e4788c9ab0de88c68f6",
+        "declaration_hash": "697ca85590550102eb79c54af229f47ff24053368c9e0cf95c1ebd991d92082f",
+        "anchor_text_hash": "9398e6445efcd3a8a4b50484bb4eea078e8e190c70c12ff370ba0965ba35c104"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "kind: Enum { variants: [VariantDecl { name: VariantName(Identifier(\"Absent\")), payload: Unit }, VariantDecl { name: VariantName(Identifier(\"LegacyRowsMissingBoundTests\")), payload: Unit }] }, methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingConsistencyError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestBindingConsistencyError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "waived_reason_hash": "c32f6e0db4f5d7bc94f0a186a38a62962fe2b2b262f857f592d95f5fb2853cc4",
+        "declaration_hash": "4c6aa4de25d9fcf69fe6cf66473289e87ea164e1c714f765809d4d38e893a6e2",
+        "anchor_text_hash": "ea73875ea10c4047021f7c664d5047480ad2e6ea9d2beffc4bb775bc46243305"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Typed voluntary-binding consistency failure."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingConsistencyError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestBindingConsistencyError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "waived_reason_hash": "7ff77297ed7338ef4504e343effb11f80cc438f4aa057fa14908c69d473a7a86",
+        "declaration_hash": "4c6aa4de25d9fcf69fe6cf66473289e87ea164e1c714f765809d4d38e893a6e2",
+        "anchor_text_hash": "f420577c5989e261f5142fcbcf8ebd99c73420803493c622d16ce7ad84c25684"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestBindingConsistencyError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestBindingConsistencyError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "waived_reason_hash": "2ca6f4f7bd5db81e62a36dc22e612976669f552761bbfb0ffa5710b9f2f5b9f2",
+        "declaration_hash": "4c6aa4de25d9fcf69fe6cf66473289e87ea164e1c714f765809d4d38e893a6e2",
+        "anchor_text_hash": "0637af9c7e989dc3b6ba0ec7df9f8045089d7140aba3f404335d24a691f4e184"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Typed voluntary-binding consistency failure."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ]
+}

@@ -4,21 +4,24 @@
   "entries": {
     "T001": [
       { "layer": "domain", "entry_key": "FulfillmentCacheLookupError" },
+      { "layer": "domain", "entry_key": "FulfillmentCacheReevaluationReason" },
       { "layer": "domain", "entry_key": "ObligationFulfillmentCacheDocument" },
+      { "layer": "domain", "entry_key": "ObligationCheckError" },
       { "layer": "domain", "entry_key": "TestBindingConsistencyError" },
       { "layer": "usecase", "entry_key": "CheckTestObligationsInteractor" }
     ],
     "T002": [
-      { "layer": "domain", "entry_key": "FulfillmentCacheReevaluationReason" },
-      { "layer": "domain", "entry_key": "ObligationCheckError" },
       { "layer": "domain", "entry_key": "ObligationFulfillmentCacheEntryError" },
+      { "layer": "domain", "entry_key": "ObligationFulfillmentCacheEntry" },
       { "layer": "domain", "entry_key": "ObligationEvaluateError" },
       { "layer": "domain", "entry_key": "ObligationFulfillmentCacheLoad" },
       { "layer": "domain", "entry_key": "ObligationFulfillmentCachePort" },
+      { "layer": "domain", "entry_key": "ResolvedBoundTests" },
       { "layer": "domain", "entry_key": "VerifyCacheError" },
       { "layer": "usecase", "entry_key": "CheckTestObligationsInteractor" },
       { "layer": "usecase", "entry_key": "EvaluateTestObligationsInteractor" },
       { "layer": "usecase", "entry_key": "TestObligationResultsInteractor" },
+      { "layer": "infrastructure", "entry_key": "ObligationFulfillmentCacheEntryDto" },
       { "layer": "infrastructure", "entry_key": "JsonObligationFulfillmentCacheCodec" }
     ],
     "T003": [
@@ -29,11 +32,8 @@
     "T004": [
       { "layer": "domain", "entry_key": "EdgeVerdictRecord" },
       { "layer": "domain", "entry_key": "EdgeResolutionOutcome" },
-      { "layer": "domain", "entry_key": "ObligationFulfillmentCacheEntry" },
-      { "layer": "domain", "entry_key": "ResolvedBoundTests" },
       { "layer": "usecase", "entry_key": "EvaluateTestObligationsInteractor" },
       { "layer": "usecase", "entry_key": "TestObligationResultsInteractor" },
-      { "layer": "infrastructure", "entry_key": "ObligationFulfillmentCacheEntryDto" },
       { "layer": "infrastructure", "entry_key": "JsonObligationFulfillmentCacheCodec" }
     ]
   }

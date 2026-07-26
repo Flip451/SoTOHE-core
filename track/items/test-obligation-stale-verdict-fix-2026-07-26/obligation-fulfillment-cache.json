@@ -1,0 +1,437 @@
+{
+  "track_id": "test-obligation-stale-verdict-fix-2026-07-26",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "FulfillmentCacheLookupError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FulfillmentCacheLookupError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "e59f9e8c9e5e7a626e7c506c12832b150a03b2a8a7d6f24f96caf523745e9381",
+        "declaration_hash": "e888a8e320b7d448fab7d4fac24dae6c475185abf282a603be43214070a5c5cd",
+        "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                }) => {\n                    assert_eq!(actual_edge_id, edge_id());\n                    assert_eq!(actual_obligation_id, obligation_id());\n                    assert_eq!(actual_key, key);\n                }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FulfillmentCacheLookupError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FulfillmentCacheLookupError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "e59f9e8c9e5e7a626e7c506c12832b150a03b2a8a7d6f24f96caf523745e9381",
+        "declaration_hash": "e888a8e320b7d448fab7d4fac24dae6c475185abf282a603be43214070a5c5cd",
+        "anchor_text_hash": "3f9cea786c50c2d7a810736fd740e2d137d2076b05c3e73fb74e5a03831640a4"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries { edge_id: actual_edge_id, obligation_id: actual_obligation_id, key: actual_key, }) => { assert_eq!(actual_edge_id, edge_id()); assert_eq!(actual_obligation_id, obligation_id()); assert_eq!(actual_key, key); }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FulfillmentCacheLookupError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FulfillmentCacheLookupError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "e59f9e8c9e5e7a626e7c506c12832b150a03b2a8a7d6f24f96caf523745e9381",
+        "declaration_hash": "e888a8e320b7d448fab7d4fac24dae6c475185abf282a603be43214070a5c5cd",
+        "anchor_text_hash": "a2eb3fe459adc5b0543bffa5b597ad1b34a47bffc837a6947d203ae3d1a57036"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                })"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FulfillmentCacheLookupError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FulfillmentCacheLookupError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "5eddd5c9b161e7c89f2a8c772c2824f7175b46f775dc89ec5328789912d74ee4",
+        "declaration_hash": "e888a8e320b7d448fab7d4fac24dae6c475185abf282a603be43214070a5c5cd",
+        "anchor_text_hash": "2bcaa6bd097998bdf743836b92e2a3a65485dfae2a0695a964ce4be6854c0d09"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.resolved_edges(), &[edge()]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FulfillmentCacheLookupError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FulfillmentCacheLookupError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "e59f9e8c9e5e7a626e7c506c12832b150a03b2a8a7d6f24f96caf523745e9381",
+        "declaration_hash": "e888a8e320b7d448fab7d4fac24dae6c475185abf282a603be43214070a5c5cd",
+        "anchor_text_hash": "3ff88b6d083f5c2a33bf137a869a58c6c9cfcc44129391db5dd737a156ed323a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                }) => {\n                    assert_eq!(actual_edge_id, edge_id());\n                    assert_eq!(actual_obligation_id, obligation_id());\n                    assert_eq!(actual_key, key);\n                }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FulfillmentCacheLookupError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FulfillmentCacheLookupError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "c3203480092f7b5743b80de38b39901521d6b4386c5f30bcb3809c269bf1a309",
+        "declaration_hash": "e888a8e320b7d448fab7d4fac24dae6c475185abf282a603be43214070a5c5cd",
+        "anchor_text_hash": "2bf538e0a37daa40874f6818500b2bbe4b2d766a646f9a788122afbeb06d4de1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                }) => {\n                    assert_eq!(actual_edge_id, edge());\n                    assert_eq!(actual_obligation_id, obligation().id().clone());\n                    assert_eq!(actual_key, expected_key);\n                }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCacheDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "53fffbfbc80f7970e3cd494fe4900be1642ea3a52649aafb02d29ab90845f937",
+        "declaration_hash": "d0e647e3f7af277cbf426a1798b5266cf21b8e5cd2c068f25203b12bd242f0ce",
+        "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(entry.key(), &current_key); assert!(matches!(entry.verdict(), ObligationFulfillmentVerdict::Fulfilled { .. }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCacheDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "e59f9e8c9e5e7a626e7c506c12832b150a03b2a8a7d6f24f96caf523745e9381",
+        "declaration_hash": "d0e647e3f7af277cbf426a1798b5266cf21b8e5cd2c068f25203b12bd242f0ce",
+        "anchor_text_hash": "3f9cea786c50c2d7a810736fd740e2d137d2076b05c3e73fb74e5a03831640a4"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries {\\n                    edge_id: actual_edge_id,\\n                    obligation_id: actual_obligation_id,\\n                    key: actual_key,\\n                })\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCacheDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "1f626d95d98ef08d775ebd7269701f02638e57299433368f5ccd57c89c5e6135",
+        "declaration_hash": "d0e647e3f7af277cbf426a1798b5266cf21b8e5cd2c068f25203b12bd242f0ce",
+        "anchor_text_hash": "a2eb3fe459adc5b0543bffa5b597ad1b34a47bffc837a6947d203ae3d1a57036"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n                document.lookup_current(&edge_id(), &obligation_id(), &key, &current_fingerprint),\n                Ok(None)\n            ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCacheDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "5eddd5c9b161e7c89f2a8c772c2824f7175b46f775dc89ec5328789912d74ee4",
+        "declaration_hash": "d0e647e3f7af277cbf426a1798b5266cf21b8e5cd2c068f25203b12bd242f0ce",
+        "anchor_text_hash": "2bcaa6bd097998bdf743836b92e2a3a65485dfae2a0695a964ce4be6854c0d09"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.resolved_edges(), &[edge()]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCacheDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "5eddd5c9b161e7c89f2a8c772c2824f7175b46f775dc89ec5328789912d74ee4",
+        "declaration_hash": "d0e647e3f7af277cbf426a1798b5266cf21b8e5cd2c068f25203b12bd242f0ce",
+        "anchor_text_hash": "3ff88b6d083f5c2a33bf137a869a58c6c9cfcc44129391db5dd737a156ed323a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(entry.key(), &current_key);\n            assert!(matches!(entry.verdict(), ObligationFulfillmentVerdict::Fulfilled { .. }));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCacheDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "c3203480092f7b5743b80de38b39901521d6b4386c5f30bcb3809c269bf1a309",
+        "declaration_hash": "d0e647e3f7af277cbf426a1798b5266cf21b8e5cd2c068f25203b12bd242f0ce",
+        "anchor_text_hash": "2bf538e0a37daa40874f6818500b2bbe4b2d766a646f9a788122afbeb06d4de1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries {"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationCheckError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "afdf57c34a3c46fe064168276b4bb1a035ec10936bddbb81ac97f93a54bb087f",
+        "declaration_hash": "f254cd5da97a5bf7c45d62e230c2899510dd01037f35dadf8b3912ce177379d2",
+        "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationCheckError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "515dabfa7974de08809b1ca232279a9c235d20793734539f01893022a464087b",
+        "declaration_hash": "f254cd5da97a5bf7c45d62e230c2899510dd01037f35dadf8b3912ce177379d2",
+        "anchor_text_hash": "3f9cea786c50c2d7a810736fd740e2d137d2076b05c3e73fb74e5a03831640a4"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(ObligationCheckError::FulfillmentCacheLookup(\n                FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                },\n            )) => {"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationCheckError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "515dabfa7974de08809b1ca232279a9c235d20793734539f01893022a464087b",
+        "declaration_hash": "f254cd5da97a5bf7c45d62e230c2899510dd01037f35dadf8b3912ce177379d2",
+        "anchor_text_hash": "a2eb3fe459adc5b0543bffa5b597ad1b34a47bffc837a6947d203ae3d1a57036"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(ObligationCheckError::FulfillmentCacheLookup(\n                FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                },\n            ))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationCheckError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "906fd0f9347d0d37869aa3991f7d340c734b01a62d2ad2ed2404af9b50d97954",
+        "declaration_hash": "f254cd5da97a5bf7c45d62e230c2899510dd01037f35dadf8b3912ce177379d2",
+        "anchor_text_hash": "2bcaa6bd097998bdf743836b92e2a3a65485dfae2a0695a964ce4be6854c0d09"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for entries in\n        [vec![historical.clone(), current.clone()], vec![current.clone(), historical.clone()]]\n    {\n        let cache = ObligationFulfillmentCacheDocument::new(track(), entries);...        let outcome = interactor(Some(obligations), Some(bindings), Some(cache), None)\n            .execute(&command())\n            .unwrap();"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationCheckError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "906fd0f9347d0d37869aa3991f7d340c734b01a62d2ad2ed2404af9b50d97954",
+        "declaration_hash": "f254cd5da97a5bf7c45d62e230c2899510dd01037f35dadf8b3912ce177379d2",
+        "anchor_text_hash": "3ff88b6d083f5c2a33bf137a869a58c6c9cfcc44129391db5dd737a156ed323a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for entries in\n        [vec![historical.clone(), current.clone()], vec![current.clone(), historical.clone()]]\n    {\n        let cache = ObligationFulfillmentCacheDocument::new(track(), entries);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationCheckError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationCheckError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "515dabfa7974de08809b1ca232279a9c235d20793734539f01893022a464087b",
+        "declaration_hash": "f254cd5da97a5bf7c45d62e230c2899510dd01037f35dadf8b3912ce177379d2",
+        "anchor_text_hash": "2bf538e0a37daa40874f6818500b2bbe4b2d766a646f9a788122afbeb06d4de1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(ObligationCheckError::FulfillmentCacheLookup(\n                FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                },\n            ))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ]
+}

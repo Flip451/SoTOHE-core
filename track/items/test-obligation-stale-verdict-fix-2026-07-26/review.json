@@ -1,86 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d3d51cb42df1025cf48a6503969c3aefaf5f9bbc5e58a0c65c8ffcbe7da696c9",
-          "at": "2026-07-26T15:18:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d3d51cb42df1025cf48a6503969c3aefaf5f9bbc5e58a0c65c8ffcbe7da696c9",
-          "at": "2026-07-26T15:20:50Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e10064361e4434808d98fa254227646a9765aa1b2cb7f1a6d6693a8455b17c20",
-          "at": "2026-07-26T16:04:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-02 の「評価エラーを黙殺しない」という意図を決定的に証明する AC がない。AC-04 は返却済みの失敗 verdict の schema を検証するだけで、評価処理自体がエラーを返す場合の伝播や非零終了を扱わないため、この目標の一部を未検証のまま完了扱いできる。",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
-              "line": 22,
-              "category": "missing AC coverage for a stated goal"
-            },
-            {
-              "message": "CN-04 の「error 出力が判定根拠を追跡可能にする」は、追跡可能と判定するための必須情報や観測条件を定義していない。IN-05 は cache 行の `bound_tests` だけを具体化しており error 出力は具体化されないため、下流工程が意味を発明しなければ検証できない制約になっている。",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
-              "line": 212,
-              "category": "constraint vague or untestable"
-            }
-          ],
-          "hash": "rvw1:sha256:e10064361e4434808d98fa254227646a9765aa1b2cb7f1a6d6693a8455b17c20",
-          "at": "2026-07-26T16:11:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8ef03a5bdb48ef39010235d2f2846560cd5152efdc6fd1bd0a8e3146db89da5f",
-          "at": "2026-07-26T16:28:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-07 は verifier provider の解決失敗時における `evaluate` のエラー伝播を要求しているが、IN-01〜IN-05 の declared in_scope は cache entry の選択、重複、binding、失敗 verdict schema、cache 診断情報に限られ、provider 解決や評価エラー伝播を含まない。したがって、この AC は宣言された in_scope 外の振る舞いを完了条件にしている。",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
-              "line": 324,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:8ef03a5bdb48ef39010235d2f2846560cd5152efdc6fd1bd0a8e3146db89da5f",
-          "at": "2026-07-26T16:30:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:07677710a91fed0ac49b9cccd00b7c6c49268d6c615cb1a9f4e3d9776c2f73a0",
-          "at": "2026-07-26T16:33:52Z"
-        }
-      ]
-    },
     "types": {
       "rounds": [
         {
@@ -429,6 +349,220 @@
           "findings": [],
           "hash": "rvw1:sha256:52fb8e64e07c285a02c1f0bd9da106ad878b1b668de849074ee2a1940017bee2",
           "at": "2026-07-26T17:20:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f379df40261d12ab51a0c82e2d69dca39b463832f4c69c05a548f6f47c70d1b5",
+          "at": "2026-07-26T18:10:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 must recover caches classified as `LegacyRowsMissingBoundTests` and prove AC-06, but the cache entry, `ResolvedBoundTests`, DTO, and writer changes that produce non-legacy rows are deferred to T004. After T002 reevaluates, the pre-T004 writer still cannot persist `bound_tests`, so the next check classifies the new cache as legacy again. Move the bound-test persistence work before/into T002 or defer AC-06 recovery until after T004.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 11,
+              "category": "dependency cycle or wrong ordering"
+            },
+            {
+              "message": "The completed T001 implementation already adds `TestBindingConsistencyError` and modifies `ObligationCheckError`, but T001's contract omits both and assigns them to T003 and T002 respectively. This misstates the actual carrier task; moreover, if implementation is changed to follow this plan, T002's catalogued `BindingConsistency(TestBindingConsistencyError)` error surface precedes the type introduced by T003. Align the implementation and plan, or restore these catalogue attributions to an earlier task.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/task-contract.json",
+              "line": 5,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:f379df40261d12ab51a0c82e2d69dca39b463832f4c69c05a548f6f47c70d1b5",
+          "at": "2026-07-26T18:15:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f43fcb2d1067a343ea8a3e62c8b951295662c6bb33de07b60bf7bbbc4ee984ef",
+          "at": "2026-07-26T18:50:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 now owns the load-bearing fulfillment-cache `bound_tests` persistence (`ResolvedBoundTests`, cache entry, DTO, codec), but it cites none of IN-05/CN-04/AC-05 and those elements remain mapped only to T004, whose description no longer owns cache-row persistence. Map T002 to these elements; T004 alone cannot plausibly cover AC-05's writer/key validation.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 11,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T003 is attributed `TestBindingConsistencyError`, although its description only uses that type and the completed T001 implementation already adds it to support `ObligationCheckError::BindingConsistency`. If T001 does not carry the type, its declared error surface cannot be completed before T003; if T001 does carry it, this attribution is false. Attribute the added type to T001 and make T003 its consumer.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/task-contract.json",
+              "line": 28,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T002 explicitly says it updates `FulfillmentCacheReevaluationReason`, but its contract omits that entry and attributes it only to T001. Either describe T002 as using the T001 type or add the T002 attribution if it truly modifies it.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/task-contract.json",
+              "line": 12,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T004's contract attributes `JsonObligationFulfillmentCacheCodec`, but T004's description names only the two domain records and two use-case interactors, with domain/evaluate/result fixtures. Because the codec is the encoder-side carrier relevant to AC-04, name its operation in T004; otherwise this attribution has no described diff to ride with.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/task-contract.json",
+              "line": 37,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T002's clause “so recovered rows are non-legacy” restates the intended recovery behavior/rationale after already specifying the persistence operation. Under `knowledge/conventions/no-upstream-restatement.md`, retain the target and operation and rely on the AC-06 anchor instead of duplicating the behavioral contract.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 11,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:f43fcb2d1067a343ea8a3e62c8b951295662c6bb33de07b60bf7bbbc4ee984ef",
+          "at": "2026-07-26T18:54:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 の description は `FulfillmentCacheReevaluationReason` を更新対象として明記しているが、task-contract.json の T002 attribution に同 catalogue entry がありません。T002 の実装差分がこの既存 entry を変更する場合、task-contract の帰属を追加してください。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/task-contract.json",
+              "line": 7,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:b895a645ba60a2ec7b388537b0a21bf0ae696ac457538c0167ddd9cc5421e27a",
+          "at": "2026-07-26T19:05:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:64b6a79b0b4d533cfd1f66f5963c29b6981c58ac0607d1a9a7a8c1b09fa15490",
+          "at": "2026-07-26T19:06:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72e882d786609bf9d9a255d94c2fbb4d84a1ad9676b1bd9778dcf0345aa91a2f",
+          "at": "2026-07-26T19:11:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3732b083eb65a6414b6f78fbfe2f5018d53807806b705fe7aa689f849c15fd7",
+          "at": "2026-07-26T19:17:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 is ordered to add `TestBindingConsistencyError` after T001, but T001 claims the complete `ObligationCheckError` payload surface, whose catalogued `BindingConsistency(TestBindingConsistencyError)` variant requires that type. The current completed T001 implementation already adds both the type and variant, so T003 is not an independently executable add and its contract attribution is false. Either attribute the type (and corresponding CN-03 coverage) to T001, or defer the `ObligationCheckError` binding variant and attribute that enum to T003 as well.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 16,
+              "category": "dependency cycle or wrong ordering"
+            }
+          ],
+          "hash": "rvw1:sha256:c3732b083eb65a6414b6f78fbfe2f5018d53807806b705fe7aa689f849c15fd7",
+          "at": "2026-07-26T19:19:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18ccae5cde9676fe7202f5d6c814cbe65d92a57c71faf3e2b4f2b6aed9c7bf07",
+          "at": "2026-07-26T19:21:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3732b083eb65a6414b6f78fbfe2f5018d53807806b705fe7aa689f849c15fd7",
+          "at": "2026-07-26T19:26:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 claims to complete the `ObligationCheckError` payload surface, but T003 is ordered later to add `TestBindingConsistencyError`, which the catalogued `ObligationCheckError::BindingConsistency` payload requires. T001 therefore cannot implement its declared final surface in order; alternatively, if T003 adds that variant later, `task-contract.json` omits `ObligationCheckError` from T003. Move `TestBindingConsistencyError` to T001 or narrow T001 and attribute the later enum modification to T003.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 6,
+              "category": "dependency cycle or wrong ordering"
+            }
+          ],
+          "hash": "rvw1:sha256:c3732b083eb65a6414b6f78fbfe2f5018d53807806b705fe7aa689f849c15fd7",
+          "at": "2026-07-26T19:27:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 now adds `TestBindingConsistencyError` and the complete `ObligationCheckError` payload surface, including the CN-03 binding-consistency error path, but `task-coverage.json` maps CN-03 only to T002/T003 and T001's description omits that anchor. This leaves T001's load-bearing error-surface work without its applicable spec mapping. Add T001 to CN-03 coverage and cite it in T001, while retaining T003 for behavioral validation.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/task-coverage.json",
+              "line": 19,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:63374ac870b3a2fd92fefa6c41437c46ebb48223e5690cc78dac9b7a10a50197",
+          "at": "2026-07-26T19:29:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6797515de15e5955308012c1ec372461569c12e5e3f30167d5f929b6414498e9",
+          "at": "2026-07-26T19:30:30Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When no exact current-key entry exists, the fallback uses `iter().find(...)` on only `(edge_id, obligation_id)`, so multiple historical rows make drift classification depend on cache row order. For example, one row with a changed bound-test hash and another with a changed declaration hash produces different reported drift depending on ordering. The fallback must aggregate or otherwise deterministically classify all matching candidates (and fail closed on ambiguity) rather than selecting the first row.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/check.rs",
+              "line": 539,
+              "category": "orchestration correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aef173043b579676959fe1365f22763a3afd1f9f320494d13537955943f35015",
+          "at": "2026-07-26T18:10:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c59f8ff80f841d2cc5cfb68937de01062c02b9992ce00951f9e7a833a5006c06",
+          "at": "2026-07-26T18:50:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c59f8ff80f841d2cc5cfb68937de01062c02b9992ce00951f9e7a833a5006c06",
+          "at": "2026-07-26T18:54:20Z"
         }
       ]
     },
@@ -447,6 +581,205 @@
           "findings": [],
           "hash": "rvw1:sha256:33b9233ae8f9244213b4be2560f3987a54b3646a0800039406aaebe7aeab783e",
           "at": "2026-07-26T16:08:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a4b34b1417bea7c91da4d865bb9138d95766f9b0953c9c023665d81addc5105",
+          "at": "2026-07-26T18:10:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The AC-03 binding cites only `test_binding_consistency_error_carries_edge_id`, which merely constructs and pattern-matches the error variant. It never runs `check` with a voluntary binding on a derived-obligation edge or verifies the required finding/nonzero failure, so AC-03 is not covered. Bind an actual gate-level regression test (or remove this premature binding until one exists).",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/test-bindings.json",
+              "line": 18,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:6a4b34b1417bea7c91da4d865bb9138d95766f9b0953c9c023665d81addc5105",
+          "at": "2026-07-26T18:15:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46672621ea57b12f35ef34a895607e5f2c5ed82eac3064fe333d0c02a2f26392",
+          "at": "2026-07-26T18:50:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46672621ea57b12f35ef34a895607e5f2c5ed82eac3064fe333d0c02a2f26392",
+          "at": "2026-07-26T18:52:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e4d252a92c4d753394639c5e0934aa469dac5b9e9cb25a5f36e843fdf89d7df",
+          "at": "2026-07-26T19:04:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e4d252a92c4d753394639c5e0934aa469dac5b9e9cb25a5f36e843fdf89d7df",
+          "at": "2026-07-26T19:05:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3a8f49f1daae1241532f3d4b74e2b57bd6158a63732b84c588f029c33e4e837",
+          "at": "2026-07-26T19:38:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3a8f49f1daae1241532f3d4b74e2b57bd6158a63732b84c588f029c33e4e837",
+          "at": "2026-07-26T19:39:57Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e10064361e4434808d98fa254227646a9765aa1b2cb7f1a6d6693a8455b17c20",
+          "at": "2026-07-26T16:04:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 の「評価エラーを黙殺しない」という意図を決定的に証明する AC がない。AC-04 は返却済みの失敗 verdict の schema を検証するだけで、評価処理自体がエラーを返す場合の伝播や非零終了を扱わないため、この目標の一部を未検証のまま完了扱いできる。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+              "line": 22,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "CN-04 の「error 出力が判定根拠を追跡可能にする」は、追跡可能と判定するための必須情報や観測条件を定義していない。IN-05 は cache 行の `bound_tests` だけを具体化しており error 出力は具体化されないため、下流工程が意味を発明しなければ検証できない制約になっている。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+              "line": 212,
+              "category": "constraint vague or untestable"
+            }
+          ],
+          "hash": "rvw1:sha256:e10064361e4434808d98fa254227646a9765aa1b2cb7f1a6d6693a8455b17c20",
+          "at": "2026-07-26T16:11:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ef03a5bdb48ef39010235d2f2846560cd5152efdc6fd1bd0a8e3146db89da5f",
+          "at": "2026-07-26T16:28:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-07 は verifier provider の解決失敗時における `evaluate` のエラー伝播を要求しているが、IN-01〜IN-05 の declared in_scope は cache entry の選択、重複、binding、失敗 verdict schema、cache 診断情報に限られ、provider 解決や評価エラー伝播を含まない。したがって、この AC は宣言された in_scope 外の振る舞いを完了条件にしている。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+              "line": 324,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8ef03a5bdb48ef39010235d2f2846560cd5152efdc6fd1bd0a8e3146db89da5f",
+          "at": "2026-07-26T16:30:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:07677710a91fed0ac49b9cccd00b7c6c49268d6c615cb1a9f4e3d9776c2f73a0",
+          "at": "2026-07-26T16:33:52Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb78f53cce67c6301d528a7d4eb3e826c558bfdc80c60da867e09335f2b4d47b",
+          "at": "2026-07-26T18:09:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-02 requires conflicting verdicts sharing the same full cache identity, but this test inserts two identical entries. A faulty implementation that rejects exact duplicates yet still first-matches `Fulfilled` versus `Pending` would pass. Give the second row the same IDs/key/fingerprint but a conflicting verdict, and verify both row orders.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/verdict.rs",
+              "line": 625,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:eb78f53cce67c6301d528a7d4eb3e826c558bfdc80c60da867e09335f2b4d47b",
+          "at": "2026-07-26T18:13:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:10a9e495468ba45cf0dd9baadb39494a066bb46a85ecb765943b2ef0a2e2e269",
+          "at": "2026-07-26T18:49:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The historical and current rows are both `Fulfilled`, but the assertion only checks the verdict variant. A lookup that ignores `bound_tests_set_hash` and returns the first same-pair row would therefore pass in both orders, leaving the required independent bound-hash dimension untested. Assert that the returned entry's key equals `current_key` (or otherwise distinguish the current row).",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/test_obligation/verdict.rs",
+              "line": 617,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:10a9e495468ba45cf0dd9baadb39494a066bb46a85ecb765943b2ef0a2e2e269",
+          "at": "2026-07-26T18:52:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6066abead3719e39cb75b9dadb701e223ec48a2da90435e1680f0a1cb0e18760",
+          "at": "2026-07-26T18:55:56Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3d51cb42df1025cf48a6503969c3aefaf5f9bbc5e58a0c65c8ffcbe7da696c9",
+          "at": "2026-07-26T15:18:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3d51cb42df1025cf48a6503969c3aefaf5f9bbc5e58a0c65c8ffcbe7da696c9",
+          "at": "2026-07-26T15:20:50Z"
         }
       ]
     }

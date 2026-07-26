@@ -48,9 +48,9 @@ use domain::tddd::test_obligation::rules::{
 };
 use domain::tddd::test_obligation::scope::UncitedSpecElementFinding;
 use domain::tddd::test_obligation::verdict::{
-    ObligationFulfillmentCacheDocument, ObligationFulfillmentCacheEntry,
-    ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict, WaiverCacheDocument,
-    WaiverCacheEntry, WaiverCacheKey, WaiverVerdict,
+    FulfillmentCacheLookupError, ObligationFulfillmentCacheDocument,
+    ObligationFulfillmentCacheEntry, ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict,
+    WaiverCacheDocument, WaiverCacheEntry, WaiverCacheKey, WaiverVerdict,
 };
 use domain::tddd::test_obligation::vocab::{
     TargetEntryRoleKind, TestObligationKind, TestObligationPatternKind, TestObligationPerAxis,
@@ -2449,6 +2449,138 @@ fn test_bound_edge_without_verdict_is_stale() {
     let result =
         interactor(Some(obligations), Some(bindings), Some(empty_cache), None).execute(&command());
     assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));
+}
+
+#[test]
+fn test_check_with_historical_fulfillment_row_uses_current_full_key() {
+    let current = fresh_fulfillment_cache().entries()[0].clone();
+    let historical = ObligationFulfillmentCacheEntry::new(
+        edge(),
+        obligation().id().clone(),
+        ObligationFulfillmentCacheKey::new(
+            BoundTestsSetHash::new(ContentHash::from_bytes([7u8; 32])),
+            current.key().declaration_hash().clone(),
+            current.key().anchor_text_hash().clone(),
+        ),
+        ObligationFulfillmentVerdict::Fulfilled {
+            citation: EvidenceCitation::try_new("historical cite".to_owned()).unwrap(),
+        },
+        Some(fulfillment_verifier_fingerprint()),
+    );
+    for entries in
+        [vec![historical.clone(), current.clone()], vec![current.clone(), historical.clone()]]
+    {
+        let cache = ObligationFulfillmentCacheDocument::new(track(), entries);
+        let obligations = ObligationsDocument::new(track(), vec![obligation()]);
+        let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
+
+        let outcome = interactor(Some(obligations), Some(bindings), Some(cache), None)
+            .execute(&command())
+            .unwrap();
+
+        assert_eq!(outcome.resolved_edges(), &[edge()]);
+    }
+}
+
+#[test]
+fn test_check_aggregates_historical_fulfillment_key_drifts_independent_of_row_order() {
+    let current = fresh_fulfillment_cache().entries()[0].clone();
+    let test_changed = ObligationFulfillmentCacheEntry::new(
+        edge(),
+        obligation().id().clone(),
+        ObligationFulfillmentCacheKey::new(
+            BoundTestsSetHash::new(ContentHash::from_bytes([7u8; 32])),
+            current.key().declaration_hash().clone(),
+            current.key().anchor_text_hash().clone(),
+        ),
+        ObligationFulfillmentVerdict::Pending,
+        Some(fulfillment_verifier_fingerprint()),
+    );
+    let declaration_changed = ObligationFulfillmentCacheEntry::new(
+        edge(),
+        obligation().id().clone(),
+        ObligationFulfillmentCacheKey::new(
+            current.key().bound_tests_set_hash().clone(),
+            DeclarationHash::new(ContentHash::from_bytes([7u8; 32])),
+            current.key().anchor_text_hash().clone(),
+        ),
+        ObligationFulfillmentVerdict::Pending,
+        Some(fulfillment_verifier_fingerprint()),
+    );
+    let expected = vec![
+        TestObligationDrift::test_changed_edge(
+            edge(),
+            DiagnosticMessage::try_new(
+                "bound test bodies changed since the verdict was frozen".to_owned(),
+            )
+            .unwrap(),
+        ),
+        TestObligationDrift::decl_changed_edge(
+            edge(),
+            DiagnosticMessage::try_new(
+                "entry declaration changed since the verdict was frozen".to_owned(),
+            )
+            .unwrap(),
+        ),
+    ];
+
+    for entries in [
+        vec![test_changed.clone(), declaration_changed.clone()],
+        vec![declaration_changed.clone(), test_changed.clone()],
+    ] {
+        let result = interactor(
+            Some(ObligationsDocument::new(track(), vec![obligation()])),
+            Some(TestBindingsDocument::new(track(), vec![fulfillment_binding()])),
+            Some(ObligationFulfillmentCacheDocument::new(track(), entries)),
+            None,
+        )
+        .execute(&command());
+
+        let Err(ObligationCheckError::DriftsDetected { drifts }) = result else {
+            panic!("expected deterministic freshness drifts");
+        };
+        assert_eq!(drifts.as_slice(), expected.as_slice());
+    }
+}
+
+#[test]
+fn test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error() {
+    let fulfilled = fresh_fulfillment_cache().entries()[0].clone();
+    let expected_key = fulfilled.key().clone();
+    let pending = ObligationFulfillmentCacheEntry::new(
+        edge(),
+        obligation().id().clone(),
+        expected_key.clone(),
+        ObligationFulfillmentVerdict::Pending,
+        Some(fulfillment_verifier_fingerprint()),
+    );
+
+    for entries in
+        [vec![fulfilled.clone(), pending.clone()], vec![pending.clone(), fulfilled.clone()]]
+    {
+        let cache = ObligationFulfillmentCacheDocument::new(track(), entries);
+        let obligations = ObligationsDocument::new(track(), vec![obligation()]);
+        let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
+        let result =
+            interactor(Some(obligations), Some(bindings), Some(cache), None).execute(&command());
+
+        match result {
+            Err(ObligationCheckError::FulfillmentCacheLookup(
+                FulfillmentCacheLookupError::AmbiguousCurrentEntries {
+                    edge_id: actual_edge_id,
+                    obligation_id: actual_obligation_id,
+                    key: actual_key,
+                },
+            )) => {
+                assert_eq!(actual_edge_id, edge());
+                assert_eq!(actual_obligation_id, obligation().id().clone());
+                assert_eq!(actual_key, expected_key);
+            }
+            other => {
+                panic!("expected ambiguity error with the complete cache identity, got {other:?}")
+            }
+        }
+    }
 }
 
 #[test]
