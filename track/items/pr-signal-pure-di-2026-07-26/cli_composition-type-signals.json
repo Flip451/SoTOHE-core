@@ -1,13 +1,13 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T09:35:45Z",
+  "generated_at": "2026-07-26T15:03:06Z",
   "declaration_hash": "324ce54c599b996a893475533f455e7730867b8969997e781d801112abacb885",
-  "implementation_input_hash": "b46f16fbdac5c4f77db9270f76673985f38c370640cbc2c4aae1efff9ea4b688",
+  "implementation_input_hash": "4ebee37c7207efe17a8795097705e982c5dbcec1afd28d6ac9cd65122c1775c1",
   "signals": [
     {
       "type_name": "PrCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "5c321eda200e59754c0ca015ddb7396866d103529a3f9ddd7b748dc0d7ca94e4",
+  "catalogue_declaration_hash": "816a97c61f9b4473abacb8184efd93c7bcd7c9d0021100d8ec9dbe93a1f27f96",
   "signals": [
     {
       "type_name": "SystemPrCommandAdapter",

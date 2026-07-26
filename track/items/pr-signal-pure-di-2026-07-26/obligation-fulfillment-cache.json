@@ -1,0 +1,701 @@
+{
+  "track_id": "pr-signal-pure-di-2026-07-26",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "PrBaseOverride",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrBaseOverride",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:non_empty_pr_base_override"
+      },
+      "key": {
+        "bound_tests_set_hash": "e35986cbc54aa765cc04b116cef4baf831e0a58fd1f0f26ab296aea4954ca134",
+        "declaration_hash": "4fd32ab2a3e69f1d07a6293947e8cae1c9de129ab035f197e1259fd84e0ad6c2",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(PrBaseOverride::try_new(String::new()), None); ... base.as_str() == \" main \" && base.is_valid()"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrBaseOverride",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrBaseOverride",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:non_empty_pr_base_override"
+      },
+      "key": {
+        "bound_tests_set_hash": "e35986cbc54aa765cc04b116cef4baf831e0a58fd1f0f26ab296aea4954ca134",
+        "declaration_hash": "4fd32ab2a3e69f1d07a6293947e8cae1c9de129ab035f197e1259fd84e0ad6c2",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(PrBaseOverride::try_new(String::new()), None);\n\n        assert_eq!(output.exit_code, 0);\n        let commands = port.commands.lock().unwrap();\n        assert!(matches!(\n            commands.as_slice(),\n            [PrCommand::Ensure { base: Some(base), .. }] if base.as_str() == \" main \" && base.is_valid()\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1a3903c849e7804c009660331b33e8d401c294ac126787efbb11b1a7f91b5df8",
+        "declaration_hash": "d7313d327f9a8a1a5a037ab52af7260209e31e4d7c76de348fbb129b593aed07",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let interactor = PrCommandInteractor::new(port.clone());\n\n        let output = interactor.push(Some(\"valid-track\".to_owned()));\n\n        assert_eq!(output.stdout.as_deref(), Some(\"delegated\"));\n        let commands = port.commands.lock().unwrap();\n        assert!(\n            matches!(commands.as_slice(), [PrCommand::Push { track_id: Some(id) }] if id.as_str() == \"valid-track\")\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1a3903c849e7804c009660331b33e8d401c294ac126787efbb11b1a7f91b5df8",
+        "declaration_hash": "d7313d327f9a8a1a5a037ab52af7260209e31e4d7c76de348fbb129b593aed07",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let interactor = PrCommandInteractor::new(port.clone());\n\n        let outputs = [\n            interactor.push(Some(\"track-id\".to_owned())),\n            interactor.ensure(Some(\"track-id\".to_owned()), \"develop\".to_owned()),\n            interactor.status(\"123\".to_owned()),\n            interactor.wait_and_merge(\"123\".to_owned(), 2, 3, \"squash\".to_owned()),\n            interactor.trigger_review(\"123\".to_owned()),\n            interactor.poll_review(\"123\".to_owned(), \"2026-07-26T00:00:00Z\".to_owned(), 0, 1),\n            interactor.review_cycle(Some(\"track-id\".to_owned()), false),\n            interactor.review_cycle(Some(\"track-id\".to_owned()), true),\n        ];\n\n        assert!(matches!(\n            commands.as_slice(),\n            [\n                PrCommand::Push { .. },\n                PrCommand::Ensure { .. },\n                PrCommand::Status(_),\n                PrCommand::WaitAndMerge { .. },\n                PrCommand::TriggerReview(_),\n                PrCommand::PollReview { .. },\n                PrCommand::ReviewCycle { mode: PrReviewCycleMode::Start, .. },\n                PrCommand::ReviewCycle { mode: PrReviewCycleMode::Resume, .. },\n            ]\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1a3903c849e7804c009660331b33e8d401c294ac126787efbb11b1a7f91b5df8",
+        "declaration_hash": "d7313d327f9a8a1a5a037ab52af7260209e31e4d7c76de348fbb129b593aed07",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            commands.as_slice(),\n            [\n                PrCommand::Push { .. },\n                PrCommand::Ensure { .. },\n                PrCommand::Status(_),\n                PrCommand::WaitAndMerge { .. },\n                PrCommand::TriggerReview(_),\n                PrCommand::PollReview { .. },\n                PrCommand::ReviewCycle { mode: PrReviewCycleMode::Start, .. },\n                PrCommand::ReviewCycle { mode: PrReviewCycleMode::Resume, .. },\n            ]\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrIdentifier",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrIdentifier",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:non_empty_pr_identifier"
+      },
+      "key": {
+        "bound_tests_set_hash": "a2d7ea710188886b35f4d2cd33c29f275f222c9668812f4c39bdf4cf913bbb1a",
+        "declaration_hash": "45ff22aeefe386107c7c3ad3adb44939da0b7eb9a64d020d9f0bf9f38e163a5c",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let output = interactor.status(String::new());\n\n        assert_eq!(output.exit_code, 1);\n        assert_eq!(output.stderr.as_deref(), Some(\"PR identifier must not be empty\"));\n        assert!(port.commands.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrIdentifier",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrIdentifier",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:non_empty_pr_identifier"
+      },
+      "key": {
+        "bound_tests_set_hash": "a2d7ea710188886b35f4d2cd33c29f275f222c9668812f4c39bdf4cf913bbb1a",
+        "declaration_hash": "45ff22aeefe386107c7c3ad3adb44939da0b7eb9a64d020d9f0bf9f38e163a5c",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(output.stderr.as_deref(), Some(\"PR identifier must not be empty\"));\n        assert!(port.commands.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommandPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommandPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "5cf4f77c529115f3635fb0fddb6fa6b2c9a29fd86af1bb438c18293e5ca509bf",
+        "declaration_hash": "790babd669b598fdbaea6958bcc41730273a1ca8520cf8a893dd94c7e021e50a",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            matches!(commands.as_slice(), [PrCommand::Push { track_id: Some(id) }] if id.as_str() == \"valid-track\")\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommandPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommandPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "5cf4f77c529115f3635fb0fddb6fa6b2c9a29fd86af1bb438c18293e5ca509bf",
+        "declaration_hash": "790babd669b598fdbaea6958bcc41730273a1ca8520cf8a893dd94c7e021e50a",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            matches!(commands.as_slice(), [PrCommand::Push { track_id: Some(id) }] if id.as_str() == \"valid-track\")\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommandPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommandPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "5cf4f77c529115f3635fb0fddb6fa6b2c9a29fd86af1bb438c18293e5ca509bf",
+        "declaration_hash": "790babd669b598fdbaea6958bcc41730273a1ca8520cf8a893dd94c7e021e50a",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            matches!(commands.as_slice(), [PrCommand::Push { track_id: Some(id) }] if id.as_str() == \"valid-track\")\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommandPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommandPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "5cf4f77c529115f3635fb0fddb6fa6b2c9a29fd86af1bb438c18293e5ca509bf",
+        "declaration_hash": "790babd669b598fdbaea6958bcc41730273a1ca8520cf8a893dd94c7e021e50a",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(output.stdout.as_deref(), Some(\"persisted stdout\"));\n        assert_eq!(output.stderr.as_deref(), Some(\"persisted stderr\"));\n        assert_eq!(output.exit_code, 17);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pr::PrCommandPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5b7a4e19956614e2d03b54fc2adf13c24be21ea97aba88210e2044c54da54b0",
+        "declaration_hash": "2e70c060ac01e921a5be20756e6e79d8298d6419ca166ac3a61451c2313c5f86",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let driver = root.pr_driver_with_port(port.clone());\n\n        let outcome = driver.handle(PrInput::Push { track_id: Some(\"wired-track\".to_owned()) });\n\n        assert_eq!(outcome.stdout.as_deref(), Some(\"driver stdout\"));\n        assert_eq!(outcome.stderr.as_deref(), Some(\"driver stderr\"));\n        assert_eq!(outcome.exit_code, 23);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pr::PrCommandPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5b7a4e19956614e2d03b54fc2adf13c24be21ea97aba88210e2044c54da54b0",
+        "declaration_hash": "2e70c060ac01e921a5be20756e6e79d8298d6419ca166ac3a61451c2313c5f86",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let driver = root.pr_driver_with_port(port.clone());\n\n        let outcome = driver.handle(PrInput::Push { track_id: Some(\"wired-track\".to_owned()) });\n\n        assert_eq!(outcome.stdout.as_deref(), Some(\"driver stdout\"));\n        assert_eq!(outcome.stderr.as_deref(), Some(\"driver stderr\"));\n        assert_eq!(outcome.exit_code, 23);\n        let commands = port.commands.lock().unwrap();\n        assert!(\n            matches!(commands.as_slice(), [PrCommand::Push { track_id: Some(id) }] if id.as_str() == \"wired-track\")\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pr::PrCommandPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5b7a4e19956614e2d03b54fc2adf13c24be21ea97aba88210e2044c54da54b0",
+        "declaration_hash": "2e70c060ac01e921a5be20756e6e79d8298d6419ca166ac3a61451c2313c5f86",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            local_head.stdout, remote_head.stdout,\n            \"pure-DI push must persist the branch ref at origin\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pr::PrCommandPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5b7a4e19956614e2d03b54fc2adf13c24be21ea97aba88210e2044c54da54b0",
+        "declaration_hash": "2e70c060ac01e921a5be20756e6e79d8298d6419ca166ac3a61451c2313c5f86",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "driver.handle(PrInput::Push { track_id: Some(track_id.to_owned()) })\nassert_eq!(outcome.stdout.as_deref(), Some(format!(\"[OK] Pushed {branch}\").as_str()));\nassert_eq!(outcome.stderr, None);\nassert_eq!(outcome.exit_code, 0);\nassert_eq!(local_head.stdout, remote_head.stdout, \"pure-DI push must persist the branch ref at origin\")"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5b7a4e19956614e2d03b54fc2adf13c24be21ea97aba88210e2044c54da54b0",
+        "declaration_hash": "a44888a7ba44481fee3a1d4884cae786013756af341b932f8160b3585d7e6bc9",
+        "anchor_text_hash": "2002daaeadc79b72748b7a8a3d7503e01c5f9eec6f4d5b7bee7037008ca48510"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let port = Arc::new(RecordingPort::new());\n        let driver = root.pr_driver_with_port(port.clone());\n\n        let outcome = driver.handle(PrInput::Push { track_id: Some(\"wired-track\".to_owned()) });\n\n        assert_eq!(outcome.stdout.as_deref(), Some(\"driver stdout\"));\n        assert_eq!(outcome.stderr.as_deref(), Some(\"driver stderr\"));\n        assert_eq!(outcome.exit_code, 23);\n        let commands = port.commands.lock().unwrap();\n        assert!(\n            matches!(commands.as_slice(), [PrCommand::Push { track_id: Some(id) }] if id.as_str() == \"wired-track\")\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "982433a0a2f872a5b37480c6aee4f61efec825547173f38cc4b6d0ad89e4bc08",
+        "declaration_hash": "db17152297722ff4a58355400123543b0877fb8416e87fea34c9aedf2c98bcbc",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            commands.as_slice(),\n            [\n                PrCommand::Push { track_id: Some(push_track_id) },\n                PrCommand::Ensure { track_id: Some(ensure_track_id), base: Some(base) },\n                PrCommand::Status(status_pr),\n                PrCommand::WaitAndMerge { pr: merge_pr, interval, timeout, method },\n                PrCommand::TriggerReview(trigger_pr),\n                PrCommand::PollReview { pr: poll_pr, trigger_timestamp, interval: poll_interval, timeout: poll_timeout },\n                PrCommand::ReviewCycle { track_id: Some(start_track_id), mode: PrReviewCycleMode::Start },\n                PrCommand::ReviewCycle { track_id: Some(resume_track_id), mode: PrReviewCycleMode::Resume, },\n            ]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "5ab61e744d89ebcb4603bccda92a41aa15ad357f900637afd8581de0940150f5",
+        "declaration_hash": "db17152297722ff4a58355400123543b0877fb8416e87fea34c9aedf2c98bcbc",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let driver = root.pr_driver_with_port(port.clone());\n\n        let outcomes = [\n            driver.handle(PrInput::Push { track_id: Some(\"INVALID\".to_owned()) }),\n            driver.handle(PrInput::Ensure {\n                track_id: Some(\"INVALID\".to_owned()),\n                base: Some(\" main \".to_owned()),\n            }),\n            driver.handle(PrInput::Status { pr: \"123\".to_owned() }),\n            driver.handle(PrInput::WaitAndMerge {\n                pr: \"123\".to_owned(),\n                interval: 0,\n                timeout: 0,\n                method: Some(\"squash\".to_owned()),\n            }),\n            driver.handle(PrInput::TriggerReview { pr: \"123\".to_owned() }),\n            driver.handle(PrInput::PollReview {\n                pr: \"123\".to_owned(),\n                trigger_timestamp: \"2026-07-26T00:00:00Z\".to_owned(),\n                interval: 0,\n                timeout: 0,\n            }),\n            driver.handle(PrInput::ReviewCycle {\n                track_id: Some(\"INVALID\".to_owned()),\n                resume: false,\n            }),\n            driver.handle(PrInput::ReviewCycle {\n                track_id: Some(\"INVALID\".to_owned()),\n                resume: true,\n            }),\n        ];\n\n        assert!(matches!(\n            commands.as_slice(),\n            [\n                PrCommand::Push { track_id: Some(push_track_id) },\n                PrCommand::Ensure { track_id: Some(ensure_track_id), base: Some(base) },\n                PrCommand::Status(status_pr),\n                PrCommand::WaitAndMerge { pr: merge_pr, interval: merge_interval, timeout: merge_timeout, method },\n                PrCommand::TriggerReview(trigger_pr),\n                PrCommand::PollReview { pr: poll_pr, trigger_timestamp, interval: poll_interval, timeout: poll_timeout },\n                PrCommand::ReviewCycle { track_id: Some(start_track_id), mode: usecase::pr::PrReviewCycleMode::Start },\n                PrCommand::ReviewCycle { track_id: Some(resume_track_id), mode: usecase::pr::PrReviewCycleMode::Resume },\n            ]\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "e7ce0bb9e4c6d1cf330ee6b67d137f723414cdd505e0a6b10ef1773cda27be2d",
+        "declaration_hash": "db17152297722ff4a58355400123543b0877fb8416e87fea34c9aedf2c98bcbc",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(outcomes.iter().all(|outcome| {\n            outcome.stdout.as_deref() == Some(\"driver stdout\")\n                && outcome.stderr.as_deref() == Some(\"driver stderr\")\n                && outcome.exit_code == 23\n        })); ... assert!(matches!(\n            commands.as_slice(),"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrPollIntervalSeconds",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrPollIntervalSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "67c53bca7a2af31e7d6a5fb9057c925ad6a7a4fa79c71d78a44c94285c7a679a",
+        "declaration_hash": "8433f7cffeff7426ec31491f06a2e8fc4672b681e877b625c115328e36166239",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "interactor.poll_review(\"123\".to_owned(), \"2026-07-26T00:00:00Z\".to_owned(), 0, 1),\n...\n&& poll_interval.as_secs() == 0"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrPollIntervalSeconds",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrPollIntervalSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "67c53bca7a2af31e7d6a5fb9057c925ad6a7a4fa79c71d78a44c94285c7a679a",
+        "declaration_hash": "8433f7cffeff7426ec31491f06a2e8fc4672b681e877b625c115328e36166239",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "&& poll_interval.as_secs() == 0"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrPollTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrPollTimeoutSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "67c53bca7a2af31e7d6a5fb9057c925ad6a7a4fa79c71d78a44c94285c7a679a",
+        "declaration_hash": "7c0920b3a79138fd73109204a496d379d0bd488c469021fb5f3e651ae2e584b6",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "&& timeout.as_secs() == 3\n                && matches!(method, Some(domain::MergeMethod::Squash))\n                && trigger_pr.as_str() == \"123\"\n                && poll_pr.as_str() == \"123\"\n                && trigger_timestamp.as_str() == \"2026-07-26T00:00:00Z\"\n                && poll_interval.as_secs() == 0\n                && poll_timeout.as_secs() == 1"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrPollTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrPollTimeoutSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "67c53bca7a2af31e7d6a5fb9057c925ad6a7a4fa79c71d78a44c94285c7a679a",
+        "declaration_hash": "7c0920b3a79138fd73109204a496d379d0bd488c469021fb5f3e651ae2e584b6",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "PrCommand::PollReview { pr: poll_pr, trigger_timestamp, interval: poll_interval, timeout: poll_timeout },\n                && poll_timeout.as_secs() == 1"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrReviewCycleMode",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrReviewCycleMode",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "67c53bca7a2af31e7d6a5fb9057c925ad6a7a4fa79c71d78a44c94285c7a679a",
+        "declaration_hash": "4c001a69caa8e3d3918e66a1f4a49e714039db7026a8f0e436f1b39fce2f0422",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "PrCommand::ReviewCycle { track_id: Some(start_track_id), mode: PrReviewCycleMode::Start },\n                PrCommand::ReviewCycle { track_id: Some(resume_track_id), mode: PrReviewCycleMode::Resume },"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrReviewCycleMode",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrReviewCycleMode",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "67c53bca7a2af31e7d6a5fb9057c925ad6a7a4fa79c71d78a44c94285c7a679a",
+        "declaration_hash": "4c001a69caa8e3d3918e66a1f4a49e714039db7026a8f0e436f1b39fce2f0422",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let port = Arc::new(RecordingPort::new());\n        let interactor = PrCommandInteractor::new(port.clone());\n\n        let outputs = [\n            interactor.review_cycle(Some(\"track-id\".to_owned()), false),\n            interactor.review_cycle(Some(\"track-id\".to_owned()), true),\n        ];\n\n        assert!(outputs.iter().all(|output| output.exit_code == 0));\n        let commands = port.commands.lock().unwrap();\n        assert!(matches!(\n            commands.as_slice(),\n            [\n                PrCommand::Push { .. },\n                PrCommand::Ensure { .. },\n                PrCommand::Status(..),\n                PrCommand::WaitAndMerge { .. },\n                PrCommand::TriggerReview(..),\n                PrCommand::PollReview { .. },\n                PrCommand::ReviewCycle { track_id: Some(start_track_id), mode: PrReviewCycleMode::Start },\n                PrCommand::ReviewCycle { track_id: Some(resume_track_id), mode: PrReviewCycleMode::Resume },\n            ] if start_track_id.as_str() == \"track-id\"\n                && resume_track_id.as_str() == \"track-id\"\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "bfd58b85a22379ca12d85c232c543b28faa03e9b725df22d6b75f2f51586541f",
+        "declaration_hash": "0a90c7844af77af1a3d50467f65fad5759071343e307a82f4a7728c7659b3733",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let driver = PrCompositionRoot::new().pr_driver();"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "bfd58b85a22379ca12d85c232c543b28faa03e9b725df22d6b75f2f51586541f",
+        "declaration_hash": "0a90c7844af77af1a3d50467f65fad5759071343e307a82f4a7728c7659b3733",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let driver = PrCompositionRoot::new().pr_driver();\nlet outcome = crate::test_support::run_in_dir(&workspace, || {\n    driver.handle(PrInput::Push { track_id: Some(track_id.to_owned()) })\n});\n\nassert_eq!(outcome.exit_code, 0);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrTrackIdOverride",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrTrackIdOverride",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "b964154d0ea5d36ccf910b9165970d8e8d36bc118f226550ac295caee289ef34",
+        "declaration_hash": "fcdeeed71f29510ebeae8e3c069e2be7cc7089a02161684384221b41fb3c4f35",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            commands.as_slice(),\n            [\n                PrCommand::Push { track_id: Some(push_track_id) },\n                PrCommand::Ensure { track_id: Some(ensure_track_id), base: None },\n                PrCommand::ReviewCycle { track_id: Some(review_track_id), mode: PrReviewCycleMode::Start },\n            ] if push_track_id.as_str() == \"INVALID\"\n                && ensure_track_id.as_str() == \"INVALID\"\n                && review_track_id.as_str() == \"INVALID\"\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrTrackIdOverride",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrTrackIdOverride",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "72459c6b744a240ca1ba5095f6597f137a03a0490681be53d06ce9e62ca11f9c",
+        "declaration_hash": "fcdeeed71f29510ebeae8e3c069e2be7cc7089a02161684384221b41fb3c4f35",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "&& push_track_id.as_str() == \"INVALID\"\n                && ensure_track_id.as_str() == \"INVALID\"\n                && review_track_id.as_str() == \"INVALID\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ]
+}

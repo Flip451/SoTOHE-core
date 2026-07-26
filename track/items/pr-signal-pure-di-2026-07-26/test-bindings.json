@@ -1,1 +1,330 @@
-{"track_id": "pr-signal-pure-di-2026-07-26", "records": []}
+{
+  "track_id": "pr-signal-pure-di-2026-07-26",
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "PrBaseOverride",
+        "item_identifier": "invariant:non_empty_pr_base_override",
+        "obligation_kind": "boundary"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_base_override_with_empty_value_returns_none"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_command_interactor_ensure_with_spaced_base_preserves_exact_value"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "PrCommandInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_command_interactor_push_with_valid_track_delegates_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_command_interactor_push_preserves_port_output_and_track_payload"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_command_interactor_all_variants_preserve_port_output_through_typed_port"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "PrIdentifier",
+        "item_identifier": "invariant:non_empty_pr_identifier",
+        "obligation_kind": "boundary"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_command_interactor_status_with_empty_identifier_returns_failure"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "PrCommandPort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_command_interactor_push_with_valid_track_delegates_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_command_interactor_push_preserves_port_output_and_track_payload"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "item_identifier": "trait_impl:usecase::pr::PrCommandPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::pr::tests",
+          "test_name": "test_pr_composition_root_push_executes_system_adapter_and_persists_remote_ref"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::pr::tests",
+          "test_name": "test_pr_composition_root_wires_driver_through_interactor_to_typed_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::pr::tests",
+          "test_name": "test_system_pr_command_adapter_as_typed_port_pushes_branch_to_remote_ref"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::pr::tests",
+          "test_name": "test_pr_composition_root_push_executes_system_adapter_and_persists_remote_ref"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::pr::tests",
+          "test_name": "test_pr_composition_root_wires_driver_through_interactor_to_typed_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::pr::tests",
+          "test_name": "test_system_pr_command_adapter_as_typed_port_pushes_branch_to_remote_ref"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_each_command_delegates_typed_variant"},
+        {"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_all_variants_preserve_port_output_through_typed_port"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {"layer": "cli_composition", "module_path": "cli_composition::pr::tests", "test_name": "test_pr_composition_root_all_commands_follow_single_path_and_preserve_outcomes"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "PrCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "reason": "The driver-to-interactor-to-port path is mechanically enforced: bin/sotp catalogue-lint check-active-track applies CompositionRootPureDi (0 violations across 6 layers); PrCompositionRoot exposes only new and pr_driver, while private pr_driver_with_port constructs PrCommandInteractor::new(port) and passes it to PrDriver::new; and PrDriver accepts only Arc<dyn PrCommandService>. Therefore no public composition route can inject a direct port or compatibility facade, while black-box port tests cannot independently prove the intermediate interactor."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {"layer": "cli_composition", "module_path": "cli_composition::pr::tests", "test_name": "test_pr_composition_root_all_commands_follow_single_path_and_preserve_outcomes"},
+        {"layer": "cli_composition", "module_path": "cli_composition::pr::tests", "test_name": "test_pr_composition_root_push_executes_system_adapter_and_persists_remote_ref"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrPollIntervalSeconds",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_each_command_delegates_typed_variant"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrPollIntervalSeconds",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_each_command_delegates_typed_variant"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrPollTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_each_command_delegates_typed_variant"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrPollTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_each_command_delegates_typed_variant"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrReviewCycleMode",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_each_command_delegates_typed_variant"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrReviewCycleMode",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_each_command_delegates_typed_variant"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [{"layer": "cli_composition", "module_path": "cli_composition::pr::tests", "test_name": "test_pr_composition_root_push_executes_system_adapter_and_persists_remote_ref"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "PrCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "reason": "The absence of command logic, outcome construction, direct I/O, and reverse delegation is a structural Pure DI property mechanically enforced by bin/sotp catalogue-lint check-active-track; a runtime unit test cannot independently prove this absence without duplicating that static analysis."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [{"layer": "cli_composition", "module_path": "cli_composition::pr::tests", "test_name": "test_pr_composition_root_push_executes_system_adapter_and_persists_remote_ref"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "PrCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "reason": "pr_driver_with_port is a private construction helper, not a declared or public compatibility facade. The public surface is pr_driver, and the no-facade structural property is mechanically enforced by bin/sotp catalogue-lint check-active-track."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrTrackIdOverride",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_command_interactor_invalid_track_ids_preserve_compatibility_overrides"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrTrackIdOverride",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_invalid_track_ids_preserve_compatibility_overrides"},
+        {"layer": "infrastructure", "module_path": "infrastructure::pr::tests", "test_name": "test_system_pr_command_adapter_as_typed_port_pushes_branch_to_remote_ref"}
+      ]
+    }
+  ]
+}

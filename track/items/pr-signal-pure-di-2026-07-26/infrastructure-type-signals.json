@@ -1,15 +1,16 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T09:35:41Z",
-  "declaration_hash": "5c321eda200e59754c0ca015ddb7396866d103529a3f9ddd7b748dc0d7ca94e4",
-  "implementation_input_hash": "eea709596722fd39f859b9a0392317f8b626d1baa233bc0531e6b6354ae9029f",
+  "generated_at": "2026-07-26T15:32:01Z",
+  "declaration_hash": "816a97c61f9b4473abacb8184efd93c7bcd7c9d0021100d8ec9dbe93a1f27f96",
+  "implementation_input_hash": "0650c2dc84ee07261d81684f42ab673c38adbc0fc13181ccbe437a4c501d9336",
   "signals": [
     {
       "type_name": "SystemPrCommandAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Default",
         "PrCommandPort"
       ]
     },

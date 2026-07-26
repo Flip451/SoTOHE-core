@@ -5,14 +5,14 @@
 
 GO-01 → T001–T006 establish the typed PR and Signal execution paths; T007 supplies their CLI contract evidence. GO-02 → T001–T007 delivers an independently CI-green migration slice, with T007 validating parity and live references.
 
-## Tasks (0/7 resolved)
+## Tasks (3/7 resolved)
 
 ### pr-typed-boundary — PR typed boundary and secondary adapter
 
 > Reuse PrCommandOutput, modify the existing PrCommandInteractor, and add SystemPrCommandAdapter. IN-01/CN-02/CN-03/CN-04/AC-03/AC-06. T001, T003.
 
-- [ ] **T001**: Add PrCommand and validated PR value objects at the driver-facing service port; modify the existing PrCommandInteractor and reuse the existing PrCommandOutput; add validation and delegation tests. IN-01/CN-02/CN-03/CN-04/AC-03/AC-06.
-- [ ] **T003**: Add SystemPrCommandAdapter for the existing PR filesystem, Git, GitHub, terminal, and polling components; add representative success and error tests. IN-01/CN-02/CN-04/AC-03/AC-06.
+- [x] **T001**: Add PrCommand and validated PR value objects at the driver-facing service port; modify the existing PrCommandInteractor and reuse the existing PrCommandOutput; add validation and delegation tests. IN-01/CN-02/CN-03/CN-04/AC-03/AC-06.
+- [x] **T003**: Add SystemPrCommandAdapter for the existing PR filesystem, Git, GitHub, terminal, and polling components; add representative success and error tests. IN-01/CN-02/CN-04/AC-03/AC-06.
 
 ### signal-typed-boundary — Signal typed boundary and secondary adapter
 
@@ -25,7 +25,7 @@ GO-01 → T001–T006 establish the typed PR and Signal execution paths; T007 su
 
 > Wire PrDriver, PrCommandInteractor, and SystemPrCommandAdapter in the PR composition root; remove closure execution. IN-01/OUT-01/CN-01/CN-02/CN-04/AC-01/AC-03/AC-06. T005.
 
-- [ ] **T005**: Wire PrDriver, PrCommandInteractor, and SystemPrCommandAdapter in the PR composition root; remove closure-based command execution. IN-01/OUT-01/CN-01/CN-02/CN-04/AC-01/AC-03/AC-06.
+- [x] **T005**: Wire PrDriver, PrCommandInteractor, and SystemPrCommandAdapter in the PR composition root; remove closure-based command execution. IN-01/OUT-01/CN-01/CN-02/CN-04/AC-01/AC-03/AC-06.
 
 ### signal-cutover — Signal composition and CLI cutover
 

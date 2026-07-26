@@ -39,6 +39,13 @@ subgraph usecase["usecase"]
   direction TB
   subgraph usecase_usecase_module_pr["usecase::pr"]
     direction TB
+  subgraph T30_usecase_usecase_PrBaseOverride["pr::PrBaseOverride"]
+    direction TB
+    T30_usecase_usecase_PrBaseOverride__self[PrBaseOverride]
+    T30_usecase_usecase_PrBaseOverride_try_new([try_new])
+    T30_usecase_usecase_PrBaseOverride_as_str([as_str])
+    T30_usecase_usecase_PrBaseOverride_is_valid([is_valid])
+  end
   subgraph T25_usecase_usecase_PrCommand["pr::PrCommand"]
     direction TB
     T25_usecase_usecase_PrCommand__self[PrCommand]
@@ -72,22 +79,26 @@ subgraph usecase["usecase"]
   subgraph T37_usecase_usecase_PrPollIntervalSeconds["pr::PrPollIntervalSeconds"]
     direction TB
     T37_usecase_usecase_PrPollIntervalSeconds__self[PrPollIntervalSeconds]
-    T37_usecase_usecase_PrPollIntervalSeconds_try_new([try_new])
+    T37_usecase_usecase_PrPollIntervalSeconds_new([new])
     T37_usecase_usecase_PrPollIntervalSeconds_as_secs([as_secs])
-    T37_usecase_usecase_PrPollIntervalSeconds_is_valid([is_valid])
   end
   subgraph T36_usecase_usecase_PrPollTimeoutSeconds["pr::PrPollTimeoutSeconds"]
     direction TB
     T36_usecase_usecase_PrPollTimeoutSeconds__self[PrPollTimeoutSeconds]
-    T36_usecase_usecase_PrPollTimeoutSeconds_try_new([try_new])
+    T36_usecase_usecase_PrPollTimeoutSeconds_new([new])
     T36_usecase_usecase_PrPollTimeoutSeconds_as_secs([as_secs])
-    T36_usecase_usecase_PrPollTimeoutSeconds_is_valid([is_valid])
   end
   subgraph T33_usecase_usecase_PrReviewCycleMode["pr::PrReviewCycleMode"]
     direction TB
     T33_usecase_usecase_PrReviewCycleMode__self[PrReviewCycleMode]
     T33_usecase_usecase_PrReviewCycleMode_Start[Start]
     T33_usecase_usecase_PrReviewCycleMode_Resume[Resume]
+  end
+  subgraph T33_usecase_usecase_PrTrackIdOverride["pr::PrTrackIdOverride"]
+    direction TB
+    T33_usecase_usecase_PrTrackIdOverride__self[PrTrackIdOverride]
+    T33_usecase_usecase_PrTrackIdOverride_new([new])
+    T33_usecase_usecase_PrTrackIdOverride_as_str([as_str])
   end
   subgraph R29_usecase_usecase_PrCommandPort["pr::PrCommandPort"]
     direction TB
@@ -192,6 +203,10 @@ end
 subgraph cli["cli"]
   direction TB
 end
+T30_usecase_usecase_PrBaseOverride_try_new --> T30_usecase_usecase_PrBaseOverride__self
+T25_usecase_usecase_PrCommand_Push --o|track_id| T33_usecase_usecase_PrTrackIdOverride__self
+T25_usecase_usecase_PrCommand_Ensure --o|track_id| T33_usecase_usecase_PrTrackIdOverride__self
+T25_usecase_usecase_PrCommand_Ensure --o|base| T30_usecase_usecase_PrBaseOverride__self
 T25_usecase_usecase_PrCommand_Status --o T28_usecase_usecase_PrIdentifier__self
 T25_usecase_usecase_PrCommand_WaitAndMerge --o|pr| T28_usecase_usecase_PrIdentifier__self
 T25_usecase_usecase_PrCommand_WaitAndMerge --o|interval| T37_usecase_usecase_PrPollIntervalSeconds__self
@@ -200,6 +215,7 @@ T25_usecase_usecase_PrCommand_TriggerReview --o T28_usecase_usecase_PrIdentifier
 T25_usecase_usecase_PrCommand_PollReview --o|pr| T28_usecase_usecase_PrIdentifier__self
 T25_usecase_usecase_PrCommand_PollReview --o|interval| T37_usecase_usecase_PrPollIntervalSeconds__self
 T25_usecase_usecase_PrCommand_PollReview --o|timeout| T36_usecase_usecase_PrPollTimeoutSeconds__self
+T25_usecase_usecase_PrCommand_ReviewCycle --o|track_id| T33_usecase_usecase_PrTrackIdOverride__self
 T25_usecase_usecase_PrCommand_ReviewCycle --o|mode| T33_usecase_usecase_PrReviewCycleMode__self
 T35_usecase_usecase_PrCommandInteractor_new --o R29_usecase_usecase_PrCommandPort__self
 T35_usecase_usecase_PrCommandInteractor_new --> T35_usecase_usecase_PrCommandInteractor__self
@@ -207,8 +223,9 @@ T31_usecase_usecase_PrCommandOutput_success --> T31_usecase_usecase_PrCommandOut
 T31_usecase_usecase_PrCommandOutput_failure --> T31_usecase_usecase_PrCommandOutput__self
 T31_usecase_usecase_PrCommandOutput_with_exit_code --> T31_usecase_usecase_PrCommandOutput__self
 T28_usecase_usecase_PrIdentifier_try_new --> T28_usecase_usecase_PrIdentifier__self
-T37_usecase_usecase_PrPollIntervalSeconds_try_new --> T37_usecase_usecase_PrPollIntervalSeconds__self
-T36_usecase_usecase_PrPollTimeoutSeconds_try_new --> T36_usecase_usecase_PrPollTimeoutSeconds__self
+T37_usecase_usecase_PrPollIntervalSeconds_new --> T37_usecase_usecase_PrPollIntervalSeconds__self
+T36_usecase_usecase_PrPollTimeoutSeconds_new --> T36_usecase_usecase_PrPollTimeoutSeconds__self
+T33_usecase_usecase_PrTrackIdOverride_new --> T33_usecase_usecase_PrTrackIdOverride__self
 R29_usecase_usecase_PrCommandPort_execute --o T25_usecase_usecase_PrCommand__self
 R29_usecase_usecase_PrCommandPort_execute --> T31_usecase_usecase_PrCommandOutput__self
 T39_usecase_usecase_SignalCommandInteractor_new --o R33_usecase_usecase_SignalCommandPort__self
@@ -227,6 +244,10 @@ T49_cli_composition_cli_composition_PrCompositionRoot_pr_driver --> T30_cli_driv
 T49_cli_composition_cli_composition_PrCompositionRoot_new --> T49_cli_composition_cli_composition_PrCompositionRoot__self
 T53_cli_composition_cli_composition_SignalCompositionRoot_new --> T53_cli_composition_cli_composition_SignalCompositionRoot__self
 T53_cli_composition_cli_composition_SignalCompositionRoot_signal_driver --> T34_cli_driver_cli_driver_SignalDriver__self
+class T30_usecase_usecase_PrBaseOverride_try_new method_node
+class T30_usecase_usecase_PrBaseOverride_as_str method_node
+class T30_usecase_usecase_PrBaseOverride_is_valid method_node
+class T30_usecase_usecase_PrBaseOverride__self value_object
 class T25_usecase_usecase_PrCommand_Push variant_node
 class T25_usecase_usecase_PrCommand_Ensure variant_node
 class T25_usecase_usecase_PrCommand_Status variant_node
@@ -245,17 +266,18 @@ class T28_usecase_usecase_PrIdentifier_try_new method_node
 class T28_usecase_usecase_PrIdentifier_as_str method_node
 class T28_usecase_usecase_PrIdentifier_is_valid method_node
 class T28_usecase_usecase_PrIdentifier__self value_object
-class T37_usecase_usecase_PrPollIntervalSeconds_try_new method_node
+class T37_usecase_usecase_PrPollIntervalSeconds_new method_node
 class T37_usecase_usecase_PrPollIntervalSeconds_as_secs method_node
-class T37_usecase_usecase_PrPollIntervalSeconds_is_valid method_node
 class T37_usecase_usecase_PrPollIntervalSeconds__self value_object
-class T36_usecase_usecase_PrPollTimeoutSeconds_try_new method_node
+class T36_usecase_usecase_PrPollTimeoutSeconds_new method_node
 class T36_usecase_usecase_PrPollTimeoutSeconds_as_secs method_node
-class T36_usecase_usecase_PrPollTimeoutSeconds_is_valid method_node
 class T36_usecase_usecase_PrPollTimeoutSeconds__self value_object
 class T33_usecase_usecase_PrReviewCycleMode_Start variant_node
 class T33_usecase_usecase_PrReviewCycleMode_Resume variant_node
 class T33_usecase_usecase_PrReviewCycleMode__self value_object
+class T33_usecase_usecase_PrTrackIdOverride_new method_node
+class T33_usecase_usecase_PrTrackIdOverride_as_str method_node
+class T33_usecase_usecase_PrTrackIdOverride__self value_object
 class R29_usecase_usecase_PrCommandPort_execute method_node
 class R29_usecase_usecase_PrCommandPort__self secondary_port
 class T29_usecase_usecase_SignalCommand_CalcAdrUser variant_node

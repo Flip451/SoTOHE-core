@@ -9,6 +9,14 @@
       },
       {
         "layer": "usecase",
+        "entry_key": "PrTrackIdOverride"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "PrBaseOverride"
+      },
+      {
+        "layer": "usecase",
         "entry_key": "PrCommandInteractor"
       },
       {

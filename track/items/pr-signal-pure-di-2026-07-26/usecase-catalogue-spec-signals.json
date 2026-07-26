@@ -1,11 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "fd5b1dcb49ec2c48f794d71e9625f9981313a383f65a2d32bb811b973b1be88e",
+  "catalogue_declaration_hash": "525dd9e36ada3f06f7fea62fcabc8acdfe13f4c1898f8d4ee75ca3d176eeefd5",
   "signals": [
+    {
+      "type_name": "PrBaseOverride",
+      "signal": "blue",
+      "entry_hash": "87c1c1a3efea9af30a6237f6017b88e4c236b673be74982e6aa2be49d4d52d77"
+    },
     {
       "type_name": "PrCommand",
       "signal": "blue",
-      "entry_hash": "37115de33292151a21f528917b3902dbfb951bb6015a440f790048bd80d8a66e"
+      "entry_hash": "e6be05bd3a5dc828aeb223136bdbb125ffdf5177b837786303566b374f21fe9f"
     },
     {
       "type_name": "PrCommandInteractor",
@@ -25,22 +30,27 @@
     {
       "type_name": "PrPollIntervalSeconds",
       "signal": "blue",
-      "entry_hash": "ce110ea03df40d620bb958d4f5583a1ec9ff77adc7ac5ee775eaacabb3ff9b8b"
+      "entry_hash": "4ea1a28fc74fcf43621659cf68e24fb4f799a8d8d9617587664a390d6cb8e5cc"
     },
     {
       "type_name": "PrPollTimeoutSeconds",
       "signal": "blue",
-      "entry_hash": "f015373a3bd2d05f73647c80cb5a541cabf290521772b9f8f3c06f4e52df70b4"
+      "entry_hash": "5ffce03b71b46c5e0db7797a99f0d8e76b7520e07ebe8d3dd76da703869fe3e9"
     },
     {
       "type_name": "PrReviewCycleMode",
       "signal": "blue",
-      "entry_hash": "346167aa3647ef9a285b4e4a4c4618163e906154e77cab19b3d3f5b1f590613a"
+      "entry_hash": "a6eac68716497adee3c4cf703690f3f5324026defb5ccf632358250fdaf36c8b"
+    },
+    {
+      "type_name": "PrTrackIdOverride",
+      "signal": "blue",
+      "entry_hash": "6e4db19e7e297ef42991b2d586b7f12e76760bba57b1682757ed906cf9f886e1"
     },
     {
       "type_name": "SignalCommand",
       "signal": "blue",
-      "entry_hash": "7f623062b899a0bd1e95f6abab53b7ec69cbe130aee5d3a7fa99ec5c3af451d5"
+      "entry_hash": "966a60fea232c114df2bee2ae17ce232d5f0ef5b16c025f3038cd86fb874c25f"
     },
     {
       "type_name": "SignalCommandInteractor",

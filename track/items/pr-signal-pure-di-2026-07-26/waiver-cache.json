@@ -1,0 +1,77 @@
+{
+  "track_id": "pr-signal-pure-di-2026-07-26",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "PrCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "waived_reason_hash": "4e08b4541b521661de213cf0011ffd347e48ec2591aa0ef292956fb8b0df8053",
+        "declaration_hash": "db17152297722ff4a58355400123543b0877fb8416e87fea34c9aedf2c98bcbc",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "waived_reason_hash": "2175c5e647071f381a5da161da1d65d979f5d724ce6b6f6feae68f1a3e1f5d45",
+        "declaration_hash": "0a90c7844af77af1a3d50467f65fad5759071343e307a82f4a7728c7659b3733",
+        "anchor_text_hash": "2002daaeadc79b72748b7a8a3d7503e01c5f9eec6f4d5b7bee7037008ca48510"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "PR の composition root は command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、または usecase から composition への逆委譲を残さない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "waived_reason_hash": "ab7786eb13eddc8e68819ae7bda6d530a419e3f2a07e0abe3dd2e13b089997a8",
+        "declaration_hash": "0a90c7844af77af1a3d50467f65fad5759071343e307a82f4a7728c7659b3733",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ]
+}

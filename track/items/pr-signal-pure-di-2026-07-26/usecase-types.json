@@ -40,14 +40,14 @@
         {
           "has_default_impl": false,
           "is_async": false,
-          "name": "try_new",
+          "name": "new",
           "params": [
             {
               "name": "value",
               "ty": "u64"
             }
           ],
-          "returns": "core::option::Option<Self>"
+          "returns": "Self"
         },
         {
           "has_default_impl": false,
@@ -56,14 +56,6 @@
           "params": [],
           "receiver": "self",
           "returns": "u64"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "is_valid",
-          "params": [],
-          "receiver": "&self",
-          "returns": "bool"
         }
       ],
       "type_name": "PrPollIntervalSeconds"
@@ -73,14 +65,14 @@
         {
           "has_default_impl": false,
           "is_async": false,
-          "name": "try_new",
+          "name": "new",
           "params": [
             {
               "name": "value",
               "ty": "u64"
             }
           ],
-          "returns": "core::option::Option<Self>"
+          "returns": "Self"
         },
         {
           "has_default_impl": false,
@@ -89,14 +81,6 @@
           "params": [],
           "receiver": "self",
           "returns": "u64"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "is_valid",
-          "params": [],
-          "receiver": "&self",
-          "returns": "bool"
         }
       ],
       "type_name": "PrPollTimeoutSeconds"
@@ -134,6 +118,64 @@
         }
       ],
       "type_name": "PrCommandInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "PrTrackIdOverride"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "core::option::Option<Self>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_valid",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "type_name": "PrBaseOverride"
     }
   ],
   "layer": "usecase",
@@ -291,6 +333,46 @@
       "action": "reference",
       "for_type": "SignalCommandOutput",
       "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PrTrackIdOverride",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PrTrackIdOverride",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PrTrackIdOverride",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "PrTrackIdOverride",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "PrTrackIdOverride",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "PrBaseOverride",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PrBaseOverride",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PrBaseOverride",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "PrBaseOverride",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "PrBaseOverride",
+      "trait_ref": "core::hash::Hash"
     }
   ],
   "traits": {
@@ -392,9 +474,46 @@
     }
   },
   "types": {
+    "PrBaseOverride": {
+      "action": "add",
+      "docs": "Usecase-boundary value object for an explicitly supplied PR base override. It owns the exact-nonempty invariant and preserves accepted text without normalization; reconnaissance found no existing value object with that invariant.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "pr",
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            {
+              "name": "non_empty_pr_base_override",
+              "predicate": {
+                "SelfMethod": "is_valid"
+              }
+            }
+          ]
+        }
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
     "PrCommand": {
       "action": "add",
-      "docs": "Typed PR application command. Variant-specific payloads preserve the seven existing operations while replacing raw command concepts with validated values. Existing domain TrackId, NonEmptyString, MergeMethod, and Timestamp types are reused instead of duplicated; command/query separation is not introduced because all variants share the same side-effecting PR workflow boundary.",
+      "docs": "Typed application command for the PR command family. Its variant set is intentionally closed and exhaustive; workspace consumers must match every variant, so additions require coordinated compiler-checked updates.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -405,7 +524,7 @@
               "fields": [
                 {
                   "name": "track_id",
-                  "ty": "core::option::Option<domain::TrackId>"
+                  "ty": "core::option::Option<PrTrackIdOverride>"
                 }
               ],
               "kind": "struct"
@@ -417,11 +536,11 @@
               "fields": [
                 {
                   "name": "track_id",
-                  "ty": "core::option::Option<domain::TrackId>"
+                  "ty": "core::option::Option<PrTrackIdOverride>"
                 },
                 {
                   "name": "base",
-                  "ty": "domain::NonEmptyString"
+                  "ty": "core::option::Option<PrBaseOverride>"
                 }
               ],
               "kind": "struct"
@@ -454,7 +573,7 @@
                 },
                 {
                   "name": "method",
-                  "ty": "domain::branch_strategy::MergeMethod"
+                  "ty": "core::option::Option<domain::branch_strategy::MergeMethod>"
                 }
               ],
               "kind": "struct"
@@ -499,7 +618,7 @@
               "fields": [
                 {
                   "name": "track_id",
-                  "ty": "core::option::Option<domain::TrackId>"
+                  "ty": "core::option::Option<PrTrackIdOverride>"
                 },
                 {
                   "name": "mode",
@@ -527,6 +646,10 @@
         },
         {
           "anchor": "CN-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-01",
           "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
         }
       ]
@@ -684,7 +807,7 @@
     },
     "PrPollIntervalSeconds": {
       "action": "add",
-      "docs": "Usecase-boundary value object for a positive PR polling interval in seconds. The existing capability-exec TimeoutSeconds is provider-process-specific and not semantically reusable; the raw u64 constructor parameter is the unvalidated CLI representation and becomes the concept only after try_new succeeds.",
+      "docs": "Usecase-boundary value object for the PR polling interval in seconds. The interval concept is stable across wait-and-merge and review-polling operations, owns the seconds-unit distinction without a rejecting value invariant, and is independent of CLI syntax, workflow mechanics, persistence, and infrastructure.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -697,16 +820,7 @@
       "methods": [],
       "module_path": "pr",
       "role": {
-        "ValueObject": {
-          "invariants": [
-            {
-              "name": "positive_poll_interval",
-              "predicate": {
-                "SelfMethod": "is_valid"
-              }
-            }
-          ]
-        }
+        "ValueObject": {}
       },
       "spec_refs": [
         {
@@ -721,7 +835,7 @@
     },
     "PrPollTimeoutSeconds": {
       "action": "add",
-      "docs": "Usecase-boundary value object for a positive PR polling timeout in seconds. The existing capability-exec TimeoutSeconds is provider-process-specific and not semantically reusable; the raw u64 constructor parameter is the unvalidated CLI representation and becomes the concept only after try_new succeeds.",
+      "docs": "Usecase-boundary value object for the PR polling timeout in seconds. The timeout concept is stable across wait-and-merge and review-polling operations, owns the seconds-unit distinction without a rejecting value invariant, and is independent of CLI syntax, workflow mechanics, persistence, and infrastructure.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -734,16 +848,7 @@
       "methods": [],
       "module_path": "pr",
       "role": {
-        "ValueObject": {
-          "invariants": [
-            {
-              "name": "positive_poll_timeout",
-              "predicate": {
-                "SelfMethod": "is_valid"
-              }
-            }
-          ]
-        }
+        "ValueObject": {}
       },
       "spec_refs": [
         {
@@ -758,7 +863,7 @@
     },
     "PrReviewCycleMode": {
       "action": "add",
-      "docs": "Finite usecase-boundary value selecting whether a PR review cycle starts fresh or resumes saved trigger state; reconnaissance found no equivalent enum, so it replaces the ambiguous raw resume boolean.",
+      "docs": "Finite usecase-boundary value selecting whether a PR review cycle starts fresh or resumes saved trigger state. Its Start and Resume variant set is intentionally closed and exhaustive; workspace consumers must match every variant, so additions require coordinated compiler-checked updates.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -793,9 +898,37 @@
         }
       ]
     },
+    "PrTrackIdOverride": {
+      "action": "add",
+      "docs": "Usecase-boundary value object for the optional PR track-id argument. It preserves arbitrary transport text without validation or normalization and remains distinct from the validated domain TrackId; reconnaissance found no equivalent boundary type.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "pr",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
     "SignalCommand": {
       "action": "add",
-      "docs": "Typed Signal application command covering the nine existing subcommands. Filesystem locations remain PathBuf technical boundary values, while strictness and gate concepts reuse the existing domain enums; command/query separation is not introduced because calculation and gate-check variants share the same signal persistence and verification collaborators.",
+      "docs": "Typed application command for the Signal command family. Its variant set is intentionally closed and exhaustive; the workspace adapter must match every variant, so additions require coordinated compiler-checked updates.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",

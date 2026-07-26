@@ -3,7 +3,55 @@
   "layer": "usecase",
   "entries": [
     {
-      "claim_hash": "37115de33292151a21f528917b3902dbfb951bb6015a440f790048bd80d8a66e",
+      "claim_hash": "87c1c1a3efea9af30a6237f6017b88e4c236b673be74982e6aa2be49d4d52d77",
+      "evidence_hash": "8dcf34a8102975ce8d8a50de2988a1181c59f86de90aab97fbeaafb06b8cff1a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrBaseOverride"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "87c1c1a3efea9af30a6237f6017b88e4c236b673be74982e6aa2be49d4d52d77",
+      "evidence_hash": "376bdef532b858bedd41e8c19cbbec310957ec27e3cc6e250436d2ca3aaa27cb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrBaseOverride"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "PR と Signal の構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6be05bd3a5dc828aeb223136bdbb125ffdf5177b837786303566b374f21fe9f",
       "evidence_hash": "8dcf34a8102975ce8d8a50de2988a1181c59f86de90aab97fbeaafb06b8cff1a",
       "verdict": {
         "kind": "pass",
@@ -27,7 +75,7 @@
       }
     },
     {
-      "claim_hash": "37115de33292151a21f528917b3902dbfb951bb6015a440f790048bd80d8a66e",
+      "claim_hash": "e6be05bd3a5dc828aeb223136bdbb125ffdf5177b837786303566b374f21fe9f",
       "evidence_hash": "40e038088bdf7e70d31454feb69d2a0f448f70d8f7d6fe6df5eb536f5fd4e36c",
       "verdict": {
         "kind": "pass",
@@ -51,7 +99,7 @@
       }
     },
     {
-      "claim_hash": "37115de33292151a21f528917b3902dbfb951bb6015a440f790048bd80d8a66e",
+      "claim_hash": "e6be05bd3a5dc828aeb223136bdbb125ffdf5177b837786303566b374f21fe9f",
       "evidence_hash": "50742c8a86837f2c87ac7973e35ecaaf2e17d4d31b08bc449e936019d57e4850",
       "verdict": {
         "kind": "pass",
@@ -71,6 +119,30 @@
           "section": "constraint",
           "element_id": "CN-04",
           "text_label": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "e6be05bd3a5dc828aeb223136bdbb125ffdf5177b837786303566b374f21fe9f",
+      "evidence_hash": "376bdef532b858bedd41e8c19cbbec310957ec27e3cc6e250436d2ca3aaa27cb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR と Signal の構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "PR と Signal の構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
         }
       }
     },
@@ -219,55 +291,7 @@
       }
     },
     {
-      "claim_hash": "ce110ea03df40d620bb958d4f5583a1ec9ff77adc7ac5ee775eaacabb3ff9b8b",
-      "evidence_hash": "8dcf34a8102975ce8d8a50de2988a1181c59f86de90aab97fbeaafb06b8cff1a",
-      "verdict": {
-        "kind": "pass",
-        "citation": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "PrPollIntervalSeconds"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-01",
-          "text_label": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
-        }
-      }
-    },
-    {
-      "claim_hash": "ce110ea03df40d620bb958d4f5583a1ec9ff77adc7ac5ee775eaacabb3ff9b8b",
-      "evidence_hash": "40e038088bdf7e70d31454feb69d2a0f448f70d8f7d6fe6df5eb536f5fd4e36c",
-      "verdict": {
-        "kind": "pass",
-        "citation": "driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "PrPollIntervalSeconds"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-03",
-          "text_label": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
-        }
-      }
-    },
-    {
-      "claim_hash": "f015373a3bd2d05f73647c80cb5a541cabf290521772b9f8f3c06f4e52df70b4",
+      "claim_hash": "4ea1a28fc74fcf43621659cf68e24fb4f799a8d8d9617587664a390d6cb8e5cc",
       "evidence_hash": "8dcf34a8102975ce8d8a50de2988a1181c59f86de90aab97fbeaafb06b8cff1a",
       "verdict": {
         "kind": "pass",
@@ -278,6 +302,54 @@
         "data": {
           "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
           "section_key": "types",
+          "entry_key": "PrPollIntervalSeconds"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4ea1a28fc74fcf43621659cf68e24fb4f799a8d8d9617587664a390d6cb8e5cc",
+      "evidence_hash": "40e038088bdf7e70d31454feb69d2a0f448f70d8f7d6fe6df5eb536f5fd4e36c",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路で各 PR command を実行する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrPollIntervalSeconds"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5ffce03b71b46c5e0db7797a99f0d8e76b7520e07ebe8d3dd76da703869fe3e9",
+      "evidence_hash": "8dcf34a8102975ce8d8a50de2988a1181c59f86de90aab97fbeaafb06b8cff1a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
           "entry_key": "PrPollTimeoutSeconds"
         }
       },
@@ -291,11 +363,11 @@
       }
     },
     {
-      "claim_hash": "f015373a3bd2d05f73647c80cb5a541cabf290521772b9f8f3c06f4e52df70b4",
+      "claim_hash": "5ffce03b71b46c5e0db7797a99f0d8e76b7520e07ebe8d3dd76da703869fe3e9",
       "evidence_hash": "40e038088bdf7e70d31454feb69d2a0f448f70d8f7d6fe6df5eb536f5fd4e36c",
       "verdict": {
         "kind": "pass",
-        "citation": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+        "citation": "driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -315,7 +387,7 @@
       }
     },
     {
-      "claim_hash": "346167aa3647ef9a285b4e4a4c4618163e906154e77cab19b3d3f5b1f590613a",
+      "claim_hash": "a6eac68716497adee3c4cf703690f3f5324026defb5ccf632358250fdaf36c8b",
       "evidence_hash": "8dcf34a8102975ce8d8a50de2988a1181c59f86de90aab97fbeaafb06b8cff1a",
       "verdict": {
         "kind": "pass",
@@ -339,11 +411,11 @@
       }
     },
     {
-      "claim_hash": "346167aa3647ef9a285b4e4a4c4618163e906154e77cab19b3d3f5b1f590613a",
+      "claim_hash": "a6eac68716497adee3c4cf703690f3f5324026defb5ccf632358250fdaf36c8b",
       "evidence_hash": "40e038088bdf7e70d31454feb69d2a0f448f70d8f7d6fe6df5eb536f5fd4e36c",
       "verdict": {
         "kind": "pass",
-        "citation": "PR driver は closure による command 実行注入を typed driven port に置き換え、driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
+        "citation": "driver → usecase interactor → port の一方向・単一路で各 PR command を実行する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -363,7 +435,55 @@
       }
     },
     {
-      "claim_hash": "7f623062b899a0bd1e95f6abab53b7ec69cbe130aee5d3a7fa99ec5c3af451d5",
+      "claim_hash": "6e4db19e7e297ef42991b2d586b7f12e76760bba57b1682757ed906cf9f886e1",
+      "evidence_hash": "8dcf34a8102975ce8d8a50de2988a1181c59f86de90aab97fbeaafb06b8cff1a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrTrackIdOverride"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "PR command 文脈の composition root、CLI entrypoint、driver、usecase、および必要な port 配線を、composition root に実行責務を残さない一方向・単一路へ移行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6e4db19e7e297ef42991b2d586b7f12e76760bba57b1682757ed906cf9f886e1",
+      "evidence_hash": "376bdef532b858bedd41e8c19cbbec310957ec27e3cc6e250436d2ca3aaa27cb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "PR と Signal の構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PrTrackIdOverride"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "PR と Signal の構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "966a60fea232c114df2bee2ae17ce232d5f0ef5b16c025f3038cd86fb874c25f",
       "evidence_hash": "c6182d533586523fcf6b085d30c9d82bd5b0f532c672c70cc58b179ad57cff6d",
       "verdict": {
         "kind": "pass",
@@ -387,7 +507,7 @@
       }
     },
     {
-      "claim_hash": "7f623062b899a0bd1e95f6abab53b7ec69cbe130aee5d3a7fa99ec5c3af451d5",
+      "claim_hash": "966a60fea232c114df2bee2ae17ce232d5f0ef5b16c025f3038cd86fb874c25f",
       "evidence_hash": "a132c3d22933c83b48a2c185452c8931926cff21a5c4871f7e736e75fed6966b",
       "verdict": {
         "kind": "pass",
@@ -411,7 +531,7 @@
       }
     },
     {
-      "claim_hash": "7f623062b899a0bd1e95f6abab53b7ec69cbe130aee5d3a7fa99ec5c3af451d5",
+      "claim_hash": "966a60fea232c114df2bee2ae17ce232d5f0ef5b16c025f3038cd86fb874c25f",
       "evidence_hash": "7fa566ecb219a7005318bbed63fd5ede0ec2a9006c5817290c880a538172161c",
       "verdict": {
         "kind": "pass",
@@ -435,7 +555,7 @@
       }
     },
     {
-      "claim_hash": "7f623062b899a0bd1e95f6abab53b7ec69cbe130aee5d3a7fa99ec5c3af451d5",
+      "claim_hash": "966a60fea232c114df2bee2ae17ce232d5f0ef5b16c025f3038cd86fb874c25f",
       "evidence_hash": "50742c8a86837f2c87ac7973e35ecaaf2e17d4d31b08bc449e936019d57e4850",
       "verdict": {
         "kind": "pass",

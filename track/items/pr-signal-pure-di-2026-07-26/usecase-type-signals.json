@@ -1,15 +1,28 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T10:33:45Z",
-  "declaration_hash": "fd5b1dcb49ec2c48f794d71e9625f9981313a383f65a2d32bb811b973b1be88e",
-  "implementation_input_hash": "1e6db89b296b2e6a275de97756b23295cdd0b0bcae4a8bbb87686d8a6699be1f",
+  "generated_at": "2026-07-26T15:02:54Z",
+  "declaration_hash": "525dd9e36ada3f06f7fea62fcabc8acdfe13f4c1898f8d4ee75ca3d176eeefd5",
+  "implementation_input_hash": "ce3ec2fb250689b55cc1a29fa523a4bf8c984a403d762f964831fe12f6a62f40",
   "signals": [
+    {
+      "type_name": "PrBaseOverride",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "Hash",
+        "PartialEq"
+      ]
+    },
     {
       "type_name": "PrCommand",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -19,21 +32,21 @@
     {
       "type_name": "PrCommandInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "PrCommandPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "PrIdentifier",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -44,9 +57,9 @@
     {
       "type_name": "PrPollIntervalSeconds",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",
@@ -58,9 +71,9 @@
     {
       "type_name": "PrPollTimeoutSeconds",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
         "Debug",
@@ -72,11 +85,24 @@
     {
       "type_name": "PrReviewCycleMode",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Copy",
+        "Debug",
+        "Eq",
+        "Hash",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "PrTrackIdOverride",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
         "Debug",
         "Eq",
         "Hash",

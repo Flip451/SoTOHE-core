@@ -1,6 +1,8 @@
 #![forbid(unsafe_code)]
 //! Infrastructure layer for the SoTOHE-core track state machine.
 
+extern crate self as infrastructure;
+
 pub mod adr_baseline;
 pub mod adr_decision;
 pub mod agent_profiles;
@@ -23,6 +25,7 @@ pub mod git_cli;
 pub mod impl_catalog_signal_reader;
 pub mod impl_plan_codec;
 pub mod impl_plan_reader;
+pub mod pr;
 pub mod pr_review;
 pub mod provider_session;
 pub mod ref_verify;

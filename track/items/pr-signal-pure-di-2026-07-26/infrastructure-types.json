@@ -31,6 +31,11 @@
   "schema_version": 5,
   "trait_impls": [
     {
+      "action": "add",
+      "for_type": "SystemPrCommandAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
       "for_type": "SystemPrCommandAdapter",
       "trait_ref": "usecase::pr::PrCommandPort"
     },

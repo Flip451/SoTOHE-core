@@ -4,6 +4,6 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| SystemPrCommandAdapter | secondary_adapter | add | impl PrCommandPort | 🟡 | 🔵 |
+| SystemPrCommandAdapter | secondary_adapter | add | impl Default, impl PrCommandPort | 🔵 | 🔵 |
 | SystemSignalCommandAdapter | secondary_adapter | add | impl SignalCommandPort | 🟡 | 🔵 |
 

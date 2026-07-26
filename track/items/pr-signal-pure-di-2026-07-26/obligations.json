@@ -3,6 +3,34 @@
   "obligations": [
     {
       "id": {
+        "entry_key": "PrBaseOverride",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:non_empty_pr_base_override"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "PrBaseOverride"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "ValueObject"
+      },
+      "brief": "Author a boundary test covering 'invariant:non_empty_pr_base_override' of PrBaseOverride",
+      "declaration_hash": "4fd32ab2a3e69f1d07a6293947e8cae1c9de129ab035f197e1259fd84e0ad6c2",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      ]
+    },
+    {
+      "id": {
         "entry_key": "PrCommandInteractor",
         "obligation_kind": "result",
         "item_identifier": "entry"
@@ -50,62 +78,6 @@
       },
       "brief": "Author a boundary test covering 'invariant:non_empty_pr_identifier' of PrIdentifier",
       "declaration_hash": "45ff22aeefe386107c7c3ad3adb44939da0b7eb9a64d020d9f0bf9f38e163a5c",
-      "spec_refs": [
-        {
-          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
-          "element_id": "IN-01"
-        },
-        {
-          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
-          "element_id": "AC-03"
-        }
-      ]
-    },
-    {
-      "id": {
-        "entry_key": "PrPollIntervalSeconds",
-        "obligation_kind": "boundary",
-        "item_identifier": "invariant:positive_poll_interval"
-      },
-      "target_entry": {
-        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
-        "section_key": "types",
-        "entry_key": "PrPollIntervalSeconds"
-      },
-      "target_role": {
-        "kind": "data_role",
-        "role": "ValueObject"
-      },
-      "brief": "Author a boundary test covering 'invariant:positive_poll_interval' of PrPollIntervalSeconds",
-      "declaration_hash": "62ba7d5dce7e14b2dd92e07461e2a27cc642d3634e12632918ba4b50b6bdd559",
-      "spec_refs": [
-        {
-          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
-          "element_id": "IN-01"
-        },
-        {
-          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
-          "element_id": "AC-03"
-        }
-      ]
-    },
-    {
-      "id": {
-        "entry_key": "PrPollTimeoutSeconds",
-        "obligation_kind": "boundary",
-        "item_identifier": "invariant:positive_poll_timeout"
-      },
-      "target_entry": {
-        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
-        "section_key": "types",
-        "entry_key": "PrPollTimeoutSeconds"
-      },
-      "target_role": {
-        "kind": "data_role",
-        "role": "ValueObject"
-      },
-      "brief": "Author a boundary test covering 'invariant:positive_poll_timeout' of PrPollTimeoutSeconds",
-      "declaration_hash": "aefeaebc8646d84df593a4698e914a360ba000973e444570761a6f77b4132c86",
       "spec_refs": [
         {
           "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
