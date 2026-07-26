@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "track_id": "composition-root-pure-di-support-workflows-2026-07-26",
+  "entries": {
+    "T001": [],
+    "T002": [],
+    "T003": [
+      { "layer": "usecase", "entry_key": "SemanticDupDriverInteractor" },
+      { "layer": "usecase", "entry_key": "SemanticDupDriverPort" },
+      { "layer": "usecase", "entry_key": "SemanticDupDriverService" },
+      { "layer": "infrastructure", "entry_key": "SemanticDupDriverAdapter" }
+    ],
+    "T004": []
+  }
+}

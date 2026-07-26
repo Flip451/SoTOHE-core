@@ -1,0 +1,609 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001's description names a workflow/path concept but no target file or symbol; an executor must invent the file boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 6,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T002's description names a workflow/path concept but no target file or symbol; an executor must invent the file boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 12,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T003's description names a route and layers but no target file or symbol; an executor must invent the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 18,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T004's description names CLI execution paths but no target file or symbol; an executor must invent the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 24,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T005's description names the TestObligation route but no target file or symbol; an executor must invent the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 30,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T006's description names CLI paths and handlers but no target file or symbol; an executor must invent the implementation boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 36,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "T007's description names a shared export-block edit but no target file or symbol; an executor must invent the exact edit boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 42,
+              "category": "task description non-executable"
+            },
+            {
+              "message": "Section descriptions S1-S4 restate upstream design rationale/behavior (self-hosting, replacement-route ordering, boundary extraction, and deferred cleanup) instead of containing only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 57,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:1a22dd0b451e66a7849b04e3062841a7a06a9cf4b2263052f7b27374c56a31f9",
+          "at": "2026-07-26T10:04:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a57c2eb8c2990dc29209c4f3734594d471d6f0e731aed2c6af1ff5d41043024d",
+          "at": "2026-07-26T10:17:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T007 leaks explicitly excluded work into this track: it removes public re-exports from `apps/cli-composition/src/lib.rs`, while `spec.json` OUT-02 reserves physical deletion of now-unreferenced compatibility definitions and exports for the Final convergence track. Remove T007 and its S4/coverage references, or revise the upstream scope through the appropriate planning workflow.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 42,
+              "category": "out_of_scope leak into a task"
+            }
+          ],
+          "hash": "rvw1:sha256:a57c2eb8c2990dc29209c4f3734594d471d6f0e731aed2c6af1ff5d41043024d",
+          "at": "2026-07-26T10:22:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 explicitly removes `TestObligationCompositionRoot::{discover,current_branch}`, but its contract omits the `cli_composition/TestObligationCompositionRoot` catalogue entry and attributes that modified entry only to T005. This leaves T006's claimed root modification untracked; attribute the entry to T006 as well (or move the root modification wholly into its attributed task).",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/task-contract.json",
+              "line": 23,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:a0fa68157457b8afd0ba2e57fc938ca16226537254e642a3c5159ee802525ed1",
+          "at": "2026-07-26T10:28:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:081e1afaf41a9864ac79ae5c72f8149b6d616046ed27359b9e1786d864a3f254",
+          "at": "2026-07-26T10:30:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:63377a498939e33192b95a21a32e97c7d02990484ec334c3c3b3c0aa09d7e4b3",
+          "at": "2026-07-26T10:50:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1672da1dba7f56c248e9bd72cb4df20735cd051e2a5f01bd6ba85b0dc35f7e73",
+          "at": "2026-07-26T11:29:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a404d01969ff53d5c5929553c2ff8c9ac1f08c891a2b3b19083115ba017de83",
+          "at": "2026-07-26T13:50:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The current spec still defines TestObligation in IN-01, AC-04, AC-05, and AC-06, but this coverage map omits AC-04 entirely and maps the other elements only to T001–T004, none of which targets TestObligation. Restore TestObligation task coverage or complete the upstream spec rescope before approving this plan.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/task-coverage.json",
+              "line": 19,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "`plan.summary` claims T001–T004 cover GO-01 and GO-02, although the current GO-01 explicitly includes TestObligation and no remaining task addresses that context. The goal traceability is therefore implausible until the upstream rescope is applied or a TestObligation task is restored.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/impl-plan.json",
+              "line": 31,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:7a404d01969ff53d5c5929553c2ff8c9ac1f08c891a2b3b19083115ba017de83",
+          "at": "2026-07-26T13:54:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a404d01969ff53d5c5929553c2ff8c9ac1f08c891a2b3b19083115ba017de83",
+          "at": "2026-07-26T13:55:10Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbfbcbdcb8a1c03e3c84df97657a57fec3c1e86f00a7742857200007092b0fb6",
+          "at": "2026-07-26T10:04:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbfbcbdcb8a1c03e3c84df97657a57fec3c1e86f00a7742857200007092b0fb6",
+          "at": "2026-07-26T10:06:12Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::TestObligationCurrentBranch` is declared as a `ValueObject`, but its catalogue entry does not establish the required semantic grounds for placing a value object in the usecase layer (ubiquitous language, stable cross-operation meaning, and independence from workflow/technical concerns). The only rationale is workflow-specific whitespace validation; either place the value object in the domain layer or document the explicit semantic justification per R1.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": null,
+              "category": "unsupported semantic placement"
+            },
+            {
+              "message": "Several load-bearing `docs` fields restate behavioral/design contracts instead of only anchoring them to `spec_refs[]`, including `TestObligationCurrentBranch` (“rejects empty or whitespace-only current-branch labels”), `TestObligationContextService` (“resolves ... through the existing git port”), and `TestObligationContextOutcome` (“preserving either ... context or opaque diagnostic text”). This violates the no-upstream-restatement convention and duplicates the spec contract in the type catalogue.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": null,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:9d31d3235283c746d15a0c5781785311b89004a437ab4676f2d0f590ab0118b8",
+          "at": "2026-07-26T10:04:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli_composition::TestObligationCompositionRoot::context_driver` has no receiver and no parameters, yet returns `TestObligationContextDriver`, whose constructor requires an `Arc<dyn TestObligationContextService>`. The composition root therefore has no declared input from which it can construct the driver, making the wiring contract internally unconstructible. Declare the appropriate receiver/field dependency or constructor parameter.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_composition-types.json",
+              "line": null,
+              "category": "declaration completeness"
+            }
+          ],
+          "hash": "rvw1:sha256:ba4f8616e556a8fe83f1cc3e3d97a554a7ccd3b95a523ec73024ca8e051b22ba",
+          "at": "2026-07-26T10:15:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:14060f963ddef747bd6541ce79571f3fc60d937070eebf095325a1bddafa2f2b",
+          "at": "2026-07-26T10:26:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::TestObligationContextService::resolve` has no request mode, while its only successful payload, `usecase::TestObligationWorkspaceContext`, requires a `TrackBranch`. Read-only commands with an explicit `--track-id` deliberately succeed without reading a branch, including on detached HEAD; CN-01 preserves that behavior. This contract cannot represent that legal success without unnecessarily reading or fabricating a branch, or returning `Failure`. Model workspace-only versus branch-required resolution explicitly.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": 366,
+              "category": "state-shape smell"
+            },
+            {
+              "message": "`usecase::TestObligationContextInteractor::new` depends on the entire `GitPrimitivePort`, although context resolution needs only repository-root and current-branch reads. That port also exposes unrelated sync, switch, create, move, fetch, stage, commit, and note operations, forcing context-specific mocks or adapters to stub mutating methods they never use. Depend on a narrow read-only context port or segregated trait.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": 12,
+              "category": "Interface Segregation violation"
+            },
+            {
+              "message": "`usecase::SemanticDupDriverPort` declares all filesystem/model/index operations synchronous, but its docs merely identify it as a baseline port and do not acknowledge the blocking choice. The relocated infrastructure adapter performs filesystem access, model loading/inference, and database I/O. Document why synchronous execution is intentional at this port boundary or change its async color.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": 53,
+              "category": "sync/async color mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:14060f963ddef747bd6541ce79571f3fc60d937070eebf095325a1bddafa2f2b",
+          "at": "2026-07-26T10:36:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::TestObligationContextInteractor` is declared as implementing `TestObligationContextService`, whose contract contains `resolve_workspace` and `resolve_workspace_and_branch`, but the interactor's declared method surface is empty (only `new` is listed). The catalogue therefore does not declare the methods required to fulfill its own trait implementation, leaving the implementation contract incomplete.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": null,
+              "category": "declaration completeness"
+            }
+          ],
+          "hash": "rvw1:sha256:f1ac962ba53faee697aaab277e79a29188ff0e8f1a223ce1b11e9d6fa7669aa8",
+          "at": "2026-07-26T10:50:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::TestObligationContextInteractor` is declared as implementing `TestObligationContextService`, whose contract contains `resolve_workspace` and `resolve_workspace_and_branch`, but the interactor's declared method surface is empty (only `new` is listed). The catalogue therefore does not declare the methods required to fulfill its own trait implementation, leaving the implementation contract incomplete.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": null,
+              "category": "declaration completeness"
+            }
+          ],
+          "hash": "rvw1:sha256:f1ac962ba53faee697aaab277e79a29188ff0e8f1a223ce1b11e9d6fa7669aa8",
+          "at": "2026-07-26T10:55:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::TestObligationContextPort` declares synchronous `workspace_root` and `current_branch` methods whose purpose is worktree/git discovery, but its docs only call it read-only and do not acknowledge the synchronous external-I/O choice. The port/adapters need an explicit sync/blocking contract (or an async signature) before implementation.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": null,
+              "category": "sync/async color mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:f1ac962ba53faee697aaab277e79a29188ff0e8f1a223ce1b11e9d6fa7669aa8",
+          "at": "2026-07-26T10:58:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4a5cbbabbd0319491eb53d2270ca0548a68f4c5fd1e894ed5c05f0953507c5bb",
+          "at": "2026-07-26T11:02:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::TestObligationContextService::{resolve_workspace, resolve_workspace_and_branch}` both return `TestObligationContextOutcome`, whose `Resolved` payload permits either `TestObligationWorkspaceContext::WorkspaceOnly` or `WorkspaceAndBranch`. This admits method/result combinations that contradict the operation selected: `resolve_workspace` may return a branch-bearing context, while `resolve_workspace_and_branch` may report success without a branch. The mirrored `cli_driver::TestObligationContextDriver` methods preserve the same ambiguity, forcing callers to handle structurally invalid successes. Give the operations precise result types or otherwise encode the method-to-payload correlation.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": 261,
+              "category": "state-shape smell"
+            }
+          ],
+          "hash": "rvw1:sha256:4a5cbbabbd0319491eb53d2270ca0548a68f4c5fd1e894ed5c05f0953507c5bb",
+          "at": "2026-07-26T11:08:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::TestObligationContextService::{resolve_workspace, resolve_workspace_and_branch}` both return `TestObligationContextOutcome`, whose `Resolved` payload can contain either `TestObligationWorkspaceContext::WorkspaceOnly` or `WorkspaceAndBranch`. This admits two method-specific illegal states: `resolve_workspace` may return the branch-bearing variant, while `resolve_workspace_and_branch` may succeed without a branch; the cli-driver methods mirror the same ambiguity. Give each operation a return type that encodes its exact success shape.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": 261,
+              "category": "state-shape smell"
+            },
+            {
+              "message": "AC-04 defines fail-closed active-track validation, but no catalogue entry names its enforcement owner. `usecase::TestObligationContextPort` can only obtain the workspace and branch, while `usecase::TestObligationContextService` receives no requested `TrackId`; the referenced handlers likewise do not state which layer compares the two or constructs the mismatch rejection. Name exactly one declared usecase/driver owner that possesses both values and owns the rejection data.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": 261,
+              "category": "enforcement-owner contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4a5cbbabbd0319491eb53d2270ca0548a68f4c5fd1e894ed5c05f0953507c5bb",
+          "at": "2026-07-26T11:08:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd0f48ddb0edc3568b4decbf056c07c5bd52125821873322ab62391ad940d9dc",
+          "at": "2026-07-26T11:16:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `docs` fields for `usecase::TestObligationContextInteractor`, `usecase::TestObligationContextService`, and `usecase::TestObligationContextOutcome` restate the upstream AC-04 enforcement behavior and data-flow rationale (receiving the requested TrackId, discovering the branch, comparing fail-closed, constructing `TrackMismatch`, and preserving mismatch values). These fields should reference the upstream anchors rather than duplicate the behavior contract, per `no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": null,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:610a01442fc1a578385566fa1ee0ec86eb107ba7ab23a4e06658ebd91832188f",
+          "at": "2026-07-26T11:30:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `docs` fields for `usecase::TestObligationContextInteractor`, `usecase::TestObligationContextService`, and `usecase::TestObligationContextOutcome` restate the upstream AC-04 behavior and design rationale (TrackId/TrackBranch comparison, fail-closed enforcement ownership, mismatch construction, and payload preservation). Per `no-upstream-restatement.md`, these fields should cite upstream anchors rather than duplicate the contract.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": null,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:610a01442fc1a578385566fa1ee0ec86eb107ba7ab23a4e06658ebd91832188f",
+          "at": "2026-07-26T11:31:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:093b199a08e173644723854ed51fbee9a0acf8de5e4d5ba452f96a9b46776605",
+          "at": "2026-07-26T11:39:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::TestObligationActiveTrackRequest` requires a `requested_track_id`, but every TestObligation command supports omitted `--track-id`, where that ID is derived from the branch discovered by this same context route. The caller cannot construct `handle_workspace_and_branch` for this valid mode without performing Git discovery outside the port. Represent explicit and branch-resolved requests separately, such as an enum or `Option<TrackId>`.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": 371,
+              "category": "state-shape smell"
+            },
+            {
+              "message": "`usecase::TestObligationContextPort::current_branch` returns `TrackBranch`, which rejects discovered values such as `main` and detached `HEAD` before the active-track owner receives them. Consequently `TestObligationContextOutcome::TrackMismatch` cannot preserve the requested/current values for these ordinary mismatches, and the adapter must enforce part of the rule through generic `Failure`. Return an arbitrary validated branch diagnostic so one owner can perform the complete comparison and construct its rejection data.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": 247,
+              "category": "enforcement-owner contradiction"
+            },
+            {
+              "message": "`usecase::TestObligationActiveTrackRequest` refers only to an unnamed “sole AC-04 enforcement owner”; the service, interactor, and outcome now merely say `See AC-04`, while `TrackMismatch` still requires a new validator and the unchanged referenced derive/evaluate services retain their existing `TrackNotActive` checks. The catalogue therefore does not identify exactly one owner or one rejection vocabulary. Name one owning entry and reconcile the other validation path.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": 364,
+              "category": "enforcement-owner contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:093b199a08e173644723854ed51fbee9a0acf8de5e4d5ba452f96a9b46776605",
+          "at": "2026-07-26T11:42:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e364620f72124431a24c368d4d2ce437949935151be6ddd510bc29fdd23f157c",
+          "at": "2026-07-26T11:58:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::TestObligationContextInteractor` is the apparent active-track validator, but its docs, the service, request, and outcome only say `See AC-04`; no entry explicitly names the rule’s sole owner. With `TrackMismatch` newly declared and the former derive/evaluate rejection variants removed, implementers can still place the comparison in the driver, service wrapper, or adapter. Name exactly one owning entry and its local comparison/rejection responsibility.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": 464,
+              "category": "enforcement-owner contradiction"
+            },
+            {
+              "message": "`TestObligationContextOutcome::Resolved.active_track_id` is the same plain `TrackId` carried by `TestObligationActiveTrackRequest::Explicit`, and `TestObligationCatalogueCommandInput::new` accepts that plain ID directly. Because the catalogue also removes `TrackNotActive` from the derive/evaluate errors and removes `current_branch` from the shared command input, a caller can pass the requested ID directly into a mutating command without ever consuming a successful context result. Represent successful validation with an opaque active-context/capability required by mutation commands, or retain the fail-closed guard in those application services.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": 506,
+              "category": "state-shape smell"
+            }
+          ],
+          "hash": "rvw1:sha256:e364620f72124431a24c368d4d2ce437949935151be6ddd510bc29fdd23f157c",
+          "at": "2026-07-26T12:05:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c4ef0de5d67600d44356fd406798295a7ebb1d66196701296008c4e7306afd8c",
+          "at": "2026-07-26T12:35:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::DeriveTestObligationsCommand` and `usecase::EvaluateTestObligationsCommand` now require the opaque `TestObligationActiveContext`, but `cli_driver::TestObligationDeriveHandler` and `cli_driver::TestObligationEvaluateHandler` remain `action: reference`; their `handle` methods accept only the baseline input types. `TestObligationContextDriver` can produce the capability, but no declared driver API can pass it to either mutation handler, so the modified commands cannot be constructed without bypassing the handler or making an undeclared public-input change. Declare the required companion modifications that thread the active context into both handlers.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_driver-types.json",
+              "line": 199,
+              "category": "missing companion modify"
+            },
+            {
+              "message": "`usecase::TestObligationContextPort` declares both worktree discovery and current-git-branch lookup as synchronous methods, but its docs do not acknowledge the blocking synchronous I/O choice. This leaves the adapter color contract unspecified for operations that necessarily perform filesystem/process I/O; either make the port asynchronous or document the intentional synchronous blocking strategy.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/usecase-types.json",
+              "line": 314,
+              "category": "sync/async color mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:c4ef0de5d67600d44356fd406798295a7ebb1d66196701296008c4e7306afd8c",
+          "at": "2026-07-26T12:43:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b853cec97a3450f36ad24361f4881f64bc322be1d9dcc84831b487f85cd10b53",
+          "at": "2026-07-26T12:56:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli_driver::TestObligationDeriveHandler::handle` and `cli_driver::TestObligationEvaluateHandler::handle` accept a validated `TestObligationActiveContext` alongside their baseline input DTOs, which independently contain `track_id` and `current_branch`; their constructors also retain a separately supplied `workspace_root`. This admits a context validated for track/workspace A together with input and paths for B. The downstream `usecase::DeriveTestObligationsCommand` and `usecase::EvaluateTestObligationsCommand` compound the problem by accepting arbitrary catalogue/spec paths beside the capability. The handler must either ignore the redundant values or revalidate them outside the declared sole owner. Derive the mutation target and paths from the validated context so mismatched combinations are unrepresentable.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_driver-types.json",
+              "line": 235,
+              "category": "state-shape smell"
+            }
+          ],
+          "hash": "rvw1:sha256:b853cec97a3450f36ad24361f4881f64bc322be1d9dcc84831b487f85cd10b53",
+          "at": "2026-07-26T12:59:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3901e08b8bb252d3d8ca53e38fdf7781014f4f0bda7098e5d5ad8ded2e68b582",
+          "at": "2026-07-26T13:50:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3901e08b8bb252d3d8ca53e38fdf7781014f4f0bda7098e5d5ad8ded2e68b582",
+          "at": "2026-07-26T13:54:49Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1d4f89fa65f02fe7ff29b6159ec5c3e8dc9780e6ee6002153a2860a08bdb87d",
+          "at": "2026-07-26T10:04:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a1d4f89fa65f02fe7ff29b6159ec5c3e8dc9780e6ee6002153a2860a08bdb87d",
+          "at": "2026-07-26T10:08:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2700ec4258a8ffa2563e6dd700bf76ffd1f76773bce418b682cd431c4aa89aa",
+          "at": "2026-07-26T13:09:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2700ec4258a8ffa2563e6dd700bf76ffd1f76773bce418b682cd431c4aa89aa",
+          "at": "2026-07-26T13:11:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The spec is internally inconsistent about the Support workflow set: GO-01 names four workflows including TestObligation, but IN-01, AC-05, and AC-06 scope and verify only three (RefVerify, SemanticDup, Verify). Consequently the stated goal has no deterministic acceptance coverage for TestObligation.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json",
+              "line": 47,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:9ebb8eb9a6f7dea7b76f86f28a9c795216a516823bc53b299544340980c65920",
+          "at": "2026-07-26T13:50:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The current spec narrows the lane to only three workflows (IN-01, AC-05, and AC-06), omitting TestObligation even though the briefing and design intent require RefVerify, SemanticDup, TestObligation, and Verify. This leaves the declared scope and acceptance contract inconsistent with the required Support-workflow lane and omits TestObligation's migration behavior entirely.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json",
+              "line": 47,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9ebb8eb9a6f7dea7b76f86f28a9c795216a516823bc53b299544340980c65920",
+          "at": "2026-07-26T13:55:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The current spec has not applied the documented rescope: it still includes TestObligation in IN-01 and requires TestObligation behavior in AC-04, AC-05, and AC-06, while the briefing explicitly defines this lane as only RefVerify, SemanticDup, and Verify and says TestObligation must be absent from every element. This contradicts the declared lane boundary.",
+              "severity": "P1",
+              "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json",
+              "line": 47,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:95075d5949a135cd38b44b13ad8df84ba4a234a1bc0293b5cba6bd3ae97b3df0",
+          "at": "2026-07-26T13:56:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ebb8eb9a6f7dea7b76f86f28a9c795216a516823bc53b299544340980c65920",
+          "at": "2026-07-26T13:58:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9ebb8eb9a6f7dea7b76f86f28a9c795216a516823bc53b299544340980c65920",
+          "at": "2026-07-26T14:00:04Z"
+        }
+      ]
+    }
+  }
+}

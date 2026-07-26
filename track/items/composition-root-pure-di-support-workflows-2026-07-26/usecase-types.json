@@ -1,0 +1,224 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "SemanticDupDriverInteractor",
+      "trait_ref": "SemanticDupDriverService"
+    }
+  ],
+  "traits": {
+    "SemanticDupDriverPort": {
+      "action": "reference",
+      "docs": "This port intentionally remains synchronous so each SemanticDup command performs its blocking filesystem, model loading and inference, and index/database work as one caller-thread operation; the CLI workflow has no concurrent scheduling requirement at this boundary.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "find_similar",
+          "params": [
+            {
+              "name": "input",
+              "ty": "FindSimilarDriverInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "SemanticDupDriverOutcome"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "index_build",
+          "params": [
+            {
+              "name": "input",
+              "ty": "IndexBuildDriverInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "SemanticDupDriverOutcome"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "index_measure_quality",
+          "params": [
+            {
+              "name": "input",
+              "ty": "IndexMeasureQualityDriverInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "SemanticDupDriverOutcome"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "dup_check",
+          "params": [
+            {
+              "name": "input",
+              "ty": "DupCheckDriverInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "SemanticDupDriverOutcome"
+        }
+      ],
+      "module_path": "semantic_dup_driver",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "SemanticDupDriverService": {
+      "action": "reference",
+      "docs": "Baseline SemanticDup driver application-service boundary.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "find_similar",
+          "params": [
+            {
+              "name": "input",
+              "ty": "FindSimilarDriverInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "SemanticDupDriverOutcome"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "index_build",
+          "params": [
+            {
+              "name": "input",
+              "ty": "IndexBuildDriverInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "SemanticDupDriverOutcome"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "index_measure_quality",
+          "params": [
+            {
+              "name": "input",
+              "ty": "IndexMeasureQualityDriverInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "SemanticDupDriverOutcome"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "dup_check",
+          "params": [
+            {
+              "name": "input",
+              "ty": "DupCheckDriverInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "SemanticDupDriverOutcome"
+        }
+      ],
+      "module_path": "semantic_dup_driver",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "SemanticDupDriverInteractor": {
+      "action": "reference",
+      "docs": "Baseline SemanticDup driver interactor.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "port",
+              "ty": "Arc<dyn SemanticDupDriverPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "semantic_dup_driver",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-03",
+          "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json"
+        }
+      ]
+    }
+  }
+}

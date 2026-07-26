@@ -1,0 +1,37 @@
+{
+  "track_id": "composition-root-pure-di-support-workflows-2026-07-26",
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "SemanticDupDriverAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::semantic_dup_driver::SemanticDupDriverPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "SemanticDupDriverAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::semantic_dup_driver::SemanticDupDriverPort' of SemanticDupDriverAdapter",
+      "declaration_hash": "f49d6da84e45888c0a7586cabee0634a6c8b0750c8b2744b0e3ca2805dd2d681",
+      "spec_refs": [
+        {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json",
+          "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      ]
+    }
+  ]
+}

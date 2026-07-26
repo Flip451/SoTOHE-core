@@ -1,0 +1,104 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef composition_root fill:#e0e7ff,stroke:#3730a3,stroke-width:2px
+classDef domain_event fill:#fce7f3,stroke:#9d174d,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef event_policy fill:#fef3c7,stroke:#92400e,stroke-width:1px
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef primary_adapter fill:#ecfccb,stroke:#3f6212,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef repository fill:#f5f3ff,stroke:#6d28d9,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_semantic_dup_driver["usecase::semantic_dup_driver"]
+    direction TB
+  subgraph T43_usecase_usecase_SemanticDupDriverInteractor["semantic_dup_driver::SemanticDupDriverInteractor"]
+    direction TB
+    T43_usecase_usecase_SemanticDupDriverInteractor__self[SemanticDupDriverInteractor]
+    T43_usecase_usecase_SemanticDupDriverInteractor_new([new])
+  end
+  subgraph R37_usecase_usecase_SemanticDupDriverPort["semantic_dup_driver::SemanticDupDriverPort"]
+    direction TB
+    R37_usecase_usecase_SemanticDupDriverPort__self[SemanticDupDriverPort]
+    R37_usecase_usecase_SemanticDupDriverPort_find_similar([find_similar])
+    R37_usecase_usecase_SemanticDupDriverPort_index_build([index_build])
+    R37_usecase_usecase_SemanticDupDriverPort_index_measure_quality([index_measure_quality])
+    R37_usecase_usecase_SemanticDupDriverPort_dup_check([dup_check])
+  end
+  subgraph R40_usecase_usecase_SemanticDupDriverService["semantic_dup_driver::SemanticDupDriverService"]
+    direction TB
+    R40_usecase_usecase_SemanticDupDriverService__self[SemanticDupDriverService]
+    R40_usecase_usecase_SemanticDupDriverService_find_similar([find_similar])
+    R40_usecase_usecase_SemanticDupDriverService_index_build([index_build])
+    R40_usecase_usecase_SemanticDupDriverService_index_measure_quality([index_measure_quality])
+    R40_usecase_usecase_SemanticDupDriverService_dup_check([dup_check])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_semantic_dup["infrastructure::semantic_dup"]
+    direction TB
+  subgraph T54_infrastructure_infrastructure_SemanticDupDriverAdapter["semantic_dup::driver_adapter::SemanticDupDriverAdapter"]
+    direction TB
+    T54_infrastructure_infrastructure_SemanticDupDriverAdapter__self[SemanticDupDriverAdapter]
+    T54_infrastructure_infrastructure_SemanticDupDriverAdapter_new([new])
+  end
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+end
+subgraph cli["cli"]
+  direction TB
+end
+T43_usecase_usecase_SemanticDupDriverInteractor_new --o R37_usecase_usecase_SemanticDupDriverPort__self
+T43_usecase_usecase_SemanticDupDriverInteractor_new --> T43_usecase_usecase_SemanticDupDriverInteractor__self
+T43_usecase_usecase_SemanticDupDriverInteractor__self -.impl.-> R40_usecase_usecase_SemanticDupDriverService__self
+T54_infrastructure_infrastructure_SemanticDupDriverAdapter_new --> T54_infrastructure_infrastructure_SemanticDupDriverAdapter__self
+T54_infrastructure_infrastructure_SemanticDupDriverAdapter__self -.impl.-> R37_usecase_usecase_SemanticDupDriverPort__self
+class T43_usecase_usecase_SemanticDupDriverInteractor_new method_node
+class T43_usecase_usecase_SemanticDupDriverInteractor__self interactor
+class R37_usecase_usecase_SemanticDupDriverPort_find_similar method_node
+class R37_usecase_usecase_SemanticDupDriverPort_index_build method_node
+class R37_usecase_usecase_SemanticDupDriverPort_index_measure_quality method_node
+class R37_usecase_usecase_SemanticDupDriverPort_dup_check method_node
+class R37_usecase_usecase_SemanticDupDriverPort__self secondary_port
+class R40_usecase_usecase_SemanticDupDriverService_find_similar method_node
+class R40_usecase_usecase_SemanticDupDriverService_index_build method_node
+class R40_usecase_usecase_SemanticDupDriverService_index_measure_quality method_node
+class R40_usecase_usecase_SemanticDupDriverService_dup_check method_node
+class R40_usecase_usecase_SemanticDupDriverService__self app_service
+class T54_infrastructure_infrastructure_SemanticDupDriverAdapter_new method_node
+class T54_infrastructure_infrastructure_SemanticDupDriverAdapter__self secondary_adapter
+```

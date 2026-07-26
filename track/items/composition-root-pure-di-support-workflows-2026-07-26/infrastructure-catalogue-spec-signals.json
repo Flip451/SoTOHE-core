@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "bfa69bd30376f566a76c1be8d7581ddf3d7cce3e29f3b178e770fc2fef8b1a6e",
+  "signals": [
+    {
+      "type_name": "SemanticDupDriverAdapter",
+      "signal": "blue",
+      "entry_hash": "67adc0240ce7bdaa2fff49d80ae5fe6ad7799c1f0f7c01528eaacdf94a42cdaf"
+    }
+  ]
+}

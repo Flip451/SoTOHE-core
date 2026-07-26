@@ -1,0 +1,268 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Support workflow composition roots pure-DI migration",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "RefVerify、SemanticDup、Verify の Support workflows を、この track 単独でレビュー可能かつ CI-green のまま統合できる純 DI migration delivery unit として完了する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D3"
+        },
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "各 Support workflow の composition-root execution path を、外部観測可能な CLI 契約を保った純 DI 境界へ収束させる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D4"
+        },
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D5"
+        },
+        {
+          "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "RefVerify、SemanticDup、Verify の三つの Support workflow command 文脈を、この track の純 DI 化対象とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "各所有 execution path から、composition root 上の command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+            "anchor": "D5"
+          },
+          {
+            "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "Support workflow の composition root 公開面を、fully wired driver を引き渡す純 DI boundary として維持し、実行メソッドまたは禁止された公開型露出を既存 catalogue lint により検出可能な状態にする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+            "anchor": "D1"
+          },
+          {
+            "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+            "anchor": "D3"
+          },
+          {
+            "file": "knowledge/adr/2026-07-23-0111-composition-root-pure-di-realignment.md",
+            "anchor": "D5"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OUT-01",
+        "text": "Leaf commands、Collaboration workflows、Core lifecycle の command 文脈、および PR / Signal / Review command contexts の純 DI 化は本 track の対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+            "anchor": "D3"
+          }
+        ]
+      },
+      {
+        "id": "OUT-02",
+        "text": "now-unreferenced となる互換定義・export の物理削除、リポジトリ全体の CompositionRootPureDi 適合、関連 lint・文書・export の最終同期、およびイニシアチブ全体の完了判定は Final convergence track の対象とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+            "anchor": "D3"
+          },
+          {
+            "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+            "anchor": "D5"
+          }
+        ]
+      },
+      {
+        "id": "OUT-03",
+        "text": "Interactor と Application Service の別 crate への分離、または crate topology の変更は本 track の対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+            "anchor": "D9"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "この Support workflows slice は単独でレビュー可能かつ CI-green のまま develop へ統合可能であり、未統合の他 migration track の実装を暗黙に前提にしない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D7"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "crate topology を維持し、Interactor と Application Service は libs/usecase 内の適切な command-context module に置いて、同一 application boundary 内で役割を分離する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D9"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "SemanticDup の外部契約維持は semantic-dup feature を有効にした統合テストで実証する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D4"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "RefVerify の live CLI path は fully wired driver を composition root から取得して実行し、legacy convenience execution methods を経由せず、composition root に command execution、CommandOutcome 生成、直接 I/O、または逆委譲を残さない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "Verify catalogue-spec-reference execution path は、track-id validation、infrastructure 呼出し、CommandOutcome assembly を composition root で実行せず、単一の driver → usecase interactor → port route に従う。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "SemanticDup は semantic-dup feature 有効時に、composition 内の SemanticDupDriverPort implementation または composition execution methods を経由せず、single one-way execution path で index build、check、find similar、index measure quality を実行する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "三つの Support workflow の各 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "統合テストは、RefVerify、SemanticDup、Verify の各所有 command 文脈について、同じ入力が構造変更前と同じ CLI 引数処理、stdout、stderr、exit code、および永続化結果を返すことを確認する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "この slice は他の未統合 migration track を必要とせず、CI-green を維持して統合できる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D2"
+        },
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D7"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/testing.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/security.md",
+      "anchor": "Sensitive Directories"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rule"
+    },
+    {
+      "file": "knowledge/conventions/no-backward-compat.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/enforce-by-mechanism.md",
+      "anchor": "Rules"
+    }
+  ],
+  "signals": {
+    "blue": 18,
+    "yellow": 0,
+    "red": 0
+  }
+}

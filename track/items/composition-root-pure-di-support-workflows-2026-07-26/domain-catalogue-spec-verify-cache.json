@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "61fdb7aa8af27a38cbc95d715a06aa0d6d41fec839dd1a19546cde9857eaaba8",
+      "evidence_hash": "f080ec78b99c5642c69600fc403d9fbccb7d0ba04c42f4fc183c6d13ea46b0ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "worktree / branch I/O を composition boundary 外の port 経路へ移し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationDeriveError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "TestObligationCompositionRoot::discover と TestObligationCompositionRoot::current_branch の worktree / branch I/O を composition boundary 外の port 経路へ移し、composition root に SystemGitRepo の discovery、branch を返す公開 query、または construction-time worktree discovery を残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "16f837cd756ce88ee47f4b2090ccbfa594a5d6a6276991370a57878b3d197238",
+      "evidence_hash": "f080ec78b99c5642c69600fc403d9fbccb7d0ba04c42f4fc183c6d13ea46b0ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "worktree / branch I/O を composition boundary 外の port 経路へ移し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationEvaluateError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "TestObligationCompositionRoot::discover と TestObligationCompositionRoot::current_branch の worktree / branch I/O を composition boundary 外の port 経路へ移し、composition root に SystemGitRepo の discovery、branch を返す公開 query、または construction-time worktree discovery を残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4e501eff6f0ae3ff6ca59e47ade3a962d278eab63317ce194b022d6f38eb1a1d",
+      "evidence_hash": "f080ec78b99c5642c69600fc403d9fbccb7d0ba04c42f4fc183c6d13ea46b0ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition boundary 外の port 経路へ移し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TrackId"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "TestObligationCompositionRoot::discover と TestObligationCompositionRoot::current_branch の worktree / branch I/O を composition boundary 外の port 経路へ移し、composition root に SystemGitRepo の discovery、branch を返す公開 query、または construction-time worktree discovery を残さない。"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "b2c7d6dd748d2f1ed349b5b4946fc93f3047e75c5fef817b0ff18e861c575911",
+  "signals": [
+    {
+      "type_name": "SemanticDupDriverInteractor",
+      "signal": "blue",
+      "entry_hash": "6bff45270fd5595cb1caa415005cf02772cb3a9242b7e3fda02eb293c3f01956"
+    },
+    {
+      "type_name": "SemanticDupDriverPort",
+      "signal": "blue",
+      "entry_hash": "25190f0e90896e9bca0589e2dad5f6e7c8fdeda793eb3b2c31661e13cd2c6b2b"
+    },
+    {
+      "type_name": "SemanticDupDriverService",
+      "signal": "blue",
+      "entry_hash": "5475b3da8c20dd39c1c332094b751495a4872f4211d30069a5e92d5149439cef"
+    }
+  ]
+}
