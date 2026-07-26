@@ -2,8 +2,6 @@
 
 use std::path::PathBuf;
 
-use crate::{CommandOutcome, error::CompositionError};
-
 // ---------------------------------------------------------------------------
 // Per-context composition root
 // ---------------------------------------------------------------------------
@@ -36,47 +34,6 @@ fn machine_home_directory() -> Option<PathBuf> {
     ["SOTP_MACHINE_HOME", "HOME", "USERPROFILE"].into_iter().find_map(|variable| {
         std::env::var_os(variable).filter(|value| !value.is_empty()).map(PathBuf::from)
     })
-}
-
-/// Execute catalogue-spec-refs verification, returning a `CommandOutcome`.
-///
-/// Validates the track id, delegates I/O to the infrastructure layer,
-/// and maps the result to a `CommandOutcome`.
-pub fn execute_catalogue_spec_refs(
-    items_dir: PathBuf,
-    track_id: String,
-    workspace_root: PathBuf,
-    skip_stale: bool,
-) -> Result<CommandOutcome, CompositionError> {
-    // Validate track id (path traversal guard) — delegates to the canonical domain rule.
-    crate::track::validate_track_id_str(&track_id)
-        .map_err(|e| CompositionError::WiringFailed(format!("invalid track ID: {e}")))?;
-
-    let mut all_formatted_findings: Vec<String> = Vec::new();
-    let no_findings =
-        infrastructure::verify::catalogue_spec_refs::execute_verify_catalogue_spec_refs(
-            items_dir,
-            track_id,
-            workspace_root,
-            skip_stale,
-            &mut all_formatted_findings,
-        )
-        .map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
-
-    if no_findings {
-        Ok(CommandOutcome::success(Some("[OK] catalogue-spec-refs: no findings".to_owned())))
-    } else {
-        let stderr = all_formatted_findings
-            .iter()
-            .chain(std::iter::once(&format!(
-                "[FAIL] catalogue-spec-refs: {} finding(s)",
-                all_formatted_findings.len()
-            )))
-            .cloned()
-            .collect::<Vec<_>>()
-            .join("\n");
-        Ok(CommandOutcome { stdout: None, stderr: Some(stderr), exit_code: 1 })
-    }
 }
 
 impl VerifyCompositionRoot {

@@ -1,0 +1,14 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-26T23:09:18Z",
+  "declaration_hash": "3b2352e4a62de71f915571b65de22861f3a624a5caa1f56348ca80fe7b520b6a",
+  "implementation_input_hash": "42cda607c01c9dcba135d5bf3354bfd1f2049cc1ccca983e470f22f7cf28c6b7",
+  "signals": [
+    {
+      "type_name": "cli_composition::verify::execute_catalogue_spec_refs",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    }
+  ]
+}

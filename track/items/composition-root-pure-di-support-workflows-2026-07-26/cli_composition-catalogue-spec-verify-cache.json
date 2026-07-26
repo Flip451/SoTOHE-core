@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "layer": "cli_composition",
+  "entries": [
+    {
+      "claim_hash": "dc34b1ec88653b50da5054272ca3d33ca4d91ab03e2e47adce307653ee4417cd",
+      "evidence_hash": "f124ff6037e2dacddee05b4ccd67277e0b2c2957bdae18764af5af9d9ccc6377",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Verify catalogue-spec-reference execution path は、track-id validation、infrastructure 呼出し、CommandOutcome assembly を composition root で実行せず、単一の driver → usecase interactor → port route に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_composition-types.json",
+          "section_key": "functions",
+          "entry_key": "cli_composition::verify::execute_catalogue_spec_refs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "Verify catalogue-spec-reference execution path は、track-id validation、infrastructure 呼出し、CommandOutcome assembly を composition root で実行せず、単一の driver → usecase interactor → port route に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "dc34b1ec88653b50da5054272ca3d33ca4d91ab03e2e47adce307653ee4417cd",
+      "evidence_hash": "6a1c7ebef15065b9d0352f83b8b6a7456f2db3740e69b8a0d9afe64e80d8de4e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path から、composition root 上の command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_composition-types.json",
+          "section_key": "functions",
+          "entry_key": "cli_composition::verify::execute_catalogue_spec_refs"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 execution path から、composition root 上の command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    }
+  ]
+}
