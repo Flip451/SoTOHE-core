@@ -16,17 +16,18 @@
     {
       "id": "T003",
       "description": "driven port `ConventionRequirementPort` と、照合語 `&ConventionCapabilityId` を受け取る純関数 `select_required_conventions` を実装する。port の contract obligation と関数の logic obligation を同一 task で果たし、filesystem 入力を使わずにテストする。実装と test は `libs/usecase/src/conventions_resolve/` 配下の sibling module に置き、`mod.rs` から再公開して catalogue が宣言する module path `conventions_resolve` を保ったまま `module_limits.max_lines` 内に収める(T002 と同じ形)。Size estimate — usecase: ~60 prod + ~200 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#AC-06`, `#AC-08`.",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "cb8281dcb9d5ab090139eba91f842a0ca6900bd0"
     },
     {
       "id": "T004",
       "description": "primary port `ConventionResolveService` と `ConventionResolveInteractor` を実装し、注入された `ConventionRequirementPort` の結果を `select_required_conventions` へ委譲する形に配線する。両者の result obligation を fake port で果たす。実装と test は `libs/usecase/src/conventions_resolve/` 配下の sibling module に置き、`mod.rs` から再公開して module path `conventions_resolve` を保ったまま `module_limits.max_lines` 内に収める(T002・T003 と同じ形)。Size estimate — usecase: ~70 prod + ~210 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#AC-06`, `#AC-08`.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T005",
       "description": "`libs/infrastructure/src/conventions_resolve/` に `CapabilityIdField`、`ConventionFrontMatterDto`、`parse_convention_front_matter` を実装し、既存の crate 内 front-matter block reader を再利用する。AC-07 の 5 条件のうち YAML 解析不能・`required_for` 非文字列配列・空 capability ID の 3 件をこの codec が所有する。`CapabilityIdField` は wire text を `ConventionCapabilityId::try_new` へ渡し、`ConventionFrontMatterDto::into_requirement` が `ConventionCapabilityIdError` を、文書名を補って `ConventionResolveError::EmptyCapabilityId` へ写す。Size estimate — infrastructure: ~140 prod + ~230 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#AC-06`, `#AC-07`, `#AC-08`.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T006",

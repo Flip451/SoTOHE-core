@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "0cbeb49612e024ab862faa7d010da3f628ddc7ccc3f34c6b7df42c27bbfe3356",
+  "catalogue_declaration_hash": "df4bae1aa5980be389e27a038c7f7064d9cf372e59775608abac475e6255a777",
   "signals": [
     {
       "type_name": "CapabilityExecError",
@@ -65,7 +65,7 @@
     {
       "type_name": "ConventionResolveError",
       "signal": "blue",
-      "entry_hash": "82a6281798e23331ef2d5214e1d6672773f52fe57888a00b14ba03d92837956d"
+      "entry_hash": "5280bd52313f87059b9fda77a08d81d3888cb63b922204447878d2dbccf663bb"
     },
     {
       "type_name": "ConventionResolveInteractor",

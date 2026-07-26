@@ -1,15 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T10:37:55Z",
-  "declaration_hash": "f2b897be8386e1f0af300922936e3888aefd559a8a5d761e8df3050d577ae5c3",
-  "implementation_input_hash": "b5c3b55e58746e1b44a49cb30383b977bbe303714cd25bbf3ace72e466f79425",
+  "generated_at": "2026-07-26T13:04:18Z",
+  "declaration_hash": "db6cec1761162d87cb0a47f1cd7a30b9497cd61a7b18ff553b865e035ac93693",
+  "implementation_input_hash": "da4ca82cb8dcd6be7c471c2e2f20021b70f4a21f696ee801d0368332e7f44ec0",
   "signals": [
     {
       "type_name": "CapabilityIdField",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Deserialize<'de>",
@@ -20,9 +20,9 @@
     {
       "type_name": "ConventionFrontMatterDto",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Default",
         "Deserialize<'de>"
@@ -51,8 +51,8 @@
     {
       "type_name": "infrastructure::conventions_resolve::parse_convention_front_matter",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::conventions_resolve::scan_convention_requirements",

@@ -14,6 +14,7 @@ pub mod code_profile_builder;
 pub mod codex_common;
 pub mod codex_runtime;
 pub mod conventions;
+pub mod conventions_resolve;
 pub mod demo;
 pub mod disk_maintenance;
 pub mod dry_check;

@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T11:30:58Z",
-  "declaration_hash": "0cbeb49612e024ab862faa7d010da3f628ddc7ccc3f34c6b7df42c27bbfe3356",
-  "implementation_input_hash": "8378d418a6b7c172350a74fbd2824546e746215e600f256d22c2d5955a4f0dcc",
+  "generated_at": "2026-07-26T13:04:17Z",
+  "declaration_hash": "df4bae1aa5980be389e27a038c7f7064d9cf372e59775608abac475e6255a777",
+  "implementation_input_hash": "a45afe57d0aacd36d9a19ce8dfd0b270ea84167730f8156a46b08d9499a836c7",
   "signals": [
     {
       "type_name": "CapabilityExecError",
@@ -138,17 +138,17 @@
     {
       "type_name": "ConventionResolveInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "ConventionResolveService"
       ]
     },
     {
       "type_name": "ConventionResolveService",
       "kind_tag": "application_service",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ConventionShippingCheckError",

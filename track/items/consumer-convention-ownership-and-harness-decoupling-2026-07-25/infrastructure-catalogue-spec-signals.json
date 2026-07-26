@@ -1,11 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "f2b897be8386e1f0af300922936e3888aefd559a8a5d761e8df3050d577ae5c3",
+  "catalogue_declaration_hash": "db6cec1761162d87cb0a47f1cd7a30b9497cd61a7b18ff553b865e035ac93693",
   "signals": [
     {
       "type_name": "CapabilityIdField",
       "signal": "blue",
-      "entry_hash": "edd0b88003e4a313787d3054e1d4f694771163f8708cbef4e34b9518040f8946"
+      "entry_hash": "83e15b5ed73728e8e2e96037e0ff2e9d99d67bace2d172fac1536e939e0394c1"
     },
     {
       "type_name": "ConventionFrontMatterDto",
@@ -25,7 +25,7 @@
     {
       "type_name": "infrastructure::conventions_resolve::parse_convention_front_matter",
       "signal": "blue",
-      "entry_hash": "ffb60564942a6b0352b7fa7eebdce0eaf4b0bfb056cffd0a74bc5c383a08b8be"
+      "entry_hash": "ad0ee3c00922bdabb508c9a5d459ebd36331dd4048c9c9c15d3c9dc280d2f5a8"
     },
     {
       "type_name": "infrastructure::conventions_resolve::scan_convention_requirements",

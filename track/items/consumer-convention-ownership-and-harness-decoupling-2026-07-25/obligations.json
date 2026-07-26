@@ -285,7 +285,7 @@
         "role": "FreeFunction"
       },
       "brief": "Author a logic test covering 'entry' of infrastructure::conventions_resolve::parse_convention_front_matter",
-      "declaration_hash": "a5baa451e88523fc124a11fd11f9666bef0f10a4f954f743aa22f90000b0464a",
+      "declaration_hash": "ba4effd44d4c9d669010562de166e0d0fa7e1bcc8743fa8cf406c77fb2f949ef",
       "spec_refs": [
         {
           "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",

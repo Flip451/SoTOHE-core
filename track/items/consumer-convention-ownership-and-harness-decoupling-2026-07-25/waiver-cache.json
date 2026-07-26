@@ -48,6 +48,30 @@
         "citation": "TraitEntry { action: Add, role: SecondaryPort, methods: [MethodDeclaration { name: MethodName(Identifier(\"scan_requirements\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"project_root\")), ty: TypeRef(\"&std::path::Path\") }], returns: TypeRef(\"Result<Vec<ConventionRequirement>, ConventionResolveError>\")"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionResolveService",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionResolveService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:resolve"
+      },
+      "key": {
+        "waived_reason_hash": "8cc9cf354be71fb4fb51d2b9e60d6bcd3c83e9e7575b9c590204c96ab5eb391d",
+        "declaration_hash": "4d1a4f5492cb238b3d9407dc9e8f8e25ae90fb1932546d11c5bd8ab6553aa2d9",
+        "anchor_text_hash": "dd5ea67e02f9b406d53b2e0a770895986e169be79549fdc8440e7f7be2e7a86d"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: [MethodDeclaration { name: MethodName(Identifier(\"resolve\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"query\")), ty: TypeRef(\"ResolveConventionsQuery\") }], returns: TypeRef(\"Result<ConventionResolution, ConventionResolveError>\") }]"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ]
 }

@@ -4,14 +4,15 @@
 //! This module owns the identity of a convention document path, the capability
 //! identifier both sides of the match are compared as, the request that names
 //! what to resolve, the scanned-document and result values, the fail-closed
-//! conditions of resolution, the port that scans documents, and the pure
-//! selection among them (spec `IN-05`, `IN-06`, `AC-06`, `AC-07`, `AC-08`,
-//! `AC-09`).
+//! conditions of resolution, the port that scans documents, the pure selection
+//! among them, and the primary port both drivers resolve through (spec
+//! `IN-05`, `IN-06`, `AC-06`, `AC-07`, `AC-08`, `AC-09`).
 
 mod capability_id;
 mod requirement_port;
 #[cfg(test)]
 mod resolve_error_tests;
+mod resolve_service;
 #[cfg(test)]
 mod selection_tests;
 
@@ -19,6 +20,7 @@ use std::path::{Component, Path, PathBuf};
 
 pub use capability_id::{ConventionCapabilityId, ConventionCapabilityIdError};
 pub use requirement_port::ConventionRequirementPort;
+pub use resolve_service::{ConventionResolveInteractor, ConventionResolveService};
 
 use crate::capability_exec::CapabilityFailureDetail;
 
