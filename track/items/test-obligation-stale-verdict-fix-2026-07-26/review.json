@@ -1,0 +1,454 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3d51cb42df1025cf48a6503969c3aefaf5f9bbc5e58a0c65c8ffcbe7da696c9",
+          "at": "2026-07-26T15:18:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3d51cb42df1025cf48a6503969c3aefaf5f9bbc5e58a0c65c8ffcbe7da696c9",
+          "at": "2026-07-26T15:20:50Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e10064361e4434808d98fa254227646a9765aa1b2cb7f1a6d6693a8455b17c20",
+          "at": "2026-07-26T16:04:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 の「評価エラーを黙殺しない」という意図を決定的に証明する AC がない。AC-04 は返却済みの失敗 verdict の schema を検証するだけで、評価処理自体がエラーを返す場合の伝播や非零終了を扱わないため、この目標の一部を未検証のまま完了扱いできる。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+              "line": 22,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "CN-04 の「error 出力が判定根拠を追跡可能にする」は、追跡可能と判定するための必須情報や観測条件を定義していない。IN-05 は cache 行の `bound_tests` だけを具体化しており error 出力は具体化されないため、下流工程が意味を発明しなければ検証できない制約になっている。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+              "line": 212,
+              "category": "constraint vague or untestable"
+            }
+          ],
+          "hash": "rvw1:sha256:e10064361e4434808d98fa254227646a9765aa1b2cb7f1a6d6693a8455b17c20",
+          "at": "2026-07-26T16:11:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ef03a5bdb48ef39010235d2f2846560cd5152efdc6fd1bd0a8e3146db89da5f",
+          "at": "2026-07-26T16:28:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-07 は verifier provider の解決失敗時における `evaluate` のエラー伝播を要求しているが、IN-01〜IN-05 の declared in_scope は cache entry の選択、重複、binding、失敗 verdict schema、cache 診断情報に限られ、provider 解決や評価エラー伝播を含まない。したがって、この AC は宣言された in_scope 外の振る舞いを完了条件にしている。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+              "line": 324,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8ef03a5bdb48ef39010235d2f2846560cd5152efdc6fd1bd0a8e3146db89da5f",
+          "at": "2026-07-26T16:30:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:07677710a91fed0ac49b9cccd00b7c6c49268d6c615cb1a9f4e3d9776c2f73a0",
+          "at": "2026-07-26T16:33:52Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:356c34dd97f2792d97ec6664f66ccdf5d7d934358361962e7e0b72e5b5666173",
+          "at": "2026-07-26T16:04:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::EdgeVerdictRecord` removes `verdict_reason` without adding a nested verdict. Its remaining `outcome: EdgeResolutionOutcome` carries only the failure category, so evaluation failure records cannot represent the required `entries[].verdict.reason` from IN-04/AC-04. Declare a companion modification that preserves the complete typed verdict and its reason.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 219,
+              "category": "missing_companion_modify"
+            },
+            {
+              "message": "`domain::ObligationFulfillmentCacheEntry::new` requires `bound_tests`, but pre-track cache rows do not contain that newly added field, and the referenced cache port exposes no typed legacy-row/migration outcome. Such rows cannot be decoded into the declared domain type, preventing `evaluate` from loading and rewriting them as required by AC-06 without treating the cache as generically malformed.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 807,
+              "category": "missing_companion_modify"
+            },
+            {
+              "message": "`domain::ObligationFulfillmentCacheEntry::new` accepts the key and diagnostic `bound_tests` independently. A caller can therefore pair a key whose `bound_tests_set_hash` was computed from set A with diagnostic set B, creating a cache row whose recorded evidence contradicts its key. Group the locations and their derived hash behind one validated type/factory while keeping locations outside equality semantics.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 795,
+              "category": "state_shape_smell"
+            },
+            {
+              "message": "Voluntary-binding enforcement has conflicting owners: `domain::ObligationsDocument` declares `validate_voluntary_binding` and `domain::TestBindingConsistencyError` says that method constructs the rejection, while `usecase::CheckTestObligationsInteractor` claims to validate it and `usecase::EvaluateTestObligationsInteractor` claims to reject it. Name the domain method as the sole enforcement owner and describe the interactors as invoking/propagating it.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+              "line": 27,
+              "category": "enforcement_owner_contradiction"
+            },
+            {
+              "message": "`domain::ObligationFulfillmentCachePort` models external cache load/save I/O as fully synchronous, but its docs do not acknowledge or justify that color choice. The contract needs to record why blocking I/O is intentional, or expose an asynchronous port before adapters and callers are fixed to the synchronous shape.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 138,
+              "category": "sync_async_color_mismatch"
+            },
+            {
+              "message": "The TypeEntries for `usecase::CheckTestObligationsInteractor`, `usecase::EvaluateTestObligationsInteractor`, and `usecase::TestObligationResultsInteractor` are marked `modify`, although their declared public type and constructor signatures exactly match the rustdoc baseline. Only their application-service implementations change, already represented by the separate trait-impl entries; these TypeEntries should be `reference`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+              "line": 26,
+              "category": "action_incoherent_with_diff"
+            },
+            {
+              "message": "`infrastructure::JsonObligationFulfillmentCacheCodec` is marked `modify`, but its declared struct and `new(PathBuf) -> Self` surface are identical to the rustdoc baseline. The behavioral port-implementation change is represented separately, and the DTO carries the actual structural wire change, so this TypeEntry should be `reference`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+              "line": 56,
+              "category": "action_incoherent_with_diff"
+            },
+            {
+              "message": "The docs for `domain::EdgeVerdictRecord`, `domain::FulfillmentCacheLookupError`, `domain::ObligationCheckError`, `domain::ObligationEvaluateError`, `domain::ObligationFulfillmentCacheDocument`, `domain::ObligationFulfillmentCacheEntry`, `domain::ObligationsDocument`, and `domain::TestBindingConsistencyError` restate upstream behavioral rules in prose. Replace these restatements with concise type/change identification and rely on their `spec_refs`, as required by `no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 186,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "The docs for `infrastructure::JsonObligationFulfillmentCacheCodec` and `infrastructure::ObligationFulfillmentCacheEntryDto` repeat the upstream contracts for nested reasons, diagnostic-only bound tests, and lookup delegation. Those behaviors must remain in the cited spec anchors rather than being duplicated in catalogue prose.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+              "line": 57,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "The docs for all three usecase interactors restate cache-selection, voluntary-binding, diagnostic-persistence, and verdict-reason behavior from the spec. Reduce the docs to type/change identification and anchor through `spec_refs` instead of duplicating the behavioral contract.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+              "line": 27,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:356c34dd97f2792d97ec6664f66ccdf5d7d934358361962e7e0b72e5b5666173",
+          "at": "2026-07-26T16:20:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20a70d74772ba4d812cbd18bf4d9a69ec1ef9b76863a1fc03a66f2485493f5eb",
+          "at": "2026-07-26T16:55:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::ResolvedBoundTests::new` receives only `NonEmptyTestLocations` but exposes a `BoundTestsSetHash`. The existing hash is calculated from scanned test bodies through the usecase `ContentHasherPort`; locations contain neither those bodies nor their hash. This signature therefore cannot construct the required value without fabricating a different hash, causing valid cache entries to fail `try_new` or carry incorrect identity. Accept the already computed `BoundTestsSetHash` alongside the locations.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 1395,
+              "category": "state_shape_smell"
+            },
+            {
+              "message": "`domain::ResolvedBoundTests` declares `new`, `set_hash`, and `locations` twice: in the top-level `inherent_impls` entry and again in `types.ResolvedBoundTests.methods`. The v5 encoder materializes these as separate inherent impl blocks, while the implementation can contain only one method set, so the final catalogue/implementation contract will diverge. Keep the signatures in one declaration location.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 5,
+              "category": "duplicated_structural_declaration"
+            },
+            {
+              "message": "`domain::ResolvedBoundTests` restates the IN-05/CN-04 contract by asserting in prose that locations are diagnostic data outside equality. Under `no-upstream-restatement.md`, retain only a concise type-purpose label and leave this behavioral/identity rule to `spec_refs`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 1378,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:20a70d74772ba4d812cbd18bf4d9a69ec1ef9b76863a1fc03a66f2485493f5eb",
+          "at": "2026-07-26T17:06:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cab2f11a64a8c2a487761c6bac3de36a15df00431cba64d494d7c3e38b07a841",
+          "at": "2026-07-26T17:16:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cab2f11a64a8c2a487761c6bac3de36a15df00431cba64d494d7c3e38b07a841",
+          "at": "2026-07-26T17:25:57Z"
+        }
+      ]
+    },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`plan.summary` restates the upstream goal and behavioral contract instead of using only task/operation/anchor traceability text.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 31,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S1 description restates design rationale and behavior (`self-hosting gate`, order-dependent lookup, and repaired-gate sequencing); retain only target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 40,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 description restates the recovery behavior and manual-cache constraint rather than providing executable task attribution only.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 50,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 description restates the ownership-validation behavior and fixture expectations already defined upstream.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 60,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S4 description restates the cache-identity design constraint (`diagnostics outside cache identity`) instead of limiting the plan text to target, operation, and anchor cite.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 70,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:13da5ce5d3fdf200036bc8793062fb35e6f6c302d521c67e2fc808b571d39fab",
+          "at": "2026-07-26T16:04:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Task T001 includes upstream behavioral rationale (`fail-closed ambiguity outcome`, freshness semantics, and duplicate-row behavior) beyond target + operation + anchor cite. Cite `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Task T002 restates the upstream cache-reuse and recovery contract, including fail-closed sequencing and prohibited manual intervention, beyond target + operation + anchor cite. Cite `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Task T003 restates the upstream voluntary-binding acceptance/rejection behavior and positive/negative fixture contract beyond target + operation + anchor cite. Cite `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Task T004 restates the upstream cache-identity constraint and diagnostic behavior (`without making them cache-key axes`, nested reason, diagnostic-only bound tests) beyond target + operation + anchor cite. Cite `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:81f137997056bb814ad81b6e7cb981c7563131812396cbe04f0c8daff15a7195",
+          "at": "2026-07-26T16:06:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ddc8fc093cf305fa3679882b45851742b116988aed42867d472812f37a3859e",
+          "at": "2026-07-26T16:08:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 and T002 precede T003, but their attributed final `ObligationCheckError` and `ObligationEvaluateError` definitions include `BindingConsistency(TestBindingConsistencyError)`, which T003 creates later. Because an entry attributed to an in-progress/done task must already be blue, T001/T002 cannot remain independent batches as planned. Move the shared domain error work into an earlier task or merge/reorder the tasks so the dependency exists first.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/task-contract.json",
+              "line": 7,
+              "category": "dependency cycle or wrong ordering"
+            },
+            {
+              "message": "The task descriptions and contract attributions disagree: T001 omits `ObligationCheckError`, T002 omits `ObligationEvaluateError`, and T003 omits both error entries despite being assigned them. Align each executable description’s targets and operations with its attributed catalogue entries, or remove/repartition the attributions.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 6,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T004 says to update `ObligationFulfillmentCachePort`, and its summary repeats that claim, but the catalogue marks this as an `action: reference` entry whose port surface remains unchanged. Keep its required carrier attribution in `task-contract.json`, but do not instruct the implementer to modify the port.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 24,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "CN-03 is mapped only to T003, whose description covers voluntary-binding ownership. CN-03 also requires contradictory same-key cache rows to fail closed; that load-bearing clause belongs to the full-key ambiguity work in T001/T002 and is not covered by the current mapping. Add the applicable tasks and anchor citations or repartition the work.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/task-coverage.json",
+              "line": 19,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:5ddc8fc093cf305fa3679882b45851742b116988aed42867d472812f37a3859e",
+          "at": "2026-07-26T16:16:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ef781f8dc3890ba0a2396c5fc320260dce313b90aa6b2c362b28188d87f21e82",
+          "at": "2026-07-26T16:22:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3a8711581e8f1fe9912e916520a848c0d07a8a9df8e48aebef53371589ac7cf",
+          "at": "2026-07-26T16:55:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T002 is attributed the add/modify catalogue entries `FulfillmentCacheReevaluationReason`, `ObligationFulfillmentCacheLoad`, and `VerifyCacheError`, but its description targets only `EvaluateTestObligationsInteractor`; it never says to create or modify those domain symbols. Add their target/operation boundary to T002 or repartition the attributions.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/task-contract.json",
+              "line": 14,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T004 is attributed `EdgeResolutionOutcome`, `ObligationFulfillmentCacheEntryError`, and `ResolvedBoundTests`, none of which its description says to add or modify. It also says the `ObligationFulfillmentCachePort` surface is preserved even though the current catalogue marks that entry `modify` and changes `load` to return `ObligationFulfillmentCacheLoad`. Align T004’s executable targets with the attributed catalogue work or reassign those entries.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 24,
+              "category": "task-contract attribution mismatch"
+            },
+            {
+              "message": "T002 cannot independently implement its AC-06 recovery path in the declared order. Its new `ObligationFulfillmentCacheLoad` must be returned by the modified `ObligationFulfillmentCachePort::load` and produced by the JSON cache adapter, but both the port and `JsonObligationFulfillmentCacheCodec` are assigned to later T004. In addition, T002’s final `VerifyCacheError` refers to `ObligationFulfillmentCacheEntryError`, also created only by T004. Move these prerequisites into T002/an earlier batch or reorder/merge the tasks.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/task-contract.json",
+              "line": 15,
+              "category": "dependency cycle or wrong ordering"
+            }
+          ],
+          "hash": "rvw1:sha256:d3a8711581e8f1fe9912e916520a848c0d07a8a9df8e48aebef53371589ac7cf",
+          "at": "2026-07-26T16:59:15Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a71ce7740e0f7edf1ea905165bf1c7ce227fa8ee606a616c871ba2642554c1e",
+          "at": "2026-07-26T17:05:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 owns and establishes the final `ObligationEvaluateError`, but that catalogue entry includes `CacheEntry(ObligationFulfillmentCacheEntryError)` while `ObligationFulfillmentCacheEntryError` is created only by later T002. T001 therefore cannot make its owned entry blue and remain independently committable. Move `ObligationEvaluateError` to T002 or create its dependency in/before T001.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/task-contract.json",
+              "line": 7,
+              "category": "dependency cycle or wrong ordering"
+            },
+            {
+              "message": "T004 restates the upstream contract in “so nested verdict reasons are the only result reason and resolved bound tests are cache-row diagnostics outside cache-key identity.” Replace that sentence-level behavior restatement with target/operation noun phrases plus the existing anchors, as required by `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 24,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:6a71ce7740e0f7edf1ea905165bf1c7ce227fa8ee606a616c871ba2642554c1e",
+          "at": "2026-07-26T17:07:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52fb8e64e07c285a02c1f0bd9da106ad878b1b668de849074ee2a1940017bee2",
+          "at": "2026-07-26T17:16:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:52fb8e64e07c285a02c1f0bd9da106ad878b1b668de849074ee2a1940017bee2",
+          "at": "2026-07-26T17:20:24Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33b9233ae8f9244213b4be2560f3987a54b3646a0800039406aaebe7aeab783e",
+          "at": "2026-07-26T16:04:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33b9233ae8f9244213b4be2560f3987a54b3646a0800039406aaebe7aeab783e",
+          "at": "2026-07-26T16:08:07Z"
+        }
+      ]
+    }
+  }
+}

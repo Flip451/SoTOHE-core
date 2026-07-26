@@ -1,0 +1,173 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {},
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "JsonObligationFulfillmentCacheCodec",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "JsonObligationFulfillmentCacheCodec",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "modify",
+      "for_type": "JsonObligationFulfillmentCacheCodec",
+      "trait_ref": "domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort"
+    },
+    {
+      "action": "reference",
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "serde::ser::Serialize"
+    },
+    {
+      "action": "reference",
+      "for_type": "ObligationFulfillmentCacheEntryDto",
+      "trait_ref": "serde::de::Deserialize<'de>"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "JsonObligationFulfillmentCacheCodec": {
+      "action": "reference",
+      "docs": "JSON fulfillment-cache secondary adapter.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::fulfillment_cache_codec",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "ObligationFulfillmentCacheEntryDto": {
+      "action": "modify",
+      "docs": "Serde mirror for the domain fulfillment-cache row.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation::fulfillment_cache_codec",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-26T16:47:50Z",
+  "declaration_hash": "42d3908ddc10123fd4011d3338e07289259d505d25922d7b30a24735e3b3d0f3",
+  "implementation_input_hash": "1e6db89b296b2e6a275de97756b23295cdd0b0bcae4a8bbb87686d8a6699be1f",
+  "signals": [
+    {
+      "type_name": "CheckTestObligationsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CheckTestObligationsApplicationService"
+      ]
+    },
+    {
+      "type_name": "EvaluateTestObligationsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "EvaluateTestObligationsApplicationService"
+      ]
+    },
+    {
+      "type_name": "TestObligationResultsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TestObligationResultsApplicationService"
+      ]
+    }
+  ]
+}

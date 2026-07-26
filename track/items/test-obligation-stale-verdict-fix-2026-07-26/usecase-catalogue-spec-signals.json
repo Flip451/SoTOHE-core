@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "42d3908ddc10123fd4011d3338e07289259d505d25922d7b30a24735e3b3d0f3",
+  "signals": [
+    {
+      "type_name": "CheckTestObligationsInteractor",
+      "signal": "blue",
+      "entry_hash": "0b3c72e78ebd147d802a28c15d08831dc45c28a548e78f06755ab9efc04530d8"
+    },
+    {
+      "type_name": "EvaluateTestObligationsInteractor",
+      "signal": "blue",
+      "entry_hash": "1cda3e7ca1c100d32b0bf2df144868be8c4ef4e828ec03630738b1135fb2207f"
+    },
+    {
+      "type_name": "TestObligationResultsInteractor",
+      "signal": "blue",
+      "entry_hash": "1c3a7dc6916f477a21b087d91d70712426bc5463b5c0635126efebdbc1921bf3"
+    }
+  ]
+}

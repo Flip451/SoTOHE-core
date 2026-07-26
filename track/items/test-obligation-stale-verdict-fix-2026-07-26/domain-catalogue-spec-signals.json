@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "29ac018553944a792129e633e1454bee6876caf681863b4e16764d365e080bdc",
+  "signals": [
+    {
+      "type_name": "EdgeResolutionOutcome",
+      "signal": "blue",
+      "entry_hash": "cdaf09913587f6a19ca31258e557dbe9d3127c70196821de8aa431d74973cb0a"
+    },
+    {
+      "type_name": "EdgeVerdictRecord",
+      "signal": "blue",
+      "entry_hash": "38f8802de17502e55654e26af1e7792f083f6a333136ef745773ade4662889df"
+    },
+    {
+      "type_name": "FulfillmentCacheLookupError",
+      "signal": "blue",
+      "entry_hash": "a6d1ee9fcb559aa3904642be62dd692d2ebd0a733951c278687ba2203967a5f1"
+    },
+    {
+      "type_name": "FulfillmentCacheReevaluationReason",
+      "signal": "blue",
+      "entry_hash": "fa977c52a6886b0401520e59804847db7f76b5850dd429acb6ec4537a768d713"
+    },
+    {
+      "type_name": "ObligationCheckError",
+      "signal": "blue",
+      "entry_hash": "8dd144d340a6d9b2419086490fa58636dce844a1a06e754b49a8a3de3c94982d"
+    },
+    {
+      "type_name": "ObligationEvaluateError",
+      "signal": "blue",
+      "entry_hash": "60dda958f0d5ce09376bd86a0e23afc0eb5da2e10515b490a71bddde64e95cb7"
+    },
+    {
+      "type_name": "ObligationFulfillmentCacheDocument",
+      "signal": "blue",
+      "entry_hash": "5fbc5250e969260a041359bf0f36b4d54d5cf35427879977c1a2ed5c2b2e5455"
+    },
+    {
+      "type_name": "ObligationFulfillmentCacheEntry",
+      "signal": "blue",
+      "entry_hash": "dc383937f15acb274b5444d8e079e1b24a382df5ca3a6f1db78f96b7c58b563e"
+    },
+    {
+      "type_name": "ObligationFulfillmentCacheEntryError",
+      "signal": "blue",
+      "entry_hash": "22cd83ae257bbce22603bbe03c518d3a0157c145619271d274ce1a60a73274a3"
+    },
+    {
+      "type_name": "ObligationFulfillmentCacheLoad",
+      "signal": "blue",
+      "entry_hash": "eb093ae13985f78f4840779e05093d6749a85f98099dbc9c29d640c4dc724da4"
+    },
+    {
+      "type_name": "ObligationsDocument",
+      "signal": "blue",
+      "entry_hash": "99bad8409d3d91c6f187bc1de4fd098735b3802412a118675f77ad9778c46cd8"
+    },
+    {
+      "type_name": "ResolvedBoundTests",
+      "signal": "blue",
+      "entry_hash": "c711329fcdfe8cd76489a9a5fc99ce1b6f6bb023e113c8e8663b41c30ea53915"
+    },
+    {
+      "type_name": "TestBindingConsistencyError",
+      "signal": "blue",
+      "entry_hash": "4ab9dca98753ba7553a2636e8905d57494dcbf9a40b2fbeb1e4ccdc322ea5e30"
+    },
+    {
+      "type_name": "VerifyCacheError",
+      "signal": "blue",
+      "entry_hash": "1bf5de4a22df4c4a9477e246079db32dd69d6722e54e3dc2d41649e809c66e16"
+    },
+    {
+      "type_name": "ObligationFulfillmentCachePort",
+      "signal": "blue",
+      "entry_hash": "28b7afcde4518a4e3b434dae50d2e3526332c5989ef8fd61f78b530a53781d96"
+    }
+  ]
+}

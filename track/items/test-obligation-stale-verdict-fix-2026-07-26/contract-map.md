@@ -1,0 +1,338 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef composition_root fill:#e0e7ff,stroke:#3730a3,stroke-width:2px
+classDef domain_event fill:#fce7f3,stroke:#9d174d,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef event_policy fill:#fef3c7,stroke:#92400e,stroke-width:1px
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef primary_adapter fill:#ecfccb,stroke:#3f6212,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef repository fill:#f5f3ff,stroke:#6d28d9,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_tddd["domain::tddd"]
+    direction TB
+  subgraph T35_domain_domain_EdgeResolutionOutcome["tddd::test_obligation::drift::EdgeResolutionOutcome"]
+    direction TB
+    T35_domain_domain_EdgeResolutionOutcome__self[EdgeResolutionOutcome]
+    T35_domain_domain_EdgeResolutionOutcome_Fulfillment[Fulfillment]
+    T35_domain_domain_EdgeResolutionOutcome_Waiver[Waiver]
+    T35_domain_domain_EdgeResolutionOutcome_MissingBinding[MissingBinding]
+  end
+  subgraph T31_domain_domain_EdgeVerdictRecord["tddd::test_obligation::drift::EdgeVerdictRecord"]
+    direction TB
+    T31_domain_domain_EdgeVerdictRecord__self[EdgeVerdictRecord]
+    T31_domain_domain_EdgeVerdictRecord_new([new])
+  end
+  subgraph T41_domain_domain_FulfillmentCacheLookupError["tddd::test_obligation::verdict::FulfillmentCacheLookupError"]
+    direction TB
+    T41_domain_domain_FulfillmentCacheLookupError__self[FulfillmentCacheLookupError]
+    T41_domain_domain_FulfillmentCacheLookupError_AmbiguousCurrentEntries[AmbiguousCurrentEntries]
+  end
+  subgraph T48_domain_domain_FulfillmentCacheReevaluationReason["tddd::test_obligation::verdict::FulfillmentCacheReevaluationReason"]
+    direction TB
+    T48_domain_domain_FulfillmentCacheReevaluationReason__self[FulfillmentCacheReevaluationReason]
+    T48_domain_domain_FulfillmentCacheReevaluationReason_Absent[Absent]
+    T48_domain_domain_FulfillmentCacheReevaluationReason_LegacyRowsMissingBoundTests[LegacyRowsMissingBoundTests]
+  end
+  subgraph T34_domain_domain_ObligationCheckError["tddd::test_obligation::errors::ObligationCheckError"]
+    direction TB
+    T34_domain_domain_ObligationCheckError__self[ObligationCheckError]
+    T34_domain_domain_ObligationCheckError_RulesLoad[RulesLoad]
+    T34_domain_domain_ObligationCheckError_ObligationsAbsent[ObligationsAbsent]
+    T34_domain_domain_ObligationCheckError_BindingsAbsent[BindingsAbsent]
+    T34_domain_domain_ObligationCheckError_StaleObligationsArtifact[StaleObligationsArtifact]
+    T34_domain_domain_ObligationCheckError_DriftsDetected[DriftsDetected]
+    T34_domain_domain_ObligationCheckError_UnresolvedEdges[UnresolvedEdges]
+    T34_domain_domain_ObligationCheckError_StaleVerdicts[StaleVerdicts]
+    T34_domain_domain_ObligationCheckError_CatalogueLoad[CatalogueLoad]
+    T34_domain_domain_ObligationCheckError_SpecLoad[SpecLoad]
+    T34_domain_domain_ObligationCheckError_InvalidCatalogueState[InvalidCatalogueState]
+    T34_domain_domain_ObligationCheckError_ArtifactCodec[ArtifactCodec]
+    T34_domain_domain_ObligationCheckError_SourceScan[SourceScan]
+    T34_domain_domain_ObligationCheckError_CacheIo[CacheIo]
+    T34_domain_domain_ObligationCheckError_TaskAttribution[TaskAttribution]
+    T34_domain_domain_ObligationCheckError_FulfillmentCacheLookup[FulfillmentCacheLookup]
+    T34_domain_domain_ObligationCheckError_BindingConsistency[BindingConsistency]
+    T34_domain_domain_ObligationCheckError_FulfillmentCacheRequiresEvaluation[FulfillmentCacheRequiresEvaluation]
+  end
+  subgraph T37_domain_domain_ObligationEvaluateError["tddd::test_obligation::errors::ObligationEvaluateError"]
+    direction TB
+    T37_domain_domain_ObligationEvaluateError__self[ObligationEvaluateError]
+    T37_domain_domain_ObligationEvaluateError_TrackNotActive[TrackNotActive]
+    T37_domain_domain_ObligationEvaluateError_CatalogueLoad[CatalogueLoad]
+    T37_domain_domain_ObligationEvaluateError_SpecLoad[SpecLoad]
+    T37_domain_domain_ObligationEvaluateError_ArtifactLoad[ArtifactLoad]
+    T37_domain_domain_ObligationEvaluateError_TestSourceScan[TestSourceScan]
+    T37_domain_domain_ObligationEvaluateError_VerifierPort[VerifierPort]
+    T37_domain_domain_ObligationEvaluateError_CachePersistence[CachePersistence]
+    T37_domain_domain_ObligationEvaluateError_SemanticFailuresConfirmed[SemanticFailuresConfirmed]
+    T37_domain_domain_ObligationEvaluateError_HumanEscalationRequired[HumanEscalationRequired]
+    T37_domain_domain_ObligationEvaluateError_FulfillmentCacheLookup[FulfillmentCacheLookup]
+    T37_domain_domain_ObligationEvaluateError_BindingConsistency[BindingConsistency]
+    T37_domain_domain_ObligationEvaluateError_CacheEntry[CacheEntry]
+  end
+  subgraph T48_domain_domain_ObligationFulfillmentCacheDocument["tddd::test_obligation::verdict::ObligationFulfillmentCacheDocument"]
+    direction TB
+    T48_domain_domain_ObligationFulfillmentCacheDocument__self[ObligationFulfillmentCacheDocument]
+    T48_domain_domain_ObligationFulfillmentCacheDocument_new([new])
+    T48_domain_domain_ObligationFulfillmentCacheDocument_track_id([track_id])
+    T48_domain_domain_ObligationFulfillmentCacheDocument_entries([entries])
+    T48_domain_domain_ObligationFulfillmentCacheDocument_lookup_current([lookup_current])
+  end
+  subgraph T45_domain_domain_ObligationFulfillmentCacheEntry["tddd::test_obligation::verdict::ObligationFulfillmentCacheEntry"]
+    direction TB
+    T45_domain_domain_ObligationFulfillmentCacheEntry__self[ObligationFulfillmentCacheEntry]
+    T45_domain_domain_ObligationFulfillmentCacheEntry_try_new([try_new])
+    T45_domain_domain_ObligationFulfillmentCacheEntry_edge_id([edge_id])
+    T45_domain_domain_ObligationFulfillmentCacheEntry_obligation_id([obligation_id])
+    T45_domain_domain_ObligationFulfillmentCacheEntry_key([key])
+    T45_domain_domain_ObligationFulfillmentCacheEntry_verdict([verdict])
+    T45_domain_domain_ObligationFulfillmentCacheEntry_verifier_fingerprint([verifier_fingerprint])
+    T45_domain_domain_ObligationFulfillmentCacheEntry_bound_tests([bound_tests])
+  end
+  subgraph T50_domain_domain_ObligationFulfillmentCacheEntryError["tddd::test_obligation::errors::ObligationFulfillmentCacheEntryError"]
+    direction TB
+    T50_domain_domain_ObligationFulfillmentCacheEntryError__self[ObligationFulfillmentCacheEntryError]
+    T50_domain_domain_ObligationFulfillmentCacheEntryError_BoundTestsHashMismatch[BoundTestsHashMismatch]
+  end
+  subgraph T44_domain_domain_ObligationFulfillmentCacheLoad["tddd::test_obligation::verdict::ObligationFulfillmentCacheLoad"]
+    direction TB
+    T44_domain_domain_ObligationFulfillmentCacheLoad__self[ObligationFulfillmentCacheLoad]
+    T44_domain_domain_ObligationFulfillmentCacheLoad_Current[Current]
+    T44_domain_domain_ObligationFulfillmentCacheLoad_ReevaluationRequired[ReevaluationRequired]
+  end
+  subgraph T33_domain_domain_ObligationsDocument["tddd::test_obligation::obligations::ObligationsDocument"]
+    direction TB
+    T33_domain_domain_ObligationsDocument__self[ObligationsDocument]
+    T33_domain_domain_ObligationsDocument_new([new])
+    T33_domain_domain_ObligationsDocument_track_id([track_id])
+    T33_domain_domain_ObligationsDocument_obligations([obligations])
+    T33_domain_domain_ObligationsDocument_edge_ownership([edge_ownership])
+    T33_domain_domain_ObligationsDocument_owners_of_edge([owners_of_edge])
+    T33_domain_domain_ObligationsDocument_validate_voluntary_binding([validate_voluntary_binding])
+    T33_domain_domain_ObligationsDocument_staleness_against([staleness_against])
+  end
+  subgraph T32_domain_domain_ResolvedBoundTests["tddd::test_obligation::verdict::ResolvedBoundTests"]
+    direction TB
+    T32_domain_domain_ResolvedBoundTests__self[ResolvedBoundTests]
+    T32_domain_domain_ResolvedBoundTests_new([new])
+    T32_domain_domain_ResolvedBoundTests_set_hash([set_hash])
+    T32_domain_domain_ResolvedBoundTests_locations([locations])
+  end
+  subgraph T41_domain_domain_TestBindingConsistencyError["tddd::test_obligation::errors::TestBindingConsistencyError"]
+    direction TB
+    T41_domain_domain_TestBindingConsistencyError__self[TestBindingConsistencyError]
+    T41_domain_domain_TestBindingConsistencyError_VoluntaryBindingOwnsDerivedObligation[VoluntaryBindingOwnsDerivedObligation]
+  end
+  subgraph T30_domain_domain_VerifyCacheError["tddd::test_obligation::errors::VerifyCacheError"]
+    direction TB
+    T30_domain_domain_VerifyCacheError__self[VerifyCacheError]
+    T30_domain_domain_VerifyCacheError_Io[Io]
+    T30_domain_domain_VerifyCacheError_MalformedJson[MalformedJson]
+    T30_domain_domain_VerifyCacheError_FulfillmentCacheEntry[FulfillmentCacheEntry]
+  end
+  subgraph R44_domain_domain_ObligationFulfillmentCachePort["tddd::test_obligation::ports::ObligationFulfillmentCachePort"]
+    direction TB
+    R44_domain_domain_ObligationFulfillmentCachePort__self[ObligationFulfillmentCachePort]
+    R44_domain_domain_ObligationFulfillmentCachePort_load([load])
+    R44_domain_domain_ObligationFulfillmentCachePort_save([save])
+  end
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_test_obligation["usecase::test_obligation"]
+    direction TB
+  subgraph T46_usecase_usecase_CheckTestObligationsInteractor["test_obligation::check::CheckTestObligationsInteractor"]
+    direction TB
+    T46_usecase_usecase_CheckTestObligationsInteractor__self[CheckTestObligationsInteractor]
+    T46_usecase_usecase_CheckTestObligationsInteractor_new([new])
+  end
+  subgraph T49_usecase_usecase_EvaluateTestObligationsInteractor["test_obligation::evaluate::EvaluateTestObligationsInteractor"]
+    direction TB
+    T49_usecase_usecase_EvaluateTestObligationsInteractor__self[EvaluateTestObligationsInteractor]
+    T49_usecase_usecase_EvaluateTestObligationsInteractor_new([new])
+  end
+  subgraph T47_usecase_usecase_TestObligationResultsInteractor["test_obligation::results::TestObligationResultsInteractor"]
+    direction TB
+    T47_usecase_usecase_TestObligationResultsInteractor__self[TestObligationResultsInteractor]
+    T47_usecase_usecase_TestObligationResultsInteractor_new([new])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_test_obligation["infrastructure::test_obligation"]
+    direction TB
+  subgraph T65_infrastructure_infrastructure_JsonObligationFulfillmentCacheCodec["test_obligation::fulfillment_cache_codec::JsonObligationFulfillmentCacheCodec"]
+    direction TB
+    T65_infrastructure_infrastructure_JsonObligationFulfillmentCacheCodec__self[JsonObligationFulfillmentCacheCodec]
+    T65_infrastructure_infrastructure_JsonObligationFulfillmentCacheCodec_new([new])
+  end
+  subgraph T64_infrastructure_infrastructure_ObligationFulfillmentCacheEntryDto["test_obligation::fulfillment_cache_codec::ObligationFulfillmentCacheEntryDto"]
+    direction TB
+    T64_infrastructure_infrastructure_ObligationFulfillmentCacheEntryDto__self[ObligationFulfillmentCacheEntryDto]
+  end
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+end
+subgraph cli["cli"]
+  direction TB
+end
+T31_domain_domain_EdgeVerdictRecord_new --o T35_domain_domain_EdgeResolutionOutcome__self
+T31_domain_domain_EdgeVerdictRecord_new --> T31_domain_domain_EdgeVerdictRecord__self
+T34_domain_domain_ObligationCheckError_CacheIo --o T30_domain_domain_VerifyCacheError__self
+T34_domain_domain_ObligationCheckError_FulfillmentCacheLookup --o T41_domain_domain_FulfillmentCacheLookupError__self
+T34_domain_domain_ObligationCheckError_BindingConsistency --o T41_domain_domain_TestBindingConsistencyError__self
+T34_domain_domain_ObligationCheckError_FulfillmentCacheRequiresEvaluation --o T48_domain_domain_FulfillmentCacheReevaluationReason__self
+T37_domain_domain_ObligationEvaluateError_CachePersistence --o T30_domain_domain_VerifyCacheError__self
+T37_domain_domain_ObligationEvaluateError_FulfillmentCacheLookup --o T41_domain_domain_FulfillmentCacheLookupError__self
+T37_domain_domain_ObligationEvaluateError_BindingConsistency --o T41_domain_domain_TestBindingConsistencyError__self
+T37_domain_domain_ObligationEvaluateError_CacheEntry --o T50_domain_domain_ObligationFulfillmentCacheEntryError__self
+T48_domain_domain_ObligationFulfillmentCacheDocument_new --o T45_domain_domain_ObligationFulfillmentCacheEntry__self
+T48_domain_domain_ObligationFulfillmentCacheDocument_new --> T48_domain_domain_ObligationFulfillmentCacheDocument__self
+T48_domain_domain_ObligationFulfillmentCacheDocument_entries --> T45_domain_domain_ObligationFulfillmentCacheEntry__self
+T48_domain_domain_ObligationFulfillmentCacheDocument_lookup_current --> T41_domain_domain_FulfillmentCacheLookupError__self
+T48_domain_domain_ObligationFulfillmentCacheDocument_lookup_current --> T45_domain_domain_ObligationFulfillmentCacheEntry__self
+T45_domain_domain_ObligationFulfillmentCacheEntry_try_new --o T32_domain_domain_ResolvedBoundTests__self
+T45_domain_domain_ObligationFulfillmentCacheEntry_try_new --> T50_domain_domain_ObligationFulfillmentCacheEntryError__self
+T45_domain_domain_ObligationFulfillmentCacheEntry_try_new --> T45_domain_domain_ObligationFulfillmentCacheEntry__self
+T44_domain_domain_ObligationFulfillmentCacheLoad_Current --o T48_domain_domain_ObligationFulfillmentCacheDocument__self
+T44_domain_domain_ObligationFulfillmentCacheLoad_ReevaluationRequired --o T48_domain_domain_FulfillmentCacheReevaluationReason__self
+T33_domain_domain_ObligationsDocument_new --> T33_domain_domain_ObligationsDocument__self
+T33_domain_domain_ObligationsDocument_validate_voluntary_binding --> T41_domain_domain_TestBindingConsistencyError__self
+T33_domain_domain_ObligationsDocument_staleness_against --o T33_domain_domain_ObligationsDocument__self
+T32_domain_domain_ResolvedBoundTests_new --> T32_domain_domain_ResolvedBoundTests__self
+T30_domain_domain_VerifyCacheError_FulfillmentCacheEntry --o T50_domain_domain_ObligationFulfillmentCacheEntryError__self
+R44_domain_domain_ObligationFulfillmentCachePort_load --> T44_domain_domain_ObligationFulfillmentCacheLoad__self
+R44_domain_domain_ObligationFulfillmentCachePort_load --> T30_domain_domain_VerifyCacheError__self
+R44_domain_domain_ObligationFulfillmentCachePort_save --o T48_domain_domain_ObligationFulfillmentCacheDocument__self
+T46_usecase_usecase_CheckTestObligationsInteractor_new --o R44_domain_domain_ObligationFulfillmentCachePort__self
+T46_usecase_usecase_CheckTestObligationsInteractor_new --> T46_usecase_usecase_CheckTestObligationsInteractor__self
+T49_usecase_usecase_EvaluateTestObligationsInteractor_new --o R44_domain_domain_ObligationFulfillmentCachePort__self
+T49_usecase_usecase_EvaluateTestObligationsInteractor_new --> T49_usecase_usecase_EvaluateTestObligationsInteractor__self
+T47_usecase_usecase_TestObligationResultsInteractor_new --o R44_domain_domain_ObligationFulfillmentCachePort__self
+T47_usecase_usecase_TestObligationResultsInteractor_new --> T47_usecase_usecase_TestObligationResultsInteractor__self
+T65_infrastructure_infrastructure_JsonObligationFulfillmentCacheCodec_new --> T65_infrastructure_infrastructure_JsonObligationFulfillmentCacheCodec__self
+T65_infrastructure_infrastructure_JsonObligationFulfillmentCacheCodec__self -.impl.-> R44_domain_domain_ObligationFulfillmentCachePort__self
+class T35_domain_domain_EdgeResolutionOutcome_Fulfillment variant_node
+class T35_domain_domain_EdgeResolutionOutcome_Waiver variant_node
+class T35_domain_domain_EdgeResolutionOutcome_MissingBinding variant_node
+class T35_domain_domain_EdgeResolutionOutcome__self value_object
+class T31_domain_domain_EdgeVerdictRecord_new method_node
+class T31_domain_domain_EdgeVerdictRecord__self value_object
+class T41_domain_domain_FulfillmentCacheLookupError_AmbiguousCurrentEntries variant_node
+class T41_domain_domain_FulfillmentCacheLookupError__self error_type
+class T48_domain_domain_FulfillmentCacheReevaluationReason_Absent variant_node
+class T48_domain_domain_FulfillmentCacheReevaluationReason_LegacyRowsMissingBoundTests variant_node
+class T48_domain_domain_FulfillmentCacheReevaluationReason__self value_object
+class T34_domain_domain_ObligationCheckError_RulesLoad variant_node
+class T34_domain_domain_ObligationCheckError_ObligationsAbsent variant_node
+class T34_domain_domain_ObligationCheckError_BindingsAbsent variant_node
+class T34_domain_domain_ObligationCheckError_StaleObligationsArtifact variant_node
+class T34_domain_domain_ObligationCheckError_DriftsDetected variant_node
+class T34_domain_domain_ObligationCheckError_UnresolvedEdges variant_node
+class T34_domain_domain_ObligationCheckError_StaleVerdicts variant_node
+class T34_domain_domain_ObligationCheckError_CatalogueLoad variant_node
+class T34_domain_domain_ObligationCheckError_SpecLoad variant_node
+class T34_domain_domain_ObligationCheckError_InvalidCatalogueState variant_node
+class T34_domain_domain_ObligationCheckError_ArtifactCodec variant_node
+class T34_domain_domain_ObligationCheckError_SourceScan variant_node
+class T34_domain_domain_ObligationCheckError_CacheIo variant_node
+class T34_domain_domain_ObligationCheckError_TaskAttribution variant_node
+class T34_domain_domain_ObligationCheckError_FulfillmentCacheLookup variant_node
+class T34_domain_domain_ObligationCheckError_BindingConsistency variant_node
+class T34_domain_domain_ObligationCheckError_FulfillmentCacheRequiresEvaluation variant_node
+class T34_domain_domain_ObligationCheckError__self error_type
+class T37_domain_domain_ObligationEvaluateError_TrackNotActive variant_node
+class T37_domain_domain_ObligationEvaluateError_CatalogueLoad variant_node
+class T37_domain_domain_ObligationEvaluateError_SpecLoad variant_node
+class T37_domain_domain_ObligationEvaluateError_ArtifactLoad variant_node
+class T37_domain_domain_ObligationEvaluateError_TestSourceScan variant_node
+class T37_domain_domain_ObligationEvaluateError_VerifierPort variant_node
+class T37_domain_domain_ObligationEvaluateError_CachePersistence variant_node
+class T37_domain_domain_ObligationEvaluateError_SemanticFailuresConfirmed variant_node
+class T37_domain_domain_ObligationEvaluateError_HumanEscalationRequired variant_node
+class T37_domain_domain_ObligationEvaluateError_FulfillmentCacheLookup variant_node
+class T37_domain_domain_ObligationEvaluateError_BindingConsistency variant_node
+class T37_domain_domain_ObligationEvaluateError_CacheEntry variant_node
+class T37_domain_domain_ObligationEvaluateError__self error_type
+class T48_domain_domain_ObligationFulfillmentCacheDocument_new method_node
+class T48_domain_domain_ObligationFulfillmentCacheDocument_track_id method_node
+class T48_domain_domain_ObligationFulfillmentCacheDocument_entries method_node
+class T48_domain_domain_ObligationFulfillmentCacheDocument_lookup_current method_node
+class T48_domain_domain_ObligationFulfillmentCacheDocument__self value_object
+class T45_domain_domain_ObligationFulfillmentCacheEntry_try_new method_node
+class T45_domain_domain_ObligationFulfillmentCacheEntry_edge_id method_node
+class T45_domain_domain_ObligationFulfillmentCacheEntry_obligation_id method_node
+class T45_domain_domain_ObligationFulfillmentCacheEntry_key method_node
+class T45_domain_domain_ObligationFulfillmentCacheEntry_verdict method_node
+class T45_domain_domain_ObligationFulfillmentCacheEntry_verifier_fingerprint method_node
+class T45_domain_domain_ObligationFulfillmentCacheEntry_bound_tests method_node
+class T45_domain_domain_ObligationFulfillmentCacheEntry__self value_object
+class T50_domain_domain_ObligationFulfillmentCacheEntryError_BoundTestsHashMismatch variant_node
+class T50_domain_domain_ObligationFulfillmentCacheEntryError__self error_type
+class T44_domain_domain_ObligationFulfillmentCacheLoad_Current variant_node
+class T44_domain_domain_ObligationFulfillmentCacheLoad_ReevaluationRequired variant_node
+class T44_domain_domain_ObligationFulfillmentCacheLoad__self value_object
+class T33_domain_domain_ObligationsDocument_new method_node
+class T33_domain_domain_ObligationsDocument_track_id method_node
+class T33_domain_domain_ObligationsDocument_obligations method_node
+class T33_domain_domain_ObligationsDocument_edge_ownership method_node
+class T33_domain_domain_ObligationsDocument_owners_of_edge method_node
+class T33_domain_domain_ObligationsDocument_validate_voluntary_binding method_node
+class T33_domain_domain_ObligationsDocument_staleness_against method_node
+class T33_domain_domain_ObligationsDocument__self value_object
+class T32_domain_domain_ResolvedBoundTests_new method_node
+class T32_domain_domain_ResolvedBoundTests_set_hash method_node
+class T32_domain_domain_ResolvedBoundTests_locations method_node
+class T32_domain_domain_ResolvedBoundTests__self value_object
+class T41_domain_domain_TestBindingConsistencyError_VoluntaryBindingOwnsDerivedObligation variant_node
+class T41_domain_domain_TestBindingConsistencyError__self error_type
+class T30_domain_domain_VerifyCacheError_Io variant_node
+class T30_domain_domain_VerifyCacheError_MalformedJson variant_node
+class T30_domain_domain_VerifyCacheError_FulfillmentCacheEntry variant_node
+class T30_domain_domain_VerifyCacheError__self error_type
+class R44_domain_domain_ObligationFulfillmentCachePort_load method_node
+class R44_domain_domain_ObligationFulfillmentCachePort_save method_node
+class R44_domain_domain_ObligationFulfillmentCachePort__self secondary_port
+class T46_usecase_usecase_CheckTestObligationsInteractor_new method_node
+class T46_usecase_usecase_CheckTestObligationsInteractor__self interactor
+class T49_usecase_usecase_EvaluateTestObligationsInteractor_new method_node
+class T49_usecase_usecase_EvaluateTestObligationsInteractor__self interactor
+class T47_usecase_usecase_TestObligationResultsInteractor_new method_node
+class T47_usecase_usecase_TestObligationResultsInteractor__self interactor
+class T65_infrastructure_infrastructure_JsonObligationFulfillmentCacheCodec_new method_node
+class T65_infrastructure_infrastructure_JsonObligationFulfillmentCacheCodec__self secondary_adapter
+class T64_infrastructure_infrastructure_ObligationFulfillmentCacheEntryDto__self dto
+```

@@ -1,0 +1,23 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-26T16:47:51Z",
+  "declaration_hash": "3f827d7dca708cfc36c3125a644846130527ffa4648949b48327ca7ba60f4014",
+  "implementation_input_hash": "eea709596722fd39f859b9a0392317f8b626d1baa233bc0531e6b6354ae9029f",
+  "signals": [
+    {
+      "type_name": "ObligationFulfillmentCacheEntryDto",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "JsonObligationFulfillmentCacheCodec",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "ObligationFulfillmentCachePort"
+      ]
+    }
+  ]
+}

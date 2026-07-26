@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "3f827d7dca708cfc36c3125a644846130527ffa4648949b48327ca7ba60f4014",
+  "signals": [
+    {
+      "type_name": "JsonObligationFulfillmentCacheCodec",
+      "signal": "blue",
+      "entry_hash": "33425570ac347c456643d1c37968695ad79e7dfa96315fd01e91b25a6f984604"
+    },
+    {
+      "type_name": "ObligationFulfillmentCacheEntryDto",
+      "signal": "blue",
+      "entry_hash": "3c395d4402384a82190f8c5b976d85ce74d22d283fbb27cc3028b11fd2955d5f"
+    }
+  ]
+}
