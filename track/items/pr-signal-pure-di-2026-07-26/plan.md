@@ -18,14 +18,14 @@ GO-01 → T001, T002, T003, T004, T005, T006, T008. GO-02 → T001, T002, T003, 
 
 > Add SignalCommand, SignalCommandPort, SignalCommandPortError, SignalFailureReason, SignalGateConfigError, SignalGateConfigPort, SignalRootSelection, SignalStrictOverride, ResolvedSignalChainCommand, SignalChainExecutionReport, SignalCommandInteractor, and SystemSignalCommandAdapter. IN-02/CN-02/CN-03/CN-04/AC-06. T002, T004.
 
-- [x] **T002**: Add SignalCommand, SignalCommandPort, SignalCommandPortError, SignalFailureReason, SignalGateConfigError, SignalGateConfigPort, SignalRootSelection, SignalStrictOverride, ResolvedSignalChainCommand, SignalChainExecutionReport, and SignalCommandInteractor at the SignalService port; reuse SignalCommandOutput and SignalGateName; add command-translation and port-integration tests. T008 owns the later error-contract amendments. IN-02/CN-02/CN-03/CN-04/AC-06/AC-08/AC-10.
-- [x] **T004**: Deliver SystemSignalCommandAdapter and SystemSignalGateConfigAdapter, including their signal execution and gate-settings loading behavior, with focused tests. IN-02/CN-02/CN-04/AC-06/AC-10.
+- [x] **T002**: Add SignalCommand, SignalCommandPort, SignalCommandPortError, SignalFailureReason, SignalGateConfigError, SignalGateConfigPort, SignalRootSelection, SignalStrictOverride, ResolvedSignalChainCommand, SignalChainExecutionReport, and SignalCommandInteractor at the SignalService port; reuse SignalCommandOutput and SignalGateName; add command-translation and port-integration tests. T008 owns the later error-contract amendments. IN-02/CN-02/CN-03/CN-04/AC-06/AC-08/AC-10. (`07d798766ecea46e277375e0830ad60141719f43`)
+- [x] **T004**: Deliver SystemSignalCommandAdapter and SystemSignalGateConfigAdapter, including their signal execution and gate-settings loading behavior, with focused tests. IN-02/CN-02/CN-04/AC-06/AC-10. (`07d798766ecea46e277375e0830ad60141719f43`)
 
 ### signal-error-parity — Signal error-contract amendments
 
 > Implement the workspace-aware active-track preflight path across the command port, interactor, adapter, mocks, and focused tests. T008.
 
-- [x] **T008**: Amend SignalCommandPort, SignalCommandInteractor, SignalCommandPortError, SignalFailureReason, SignalGateConfigError, SignalGateConfigPort, SignalRootSelection, SystemSignalCommandAdapter, and SystemSignalGateConfigAdapter; split active-track and spec-path resolution into SignalActiveTrackResolverPort and SignalSpecPathResolverPort, then align the interactor, adapters, mocks, and focused parity tests. IN-02/CN-01/AC-05/AC-06/AC-08/AC-09/AC-10.
+- [x] **T008**: Amend SignalCommandPort, SignalCommandInteractor, SignalCommandPortError, SignalFailureReason, SignalGateConfigError, SignalGateConfigPort, SignalRootSelection, SystemSignalCommandAdapter, and SystemSignalGateConfigAdapter; split active-track and spec-path resolution into SignalActiveTrackResolverPort and SignalSpecPathResolverPort, then align the interactor, adapters, mocks, and focused parity tests. IN-02/CN-01/AC-05/AC-06/AC-08/AC-09/AC-10. (`07d798766ecea46e277375e0830ad60141719f43`)
 
 ### pr-cutover — PR composition cutover
 
@@ -37,10 +37,10 @@ GO-01 → T001, T002, T003, T004, T005, T006, T008. GO-02 → T001, T002, T003, 
 
 > Wire the Signal composition root and route the Signal CLI entries through the driver. IN-02/OUT-01/CN-01/CN-02/CN-04/AC-02/AC-04/AC-06/AC-07. T006.
 
-- [x] **T006**: Deliver SignalCompositionRoot wiring for SignalDriver, SignalCommandInteractor, SystemSignalCommandAdapter, and SystemSignalGateConfigAdapter; move execution into the adapter, remove the composition execution surface, and switch all Signal CLI entries to the driver. IN-02/OUT-01/CN-01/CN-02/CN-04/AC-02/AC-04/AC-06/AC-07.
+- [x] **T006**: Deliver SignalCompositionRoot wiring for SignalDriver, SignalCommandInteractor, SystemSignalCommandAdapter, and SystemSignalGateConfigAdapter; move execution into the adapter, remove the composition execution surface, and switch all Signal CLI entries to the driver. IN-02/OUT-01/CN-01/CN-02/CN-04/AC-02/AC-04/AC-06/AC-07. (`07d798766ecea46e277375e0830ad60141719f43`)
 
 ### contract-evidence-and-surface-cleanup — Contract evidence and live-reference verification
 
 > Add apps/cli/tests/pr_signal_pure_di_contract.rs to exercise sotp pr push, ensure-pr, review-cycle, and signal check CLI contracts, including AC-07 single-path validation; extend apps/cli/tests/operational_reference_cutover.rs::test_live_operational_reference_surfaces_retired_planner_not_present for the live-reference check. IN-01/IN-02/OUT-02/OUT-04/CN-01/CN-02/CN-04/AC-01/AC-02/AC-04/AC-05/AC-06/AC-07. T007.
 
-- [x] **T007**: Add apps/cli/tests/pr_signal_pure_di_contract.rs to exercise sotp pr push, ensure-pr, review-cycle, and signal check CLI contracts, including AC-07 single-path validation; extend apps/cli/tests/operational_reference_cutover.rs::test_live_operational_reference_surfaces_retired_planner_not_present for the live-reference check. IN-01/IN-02/OUT-02/OUT-04/CN-01/CN-02/CN-04/AC-01/AC-02/AC-04/AC-05/AC-06/AC-07.
+- [x] **T007**: Add apps/cli/tests/pr_signal_pure_di_contract.rs to exercise sotp pr push, ensure-pr, review-cycle, and signal check CLI contracts, including AC-07 single-path validation; extend apps/cli/tests/operational_reference_cutover.rs::test_live_operational_reference_surfaces_retired_planner_not_present for the live-reference check. IN-01/IN-02/OUT-02/OUT-04/CN-01/CN-02/CN-04/AC-01/AC-02/AC-04/AC-05/AC-06/AC-07. (`f6978018`)

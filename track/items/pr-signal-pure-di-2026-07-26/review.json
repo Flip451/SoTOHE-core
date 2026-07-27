@@ -1,6 +1,656 @@
 {
   "schema_version": 2,
   "scopes": {
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b664926990f7a39da5a12601181fff146ef27746e40ffded219a16d3718085d7",
+          "at": "2026-07-26T09:53:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b664926990f7a39da5a12601181fff146ef27746e40ffded219a16d3718085d7",
+          "at": "2026-07-26T09:55:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdfe60fd582d5a8160d83529ca89a75627502047e5ed4dd65c913db9e103cf6d",
+          "at": "2026-07-26T13:45:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bdfe60fd582d5a8160d83529ca89a75627502047e5ed4dd65c913db9e103cf6d",
+          "at": "2026-07-26T13:48:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`bin/sotp test-obligation check --track-id pr-signal-pure-di-2026-07-26` fails because several bindings reference tests whose bodies changed after the verdict was frozen (`SystemPrCommandAdapter` and `PrTrackIdOverride` edges). The bindings/verdict cache must be re-evaluated or the stale bindings repaired before this artifact can pass its gate.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/test-bindings.json",
+              "line": 112,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:ec9f6ee71dc1097df336351cca48855f49b72be6fa3f38118d799ed1542bed8b",
+          "at": "2026-07-26T15:30:00Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec9f6ee71dc1097df336351cca48855f49b72be6fa3f38118d799ed1542bed8b",
+          "at": "2026-07-26T15:39:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec9f6ee71dc1097df336351cca48855f49b72be6fa3f38118d799ed1542bed8b",
+          "at": "2026-07-26T15:40:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ec9f6ee71dc1097df336351cca48855f49b72be6fa3f38118d799ed1542bed8b",
+          "at": "2026-07-26T15:40:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d933ff9972194e3b6cd3b711f50496ffb8949e054819a2d15b2213ea101a0536",
+          "at": "2026-07-27T02:59:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d933ff9972194e3b6cd3b711f50496ffb8949e054819a2d15b2213ea101a0536",
+          "at": "2026-07-27T03:01:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:37269f34d43f7854404f223bf75264aa168658ec312686faa1dfbe952b002fb3",
+          "at": "2026-07-27T05:03:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:37269f34d43f7854404f223bf75264aa168658ec312686faa1dfbe952b002fb3",
+          "at": "2026-07-27T05:04:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b85ffd90951b065171f91d6d3201dcd979d0659594846a82298635cd1f817b1a",
+          "at": "2026-07-27T06:23:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b85ffd90951b065171f91d6d3201dcd979d0659594846a82298635cd1f817b1a",
+          "at": "2026-07-27T06:24:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0505dd9502066d982e1cd4a875440e6de531b871bc8fded9c34eb57a7f550fd",
+          "at": "2026-07-27T08:54:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0505dd9502066d982e1cd4a875440e6de531b871bc8fded9c34eb57a7f550fd",
+          "at": "2026-07-27T09:01:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf496fac7aaf16acff87e55a166dedcb927896535ca7fabb58e4d0fb24ea50bd",
+          "at": "2026-07-27T09:59:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cf496fac7aaf16acff87e55a166dedcb927896535ca7fabb58e4d0fb24ea50bd",
+          "at": "2026-07-27T10:01:14Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a7fb7eba1636fbe0030ee5c9749d775811d613516b6da67df8b4fc60ac57b1c",
+          "at": "2026-07-27T11:31:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8a7fb7eba1636fbe0030ee5c9749d775811d613516b6da67df8b4fc60ac57b1c",
+          "at": "2026-07-27T11:32:32Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfd7b75243e68014f6606c976f1ac1326d4561381901ad707b6c70ef8788d7e1",
+          "at": "2026-07-26T13:45:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The deprecated `--track-id` compatibility argument was previously ignored on a track branch by `resolve_pr_branch`, but the interactor now rejects any value that is not a valid `TrackId` before reaching the port. Commands such as `pr push --track-id INVALID` therefore change from operating on the current track to exiting with failure, violating CN-01. Preserve the ignored compatibility semantics when constructing the typed command.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pr.rs",
+              "line": 223,
+              "category": "correctness"
+            },
+            {
+              "message": "`NonEmptyString::try_new` trims its input, so an explicit base such as `\" main \"` is silently changed to `\"main\"`. The baseline treated only the exactly empty string as omitted and otherwise forwarded the value unchanged; this can now create a PR against a different base instead of failing, contrary to CN-01. Use a non-trimming representation for this override.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pr.rs",
+              "line": 237,
+              "category": "correctness"
+            },
+            {
+              "message": "The new public validation branches lack the required error-case coverage: only `status` with an empty identifier is tested, while invalid/compatibility track IDs, explicit-base boundaries, invalid merge methods and timestamps, and empty identifiers for wait/trigger/poll are untested. Add focused regression tests for these public service paths.",
+              "severity": "P1",
+              "file": "libs/usecase/src/pr.rs",
+              "line": 363,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:cfd7b75243e68014f6606c976f1ac1326d4561381901ad707b6c70ef8788d7e1",
+          "at": "2026-07-26T13:51:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50c80da6a36038e5b248c8daea57a4f4ffeba26320edd3ce54824b70842acd28",
+          "at": "2026-07-26T15:05:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50c80da6a36038e5b248c8daea57a4f4ffeba26320edd3ce54824b70842acd28",
+          "at": "2026-07-26T15:07:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:50c80da6a36038e5b248c8daea57a4f4ffeba26320edd3ce54824b70842acd28",
+          "at": "2026-07-26T15:07:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ddcaec9a576aebabd6e1f286f1565de007f9baab1162445d508076a2ca9825b3",
+          "at": "2026-07-27T02:59:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "All SignalGateConfigPort failures are collapsed to a fixed message. Missing/malformed gate configuration and repository-discovery failures previously produced distinct stderr with the relevant context; CN-01 requires stdout/stderr compatibility. Preserve those usecase-level failure identities without exposing infrastructure error types.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 322,
+              "category": "correctness"
+            },
+            {
+              "message": "All SignalCommandPort failures are converted to the same generic stderr. Ordinary failures such as spec-path resolution, repository discovery, and persistence errors therefore lose their established actionable output, violating CN-01. The usecase error contract needs conceptual variants or a safe presentation payload that preserves existing behavior.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 339,
+              "category": "error-handling"
+            },
+            {
+              "message": "check_gate converts a chain execution error into a child SignalCommandOutput, continues executing later chains, and then moves the error text into aggregate stdout. The previous gate flow short-circuited runner/preflight failures and returned stderr directly, so missing repository/spec inputs now change both execution and observable output. Propagate dependency errors separately and merge only completed verification reports.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 361,
+              "category": "orchestration"
+            }
+          ],
+          "hash": "rvw1:sha256:ddcaec9a576aebabd6e1f286f1565de007f9baab1162445d508076a2ca9825b3",
+          "at": "2026-07-27T03:06:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bde0d57cd45461f4f4d0f314431943671be9d5bda58c3637bb4ae75551e153fd",
+          "at": "2026-07-27T04:58:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SignalGateConfigError::RepositoryDiscovery` is mapped to `cannot discover git repository: {reason}` without the required `[BLOCKED]` prefix and `; pass --workspace-root or --spec-json explicitly` suffix. When `signal check --gate` runs without `--workspace-root`, this changes the baseline CN-01 observable error identity/message.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 411,
+              "category": "behavior-regression"
+            }
+          ],
+          "hash": "rvw1:sha256:bde0d57cd45461f4f4d0f314431943671be9d5bda58c3637bb4ae75551e153fd",
+          "at": "2026-07-27T05:03:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:483e4a27c4382aa91139094cc1daa6e8b3202be4e96a01c35ebac8edb34259c2",
+          "at": "2026-07-27T05:09:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Repository discovery while loading the gate matrix still changes the CLI contract. The baseline `load_gate_matrix` returned stderr `cannot discover git repository: {reason}`; this arm adds `[BLOCKED]` and the `--workspace-root or --spec-json` suffix. This affects every non-`--strict` check and aggregate gate invoked outside a repository, violating CN-01.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 412,
+              "category": "correctness"
+            },
+            {
+              "message": "`RepositoryDiscovery` lacks command context, so one formatter is incorrectly reused for different baseline behaviors. The current `[BLOCKED] ... pass --workspace-root or --spec-json` text is appropriate for spec-path resolution, but `calc-catalog-spec`, `calc-impl-catalog`, and strict catalog checks previously emitted command-specific `cannot discover git repo` errors. Separate these failure identities or carry the command context required to preserve CN-01.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 389,
+              "category": "error-handling"
+            },
+            {
+              "message": "Branch-resolution failures do not preserve their established output. The baseline printed `signal calc-impl-catalog: cannot read current branch: {reason}` without an `[ERROR]` prefix, and a missing current branch omitted the trailing reason entirely. This arm always adds `[ERROR]`, while the adapter represents the missing-branch case as `: no current branch`.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 393,
+              "category": "correctness"
+            },
+            {
+              "message": "Persistence errors gain a new `[ERROR] signal calc-spec-adr:` prefix. Previously the CLI printed the `SpecAdrSignalError` text directly (for example, `spec-adr signal write error: ...`), so read/decode/encode/write failures now violate CN-01 even though their diagnostic payload is retained.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 400,
+              "category": "correctness"
+            },
+            {
+              "message": "The aggregate gate no longer performs the baseline active-track preflight before dispatching chains. With an explicit spec path on a non-track branch, chain ⓪ and chain ① run, the layer checks return ordinary error reports, and the interactor aggregates them into stdout and continues through chain ③. The baseline instead returned a single stderr `[BLOCKED] signal check --gate ...: cannot resolve active track ID: ...` before executing any chain. The usecase boundary needs a typed preflight/dependency failure path so this condition short-circuits rather than becoming a verification report.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 443,
+              "category": "orchestration"
+            }
+          ],
+          "hash": "rvw1:sha256:483e4a27c4382aa91139094cc1daa6e8b3202be4e96a01c35ebac8edb34259c2",
+          "at": "2026-07-27T05:14:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Gate-matrix repository discovery now returns only the adapter reason. The baseline emitted `cannot discover git repository: {reason}`, while the production adapter supplies only `{reason}`; callers therefore lose the established prefix. Reconstruct the application-level message here while keeping the infrastructure error type behind the port.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 418,
+              "category": "correctness"
+            },
+            {
+              "message": "Branch absence is distinguished from branch-read failure by comparing diagnostic text to the magic string `no current branch`. An actual adapter failure with that same text is therefore rendered as the absence case, dropping the required `: {reason}` suffix. Model these as separate usecase-level variants so the two observable outcomes are unambiguous.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 395,
+              "category": "error-handling"
+            },
+            {
+              "message": "An omitted project/workspace root is encoded as an empty PathBuf even though ResolvedSignalChainCommand claims to be fully resolved. The execution adapter interprets that sentinel by discovering a repository from process CWD, creating an undocumented implicit runtime dependency and making an explicitly supplied empty path indistinguishable from absence. Represent root discovery explicitly through the usecase-owned port contract.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 445,
+              "category": "architecture"
+            },
+            {
+              "message": "The aggregate gate still omits the baseline active-track preflight. With an explicit spec path on a non-track branch, chains ⓪ and ① execute, layer-chain track-resolution failures become ordinary reports, and chain ③ continues before the errors are aggregated into stdout. Previously this condition returned a single stderr `[BLOCKED] signal check --gate ...: cannot resolve active track ID: ...` before any chain ran. Add a typed preflight/dependency path at this usecase boundary and short-circuit it.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 446,
+              "category": "orchestration"
+            }
+          ],
+          "hash": "rvw1:sha256:a674667134bff6b76598f290eb74638b42a5f6838057ee1c7ad39af637dede53",
+          "at": "2026-07-27T05:20:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:39e60191b3dcd0cd153765a143cb26d9fd6058b48dc7e4949aa684fd710f56e6",
+          "at": "2026-07-27T06:23:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The active-track preflight is conditional on `SignalRootSelection::Discover`. When a caller supplies `project_root` or `workspace_root` together with an explicit `spec_json_path`, a non-track branch skips the preflight; the failure can instead become an ordinary layer report and later chains continue. The baseline resolves the active track before every gate chain and returns one blocking stderr error. Make active-track validation an explicit, unconditional orchestration step independent of root discovery.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 475,
+              "category": "orchestration"
+            }
+          ],
+          "hash": "rvw1:sha256:39e60191b3dcd0cd153765a143cb26d9fd6058b48dc7e4949aa684fd710f56e6",
+          "at": "2026-07-27T06:27:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SignalGateConfigError::RepositoryDiscovery` is still rendered as `cannot discover git repository: {reason}`. The briefing's CN-01 contract requires the exact blocked diagnostic with the `[BLOCKED]` prefix and `; pass --workspace-root or --spec-json explicitly` suffix, so gate-matrix discovery failures remain externally incompatible.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 429,
+              "category": "behavior-regression"
+            }
+          ],
+          "hash": "rvw1:sha256:f14fc27c577556a515444d412809882773b9a11daecd33786d81fe412ea85c53",
+          "at": "2026-07-27T06:55:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:62c660affdbfba76d381dc58f72edb71b57889c479af537d2a86004999a70dfb",
+          "at": "2026-07-27T07:00:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SignalGateConfigError::RepositoryDiscovery` is formatted as `[BLOCKED] ...; pass --workspace-root or --spec-json explicitly`, but the baseline gate-matrix loader emitted only `cannot discover git repository: {error}`. This changes stderr for every matrix-backed check outside a repository, and `--spec-json` cannot locate `signal-gates.json` anyway. Preserve the gate-config-specific error mapping required by CN-01.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 426,
+              "category": "error-handling"
+            },
+            {
+              "message": "The aggregate preflight hard-codes `SignalRootSelection::Discover` and cannot carry the supplied `workspace_root`. Running with `--workspace-root /valid/repo` from outside a repository—or from a different checkout—therefore fails discovery or validates the wrong checkout's active track, whereas the baseline used the supplied workspace. The preflight operation must resolve the active track against the selected workspace root.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 477,
+              "category": "orchestration"
+            },
+            {
+              "message": "Active-track preflight now runs before spec-path resolution. With no explicit `spec_json_path` on a non-track branch, the baseline first returned `[BLOCKED] cannot resolve spec.json from active track: ...`, while this path returns the aggregate `cannot resolve active track ID` error and invokes ADR checking before discovering that the spec is unavailable. Preserve the baseline resolution and failure ordering required by CN-01.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 477,
+              "category": "compatibility"
+            },
+            {
+              "message": "The preflight dispatches the full `CheckAdrUser` command, discards its successful report, and then dispatches `CheckAdrUser` again as chain ⓪. This executes the ADR check twice and resolves `ChainId::AdrUser` strictness twice, violating the four-chain orchestration and AC-10's resolve-once requirement. Model active-track preflight as a distinct operation instead of reusing a chain check.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 477,
+              "category": "orchestration"
+            }
+          ],
+          "hash": "rvw1:sha256:62c660affdbfba76d381dc58f72edb71b57889c479af537d2a86004999a70dfb",
+          "at": "2026-07-27T07:05:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SignalGateConfigError::RepositoryDiscovery` is rendered without the CN-01-required `[BLOCKED]` prefix and remediation suffix. A gate-matrix repository-discovery failure therefore does not reproduce the briefing's required baseline diagnostic.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 429,
+              "category": "behavior-regression"
+            }
+          ],
+          "hash": "rvw1:sha256:bfe492c5c35dfacbd9027cd08fc8274b7ad54ba85c9643f5d833376e0c3ea5d4",
+          "at": "2026-07-27T08:51:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0dd305b90635500292e490a6db322c106e509bb8c0428ef121b9108b93926a9c",
+          "at": "2026-07-27T08:54:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bfe492c5c35dfacbd9027cd08fc8274b7ad54ba85c9643f5d833376e0c3ea5d4",
+          "at": "2026-07-27T09:01:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When `spec_json_path` is absent, this calls the full `CheckSpecAdr` chain before active-track preflight and chain ⓪, then merely delays rendering its report. The baseline only resolved the spec path at this stage and executed chains afterward in ⓪→①→②→③ order. Consequently chain ① verification and its runtime dependencies run even when the later preflight or chain ⓪ would short-circuit the gate. Add a dedicated spec-path resolution operation instead of using the chain check as a preflight.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 487,
+              "category": "orchestration"
+            }
+          ],
+          "hash": "rvw1:sha256:bfe492c5c35dfacbd9027cd08fc8274b7ad54ba85c9643f5d833376e0c3ea5d4",
+          "at": "2026-07-27T09:03:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3d36789962c293fdabdf5fe83d9dd02bf300daed38af49ab8a7baf314f313d5",
+          "at": "2026-07-27T09:59:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3d36789962c293fdabdf5fe83d9dd02bf300daed38af49ab8a7baf314f313d5",
+          "at": "2026-07-27T10:01:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d798b7277d022be608ef6823eecd0ea116851214c25e158f711f90c19d251485",
+          "at": "2026-07-27T11:31:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d798b7277d022be608ef6823eecd0ea116851214c25e158f711f90c19d251485",
+          "at": "2026-07-27T11:32:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d599b4a620a9e3d757b22c4f2e1c27973891a4ce419b91ddc6149fd2ed87b67",
+          "at": "2026-07-27T11:46:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Repository-discovery failures for the catalog/impl commands are rendered as `{label}: cannot discover git repo: ...`, but the baseline returned these `CompositionError`s through `composition_to_output`, producing `[ERROR] {label}: cannot discover git repo: ...`. The driver copies stderr verbatim, so all four mapped commands lose the required `[ERROR]` prefix, violating CN-01.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 442,
+              "category": "compatibility"
+            },
+            {
+              "message": "`BranchAbsent` and `BranchReadFailure` omit the baseline `[ERROR]` prefix. These calc-impl-catalog failures previously propagated as `CompositionError::AdapterInit` and were rendered as `[ERROR] signal calc-impl-catalog: cannot read current branch...`; the new interactor returns the unprefixed text directly.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 456,
+              "category": "compatibility"
+            },
+            {
+              "message": "The production portion of this module now spans 718 lines before the `#[cfg(test)]` block, exceeding the repository's 700-line maximum for production modules. Split the ports, error presentation, or interactor orchestration into focused modules.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service.rs",
+              "line": 719,
+              "category": "architecture"
+            }
+          ],
+          "hash": "rvw1:sha256:8d599b4a620a9e3d757b22c4f2e1c27973891a4ce419b91ddc6149fd2ed87b67",
+          "at": "2026-07-27T11:49:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`command_error_with_repository_discovery_label` changes repository-discovery failures for `calc-catalog-spec`, `check-catalog-spec`, `calc-impl-catalog`, and `check-impl-catalog` to `[ERROR] signal <command>: cannot discover git repo: ...`. The existing infrastructure/baseline contract emits `[ERROR] cannot discover git repository: ...` without the command prefix and with the full word `repository`; this helper therefore regresses externally visible error output for those commands.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service/error_presentation.rs",
+              "line": 16,
+              "category": "behavior-regression"
+            }
+          ],
+          "hash": "rvw1:sha256:108db88a5b64c3d54a8760d4cea315677ed0c3fd099004149703126b20d7c992",
+          "at": "2026-07-27T12:01:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21bfd284be49f55541e3ef100b864125672710261df2f955f9ba85ad23692753",
+          "at": "2026-07-27T12:04:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`catalogue_command_error` collapses repository-discovery failures for all four catalogue commands to `[ERROR] cannot discover git repository: {reason}`. Before the migration, these paths produced command-specific stderr such as `[ERROR] signal calc-catalog-spec: cannot discover git repo: {e}` (likewise for check-catalog-spec, calc-impl-catalog, and check-impl-catalog). The lost command label and changed `repo` wording violate CN-01's exact CLI compatibility requirement; preserve the operation identity through the error path and reproduce the original message exactly.",
+              "severity": "P1",
+              "file": "libs/usecase/src/signal_service/error_presentation.rs",
+              "line": 17,
+              "category": "compatibility"
+            }
+          ],
+          "hash": "rvw1:sha256:21bfd284be49f55541e3ef100b864125672710261df2f955f9ba85ad23692753",
+          "at": "2026-07-27T12:06:43Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:819de37d22bdbe99be8e390899c8fa5674b63be7a31378d3c5a8cb42e6061631",
+          "at": "2026-07-27T12:12:22Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-01 is not fully covered: AC-03 verifies the driver → usecase interactor → port pure-DI path only for PR, while no acceptance criterion deterministically verifies the equivalent Signal execution path. AC-02 and AC-04 only constrain the Signal composition root and legacy references, so a Signal path that still bypasses the intended typed DI route could satisfy all current ACs.",
+              "severity": "P1",
+              "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+              "line": 178,
+              "category": "missing AC coverage for a stated goal"
+            }
+          ],
+          "hash": "rvw1:sha256:6d2c560fd3dd4457435338a1d54be327e7a567a6e8729f2352af124d0504fc39",
+          "at": "2026-07-26T09:54:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:841bcd1f1e90e5553c5ce308d71062b36fc5d99097c141e0e923ced5f6a77a83",
+          "at": "2026-07-26T09:57:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60f97e9ca6dbaf0b5b6bdd2639f0d2cf4f9182a6baa9a65e612f01d56a6a1d22",
+          "at": "2026-07-26T10:10:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebeb4400a998132df32bc92e34e8963a63de50d99f951822339074744d9b841c",
+          "at": "2026-07-27T02:59:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ebeb4400a998132df32bc92e34e8963a63de50d99f951822339074744d9b841c",
+          "at": "2026-07-27T03:01:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d05243400599ca19cdafc6c95768ea30057152b328ef24b0c31091753db6451",
+          "at": "2026-07-27T11:31:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8d05243400599ca19cdafc6c95768ea30057152b328ef24b0c31091753db6451",
+          "at": "2026-07-27T11:32:22Z"
+        }
+      ]
+    },
     "infrastructure": {
       "rounds": [
         {
@@ -341,536 +991,6 @@
           "findings": [],
           "hash": "rvw1:sha256:398205d5cb9a5178e32c991ff2f312916bfcea8643ee3f5029181a7b610c89c3",
           "at": "2026-07-27T11:49:22Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d87009fe66ac3626456801b8edfd11eccc0a5cd64571a7cef04f3726f3b70ad9",
-          "at": "2026-07-26T13:45:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d87009fe66ac3626456801b8edfd11eccc0a5cd64571a7cef04f3726f3b70ad9",
-          "at": "2026-07-26T13:48:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:40d44d09571638572299d5d53b0940f1385a7ae2cd90dc87398ec98d1a9e8ce1",
-          "at": "2026-07-26T15:29:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:40d44d09571638572299d5d53b0940f1385a7ae2cd90dc87398ec98d1a9e8ce1",
-          "at": "2026-07-26T15:31:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:40d44d09571638572299d5d53b0940f1385a7ae2cd90dc87398ec98d1a9e8ce1",
-          "at": "2026-07-26T15:32:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:01a6462178c4cd7f08201389c05efc8f4c24cce01204055d2b93015cf5f76f58",
-          "at": "2026-07-26T15:43:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:01a6462178c4cd7f08201389c05efc8f4c24cce01204055d2b93015cf5f76f58",
-          "at": "2026-07-26T15:45:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3684b42b5ffda5627a7799e8e16ec96030d42626e6a706ae5987880d8b6df423",
-          "at": "2026-07-27T03:00:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3684b42b5ffda5627a7799e8e16ec96030d42626e6a706ae5987880d8b6df423",
-          "at": "2026-07-27T03:04:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e082d59ed17c3533c5ea995303ffc7771380b1445f51ee1961faa098c02a6397",
-          "at": "2026-07-27T04:57:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e082d59ed17c3533c5ea995303ffc7771380b1445f51ee1961faa098c02a6397",
-          "at": "2026-07-27T05:03:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The missing-config wiring test now deterministically fails. `SystemSignalGateConfigAdapter` classifies a missing file as `ConfigurationNotFound`, and `SignalCommandInteractor` renders a path-bearing diagnostic beginning `[ERROR] failed to load signal-gates config from ...`; it no longer returns the exact short string asserted here. Update the assertion to the current contract (prefer stable prefix/path checks) so `cargo test -p cli_composition` can pass.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/signal/tests.rs",
-              "line": 62,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:e082d59ed17c3533c5ea995303ffc7771380b1445f51ee1961faa098c02a6397",
-          "at": "2026-07-27T05:06:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ce5417d22c5d5c67ef36a877a835edc6c5d05195ee080b60fef80f66bda01f8",
-          "at": "2026-07-27T05:10:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0ce5417d22c5d5c67ef36a877a835edc6c5d05195ee080b60fef80f66bda01f8",
-          "at": "2026-07-27T05:11:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71926aa60dfcf41f56191499b422b751c905a1ad2c690b0926b0b70abe7a4fcf",
-          "at": "2026-07-27T06:22:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71926aa60dfcf41f56191499b422b751c905a1ad2c690b0926b0b70abe7a4fcf",
-          "at": "2026-07-27T06:24:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5cc6ecf3e7c258a72178671851605857fd850c252fc718bad4c1f922564f30df",
-          "at": "2026-07-27T08:51:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5cc6ecf3e7c258a72178671851605857fd850c252fc718bad4c1f922564f30df",
-          "at": "2026-07-27T08:53:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:02dcc9c74759f666bbcd7d788b6df344d077f45fb216d8ca8b6bd1f766f04992",
-          "at": "2026-07-27T09:58:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:02dcc9c74759f666bbcd7d788b6df344d077f45fb216d8ca8b6bd1f766f04992",
-          "at": "2026-07-27T10:02:37Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:289befa1e2f87aeb202b309d56d5d1bcb8258e2ff68de4ecd9460afd89709ad2",
-          "at": "2026-07-27T11:31:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:289befa1e2f87aeb202b309d56d5d1bcb8258e2ff68de4ecd9460afd89709ad2",
-          "at": "2026-07-27T11:33:52Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b664926990f7a39da5a12601181fff146ef27746e40ffded219a16d3718085d7",
-          "at": "2026-07-26T09:53:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b664926990f7a39da5a12601181fff146ef27746e40ffded219a16d3718085d7",
-          "at": "2026-07-26T09:55:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bdfe60fd582d5a8160d83529ca89a75627502047e5ed4dd65c913db9e103cf6d",
-          "at": "2026-07-26T13:45:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bdfe60fd582d5a8160d83529ca89a75627502047e5ed4dd65c913db9e103cf6d",
-          "at": "2026-07-26T13:48:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`bin/sotp test-obligation check --track-id pr-signal-pure-di-2026-07-26` fails because several bindings reference tests whose bodies changed after the verdict was frozen (`SystemPrCommandAdapter` and `PrTrackIdOverride` edges). The bindings/verdict cache must be re-evaluated or the stale bindings repaired before this artifact can pass its gate.",
-              "severity": "P1",
-              "file": "track/items/pr-signal-pure-di-2026-07-26/test-bindings.json",
-              "line": 112,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:ec9f6ee71dc1097df336351cca48855f49b72be6fa3f38118d799ed1542bed8b",
-          "at": "2026-07-26T15:30:00Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ec9f6ee71dc1097df336351cca48855f49b72be6fa3f38118d799ed1542bed8b",
-          "at": "2026-07-26T15:39:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ec9f6ee71dc1097df336351cca48855f49b72be6fa3f38118d799ed1542bed8b",
-          "at": "2026-07-26T15:40:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ec9f6ee71dc1097df336351cca48855f49b72be6fa3f38118d799ed1542bed8b",
-          "at": "2026-07-26T15:40:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d933ff9972194e3b6cd3b711f50496ffb8949e054819a2d15b2213ea101a0536",
-          "at": "2026-07-27T02:59:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d933ff9972194e3b6cd3b711f50496ffb8949e054819a2d15b2213ea101a0536",
-          "at": "2026-07-27T03:01:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:37269f34d43f7854404f223bf75264aa168658ec312686faa1dfbe952b002fb3",
-          "at": "2026-07-27T05:03:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:37269f34d43f7854404f223bf75264aa168658ec312686faa1dfbe952b002fb3",
-          "at": "2026-07-27T05:04:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b85ffd90951b065171f91d6d3201dcd979d0659594846a82298635cd1f817b1a",
-          "at": "2026-07-27T06:23:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b85ffd90951b065171f91d6d3201dcd979d0659594846a82298635cd1f817b1a",
-          "at": "2026-07-27T06:24:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e0505dd9502066d982e1cd4a875440e6de531b871bc8fded9c34eb57a7f550fd",
-          "at": "2026-07-27T08:54:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e0505dd9502066d982e1cd4a875440e6de531b871bc8fded9c34eb57a7f550fd",
-          "at": "2026-07-27T09:01:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cf496fac7aaf16acff87e55a166dedcb927896535ca7fabb58e4d0fb24ea50bd",
-          "at": "2026-07-27T09:59:21Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cf496fac7aaf16acff87e55a166dedcb927896535ca7fabb58e4d0fb24ea50bd",
-          "at": "2026-07-27T10:01:14Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8a7fb7eba1636fbe0030ee5c9749d775811d613516b6da67df8b4fc60ac57b1c",
-          "at": "2026-07-27T11:31:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8a7fb7eba1636fbe0030ee5c9749d775811d613516b6da67df8b4fc60ac57b1c",
-          "at": "2026-07-27T11:32:32Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ddcc3d50f59ae185fd7a9b4bad9a5c06b87a35303e9b13077e62d72072692025",
-          "at": "2026-07-26T13:45:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The two `contains` checks do not freeze the stdout contract: extra lines, changed ordering, or other output regressions still pass. AC-05 requires stdout parity, so assert the complete expected byte sequence.",
-              "severity": "P1",
-              "file": "apps/cli/tests/pr_pure_di_contract.rs",
-              "line": 55,
-              "category": "testing.cli_contract"
-            },
-            {
-              "message": "The Git setup helpers and the `sotp` child inherit system/global Git configuration and Git-related environment variables. Settings such as `commit.gpgSign`, `core.hooksPath`, or URL rewrites can break or redirect this test; isolate Git configuration consistently for every spawned process.",
-              "severity": "P1",
-              "file": "apps/cli/tests/pr_pure_di_contract.rs",
-              "line": 15,
-              "category": "testing.isolation"
-            },
-            {
-              "message": "Only the successful push contract is covered. A regression that maps a failed push to a successful exit code or the wrong stderr stream would remain undetected; add a deterministic failure scenario asserting non-zero exit, stderr, and absence of the remote ref.",
-              "severity": "P1",
-              "file": "apps/cli/tests/pr_pure_di_contract.rs",
-              "line": 53,
-              "category": "testing.error_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:ddcc3d50f59ae185fd7a9b4bad9a5c06b87a35303e9b13077e62d72072692025",
-          "at": "2026-07-26T13:51:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The Git subprocesses inherit the developer/CI machine's global and system Git configuration. For example, `commit.gpgSign=true` can make the fixture commit fail, while `core.hooksPath`, push signing, or URL rewrites can change or fail the exercised `pr push`. Isolate Git configuration for both the fixture commands and `sotp` (for example with `GIT_CONFIG_NOSYSTEM`, an empty `GIT_CONFIG_GLOBAL`, and cleared inherited Git overrides).",
-              "severity": "P1",
-              "file": "apps/cli/tests/pr_pure_di_contract.rs",
-              "line": 15,
-              "category": "test_reliability"
-            },
-            {
-              "message": "The two `contains` assertions do not preserve the stdout contract required by AC-05: additional output or reversed message order would still pass. Assert the complete expected stdout, including ordering and newlines, so observable output regressions are detected.",
-              "severity": "P1",
-              "file": "apps/cli/tests/pr_pure_di_contract.rs",
-              "line": 55,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:ddcc3d50f59ae185fd7a9b4bad9a5c06b87a35303e9b13077e62d72072692025",
-          "at": "2026-07-26T13:53:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19f1dd8573df9fa821c5db53a6878caf88d54c0bf94fcf1428e18bda7d5d5270",
-          "at": "2026-07-26T13:58:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19f1dd8573df9fa821c5db53a6878caf88d54c0bf94fcf1428e18bda7d5d5270",
-          "at": "2026-07-26T13:58:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a1d8b4467cad87daea2aa2d2ce42b9760cf02f30012b1d65f47ebde108f8a28b",
-          "at": "2026-07-27T02:59:43Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a1d8b4467cad87daea2aa2d2ce42b9760cf02f30012b1d65f47ebde108f8a28b",
-          "at": "2026-07-27T03:02:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b7fa78b85a638b69a1e6603f5e56e8d92c002261e531bd3f2de015c53449af1e",
-          "at": "2026-07-27T09:59:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b7fa78b85a638b69a1e6603f5e56e8d92c002261e531bd3f2de015c53449af1e",
-          "at": "2026-07-27T10:01:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b3863071c074ecacff8178dbd66d15ac1673c25d2864149f673d7d636df54812",
-          "at": "2026-07-27T11:31:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b3863071c074ecacff8178dbd66d15ac1673c25d2864149f673d7d636df54812",
-          "at": "2026-07-27T11:32:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b986b6c2580f48e067d258b3475a797dce17bed3b9c19c141ec0fef257a2678f",
-          "at": "2026-07-27T12:41:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The aggregate Signal test uses the real checkout as `--workspace-root`. `check_gate` always resolves an active track from that repository, so this test fails when run from `develop` or a detached CI checkout instead of `track/<id>`. Use a temporary repository initialized on a controlled track branch.",
-              "severity": "P1",
-              "file": "apps/cli/tests/pr_signal_pure_di_contract.rs",
-              "line": 249,
-              "category": "test_stability"
-            },
-            {
-              "message": "`LIVE_SIGNAL_EXECUTION_SOURCES` omits the eight `calc_*`/`check_*` modules containing the migrated CLI `run` entry points, and searching only for two legacy strings does not validate the required driver → interactor → port path. A command can bypass the driver or regain a compatibility call without this guard failing, leaving AC-04/AC-07 and T007 uncovered.",
-              "severity": "P1",
-              "file": "apps/cli/tests/operational_reference_cutover.rs",
-              "line": 58,
-              "category": "test_coverage"
-            },
-            {
-              "message": "The Signal contract coverage invokes only read-only check commands and never snapshots relevant files before and after execution. It therefore does not verify AC-05's persistence-result contract for Signal; regressions where a check mutates signal artifacts, or where migrated calc commands persist different results, can pass this suite.",
-              "severity": "P1",
-              "file": "apps/cli/tests/pr_signal_pure_di_contract.rs",
-              "line": 226,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:b986b6c2580f48e067d258b3475a797dce17bed3b9c19c141ec0fef257a2678f",
-          "at": "2026-07-27T12:47:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The aggregate Signal test uses the real checkout as `--workspace-root`. Because the aggregate gate unconditionally resolves an active track from that repository, this test fails whenever the permanent suite runs on `develop` or `main` after merge. Build a temporary repository on a controlled `track/<id>` branch instead.",
-              "severity": "P1",
-              "file": "apps/cli/tests/pr_signal_pure_di_contract.rs",
-              "line": 249,
-              "category": "test_stability"
-            },
-            {
-              "message": "`LIVE_SIGNAL_EXECUTION_SOURCES` omits the eight `calc_*`/`check_*` modules containing the migrated CLI `run` entry points. Searching the remaining files for only two legacy strings therefore neither protects those execution surfaces from restored shim/service references nor validates the required driver → interactor → port route, leaving AC-04/AC-07 and T007 incompletely covered.",
-              "severity": "P1",
-              "file": "apps/cli/tests/operational_reference_cutover.rs",
-              "line": 58,
-              "category": "test_coverage"
-            },
-            {
-              "message": "The Signal contract tests invoke only check operations and never compare relevant persisted files before and after execution. They therefore do not verify AC-05's persistence-result contract: a check that mutates signal artifacts, or changed persistence behavior in the migrated calc commands, can pass this suite.",
-              "severity": "P1",
-              "file": "apps/cli/tests/pr_signal_pure_di_contract.rs",
-              "line": 226,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:b986b6c2580f48e067d258b3475a797dce17bed3b9c19c141ec0fef257a2678f",
-          "at": "2026-07-27T12:50:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d43380b5872031ce8e24f5f70cae355fd1fde1471c8ccc79ff6f82d22b1f4168",
-          "at": "2026-07-27T12:59:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The single-path route table covers only the eight child-module commands and omits the ninth migrated entry point, `run_aggregate_check` (`SignalInput::CheckGate` → `SignalService::check_gate`). The end-to-end aggregate test verifies output only, so this helper could bypass the driver through a composition-root/facade path without the AC-07 guard failing. Add an explicit aggregate route assertion, and ensure its service method is connected to the typed port.",
-              "severity": "P1",
-              "file": "apps/cli/tests/operational_reference_cutover.rs",
-              "line": 133,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:d43380b5872031ce8e24f5f70cae355fd1fde1471c8ccc79ff6f82d22b1f4168",
-          "at": "2026-07-27T13:04:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2e78b2a78e37ceee75b00ab72904a21bab404fb49d44927c28016c99c48e2fea",
-          "at": "2026-07-27T13:07:38Z"
         }
       ]
     },
@@ -1752,443 +1872,186 @@
           "findings": [],
           "hash": "rvw1:sha256:4a4182f8478ef4ef8843e43b10b1888100d63cb069736740bf9a6b19abb23ec0",
           "at": "2026-07-27T13:10:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16a67d2ea964f1a93f2588e60bb84b2ffd52f3f12886f16ae32cccfa34b5214c",
+          "at": "2026-07-27T13:14:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16a67d2ea964f1a93f2588e60bb84b2ffd52f3f12886f16ae32cccfa34b5214c",
+          "at": "2026-07-27T13:23:59Z"
         }
       ]
     },
-    "usecase": {
+    "cli_composition": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:cfd7b75243e68014f6606c976f1ac1326d4561381901ad707b6c70ef8788d7e1",
-          "at": "2026-07-26T13:45:26Z"
+          "hash": "rvw1:sha256:d87009fe66ac3626456801b8edfd11eccc0a5cd64571a7cef04f3726f3b70ad9",
+          "at": "2026-07-26T13:45:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d87009fe66ac3626456801b8edfd11eccc0a5cd64571a7cef04f3726f3b70ad9",
+          "at": "2026-07-26T13:48:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:40d44d09571638572299d5d53b0940f1385a7ae2cd90dc87398ec98d1a9e8ce1",
+          "at": "2026-07-26T15:29:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:40d44d09571638572299d5d53b0940f1385a7ae2cd90dc87398ec98d1a9e8ce1",
+          "at": "2026-07-26T15:31:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:40d44d09571638572299d5d53b0940f1385a7ae2cd90dc87398ec98d1a9e8ce1",
+          "at": "2026-07-26T15:32:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01a6462178c4cd7f08201389c05efc8f4c24cce01204055d2b93015cf5f76f58",
+          "at": "2026-07-26T15:43:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:01a6462178c4cd7f08201389c05efc8f4c24cce01204055d2b93015cf5f76f58",
+          "at": "2026-07-26T15:45:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3684b42b5ffda5627a7799e8e16ec96030d42626e6a706ae5987880d8b6df423",
+          "at": "2026-07-27T03:00:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3684b42b5ffda5627a7799e8e16ec96030d42626e6a706ae5987880d8b6df423",
+          "at": "2026-07-27T03:04:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e082d59ed17c3533c5ea995303ffc7771380b1445f51ee1961faa098c02a6397",
+          "at": "2026-07-27T04:57:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e082d59ed17c3533c5ea995303ffc7771380b1445f51ee1961faa098c02a6397",
+          "at": "2026-07-27T05:03:25Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "The deprecated `--track-id` compatibility argument was previously ignored on a track branch by `resolve_pr_branch`, but the interactor now rejects any value that is not a valid `TrackId` before reaching the port. Commands such as `pr push --track-id INVALID` therefore change from operating on the current track to exiting with failure, violating CN-01. Preserve the ignored compatibility semantics when constructing the typed command.",
+              "message": "The missing-config wiring test now deterministically fails. `SystemSignalGateConfigAdapter` classifies a missing file as `ConfigurationNotFound`, and `SignalCommandInteractor` renders a path-bearing diagnostic beginning `[ERROR] failed to load signal-gates config from ...`; it no longer returns the exact short string asserted here. Update the assertion to the current contract (prefer stable prefix/path checks) so `cargo test -p cli_composition` can pass.",
               "severity": "P1",
-              "file": "libs/usecase/src/pr.rs",
-              "line": 223,
-              "category": "correctness"
-            },
-            {
-              "message": "`NonEmptyString::try_new` trims its input, so an explicit base such as `\" main \"` is silently changed to `\"main\"`. The baseline treated only the exactly empty string as omitted and otherwise forwarded the value unchanged; this can now create a PR against a different base instead of failing, contrary to CN-01. Use a non-trimming representation for this override.",
-              "severity": "P1",
-              "file": "libs/usecase/src/pr.rs",
-              "line": 237,
-              "category": "correctness"
-            },
-            {
-              "message": "The new public validation branches lack the required error-case coverage: only `status` with an empty identifier is tested, while invalid/compatibility track IDs, explicit-base boundaries, invalid merge methods and timestamps, and empty identifiers for wait/trigger/poll are untested. Add focused regression tests for these public service paths.",
-              "severity": "P1",
-              "file": "libs/usecase/src/pr.rs",
-              "line": 363,
+              "file": "apps/cli-composition/src/signal/tests.rs",
+              "line": 62,
               "category": "testing"
             }
           ],
-          "hash": "rvw1:sha256:cfd7b75243e68014f6606c976f1ac1326d4561381901ad707b6c70ef8788d7e1",
-          "at": "2026-07-26T13:51:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:50c80da6a36038e5b248c8daea57a4f4ffeba26320edd3ce54824b70842acd28",
-          "at": "2026-07-26T15:05:01Z"
+          "hash": "rvw1:sha256:e082d59ed17c3533c5ea995303ffc7771380b1445f51ee1961faa098c02a6397",
+          "at": "2026-07-27T05:06:22Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:50c80da6a36038e5b248c8daea57a4f4ffeba26320edd3ce54824b70842acd28",
-          "at": "2026-07-26T15:07:09Z"
+          "hash": "rvw1:sha256:0ce5417d22c5d5c67ef36a877a835edc6c5d05195ee080b60fef80f66bda01f8",
+          "at": "2026-07-27T05:10:07Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:50c80da6a36038e5b248c8daea57a4f4ffeba26320edd3ce54824b70842acd28",
-          "at": "2026-07-26T15:07:50Z"
+          "hash": "rvw1:sha256:0ce5417d22c5d5c67ef36a877a835edc6c5d05195ee080b60fef80f66bda01f8",
+          "at": "2026-07-27T05:11:04Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ddcaec9a576aebabd6e1f286f1565de007f9baab1162445d508076a2ca9825b3",
-          "at": "2026-07-27T02:59:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "All SignalGateConfigPort failures are collapsed to a fixed message. Missing/malformed gate configuration and repository-discovery failures previously produced distinct stderr with the relevant context; CN-01 requires stdout/stderr compatibility. Preserve those usecase-level failure identities without exposing infrastructure error types.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 322,
-              "category": "correctness"
-            },
-            {
-              "message": "All SignalCommandPort failures are converted to the same generic stderr. Ordinary failures such as spec-path resolution, repository discovery, and persistence errors therefore lose their established actionable output, violating CN-01. The usecase error contract needs conceptual variants or a safe presentation payload that preserves existing behavior.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 339,
-              "category": "error-handling"
-            },
-            {
-              "message": "check_gate converts a chain execution error into a child SignalCommandOutput, continues executing later chains, and then moves the error text into aggregate stdout. The previous gate flow short-circuited runner/preflight failures and returned stderr directly, so missing repository/spec inputs now change both execution and observable output. Propagate dependency errors separately and merge only completed verification reports.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 361,
-              "category": "orchestration"
-            }
-          ],
-          "hash": "rvw1:sha256:ddcaec9a576aebabd6e1f286f1565de007f9baab1162445d508076a2ca9825b3",
-          "at": "2026-07-27T03:06:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bde0d57cd45461f4f4d0f314431943671be9d5bda58c3637bb4ae75551e153fd",
-          "at": "2026-07-27T04:58:05Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SignalGateConfigError::RepositoryDiscovery` is mapped to `cannot discover git repository: {reason}` without the required `[BLOCKED]` prefix and `; pass --workspace-root or --spec-json explicitly` suffix. When `signal check --gate` runs without `--workspace-root`, this changes the baseline CN-01 observable error identity/message.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 411,
-              "category": "behavior-regression"
-            }
-          ],
-          "hash": "rvw1:sha256:bde0d57cd45461f4f4d0f314431943671be9d5bda58c3637bb4ae75551e153fd",
-          "at": "2026-07-27T05:03:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:483e4a27c4382aa91139094cc1daa6e8b3202be4e96a01c35ebac8edb34259c2",
-          "at": "2026-07-27T05:09:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Repository discovery while loading the gate matrix still changes the CLI contract. The baseline `load_gate_matrix` returned stderr `cannot discover git repository: {reason}`; this arm adds `[BLOCKED]` and the `--workspace-root or --spec-json` suffix. This affects every non-`--strict` check and aggregate gate invoked outside a repository, violating CN-01.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 412,
-              "category": "correctness"
-            },
-            {
-              "message": "`RepositoryDiscovery` lacks command context, so one formatter is incorrectly reused for different baseline behaviors. The current `[BLOCKED] ... pass --workspace-root or --spec-json` text is appropriate for spec-path resolution, but `calc-catalog-spec`, `calc-impl-catalog`, and strict catalog checks previously emitted command-specific `cannot discover git repo` errors. Separate these failure identities or carry the command context required to preserve CN-01.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 389,
-              "category": "error-handling"
-            },
-            {
-              "message": "Branch-resolution failures do not preserve their established output. The baseline printed `signal calc-impl-catalog: cannot read current branch: {reason}` without an `[ERROR]` prefix, and a missing current branch omitted the trailing reason entirely. This arm always adds `[ERROR]`, while the adapter represents the missing-branch case as `: no current branch`.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 393,
-              "category": "correctness"
-            },
-            {
-              "message": "Persistence errors gain a new `[ERROR] signal calc-spec-adr:` prefix. Previously the CLI printed the `SpecAdrSignalError` text directly (for example, `spec-adr signal write error: ...`), so read/decode/encode/write failures now violate CN-01 even though their diagnostic payload is retained.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 400,
-              "category": "correctness"
-            },
-            {
-              "message": "The aggregate gate no longer performs the baseline active-track preflight before dispatching chains. With an explicit spec path on a non-track branch, chain ⓪ and chain ① run, the layer checks return ordinary error reports, and the interactor aggregates them into stdout and continues through chain ③. The baseline instead returned a single stderr `[BLOCKED] signal check --gate ...: cannot resolve active track ID: ...` before executing any chain. The usecase boundary needs a typed preflight/dependency failure path so this condition short-circuits rather than becoming a verification report.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 443,
-              "category": "orchestration"
-            }
-          ],
-          "hash": "rvw1:sha256:483e4a27c4382aa91139094cc1daa6e8b3202be4e96a01c35ebac8edb34259c2",
-          "at": "2026-07-27T05:14:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Gate-matrix repository discovery now returns only the adapter reason. The baseline emitted `cannot discover git repository: {reason}`, while the production adapter supplies only `{reason}`; callers therefore lose the established prefix. Reconstruct the application-level message here while keeping the infrastructure error type behind the port.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 418,
-              "category": "correctness"
-            },
-            {
-              "message": "Branch absence is distinguished from branch-read failure by comparing diagnostic text to the magic string `no current branch`. An actual adapter failure with that same text is therefore rendered as the absence case, dropping the required `: {reason}` suffix. Model these as separate usecase-level variants so the two observable outcomes are unambiguous.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 395,
-              "category": "error-handling"
-            },
-            {
-              "message": "An omitted project/workspace root is encoded as an empty PathBuf even though ResolvedSignalChainCommand claims to be fully resolved. The execution adapter interprets that sentinel by discovering a repository from process CWD, creating an undocumented implicit runtime dependency and making an explicitly supplied empty path indistinguishable from absence. Represent root discovery explicitly through the usecase-owned port contract.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 445,
-              "category": "architecture"
-            },
-            {
-              "message": "The aggregate gate still omits the baseline active-track preflight. With an explicit spec path on a non-track branch, chains ⓪ and ① execute, layer-chain track-resolution failures become ordinary reports, and chain ③ continues before the errors are aggregated into stdout. Previously this condition returned a single stderr `[BLOCKED] signal check --gate ...: cannot resolve active track ID: ...` before any chain ran. Add a typed preflight/dependency path at this usecase boundary and short-circuit it.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 446,
-              "category": "orchestration"
-            }
-          ],
-          "hash": "rvw1:sha256:a674667134bff6b76598f290eb74638b42a5f6838057ee1c7ad39af637dede53",
-          "at": "2026-07-27T05:20:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:39e60191b3dcd0cd153765a143cb26d9fd6058b48dc7e4949aa684fd710f56e6",
-          "at": "2026-07-27T06:23:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The active-track preflight is conditional on `SignalRootSelection::Discover`. When a caller supplies `project_root` or `workspace_root` together with an explicit `spec_json_path`, a non-track branch skips the preflight; the failure can instead become an ordinary layer report and later chains continue. The baseline resolves the active track before every gate chain and returns one blocking stderr error. Make active-track validation an explicit, unconditional orchestration step independent of root discovery.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 475,
-              "category": "orchestration"
-            }
-          ],
-          "hash": "rvw1:sha256:39e60191b3dcd0cd153765a143cb26d9fd6058b48dc7e4949aa684fd710f56e6",
-          "at": "2026-07-27T06:27:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SignalGateConfigError::RepositoryDiscovery` is still rendered as `cannot discover git repository: {reason}`. The briefing's CN-01 contract requires the exact blocked diagnostic with the `[BLOCKED]` prefix and `; pass --workspace-root or --spec-json explicitly` suffix, so gate-matrix discovery failures remain externally incompatible.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 429,
-              "category": "behavior-regression"
-            }
-          ],
-          "hash": "rvw1:sha256:f14fc27c577556a515444d412809882773b9a11daecd33786d81fe412ea85c53",
-          "at": "2026-07-27T06:55:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:62c660affdbfba76d381dc58f72edb71b57889c479af537d2a86004999a70dfb",
-          "at": "2026-07-27T07:00:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SignalGateConfigError::RepositoryDiscovery` is formatted as `[BLOCKED] ...; pass --workspace-root or --spec-json explicitly`, but the baseline gate-matrix loader emitted only `cannot discover git repository: {error}`. This changes stderr for every matrix-backed check outside a repository, and `--spec-json` cannot locate `signal-gates.json` anyway. Preserve the gate-config-specific error mapping required by CN-01.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 426,
-              "category": "error-handling"
-            },
-            {
-              "message": "The aggregate preflight hard-codes `SignalRootSelection::Discover` and cannot carry the supplied `workspace_root`. Running with `--workspace-root /valid/repo` from outside a repository—or from a different checkout—therefore fails discovery or validates the wrong checkout's active track, whereas the baseline used the supplied workspace. The preflight operation must resolve the active track against the selected workspace root.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 477,
-              "category": "orchestration"
-            },
-            {
-              "message": "Active-track preflight now runs before spec-path resolution. With no explicit `spec_json_path` on a non-track branch, the baseline first returned `[BLOCKED] cannot resolve spec.json from active track: ...`, while this path returns the aggregate `cannot resolve active track ID` error and invokes ADR checking before discovering that the spec is unavailable. Preserve the baseline resolution and failure ordering required by CN-01.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 477,
-              "category": "compatibility"
-            },
-            {
-              "message": "The preflight dispatches the full `CheckAdrUser` command, discards its successful report, and then dispatches `CheckAdrUser` again as chain ⓪. This executes the ADR check twice and resolves `ChainId::AdrUser` strictness twice, violating the four-chain orchestration and AC-10's resolve-once requirement. Model active-track preflight as a distinct operation instead of reusing a chain check.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 477,
-              "category": "orchestration"
-            }
-          ],
-          "hash": "rvw1:sha256:62c660affdbfba76d381dc58f72edb71b57889c479af537d2a86004999a70dfb",
-          "at": "2026-07-27T07:05:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SignalGateConfigError::RepositoryDiscovery` is rendered without the CN-01-required `[BLOCKED]` prefix and remediation suffix. A gate-matrix repository-discovery failure therefore does not reproduce the briefing's required baseline diagnostic.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 429,
-              "category": "behavior-regression"
-            }
-          ],
-          "hash": "rvw1:sha256:bfe492c5c35dfacbd9027cd08fc8274b7ad54ba85c9643f5d833376e0c3ea5d4",
-          "at": "2026-07-27T08:51:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0dd305b90635500292e490a6db322c106e509bb8c0428ef121b9108b93926a9c",
-          "at": "2026-07-27T08:54:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bfe492c5c35dfacbd9027cd08fc8274b7ad54ba85c9643f5d833376e0c3ea5d4",
-          "at": "2026-07-27T09:01:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "When `spec_json_path` is absent, this calls the full `CheckSpecAdr` chain before active-track preflight and chain ⓪, then merely delays rendering its report. The baseline only resolved the spec path at this stage and executed chains afterward in ⓪→①→②→③ order. Consequently chain ① verification and its runtime dependencies run even when the later preflight or chain ⓪ would short-circuit the gate. Add a dedicated spec-path resolution operation instead of using the chain check as a preflight.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 487,
-              "category": "orchestration"
-            }
-          ],
-          "hash": "rvw1:sha256:bfe492c5c35dfacbd9027cd08fc8274b7ad54ba85c9643f5d833376e0c3ea5d4",
-          "at": "2026-07-27T09:03:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d3d36789962c293fdabdf5fe83d9dd02bf300daed38af49ab8a7baf314f313d5",
-          "at": "2026-07-27T09:59:09Z"
+          "hash": "rvw1:sha256:71926aa60dfcf41f56191499b422b751c905a1ad2c690b0926b0b70abe7a4fcf",
+          "at": "2026-07-27T06:22:58Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d3d36789962c293fdabdf5fe83d9dd02bf300daed38af49ab8a7baf314f313d5",
-          "at": "2026-07-27T10:01:26Z"
+          "hash": "rvw1:sha256:71926aa60dfcf41f56191499b422b751c905a1ad2c690b0926b0b70abe7a4fcf",
+          "at": "2026-07-27T06:24:31Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d798b7277d022be608ef6823eecd0ea116851214c25e158f711f90c19d251485",
-          "at": "2026-07-27T11:31:10Z"
+          "hash": "rvw1:sha256:5cc6ecf3e7c258a72178671851605857fd850c252fc718bad4c1f922564f30df",
+          "at": "2026-07-27T08:51:13Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d798b7277d022be608ef6823eecd0ea116851214c25e158f711f90c19d251485",
-          "at": "2026-07-27T11:32:37Z"
+          "hash": "rvw1:sha256:5cc6ecf3e7c258a72178671851605857fd850c252fc718bad4c1f922564f30df",
+          "at": "2026-07-27T08:53:07Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8d599b4a620a9e3d757b22c4f2e1c27973891a4ce419b91ddc6149fd2ed87b67",
-          "at": "2026-07-27T11:46:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Repository-discovery failures for the catalog/impl commands are rendered as `{label}: cannot discover git repo: ...`, but the baseline returned these `CompositionError`s through `composition_to_output`, producing `[ERROR] {label}: cannot discover git repo: ...`. The driver copies stderr verbatim, so all four mapped commands lose the required `[ERROR]` prefix, violating CN-01.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 442,
-              "category": "compatibility"
-            },
-            {
-              "message": "`BranchAbsent` and `BranchReadFailure` omit the baseline `[ERROR]` prefix. These calc-impl-catalog failures previously propagated as `CompositionError::AdapterInit` and were rendered as `[ERROR] signal calc-impl-catalog: cannot read current branch...`; the new interactor returns the unprefixed text directly.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 456,
-              "category": "compatibility"
-            },
-            {
-              "message": "The production portion of this module now spans 718 lines before the `#[cfg(test)]` block, exceeding the repository's 700-line maximum for production modules. Split the ports, error presentation, or interactor orchestration into focused modules.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service.rs",
-              "line": 719,
-              "category": "architecture"
-            }
-          ],
-          "hash": "rvw1:sha256:8d599b4a620a9e3d757b22c4f2e1c27973891a4ce419b91ddc6149fd2ed87b67",
-          "at": "2026-07-27T11:49:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`command_error_with_repository_discovery_label` changes repository-discovery failures for `calc-catalog-spec`, `check-catalog-spec`, `calc-impl-catalog`, and `check-impl-catalog` to `[ERROR] signal <command>: cannot discover git repo: ...`. The existing infrastructure/baseline contract emits `[ERROR] cannot discover git repository: ...` without the command prefix and with the full word `repository`; this helper therefore regresses externally visible error output for those commands.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service/error_presentation.rs",
-              "line": 16,
-              "category": "behavior-regression"
-            }
-          ],
-          "hash": "rvw1:sha256:108db88a5b64c3d54a8760d4cea315677ed0c3fd099004149703126b20d7c992",
-          "at": "2026-07-27T12:01:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:21bfd284be49f55541e3ef100b864125672710261df2f955f9ba85ad23692753",
-          "at": "2026-07-27T12:04:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`catalogue_command_error` collapses repository-discovery failures for all four catalogue commands to `[ERROR] cannot discover git repository: {reason}`. Before the migration, these paths produced command-specific stderr such as `[ERROR] signal calc-catalog-spec: cannot discover git repo: {e}` (likewise for check-catalog-spec, calc-impl-catalog, and check-impl-catalog). The lost command label and changed `repo` wording violate CN-01's exact CLI compatibility requirement; preserve the operation identity through the error path and reproduce the original message exactly.",
-              "severity": "P1",
-              "file": "libs/usecase/src/signal_service/error_presentation.rs",
-              "line": 17,
-              "category": "compatibility"
-            }
-          ],
-          "hash": "rvw1:sha256:21bfd284be49f55541e3ef100b864125672710261df2f955f9ba85ad23692753",
-          "at": "2026-07-27T12:06:43Z"
+          "hash": "rvw1:sha256:02dcc9c74759f666bbcd7d788b6df344d077f45fb216d8ca8b6bd1f766f04992",
+          "at": "2026-07-27T09:58:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:819de37d22bdbe99be8e390899c8fa5674b63be7a31378d3c5a8cb42e6061631",
-          "at": "2026-07-27T12:12:22Z"
+          "hash": "rvw1:sha256:02dcc9c74759f666bbcd7d788b6df344d077f45fb216d8ca8b6bd1f766f04992",
+          "at": "2026-07-27T10:02:37Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:289befa1e2f87aeb202b309d56d5d1bcb8258e2ff68de4ecd9460afd89709ad2",
+          "at": "2026-07-27T11:31:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:289befa1e2f87aeb202b309d56d5d1bcb8258e2ff68de4ecd9460afd89709ad2",
+          "at": "2026-07-27T11:33:52Z"
         }
       ]
     },
@@ -2686,64 +2549,215 @@
         }
       ]
     },
-    "spec": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ddcc3d50f59ae185fd7a9b4bad9a5c06b87a35303e9b13077e62d72072692025",
+          "at": "2026-07-26T13:45:30Z"
+        },
+        {
+          "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "GO-01 is not fully covered: AC-03 verifies the driver → usecase interactor → port pure-DI path only for PR, while no acceptance criterion deterministically verifies the equivalent Signal execution path. AC-02 and AC-04 only constrain the Signal composition root and legacy references, so a Signal path that still bypasses the intended typed DI route could satisfy all current ACs.",
+              "message": "The two `contains` checks do not freeze the stdout contract: extra lines, changed ordering, or other output regressions still pass. AC-05 requires stdout parity, so assert the complete expected byte sequence.",
               "severity": "P1",
-              "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
-              "line": 178,
-              "category": "missing AC coverage for a stated goal"
+              "file": "apps/cli/tests/pr_pure_di_contract.rs",
+              "line": 55,
+              "category": "testing.cli_contract"
+            },
+            {
+              "message": "The Git setup helpers and the `sotp` child inherit system/global Git configuration and Git-related environment variables. Settings such as `commit.gpgSign`, `core.hooksPath`, or URL rewrites can break or redirect this test; isolate Git configuration consistently for every spawned process.",
+              "severity": "P1",
+              "file": "apps/cli/tests/pr_pure_di_contract.rs",
+              "line": 15,
+              "category": "testing.isolation"
+            },
+            {
+              "message": "Only the successful push contract is covered. A regression that maps a failed push to a successful exit code or the wrong stderr stream would remain undetected; add a deterministic failure scenario asserting non-zero exit, stderr, and absence of the remote ref.",
+              "severity": "P1",
+              "file": "apps/cli/tests/pr_pure_di_contract.rs",
+              "line": 53,
+              "category": "testing.error_coverage"
             }
           ],
-          "hash": "rvw1:sha256:6d2c560fd3dd4457435338a1d54be327e7a567a6e8729f2352af124d0504fc39",
-          "at": "2026-07-26T09:54:03Z"
+          "hash": "rvw1:sha256:ddcc3d50f59ae185fd7a9b4bad9a5c06b87a35303e9b13077e62d72072692025",
+          "at": "2026-07-26T13:51:26Z"
         },
         {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:841bcd1f1e90e5553c5ce308d71062b36fc5d99097c141e0e923ced5f6a77a83",
-          "at": "2026-07-26T09:57:05Z"
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The Git subprocesses inherit the developer/CI machine's global and system Git configuration. For example, `commit.gpgSign=true` can make the fixture commit fail, while `core.hooksPath`, push signing, or URL rewrites can change or fail the exercised `pr push`. Isolate Git configuration for both the fixture commands and `sotp` (for example with `GIT_CONFIG_NOSYSTEM`, an empty `GIT_CONFIG_GLOBAL`, and cleared inherited Git overrides).",
+              "severity": "P1",
+              "file": "apps/cli/tests/pr_pure_di_contract.rs",
+              "line": 15,
+              "category": "test_reliability"
+            },
+            {
+              "message": "The two `contains` assertions do not preserve the stdout contract required by AC-05: additional output or reversed message order would still pass. Assert the complete expected stdout, including ordering and newlines, so observable output regressions are detected.",
+              "severity": "P1",
+              "file": "apps/cli/tests/pr_pure_di_contract.rs",
+              "line": 55,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:ddcc3d50f59ae185fd7a9b4bad9a5c06b87a35303e9b13077e62d72072692025",
+          "at": "2026-07-26T13:53:09Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:60f97e9ca6dbaf0b5b6bdd2639f0d2cf4f9182a6baa9a65e612f01d56a6a1d22",
-          "at": "2026-07-26T10:10:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ebeb4400a998132df32bc92e34e8963a63de50d99f951822339074744d9b841c",
-          "at": "2026-07-27T02:59:48Z"
+          "hash": "rvw1:sha256:19f1dd8573df9fa821c5db53a6878caf88d54c0bf94fcf1428e18bda7d5d5270",
+          "at": "2026-07-26T13:58:36Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ebeb4400a998132df32bc92e34e8963a63de50d99f951822339074744d9b841c",
-          "at": "2026-07-27T03:01:40Z"
+          "hash": "rvw1:sha256:19f1dd8573df9fa821c5db53a6878caf88d54c0bf94fcf1428e18bda7d5d5270",
+          "at": "2026-07-26T13:58:43Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8d05243400599ca19cdafc6c95768ea30057152b328ef24b0c31091753db6451",
-          "at": "2026-07-27T11:31:05Z"
+          "hash": "rvw1:sha256:a1d8b4467cad87daea2aa2d2ce42b9760cf02f30012b1d65f47ebde108f8a28b",
+          "at": "2026-07-27T02:59:43Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8d05243400599ca19cdafc6c95768ea30057152b328ef24b0c31091753db6451",
-          "at": "2026-07-27T11:32:22Z"
+          "hash": "rvw1:sha256:a1d8b4467cad87daea2aa2d2ce42b9760cf02f30012b1d65f47ebde108f8a28b",
+          "at": "2026-07-27T03:02:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7fa78b85a638b69a1e6603f5e56e8d92c002261e531bd3f2de015c53449af1e",
+          "at": "2026-07-27T09:59:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b7fa78b85a638b69a1e6603f5e56e8d92c002261e531bd3f2de015c53449af1e",
+          "at": "2026-07-27T10:01:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3863071c074ecacff8178dbd66d15ac1673c25d2864149f673d7d636df54812",
+          "at": "2026-07-27T11:31:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3863071c074ecacff8178dbd66d15ac1673c25d2864149f673d7d636df54812",
+          "at": "2026-07-27T11:32:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b986b6c2580f48e067d258b3475a797dce17bed3b9c19c141ec0fef257a2678f",
+          "at": "2026-07-27T12:41:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The aggregate Signal test uses the real checkout as `--workspace-root`. `check_gate` always resolves an active track from that repository, so this test fails when run from `develop` or a detached CI checkout instead of `track/<id>`. Use a temporary repository initialized on a controlled track branch.",
+              "severity": "P1",
+              "file": "apps/cli/tests/pr_signal_pure_di_contract.rs",
+              "line": 249,
+              "category": "test_stability"
+            },
+            {
+              "message": "`LIVE_SIGNAL_EXECUTION_SOURCES` omits the eight `calc_*`/`check_*` modules containing the migrated CLI `run` entry points, and searching only for two legacy strings does not validate the required driver → interactor → port path. A command can bypass the driver or regain a compatibility call without this guard failing, leaving AC-04/AC-07 and T007 uncovered.",
+              "severity": "P1",
+              "file": "apps/cli/tests/operational_reference_cutover.rs",
+              "line": 58,
+              "category": "test_coverage"
+            },
+            {
+              "message": "The Signal contract coverage invokes only read-only check commands and never snapshots relevant files before and after execution. It therefore does not verify AC-05's persistence-result contract for Signal; regressions where a check mutates signal artifacts, or where migrated calc commands persist different results, can pass this suite.",
+              "severity": "P1",
+              "file": "apps/cli/tests/pr_signal_pure_di_contract.rs",
+              "line": 226,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:b986b6c2580f48e067d258b3475a797dce17bed3b9c19c141ec0fef257a2678f",
+          "at": "2026-07-27T12:47:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The aggregate Signal test uses the real checkout as `--workspace-root`. Because the aggregate gate unconditionally resolves an active track from that repository, this test fails whenever the permanent suite runs on `develop` or `main` after merge. Build a temporary repository on a controlled `track/<id>` branch instead.",
+              "severity": "P1",
+              "file": "apps/cli/tests/pr_signal_pure_di_contract.rs",
+              "line": 249,
+              "category": "test_stability"
+            },
+            {
+              "message": "`LIVE_SIGNAL_EXECUTION_SOURCES` omits the eight `calc_*`/`check_*` modules containing the migrated CLI `run` entry points. Searching the remaining files for only two legacy strings therefore neither protects those execution surfaces from restored shim/service references nor validates the required driver → interactor → port route, leaving AC-04/AC-07 and T007 incompletely covered.",
+              "severity": "P1",
+              "file": "apps/cli/tests/operational_reference_cutover.rs",
+              "line": 58,
+              "category": "test_coverage"
+            },
+            {
+              "message": "The Signal contract tests invoke only check operations and never compare relevant persisted files before and after execution. They therefore do not verify AC-05's persistence-result contract: a check that mutates signal artifacts, or changed persistence behavior in the migrated calc commands, can pass this suite.",
+              "severity": "P1",
+              "file": "apps/cli/tests/pr_signal_pure_di_contract.rs",
+              "line": 226,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:b986b6c2580f48e067d258b3475a797dce17bed3b9c19c141ec0fef257a2678f",
+          "at": "2026-07-27T12:50:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d43380b5872031ce8e24f5f70cae355fd1fde1471c8ccc79ff6f82d22b1f4168",
+          "at": "2026-07-27T12:59:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The single-path route table covers only the eight child-module commands and omits the ninth migrated entry point, `run_aggregate_check` (`SignalInput::CheckGate` → `SignalService::check_gate`). The end-to-end aggregate test verifies output only, so this helper could bypass the driver through a composition-root/facade path without the AC-07 guard failing. Add an explicit aggregate route assertion, and ensure its service method is connected to the typed port.",
+              "severity": "P1",
+              "file": "apps/cli/tests/operational_reference_cutover.rs",
+              "line": 133,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:d43380b5872031ce8e24f5f70cae355fd1fde1471c8ccc79ff6f82d22b1f4168",
+          "at": "2026-07-27T13:04:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e78b2a78e37ceee75b00ab72904a21bab404fb49d44927c28016c99c48e2fea",
+          "at": "2026-07-27T13:07:38Z"
         }
       ]
     }
