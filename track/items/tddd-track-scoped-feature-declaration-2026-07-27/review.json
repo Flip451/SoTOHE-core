@@ -1,0 +1,59 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ce2edadf548aa73c048b12a92127764347b1ca881c4f4923ce48b037d80b303",
+          "at": "2026-07-27T00:54:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 は「baseline と実測が同一の宣言を読む」だけで feature 集合の乖離が構造的に不可能になるとしていますが、この commit 対象成果物は両取得の間に変更できます。baseline 後に宣言が更新されれば、同じパスを読んでも異なる feature 集合で抽出され、Context の中核要件と矛盾します。両取得を同一内容へ拘束する決定が必要です（具体的な形式は下流へ委ねられます）。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+              "line": 68,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:5ce2edadf548aa73c048b12a92127764347b1ca881c4f4923ce48b037d80b303",
+          "at": "2026-07-27T00:57:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:312e3823bde4aa58374a77d63bdc6933c9f5d99fa5d28d38eb7de6c8becf6fbb",
+          "at": "2026-07-27T01:03:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:312e3823bde4aa58374a77d63bdc6933c9f5d99fa5d28d38eb7de6c8becf6fbb",
+          "at": "2026-07-27T01:06:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c59bec9944232a1bc692cf2bf9e75f686164690f3d82e579126fc4d6b731950",
+          "at": "2026-07-27T01:49:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c59bec9944232a1bc692cf2bf9e75f686164690f3d82e579126fc4d6b731950",
+          "at": "2026-07-27T01:51:58Z"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "tddd-track-scoped-feature-declaration-2026-07-27",
+  "title": "TDDD chain ③ の rustdoc 抽出を track 単位の feature 宣言に基づかせる",
+  "branch": "track/tddd-track-scoped-feature-declaration-2026-07-27",
+  "created_at": "2026-07-27T00:52:37Z",
+  "updated_at": "2026-07-27T00:52:37Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

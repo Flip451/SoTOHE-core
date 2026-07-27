@@ -126,6 +126,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [TDDD GAT trait サポート: パーサ QualifiedPath + 比較フォーマッター正規化 + カタログ関連アイテムスキーマ](2026-06-18-0822-typeref-parser-qualified-path-support.md) | Proposed | 2026-06-18 |
 | [cli 系 3 層への TDDD 適用と既存 linter によるロール配置制約の設定](2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md) | Proposed | 2026-06-21 |
 | [TDDD chain ③ の `cargo rustdoc` 呼び出しに `--document-hidden-items` を追加する](2026-06-27-0440-tddd-rustdoc-document-hidden-items.md) | Proposed | 2026-06-27 |
+| [TDDD chain ③ の rustdoc 抽出を track 単位の feature 宣言に基づかせる](2026-07-27-0039-tddd-track-scoped-feature-declaration.md) | Proposed | 2026-07-27 |
 | [型カタログ作成の「生成 + 注釈」への移行 — 意図入力スキャフォールディング API](2026-07-02-1345-catalogue-generation-annotation.md) | — | 2026-07-02 |
 | [テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成](2026-07-02-0359-test-obligation-and-fulfillment-gate.md) | Proposed | 2026-07-02 |
 | [テスト義務ゲートにおける skipped task status レーン](2026-07-11-0802-test-obligation-skipped-status-lane.md) | Proposed | 2026-07-11 |
