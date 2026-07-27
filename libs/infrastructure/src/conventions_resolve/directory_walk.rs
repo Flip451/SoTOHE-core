@@ -1,11 +1,12 @@
 //! Handle-relative directory traversal for the convention scan.
 //!
 //! Kept in a sibling module so the codec, the scan, and the adapter stay inside
-//! the parent module's length limit. Every open here is `NOFOLLOW` and, below
-//! the root, relative to the handle whose listing produced the name: a name
-//! resolved again from the top can have become a link since the listing
-//! classified it, and the walk would then leave the convention tree while every
-//! path it builds still reads as repository-relative.
+//! the parent module's length limit. Only the anchor the walk starts from is
+//! opened by pathname; every open below it is `NOFOLLOW` and relative to the
+//! handle above it — the one whose listing produced the name, once the walk is
+//! inside the tree. A name resolved again from the top can have become a link
+//! since it was last looked at, and the walk would then leave the convention
+//! tree while every path it builds still reads as repository-relative.
 
 use std::path::{Path, PathBuf};
 
@@ -89,19 +90,21 @@ pub(super) struct DirectoryEntry {
     pub(super) is_symlink: bool,
 }
 
-/// Opens the convention root itself without following a symlink.
+/// Opens the root the walk descends from.
 ///
 /// The one open in this walk taken by pathname rather than relative to a
-/// handle, because it is where the walk starts and there is no handle yet. The
-/// ancestors above it are checked separately by the symlink guard; from here
-/// down every descent goes through [`open_directory_at`].
-pub(super) fn open_directory(path: &Path) -> std::io::Result<std::fs::File> {
+/// handle, because it is where the walk starts and there is no handle yet.
+///
+/// Deliberately without `NOFOLLOW`: this is the root the caller vouched for,
+/// and a repository checked out under a symlinked path is still that
+/// repository. What the walk owes a guarantee about is the components *below*
+/// this anchor, and each of those is opened through [`open_directory_at`],
+/// relative to the handle above it, so none of them can be swapped for a link
+/// between one open and the next.
+pub(super) fn open_trusted_root(path: &Path) -> std::io::Result<std::fs::File> {
     rustix::fs::open(
         path,
-        rustix::fs::OFlags::RDONLY
-            | rustix::fs::OFlags::DIRECTORY
-            | rustix::fs::OFlags::NOFOLLOW
-            | rustix::fs::OFlags::CLOEXEC,
+        rustix::fs::OFlags::RDONLY | rustix::fs::OFlags::DIRECTORY | rustix::fs::OFlags::CLOEXEC,
         rustix::fs::Mode::empty(),
     )
     .map(std::fs::File::from)

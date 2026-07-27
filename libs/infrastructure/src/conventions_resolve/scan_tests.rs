@@ -509,13 +509,16 @@ fn test_scan_convention_requirements_does_not_list_a_linked_convention_root() {
     )
     .unwrap();
 
-    let scanned = scan_convention_requirements(project.path()).unwrap();
+    let result = scan_convention_requirements(project.path());
 
-    assert!(
-        scanned.is_empty(),
-        "a linked convention root presents no documents rather than presenting another tree's \
-         documents under this tree's paths"
-    );
+    let Err(ConventionResolveError::ConventionRootUnlistable { root, .. }) = result else {
+        panic!(
+            "a linked convention root neither presents another tree's documents under this tree's \
+             paths nor presents none: the documents exist, in the tree the link points at, and \
+             refusing to read that tree leaves this one undecided rather than empty"
+        );
+    };
+    assert_eq!(root, PathBuf::from("knowledge/conventions"));
 }
 
 #[cfg(unix)]
@@ -530,12 +533,81 @@ fn test_scan_convention_requirements_does_not_list_a_convention_root_below_a_lin
     )
     .unwrap();
 
-    let scanned = scan_convention_requirements(project.path()).unwrap();
+    let result = scan_convention_requirements(project.path());
 
-    assert!(
-        scanned.is_empty(),
-        "every component the walk joins rather than lists is checked, not only the root itself"
-    );
+    let Err(ConventionResolveError::ConventionRootUnlistable { root, .. }) = result else {
+        panic!(
+            "every component the walk joins rather than lists is checked, not only the root \
+             itself, and a refusal one component higher is the same undecided tree"
+        );
+    };
+    assert_eq!(root, PathBuf::from("knowledge/conventions"));
+}
+
+#[test]
+fn test_scan_convention_requirements_with_a_project_root_that_does_not_exist_fails_closed() {
+    // `project_root` arrives from the caller — `--project-root` hands it over
+    // directly — so a misspelling reaches this walk as an ordinary path. If the
+    // failure to open it were folded in with an absent convention root, the
+    // scan would answer that a repository nobody opened requires nothing, and
+    // dispatch would proceed on it. Absence is only an answer about a
+    // repository that was opened.
+    let parent = tempfile::tempdir().expect("tempdir must be created");
+
+    let result = scan_convention_requirements(&parent.path().join("no-such-repository"));
+
+    let Err(ConventionResolveError::ConventionRootUnlistable { root, .. }) = result else {
+        panic!(
+            "a project root that could not be opened leaves the repository unread, not empty: \
+             nothing was looked at to declare anything"
+        );
+    };
+    assert_eq!(root, PathBuf::from("knowledge/conventions"));
+}
+
+#[cfg(unix)]
+#[test]
+fn test_scan_convention_requirements_with_a_project_root_link_to_nothing_fails_closed() {
+    // The same claim through the anchor's own resolution rather than a plain
+    // missing directory: the anchor is opened as the caller handed it over, so
+    // it follows a link, and a link to nothing reports the repository absent by
+    // the same `NotFound` an absent convention root would.
+    let parent = tempfile::tempdir().expect("tempdir must be created");
+    let project_root = parent.path().join("repository");
+    std::os::unix::fs::symlink(parent.path().join("nowhere"), &project_root)
+        .expect("the dangling project-root link must be created");
+
+    let result = scan_convention_requirements(&project_root);
+
+    let Err(ConventionResolveError::ConventionRootUnlistable { root, .. }) = result else {
+        panic!("a project root that points at nothing was never opened, so nothing is empty yet");
+    };
+    assert_eq!(root, PathBuf::from("knowledge/conventions"));
+}
+
+#[cfg(unix)]
+#[test]
+fn test_scan_convention_requirements_does_not_read_a_dangling_ancestor_link_as_an_absent_root() {
+    // `knowledge` is a link to nothing, so resolving `knowledge/conventions` as
+    // a pathname reports the root absent — and absence is the one condition
+    // this scan answers with an empty result. The two are not the same: nothing
+    // has said what is behind the link, and this fixture pins that the refusal
+    // comes from the open of the component itself rather than from a check made
+    // before it. A descent that resolved the path again, however carefully it
+    // had checked first, would hand back `NotFound` here.
+    let project = tempfile::tempdir().expect("tempdir must be created");
+    std::os::unix::fs::symlink(project.path().join("nowhere"), project.path().join("knowledge"))
+        .expect("the dangling ancestor link must be created");
+
+    let result = scan_convention_requirements(project.path());
+
+    let Err(ConventionResolveError::ConventionRootUnlistable { root, .. }) = result else {
+        panic!(
+            "a root reached through a link that points at nothing is undecided, not absent: the \
+             tree behind the link was never looked at"
+        );
+    };
+    assert_eq!(root, PathBuf::from("knowledge/conventions"));
 }
 
 #[cfg(unix)]

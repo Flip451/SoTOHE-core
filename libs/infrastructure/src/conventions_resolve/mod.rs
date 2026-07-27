@@ -32,12 +32,12 @@ use usecase::conventions_resolve::{
 };
 
 use crate::capability_exec::{YAML_LINE_BREAKS, read_front_matter};
-use crate::track::symlink_guard::{is_symlink_rejection, reject_symlinks_below};
 mod directory_walk;
 mod front_matter_dto;
 
 use directory_walk::{
-    DirectoryEntry, bounded_entries, is_symlink_open_rejection, open_directory, open_directory_at,
+    DirectoryEntry, bounded_entries, is_symlink_open_rejection, open_directory_at,
+    open_trusted_root,
 };
 
 pub use front_matter_dto::{CapabilityIdField, ConventionFrontMatterDto};
@@ -218,6 +218,83 @@ pub(super) const MAX_DIRECTORY_ENTRIES: usize = 10_000;
 /// walk.
 const MAX_DIRECTORY_DEPTH: usize = 64;
 
+/// Opens [`CONVENTION_ROOT`] below `project_root`, refusing to follow a link at
+/// any component of it.
+///
+/// The root is reached one component at a time, each open relative to the
+/// handle above it and `NOFOLLOW`, rather than by resolving the whole path in
+/// one call. A pathname open guards only its trailing component, so `knowledge`
+/// could be replaced by a link between one resolution and the next and the open
+/// would follow it into another tree; a substituted link that dangles comes back
+/// `NotFound`, which this walk reads as a repository that keeps no conventions —
+/// the one wrong answer it must not give. Holding each handle closes that
+/// window, because there is no second resolution left to race.
+///
+/// This is also why the walk no longer asks the symlink guard about these
+/// components first. Checking a path and then resolving it again is what opened
+/// the window; refusing the link at the moment of the open is the same check
+/// without one.
+///
+/// The anchor is opened on its own terms and its failures are never absence.
+/// `NotFound` reported while descending to `knowledge` or to `conventions` is a
+/// repository that keeps no conventions; `NotFound` from the anchor is a
+/// repository that was never opened, and the two would otherwise arrive as the
+/// same value. `project_root` is taken from the caller — `--project-root` hands
+/// it over directly — so a path that is misspelled, or that points at a link to
+/// nothing, must not come back as a repository declaring no conventions and let
+/// dispatch proceed.
+fn open_convention_root(project_root: &Path) -> Result<ConventionRootOpen, ConventionResolveError> {
+    let mut directory = open_trusted_root(project_root).map_err(|error| {
+        unlistable_root(format!(
+            "project root {} could not be opened: {error}",
+            project_root.display()
+        ))
+    })?;
+    for component in Path::new(CONVENTION_ROOT).components() {
+        let name = Path::new(component.as_os_str());
+        directory = match open_directory_at(&directory, name) {
+            Ok(descended) => descended,
+            Err(error) if error.kind() == std::io::ErrorKind::NotFound => {
+                return Ok(ConventionRootOpen::Absent);
+            }
+            Err(error) => {
+                return Err(unlistable_root(format!(
+                    "{} below the project root could not be opened: {error}",
+                    name.display()
+                )));
+            }
+        };
+    }
+    Ok(ConventionRootOpen::Opened(directory))
+}
+
+/// What opening the convention root came to.
+///
+/// A handle and an absent root are different answers rather than one nullable
+/// handle, so that the arm returning the empty result has to be written out and
+/// cannot be reached by a failure that merely happens to look like absence.
+enum ConventionRootOpen {
+    /// The root is open and can be listed.
+    Opened(std::fs::File),
+    /// The repository keeps no conventions: a component of the convention root
+    /// is absent below a project root that opened.
+    Absent,
+}
+
+/// Builds the failure for a convention root this walk could not read.
+///
+/// `detail` says which path failed and how, because the variant itself can only
+/// name the repository-relative root: the anchor above it and the two
+/// components below it all surface here, and a caller told only
+/// `knowledge/conventions` could not tell a mistyped project root from an
+/// unreadable convention directory.
+fn unlistable_root(detail: String) -> ConventionResolveError {
+    ConventionResolveError::ConventionRootUnlistable {
+        root: PathBuf::from(CONVENTION_ROOT),
+        detail: CapabilityFailureDetail::new(detail),
+    }
+}
+
 /// Scans `project_root`'s convention tree and pairs every document with the
 /// capability identifiers its front matter declares (`IN-05`, `AC-06`,
 /// `AC-07`).
@@ -267,14 +344,14 @@ const MAX_DIRECTORY_DEPTH: usize = 64;
 /// bounds the recursion by the real tree's depth.
 ///
 /// That skip is applied to entries a listing reported, so it cannot see the two
-/// components the walk reaches by joining rather than by listing: `knowledge`
-/// and `knowledge/conventions` themselves. A link at either would be resolved
-/// by the listing call before any entry existed to inspect, and the walk would
-/// present another tree's files under this one's paths — the same escape,
-/// arriving one level above where the walk looks for it. Both are therefore
-/// checked here before the root is listed. `project_root` above them is the
-/// caller's to vouch for: it is the tree the port was asked about, not
-/// something this walk resolved.
+/// components the walk reaches on its way to the root rather than by listing:
+/// `knowledge` and `knowledge/conventions` themselves. A link at either would
+/// be resolved before any entry existed to inspect, and the walk would present
+/// another tree's files under this one's paths — the same escape, arriving one
+/// level above where the walk looks for it. The descent this walk starts from
+/// refuses both, at the open of each rather than by a check made before them.
+/// `project_root` above them is the caller's to vouch for: it is the tree the
+/// port was asked about, not something this walk resolved.
 ///
 /// A skipped link is simply not a document this walk presents, the same way a
 /// linked subdirectory contributes none. So is anything that is not a regular
@@ -297,6 +374,13 @@ const MAX_DIRECTORY_DEPTH: usize = 64;
 ///
 /// # Errors
 ///
+/// Returns [`ConventionResolveError::ConventionRootUnlistable`] when the tree
+/// the walk was asked about could not be read at all: `project_root` itself
+/// could not be opened, a component of the convention root below it could not
+/// be opened for any reason other than being absent — a link among them — or
+/// the opened root could not be listed. An absent convention root is not one of
+/// these; it is the empty result `AC-08` allows.
+///
 /// Returns [`ConventionResolveError::DocumentUnreadable`] when a document or a
 /// directory below the convention root cannot be read, including when either
 /// exceeds the bound this walk reads it under (`MAX_DOCUMENT_BYTES`,
@@ -309,78 +393,43 @@ const MAX_DIRECTORY_DEPTH: usize = 64;
 pub fn scan_convention_requirements(
     project_root: &Path,
 ) -> Result<Vec<ConventionRequirement>, ConventionResolveError> {
-    let convention_root = project_root.join(CONVENTION_ROOT);
-
-    // A convention root that is absent, is not a directory, cannot be listed,
-    // or is reached through a link presents no documents, which `AC-08` makes
-    // an ordinary empty result. It is also the only path this walk touches that
-    // is not itself a document — `ConventionDocumentPath` rejects the root —
-    // and so the only path whose failure none of `AC-07`'s five
-    // document-shaped conditions can name. Everything below it is fail-closed.
+    // Only an absent convention root presents no documents, which `AC-08` makes
+    // an ordinary empty result. A root that exists but cannot be read — because
+    // it is not a directory, cannot be listed, or is reached through a link —
+    // fails closed. The root is the only path this walk touches that is not
+    // itself a document — `ConventionDocumentPath` rejects it — and so the only
+    // path whose failure none of `AC-07`'s five document-shaped conditions can
+    // name; `ConventionRootUnlistable` is the variant that names it. Everything
+    // below it is fail-closed too.
     //
-    // The link check runs first and covers `knowledge` as well, because a
-    // listing of a linked root would already have produced entries from
-    // another tree by the time any of them could be inspected.
-    match reject_symlinks_below(&convention_root, project_root) {
-        // A link on the way to the root, or at it: the tree reached through it
-        // is not the one the caller named, and presenting its documents under
-        // repository-relative paths would misreport where they came from.
-        Ok(false) => return Ok(Vec::new()),
-        Ok(true) => {}
-        // A link the guard refused is the same answer as `Ok(false)` for this
-        // walk: the tree behind it is not the one the caller named, so it
-        // presents no documents. The guard is asked to recognise its own
-        // rejection rather than the kind being matched here — it raises
-        // `InvalidInput` for a link and the filesystem raises the same kind for
-        // other malformed paths, so matching the kind would quietly answer an
-        // undecidable root as an ordinary empty one.
-        Err(error) if is_symlink_rejection(&error) => return Ok(Vec::new()),
-        // An absent component is a repository that keeps no conventions.
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
-        // Anything else means the guard could not decide — `knowledge` being a
-        // regular file, a component that cannot be traversed. That is a
-        // structural anomaly and fails closed for the same reason an unlistable
-        // root does: not knowing what is there is not the same as nothing.
-        Err(error) => {
-            return Err(ConventionResolveError::ConventionRootUnlistable {
-                root: PathBuf::from(CONVENTION_ROOT),
-                detail: CapabilityFailureDetail::new(error.to_string()),
-            });
-        }
-    }
-    // An absent root is a repository that keeps no conventions, which `AC-08`
-    // makes an ordinary empty result. Every other listing failure — a root that
-    // is a regular file, or a directory the process may not read — is a
-    // structural anomaly and fails closed: "no document declares this
+    // A linked root is not an empty tree: the documents exist, in the tree the
+    // link points at, and this walk will not present them because their
+    // repository-relative paths would misreport where they came from. A
+    // consumer who symlinks their convention directory would otherwise be told
+    // they require no conventions, and dispatch would proceed without policies
+    // that do exist. Refusing to read a tree is a structural anomaly under
+    // `AC-07`; saying it is empty is a wrong answer. The same holds for the
+    // ordinary unreadable root — a regular file where the directory should be,
+    // or a directory the process may not read: "no document declares this
     // capability" and "the documents could not be looked at" mean opposite
-    // things to a caller, and returning the first for the second would report a
-    // repository whose convention tree is unreadable as one requiring nothing.
-    let root_dir = match open_directory(&convention_root) {
-        Ok(root_dir) => root_dir,
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
-        // Only a link is an empty result here. `ENOTDIR` is deliberately not
-        // folded in with it: for an entry mid-walk it means the node changed
-        // under the listing and skipping is right, but for the root it means
-        // `knowledge/conventions` is not a directory at all, which is a tree
-        // that cannot be read rather than a tree that is empty.
-        Err(error) if error.raw_os_error() == Some(libc::ELOOP) => return Ok(Vec::new()),
-        Err(error) => {
-            return Err(ConventionResolveError::ConventionRootUnlistable {
-                root: PathBuf::from(CONVENTION_ROOT),
-                detail: CapabilityFailureDetail::new(error.to_string()),
-            });
-        }
+    // things to a caller.
+    //
+    // Mid-walk the answer differs, and deliberately: a node that turned into a
+    // link between the listing and the open is skipped, because the listing
+    // already classified it and one entry going away is not the tree going
+    // away. The root has no such fallback — nothing has said what is there yet.
+    let root_dir = match open_convention_root(project_root)? {
+        ConventionRootOpen::Opened(root_dir) => root_dir,
+        ConventionRootOpen::Absent => return Ok(Vec::new()),
     };
-    let entries = match bounded_entries(&root_dir) {
-        Ok(entries) => entries,
-        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
-        Err(error) => {
-            return Err(ConventionResolveError::ConventionRootUnlistable {
-                root: PathBuf::from(CONVENTION_ROOT),
-                detail: CapabilityFailureDetail::new(error.to_string()),
-            });
-        }
-    };
+    // Every listing failure fails closed, absence included. The root is open by
+    // now, so `NotFound` here is no longer evidence that it was never there: a
+    // listing can report it for a directory emptied and removed underneath the
+    // walk, and that is a tree this scan did not read rather than a tree with
+    // nothing in it.
+    let entries = bounded_entries(&root_dir).map_err(|error| {
+        unlistable_root(format!("{CONVENTION_ROOT} could not be listed: {error}"))
+    })?;
 
     let mut requirements = Vec::new();
     scan_entries(
