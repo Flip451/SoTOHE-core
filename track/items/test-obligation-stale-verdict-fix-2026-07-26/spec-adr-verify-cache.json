@@ -256,10 +256,10 @@
     },
     {
       "claim_hash": "8820bdec45a833bed09879c2a38ef4cfe3fb09a6fbeaa37b8905908752888c97",
-      "evidence_hash": "b9ac04075bded9b8d055d00bc6ef737f1bb58d6f2354bae7c124b6c8ba053e77",
+      "evidence_hash": "7ff798a0a1d3eac6a3dc786d489844a538701a1d938431e1a5a1d789a3e8586c",
       "verdict": {
         "kind": "pass",
-        "citation": "失敗 verdict の実際の判定理由は `entries[].verdict.reason` のみを正本とし、失敗 verdict ではこの値を必須かつ非空にする。"
+        "citation": "出力 schema、domain model、encoder はこのフィールドを表現または出力せず、null placeholder、alias、mirror のいずれも設けない。失敗 verdict の実際の判定理由は `entries[].verdict.reason` のみを正本とし、失敗 verdict ではこの値を必須かつ非空にする。"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -693,10 +693,10 @@
     },
     {
       "claim_hash": "15da3dc7bd290beaba756f25c9587eeb7410ec6b89d5bbc86a5e8635a8837cf2",
-      "evidence_hash": "b9ac04075bded9b8d055d00bc6ef737f1bb58d6f2354bae7c124b6c8ba053e77",
+      "evidence_hash": "7ff798a0a1d3eac6a3dc786d489844a538701a1d938431e1a5a1d789a3e8586c",
       "verdict": {
         "kind": "pass",
-        "citation": "失敗 verdict の実際の判定理由は `entries[].verdict.reason` のみを正本とし、失敗 verdict ではこの値を必須かつ非空にする。caller は失敗理由の取得と理由記録の有無の判定にこの nested field だけを使い、同じ意味を持つ sibling field の存在を前提にしない。"
+        "citation": "「失敗 verdict の実際の判定理由は `entries[].verdict.reason` のみを正本とし、失敗 verdict ではこの値を必須かつ非空にする。」"
       },
       "claim_origin": {
         "kind": "spec_element",
@@ -877,10 +877,10 @@
     },
     {
       "claim_hash": "96433e2c2a52bfca7e707c69812b7a5252377f7cf36fde556472753916c928f8",
-      "evidence_hash": "b9ac04075bded9b8d055d00bc6ef737f1bb58d6f2354bae7c124b6c8ba053e77",
+      "evidence_hash": "7ff798a0a1d3eac6a3dc786d489844a538701a1d938431e1a5a1d789a3e8586c",
       "verdict": {
         "kind": "pass",
-        "citation": "「出力 schema、domain model、encoder はこのフィールドを表現または出力せず、null placeholder、alias、mirror のいずれも設けない。」また、「失敗 verdict の実際の判定理由は `entries[].verdict.reason` のみを正本とし、失敗 verdict ではこの値を必須かつ非空にする。」"
+        "citation": "出力 schema、domain model、encoder はこのフィールドを表現または出力せず、null placeholder、alias、mirror のいずれも設けない。失敗 verdict の実際の判定理由は `entries[].verdict.reason` のみを正本とし、失敗 verdict ではこの値を必須かつ非空にする。"
       },
       "claim_origin": {
         "kind": "spec_element",
