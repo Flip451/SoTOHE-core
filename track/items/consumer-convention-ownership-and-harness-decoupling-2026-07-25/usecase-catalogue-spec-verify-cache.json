@@ -51,11 +51,11 @@
       }
     },
     {
-      "claim_hash": "219640a86601cf16ca45ff73fcc93d39b6b3432bc0fce96d1e26d0a65fab5457",
+      "claim_hash": "4236fbceaf03f79d079c152e84f41405f3470aba2d367a1b66b375c77271b59f",
       "evidence_hash": "7c2e11d3f81713d0229ff327beceffeb494c5078be5f829a8b7ff8c16a2e4931",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp capability exec <capability> --host <host> --briefing-file <path>` が実行主体を決定する前に対象 capability ID で resolver を一度だけ実行し、解決した規約 path と全文書を読む義務を、`executed` では provider prompt／実行入力へ注入し、`delegate-in-host` では返却 payload の `discipline` に含める。"
+        "citation": "対象 capability ID で resolver を一度だけ実行し、解決した規約 path と全文書を読む義務を、`executed` では provider prompt／実行入力へ注入し、`delegate-in-host` では返却 payload の `discipline` に含める。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -75,11 +75,11 @@
       }
     },
     {
-      "claim_hash": "219640a86601cf16ca45ff73fcc93d39b6b3432bc0fce96d1e26d0a65fab5457",
+      "claim_hash": "4236fbceaf03f79d079c152e84f41405f3470aba2d367a1b66b375c77271b59f",
       "evidence_hash": "ee0c03a0963c156547028e87af734df048ea4d40a636f953742c83e87e7c4a7a",
       "verdict": {
         "kind": "pass",
-        "citation": "`CAPABILITY_EXEC_OUTCOME: executed` では解決した規約 path と全文書を読む義務が provider の実行入力に含まれ、`CAPABILITY_EXEC_OUTCOME: delegate-in-host` では同じ義務が返却 payload の `discipline` に含まれることを、両経路それぞれについて確認できる。"
+        "citation": "`orchestrator-output` capability の dispatch において、`CAPABILITY_EXEC_OUTCOME: executed` では解決した規約 path と全文書を読む義務が provider の実行入力に含まれ、`CAPABILITY_EXEC_OUTCOME: delegate-in-host` では同じ義務が返却 payload の `discipline` に含まれることを、両経路それぞれについて確認できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -99,7 +99,7 @@
       }
     },
     {
-      "claim_hash": "219640a86601cf16ca45ff73fcc93d39b6b3432bc0fce96d1e26d0a65fab5457",
+      "claim_hash": "4236fbceaf03f79d079c152e84f41405f3470aba2d367a1b66b375c77271b59f",
       "evidence_hash": "e4c9e396f5f20f27d9e0049259cdfdb485e6036d513d12972d400f5145120f5c",
       "verdict": {
         "kind": "pass",
@@ -123,7 +123,7 @@
       }
     },
     {
-      "claim_hash": "219640a86601cf16ca45ff73fcc93d39b6b3432bc0fce96d1e26d0a65fab5457",
+      "claim_hash": "4236fbceaf03f79d079c152e84f41405f3470aba2d367a1b66b375c77271b59f",
       "evidence_hash": "8206931c895d18e648b174e93135997caa9e9013621c3f0a5285780bb63f2363",
       "verdict": {
         "kind": "pass",

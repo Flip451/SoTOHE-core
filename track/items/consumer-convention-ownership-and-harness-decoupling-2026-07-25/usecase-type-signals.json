@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-27T01:54:52Z",
-  "declaration_hash": "e9f473f5acc519cc9610ec479dfb743ab096d72c656ec02a8290a7ff16c6ada5",
-  "implementation_input_hash": "4719a4d07d99fe5af0c0bc4b0e08eb91f3a3821256dbca5b9d2964e7e7ae1be2",
+  "generated_at": "2026-07-27T11:09:04Z",
+  "declaration_hash": "894afddc4dc648cad1639fd5b44e91d94ed436dfa0a3f6b1270a7596c5827d19",
+  "implementation_input_hash": "3e12f30ec14d963c1d0c2a266b8d3f6fd42871efea94c743c033b301dc2c64ba",
   "signals": [
     {
       "type_name": "CapabilityExecError",
@@ -18,7 +18,7 @@
     {
       "type_name": "CapabilityExecInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "CapabilityExecService"

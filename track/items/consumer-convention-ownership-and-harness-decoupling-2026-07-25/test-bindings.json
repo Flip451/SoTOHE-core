@@ -1385,6 +1385,51 @@
           "test_name": "test_convention_document_path_with_a_non_utf8_name_returns_not_renderable_error"
         }
       ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "CapabilityExecInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_conventions_once_and_dispatches_the_composed_discipline"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_query_names_the_dispatched_capability_as_a_matching_term"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_conventions_before_the_execution_subject_is_chosen"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_typed_pipeline_dispatch_resolves_no_conventions"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_convention_resolution_failure_stops_before_the_provider"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_injects_the_resolved_documents_and_nothing_else"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_delegate_in_host_payload_carries_the_resolved_obligation"
+        }
+      ]
     }
   ]
 }

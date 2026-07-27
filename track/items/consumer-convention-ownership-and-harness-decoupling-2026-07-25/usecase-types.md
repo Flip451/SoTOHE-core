@@ -47,7 +47,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityExecInteractor | interactor | modify | — | 🟡 | 🔵 |
+| CapabilityExecInteractor | interactor | modify | — | 🔵 | 🔵 |
 | ConventionResolveInteractor | interactor | add | — | 🔵 | 🔵 |
 | ConventionShippingCheckInteractor | interactor | add | — | 🟡 | 🔵 |
 

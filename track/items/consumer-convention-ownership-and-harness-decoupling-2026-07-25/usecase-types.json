@@ -849,7 +849,7 @@
     },
     "CapabilityExecInteractor": {
       "action": "modify",
-      "docs": "Pure application-layer coordinator for generic capability dispatch. This track injects `ConventionResolveService` as a fourth dependency (AC-10, AC-11, AC-12). The seam falls here rather than in the two route branches because the interactor is the one point both outcomes pass through: resolving once above the branch is what makes a single value reach either route, whereas resolving inside each branch would place the same rule in two sites with nothing but review keeping them equal. The resolved value is composed into `DisciplineText` rather than passed alongside it, so the two routes share one representation by construction. The preflight query names the dispatched capability as a `ConventionCapabilityId` obtained through `From<&CapabilityName>`: this is the single site in the workspace where a profile lookup key becomes a matching term, and it is infallible because the key is already a trimmed non-empty string.",
+      "docs": "Pure application-layer coordinator for generic capability dispatch. This track injects `ConventionResolveService` as a fourth dependency and the root it scans as a fifth constructor parameter (AC-10, AC-11, AC-12). The preflight query names the dispatched capability as a `ConventionCapabilityId` obtained through `From<&CapabilityName>`: this is the single site in the workspace where a profile lookup key becomes a matching term, and it is infallible because the key is already a trimmed non-empty string. `project_root` is a constructor parameter supplying `ResolveConventionsQuery.project_root`, injected at the `apps/cli-composition` construction site rather than declared on `CapabilityExecRequest` (IN-07). It stays `std::path::PathBuf` under R9's truly-opaque case, as on `ResolveConventionsQuery` and `CheckConventionShippingQuery`: a scan root owns no invariant this layer can enforce without a filesystem lookup, and the constrained concept in this slice is `ConventionDocumentPath`. Declared last, after the collaborator ports, as the one ambient value among them.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -880,6 +880,10 @@
             {
               "name": "providers",
               "ty": "Vec<Arc<dyn CapabilityProviderPort>>"
+            },
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
             }
           ],
           "returns": "Self"

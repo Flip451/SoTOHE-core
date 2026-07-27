@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "e9f473f5acc519cc9610ec479dfb743ab096d72c656ec02a8290a7ff16c6ada5",
+  "catalogue_declaration_hash": "894afddc4dc648cad1639fd5b44e91d94ed436dfa0a3f6b1270a7596c5827d19",
   "signals": [
     {
       "type_name": "CapabilityExecError",
@@ -10,7 +10,7 @@
     {
       "type_name": "CapabilityExecInteractor",
       "signal": "blue",
-      "entry_hash": "219640a86601cf16ca45ff73fcc93d39b6b3432bc0fce96d1e26d0a65fab5457"
+      "entry_hash": "4236fbceaf03f79d079c152e84f41405f3470aba2d367a1b66b375c77271b59f"
     },
     {
       "type_name": "CapabilityFailureDetail",

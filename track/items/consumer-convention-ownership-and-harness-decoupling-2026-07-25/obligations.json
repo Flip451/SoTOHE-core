@@ -17,7 +17,7 @@
         "role": "Interactor"
       },
       "brief": "Author a result test covering 'entry' of CapabilityExecInteractor",
-      "declaration_hash": "e69087b1051b1c36468c1996a0551a50ec8c381da2c196955304c407e27b09dd",
+      "declaration_hash": "427b4d75854e868dea37e391328c61d80edd9720f413863064ace03655c1c064",
       "spec_refs": [
         {
           "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
