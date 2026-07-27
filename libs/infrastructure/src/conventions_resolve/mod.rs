@@ -33,7 +33,12 @@ use usecase::conventions_resolve::{
 
 use crate::capability_exec::{YAML_LINE_BREAKS, read_front_matter};
 use crate::track::symlink_guard::{is_symlink_rejection, reject_symlinks_below};
+mod directory_walk;
 mod front_matter_dto;
+
+use directory_walk::{
+    DirectoryEntry, bounded_entries, is_symlink_open_rejection, open_directory, open_directory_at,
+};
 
 pub use front_matter_dto::{CapabilityIdField, ConventionFrontMatterDto};
 
@@ -201,7 +206,7 @@ const MAX_DOCUMENT_BYTES: u64 = 4 * 1024 * 1024;
 /// The same reasoning and the same reporting route as [`MAX_DOCUMENT_BYTES`]
 /// apply, and the bound sits far above any convention tree a person would
 /// author.
-const MAX_DIRECTORY_ENTRIES: usize = 10_000;
+pub(super) const MAX_DIRECTORY_ENTRIES: usize = 10_000;
 
 /// Deepest nesting this walk will descend to below the convention root.
 ///
@@ -350,7 +355,23 @@ pub fn scan_convention_requirements(
     // capability" and "the documents could not be looked at" mean opposite
     // things to a caller, and returning the first for the second would report a
     // repository whose convention tree is unreadable as one requiring nothing.
-    let entries = match bounded_entries(&convention_root) {
+    let root_dir = match open_directory(&convention_root) {
+        Ok(root_dir) => root_dir,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
+        // Only a link is an empty result here. `ENOTDIR` is deliberately not
+        // folded in with it: for an entry mid-walk it means the node changed
+        // under the listing and skipping is right, but for the root it means
+        // `knowledge/conventions` is not a directory at all, which is a tree
+        // that cannot be read rather than a tree that is empty.
+        Err(error) if error.raw_os_error() == Some(libc::ELOOP) => return Ok(Vec::new()),
+        Err(error) => {
+            return Err(ConventionResolveError::ConventionRootUnlistable {
+                root: PathBuf::from(CONVENTION_ROOT),
+                detail: CapabilityFailureDetail::new(error.to_string()),
+            });
+        }
+    };
+    let entries = match bounded_entries(&root_dir) {
         Ok(entries) => entries,
         Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
         Err(error) => {
@@ -362,7 +383,13 @@ pub fn scan_convention_requirements(
     };
 
     let mut requirements = Vec::new();
-    scan_entries(entries, Path::new(CONVENTION_ROOT), &mut requirements, MAX_DIRECTORY_DEPTH)?;
+    scan_entries(
+        &root_dir,
+        entries,
+        Path::new(CONVENTION_ROOT),
+        &mut requirements,
+        MAX_DIRECTORY_DEPTH,
+    )?;
     Ok(requirements)
 }
 
@@ -380,7 +407,8 @@ pub fn scan_convention_requirements(
 /// decremented per level and a subdirectory met at zero is reported unreadable
 /// rather than entered.
 fn scan_entries(
-    entries: Vec<std::fs::DirEntry>,
+    parent: &std::fs::File,
+    entries: Vec<DirectoryEntry>,
     relative_dir: &Path,
     requirements: &mut Vec<ConventionRequirement>,
     remaining_depth: usize,
@@ -392,26 +420,15 @@ fn scan_entries(
         // `notes\n.txt` is an ordinary directory entry, and the constructor
         // rejects it for a rendering rule that only matters to documents the
         // scan actually returns.
-        let candidate = relative_dir.join(entry.file_name());
-
-        let file_type = match entry.file_type() {
-            Ok(file_type) => file_type,
-            // An entry that cannot be classified cannot be shown to be one the
-            // walk ignores, so it is reported rather than skipped — which means
-            // naming it, and so validating its path after all. A name that then
-            // fails surfaces as the rejection, which is the more specific of
-            // the two failures: an entry that cannot be named is one this
-            // report could not have attributed anyway.
-            Err(error) => return Err(unreadable(&document_path(candidate)?, &error)),
-        };
+        let candidate = relative_dir.join(&entry.name);
 
         // Reported by the listing itself, so this is the link and never what it
-        // points at — the one place the walk can tell the two apart, since
-        // every read below this point resolves the link silently.
-        if file_type.is_symlink() {
+        // points at. Every open below is `NOFOLLOW` as well, so this only saves
+        // the work: a link that survives to an open is refused there.
+        if entry.is_symlink {
             continue;
         }
-        if file_type.is_dir() {
+        if entry.is_dir {
             // Not validated on the way in. A directory is not a document and is
             // never returned, so its name is only ever a component of some
             // document's path — and a subtree holding no `*.md` candidate has
@@ -428,11 +445,23 @@ fn scan_entries(
                     format!("convention tree is nested deeper than {MAX_DIRECTORY_DEPTH} levels"),
                 ));
             };
-            let nested = match bounded_entries(&entry.path()) {
+            // Opened relative to the handle that produced this entry, with
+            // `NOFOLLOW`, so the directory that gets listed is the one that was
+            // classified. Re-resolving `relative_dir.join(name)` here would let
+            // the entry be replaced by a link between the classification and
+            // the listing, and the listing would then walk out of the tree
+            // while every path this scan builds still reads as repository-
+            // relative.
+            let nested_dir = match open_directory_at(parent, &entry.name) {
+                Ok(nested_dir) => nested_dir,
+                Err(error) if is_symlink_open_rejection(&error) => continue,
+                Err(error) => return Err(unreadable(&document_path(candidate)?, &error)),
+            };
+            let nested = match bounded_entries(&nested_dir) {
                 Ok(nested) => nested,
                 Err(error) => return Err(unreadable(&document_path(candidate)?, &error)),
             };
-            scan_entries(nested, &candidate, requirements, nested_depth)?;
+            scan_entries(&nested_dir, nested, &candidate, requirements, nested_depth)?;
             continue;
         }
         // Anything left that is not a regular file is not a document either,
@@ -441,7 +470,7 @@ fn scan_entries(
         // it. This decides which nodes the walk offers; that the decision
         // still holds when the file is opened is `read_document`'s business,
         // since the node can be replaced in between.
-        if !file_type.is_file() {
+        if !entry.is_file {
             continue;
         }
         // Read from the unvalidated candidate, which carries the same extension
@@ -457,32 +486,11 @@ fn scan_entries(
         // are safe: arguing that would be the walk deciding the path rule a
         // second time.
         let document = document_path(candidate)?;
-        let content = read_document(&entry.path(), &document)?;
+        let content = read_document_at(parent, &entry.name, &document)?;
         requirements
             .push(parse_convention_front_matter(&document, &content)?.into_requirement(document)?);
     }
     Ok(())
-}
-
-/// Lists `directory`, holding at most [`MAX_DIRECTORY_ENTRIES`] entries.
-///
-/// The entries are kept in whatever order the listing yielded them. This walk
-/// deliberately does not order them: ordering convention documents belongs to
-/// [`usecase::conventions_resolve::ConventionResolution`], whose constructor
-/// sorts and deduplicates so that no consumer has to, and sorting here as well
-/// would put a second site in charge of a rule that type already owns.
-fn bounded_entries(directory: &Path) -> std::io::Result<Vec<std::fs::DirEntry>> {
-    let mut entries = Vec::new();
-    for entry in std::fs::read_dir(directory)? {
-        if entries.len() >= MAX_DIRECTORY_ENTRIES {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::InvalidData,
-                format!("directory holds more than {MAX_DIRECTORY_ENTRIES} entries"),
-            ));
-        }
-        entries.push(entry?);
-    }
-    Ok(entries)
 }
 
 /// Reads the document at `path`, holding at most [`MAX_DOCUMENT_BYTES`] of it.
@@ -490,8 +498,9 @@ fn bounded_entries(directory: &Path) -> std::io::Result<Vec<std::fs::DirEntry>> 
 /// `path` is the location on disk and `document` the validated repository-relative
 /// identity the failure is reported under; the two are the same file, named the
 /// two ways this walk has to name it.
-fn read_document(
-    path: &Path,
+fn read_document_at(
+    parent: &std::fs::File,
+    name: &Path,
     document: &ConventionDocumentPath,
 ) -> Result<String, ConventionResolveError> {
     // The listing decided this entry was a regular file, but the entry and the
@@ -502,8 +511,9 @@ fn read_document(
     // of the tree, and `NONBLOCK` so a FIFO returns instead of waiting for a
     // writer. What the flags cannot judge is the node's type, so the opened
     // handle is asked directly below.
-    let file = rustix::fs::open(
-        path,
+    let file = rustix::fs::openat(
+        parent,
+        name,
         rustix::fs::OFlags::RDONLY
             | rustix::fs::OFlags::NONBLOCK
             | rustix::fs::OFlags::NOFOLLOW
