@@ -3948,6 +3948,68 @@
           "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationEvaluateError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationEvaluateError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "c146816fbebabb269d212dcb81182eed6df16d897a24b35ad414bc1c7929402b",
+        "declaration_hash": "e8d440992f8e8b2713e2a5547a40f0ec9de15061b461f5471b3f66ce1f95f412",
+        "anchor_text_hash": "0637af9c7e989dc3b6ba0ec7df9f8045089d7140aba3f404335d24a691f4e184"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(ObligationEvaluateError::BindingConsistency(\n            domain::tddd::test_obligation::errors::TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id }\n        )) if edge_id == edge()"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationEvaluateError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationEvaluateError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "92aa0680a43b4603b8e8db2fa4b433c300f821589cda9395bd2106902ef4aed6",
+        "declaration_hash": "e8d440992f8e8b2713e2a5547a40f0ec9de15061b461f5471b3f66ce1f95f412",
+        "anchor_text_hash": "753b9eb475bf1c9bd7805922ce379a8289a44e27cf1b3345979352f438bde285"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        result,\n        Err(ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(message)))\n            if message.as_str() == \"provider unavailable\"\n    ));\n    assert!(h.fulfillment_cache.saved.lock().unwrap().is_none());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        }
+      ]
     }
   ]
 }

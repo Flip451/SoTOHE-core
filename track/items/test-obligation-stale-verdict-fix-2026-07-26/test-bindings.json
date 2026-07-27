@@ -1448,6 +1448,128 @@
           "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
         }
       ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ObligationEvaluateError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "reason": "ObligationEvaluateError is passive typed error vocabulary: it neither selects a cache row nor invokes a verifier, so IN-01's cache-identity and verifier-propagation behavior is not independently testable behavior of this enum entry."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ObligationEvaluateError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "reason": "ObligationEvaluateError only represents a failure after cache lookup; it cannot compare full cache keys, detect duplicate rows, or choose a verdict. IN-02 has no independently testable behavior for this enum entry."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ObligationEvaluateError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "reason": "ObligationEvaluateError only carries an already-detected binding inconsistency; it does not inspect a voluntary binding, determine derived-obligation ownership, or accept or reject a binding. IN-03 has no independently testable behavior for this enum entry."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ObligationEvaluateError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "reason": "ObligationEvaluateError is passive error vocabulary: it neither validates binding ownership nor emits a nonzero gate result. CN-03's fail-closed inconsistency behavior is not independently testable behavior of this enum entry."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ObligationEvaluateError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "reason": "ObligationEvaluateError only models an error returned by evaluation; it cannot construct historical and current cache rows, perform full-key lookup, or make check succeed regardless of row order. AC-01 has no independently testable behavior for this enum entry."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ObligationEvaluateError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ObligationEvaluateError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "ObligationEvaluateError only represents a recovery-required failure. It neither reads stale cache rows, performs re-evaluation, nor turns recovered data into a successful check, so AC-06 has no independently testable behavior for this enum entry."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ObligationEvaluateError",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheEntryDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "reason": "ObligationFulfillmentCacheEntryDto is an opaque serde DTO declaration with no catalogue-visible fields; it neither resolves bound tests nor defines cache-key selection. IN-05's diagnostic-recording behavior is not independently testable behavior of this declaration."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheEntryDto",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "reason": "ObligationFulfillmentCacheEntryDto is an opaque serde DTO declaration with no catalogue-visible fields; it neither writes cache rows nor compares cache keys. AC-05's persistence and identity observables are not independently testable behavior of this declaration."
     }
   ]
 }

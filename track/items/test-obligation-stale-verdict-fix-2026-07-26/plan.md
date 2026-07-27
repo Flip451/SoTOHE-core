@@ -3,65 +3,65 @@
 
 ## Summary
 
-T001 delivers the completed domain primitives and cache-document lookup; T003, rather than the already-done task, owns the final check-interactor contract. GO-01, GO-02.
-T002 delivers the cache/evidence foundation with usecase-owned resolved evidence, fingerprint-preserving `Legacy`/`Identified` cache-entry state, and the existing `VerifyCacheError` load boundary; it removes T001's stale reevaluation-reason source and tests and makes the compatibility-only consumer and codec trait migration required for the port/load transition compile on its own. Final check, result-model, evaluation, and wire-format behavior remains with dedicated later batches. GO-01, GO-02.
-T003 owns the final check-interactor semantics, combining cache recovery with voluntary-binding validation after T002's compile-preserving migration. GO-01, GO-02.
-T004 establishes the result-model and result-projection contract; T005 consumes it for final evaluation; T006–T008 complete cache mapping, load decoding, and file writes. GO-01, GO-02.
+T001 adds domain lookup and consistency targets. GO-01, GO-02.
+T002 updates the cache/evidence targets and their transition consumers. GO-01, GO-02.
+T003 updates check and binding-validation targets. GO-01, GO-02.
+T004–T008 update result, evaluation, and cache targets. GO-01, GO-02.
 
-## Tasks (1/8 resolved)
+## Tasks (8/8 resolved)
 
 ### S1 — Batch T001
 
-> Completed batch. Its implemented domain primitives and cache-document lookup remain attributed to T001; the stale reevaluation-reason cleanup is explicitly assigned to active T002, and later check-interactor work is explicitly attributed to T003.
+> Add domain lookup and consistency targets. IN-01, IN-02; OUT-04; CN-01, CN-02, CN-03; AC-01, AC-02.
 > Expected review scope: domain approximately 260 changed lines; usecase and infrastructure have no T001-owned changes.
 
-- [x] **T001**: Add `FulfillmentCacheLookupError` and `TestBindingConsistencyError`; update `ObligationFulfillmentCacheDocument` with full-key lookup and add the completed domain regressions. The final `ObligationCheckError` and `CheckTestObligationsInteractor` contract is owned by T003 so later cache-recovery and binding-validation changes do not share a done-task attribution. T002 owns removal of the residual `FulfillmentCacheReevaluationReason` enum and its tests because that cleanup cannot be attributed to this completed task. IN-01, IN-02; OUT-04; CN-01, CN-02, CN-03; AC-01, AC-02. (`062ed4ea`)
+- [x] **T001**: Add `FulfillmentCacheLookupError` and `TestBindingConsistencyError`; update `ObligationFulfillmentCacheDocument` with full-key lookup; add domain regressions. IN-01, IN-02; OUT-04; CN-01, CN-02, CN-03; AC-01, AC-02. (`062ed4ea`)
 
 ### S2 — Batch T002 — cache and evidence foundation
 
-> Cache/evidence foundation, T001's stale reevaluation-reason source/test removal, and the minimal compile-preserving migration for every consumer and codec trait implementation of the removed domain cache port and direct usecase-port load result. Update the usecase-owned resolver, cache-entry state, and existing `VerifyCacheError` load boundary. Do not finalize check, result-model, evaluate, DTO, or JSON-codec behavior in this batch; those contracts are assigned to T003–T008.
+> Update cache/evidence targets, remove `FulfillmentCacheReevaluationReason` and its tests, and migrate consumers and codec trait implementations. IN-01, IN-02, IN-05; OUT-01, OUT-02; CN-02, CN-03, CN-04; AC-01, AC-05, AC-06.
 > Expected review scope: domain approximately 440 changed lines, usecase approximately 480 changed lines, infrastructure approximately 395 changed lines, composition approximately 80 changed lines; each scope remains below the 500-line ceiling.
 
-- [~] **T002**: Implement the cache/evidence foundation: add `ResolvedBoundTestsResolver`, `ResolvedBoundTestsResolverPort`, usecase-owned `ResolvedBoundTests`, `ContentHasherPort`, `Sha256ContentHasher`, and `domain::tddd::test_obligation::ids::unavailable_diagnostic_message`; update `ObligationFulfillmentCacheEntryState`, `ObligationFulfillmentCacheEntry`, `VerifyCacheError`, and the domain-deletion/usecase-migration `ObligationFulfillmentCachePort` entries; and add focused regressions. Remove the residual `FulfillmentCacheReevaluationReason` enum and its tests that the completed T001 incorrectly introduced. In this same batch, migrate every existing check/evaluate/results consumer, composition path, test double, and `JsonObligationFulfillmentCacheCodec` trait implementation needed by the domain-port deletion and direct load result to a compile-preserving intermediate contract. T003 owns final check behavior, T004 owns result-model and result-projection behavior, T005 owns final evaluation behavior, and T006–T008 own final cache-wire behavior. IN-01, IN-02, IN-05; OUT-01, OUT-02; CN-02, CN-03, CN-04; AC-01, AC-05, AC-06.
+- [x] **T002**: Add `ResolvedBoundTestsResolver`, `ResolvedBoundTestsResolverPort`, `ResolvedBoundTests`, `ContentHasherPort`, `Sha256ContentHasher`, and `domain::tddd::test_obligation::ids::unavailable_diagnostic_message`; update cache-entry, cache-port, and `VerifyCacheError` targets; remove `FulfillmentCacheReevaluationReason`; migrate consumers, composition, test doubles, and codec trait implementations; add regressions. IN-01, IN-02, IN-05; OUT-01, OUT-02; CN-02, CN-03, CN-04; AC-01, AC-05, AC-06.
 
 ### S3 — Batch T003 — check and binding validation
 
-> Check-boundary completion only. It consumes T001/T002 primitives and the already-compilable transition contract, then owns the final check behavior, including cache-recovery and binding-consistency regressions.
+> Update check and binding-validation targets. IN-01, IN-02, IN-03; OUT-03; CN-01, CN-02, CN-03; AC-01, AC-02, AC-03, AC-06.
 > Expected review scope: domain approximately 150 changed lines, usecase approximately 490 changed lines, infrastructure has no T003-owned changes; each scope remains below the 500-line ceiling.
 
-- [~] **T003**: Complete the check boundary after T002's compilable contract transition: use `TestBindingConsistencyError`, update `ObligationsDocument`, the complete `ObligationCheckError` payload surface, and `CheckTestObligationsInteractor` for full-key cache recovery and voluntary-binding ownership validation. Add check finding/exit, duplicate-current-key, historical-row, and binding-consistency regressions. This task owns the final semantic completion of `CheckTestObligationsInteractor` after T002's compile-preserving migration. IN-01, IN-02, IN-03; OUT-03; CN-01, CN-02, CN-03; AC-01, AC-02, AC-03, AC-06.
+- [x] **T003**: Update `ObligationsDocument`, `ObligationCheckError`, and `CheckTestObligationsInteractor`; use `TestBindingConsistencyError`; add check finding/exit, duplicate-current-key, historical-row, and binding-consistency regressions. IN-01, IN-02, IN-03; OUT-03; CN-01, CN-02, CN-03; AC-01, AC-02, AC-03, AC-06.
 
 ### S4 — Batch T004 — result model and projection
 
-> Result-model and result-projection completion only. It establishes the changed record shape and migrates every results constructor before T005 evaluates into that shape.
+> Update result-model and result-projection targets; migrate constructors. IN-04; CN-04; AC-04.
 > Expected review scope: domain approximately 260 changed lines, usecase approximately 460 changed lines, infrastructure has no T004-owned changes; each scope remains below the 500-line ceiling.
 
-- [~] **T004**: After T002 completes the cache/evidence foundation, complete the result-model and result-projection boundary: update `EdgeResolutionOutcome`, `EdgeVerdictRecord`, and `TestObligationResultsInteractor`, including every constructor migration required by the changed record shape. Add result fixtures. T005 consumes this completed record contract for evaluation. IN-04; CN-04; AC-04.
+- [x] **T004**: Update `EdgeResolutionOutcome`, `EdgeVerdictRecord`, and `TestObligationResultsInteractor`; migrate `EvaluateTestObligationsInteractor` constructors; add result fixtures. IN-04; CN-04; AC-04.
 
 ### S5 — Batch T005 — evaluation boundary
 
-> Evaluation completion only. It consumes T004's completed record contract and owns evaluation errors, verdict construction, resolved-evidence handoff, and verifier-error propagation.
+> Update evaluation targets and add fixtures. IN-01, IN-04, IN-05; OUT-04; CN-04; AC-04, AC-05, AC-07.
 > Expected review scope: domain approximately 120 changed lines, usecase approximately 440 changed lines, infrastructure has no T005-owned changes; each scope remains below the 500-line ceiling.
 
-- [ ] **T005**: After T004 establishes the result-record contract, complete the evaluation boundary: update `ObligationEvaluateError` and `EvaluateTestObligationsInteractor`, persist resolved evidence through the migrated cache contract, propagate evaluation errors, and add evaluation fixtures. T006–T008 own final DTO, decode, and write behavior. IN-01, IN-04, IN-05; OUT-04; CN-04; AC-04, AC-05, AC-07.
+- [x] **T005**: Update `ObligationEvaluateError` and `EvaluateTestObligationsInteractor`; add evaluation fixtures. IN-01, IN-04, IN-05; OUT-04; CN-04; AC-04, AC-05, AC-07.
 
 ### S6 — Batch T006 — cache DTO and mapping
 
-> DTO and in-memory codec mapping completion only, including fingerprint-preserving `Legacy`/`Identified` cache-entry state with optional diagnostics. T007 and T008 retain decode and write-path changes.
+> Update cache DTO and in-memory mapping targets. IN-05; OUT-04; CN-04; AC-05.
 > Expected review scope: infrastructure approximately 420 changed lines; each scope remains below the 500-line ceiling.
 
-- [ ] **T006**: After T005, update `ObligationFulfillmentCacheEntryDto` and the in-memory mapping portion of `JsonObligationFulfillmentCacheCodec` for the `Legacy`/`Identified` cache-entry state: preserve every present verifier fingerprint, with optional resolved `bound_tests` carried only as diagnostic evidence. Add focused mapping fixtures for fingerprint-absent legacy rows, fingerprint-only identified rows, and identified rows with diagnostics. T007 owns cache-load decoding and T008 owns cache-file writes. IN-05; OUT-04; CN-04; AC-05.
+- [x] **T006**: Update `ObligationFulfillmentCacheEntryDto` and in-memory `JsonObligationFulfillmentCacheCodec` mapping; add mapping fixtures. IN-05; OUT-04; CN-04; AC-05.
 
 ### S7 — Batch T007 — cache decode
 
-> Cache-load and legacy-decode completion only, constructing `Legacy` for fingerprint-absent rows and `Identified` for fingerprint-present rows with optional diagnostics. T008 retains file-write changes.
+> Update cache-load and legacy-decode targets. IN-05; OUT-04; CN-04; AC-05.
 > Expected review scope: infrastructure approximately 410 changed lines; each scope remains below the 500-line ceiling.
 
-- [ ] **T007**: After T006, update the cache-load and legacy-decode path of `JsonObligationFulfillmentCacheCodec`: decode fingerprint-absent rows as `Legacy`, and decode every fingerprint-present row as `Identified` whether its optional diagnostic `bound_tests` are absent or present. Add focused regressions that prevent fingerprint-only rows from degrading to `Legacy`. T008 owns cache-file write behavior. IN-05; OUT-04; CN-04; AC-05.
+- [x] **T007**: Update `JsonObligationFulfillmentCacheCodec` cache-load and legacy-decode paths; add decode regressions. IN-05; OUT-04; CN-04; AC-05.
 
 ### S8 — Batch T008 — cache write
 
-> Cache-file write completion only, including persistence of fingerprint-preserving `Legacy`/`Identified` cache-entry state in the extracted I/O module and persistence fixtures.
+> Update cache-file write and persistence-fixture targets. IN-05; OUT-04; CN-04; AC-05.
 > Expected review scope: infrastructure approximately 480 changed lines; each scope remains below the 500-line ceiling.
 
-- [ ] **T008**: After T007, update the cache-file write path of `JsonObligationFulfillmentCacheCodec`, including `fulfillment_cache_io`, to persist `Legacy` or `Identified` cache-entry state without coupling verifier identity to optional diagnostic `bound_tests`, and add persistence fixtures. IN-05; OUT-04; CN-04; AC-05.
+- [x] **T008**: Update the `JsonObligationFulfillmentCacheCodec` cache-file write path and `fulfillment_cache_io`; add persistence fixtures. IN-05; OUT-04; CN-04; AC-05.

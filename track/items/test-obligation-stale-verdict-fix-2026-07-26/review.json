@@ -1,1599 +1,6 @@
 {
   "schema_version": 2,
   "scopes": {
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e10064361e4434808d98fa254227646a9765aa1b2cb7f1a6d6693a8455b17c20",
-          "at": "2026-07-26T16:04:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "GO-02 の「評価エラーを黙殺しない」という意図を決定的に証明する AC がない。AC-04 は返却済みの失敗 verdict の schema を検証するだけで、評価処理自体がエラーを返す場合の伝播や非零終了を扱わないため、この目標の一部を未検証のまま完了扱いできる。",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
-              "line": 22,
-              "category": "missing AC coverage for a stated goal"
-            },
-            {
-              "message": "CN-04 の「error 出力が判定根拠を追跡可能にする」は、追跡可能と判定するための必須情報や観測条件を定義していない。IN-05 は cache 行の `bound_tests` だけを具体化しており error 出力は具体化されないため、下流工程が意味を発明しなければ検証できない制約になっている。",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
-              "line": 212,
-              "category": "constraint vague or untestable"
-            }
-          ],
-          "hash": "rvw1:sha256:e10064361e4434808d98fa254227646a9765aa1b2cb7f1a6d6693a8455b17c20",
-          "at": "2026-07-26T16:11:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8ef03a5bdb48ef39010235d2f2846560cd5152efdc6fd1bd0a8e3146db89da5f",
-          "at": "2026-07-26T16:28:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-07 は verifier provider の解決失敗時における `evaluate` のエラー伝播を要求しているが、IN-01〜IN-05 の declared in_scope は cache entry の選択、重複、binding、失敗 verdict schema、cache 診断情報に限られ、provider 解決や評価エラー伝播を含まない。したがって、この AC は宣言された in_scope 外の振る舞いを完了条件にしている。",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
-              "line": 324,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:8ef03a5bdb48ef39010235d2f2846560cd5152efdc6fd1bd0a8e3146db89da5f",
-          "at": "2026-07-26T16:30:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:07677710a91fed0ac49b9cccd00b7c6c49268d6c615cb1a9f4e3d9776c2f73a0",
-          "at": "2026-07-26T16:33:52Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "When no exact current-key entry exists, the fallback uses `iter().find(...)` on only `(edge_id, obligation_id)`, so multiple historical rows make drift classification depend on cache row order. For example, one row with a changed bound-test hash and another with a changed declaration hash produces different reported drift depending on ordering. The fallback must aggregate or otherwise deterministically classify all matching candidates (and fail closed on ambiguity) rather than selecting the first row.",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/check.rs",
-              "line": 539,
-              "category": "orchestration correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:aef173043b579676959fe1365f22763a3afd1f9f320494d13537955943f35015",
-          "at": "2026-07-26T18:10:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c59f8ff80f841d2cc5cfb68937de01062c02b9992ce00951f9e7a833a5006c06",
-          "at": "2026-07-26T18:50:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c59f8ff80f841d2cc5cfb68937de01062c02b9992ce00951f9e7a833a5006c06",
-          "at": "2026-07-26T18:54:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5a80828642febd810e193b3530b5663742abbe35b32ddf24c55fdcae17aca62c",
-          "at": "2026-07-27T00:00:39Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:27546d1a7f8c5cbb58182546242b8c891139635c75b0837badccd5c15ec08f4d",
-          "at": "2026-07-27T00:26:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "同一の完全キーを持つ複数のキャッシュ行があると、ambiguity を即座に伝播して保存前に `evaluate` を終了します。そのため `check` と通常の `evaluate` の両方が恒久的に失敗し、重複 binding を修正しても古い競合行が残るため、復旧には手動のキャッシュ編集・削除が必要です。fail-closed な `check` は維持しつつ、`evaluate` には競合行を再評価して置換できる正常な復旧経路が必要です。",
-              "severity": "P0",
-              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
-              "line": 422,
-              "category": "correctness"
-            },
-            {
-              "message": "waiver cache の保存失敗時、以前の fulfillment cache が `ReevaluationRequired` だった場合に空の `Current` 文書を保存しており、元の状態へロールバックしていません。失敗した評価が absent/legacy 状態を正常な空キャッシュへ変換するため、その後の `check` が再評価要求を見失って通過する可能性があります。以前の load state を忠実に復元できる port 操作、または部分保存を発生させない構成が必要です。",
-              "severity": "P0",
-              "file": "libs/usecase/src/test_obligation/evaluate/records.rs",
-              "line": 43,
-              "category": "data_integrity"
-            }
-          ],
-          "hash": "rvw1:sha256:27546d1a7f8c5cbb58182546242b8c891139635c75b0837badccd5c15ec08f4d",
-          "at": "2026-07-27T00:29:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a09542cc07d4c3c16291f92ac7a857e2d8d2456c5b47ade6892e3148b9e222de",
-          "at": "2026-07-27T00:39:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`save_caches` は waiver cache を先に保存し、その後 fulfillment cache の保存に失敗すると waiver だけが新しい評価結果になります。旧実装の fulfillment rollback を削除したため、`evaluate` がエラーを返した後も2つのキャッシュが不整合になり、次回の `results`/`check` が異なる世代の verdict を組み合わせて扱います。waiver 保存失敗時だけでなく fulfillment 保存失敗時にも整合性を復元するか、両キャッシュを原子的に更新できる設計にしてください。",
-              "severity": "P0",
-              "file": "libs/usecase/src/test_obligation/evaluate/records.rs",
-              "line": 34,
-              "category": "orchestration correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4529645d0483c07bea1d83b102366016fcfd4499b111622bf743a7f4134122ab",
-          "at": "2026-07-27T03:28:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`save_caches` は waiver cache を先に保存し、続く fulfillment cache の保存失敗時に waiver cache をロールバックしません。このため `evaluate` がエラーを返しても waiver だけが新世代になり、次回の `results`/`check` が異なる世代の verdict を組み合わせる不整合状態が残ります。両キャッシュを原子的に更新するか、後段保存失敗時に先行保存を復元してください。",
-              "severity": "P0",
-              "file": "libs/usecase/src/test_obligation/evaluate/records.rs",
-              "line": 34,
-              "category": "orchestration correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:439e6c3e22e7d951daa324153c44eb97984b808a644f88d893107645d9b358e0",
-          "at": "2026-07-27T03:33:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3d1d240dd6f97065b7f982dcee3a42c26b626b84e600bdca1c3884c6bbdc1b66",
-          "at": "2026-07-27T05:56:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`new` が公開引数 `source_scanner` を即座に破棄し、実際の bound-test 読み取りは別途注入された resolver 内の scanner だけで行われます。両者に異なる実装を渡せるため、呼出側が指定した scanner と異なるソースを評価・キャッシュでき、宣言された port wiring が無効です。scanner を単一の依存に統合してください。",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate/mod.rs",
-              "line": 336,
-              "category": "architecture"
-            },
-            {
-              "message": "未解決 edge の共通処理が常に `MissingBinding` を記録しますが、この処理は binding が存在する状態での declaration 欠如や spec anchor 欠如にも使われています。そのため human-escalation payload が原因と修復方法を誤って「binding 不在」と報告します。非 verdict の未解決状態を別 outcome で表すか、実際の原因を渡してください。",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate/verify.rs",
-              "line": 94,
-              "category": "error_semantics"
-            },
-            {
-              "message": "AC-06 の回復テストは absent cache だけを開始状態にしており、旧形式を表す `LegacyRowsMissingBoundTests` を一度も生成しません。したがって legacy cache の check→evaluate→check 回復が壊れてもテストは通ります。旧形式 reason を使う active-track 回復 fixture を追加してください。",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/check_tests.rs",
-              "line": 2727,
-              "category": "test_coverage"
-            },
-            {
-              "message": "`VerifyCacheError::SourceScan` を一律 `MalformedArtifact` に変換しているため、`TestSourceScanError::Io` のような読み取り失敗までデータ破損として公開されます。内部 error の種別に応じて `IoError` と malformed/source-validation error を分けてください。",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/results.rs",
-              "line": 377,
-              "category": "error_handling"
-            }
-          ],
-          "hash": "rvw1:sha256:3d1d240dd6f97065b7f982dcee3a42c26b626b84e600bdca1c3884c6bbdc1b66",
-          "at": "2026-07-27T06:08:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`new` は `source_scanner` を依存として受け取りながら即座に破棄し、実際の bound-test 読み取りは `ResolvedBoundTestsResolver` が内部に保持する別 scanner だけを使います。呼出元が scanner A と scanner B で構成された resolver を渡すと、A の読み取り結果やエラーが黙って無視されます。scanner を単一の依存元にするか、冗長な引数を契約から除いてください。",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate/mod.rs",
-              "line": 336,
-              "category": "orchestration correctness"
-            },
-            {
-              "message": "`record_pending_edge` は、binding が存在するものの declaration や spec anchor を解決できない経路からも呼ばれますが、すべてを `MissingBinding` として記録します。その結果、`HumanEscalationRequired` の構造化 payload が実際の失敗原因と異なり、呼出元へ誤った修復対象を示します。plan に unresolved の原因または lane を保持し、実際に binding がない場合だけ `MissingBinding` を使ってください。",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate/verify.rs",
-              "line": 94,
-              "category": "error semantics"
-            },
-            {
-              "message": "`VerifyCacheError::SourceScan` を無条件に `MalformedArtifact` へ変換しているため、内包された `TestSourceScanError::Io` までキャッシュ破損として報告されます。読み取り不能と不正 artifact は異なる回復経路を持つため、少なくとも `Io` は `IoError` に写像し、parse/source-scan failure も適切な usecase-level 概念として分類してください。",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/results.rs",
-              "line": 377,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:3d1d240dd6f97065b7f982dcee3a42c26b626b84e600bdca1c3884c6bbdc1b66",
-          "at": "2026-07-27T06:09:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:29c49133b542dd79cd92422a00dfae554c121e117ff4a0822098d7d38e9fbab0",
-          "at": "2026-07-27T09:48:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`record_pending_obligation_id` は既存の fulfillment binding が存在するものの obligation を解決できない場合、または obligation に anchor がない場合に到達しますが、`MissingBinding` を記録しています。その domain 契約は「edge に binding がない」なので、`HumanEscalationRequired` が実際とは異なる修復対象を示します。fulfillment の pending、または dangling obligation 専用 outcome として記録してください。",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/evaluate/verify.rs",
-              "line": 65,
-              "category": "error_semantics"
-            },
-            {
-              "message": "AC-06 の回復テストは `saved: None` から `ReevaluationRequired(Absent)` を返すだけで、旧形式または stale な cache 行を一度も check→evaluate→check に通していません。旧行の破棄・再評価処理が壊れてもこのテストは通るため、実際の stale document または旧形式 load を開始状態とする回復 fixture が必要です。",
-              "severity": "P1",
-              "file": "libs/usecase/src/test_obligation/check_tests.rs",
-              "line": 2727,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:29c49133b542dd79cd92422a00dfae554c121e117ff4a0822098d7d38e9fbab0",
-          "at": "2026-07-27T10:00:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d42cf1d1d795f4ecba2f5643ada2971b54a88f0d3c2ce78e0c8c513b8e47350b",
-          "at": "2026-07-27T10:06:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c88692abd9527f6f72e3881201ff08e5e92152aa49f19a086238a09cec2d2bab",
-          "at": "2026-07-27T12:11:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c88692abd9527f6f72e3881201ff08e5e92152aa49f19a086238a09cec2d2bab",
-          "at": "2026-07-27T12:17:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31e8c2e869f1762f097e5915e500d4354ae2669184eea63785f54ca97e020050",
-          "at": "2026-07-27T14:33:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:31e8c2e869f1762f097e5915e500d4354ae2669184eea63785f54ca97e020050",
-          "at": "2026-07-27T14:44:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6bcec9382f7200753f7e0e4bdd9d378adbfe7a3bcfa6013be9de796734d90aa0",
-          "at": "2026-07-27T16:06:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6bcec9382f7200753f7e0e4bdd9d378adbfe7a3bcfa6013be9de796734d90aa0",
-          "at": "2026-07-27T16:09:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2e7546539e20effcbce0b740cb244d56c0554c9f225321c69c926541d7a4ad8",
-          "at": "2026-07-27T16:59:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a2e7546539e20effcbce0b740cb244d56c0554c9f225321c69c926541d7a4ad8",
-          "at": "2026-07-27T17:01:12Z"
-        }
-      ]
-    },
-    "adr": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d3d51cb42df1025cf48a6503969c3aefaf5f9bbc5e58a0c65c8ffcbe7da696c9",
-          "at": "2026-07-26T15:18:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d3d51cb42df1025cf48a6503969c3aefaf5f9bbc5e58a0c65c8ffcbe7da696c9",
-          "at": "2026-07-26T15:20:50Z"
-        }
-      ]
-    },
-    "other": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:33b9233ae8f9244213b4be2560f3987a54b3646a0800039406aaebe7aeab783e",
-          "at": "2026-07-26T16:04:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:33b9233ae8f9244213b4be2560f3987a54b3646a0800039406aaebe7aeab783e",
-          "at": "2026-07-26T16:08:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6a4b34b1417bea7c91da4d865bb9138d95766f9b0953c9c023665d81addc5105",
-          "at": "2026-07-26T18:10:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The AC-03 binding cites only `test_binding_consistency_error_carries_edge_id`, which merely constructs and pattern-matches the error variant. It never runs `check` with a voluntary binding on a derived-obligation edge or verifies the required finding/nonzero failure, so AC-03 is not covered. Bind an actual gate-level regression test (or remove this premature binding until one exists).",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/test-bindings.json",
-              "line": 18,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:6a4b34b1417bea7c91da4d865bb9138d95766f9b0953c9c023665d81addc5105",
-          "at": "2026-07-26T18:15:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:46672621ea57b12f35ef34a895607e5f2c5ed82eac3064fe333d0c02a2f26392",
-          "at": "2026-07-26T18:50:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:46672621ea57b12f35ef34a895607e5f2c5ed82eac3064fe333d0c02a2f26392",
-          "at": "2026-07-26T18:52:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2e4d252a92c4d753394639c5e0934aa469dac5b9e9cb25a5f36e843fdf89d7df",
-          "at": "2026-07-26T19:04:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2e4d252a92c4d753394639c5e0934aa469dac5b9e9cb25a5f36e843fdf89d7df",
-          "at": "2026-07-26T19:05:54Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a3a8f49f1daae1241532f3d4b74e2b57bd6158a63732b84c588f029c33e4e837",
-          "at": "2026-07-26T19:38:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a3a8f49f1daae1241532f3d4b74e2b57bd6158a63732b84c588f029c33e4e837",
-          "at": "2026-07-26T19:39:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7373b1a97226fc65b412ba5f6740dbc1787219e6cc42b158fd83949f3e001955",
-          "at": "2026-07-27T00:00:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The IN-04 binding cites `test_cache_dto_persists_resolved_bound_test_locations`, but that test only checks `bound_tests` length. It never verifies the required nested `verdict.reason` shape, rejection of `verdict_reason`, or non-empty failure reasons, so it cannot fulfill IN-04.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/test-bindings.json",
-              "line": 50,
-              "category": "testing"
-            },
-            {
-              "message": "The AC-04 binding uses the same unrelated `bound_tests` persistence test. AC-04 requires coverage that the output schema/domain/encoder omit `entries[].verdict_reason` and retain a required non-empty `entries[].verdict.reason`; this binding leaves that behavior uncovered.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/test-bindings.json",
-              "line": 52,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:7373b1a97226fc65b412ba5f6740dbc1787219e6cc42b158fd83949f3e001955",
-          "at": "2026-07-27T00:10:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7373b1a97226fc65b412ba5f6740dbc1787219e6cc42b158fd83949f3e001955",
-          "at": "2026-07-27T00:26:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The IN-04 binding cites `test_cache_dto_persists_resolved_bound_test_locations`, but that test only checks `bound_tests` length. It does not verify the required nested `verdict.reason` shape, reject `verdict_reason`, or require a non-empty failure reason, so IN-04 remains uncovered.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/test-bindings.json",
-              "line": 50,
-              "category": "testing"
-            },
-            {
-              "message": "The AC-04 binding cites the same unrelated `bound_tests` persistence test. AC-04 requires coverage that the schema/domain/encoder omit `entries[].verdict_reason` and preserve a required non-empty `entries[].verdict.reason`; this binding does not test those guarantees.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/test-bindings.json",
-              "line": 52,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:7373b1a97226fc65b412ba5f6740dbc1787219e6cc42b158fd83949f3e001955",
-          "at": "2026-07-27T00:27:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b3a5d132d087754d306a1e303604a3edc632b0b281fbe32e8a7479ed897e8651",
-          "at": "2026-07-27T03:28:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b3a5d132d087754d306a1e303604a3edc632b0b281fbe32e8a7479ed897e8651",
-          "at": "2026-07-27T03:30:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b5e77d0b95c64a5d6da16d6659d25858c03baca33936553642ebdfe61c60fd9e",
-          "at": "2026-07-27T05:56:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b5e77d0b95c64a5d6da16d6659d25858c03baca33936553642ebdfe61c60fd9e",
-          "at": "2026-07-27T05:59:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:500d7c3cf072f84d7affcd37ba61711607bf09b3fe1bc6e26a7993f7dc9558dd",
-          "at": "2026-07-27T09:48:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:500d7c3cf072f84d7affcd37ba61711607bf09b3fe1bc6e26a7993f7dc9558dd",
-          "at": "2026-07-27T09:54:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:438b42e14d097980f1350a9e69b61a893923f9a171b804aebc5d2d70b205dba3",
-          "at": "2026-07-27T12:11:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:438b42e14d097980f1350a9e69b61a893923f9a171b804aebc5d2d70b205dba3",
-          "at": "2026-07-27T12:14:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:afa17ef0c63a705f0e7c96b3f63ee11a709f215878a25d2b2f59ff03f0205e86",
-          "at": "2026-07-27T14:33:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:afa17ef0c63a705f0e7c96b3f63ee11a709f215878a25d2b2f59ff03f0205e86",
-          "at": "2026-07-27T14:40:24Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:759f670952ae119fcd9bdadb7cb1510ba4196333a4ea505f310970cf93ea965e",
-          "at": "2026-07-27T16:06:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:759f670952ae119fcd9bdadb7cb1510ba4196333a4ea505f310970cf93ea965e",
-          "at": "2026-07-27T16:08:07Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:80013f452f0f01440cf9a383f2789d995fb54618cdf5c172fe3121f036c46c69",
-          "at": "2026-07-27T16:59:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:80013f452f0f01440cf9a383f2789d995fb54618cdf5c172fe3121f036c46c69",
-          "at": "2026-07-27T17:01:47Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:356c34dd97f2792d97ec6664f66ccdf5d7d934358361962e7e0b72e5b5666173",
-          "at": "2026-07-26T16:04:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`domain::EdgeVerdictRecord` removes `verdict_reason` without adding a nested verdict. Its remaining `outcome: EdgeResolutionOutcome` carries only the failure category, so evaluation failure records cannot represent the required `entries[].verdict.reason` from IN-04/AC-04. Declare a companion modification that preserves the complete typed verdict and its reason.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 219,
-              "category": "missing_companion_modify"
-            },
-            {
-              "message": "`domain::ObligationFulfillmentCacheEntry::new` requires `bound_tests`, but pre-track cache rows do not contain that newly added field, and the referenced cache port exposes no typed legacy-row/migration outcome. Such rows cannot be decoded into the declared domain type, preventing `evaluate` from loading and rewriting them as required by AC-06 without treating the cache as generically malformed.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 807,
-              "category": "missing_companion_modify"
-            },
-            {
-              "message": "`domain::ObligationFulfillmentCacheEntry::new` accepts the key and diagnostic `bound_tests` independently. A caller can therefore pair a key whose `bound_tests_set_hash` was computed from set A with diagnostic set B, creating a cache row whose recorded evidence contradicts its key. Group the locations and their derived hash behind one validated type/factory while keeping locations outside equality semantics.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 795,
-              "category": "state_shape_smell"
-            },
-            {
-              "message": "Voluntary-binding enforcement has conflicting owners: `domain::ObligationsDocument` declares `validate_voluntary_binding` and `domain::TestBindingConsistencyError` says that method constructs the rejection, while `usecase::CheckTestObligationsInteractor` claims to validate it and `usecase::EvaluateTestObligationsInteractor` claims to reject it. Name the domain method as the sole enforcement owner and describe the interactors as invoking/propagating it.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
-              "line": 27,
-              "category": "enforcement_owner_contradiction"
-            },
-            {
-              "message": "`domain::ObligationFulfillmentCachePort` models external cache load/save I/O as fully synchronous, but its docs do not acknowledge or justify that color choice. The contract needs to record why blocking I/O is intentional, or expose an asynchronous port before adapters and callers are fixed to the synchronous shape.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 138,
-              "category": "sync_async_color_mismatch"
-            },
-            {
-              "message": "The TypeEntries for `usecase::CheckTestObligationsInteractor`, `usecase::EvaluateTestObligationsInteractor`, and `usecase::TestObligationResultsInteractor` are marked `modify`, although their declared public type and constructor signatures exactly match the rustdoc baseline. Only their application-service implementations change, already represented by the separate trait-impl entries; these TypeEntries should be `reference`.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
-              "line": 26,
-              "category": "action_incoherent_with_diff"
-            },
-            {
-              "message": "`infrastructure::JsonObligationFulfillmentCacheCodec` is marked `modify`, but its declared struct and `new(PathBuf) -> Self` surface are identical to the rustdoc baseline. The behavioral port-implementation change is represented separately, and the DTO carries the actual structural wire change, so this TypeEntry should be `reference`.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
-              "line": 56,
-              "category": "action_incoherent_with_diff"
-            },
-            {
-              "message": "The docs for `domain::EdgeVerdictRecord`, `domain::FulfillmentCacheLookupError`, `domain::ObligationCheckError`, `domain::ObligationEvaluateError`, `domain::ObligationFulfillmentCacheDocument`, `domain::ObligationFulfillmentCacheEntry`, `domain::ObligationsDocument`, and `domain::TestBindingConsistencyError` restate upstream behavioral rules in prose. Replace these restatements with concise type/change identification and rely on their `spec_refs`, as required by `no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 186,
-              "category": "upstream_restatement"
-            },
-            {
-              "message": "The docs for `infrastructure::JsonObligationFulfillmentCacheCodec` and `infrastructure::ObligationFulfillmentCacheEntryDto` repeat the upstream contracts for nested reasons, diagnostic-only bound tests, and lookup delegation. Those behaviors must remain in the cited spec anchors rather than being duplicated in catalogue prose.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
-              "line": 57,
-              "category": "upstream_restatement"
-            },
-            {
-              "message": "The docs for all three usecase interactors restate cache-selection, voluntary-binding, diagnostic-persistence, and verdict-reason behavior from the spec. Reduce the docs to type/change identification and anchor through `spec_refs` instead of duplicating the behavioral contract.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
-              "line": 27,
-              "category": "upstream_restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:356c34dd97f2792d97ec6664f66ccdf5d7d934358361962e7e0b72e5b5666173",
-          "at": "2026-07-26T16:20:49Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:20a70d74772ba4d812cbd18bf4d9a69ec1ef9b76863a1fc03a66f2485493f5eb",
-          "at": "2026-07-26T16:55:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`domain::ResolvedBoundTests::new` receives only `NonEmptyTestLocations` but exposes a `BoundTestsSetHash`. The existing hash is calculated from scanned test bodies through the usecase `ContentHasherPort`; locations contain neither those bodies nor their hash. This signature therefore cannot construct the required value without fabricating a different hash, causing valid cache entries to fail `try_new` or carry incorrect identity. Accept the already computed `BoundTestsSetHash` alongside the locations.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 1395,
-              "category": "state_shape_smell"
-            },
-            {
-              "message": "`domain::ResolvedBoundTests` declares `new`, `set_hash`, and `locations` twice: in the top-level `inherent_impls` entry and again in `types.ResolvedBoundTests.methods`. The v5 encoder materializes these as separate inherent impl blocks, while the implementation can contain only one method set, so the final catalogue/implementation contract will diverge. Keep the signatures in one declaration location.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 5,
-              "category": "duplicated_structural_declaration"
-            },
-            {
-              "message": "`domain::ResolvedBoundTests` restates the IN-05/CN-04 contract by asserting in prose that locations are diagnostic data outside equality. Under `no-upstream-restatement.md`, retain only a concise type-purpose label and leave this behavioral/identity rule to `spec_refs`.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 1378,
-              "category": "upstream_restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:20a70d74772ba4d812cbd18bf4d9a69ec1ef9b76863a1fc03a66f2485493f5eb",
-          "at": "2026-07-26T17:06:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cab2f11a64a8c2a487761c6bac3de36a15df00431cba64d494d7c3e38b07a841",
-          "at": "2026-07-26T17:16:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cab2f11a64a8c2a487761c6bac3de36a15df00431cba64d494d7c3e38b07a841",
-          "at": "2026-07-26T17:25:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c9e36d717b1643215ddb8aafb283de062d1b1d00b8c701c384c6780c82a69cf1",
-          "at": "2026-07-27T03:28:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`infrastructure::JsonObligationFulfillmentCacheCodec` and `infrastructure::ObligationFulfillmentCacheEntryDto` cite `IN-04`/`AC-04`, but those anchors govern removing `entries[].verdict_reason` from the `evaluate` result envelope. These entries encode the fulfillment-cache artifact, whose change adds diagnostic `bound_tests`; it never contained that result-envelope field. Remove the off-topic references to avoid false catalogue→spec edges.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
-              "line": 114,
-              "category": "SoT integrity: spec_refs off-topic"
-            }
-          ],
-          "hash": "rvw1:sha256:c9e36d717b1643215ddb8aafb283de062d1b1d00b8c701c384c6780c82a69cf1",
-          "at": "2026-07-27T03:38:10Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`infrastructure::JsonObligationFulfillmentCacheCodec::new` depends directly on the concrete usecase type `usecase::test_obligation::bound_tests::ResolvedBoundTestsResolver` (line 104). This reverses the layer dependency direction and bypasses a port, violating dependency inversion; the adapter should consume an abstraction owned by the usecase/domain boundary.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
-              "line": 104,
-              "category": "Dependency Inversion violation"
-            }
-          ],
-          "hash": "rvw1:sha256:00a91aacbe91702af0f4039638e9150424bb69a051248a49119b8b18f9899bee",
-          "at": "2026-07-27T05:56:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c12ad6f8809e101cc3d79bda03aed78ddca86d0af20a55a16d2522b41af95dc",
-          "at": "2026-07-27T07:24:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`JsonObligationFulfillmentCacheCodec -> usecase::test_obligation::ports::ObligationFulfillmentCachePort` is marked `modify`, but the rustdoc baseline contains only the distinct domain-port implementation. Trait-impl identity includes the external trait path, so this new usecase-port implementation must be `add`.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
-              "line": 18,
-              "category": "SoT integrity: action incoherent"
-            },
-            {
-              "message": "`infrastructure::Sha256ContentHasher` is marked `modify`, although its struct and `new() -> Self` signature are identical to the baseline. The only new surface is already represented by the separate `BoundTestsSetHasherPort` trait-impl entry; the type entry should be `reference`.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
-              "line": 162,
-              "category": "SoT integrity: action incoherent"
-            },
-            {
-              "message": "`ResolvedBoundTestsResolver` injects scanner and hasher ports and implements `ResolvedBoundTestsResolverPort`, but it is classified as `UseCase` while that trait is classified as `SecondaryPort`. R2/R3 require injected usecase behavior exposed through a service boundary to use the `Interactor` + `ApplicationService` pairing; a `SecondaryPort` is a driven boundary implemented by infrastructure. Reclassify the pair or remove the unnecessary trait boundary.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
-              "line": 204,
-              "category": "SoT integrity: role/kind mismatch"
-            },
-            {
-              "message": "`ResolvedBoundTestsResolverPort::resolve` explicitly scans source and returns `TestSourceScanError`, implying filesystem I/O, but is declared synchronous and its docs do not acknowledge that choice. Make the port asynchronous or document the bounded synchronous-I/O decision.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
-              "line": 211,
-              "category": "API shape: sync/async color mismatch"
-            },
-            {
-              "message": "`ResolvedBoundTestsResolution::derive` accepts `source` and `locations` independently and permits the hashing closure to return a hash unrelated to either. It therefore admits evidence whose hash, source, and diagnostic locations describe different inputs, contradicting the claimed source-coupled invariant. Use an opaque scanner result or a distinct persisted-rehydration type/API.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 92,
-              "category": "API shape: state-shape smell"
-            },
-            {
-              "message": "The docs for `domain::ResolvedBoundTests` and `domain::ResolvedBoundTestsResolution` reproduce the exact-source assembly and hashing behavior referenced by IN-05/CN-04/AC-05. The no-upstream-restatement convention requires a short purpose label with `spec_refs`, not a downstream copy of the behavior contract.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 1445,
-              "category": "SoT integrity: upstream restatement"
-            },
-            {
-              "message": "The docs for `usecase::BoundTestsSetHasherPort` and `usecase::ResolvedBoundTestsResolver` narrate the scan → exact-source hash → domain derivation choreography already owned by IN-01/IN-05/CN-04/AC-05. Replace that prose with short purpose labels and rely on `spec_refs`.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
-              "line": 75,
-              "category": "SoT integrity: upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:3c12ad6f8809e101cc3d79bda03aed78ddca86d0af20a55a16d2522b41af95dc",
-          "at": "2026-07-27T07:39:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bd8f47b2070372a5a70b342cac2dacc14021cf75e3f919ac07d3dc926dcbbcc2",
-          "at": "2026-07-27T09:48:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ScannedBoundTests::new(source, locations)` merely packages two independently supplied values, while `ResolvedBoundTestsResolution::derive(scanned, H)` permits `H` to ignore `scanned`. A caller can therefore combine source A, locations B, and hash C; the current cache codec does exactly this with placeholder source and a key-derived hash. The wrapper still permits evidence whose diagnostic locations did not produce its hash. Use a trusted construction path or a distinct persisted-rehydration type.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 133,
-              "category": "API shape: state-shape smell"
-            },
-            {
-              "message": "`VerifyCacheError::SourceScan` has no production constructor. The sole fulfillment-cache adapter deliberately does not invoke its injected `ResolvedBoundTestsResolverPort`, and no other production cache adapter can obtain this error; only consumers/tests match or construct it. Remove the variant or declare an actual source-scan owner and call path.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 1668,
-              "category": "Cross-layer contract: unconstructible error variant"
-            },
-            {
-              "message": "`JsonObligationFulfillmentCacheCodec::new` requires a `ResolvedBoundTestsResolverPort` application service even though the adapter's responsibility is cache wire I/O and cache decoding intentionally must not rescan historical sources. This forces an unrelated, unused source-resolution collaborator into every codec instance. Keep resolution in usecase orchestration and remove the dependency from the secondary adapter.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
-              "line": 103,
-              "category": "SOLID: Single Responsibility violation"
-            }
-          ],
-          "hash": "rvw1:sha256:bd8f47b2070372a5a70b342cac2dacc14021cf75e3f919ac07d3dc926dcbbcc2",
-          "at": "2026-07-27T10:01:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bd8f47b2070372a5a70b342cac2dacc14021cf75e3f919ac07d3dc926dcbbcc2",
-          "at": "2026-07-27T12:11:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`infrastructure::JsonObligationFulfillmentCacheCodec` now depends on `ResolvedBoundTestsResolverPort`, combining JSON persistence with live source resolution. Consequently a historical row whose diagnostic location is unreadable or now hashes differently can fail document loading before `lookup_current` selects an otherwise valid current key/fingerprint. This promotes IN-05/CN-04 diagnostic-only `bound_tests` into a validity gate and violates AC-01/AC-05. Decode persisted locations independently and keep source resolution on the evaluation/write path.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
-              "line": 103,
-              "category": "single-responsibility-violation"
-            },
-            {
-              "message": "`domain::ScannedBoundTests::new` accepts independently constructible `BoundTestsSource` and `NonEmptyTestLocations` values without validating their provenance. It therefore admits the illegal state “source from scan A paired with locations from scan B”; `ResolvedBoundTestsResolution::derive` then legitimizes that pair as resolved evidence. Restrict construction to the resolver/factory that performs the scan or otherwise encode the shared provenance.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 133,
-              "category": "state-shape-smell"
-            },
-            {
-              "message": "`domain::VerifyCacheError` is shared by the existing `WaiverCachePort::load`, but the newly declared `FulfillmentCacheEntry` and `SourceScan` variants are structurally impossible for that waiver-only JSON/I/O operation. Half of the error vocabulary is therefore unreachable for that method, and the generic docs do not declare or justify a producible subset. Introduce a fulfillment-specific load error or narrow the waiver method's error type.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 1633,
-              "category": "per-method-error-imprecision"
-            }
-          ],
-          "hash": "rvw1:sha256:bd8f47b2070372a5a70b342cac2dacc14021cf75e3f919ac07d3dc926dcbbcc2",
-          "at": "2026-07-27T12:20:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:72bd03e1aab7b48e7a9ca4585c671f9b8538845bfab75a5b8a24ed9babf2097e",
-          "at": "2026-07-27T14:34:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`domain::ObligationFulfillmentCacheEntry::new` accepts `verifier_fingerprint` and `bound_tests` as independent `Option`s, conflating legacy and current rows. It admits states such as diagnostics present without a fingerprint and allows a newly evaluated current row to omit the required diagnostics. Represent legacy/current row states with a dedicated enum or distinct construction types so these combinations are unrepresentable.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 893,
-              "category": "state-shape-smell"
-            },
-            {
-              "message": "`domain::ObligationFulfillmentCacheEntry.docs` restates the IN-02/IN-05/CN-04 contract that diagnostics are optional and identity is the complete key plus fingerprint. Per `no-upstream-restatement.md`, retain only a short identifying noun phrase and rely on `spec_refs` for that behavior.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 860,
-              "category": "upstream-restatement"
-            },
-            {
-              "message": "`infrastructure::JsonObligationFulfillmentCacheCodec.docs` reproduces the upstream decoding, diagnostic-only, legacy-retention, and duplicate-detection behavior instead of merely identifying the adapter. Replace this behavioral sentence with a short noun phrase and leave the contract to IN-05/CN-04/AC-05/AC-06.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
-              "line": 77,
-              "category": "upstream-restatement"
-            },
-            {
-              "message": "`infrastructure::ObligationFulfillmentCacheEntryDto.docs` restates the optional-diagnostics and legacy-identity behavior from IN-05/AC-05. The catalogue should identify the DTO briefly and reference those anchors rather than maintain a second prose contract.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
-              "line": 126,
-              "category": "upstream-restatement"
-            },
-            {
-              "message": "`usecase::ObligationFulfillmentCachePort.docs` repeats the full load discipline—retaining legacy rows, avoiding scans, and preserving ambiguity detection—from IN-01/IN-05/AC-06. Keep only the local synchronous-port identification/rationale and defer behavioral details to `spec_refs`.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
-              "line": 158,
-              "category": "upstream-restatement"
-            },
-            {
-              "message": "`usecase::FulfillmentCacheLoadError` duplicates the referenced `domain::VerifyCacheError`: both contain only `Io(DiagnosticMessage)` and `MalformedJson(DiagnosticMessage)` and express the same cache-loading failures. This creates parallel error vocabulary and conversion code without distinct structure or invariants; reuse the existing error or introduce genuinely operation-specific detail.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
-              "line": 485,
-              "category": "duplicated-structural-declaration"
-            },
-            {
-              "message": "`usecase::ResolvedBoundTestsResolverPort::resolve` performs source-scanner I/O and returns `TestSourceScanError`, but it is fully synchronous and the entry docs do not acknowledge why blocking source reads are acceptable or bounded. Document the synchronous execution boundary or make the port asynchronous.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
-              "line": 218,
-              "category": "sync-async-color-mismatch"
-            }
-          ],
-          "hash": "rvw1:sha256:72bd03e1aab7b48e7a9ca4585c671f9b8538845bfab75a5b8a24ed9babf2097e",
-          "at": "2026-07-27T14:45:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9eb82bcce01d71a4b38470595a7c140dcfc1e2e5025f0513c8b885d9a9ebf76d",
-          "at": "2026-07-27T16:06:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`domain::ObligationFulfillmentCacheEntryState` couples verifier identity to diagnostic availability: `Legacy` carries nothing, while `Current` requires both `verifier_fingerprint` and `bound_tests`. The persistence DTO permits these fields independently, so a previous-format row with a valid fingerprint but absent diagnostic `bound_tests` is collapsed to `Legacy` and loses the fingerprint. That makes diagnostic presence affect full-key/fingerprint lookup despite CN-04 declaring diagnostics observational only. Preserve fingerprint identity independently, for example with an identified state whose `bound_tests` remains optional.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 995,
-              "category": "state-shape-smell"
-            }
-          ],
-          "hash": "rvw1:sha256:9eb82bcce01d71a4b38470595a7c140dcfc1e2e5025f0513c8b885d9a9ebf76d",
-          "at": "2026-07-27T16:09:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:df58ffacfd61b386bbd373df7da7795396d70fe52b05de37a305219181fd8a23",
-          "at": "2026-07-27T16:59:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ObligationFulfillmentCacheEntryState.docs` restates CN-04’s behavioral contract by asserting that bound-test diagnostics do not affect fingerprint lookup. Keep this downstream documentation to the type’s local purpose plus an anchor reference, leaving lookup-selection behavior in `spec.json`, as required by `no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
-              "line": 989,
-              "category": "upstream-restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:df58ffacfd61b386bbd373df7da7795396d70fe52b05de37a305219181fd8a23",
-          "at": "2026-07-27T17:04:04Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b49d83e835db7640f69abb63e15ef81ef614cf7ed9108e6dd914b36fc20328f5",
-          "at": "2026-07-27T17:17:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b49d83e835db7640f69abb63e15ef81ef614cf7ed9108e6dd914b36fc20328f5",
-          "at": "2026-07-27T17:19:03Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:db35833fa210981bbc93e3e1892797d6ede808d4fbf4c215801e238719a239cb",
-          "at": "2026-07-27T00:00:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:db35833fa210981bbc93e3e1892797d6ede808d4fbf4c215801e238719a239cb",
-          "at": "2026-07-27T00:04:13Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a7b8878e555bfdd2a32213e72cb197bdc24ea3b87be2360187025cffc4a1dbf6",
-          "at": "2026-07-27T05:56:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:a7b8878e555bfdd2a32213e72cb197bdc24ea3b87be2360187025cffc4a1dbf6",
-          "at": "2026-07-27T06:00:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e9f6a163fd3741e801f9c74be5aae601218a176646daa53695ddbaa6f7dbf86e",
-          "at": "2026-07-27T09:48:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e9f6a163fd3741e801f9c74be5aae601218a176646daa53695ddbaa6f7dbf86e",
-          "at": "2026-07-27T09:54:55Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2ec9f224ba6ac1469b045aed67f5323a91fea76407e224bddd93e6699b480af5",
-          "at": "2026-07-27T00:00:44Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2ec9f224ba6ac1469b045aed67f5323a91fea76407e224bddd93e6699b480af5",
-          "at": "2026-07-27T00:04:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:6dbcba224c996ff437b21dc03755c00e76b55159ba7f054bf6805f3f19e94801",
-          "at": "2026-07-27T03:28:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`load` は完全キーで current row を選ぶ前に、全 persisted row の診断用 `bound_tests` を現行 worktree で再走査しています。同じ test location の body 変更後に old-hash の historical row と new-hash の current row が共存すると、historical row も new hash に解決され、この分岐が cache 全体を `ReevaluationRequired` にするため、有効な current verdict があっても `check` が失敗します。historical test が削除済みなら `SourceScan` error となり、`evaluate` による自動回復もできません。診断情報で全 document を失効させず、三つ組＋fingerprint に一致する候補を historical rows から独立して扱ってください。",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 313,
-              "category": "adapter correctness"
-            },
-            {
-              "message": "JSON 由来の `entries` と各 `bound_tests` は件数上限がない一方、decoder は各 row/location を resolver に渡します。本番 scanner は location ごとにファイル読取と Rust parse を行うため、大きな cache artifact で無制限の filesystem I/O と parsing を発生させられます。artifact、entry、location の上限を検証してから source resolution を行ってください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 269,
-              "category": "unbounded I/O"
-            }
-          ],
-          "hash": "rvw1:sha256:6dbcba224c996ff437b21dc03755c00e76b55159ba7f054bf6805f3f19e94801",
-          "at": "2026-07-27T03:33:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`save` は byte 上限しか検証せず、`load` だけが entry 数と entry ごとの bound-test 数を制限しています。そのため domain 上は有効な 1,025 entries または 65 bound tests の document を 4 MiB 未満で正常保存した後、自身の `load` が `MalformedJson` として拒否します。また上限検査前の `document_to_dto` が無制限に収集します。保存前にも同じ構造上限を検証してください。",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 217,
-              "category": "adapter correctness"
-            },
-            {
-              "message": "`O_NOFOLLOW` は最終 component しか保護しません。事前の `reject_symlinks_below` 後に track directory を symlink へ差し替えると、この pathname-based `open` は ancestor symlink を辿って trusted items root 外の cache を開けます。既存の `ref_verify::guarded_io::open_guarded_path` と同様、trusted-root の directory handle から各 component を `openat(..., O_DIRECTORY|O_NOFOLLOW)` で固定してください。",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 405,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "resolver の全エラーを `let Ok(...)` で捨てて row absence に変換しています。permission failure や Rust parse failure まで stale historical row と区別されず、adapter の I/O failure が型付きエラーとして伝播しません。無視可能な stale 状態だけを明示的に分類し、それ以外の `TestSourceScanError` は `VerifyCacheError` へ伝播してください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 291,
-              "category": "error handling"
-            },
-            {
-              "message": "regular-file 検査は `open` 後ですが、Unix の open flags に `O_NONBLOCK` がありません。cache path が FIFO の場合は symlink guardを通過し、metadata/byte-cap 検査へ到達する前に無期限 block します。既存の `read_output_last_message_at` と同様に nonblocking で開いてから file type を検証してください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 405,
-              "category": "unbounded I/O"
-            }
-          ],
-          "hash": "rvw1:sha256:dec546e492fa2e5aa7dcd5d85d3849252f569c9b1dbf6767643c7ccbb380eb34",
-          "at": "2026-07-27T03:47:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`bound_tests` が無い行や、再走査した hash が persisted key と異なる行を `Ok(None)` で削除してから document を構築しています。このため診断専用の `bound_tests` が full-key candidate 集合を変更します。同一 edge / obligation / 三つ組 key / fingerprint を持つ矛盾した2行の片方だけで `bound_tests` を省略・変更すると、その行が消えて `lookup_current` は ambiguity を検出せず、残った verdict を採用できます。full identity の重複は診断情報を除外する前に fail-closed で検出し、異なる full key の historical row だけを独立して無視してください。",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 297,
-              "category": "adapter correctness"
-            },
-            {
-              "message": "欠落 source の判定を `TestSourceScanError::Io` の diagnostic 文字列との完全一致で行っています。同じ文言を持つ実際の I/O failure も row absence として黙って捨てられ、文言変更だけでも欠落状態の扱いが変わります。`NotFound` などの型付き variant／outcome を用意し、それだけを回復可能状態として扱ってください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 314,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:b4104e88ed52d328d0676a75fd861d6a524f61c86fdd488496815366da954e25",
-          "at": "2026-07-27T03:58:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aea33ffe6f31d668aa586ce30802242c62c8cd9504806a00c7ea69c8d35c08c4",
-          "at": "2026-07-27T05:56:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`document_from_dto` は全 persisted row を `entry_from_dto(...)?` で再検証するため、`bound_tests` を持たない旧形式行、source が削除された historical 行、または現行 source hash と old key が異なる historical 行が1件でもあると、完全キー照合前に cache 全体を `MalformedJson` / `SourceScan` で拒否します。有効な current row が共存していても利用できず、さらに `evaluate` も同じ `load` error を伝播するため、AC-06 が要求する通常の再評価による旧 cache の自動置換も実行できません。診断用 `bound_tests` を unrelated historical full keys の document-wide 有効性条件にせず、full-identity 重複は fail-closed で保持・検出しながら current candidate を独立して扱ってください。",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 270,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:aea33ffe6f31d668aa586ce30802242c62c8cd9504806a00c7ea69c8d35c08c4",
-          "at": "2026-07-27T06:03:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "全 persisted row を `entry_from_dto` で検証しているため、新設された診断用 `bound_tests` がない旧形式 row、source が削除された historical row、または現行 source hash と key が異なる historical rowのいずれか1件で cache 全体がエラーになります。`evaluate` も同じ `load` エラーを伝播するので、旧/stale cache を通常の再評価で置換できず、有効な current row が共存していても利用できません。診断情報を document-wide validity gate にせず、full identity の重複は ambiguity として保持しつつ、current 候補と無関係な historical row から独立して回復できるようにしてください。",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 270,
-              "category": "adapter correctness"
-            },
-            {
-              "message": "read/write の guarded-open helper は `cfg(not(unix))` で常に `Unsupported` を返すため、Windows では fulfillment-cache port の既存 cache load と全 save が失敗します。同じ infrastructure 層の waiver-cache adapter は Windows の reparse-point 拒否を実装しており、round-trip test も Unix 限定ではありません。Windows でも descriptor/reparse-point を使った fail-closed open を実装するか、port 自体を明示的に対応 platform へ限定してください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 473,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:aea33ffe6f31d668aa586ce30802242c62c8cd9504806a00c7ea69c8d35c08c4",
-          "at": "2026-07-27T06:04:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "On Windows, the guarded cache I/O ignores `trusted_root` and opens `path` directly (`let _ = trusted_root; ... open(path)`), while the write path calls `create_dir_all(parent)` before its symlink check. This does not enforce that the resolved path remains beneath the trusted root and leaves a symlink/junction race that can redirect cache reads or writes outside the intended items directory. Implement descriptor/reparse-point-pinned traversal or an equivalent fail-closed root-containment check for Windows.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
-              "line": 166,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:2cf5d750491091682127cef0d7889f99bd6fb68c0b77133974fe2e49a25b3928",
-          "at": "2026-07-27T09:48:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fc2a8f774738c86f690f761c2837f4e0b960a84958e535b88c9befb62ecbe622",
-          "at": "2026-07-27T09:52:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`document_from_dto` は `entry_from_dto` の全エラーを `if let Ok(Some(...))` で黙って行の削除へ変換します。同一の完全 identity を持つ2行の片方だけで `bound_tests` を不正にすると、その行が消えて ambiguity が検出されず、残った verdict が採用されます。明示的に分類された legacy/historical 状態以外は fail-closed で拒否してください。",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 285,
-              "category": "adapter correctness"
-            },
-            {
-              "message": "`entry_from_dto` は注入された resolver を無視し、固定文字列を `ScannedBoundTests` として作りながら、hash closure では wire 上の key hash をそのまま返しています。これにより任意の persisted location と hash が source-derived な `ResolvedBoundTests` として受理され、`try_new` の evidence 検証が恒真になります。persisted diagnostics を表す別の型／constructor を使用し、source provenance を捏造しないでください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 330,
-              "category": "broken invariant"
-            },
-            {
-              "message": "Windows の read は `trusted_root` を無視して pathname を直接開き、write も `create_dir_all` と事前検査後に pathname を開きます。`FILE_FLAG_OPEN_REPARSE_POINT` が保護するのは最終 component だけなので、ancestor junction の差し替えにより trusted root 外のファイルを読み取り、または truncate できます。各 component を handle-relative に固定するなど、root containment を原子的に保証してください。",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
-              "line": 170,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:9afd8f2c7b75e9e7b2f3428ed8e0e52d3d381cad0b64d6bc4657010f94a5ed31",
-          "at": "2026-07-27T10:06:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8f40cc3f94606038a03ce40e42396cc7dbdf7ea8e8936224bc316ba531dca0d9",
-          "at": "2026-07-27T12:11:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`entry_from_dto` は `bound_tests` を持つ全 persisted row を現行 worktree で再走査します。同じ location の source が更新された後、old hash の historical row と valid current row が共存すると、historical row の再計算 hash が persisted key と一致せず cache 全体がエラーになります。削除済み historical test でも `SourceScan` となるため、有効な current verdict の利用と通常再評価による回復を妨げます。診断情報を document-wide validity 条件にせず、unrelated historical identities から current lookup を独立させてください。",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 330,
-              "category": "adapter correctness"
-            },
-            {
-              "message": "`legacy_historical_entry` は `bound_tests` がないだけで row を identity の検証前に削除します。旧形式にも三つ組 key と fingerprint は存在するため、有効な row と同じ完全 identity を持つ legacy row が共存すると、その重複が消えて `lookup_current` の ambiguity を回避できます。`bound_tests` は lookup identity ではないため、raw full identity の重複を先に fail-closed で検出してください。",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 296,
-              "category": "adapter correctness"
-            },
-            {
-              "message": "非 Unix では guarded read/write が常に `Unsupported` を返しますが、adapter と port implementation は全 platform で構築可能なままです。そのため Windows では既存 cache を読み込めず、評価結果も一切保存できません。安全な Windows 実装を提供するか、adapter/composition 自体を compile-time で対応 platform に限定してください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
-              "line": 162,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c3506e7b1a0afa0b9fd736933aafceb935b4bc160135471b49a6cf901c7d69cd",
-          "at": "2026-07-27T12:25:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`entry_from_dto` は `bound_tests` を持つ全 persisted row を現行 worktreeで再走査します。test body 更新後に old-hash の historical row と valid current row が共存すると、historical row の再計算 hash が persisted key と一致せず、cache 全体が `FulfillmentCacheEntry` error になります。削除済み historical test でも `SourceScan` となるため、有効な current verdict の利用と通常再評価による回復を妨げます。診断情報を document-wide validity 条件にせず、unrelated historical identities から current lookup を独立させてください。",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 349,
-              "category": "adapter correctness"
-            },
-            {
-              "message": "duplicate full identity を domain documentへ渡す前に一律 `VerifyCacheError::MalformedJson` へ変換しているため、`lookup_current` が契約する `FulfillmentCacheLookupError::AmbiguousCurrentEntries` と、その edge/obligation/key payload が一度も返りません。fail-closed ではありますが、briefing が要求する型付き ambiguity error surfaceを破っています。重複を domain lookup に保持するか、同等の型付き payload として伝播してください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 296,
-              "category": "error handling"
-            },
-            {
-              "message": "`JsonObligationFulfillmentCacheCodec` の型定義は `#[cfg(unix)]` ですが、この `impl JsonObligationFulfillmentCacheCodec` は無条件にコンパイルされます。module 自体も非 Unix で有効なため、Windows 等では未定義型への impl となり library build が失敗します。platform gating を型・全 impl・公開 wiring に一貫して適用してください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 272,
-              "category": "portability"
-            }
-          ],
-          "hash": "rvw1:sha256:8656f08c8054a8957e561b6ac61b4ba46f8f0681ebb237b25cea563743c12d89",
-          "at": "2026-07-27T12:34:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`entry_from_dto` は `bound_tests` を持つ全 persisted row を現行 worktreeで再走査します。test body 更新後に old-hash の historical row と valid current row が共存すると、historical row の再計算 hash が persisted key と一致せず cache 全体がエラーになります。削除済み historical test でも `SourceScan` となるため、有効な current verdict の利用と通常再評価による回復を妨げます。診断情報を document-wide validity 条件にせず、unrelated historical identities から current lookup を独立させてください。",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 336,
-              "category": "adapter correctness"
-            },
-            {
-              "message": "`legacy_historical_entry` は `bound_tests` がないだけで row を完全 identity の検証前に削除します。旧 wire formatにも三つ組 key と fingerprint は存在するため、有効な row と同じ完全 identity を持つ row から `bound_tests` だけを除くと、その重複が消えて `lookup_current` の ambiguity を回避できます。診断情報を除外する前に full identity の重複を fail-closed で保持・検出してください。",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 302,
-              "category": "adapter correctness"
-            },
-            {
-              "message": "`JsonObligationFulfillmentCacheCodec` の型定義は `#[cfg(unix)]` ですが、この conversion-helper `impl JsonObligationFulfillmentCacheCodec` は無条件にコンパイルされます。module 自体も非 Unix で有効なため、Windows 等では未定義型への impl となり library build が失敗します。platform gating を型と全 impl に一貫して適用してください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 273,
-              "category": "portability"
-            }
-          ],
-          "hash": "rvw1:sha256:59ced12e09e56eb97c82eaeb527fd9fce7a4a4562580786256f9903cff700870",
-          "at": "2026-07-27T12:41:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`entry_from_dto` は `bound_tests` を持つ全 persisted row を現行 worktreeで再走査します。test body 更新後に old-hash の historical row と valid current row が共存すると、historical row の再計算 hash が persisted key と一致せず cache 全体がエラーになります。削除済み historical test でも `SourceScan` となるため、有効な current verdict の利用と通常再評価による回復を妨げます。診断情報を document-wide validity 条件にせず、unrelated historical identities から current lookup を独立させてください。",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 336,
-              "category": "adapter correctness"
-            },
-            {
-              "message": "`legacy_historical_entry` は `bound_tests` がないだけで row を完全 identity の検証前に削除します。旧 wire formatにも三つ組 key と fingerprint は存在するため、有効な row と同じ完全 identity を持つ row から `bound_tests` だけを除くと、その重複が消えて `lookup_current` の ambiguity を回避できます。診断情報を除外する前に full identity の重複を fail-closed で保持・検出してください。",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 302,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:2fb384eefdd7e647f00499d20ca009b2f844e41c9023d9ea726c0362cde2cb25",
-          "at": "2026-07-27T12:44:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`JsonObligationFulfillmentCacheCodec` and its port implementation are gated with `#[cfg(unix)]`, but `apps/cli-composition/src/test_obligation.rs` imports and constructs this type unconditionally. On Windows or another non-Unix target, the infrastructure crate omits the exported type, so the workspace fails to compile rather than using the intended fail-closed `Unsupported` I/O behavior already implemented in `fulfillment_cache_io.rs`. Keep the adapter type/constructor available on all targets and return a typed unsupported error on non-Unix platforms.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
-              "line": 130,
-              "category": "port impl / cross-platform compilation"
-            }
-          ],
-          "hash": "rvw1:sha256:b97c931d1043136ad95c9af5acaddf80699f5383f4cbc95904de83414d3798cf",
-          "at": "2026-07-27T14:34:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cd8f8788edbc49a6b046fc6fed537bd6f937c48a567407bfd58e51b3cb86e991",
-          "at": "2026-07-27T14:38:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The guarded writer opens `trusted_root` before creating anything and only creates descendants afterward. When `items_dir` itself does not yet exist, first-time `save` now fails with `NotFound`; the previous implementation created the complete parent path, and the shared root guard explicitly permits missing roots so saves can create them. Create the trusted root safely before opening it and add a missing-root regression test.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
-              "line": 184,
-              "category": "adapter_correctness"
-            },
-            {
-              "message": "This test never varies diagnostic data or exercises diagnostic-to-hash derivation: both hashes are computed from the identical byte literal and then wrapped directly, so the assertion is tautological. It would still pass if the real resolved-bound-tests hashing incorrectly incorporated diagnostic locations. Resolve two inputs with different diagnostics but identical scanned source and compare the resolver-produced hashes/keys.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/sha256_content_hasher.rs",
-              "line": 108,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:cd8f8788edbc49a6b046fc6fed537bd6f937c48a567407bfd58e51b3cb86e991",
-          "at": "2026-07-27T14:46:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`create_dir_all(trusted_root)` resolves and creates the trusted-root path by pathname after the caller's symlink check. An attacker can replace an ancestor with a symlink between that check and this call; `O_NOFOLLOW` on the subsequent `open` protects only the final component, so the cache can be created or truncated outside the trusted root. Create and open the root through a descriptor-pinned, no-follow component walk from a stable ancestor.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
-              "line": 242,
-              "category": "trusted_root_violation"
-            }
-          ],
-          "hash": "rvw1:sha256:8ea3ad574ff6932a71a8a2a074430f6b27843bfed9d6fc14782b08bb54d0d054",
-          "at": "2026-07-27T14:53:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The read path still opens `trusted_root` by pathname after separate symlink preflight checks. `O_NOFOLLOW` protects only the final component, so replacing an ancestor between the check and this open redirects the descriptor outside the trusted root and allows loading an external cache. Acquire the read root with the same component-by-component, descriptor-pinned `openat` walk used by the writer, without creating missing components.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
-              "line": 121,
-              "category": "trusted_root_violation"
-            },
-            {
-              "message": "Safe relative roots beginning with `.` are rejected because the component walk accepts only `RootDir` followed by `Normal` components. For example, `JsonObligationFulfillmentCacheCodec::new(PathBuf::from(\".\"))` can load but every save fails on `Component::CurDir`, even though the constructor requires neither an absolute nor a normalized path. Consume a leading `CurDir` while continuing to reject `ParentDir`, and add a relative-root regression test.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
-              "line": 255,
-              "category": "adapter_correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:c2db3dd3cfc649b0edd0c0c318dc4bf730be4c698ee6672fa1e38853677a081a",
-          "at": "2026-07-27T14:58:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71ea34da93e874b45bf21cff4bf70b31766cf1fff2ee8f9e6a7c92bb45d42d49",
-          "at": "2026-07-27T15:03:08Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cb91ca1adf417463ec7a61ddd23bfe553ff6902ece3f1284fca513043320a541",
-          "at": "2026-07-27T16:06:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The legacy-wire regression removes both `bound_tests` and `verifier_fingerprint`, but the immediately preceding cache format persisted the fingerprint and lacked only the newly added `bound_tests`. Because decoding now branches on that exact field combination, the real upgrade path is untested. Keep the fingerprint, remove only `bound_tests`, and assert that the row becomes `Legacy` and remains fail-closed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/tests.rs",
-              "line": 150,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:cb91ca1adf417463ec7a61ddd23bfe553ff6902ece3f1284fca513043320a541",
-          "at": "2026-07-27T16:09:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:54dc93afefd6c51270d6ac4103a88d3dcf61f6875c84a1c3f8cf52044b645c6c",
-          "at": "2026-07-27T16:13:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0b239f7be25d426c4f37a446e175ce4a01c6ef6043d8b5c8ea751d179d9045ea",
-          "at": "2026-07-27T16:59:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0b239f7be25d426c4f37a446e175ce4a01c6ef6043d8b5c8ea751d179d9045ea",
-          "at": "2026-07-27T17:00:52Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0e133c7290b02c7193e818f9665e022ab928e0a9ae50d7754ae8396af8a2af50",
-          "at": "2026-07-27T03:29:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0e133c7290b02c7193e818f9665e022ab928e0a9ae50d7754ae8396af8a2af50",
-          "at": "2026-07-27T03:32:43Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dcae4320e54a308e4469ebd49421ff49c66839c258d082d56acb2fff85845c34",
-          "at": "2026-07-27T05:56:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dcae4320e54a308e4469ebd49421ff49c66839c258d082d56acb2fff85845c34",
-          "at": "2026-07-27T05:59:42Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:21717aac6c87c189cd4ba88118fd90dac23a81bcf9b9624d21471280a9f67ade",
-          "at": "2026-07-27T14:34:02Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:21717aac6c87c189cd4ba88118fd90dac23a81bcf9b9624d21471280a9f67ade",
-          "at": "2026-07-27T14:39:57Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c43fa57ef64db76f12a9d5eb38afa7fb4327f20d20417ac60bc5153a35ad4671",
-          "at": "2026-07-27T03:28:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c43fa57ef64db76f12a9d5eb38afa7fb4327f20d20417ac60bc5153a35ad4671",
-          "at": "2026-07-27T03:31:20Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30b7c5a5b8d557d24ebb2bda9515d57951161bd86b762b4ce09171f6a4e8fde7",
-          "at": "2026-07-27T14:33:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30b7c5a5b8d557d24ebb2bda9515d57951161bd86b762b4ce09171f6a4e8fde7",
-          "at": "2026-07-27T14:40:37Z"
-        }
-      ]
-    },
     "impl-plan": {
       "rounds": [
         {
@@ -2474,6 +881,121 @@
           "findings": [],
           "hash": "rvw1:sha256:0327951e849bde5d3289b9747d3842514e911c1456711555b88232d5be60296a",
           "at": "2026-07-27T17:06:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Plan summary restates upstream behavior/design instead of using only target + operation + anchor: “fingerprint-preserving `Legacy`/`Identified` cache-entry state” and “Final check, result-model, evaluation, and wire-format behavior remains...” Remove the rationale/contract prose from this section.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 49,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S2 restates the behavioral contract and rationale in prose: “compile-preserving migration,” “Do not finalize check, result-model, evaluate, DTO, or JSON-codec behavior...” Keep only the scoped targets, operations, and spec anchors.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 69,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Section S3 restates implementation behavior and rationale: “owns the final check behavior, including cache-recovery and binding-consistency regressions.” Replace this with target + operation + anchor citations only.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 80,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:3c26ab3f3eb3d2819a65e8005072cbb594e4e650acf7ce5ea89eeb3dbedd3209",
+          "at": "2026-07-27T17:37:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Task T001 includes upstream rationale/ownership prose: “so later cache-recovery and binding-validation changes do not share a done-task attribution” and “because that cleanup cannot be attributed to this completed task.” Keep target + operation + anchors only.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Tasks T002 and T003 include upstream contract/rationale prose such as “compile-preserving intermediate contract,” “owns final check behavior,” and “final semantic completion.” Remove these restatements while retaining executable targets, operations, and anchors.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Tasks T004 and T005 restate upstream behavior and sequencing: “changed record shape,” “persist resolved evidence,” “propagate evaluation errors,” and ownership of later wire behavior. Reduce descriptions to target + operation + anchors.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 22,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Tasks T006–T008 restate cache-wire behavior and invariants, including fingerprint preservation, Legacy/Identified decoding, and diagnostic coupling. The permitted form is target + operation + anchor cite only.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 32,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Plan summary entry T001 contains upstream attribution/rationale prose: “rather than the already-done task, owns the final check-interactor contract.” Replace it with target + operation + GO anchors.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 48,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Plan summary entry T004–T008 restates upstream contracts and behavior: “establishes the result-model... contract,” “final evaluation,” and “complete cache mapping, load decoding, and file writes.” Use concise target/operation/GO references only.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 51,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "Sections S1 and S4–S8 contain upstream status, contract, or behavior restatements, including “stale reevaluation-reason cleanup,” “changed record shape,” “verdict construction,” and Legacy/Identified cache semantics. Rewrite each section description to scoped targets, operations, and anchors.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 58,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:93113aed59bcd732a4101f5160588db21cfc391c8c533338b9a6d01f19bd687e",
+          "at": "2026-07-27T17:38:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T004's task-contract attribution includes the `usecase::EvaluateTestObligationsInteractor` catalogue entry, but T004's description only claims updates to `EdgeResolutionOutcome`, `EdgeVerdictRecord`, `TestObligationResultsInteractor`, constructors, and fixtures. The evaluation interactor is not part of T004's stated boundary; move that attribution to the task that actually modifies it or explicitly include the modification in T004.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/impl-plan.json",
+              "line": 22,
+              "category": "task-contract attribution mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:2612f6c5b6b15c7cd4ab56d5340582f3ffcdce097faf987c25dc8a5a266192bd",
+          "at": "2026-07-27T17:41:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb1d7cde5ac66798e354839d8092fbb094727e2a174251e8cc1ecb53b413ca06",
+          "at": "2026-07-27T17:42:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb1d7cde5ac66798e354839d8092fbb094727e2a174251e8cc1ecb53b413ca06",
+          "at": "2026-07-27T17:46:13Z"
         }
       ]
     },
@@ -2778,6 +1300,1613 @@
           "findings": [],
           "hash": "rvw1:sha256:d2a63eb9fdcc8feb8b9074f1cbbeb40c0a6763cc40cb8188350309342be98532",
           "at": "2026-07-27T17:06:16Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33b9233ae8f9244213b4be2560f3987a54b3646a0800039406aaebe7aeab783e",
+          "at": "2026-07-26T16:04:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:33b9233ae8f9244213b4be2560f3987a54b3646a0800039406aaebe7aeab783e",
+          "at": "2026-07-26T16:08:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6a4b34b1417bea7c91da4d865bb9138d95766f9b0953c9c023665d81addc5105",
+          "at": "2026-07-26T18:10:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The AC-03 binding cites only `test_binding_consistency_error_carries_edge_id`, which merely constructs and pattern-matches the error variant. It never runs `check` with a voluntary binding on a derived-obligation edge or verifies the required finding/nonzero failure, so AC-03 is not covered. Bind an actual gate-level regression test (or remove this premature binding until one exists).",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/test-bindings.json",
+              "line": 18,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:6a4b34b1417bea7c91da4d865bb9138d95766f9b0953c9c023665d81addc5105",
+          "at": "2026-07-26T18:15:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46672621ea57b12f35ef34a895607e5f2c5ed82eac3064fe333d0c02a2f26392",
+          "at": "2026-07-26T18:50:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:46672621ea57b12f35ef34a895607e5f2c5ed82eac3064fe333d0c02a2f26392",
+          "at": "2026-07-26T18:52:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e4d252a92c4d753394639c5e0934aa469dac5b9e9cb25a5f36e843fdf89d7df",
+          "at": "2026-07-26T19:04:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2e4d252a92c4d753394639c5e0934aa469dac5b9e9cb25a5f36e843fdf89d7df",
+          "at": "2026-07-26T19:05:54Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3a8f49f1daae1241532f3d4b74e2b57bd6158a63732b84c588f029c33e4e837",
+          "at": "2026-07-26T19:38:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a3a8f49f1daae1241532f3d4b74e2b57bd6158a63732b84c588f029c33e4e837",
+          "at": "2026-07-26T19:39:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7373b1a97226fc65b412ba5f6740dbc1787219e6cc42b158fd83949f3e001955",
+          "at": "2026-07-27T00:00:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The IN-04 binding cites `test_cache_dto_persists_resolved_bound_test_locations`, but that test only checks `bound_tests` length. It never verifies the required nested `verdict.reason` shape, rejection of `verdict_reason`, or non-empty failure reasons, so it cannot fulfill IN-04.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/test-bindings.json",
+              "line": 50,
+              "category": "testing"
+            },
+            {
+              "message": "The AC-04 binding uses the same unrelated `bound_tests` persistence test. AC-04 requires coverage that the output schema/domain/encoder omit `entries[].verdict_reason` and retain a required non-empty `entries[].verdict.reason`; this binding leaves that behavior uncovered.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/test-bindings.json",
+              "line": 52,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:7373b1a97226fc65b412ba5f6740dbc1787219e6cc42b158fd83949f3e001955",
+          "at": "2026-07-27T00:10:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7373b1a97226fc65b412ba5f6740dbc1787219e6cc42b158fd83949f3e001955",
+          "at": "2026-07-27T00:26:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The IN-04 binding cites `test_cache_dto_persists_resolved_bound_test_locations`, but that test only checks `bound_tests` length. It does not verify the required nested `verdict.reason` shape, reject `verdict_reason`, or require a non-empty failure reason, so IN-04 remains uncovered.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/test-bindings.json",
+              "line": 50,
+              "category": "testing"
+            },
+            {
+              "message": "The AC-04 binding cites the same unrelated `bound_tests` persistence test. AC-04 requires coverage that the schema/domain/encoder omit `entries[].verdict_reason` and preserve a required non-empty `entries[].verdict.reason`; this binding does not test those guarantees.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/test-bindings.json",
+              "line": 52,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:7373b1a97226fc65b412ba5f6740dbc1787219e6cc42b158fd83949f3e001955",
+          "at": "2026-07-27T00:27:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3a5d132d087754d306a1e303604a3edc632b0b281fbe32e8a7479ed897e8651",
+          "at": "2026-07-27T03:28:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b3a5d132d087754d306a1e303604a3edc632b0b281fbe32e8a7479ed897e8651",
+          "at": "2026-07-27T03:30:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b5e77d0b95c64a5d6da16d6659d25858c03baca33936553642ebdfe61c60fd9e",
+          "at": "2026-07-27T05:56:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b5e77d0b95c64a5d6da16d6659d25858c03baca33936553642ebdfe61c60fd9e",
+          "at": "2026-07-27T05:59:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:500d7c3cf072f84d7affcd37ba61711607bf09b3fe1bc6e26a7993f7dc9558dd",
+          "at": "2026-07-27T09:48:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:500d7c3cf072f84d7affcd37ba61711607bf09b3fe1bc6e26a7993f7dc9558dd",
+          "at": "2026-07-27T09:54:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:438b42e14d097980f1350a9e69b61a893923f9a171b804aebc5d2d70b205dba3",
+          "at": "2026-07-27T12:11:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:438b42e14d097980f1350a9e69b61a893923f9a171b804aebc5d2d70b205dba3",
+          "at": "2026-07-27T12:14:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:afa17ef0c63a705f0e7c96b3f63ee11a709f215878a25d2b2f59ff03f0205e86",
+          "at": "2026-07-27T14:33:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:afa17ef0c63a705f0e7c96b3f63ee11a709f215878a25d2b2f59ff03f0205e86",
+          "at": "2026-07-27T14:40:24Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:759f670952ae119fcd9bdadb7cb1510ba4196333a4ea505f310970cf93ea965e",
+          "at": "2026-07-27T16:06:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:759f670952ae119fcd9bdadb7cb1510ba4196333a4ea505f310970cf93ea965e",
+          "at": "2026-07-27T16:08:07Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80013f452f0f01440cf9a383f2789d995fb54618cdf5c172fe3121f036c46c69",
+          "at": "2026-07-27T16:59:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:80013f452f0f01440cf9a383f2789d995fb54618cdf5c172fe3121f036c46c69",
+          "at": "2026-07-27T17:01:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:32a414efb0d8e8bd411b418d78009f14247f2a583c404a36be5d456c02ca56fc",
+          "at": "2026-07-27T17:37:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:32a414efb0d8e8bd411b418d78009f14247f2a583c404a36be5d456c02ca56fc",
+          "at": "2026-07-27T17:41:22Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c43fa57ef64db76f12a9d5eb38afa7fb4327f20d20417ac60bc5153a35ad4671",
+          "at": "2026-07-27T03:28:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c43fa57ef64db76f12a9d5eb38afa7fb4327f20d20417ac60bc5153a35ad4671",
+          "at": "2026-07-27T03:31:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30b7c5a5b8d557d24ebb2bda9515d57951161bd86b762b4ce09171f6a4e8fde7",
+          "at": "2026-07-27T14:33:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30b7c5a5b8d557d24ebb2bda9515d57951161bd86b762b4ce09171f6a4e8fde7",
+          "at": "2026-07-27T14:40:37Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:356c34dd97f2792d97ec6664f66ccdf5d7d934358361962e7e0b72e5b5666173",
+          "at": "2026-07-26T16:04:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::EdgeVerdictRecord` removes `verdict_reason` without adding a nested verdict. Its remaining `outcome: EdgeResolutionOutcome` carries only the failure category, so evaluation failure records cannot represent the required `entries[].verdict.reason` from IN-04/AC-04. Declare a companion modification that preserves the complete typed verdict and its reason.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 219,
+              "category": "missing_companion_modify"
+            },
+            {
+              "message": "`domain::ObligationFulfillmentCacheEntry::new` requires `bound_tests`, but pre-track cache rows do not contain that newly added field, and the referenced cache port exposes no typed legacy-row/migration outcome. Such rows cannot be decoded into the declared domain type, preventing `evaluate` from loading and rewriting them as required by AC-06 without treating the cache as generically malformed.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 807,
+              "category": "missing_companion_modify"
+            },
+            {
+              "message": "`domain::ObligationFulfillmentCacheEntry::new` accepts the key and diagnostic `bound_tests` independently. A caller can therefore pair a key whose `bound_tests_set_hash` was computed from set A with diagnostic set B, creating a cache row whose recorded evidence contradicts its key. Group the locations and their derived hash behind one validated type/factory while keeping locations outside equality semantics.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 795,
+              "category": "state_shape_smell"
+            },
+            {
+              "message": "Voluntary-binding enforcement has conflicting owners: `domain::ObligationsDocument` declares `validate_voluntary_binding` and `domain::TestBindingConsistencyError` says that method constructs the rejection, while `usecase::CheckTestObligationsInteractor` claims to validate it and `usecase::EvaluateTestObligationsInteractor` claims to reject it. Name the domain method as the sole enforcement owner and describe the interactors as invoking/propagating it.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+              "line": 27,
+              "category": "enforcement_owner_contradiction"
+            },
+            {
+              "message": "`domain::ObligationFulfillmentCachePort` models external cache load/save I/O as fully synchronous, but its docs do not acknowledge or justify that color choice. The contract needs to record why blocking I/O is intentional, or expose an asynchronous port before adapters and callers are fixed to the synchronous shape.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 138,
+              "category": "sync_async_color_mismatch"
+            },
+            {
+              "message": "The TypeEntries for `usecase::CheckTestObligationsInteractor`, `usecase::EvaluateTestObligationsInteractor`, and `usecase::TestObligationResultsInteractor` are marked `modify`, although their declared public type and constructor signatures exactly match the rustdoc baseline. Only their application-service implementations change, already represented by the separate trait-impl entries; these TypeEntries should be `reference`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+              "line": 26,
+              "category": "action_incoherent_with_diff"
+            },
+            {
+              "message": "`infrastructure::JsonObligationFulfillmentCacheCodec` is marked `modify`, but its declared struct and `new(PathBuf) -> Self` surface are identical to the rustdoc baseline. The behavioral port-implementation change is represented separately, and the DTO carries the actual structural wire change, so this TypeEntry should be `reference`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+              "line": 56,
+              "category": "action_incoherent_with_diff"
+            },
+            {
+              "message": "The docs for `domain::EdgeVerdictRecord`, `domain::FulfillmentCacheLookupError`, `domain::ObligationCheckError`, `domain::ObligationEvaluateError`, `domain::ObligationFulfillmentCacheDocument`, `domain::ObligationFulfillmentCacheEntry`, `domain::ObligationsDocument`, and `domain::TestBindingConsistencyError` restate upstream behavioral rules in prose. Replace these restatements with concise type/change identification and rely on their `spec_refs`, as required by `no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 186,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "The docs for `infrastructure::JsonObligationFulfillmentCacheCodec` and `infrastructure::ObligationFulfillmentCacheEntryDto` repeat the upstream contracts for nested reasons, diagnostic-only bound tests, and lookup delegation. Those behaviors must remain in the cited spec anchors rather than being duplicated in catalogue prose.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+              "line": 57,
+              "category": "upstream_restatement"
+            },
+            {
+              "message": "The docs for all three usecase interactors restate cache-selection, voluntary-binding, diagnostic-persistence, and verdict-reason behavior from the spec. Reduce the docs to type/change identification and anchor through `spec_refs` instead of duplicating the behavioral contract.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+              "line": 27,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:356c34dd97f2792d97ec6664f66ccdf5d7d934358361962e7e0b72e5b5666173",
+          "at": "2026-07-26T16:20:49Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:20a70d74772ba4d812cbd18bf4d9a69ec1ef9b76863a1fc03a66f2485493f5eb",
+          "at": "2026-07-26T16:55:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::ResolvedBoundTests::new` receives only `NonEmptyTestLocations` but exposes a `BoundTestsSetHash`. The existing hash is calculated from scanned test bodies through the usecase `ContentHasherPort`; locations contain neither those bodies nor their hash. This signature therefore cannot construct the required value without fabricating a different hash, causing valid cache entries to fail `try_new` or carry incorrect identity. Accept the already computed `BoundTestsSetHash` alongside the locations.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 1395,
+              "category": "state_shape_smell"
+            },
+            {
+              "message": "`domain::ResolvedBoundTests` declares `new`, `set_hash`, and `locations` twice: in the top-level `inherent_impls` entry and again in `types.ResolvedBoundTests.methods`. The v5 encoder materializes these as separate inherent impl blocks, while the implementation can contain only one method set, so the final catalogue/implementation contract will diverge. Keep the signatures in one declaration location.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 5,
+              "category": "duplicated_structural_declaration"
+            },
+            {
+              "message": "`domain::ResolvedBoundTests` restates the IN-05/CN-04 contract by asserting in prose that locations are diagnostic data outside equality. Under `no-upstream-restatement.md`, retain only a concise type-purpose label and leave this behavioral/identity rule to `spec_refs`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 1378,
+              "category": "upstream_restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:20a70d74772ba4d812cbd18bf4d9a69ec1ef9b76863a1fc03a66f2485493f5eb",
+          "at": "2026-07-26T17:06:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cab2f11a64a8c2a487761c6bac3de36a15df00431cba64d494d7c3e38b07a841",
+          "at": "2026-07-26T17:16:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cab2f11a64a8c2a487761c6bac3de36a15df00431cba64d494d7c3e38b07a841",
+          "at": "2026-07-26T17:25:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c9e36d717b1643215ddb8aafb283de062d1b1d00b8c701c384c6780c82a69cf1",
+          "at": "2026-07-27T03:28:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::JsonObligationFulfillmentCacheCodec` and `infrastructure::ObligationFulfillmentCacheEntryDto` cite `IN-04`/`AC-04`, but those anchors govern removing `entries[].verdict_reason` from the `evaluate` result envelope. These entries encode the fulfillment-cache artifact, whose change adds diagnostic `bound_tests`; it never contained that result-envelope field. Remove the off-topic references to avoid false catalogue→spec edges.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+              "line": 114,
+              "category": "SoT integrity: spec_refs off-topic"
+            }
+          ],
+          "hash": "rvw1:sha256:c9e36d717b1643215ddb8aafb283de062d1b1d00b8c701c384c6780c82a69cf1",
+          "at": "2026-07-27T03:38:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::JsonObligationFulfillmentCacheCodec::new` depends directly on the concrete usecase type `usecase::test_obligation::bound_tests::ResolvedBoundTestsResolver` (line 104). This reverses the layer dependency direction and bypasses a port, violating dependency inversion; the adapter should consume an abstraction owned by the usecase/domain boundary.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+              "line": 104,
+              "category": "Dependency Inversion violation"
+            }
+          ],
+          "hash": "rvw1:sha256:00a91aacbe91702af0f4039638e9150424bb69a051248a49119b8b18f9899bee",
+          "at": "2026-07-27T05:56:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c12ad6f8809e101cc3d79bda03aed78ddca86d0af20a55a16d2522b41af95dc",
+          "at": "2026-07-27T07:24:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`JsonObligationFulfillmentCacheCodec -> usecase::test_obligation::ports::ObligationFulfillmentCachePort` is marked `modify`, but the rustdoc baseline contains only the distinct domain-port implementation. Trait-impl identity includes the external trait path, so this new usecase-port implementation must be `add`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+              "line": 18,
+              "category": "SoT integrity: action incoherent"
+            },
+            {
+              "message": "`infrastructure::Sha256ContentHasher` is marked `modify`, although its struct and `new() -> Self` signature are identical to the baseline. The only new surface is already represented by the separate `BoundTestsSetHasherPort` trait-impl entry; the type entry should be `reference`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+              "line": 162,
+              "category": "SoT integrity: action incoherent"
+            },
+            {
+              "message": "`ResolvedBoundTestsResolver` injects scanner and hasher ports and implements `ResolvedBoundTestsResolverPort`, but it is classified as `UseCase` while that trait is classified as `SecondaryPort`. R2/R3 require injected usecase behavior exposed through a service boundary to use the `Interactor` + `ApplicationService` pairing; a `SecondaryPort` is a driven boundary implemented by infrastructure. Reclassify the pair or remove the unnecessary trait boundary.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+              "line": 204,
+              "category": "SoT integrity: role/kind mismatch"
+            },
+            {
+              "message": "`ResolvedBoundTestsResolverPort::resolve` explicitly scans source and returns `TestSourceScanError`, implying filesystem I/O, but is declared synchronous and its docs do not acknowledge that choice. Make the port asynchronous or document the bounded synchronous-I/O decision.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+              "line": 211,
+              "category": "API shape: sync/async color mismatch"
+            },
+            {
+              "message": "`ResolvedBoundTestsResolution::derive` accepts `source` and `locations` independently and permits the hashing closure to return a hash unrelated to either. It therefore admits evidence whose hash, source, and diagnostic locations describe different inputs, contradicting the claimed source-coupled invariant. Use an opaque scanner result or a distinct persisted-rehydration type/API.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 92,
+              "category": "API shape: state-shape smell"
+            },
+            {
+              "message": "The docs for `domain::ResolvedBoundTests` and `domain::ResolvedBoundTestsResolution` reproduce the exact-source assembly and hashing behavior referenced by IN-05/CN-04/AC-05. The no-upstream-restatement convention requires a short purpose label with `spec_refs`, not a downstream copy of the behavior contract.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 1445,
+              "category": "SoT integrity: upstream restatement"
+            },
+            {
+              "message": "The docs for `usecase::BoundTestsSetHasherPort` and `usecase::ResolvedBoundTestsResolver` narrate the scan → exact-source hash → domain derivation choreography already owned by IN-01/IN-05/CN-04/AC-05. Replace that prose with short purpose labels and rely on `spec_refs`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+              "line": 75,
+              "category": "SoT integrity: upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:3c12ad6f8809e101cc3d79bda03aed78ddca86d0af20a55a16d2522b41af95dc",
+          "at": "2026-07-27T07:39:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bd8f47b2070372a5a70b342cac2dacc14021cf75e3f919ac07d3dc926dcbbcc2",
+          "at": "2026-07-27T09:48:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ScannedBoundTests::new(source, locations)` merely packages two independently supplied values, while `ResolvedBoundTestsResolution::derive(scanned, H)` permits `H` to ignore `scanned`. A caller can therefore combine source A, locations B, and hash C; the current cache codec does exactly this with placeholder source and a key-derived hash. The wrapper still permits evidence whose diagnostic locations did not produce its hash. Use a trusted construction path or a distinct persisted-rehydration type.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 133,
+              "category": "API shape: state-shape smell"
+            },
+            {
+              "message": "`VerifyCacheError::SourceScan` has no production constructor. The sole fulfillment-cache adapter deliberately does not invoke its injected `ResolvedBoundTestsResolverPort`, and no other production cache adapter can obtain this error; only consumers/tests match or construct it. Remove the variant or declare an actual source-scan owner and call path.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 1668,
+              "category": "Cross-layer contract: unconstructible error variant"
+            },
+            {
+              "message": "`JsonObligationFulfillmentCacheCodec::new` requires a `ResolvedBoundTestsResolverPort` application service even though the adapter's responsibility is cache wire I/O and cache decoding intentionally must not rescan historical sources. This forces an unrelated, unused source-resolution collaborator into every codec instance. Keep resolution in usecase orchestration and remove the dependency from the secondary adapter.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+              "line": 103,
+              "category": "SOLID: Single Responsibility violation"
+            }
+          ],
+          "hash": "rvw1:sha256:bd8f47b2070372a5a70b342cac2dacc14021cf75e3f919ac07d3dc926dcbbcc2",
+          "at": "2026-07-27T10:01:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bd8f47b2070372a5a70b342cac2dacc14021cf75e3f919ac07d3dc926dcbbcc2",
+          "at": "2026-07-27T12:11:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`infrastructure::JsonObligationFulfillmentCacheCodec` now depends on `ResolvedBoundTestsResolverPort`, combining JSON persistence with live source resolution. Consequently a historical row whose diagnostic location is unreadable or now hashes differently can fail document loading before `lookup_current` selects an otherwise valid current key/fingerprint. This promotes IN-05/CN-04 diagnostic-only `bound_tests` into a validity gate and violates AC-01/AC-05. Decode persisted locations independently and keep source resolution on the evaluation/write path.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+              "line": 103,
+              "category": "single-responsibility-violation"
+            },
+            {
+              "message": "`domain::ScannedBoundTests::new` accepts independently constructible `BoundTestsSource` and `NonEmptyTestLocations` values without validating their provenance. It therefore admits the illegal state “source from scan A paired with locations from scan B”; `ResolvedBoundTestsResolution::derive` then legitimizes that pair as resolved evidence. Restrict construction to the resolver/factory that performs the scan or otherwise encode the shared provenance.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 133,
+              "category": "state-shape-smell"
+            },
+            {
+              "message": "`domain::VerifyCacheError` is shared by the existing `WaiverCachePort::load`, but the newly declared `FulfillmentCacheEntry` and `SourceScan` variants are structurally impossible for that waiver-only JSON/I/O operation. Half of the error vocabulary is therefore unreachable for that method, and the generic docs do not declare or justify a producible subset. Introduce a fulfillment-specific load error or narrow the waiver method's error type.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 1633,
+              "category": "per-method-error-imprecision"
+            }
+          ],
+          "hash": "rvw1:sha256:bd8f47b2070372a5a70b342cac2dacc14021cf75e3f919ac07d3dc926dcbbcc2",
+          "at": "2026-07-27T12:20:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:72bd03e1aab7b48e7a9ca4585c671f9b8538845bfab75a5b8a24ed9babf2097e",
+          "at": "2026-07-27T14:34:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::ObligationFulfillmentCacheEntry::new` accepts `verifier_fingerprint` and `bound_tests` as independent `Option`s, conflating legacy and current rows. It admits states such as diagnostics present without a fingerprint and allows a newly evaluated current row to omit the required diagnostics. Represent legacy/current row states with a dedicated enum or distinct construction types so these combinations are unrepresentable.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 893,
+              "category": "state-shape-smell"
+            },
+            {
+              "message": "`domain::ObligationFulfillmentCacheEntry.docs` restates the IN-02/IN-05/CN-04 contract that diagnostics are optional and identity is the complete key plus fingerprint. Per `no-upstream-restatement.md`, retain only a short identifying noun phrase and rely on `spec_refs` for that behavior.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 860,
+              "category": "upstream-restatement"
+            },
+            {
+              "message": "`infrastructure::JsonObligationFulfillmentCacheCodec.docs` reproduces the upstream decoding, diagnostic-only, legacy-retention, and duplicate-detection behavior instead of merely identifying the adapter. Replace this behavioral sentence with a short noun phrase and leave the contract to IN-05/CN-04/AC-05/AC-06.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+              "line": 77,
+              "category": "upstream-restatement"
+            },
+            {
+              "message": "`infrastructure::ObligationFulfillmentCacheEntryDto.docs` restates the optional-diagnostics and legacy-identity behavior from IN-05/AC-05. The catalogue should identify the DTO briefly and reference those anchors rather than maintain a second prose contract.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+              "line": 126,
+              "category": "upstream-restatement"
+            },
+            {
+              "message": "`usecase::ObligationFulfillmentCachePort.docs` repeats the full load discipline—retaining legacy rows, avoiding scans, and preserving ambiguity detection—from IN-01/IN-05/AC-06. Keep only the local synchronous-port identification/rationale and defer behavioral details to `spec_refs`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+              "line": 158,
+              "category": "upstream-restatement"
+            },
+            {
+              "message": "`usecase::FulfillmentCacheLoadError` duplicates the referenced `domain::VerifyCacheError`: both contain only `Io(DiagnosticMessage)` and `MalformedJson(DiagnosticMessage)` and express the same cache-loading failures. This creates parallel error vocabulary and conversion code without distinct structure or invariants; reuse the existing error or introduce genuinely operation-specific detail.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+              "line": 485,
+              "category": "duplicated-structural-declaration"
+            },
+            {
+              "message": "`usecase::ResolvedBoundTestsResolverPort::resolve` performs source-scanner I/O and returns `TestSourceScanError`, but it is fully synchronous and the entry docs do not acknowledge why blocking source reads are acceptable or bounded. Document the synchronous execution boundary or make the port asynchronous.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+              "line": 218,
+              "category": "sync-async-color-mismatch"
+            }
+          ],
+          "hash": "rvw1:sha256:72bd03e1aab7b48e7a9ca4585c671f9b8538845bfab75a5b8a24ed9babf2097e",
+          "at": "2026-07-27T14:45:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9eb82bcce01d71a4b38470595a7c140dcfc1e2e5025f0513c8b885d9a9ebf76d",
+          "at": "2026-07-27T16:06:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`domain::ObligationFulfillmentCacheEntryState` couples verifier identity to diagnostic availability: `Legacy` carries nothing, while `Current` requires both `verifier_fingerprint` and `bound_tests`. The persistence DTO permits these fields independently, so a previous-format row with a valid fingerprint but absent diagnostic `bound_tests` is collapsed to `Legacy` and loses the fingerprint. That makes diagnostic presence affect full-key/fingerprint lookup despite CN-04 declaring diagnostics observational only. Preserve fingerprint identity independently, for example with an identified state whose `bound_tests` remains optional.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 995,
+              "category": "state-shape-smell"
+            }
+          ],
+          "hash": "rvw1:sha256:9eb82bcce01d71a4b38470595a7c140dcfc1e2e5025f0513c8b885d9a9ebf76d",
+          "at": "2026-07-27T16:09:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:df58ffacfd61b386bbd373df7da7795396d70fe52b05de37a305219181fd8a23",
+          "at": "2026-07-27T16:59:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ObligationFulfillmentCacheEntryState.docs` restates CN-04’s behavioral contract by asserting that bound-test diagnostics do not affect fingerprint lookup. Keep this downstream documentation to the type’s local purpose plus an anchor reference, leaving lookup-selection behavior in `spec.json`, as required by `no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+              "line": 989,
+              "category": "upstream-restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:df58ffacfd61b386bbd373df7da7795396d70fe52b05de37a305219181fd8a23",
+          "at": "2026-07-27T17:04:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b49d83e835db7640f69abb63e15ef81ef614cf7ed9108e6dd914b36fc20328f5",
+          "at": "2026-07-27T17:17:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b49d83e835db7640f69abb63e15ef81ef614cf7ed9108e6dd914b36fc20328f5",
+          "at": "2026-07-27T17:19:03Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db35833fa210981bbc93e3e1892797d6ede808d4fbf4c215801e238719a239cb",
+          "at": "2026-07-27T00:00:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db35833fa210981bbc93e3e1892797d6ede808d4fbf4c215801e238719a239cb",
+          "at": "2026-07-27T00:04:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a7b8878e555bfdd2a32213e72cb197bdc24ea3b87be2360187025cffc4a1dbf6",
+          "at": "2026-07-27T05:56:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a7b8878e555bfdd2a32213e72cb197bdc24ea3b87be2360187025cffc4a1dbf6",
+          "at": "2026-07-27T06:00:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9f6a163fd3741e801f9c74be5aae601218a176646daa53695ddbaa6f7dbf86e",
+          "at": "2026-07-27T09:48:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e9f6a163fd3741e801f9c74be5aae601218a176646daa53695ddbaa6f7dbf86e",
+          "at": "2026-07-27T09:54:55Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e133c7290b02c7193e818f9665e022ab928e0a9ae50d7754ae8396af8a2af50",
+          "at": "2026-07-27T03:29:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0e133c7290b02c7193e818f9665e022ab928e0a9ae50d7754ae8396af8a2af50",
+          "at": "2026-07-27T03:32:43Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcae4320e54a308e4469ebd49421ff49c66839c258d082d56acb2fff85845c34",
+          "at": "2026-07-27T05:56:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dcae4320e54a308e4469ebd49421ff49c66839c258d082d56acb2fff85845c34",
+          "at": "2026-07-27T05:59:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21717aac6c87c189cd4ba88118fd90dac23a81bcf9b9624d21471280a9f67ade",
+          "at": "2026-07-27T14:34:02Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:21717aac6c87c189cd4ba88118fd90dac23a81bcf9b9624d21471280a9f67ade",
+          "at": "2026-07-27T14:39:57Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "When no exact current-key entry exists, the fallback uses `iter().find(...)` on only `(edge_id, obligation_id)`, so multiple historical rows make drift classification depend on cache row order. For example, one row with a changed bound-test hash and another with a changed declaration hash produces different reported drift depending on ordering. The fallback must aggregate or otherwise deterministically classify all matching candidates (and fail closed on ambiguity) rather than selecting the first row.",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/check.rs",
+              "line": 539,
+              "category": "orchestration correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aef173043b579676959fe1365f22763a3afd1f9f320494d13537955943f35015",
+          "at": "2026-07-26T18:10:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c59f8ff80f841d2cc5cfb68937de01062c02b9992ce00951f9e7a833a5006c06",
+          "at": "2026-07-26T18:50:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c59f8ff80f841d2cc5cfb68937de01062c02b9992ce00951f9e7a833a5006c06",
+          "at": "2026-07-26T18:54:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5a80828642febd810e193b3530b5663742abbe35b32ddf24c55fdcae17aca62c",
+          "at": "2026-07-27T00:00:39Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:27546d1a7f8c5cbb58182546242b8c891139635c75b0837badccd5c15ec08f4d",
+          "at": "2026-07-27T00:26:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "同一の完全キーを持つ複数のキャッシュ行があると、ambiguity を即座に伝播して保存前に `evaluate` を終了します。そのため `check` と通常の `evaluate` の両方が恒久的に失敗し、重複 binding を修正しても古い競合行が残るため、復旧には手動のキャッシュ編集・削除が必要です。fail-closed な `check` は維持しつつ、`evaluate` には競合行を再評価して置換できる正常な復旧経路が必要です。",
+              "severity": "P0",
+              "file": "libs/usecase/src/test_obligation/evaluate/plan.rs",
+              "line": 422,
+              "category": "correctness"
+            },
+            {
+              "message": "waiver cache の保存失敗時、以前の fulfillment cache が `ReevaluationRequired` だった場合に空の `Current` 文書を保存しており、元の状態へロールバックしていません。失敗した評価が absent/legacy 状態を正常な空キャッシュへ変換するため、その後の `check` が再評価要求を見失って通過する可能性があります。以前の load state を忠実に復元できる port 操作、または部分保存を発生させない構成が必要です。",
+              "severity": "P0",
+              "file": "libs/usecase/src/test_obligation/evaluate/records.rs",
+              "line": 43,
+              "category": "data_integrity"
+            }
+          ],
+          "hash": "rvw1:sha256:27546d1a7f8c5cbb58182546242b8c891139635c75b0837badccd5c15ec08f4d",
+          "at": "2026-07-27T00:29:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a09542cc07d4c3c16291f92ac7a857e2d8d2456c5b47ade6892e3148b9e222de",
+          "at": "2026-07-27T00:39:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`save_caches` は waiver cache を先に保存し、その後 fulfillment cache の保存に失敗すると waiver だけが新しい評価結果になります。旧実装の fulfillment rollback を削除したため、`evaluate` がエラーを返した後も2つのキャッシュが不整合になり、次回の `results`/`check` が異なる世代の verdict を組み合わせて扱います。waiver 保存失敗時だけでなく fulfillment 保存失敗時にも整合性を復元するか、両キャッシュを原子的に更新できる設計にしてください。",
+              "severity": "P0",
+              "file": "libs/usecase/src/test_obligation/evaluate/records.rs",
+              "line": 34,
+              "category": "orchestration correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4529645d0483c07bea1d83b102366016fcfd4499b111622bf743a7f4134122ab",
+          "at": "2026-07-27T03:28:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`save_caches` は waiver cache を先に保存し、続く fulfillment cache の保存失敗時に waiver cache をロールバックしません。このため `evaluate` がエラーを返しても waiver だけが新世代になり、次回の `results`/`check` が異なる世代の verdict を組み合わせる不整合状態が残ります。両キャッシュを原子的に更新するか、後段保存失敗時に先行保存を復元してください。",
+              "severity": "P0",
+              "file": "libs/usecase/src/test_obligation/evaluate/records.rs",
+              "line": 34,
+              "category": "orchestration correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:439e6c3e22e7d951daa324153c44eb97984b808a644f88d893107645d9b358e0",
+          "at": "2026-07-27T03:33:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3d1d240dd6f97065b7f982dcee3a42c26b626b84e600bdca1c3884c6bbdc1b66",
+          "at": "2026-07-27T05:56:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`new` が公開引数 `source_scanner` を即座に破棄し、実際の bound-test 読み取りは別途注入された resolver 内の scanner だけで行われます。両者に異なる実装を渡せるため、呼出側が指定した scanner と異なるソースを評価・キャッシュでき、宣言された port wiring が無効です。scanner を単一の依存に統合してください。",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate/mod.rs",
+              "line": 336,
+              "category": "architecture"
+            },
+            {
+              "message": "未解決 edge の共通処理が常に `MissingBinding` を記録しますが、この処理は binding が存在する状態での declaration 欠如や spec anchor 欠如にも使われています。そのため human-escalation payload が原因と修復方法を誤って「binding 不在」と報告します。非 verdict の未解決状態を別 outcome で表すか、実際の原因を渡してください。",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate/verify.rs",
+              "line": 94,
+              "category": "error_semantics"
+            },
+            {
+              "message": "AC-06 の回復テストは absent cache だけを開始状態にしており、旧形式を表す `LegacyRowsMissingBoundTests` を一度も生成しません。したがって legacy cache の check→evaluate→check 回復が壊れてもテストは通ります。旧形式 reason を使う active-track 回復 fixture を追加してください。",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/check_tests.rs",
+              "line": 2727,
+              "category": "test_coverage"
+            },
+            {
+              "message": "`VerifyCacheError::SourceScan` を一律 `MalformedArtifact` に変換しているため、`TestSourceScanError::Io` のような読み取り失敗までデータ破損として公開されます。内部 error の種別に応じて `IoError` と malformed/source-validation error を分けてください。",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/results.rs",
+              "line": 377,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:3d1d240dd6f97065b7f982dcee3a42c26b626b84e600bdca1c3884c6bbdc1b66",
+          "at": "2026-07-27T06:08:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`new` は `source_scanner` を依存として受け取りながら即座に破棄し、実際の bound-test 読み取りは `ResolvedBoundTestsResolver` が内部に保持する別 scanner だけを使います。呼出元が scanner A と scanner B で構成された resolver を渡すと、A の読み取り結果やエラーが黙って無視されます。scanner を単一の依存元にするか、冗長な引数を契約から除いてください。",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate/mod.rs",
+              "line": 336,
+              "category": "orchestration correctness"
+            },
+            {
+              "message": "`record_pending_edge` は、binding が存在するものの declaration や spec anchor を解決できない経路からも呼ばれますが、すべてを `MissingBinding` として記録します。その結果、`HumanEscalationRequired` の構造化 payload が実際の失敗原因と異なり、呼出元へ誤った修復対象を示します。plan に unresolved の原因または lane を保持し、実際に binding がない場合だけ `MissingBinding` を使ってください。",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate/verify.rs",
+              "line": 94,
+              "category": "error semantics"
+            },
+            {
+              "message": "`VerifyCacheError::SourceScan` を無条件に `MalformedArtifact` へ変換しているため、内包された `TestSourceScanError::Io` までキャッシュ破損として報告されます。読み取り不能と不正 artifact は異なる回復経路を持つため、少なくとも `Io` は `IoError` に写像し、parse/source-scan failure も適切な usecase-level 概念として分類してください。",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/results.rs",
+              "line": 377,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:3d1d240dd6f97065b7f982dcee3a42c26b626b84e600bdca1c3884c6bbdc1b66",
+          "at": "2026-07-27T06:09:13Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:29c49133b542dd79cd92422a00dfae554c121e117ff4a0822098d7d38e9fbab0",
+          "at": "2026-07-27T09:48:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`record_pending_obligation_id` は既存の fulfillment binding が存在するものの obligation を解決できない場合、または obligation に anchor がない場合に到達しますが、`MissingBinding` を記録しています。その domain 契約は「edge に binding がない」なので、`HumanEscalationRequired` が実際とは異なる修復対象を示します。fulfillment の pending、または dangling obligation 専用 outcome として記録してください。",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/evaluate/verify.rs",
+              "line": 65,
+              "category": "error_semantics"
+            },
+            {
+              "message": "AC-06 の回復テストは `saved: None` から `ReevaluationRequired(Absent)` を返すだけで、旧形式または stale な cache 行を一度も check→evaluate→check に通していません。旧行の破棄・再評価処理が壊れてもこのテストは通るため、実際の stale document または旧形式 load を開始状態とする回復 fixture が必要です。",
+              "severity": "P1",
+              "file": "libs/usecase/src/test_obligation/check_tests.rs",
+              "line": 2727,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:29c49133b542dd79cd92422a00dfae554c121e117ff4a0822098d7d38e9fbab0",
+          "at": "2026-07-27T10:00:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d42cf1d1d795f4ecba2f5643ada2971b54a88f0d3c2ce78e0c8c513b8e47350b",
+          "at": "2026-07-27T10:06:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c88692abd9527f6f72e3881201ff08e5e92152aa49f19a086238a09cec2d2bab",
+          "at": "2026-07-27T12:11:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c88692abd9527f6f72e3881201ff08e5e92152aa49f19a086238a09cec2d2bab",
+          "at": "2026-07-27T12:17:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31e8c2e869f1762f097e5915e500d4354ae2669184eea63785f54ca97e020050",
+          "at": "2026-07-27T14:33:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:31e8c2e869f1762f097e5915e500d4354ae2669184eea63785f54ca97e020050",
+          "at": "2026-07-27T14:44:10Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bcec9382f7200753f7e0e4bdd9d378adbfe7a3bcfa6013be9de796734d90aa0",
+          "at": "2026-07-27T16:06:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6bcec9382f7200753f7e0e4bdd9d378adbfe7a3bcfa6013be9de796734d90aa0",
+          "at": "2026-07-27T16:09:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2e7546539e20effcbce0b740cb244d56c0554c9f225321c69c926541d7a4ad8",
+          "at": "2026-07-27T16:59:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a2e7546539e20effcbce0b740cb244d56c0554c9f225321c69c926541d7a4ad8",
+          "at": "2026-07-27T17:01:12Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3d51cb42df1025cf48a6503969c3aefaf5f9bbc5e58a0c65c8ffcbe7da696c9",
+          "at": "2026-07-26T15:18:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3d51cb42df1025cf48a6503969c3aefaf5f9bbc5e58a0c65c8ffcbe7da696c9",
+          "at": "2026-07-26T15:20:50Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e10064361e4434808d98fa254227646a9765aa1b2cb7f1a6d6693a8455b17c20",
+          "at": "2026-07-26T16:04:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "GO-02 の「評価エラーを黙殺しない」という意図を決定的に証明する AC がない。AC-04 は返却済みの失敗 verdict の schema を検証するだけで、評価処理自体がエラーを返す場合の伝播や非零終了を扱わないため、この目標の一部を未検証のまま完了扱いできる。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+              "line": 22,
+              "category": "missing AC coverage for a stated goal"
+            },
+            {
+              "message": "CN-04 の「error 出力が判定根拠を追跡可能にする」は、追跡可能と判定するための必須情報や観測条件を定義していない。IN-05 は cache 行の `bound_tests` だけを具体化しており error 出力は具体化されないため、下流工程が意味を発明しなければ検証できない制約になっている。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+              "line": 212,
+              "category": "constraint vague or untestable"
+            }
+          ],
+          "hash": "rvw1:sha256:e10064361e4434808d98fa254227646a9765aa1b2cb7f1a6d6693a8455b17c20",
+          "at": "2026-07-26T16:11:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ef03a5bdb48ef39010235d2f2846560cd5152efdc6fd1bd0a8e3146db89da5f",
+          "at": "2026-07-26T16:28:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-07 は verifier provider の解決失敗時における `evaluate` のエラー伝播を要求しているが、IN-01〜IN-05 の declared in_scope は cache entry の選択、重複、binding、失敗 verdict schema、cache 診断情報に限られ、provider 解決や評価エラー伝播を含まない。したがって、この AC は宣言された in_scope 外の振る舞いを完了条件にしている。",
+              "severity": "P1",
+              "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+              "line": 324,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:8ef03a5bdb48ef39010235d2f2846560cd5152efdc6fd1bd0a8e3146db89da5f",
+          "at": "2026-07-26T16:30:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:07677710a91fed0ac49b9cccd00b7c6c49268d6c615cb1a9f4e3d9776c2f73a0",
+          "at": "2026-07-26T16:33:52Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ec9f224ba6ac1469b045aed67f5323a91fea76407e224bddd93e6699b480af5",
+          "at": "2026-07-27T00:00:44Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ec9f224ba6ac1469b045aed67f5323a91fea76407e224bddd93e6699b480af5",
+          "at": "2026-07-27T00:04:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6dbcba224c996ff437b21dc03755c00e76b55159ba7f054bf6805f3f19e94801",
+          "at": "2026-07-27T03:28:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`load` は完全キーで current row を選ぶ前に、全 persisted row の診断用 `bound_tests` を現行 worktree で再走査しています。同じ test location の body 変更後に old-hash の historical row と new-hash の current row が共存すると、historical row も new hash に解決され、この分岐が cache 全体を `ReevaluationRequired` にするため、有効な current verdict があっても `check` が失敗します。historical test が削除済みなら `SourceScan` error となり、`evaluate` による自動回復もできません。診断情報で全 document を失効させず、三つ組＋fingerprint に一致する候補を historical rows から独立して扱ってください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 313,
+              "category": "adapter correctness"
+            },
+            {
+              "message": "JSON 由来の `entries` と各 `bound_tests` は件数上限がない一方、decoder は各 row/location を resolver に渡します。本番 scanner は location ごとにファイル読取と Rust parse を行うため、大きな cache artifact で無制限の filesystem I/O と parsing を発生させられます。artifact、entry、location の上限を検証してから source resolution を行ってください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 269,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:6dbcba224c996ff437b21dc03755c00e76b55159ba7f054bf6805f3f19e94801",
+          "at": "2026-07-27T03:33:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`save` は byte 上限しか検証せず、`load` だけが entry 数と entry ごとの bound-test 数を制限しています。そのため domain 上は有効な 1,025 entries または 65 bound tests の document を 4 MiB 未満で正常保存した後、自身の `load` が `MalformedJson` として拒否します。また上限検査前の `document_to_dto` が無制限に収集します。保存前にも同じ構造上限を検証してください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 217,
+              "category": "adapter correctness"
+            },
+            {
+              "message": "`O_NOFOLLOW` は最終 component しか保護しません。事前の `reject_symlinks_below` 後に track directory を symlink へ差し替えると、この pathname-based `open` は ancestor symlink を辿って trusted items root 外の cache を開けます。既存の `ref_verify::guarded_io::open_guarded_path` と同様、trusted-root の directory handle から各 component を `openat(..., O_DIRECTORY|O_NOFOLLOW)` で固定してください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 405,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "resolver の全エラーを `let Ok(...)` で捨てて row absence に変換しています。permission failure や Rust parse failure まで stale historical row と区別されず、adapter の I/O failure が型付きエラーとして伝播しません。無視可能な stale 状態だけを明示的に分類し、それ以外の `TestSourceScanError` は `VerifyCacheError` へ伝播してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 291,
+              "category": "error handling"
+            },
+            {
+              "message": "regular-file 検査は `open` 後ですが、Unix の open flags に `O_NONBLOCK` がありません。cache path が FIFO の場合は symlink guardを通過し、metadata/byte-cap 検査へ到達する前に無期限 block します。既存の `read_output_last_message_at` と同様に nonblocking で開いてから file type を検証してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 405,
+              "category": "unbounded I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:dec546e492fa2e5aa7dcd5d85d3849252f569c9b1dbf6767643c7ccbb380eb34",
+          "at": "2026-07-27T03:47:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`bound_tests` が無い行や、再走査した hash が persisted key と異なる行を `Ok(None)` で削除してから document を構築しています。このため診断専用の `bound_tests` が full-key candidate 集合を変更します。同一 edge / obligation / 三つ組 key / fingerprint を持つ矛盾した2行の片方だけで `bound_tests` を省略・変更すると、その行が消えて `lookup_current` は ambiguity を検出せず、残った verdict を採用できます。full identity の重複は診断情報を除外する前に fail-closed で検出し、異なる full key の historical row だけを独立して無視してください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 297,
+              "category": "adapter correctness"
+            },
+            {
+              "message": "欠落 source の判定を `TestSourceScanError::Io` の diagnostic 文字列との完全一致で行っています。同じ文言を持つ実際の I/O failure も row absence として黙って捨てられ、文言変更だけでも欠落状態の扱いが変わります。`NotFound` などの型付き variant／outcome を用意し、それだけを回復可能状態として扱ってください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 314,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:b4104e88ed52d328d0676a75fd861d6a524f61c86fdd488496815366da954e25",
+          "at": "2026-07-27T03:58:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aea33ffe6f31d668aa586ce30802242c62c8cd9504806a00c7ea69c8d35c08c4",
+          "at": "2026-07-27T05:56:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`document_from_dto` は全 persisted row を `entry_from_dto(...)?` で再検証するため、`bound_tests` を持たない旧形式行、source が削除された historical 行、または現行 source hash と old key が異なる historical 行が1件でもあると、完全キー照合前に cache 全体を `MalformedJson` / `SourceScan` で拒否します。有効な current row が共存していても利用できず、さらに `evaluate` も同じ `load` error を伝播するため、AC-06 が要求する通常の再評価による旧 cache の自動置換も実行できません。診断用 `bound_tests` を unrelated historical full keys の document-wide 有効性条件にせず、full-identity 重複は fail-closed で保持・検出しながら current candidate を独立して扱ってください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 270,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aea33ffe6f31d668aa586ce30802242c62c8cd9504806a00c7ea69c8d35c08c4",
+          "at": "2026-07-27T06:03:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "全 persisted row を `entry_from_dto` で検証しているため、新設された診断用 `bound_tests` がない旧形式 row、source が削除された historical row、または現行 source hash と key が異なる historical rowのいずれか1件で cache 全体がエラーになります。`evaluate` も同じ `load` エラーを伝播するので、旧/stale cache を通常の再評価で置換できず、有効な current row が共存していても利用できません。診断情報を document-wide validity gate にせず、full identity の重複は ambiguity として保持しつつ、current 候補と無関係な historical row から独立して回復できるようにしてください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 270,
+              "category": "adapter correctness"
+            },
+            {
+              "message": "read/write の guarded-open helper は `cfg(not(unix))` で常に `Unsupported` を返すため、Windows では fulfillment-cache port の既存 cache load と全 save が失敗します。同じ infrastructure 層の waiver-cache adapter は Windows の reparse-point 拒否を実装しており、round-trip test も Unix 限定ではありません。Windows でも descriptor/reparse-point を使った fail-closed open を実装するか、port 自体を明示的に対応 platform へ限定してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 473,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:aea33ffe6f31d668aa586ce30802242c62c8cd9504806a00c7ea69c8d35c08c4",
+          "at": "2026-07-27T06:04:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "On Windows, the guarded cache I/O ignores `trusted_root` and opens `path` directly (`let _ = trusted_root; ... open(path)`), while the write path calls `create_dir_all(parent)` before its symlink check. This does not enforce that the resolved path remains beneath the trusted root and leaves a symlink/junction race that can redirect cache reads or writes outside the intended items directory. Implement descriptor/reparse-point-pinned traversal or an equivalent fail-closed root-containment check for Windows.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
+              "line": 166,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:2cf5d750491091682127cef0d7889f99bd6fb68c0b77133974fe2e49a25b3928",
+          "at": "2026-07-27T09:48:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fc2a8f774738c86f690f761c2837f4e0b960a84958e535b88c9befb62ecbe622",
+          "at": "2026-07-27T09:52:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`document_from_dto` は `entry_from_dto` の全エラーを `if let Ok(Some(...))` で黙って行の削除へ変換します。同一の完全 identity を持つ2行の片方だけで `bound_tests` を不正にすると、その行が消えて ambiguity が検出されず、残った verdict が採用されます。明示的に分類された legacy/historical 状態以外は fail-closed で拒否してください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 285,
+              "category": "adapter correctness"
+            },
+            {
+              "message": "`entry_from_dto` は注入された resolver を無視し、固定文字列を `ScannedBoundTests` として作りながら、hash closure では wire 上の key hash をそのまま返しています。これにより任意の persisted location と hash が source-derived な `ResolvedBoundTests` として受理され、`try_new` の evidence 検証が恒真になります。persisted diagnostics を表す別の型／constructor を使用し、source provenance を捏造しないでください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 330,
+              "category": "broken invariant"
+            },
+            {
+              "message": "Windows の read は `trusted_root` を無視して pathname を直接開き、write も `create_dir_all` と事前検査後に pathname を開きます。`FILE_FLAG_OPEN_REPARSE_POINT` が保護するのは最終 component だけなので、ancestor junction の差し替えにより trusted root 外のファイルを読み取り、または truncate できます。各 component を handle-relative に固定するなど、root containment を原子的に保証してください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
+              "line": 170,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:9afd8f2c7b75e9e7b2f3428ed8e0e52d3d381cad0b64d6bc4657010f94a5ed31",
+          "at": "2026-07-27T10:06:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8f40cc3f94606038a03ce40e42396cc7dbdf7ea8e8936224bc316ba531dca0d9",
+          "at": "2026-07-27T12:11:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`entry_from_dto` は `bound_tests` を持つ全 persisted row を現行 worktree で再走査します。同じ location の source が更新された後、old hash の historical row と valid current row が共存すると、historical row の再計算 hash が persisted key と一致せず cache 全体がエラーになります。削除済み historical test でも `SourceScan` となるため、有効な current verdict の利用と通常再評価による回復を妨げます。診断情報を document-wide validity 条件にせず、unrelated historical identities から current lookup を独立させてください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 330,
+              "category": "adapter correctness"
+            },
+            {
+              "message": "`legacy_historical_entry` は `bound_tests` がないだけで row を identity の検証前に削除します。旧形式にも三つ組 key と fingerprint は存在するため、有効な row と同じ完全 identity を持つ legacy row が共存すると、その重複が消えて `lookup_current` の ambiguity を回避できます。`bound_tests` は lookup identity ではないため、raw full identity の重複を先に fail-closed で検出してください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 296,
+              "category": "adapter correctness"
+            },
+            {
+              "message": "非 Unix では guarded read/write が常に `Unsupported` を返しますが、adapter と port implementation は全 platform で構築可能なままです。そのため Windows では既存 cache を読み込めず、評価結果も一切保存できません。安全な Windows 実装を提供するか、adapter/composition 自体を compile-time で対応 platform に限定してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
+              "line": 162,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c3506e7b1a0afa0b9fd736933aafceb935b4bc160135471b49a6cf901c7d69cd",
+          "at": "2026-07-27T12:25:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`entry_from_dto` は `bound_tests` を持つ全 persisted row を現行 worktreeで再走査します。test body 更新後に old-hash の historical row と valid current row が共存すると、historical row の再計算 hash が persisted key と一致せず、cache 全体が `FulfillmentCacheEntry` error になります。削除済み historical test でも `SourceScan` となるため、有効な current verdict の利用と通常再評価による回復を妨げます。診断情報を document-wide validity 条件にせず、unrelated historical identities から current lookup を独立させてください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 349,
+              "category": "adapter correctness"
+            },
+            {
+              "message": "duplicate full identity を domain documentへ渡す前に一律 `VerifyCacheError::MalformedJson` へ変換しているため、`lookup_current` が契約する `FulfillmentCacheLookupError::AmbiguousCurrentEntries` と、その edge/obligation/key payload が一度も返りません。fail-closed ではありますが、briefing が要求する型付き ambiguity error surfaceを破っています。重複を domain lookup に保持するか、同等の型付き payload として伝播してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 296,
+              "category": "error handling"
+            },
+            {
+              "message": "`JsonObligationFulfillmentCacheCodec` の型定義は `#[cfg(unix)]` ですが、この `impl JsonObligationFulfillmentCacheCodec` は無条件にコンパイルされます。module 自体も非 Unix で有効なため、Windows 等では未定義型への impl となり library build が失敗します。platform gating を型・全 impl・公開 wiring に一貫して適用してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 272,
+              "category": "portability"
+            }
+          ],
+          "hash": "rvw1:sha256:8656f08c8054a8957e561b6ac61b4ba46f8f0681ebb237b25cea563743c12d89",
+          "at": "2026-07-27T12:34:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`entry_from_dto` は `bound_tests` を持つ全 persisted row を現行 worktreeで再走査します。test body 更新後に old-hash の historical row と valid current row が共存すると、historical row の再計算 hash が persisted key と一致せず cache 全体がエラーになります。削除済み historical test でも `SourceScan` となるため、有効な current verdict の利用と通常再評価による回復を妨げます。診断情報を document-wide validity 条件にせず、unrelated historical identities から current lookup を独立させてください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 336,
+              "category": "adapter correctness"
+            },
+            {
+              "message": "`legacy_historical_entry` は `bound_tests` がないだけで row を完全 identity の検証前に削除します。旧 wire formatにも三つ組 key と fingerprint は存在するため、有効な row と同じ完全 identity を持つ row から `bound_tests` だけを除くと、その重複が消えて `lookup_current` の ambiguity を回避できます。診断情報を除外する前に full identity の重複を fail-closed で保持・検出してください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 302,
+              "category": "adapter correctness"
+            },
+            {
+              "message": "`JsonObligationFulfillmentCacheCodec` の型定義は `#[cfg(unix)]` ですが、この conversion-helper `impl JsonObligationFulfillmentCacheCodec` は無条件にコンパイルされます。module 自体も非 Unix で有効なため、Windows 等では未定義型への impl となり library build が失敗します。platform gating を型と全 impl に一貫して適用してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 273,
+              "category": "portability"
+            }
+          ],
+          "hash": "rvw1:sha256:59ced12e09e56eb97c82eaeb527fd9fce7a4a4562580786256f9903cff700870",
+          "at": "2026-07-27T12:41:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`entry_from_dto` は `bound_tests` を持つ全 persisted row を現行 worktreeで再走査します。test body 更新後に old-hash の historical row と valid current row が共存すると、historical row の再計算 hash が persisted key と一致せず cache 全体がエラーになります。削除済み historical test でも `SourceScan` となるため、有効な current verdict の利用と通常再評価による回復を妨げます。診断情報を document-wide validity 条件にせず、unrelated historical identities から current lookup を独立させてください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 336,
+              "category": "adapter correctness"
+            },
+            {
+              "message": "`legacy_historical_entry` は `bound_tests` がないだけで row を完全 identity の検証前に削除します。旧 wire formatにも三つ組 key と fingerprint は存在するため、有効な row と同じ完全 identity を持つ row から `bound_tests` だけを除くと、その重複が消えて `lookup_current` の ambiguity を回避できます。診断情報を除外する前に full identity の重複を fail-closed で保持・検出してください。",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 302,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2fb384eefdd7e647f00499d20ca009b2f844e41c9023d9ea726c0362cde2cb25",
+          "at": "2026-07-27T12:44:42Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`JsonObligationFulfillmentCacheCodec` and its port implementation are gated with `#[cfg(unix)]`, but `apps/cli-composition/src/test_obligation.rs` imports and constructs this type unconditionally. On Windows or another non-Unix target, the infrastructure crate omits the exported type, so the workspace fails to compile rather than using the intended fail-closed `Unsupported` I/O behavior already implemented in `fulfillment_cache_io.rs`. Keep the adapter type/constructor available on all targets and return a typed unsupported error on non-Unix platforms.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec.rs",
+              "line": 130,
+              "category": "port impl / cross-platform compilation"
+            }
+          ],
+          "hash": "rvw1:sha256:b97c931d1043136ad95c9af5acaddf80699f5383f4cbc95904de83414d3798cf",
+          "at": "2026-07-27T14:34:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd8f8788edbc49a6b046fc6fed537bd6f937c48a567407bfd58e51b3cb86e991",
+          "at": "2026-07-27T14:38:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The guarded writer opens `trusted_root` before creating anything and only creates descendants afterward. When `items_dir` itself does not yet exist, first-time `save` now fails with `NotFound`; the previous implementation created the complete parent path, and the shared root guard explicitly permits missing roots so saves can create them. Create the trusted root safely before opening it and add a missing-root regression test.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
+              "line": 184,
+              "category": "adapter_correctness"
+            },
+            {
+              "message": "This test never varies diagnostic data or exercises diagnostic-to-hash derivation: both hashes are computed from the identical byte literal and then wrapped directly, so the assertion is tautological. It would still pass if the real resolved-bound-tests hashing incorrectly incorporated diagnostic locations. Resolve two inputs with different diagnostics but identical scanned source and compare the resolver-produced hashes/keys.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/sha256_content_hasher.rs",
+              "line": 108,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:cd8f8788edbc49a6b046fc6fed537bd6f937c48a567407bfd58e51b3cb86e991",
+          "at": "2026-07-27T14:46:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`create_dir_all(trusted_root)` resolves and creates the trusted-root path by pathname after the caller's symlink check. An attacker can replace an ancestor with a symlink between that check and this call; `O_NOFOLLOW` on the subsequent `open` protects only the final component, so the cache can be created or truncated outside the trusted root. Create and open the root through a descriptor-pinned, no-follow component walk from a stable ancestor.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
+              "line": 242,
+              "category": "trusted_root_violation"
+            }
+          ],
+          "hash": "rvw1:sha256:8ea3ad574ff6932a71a8a2a074430f6b27843bfed9d6fc14782b08bb54d0d054",
+          "at": "2026-07-27T14:53:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The read path still opens `trusted_root` by pathname after separate symlink preflight checks. `O_NOFOLLOW` protects only the final component, so replacing an ancestor between the check and this open redirects the descriptor outside the trusted root and allows loading an external cache. Acquire the read root with the same component-by-component, descriptor-pinned `openat` walk used by the writer, without creating missing components.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
+              "line": 121,
+              "category": "trusted_root_violation"
+            },
+            {
+              "message": "Safe relative roots beginning with `.` are rejected because the component walk accepts only `RootDir` followed by `Normal` components. For example, `JsonObligationFulfillmentCacheCodec::new(PathBuf::from(\".\"))` can load but every save fails on `Component::CurDir`, even though the constructor requires neither an absolute nor a normalized path. Consume a leading `CurDir` while continuing to reject `ParentDir`, and add a relative-root regression test.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/fulfillment_cache_io.rs",
+              "line": 255,
+              "category": "adapter_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:c2db3dd3cfc649b0edd0c0c318dc4bf730be4c698ee6672fa1e38853677a081a",
+          "at": "2026-07-27T14:58:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:71ea34da93e874b45bf21cff4bf70b31766cf1fff2ee8f9e6a7c92bb45d42d49",
+          "at": "2026-07-27T15:03:08Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb91ca1adf417463ec7a61ddd23bfe553ff6902ece3f1284fca513043320a541",
+          "at": "2026-07-27T16:06:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The legacy-wire regression removes both `bound_tests` and `verifier_fingerprint`, but the immediately preceding cache format persisted the fingerprint and lacked only the newly added `bound_tests`. Because decoding now branches on that exact field combination, the real upgrade path is untested. Keep the fingerprint, remove only `bound_tests`, and assert that the row becomes `Legacy` and remains fail-closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/test_obligation/fulfillment_cache_codec/tests.rs",
+              "line": 150,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:cb91ca1adf417463ec7a61ddd23bfe553ff6902ece3f1284fca513043320a541",
+          "at": "2026-07-27T16:09:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:54dc93afefd6c51270d6ac4103a88d3dcf61f6875c84a1c3f8cf52044b645c6c",
+          "at": "2026-07-27T16:13:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b239f7be25d426c4f37a446e175ce4a01c6ef6043d8b5c8ea751d179d9045ea",
+          "at": "2026-07-27T16:59:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0b239f7be25d426c4f37a446e175ce4a01c6ef6043d8b5c8ea751d179d9045ea",
+          "at": "2026-07-27T17:00:52Z"
         }
       ]
     }
