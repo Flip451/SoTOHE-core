@@ -15,9 +15,9 @@
       "trait_ref": "core::clone::Clone"
     },
     {
-      "action": "modify",
+      "action": "add",
       "for_type": "JsonObligationFulfillmentCacheCodec",
-      "trait_ref": "domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort"
+      "trait_ref": "usecase::test_obligation::ports::ObligationFulfillmentCachePort"
     },
     {
       "action": "reference",
@@ -48,13 +48,33 @@
       "action": "reference",
       "for_type": "ObligationFulfillmentCacheEntryDto",
       "trait_ref": "serde::de::Deserialize<'de>"
+    },
+    {
+      "action": "reference",
+      "for_type": "Sha256ContentHasher",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "Sha256ContentHasher",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "Sha256ContentHasher",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "Sha256ContentHasher",
+      "trait_ref": "usecase::test_obligation::hasher::ContentHasherPort"
     }
   ],
   "traits": {},
   "types": {
     "JsonObligationFulfillmentCacheCodec": {
-      "action": "reference",
-      "docs": "JSON fulfillment-cache secondary adapter.",
+      "action": "modify",
+      "docs": "JSON fulfillment-cache adapter.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -84,43 +104,11 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-01",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
-          "anchor": "IN-02",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
-          "anchor": "IN-04",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
           "anchor": "IN-05",
           "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
         },
         {
-          "anchor": "CN-01",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
-          "anchor": "CN-02",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
           "anchor": "CN-04",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
-          "anchor": "AC-01",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
-          "anchor": "AC-02",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
-          "anchor": "AC-04",
           "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
         },
         {
@@ -135,7 +123,7 @@
     },
     "ObligationFulfillmentCacheEntryDto": {
       "action": "modify",
-      "docs": "Serde mirror for the domain fulfillment-cache row.",
+      "docs": "Fulfillment-cache entry serde DTO.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -152,7 +140,43 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-04",
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "Sha256ContentHasher": {
+      "action": "reference",
+      "docs": "SHA-256 secondary adapter.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::sha256_content_hasher",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
           "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
         },
         {
@@ -160,7 +184,7 @@
           "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
         },
         {
-          "anchor": "AC-04",
+          "anchor": "CN-04",
           "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
         },
         {

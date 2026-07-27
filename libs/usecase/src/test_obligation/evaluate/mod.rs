@@ -36,8 +36,7 @@ use domain::tddd::test_obligation::pair::{
     AnchorText, EntryDeclaration, ObligationFulfillmentPair, TestsSource, WaiverPair,
 };
 use domain::tddd::test_obligation::ports::{
-    ObligationFulfillmentCachePort, ObligationsArtifactPort, TestBindingsArtifactPort,
-    TestSourceScannerPort, WaiverCachePort,
+    ObligationsArtifactPort, TestBindingsArtifactPort, TestSourceScannerPort, WaiverCachePort,
 };
 use domain::tddd::test_obligation::verdict::{
     DetectionRatePercent, ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict,
@@ -47,7 +46,9 @@ use domain::{SpecDocumentLoaderPort, TrackId};
 
 use crate::semantic_verdict_core::driver::SemanticEscalationDriverPort;
 
+use super::bound_tests::ResolvedBoundTestsResolver;
 use super::hasher::ContentHasherPort;
+use super::ports::ObligationFulfillmentCachePort;
 use super::{LoadedCatalogueDocument, diag, is_active_branch};
 
 mod cache;
@@ -264,7 +265,6 @@ struct Tally {
 pub struct EvaluateTestObligationsInteractor {
     obligations_port: Arc<dyn ObligationsArtifactPort + Send + Sync>,
     bindings_port: Arc<dyn TestBindingsArtifactPort + Send + Sync>,
-    source_scanner: Arc<dyn TestSourceScannerPort + Send + Sync>,
     fulfillment_driver: Arc<
         dyn SemanticEscalationDriverPort<
                 ObligationFulfillmentPair,
@@ -291,6 +291,7 @@ pub struct EvaluateTestObligationsInteractor {
     spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
     catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
     hasher: Arc<dyn ContentHasherPort + Send + Sync>,
+    resolved_bound_tests_resolver: Arc<ResolvedBoundTestsResolver>,
 }
 
 impl EvaluateTestObligationsInteractor {
@@ -327,11 +328,16 @@ impl EvaluateTestObligationsInteractor {
         spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
         catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
         hasher: Arc<dyn ContentHasherPort + Send + Sync>,
+        resolved_bound_tests_resolver: Arc<ResolvedBoundTestsResolver>,
     ) -> Self {
+        // The application service owns the scanner dependency. Rebind the
+        // resolver so its evidence reads and scan errors always come from that
+        // same injected port.
+        let resolved_bound_tests_resolver =
+            Arc::new(resolved_bound_tests_resolver.with_source_scanner(source_scanner));
         Self {
             obligations_port,
             bindings_port,
-            source_scanner,
             fulfillment_driver,
             waiver_driver,
             fulfillment_cache,
@@ -342,6 +348,7 @@ impl EvaluateTestObligationsInteractor {
             spec_reader,
             catalogue_reader,
             hasher,
+            resolved_bound_tests_resolver,
         }
     }
 
@@ -501,12 +508,16 @@ fn production_pair_count(
                     .unwrap_or(1);
                 count = count.saturating_add(edge_count.max(1));
             }
-            TestBindingRecord::VoluntaryBinding { edge_id, .. }
-            | TestBindingRecord::Waiver { edge_id, .. } => {
-                // Voluntary bindings and waivers are both adjudicated once
-                // per owning obligation, so the calibration budget must
-                // scale with the owner count (minimum one for catalogue-only
-                // edges).
+            TestBindingRecord::VoluntaryBinding { .. } => {
+                // Validation rejects a voluntary binding with any derived
+                // owner before this count is read, so every valid voluntary
+                // record contributes exactly one catalogue-only edge.
+                count = count.saturating_add(1);
+            }
+            TestBindingRecord::Waiver { edge_id, .. } => {
+                // Waivers are adjudicated once per owning obligation, so the
+                // calibration budget scales with the owner count (minimum one
+                // for catalogue-only edges).
                 let owner_count = obligations.owners_of_edge(edge_id).len();
                 count = count.saturating_add(owner_count.max(1));
             }
@@ -557,6 +568,9 @@ impl EvaluateTestObligationsInteractor {
             (None, Some(_)) => return Err(half_materialized_scope_error("obligations")),
             (Some(_), None) => return Err(half_materialized_scope_error("test-bindings")),
         };
+
+        validate_voluntary_bindings(&obligations, &bindings)
+            .map_err(ObligationEvaluateError::BindingConsistency)?;
 
         let detection_rate =
             self.known_bad_detection_rate(production_pair_count(&obligations, &bindings)).await?;
@@ -618,7 +632,7 @@ impl EvaluateTestObligationsInteractor {
             &mut tally,
             &mut fulfillment_entries,
             &mut waiver_entries,
-        );
+        )?;
 
         self.save_caches(&cmd.track_id, fulfillment_entries, waiver_entries)?;
 
@@ -638,6 +652,19 @@ impl EvaluateTestObligationsInteractor {
             detection_rate,
         ))
     }
+}
+
+/// Applies the domain-owned voluntary-binding ownership invariant to every record.
+fn validate_voluntary_bindings(
+    obligations: &ObligationsDocument,
+    bindings: &TestBindingsDocument,
+) -> Result<(), domain::tddd::test_obligation::errors::TestBindingConsistencyError> {
+    for record in bindings.records() {
+        if let TestBindingRecord::VoluntaryBinding { edge_id, .. } = record {
+            obligations.validate_voluntary_binding(edge_id)?;
+        }
+    }
+    Ok(())
 }
 
 #[cfg(test)]

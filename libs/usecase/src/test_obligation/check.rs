@@ -3,14 +3,10 @@
 // The catalogue contract requires unboxed non-empty error payloads.
 #![allow(clippy::result_large_err)]
 
-use std::path::PathBuf;
 use std::sync::Arc;
 
 use domain::TaskStatusKind;
-use domain::TrackId;
-use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
-    CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort,
-};
+use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort;
 use domain::tddd::test_obligation::binding::{
     TestBindingRecord, TestBindingsDocument, TestLocation,
 };
@@ -24,8 +20,8 @@ use domain::tddd::test_obligation::ids::{
 };
 use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
 use domain::tddd::test_obligation::ports::{
-    ObligationFulfillmentCachePort, ObligationsArtifactPort, TestBindingsArtifactPort,
-    TestObligationRulesLoaderPort, TestSourceScannerPort, WaiverCachePort,
+    ObligationsArtifactPort, TestBindingsArtifactPort, TestObligationRulesLoaderPort,
+    TestSourceScannerPort, WaiverCachePort,
 };
 use domain::tddd::test_obligation::projection::RoleObligationItemsProjector;
 use domain::tddd::test_obligation::verdict::{
@@ -41,11 +37,13 @@ pub use super::check_contract::{
     CheckTestObligationsApplicationService, CheckTestObligationsCommand,
     CheckTestObligationsOutcome,
 };
+mod input;
+mod validation;
+
 use super::check_support::{
-    GateState, SpecElement, active_cited_edges_from_catalogues, anchor_text, anchor_texts,
-    compute_uncited_from, edge_is_derived, edge_is_known, fulfillment_tests,
-    spec_elements_from_document, synthetic_edge, synthetic_voluntary_obligation_id,
-    voluntary_tests, waived_reason,
+    GateState, active_cited_edges_from_catalogues, anchor_text, anchor_texts, compute_uncited_from,
+    edge_is_derived, edge_is_known, fulfillment_tests, synthetic_edge,
+    synthetic_voluntary_obligation_id, voluntary_tests, waived_reason,
 };
 use super::derive::derive_obligations_document;
 use super::results::TestObligationStatusLaneSummary;
@@ -57,6 +55,10 @@ use super::{
     LoadedCatalogueDocument, diag, find_declaration_text_from_loaded,
     obligation_declaration_text_from_loaded, sha256_content_hash,
 };
+
+use super::ports::ObligationFulfillmentCachePort;
+use input::{has_catalogue, load_catalogues, spec_elements};
+use validation::validate_voluntary_bindings;
 
 /// Interactor implementing [`CheckTestObligationsApplicationService`] (IN-08).
 pub struct CheckTestObligationsInteractor {
@@ -107,38 +109,6 @@ impl CheckTestObligationsInteractor {
             impl_plan_reader,
         }
     }
-
-    fn load_catalogues(
-        &self,
-        cmd: &CheckTestObligationsCommand,
-    ) -> Result<Vec<LoadedCatalogueDocument>, ObligationCheckError> {
-        let mut catalogues = Vec::with_capacity(cmd.input.catalogue_paths().len());
-        for path in cmd.input.catalogue_paths() {
-            let doc =
-                self.catalogue_reader.load(path).map_err(ObligationCheckError::CatalogueLoad)?;
-            catalogues.push(LoadedCatalogueDocument::new(path, doc));
-        }
-        Ok(catalogues)
-    }
-
-    fn has_catalogue(
-        &self,
-        cmd: &CheckTestObligationsCommand,
-    ) -> Result<bool, ObligationCheckError> {
-        cmd.input.catalogue_paths().iter().try_fold(false, |exists, path| {
-            match self.catalogue_reader.load(path) {
-                Ok(_) => Ok(true),
-                Err(CatalogueDocumentLoaderError::NotFound { .. }) => Ok(exists),
-                Err(error) => Err(ObligationCheckError::CatalogueLoad(error)),
-            }
-        })
-    }
-
-    fn spec_elements(&self, track_id: &TrackId) -> Result<Vec<SpecElement>, ObligationCheckError> {
-        let spec_path = PathBuf::from(format!("track/items/{}/spec.json", track_id.as_ref()));
-        let spec = self.spec_reader.load(&spec_path).map_err(ObligationCheckError::SpecLoad)?;
-        Ok(spec_elements_from_document(&spec))
-    }
 }
 
 impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
@@ -167,7 +137,7 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
 
         // Catalogue-bearing tracks require enrollment; catalogue-free tracks are empty.
         let (obligations, bindings) = match (obligations, bindings) {
-            (None, None) if !self.has_catalogue(cmd)? => {
+            (None, None) if !has_catalogue(self.catalogue_reader.as_ref(), cmd)? => {
                 return Ok(CheckTestObligationsOutcome::new_empty_scope(Vec::new()));
             }
             (None, None) => return Err(ObligationCheckError::ObligationsAbsent),
@@ -176,8 +146,11 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
             (Some(obligations), Some(bindings)) => (obligations, bindings),
         };
 
-        let catalogues = self.load_catalogues(cmd)?;
-        let elements = self.spec_elements(cmd.input.track_id())?;
+        validate_voluntary_bindings(&obligations, &bindings)
+            .map_err(ObligationCheckError::BindingConsistency)?;
+
+        let catalogues = load_catalogues(self.catalogue_reader.as_ref(), cmd)?;
+        let elements = spec_elements(self.spec_reader.as_ref(), cmd.input.track_id())?;
         let derivation_catalogues = catalogues
             .iter()
             .map(|catalogue| (catalogue.read_path().to_path_buf(), catalogue.document().clone()))
@@ -200,9 +173,7 @@ impl CheckTestObligationsApplicationService for CheckTestObligationsInteractor {
             .fulfillment_cache
             .load(cmd.input.track_id())
             .map_err(ObligationCheckError::CacheIo)?
-            .unwrap_or_else(|| {
-                ObligationFulfillmentCacheDocument::new(cmd.input.track_id().clone(), Vec::new())
-            });
+            .ok_or(ObligationCheckError::FulfillmentCacheRequiresEvaluation)?;
         let waiver = self
             .waiver_cache
             .load(cmd.input.track_id())

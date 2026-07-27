@@ -4,19 +4,17 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| EdgeResolutionOutcome | enum | modify | Fulfillment, Waiver, MissingBinding | 🟡 | 🔵 |
-| FulfillmentCacheReevaluationReason | enum | add | Absent, LegacyRowsMissingBoundTests | 🔵 | 🔵 |
-| ObligationFulfillmentCacheLoad | enum | add | Current, ReevaluationRequired | 🟡 | 🔵 |
+| EdgeResolutionOutcome | enum | modify | Fulfillment, Waiver, MissingBinding | 🔵 | 🔵 |
+| ObligationFulfillmentCacheEntryState | enum | add | Legacy, Identified | 🔵 | 🔵 |
 
 ## Value Objects
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| EdgeVerdictRecord | value_object | modify | — | 🟡 | 🔵 |
+| EdgeVerdictRecord | value_object | modify | — | 🔵 | 🔵 |
 | ObligationFulfillmentCacheDocument | value_object | modify | — | 🔵 | 🔵 |
-| ObligationFulfillmentCacheEntry | value_object | modify | — | 🟡 | 🔵 |
-| ObligationsDocument | value_object | modify | — | 🟡 | 🔵 |
-| ResolvedBoundTests | value_object | add | — | 🟡 | 🔵 |
+| ObligationFulfillmentCacheEntry | value_object | modify | — | 🔵 | 🔵 |
+| ObligationsDocument | value_object | modify | — | 🔵 | 🔵 |
 
 ## Error Types
 
@@ -24,14 +22,13 @@
 |------|------|--------|---------|--------|----------|
 | FulfillmentCacheLookupError | error_type | add | AmbiguousCurrentEntries | 🔵 | 🔵 |
 | ObligationCheckError | error_type | modify | RulesLoad, ObligationsAbsent, BindingsAbsent, StaleObligationsArtifact, DriftsDetected, UnresolvedEdges, StaleVerdicts, CatalogueLoad, SpecLoad, InvalidCatalogueState, ArtifactCodec, SourceScan, CacheIo, TaskAttribution, FulfillmentCacheLookup, BindingConsistency, FulfillmentCacheRequiresEvaluation | 🔵 | 🔵 |
-| ObligationEvaluateError | error_type | modify | TrackNotActive, CatalogueLoad, SpecLoad, ArtifactLoad, TestSourceScan, VerifierPort, CachePersistence, SemanticFailuresConfirmed, HumanEscalationRequired, FulfillmentCacheLookup, BindingConsistency, CacheEntry | 🟡 | 🔵 |
-| ObligationFulfillmentCacheEntryError | error_type | add | BoundTestsHashMismatch | 🟡 | 🔵 |
+| ObligationEvaluateError | error_type | modify | TrackNotActive, CatalogueLoad, SpecLoad, ArtifactLoad, TestSourceScan, VerifierPort, CachePersistence, SemanticFailuresConfirmed, HumanEscalationRequired, FulfillmentCacheLookup, BindingConsistency | 🔵 | 🔵 |
 | TestBindingConsistencyError | error_type | add | VoluntaryBindingOwnsDerivedObligation | 🔵 | 🔵 |
-| VerifyCacheError | error_type | modify | Io, MalformedJson, FulfillmentCacheEntry | 🟡 | 🔵 |
+| VerifyCacheError | error_type | reference | Io, MalformedJson | 🔵 | 🔵 |
 
-## Secondary Ports
+## Free Functions
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ObligationFulfillmentCachePort | secondary_port | modify | fn load(&self, track_id: &TrackId) -> Result<ObligationFulfillmentCacheLoad, VerifyCacheError>, fn save(&self, doc: &ObligationFulfillmentCacheDocument) -> Result<(), DiagnosticMessage> | 🟡 | 🔵 |
+| domain::tddd::test_obligation::ids::unavailable_diagnostic_message | free_function | add | fn() -> DiagnosticMessage | 🔵 | 🔵 |
 

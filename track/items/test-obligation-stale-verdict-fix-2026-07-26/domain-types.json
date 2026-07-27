@@ -1,45 +1,23 @@
 {
   "crate_name": "domain",
-  "functions": {},
-  "inherent_impls": [
-    {
-      "methods": [
+  "functions": {
+    "domain::tddd::test_obligation::ids::unavailable_diagnostic_message": {
+      "action": "add",
+      "docs": "Fallback diagnostic message constructor.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [],
+      "returns": "DiagnosticMessage",
+      "role": "FreeFunction",
+      "spec_refs": [
         {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "new",
-          "params": [
-            {
-              "name": "set_hash",
-              "ty": "BoundTestsSetHash"
-            },
-            {
-              "name": "locations",
-              "ty": "NonEmptyTestLocations"
-            }
-          ],
-          "returns": "Self"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "set_hash",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&BoundTestsSetHash"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "locations",
-          "params": [],
-          "receiver": "&self",
-          "returns": "&NonEmptyTestLocations"
+          "anchor": "GO-02",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
         }
-      ],
-      "type_name": "ResolvedBoundTests"
+      ]
     }
-  ],
+  },
+  "inherent_impls": [],
   "layer": "domain",
   "schema_version": 5,
   "trait_impls": [
@@ -182,78 +160,6 @@
       "trait_ref": "core::cmp::Eq"
     },
     {
-      "for_type": "ResolvedBoundTests",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "ResolvedBoundTests",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "ResolvedBoundTests",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "ResolvedBoundTests",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "ObligationFulfillmentCacheEntryError",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "ObligationFulfillmentCacheEntryError",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "ObligationFulfillmentCacheEntryError",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "ObligationFulfillmentCacheEntryError",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "ObligationFulfillmentCacheEntryError",
-      "trait_ref": "core::fmt::Display"
-    },
-    {
-      "for_type": "ObligationFulfillmentCacheEntryError",
-      "trait_ref": "core::error::Error"
-    },
-    {
-      "for_type": "FulfillmentCacheReevaluationReason",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "FulfillmentCacheReevaluationReason",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "FulfillmentCacheReevaluationReason",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "FulfillmentCacheReevaluationReason",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
-      "for_type": "ObligationFulfillmentCacheLoad",
-      "trait_ref": "core::fmt::Debug"
-    },
-    {
-      "for_type": "ObligationFulfillmentCacheLoad",
-      "trait_ref": "core::clone::Clone"
-    },
-    {
-      "for_type": "ObligationFulfillmentCacheLoad",
-      "trait_ref": "core::cmp::PartialEq"
-    },
-    {
-      "for_type": "ObligationFulfillmentCacheLoad",
-      "trait_ref": "core::cmp::Eq"
-    },
-    {
       "action": "reference",
       "for_type": "EdgeResolutionOutcome",
       "trait_ref": "core::fmt::Debug"
@@ -287,54 +193,29 @@
       "action": "reference",
       "for_type": "VerifyCacheError",
       "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "ObligationFulfillmentCacheEntryState",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ObligationFulfillmentCacheEntryState",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ObligationFulfillmentCacheEntryState",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ObligationFulfillmentCacheEntryState",
+      "trait_ref": "core::cmp::Eq"
     }
   ],
   "traits": {
     "ObligationFulfillmentCachePort": {
-      "action": "modify",
-      "docs": "Synchronous secondary port for small local track-cache documents; blocking I/O is bounded to command execution.",
-      "informal_grounds": [],
-      "methods": [
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "load",
-          "params": [
-            {
-              "name": "track_id",
-              "ty": "&TrackId"
-            }
-          ],
-          "receiver": "&self",
-          "returns": "Result<ObligationFulfillmentCacheLoad, VerifyCacheError>"
-        },
-        {
-          "has_default_impl": false,
-          "is_async": false,
-          "name": "save",
-          "params": [
-            {
-              "name": "doc",
-              "ty": "&ObligationFulfillmentCacheDocument"
-            }
-          ],
-          "receiver": "&self",
-          "returns": "Result<(), DiagnosticMessage>"
-        }
-      ],
+      "action": "delete",
       "module_path": "tddd::test_obligation::ports",
-      "role": {
-        "SecondaryPort": {}
-      },
       "spec_refs": [
-        {
-          "anchor": "IN-01",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
-          "anchor": "IN-02",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
         {
           "anchor": "IN-05",
           "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
@@ -497,10 +378,6 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-01",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
           "anchor": "IN-02",
           "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
         },
@@ -518,39 +395,6 @@
         },
         {
           "anchor": "AC-02",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        }
-      ]
-    },
-    "FulfillmentCacheReevaluationReason": {
-      "action": "add",
-      "docs": "Typed reason a fulfillment cache requires reevaluation.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Absent",
-            "payload": {
-              "kind": "unit"
-            }
-          },
-          {
-            "name": "LegacyRowsMissingBoundTests",
-            "payload": {
-              "kind": "unit"
-            }
-          }
-        ]
-      },
-      "methods": [],
-      "module_path": "tddd::test_obligation::verdict",
-      "role": {
-        "ValueObject": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "AC-06",
           "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
         }
       ]
@@ -715,10 +559,7 @@
           {
             "name": "FulfillmentCacheRequiresEvaluation",
             "payload": {
-              "fields": [
-                "FulfillmentCacheReevaluationReason"
-              ],
-              "kind": "tuple"
+              "kind": "unit"
             }
           }
         ]
@@ -885,15 +726,6 @@
               ],
               "kind": "tuple"
             }
-          },
-          {
-            "name": "CacheEntry",
-            "payload": {
-              "fields": [
-                "ObligationFulfillmentCacheEntryError"
-              ],
-              "kind": "tuple"
-            }
           }
         ]
       },
@@ -1041,7 +873,7 @@
     },
     "ObligationFulfillmentCacheEntry": {
       "action": "modify",
-      "docs": "Validated fulfillment-cache row with hash-identified bound-test evidence.",
+      "docs": "Frozen obligation-fulfillment cache row.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1055,7 +887,7 @@
         {
           "has_default_impl": false,
           "is_async": false,
-          "name": "try_new",
+          "name": "new",
           "params": [
             {
               "name": "edge_id",
@@ -1074,15 +906,11 @@
               "ty": "ObligationFulfillmentVerdict"
             },
             {
-              "name": "verifier_fingerprint",
-              "ty": "Option<VerifierPromptFingerprint>"
-            },
-            {
-              "name": "resolved_bound_tests",
-              "ty": "ResolvedBoundTests"
+              "name": "state",
+              "ty": "ObligationFulfillmentCacheEntryState"
             }
           ],
-          "returns": "Result<Self, ObligationFulfillmentCacheEntryError>"
+          "returns": "Self"
         },
         {
           "has_default_impl": false,
@@ -1130,7 +958,7 @@
           "name": "bound_tests",
           "params": [],
           "receiver": "&self",
-          "returns": "&NonEmptyTestLocations"
+          "returns": "Option<&NonEmptyTestLocations>"
         }
       ],
       "module_path": "tddd::test_obligation::verdict",
@@ -1138,10 +966,6 @@
         "ValueObject": {}
       },
       "spec_refs": [
-        {
-          "anchor": "IN-01",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
         {
           "anchor": "IN-02",
           "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
@@ -1151,99 +975,42 @@
           "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
         },
         {
-          "anchor": "CN-01",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
-          "anchor": "CN-02",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
           "anchor": "CN-04",
           "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
         },
         {
-          "anchor": "AC-01",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
-          "anchor": "AC-02",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
           "anchor": "AC-05",
           "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
         }
       ]
     },
-    "ObligationFulfillmentCacheEntryError": {
+    "ObligationFulfillmentCacheEntryState": {
       "action": "add",
-      "docs": "Typed cache-entry construction failure.",
+      "docs": "Domain value vocabulary for Legacy and Identified fulfillment-cache row states.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
         "variants": [
           {
-            "name": "BoundTestsHashMismatch",
+            "name": "Legacy",
             "payload": {
-              "fields": [
-                {
-                  "name": "key_hash",
-                  "ty": "BoundTestsSetHash"
-                },
-                {
-                  "name": "resolved_hash",
-                  "ty": "BoundTestsSetHash"
-                }
-              ],
-              "kind": "struct"
-            }
-          }
-        ]
-      },
-      "methods": [],
-      "module_path": "tddd::test_obligation::errors",
-      "role": {
-        "ErrorType": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-01",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
-          "anchor": "IN-05",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
-          "anchor": "AC-05",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        }
-      ]
-    },
-    "ObligationFulfillmentCacheLoad": {
-      "action": "add",
-      "docs": "Typed fulfillment-cache load state.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "Current",
-            "payload": {
-              "fields": [
-                "ObligationFulfillmentCacheDocument"
-              ],
-              "kind": "tuple"
+              "kind": "unit"
             }
           },
           {
-            "name": "ReevaluationRequired",
+            "name": "Identified",
             "payload": {
               "fields": [
-                "FulfillmentCacheReevaluationReason"
+                {
+                  "name": "verifier_fingerprint",
+                  "ty": "VerifierPromptFingerprint"
+                },
+                {
+                  "name": "bound_tests",
+                  "ty": "Option<NonEmptyTestLocations>"
+                }
               ],
-              "kind": "tuple"
+              "kind": "struct"
             }
           }
         ]
@@ -1255,7 +1022,15 @@
       },
       "spec_refs": [
         {
-          "anchor": "AC-06",
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-05",
           "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
         }
       ]
@@ -1377,42 +1152,6 @@
         }
       ]
     },
-    "ResolvedBoundTests": {
-      "action": "add",
-      "docs": "Resolved bound-test evidence value.",
-      "informal_grounds": [],
-      "kind": {
-        "kind": "struct",
-        "shape": {
-          "fields": [],
-          "has_stripped_fields": true,
-          "kind": "plain"
-        }
-      },
-      "methods": [],
-      "module_path": "tddd::test_obligation::verdict",
-      "role": {
-        "ValueObject": {}
-      },
-      "spec_refs": [
-        {
-          "anchor": "IN-01",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
-          "anchor": "IN-05",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
-          "anchor": "CN-04",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        },
-        {
-          "anchor": "AC-05",
-          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
-        }
-      ]
-    },
     "TestBindingConsistencyError": {
       "action": "add",
       "docs": "Typed voluntary-binding consistency failure.",
@@ -1455,7 +1194,7 @@
       ]
     },
     "VerifyCacheError": {
-      "action": "modify",
+      "action": "reference",
       "docs": "Typed verdict-cache I/O and decoding failure.",
       "informal_grounds": [],
       "kind": {
@@ -1475,15 +1214,6 @@
             "payload": {
               "fields": [
                 "DiagnosticMessage"
-              ],
-              "kind": "tuple"
-            }
-          },
-          {
-            "name": "FulfillmentCacheEntry",
-            "payload": {
-              "fields": [
-                "ObligationFulfillmentCacheEntryError"
               ],
               "kind": "tuple"
             }

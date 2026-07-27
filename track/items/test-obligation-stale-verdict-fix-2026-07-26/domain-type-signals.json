@@ -1,19 +1,19 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T18:55:05Z",
-  "declaration_hash": "29ac018553944a792129e633e1454bee6876caf681863b4e16764d365e080bdc",
-  "implementation_input_hash": "6fe11bfa57e76b1ebf2639f6bf2cfc0e6607321791cfaa8216edf872a5c43404",
+  "generated_at": "2026-07-27T17:12:40Z",
+  "declaration_hash": "da7c98a742168af1de0282184c5a3c8149859e417d254dca39fcfa984f8c86a8",
+  "implementation_input_hash": "a007e43d4be73a3e28784117716c96b6c93b313fc87f113e3489f1e90c09d833",
   "signals": [
     {
       "type_name": "EdgeResolutionOutcome",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
       "type_name": "EdgeVerdictRecord",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -31,18 +31,6 @@
       ]
     },
     {
-      "type_name": "FulfillmentCacheReevaluationReason",
-      "kind_tag": "enum",
-      "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
-    },
-    {
       "type_name": "ObligationCheckError",
       "kind_tag": "error_type",
       "signal": "blue",
@@ -51,7 +39,7 @@
     {
       "type_name": "ObligationEvaluateError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
@@ -63,58 +51,26 @@
     {
       "type_name": "ObligationFulfillmentCacheEntry",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
-      "type_name": "ObligationFulfillmentCacheEntryError",
-      "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "Clone",
-        "Debug",
-        "Display",
-        "Eq",
-        "Error",
-        "PartialEq"
-      ]
-    },
-    {
-      "type_name": "ObligationFulfillmentCacheLoad",
+      "type_name": "ObligationFulfillmentCacheEntryState",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
         "PartialEq"
       ]
-    },
-    {
-      "type_name": "ObligationFulfillmentCachePort",
-      "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": true
     },
     {
       "type_name": "ObligationsDocument",
       "kind_tag": "value_object",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
-    },
-    {
-      "type_name": "ResolvedBoundTests",
-      "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "Clone",
-        "Debug",
-        "Eq",
-        "PartialEq"
-      ]
     },
     {
       "type_name": "TestBindingConsistencyError",
@@ -131,9 +87,21 @@
       ]
     },
     {
+      "type_name": "domain::tddd::test_obligation::ids::unavailable_diagnostic_message",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ObligationFulfillmentCachePort",
+      "kind_tag": "unknown",
+      "signal": "blue",
+      "found_type": false
+    },
+    {
       "type_name": "VerifyCacheError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     }
   ]

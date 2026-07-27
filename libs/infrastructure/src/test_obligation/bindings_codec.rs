@@ -301,7 +301,7 @@ fn locations_from_dto(
     })
 }
 
-fn location_to_dto(location: &TestLocation) -> TestLocationDto {
+pub(crate) fn location_to_dto(location: &TestLocation) -> TestLocationDto {
     TestLocationDto {
         layer: location.layer().as_ref().to_owned(),
         module_path: location.module_path().as_str().to_owned(),
@@ -309,7 +309,9 @@ fn location_to_dto(location: &TestLocation) -> TestLocationDto {
     }
 }
 
-fn location_from_dto(dto: TestLocationDto) -> Result<TestLocation, TestBindingsCodecError> {
+pub(crate) fn location_from_dto(
+    dto: TestLocationDto,
+) -> Result<TestLocation, TestBindingsCodecError> {
     let layer = LayerId::try_new(dto.layer).map_err(|e| {
         ArtifactCodecError::DomainInvariant(diagnostic(&format!("invalid test layer: {e}")))
     })?;

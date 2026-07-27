@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T18:49:29Z",
-  "declaration_hash": "42d3908ddc10123fd4011d3338e07289259d505d25922d7b30a24735e3b3d0f3",
-  "implementation_input_hash": "b7a606a2519a40cc9f6beccb85ed8db90895b5ab38f99c3e5da9f50dcec88215",
+  "generated_at": "2026-07-27T16:58:53Z",
+  "declaration_hash": "621045cc782dfdce6fc8d497ee29a11c47ff70159f12661a6d63c26cb45d4583",
+  "implementation_input_hash": "5a67732a2acb1c4d7188be0c6b68960c0c1bf14211401e9a5d918b2d128aa31c",
   "signals": [
     {
       "type_name": "CheckTestObligationsInteractor",
@@ -23,6 +23,41 @@
       ]
     },
     {
+      "type_name": "ObligationFulfillmentCachePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ResolvedBoundTests",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ResolvedBoundTestsResolver",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "ResolvedBoundTestsResolverPort"
+      ]
+    },
+    {
+      "type_name": "ResolvedBoundTestsResolverPort",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "TestObligationResultsInteractor",
       "kind_tag": "interactor",
       "signal": "blue",
@@ -30,6 +65,12 @@
       "found_items": [
         "TestObligationResultsApplicationService"
       ]
+    },
+    {
+      "type_name": "ContentHasherPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

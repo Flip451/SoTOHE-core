@@ -1,16 +1,21 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "3f827d7dca708cfc36c3125a644846130527ffa4648949b48327ca7ba60f4014",
+  "catalogue_declaration_hash": "4c6198df91cddad455166aa8fa6a6aeb1144b215ce5af38ba055fefd9b036898",
   "signals": [
     {
       "type_name": "JsonObligationFulfillmentCacheCodec",
       "signal": "blue",
-      "entry_hash": "33425570ac347c456643d1c37968695ad79e7dfa96315fd01e91b25a6f984604"
+      "entry_hash": "5697ff53517c7522bf7f755249d2611866235e45dd5babc469545bb92b660c58"
     },
     {
       "type_name": "ObligationFulfillmentCacheEntryDto",
       "signal": "blue",
-      "entry_hash": "3c395d4402384a82190f8c5b976d85ce74d22d283fbb27cc3028b11fd2955d5f"
+      "entry_hash": "76b5ff73943407b8aa404c48966a4710de136b91968edf591ce475a2625db7b1"
+    },
+    {
+      "type_name": "Sha256ContentHasher",
+      "signal": "blue",
+      "entry_hash": "ff022977afe5964ea1d057a287a02a77f64bb7a72b96cc7a4a7c87d778765e54"
     }
   ]
 }

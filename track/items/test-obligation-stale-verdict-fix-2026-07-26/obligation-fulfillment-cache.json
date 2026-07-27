@@ -6,30 +6,6 @@
         "entry_key": "FulfillmentCacheLookupError",
         "anchor_id": {
           "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
-          "element_id": "IN-01"
-        }
-      },
-      "obligation_id": {
-        "entry_key": "FulfillmentCacheLookupError",
-        "obligation_kind": "logic",
-        "item_identifier": "voluntary:IN-01"
-      },
-      "key": {
-        "bound_tests_set_hash": "e59f9e8c9e5e7a626e7c506c12832b150a03b2a8a7d6f24f96caf523745e9381",
-        "declaration_hash": "e888a8e320b7d448fab7d4fac24dae6c475185abf282a603be43214070a5c5cd",
-        "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
-      },
-      "verdict": {
-        "kind": "fulfilled",
-        "citation": "Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                }) => {\n                    assert_eq!(actual_edge_id, edge_id());\n                    assert_eq!(actual_obligation_id, obligation_id());\n                    assert_eq!(actual_key, key);\n                }"
-      },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
-    },
-    {
-      "edge_id": {
-        "entry_key": "FulfillmentCacheLookupError",
-        "anchor_id": {
-          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
           "element_id": "IN-02"
         }
       },
@@ -39,15 +15,37 @@
         "item_identifier": "voluntary:IN-02"
       },
       "key": {
-        "bound_tests_set_hash": "e59f9e8c9e5e7a626e7c506c12832b150a03b2a8a7d6f24f96caf523745e9381",
-        "declaration_hash": "e888a8e320b7d448fab7d4fac24dae6c475185abf282a603be43214070a5c5cd",
+        "bound_tests_set_hash": "369111414015bbad8a834f1ee47d1dc76600a8fda845d8b907de5676e751d9ed",
+        "declaration_hash": "58803adbbe60e00a2490af7f2ccb7a4e09a61ba2214da250de1bcb6b187efe1c",
         "anchor_text_hash": "3f9cea786c50c2d7a810736fd740e2d137d2076b05c3e73fb74e5a03831640a4"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries { edge_id: actual_edge_id, obligation_id: actual_obligation_id, key: actual_key, }) => { assert_eq!(actual_edge_id, edge_id()); assert_eq!(actual_obligation_id, obligation_id()); assert_eq!(actual_key, key); }"
+        "citation": "`assert_eq!(entry.key(), &current_key);` and `Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries { edge_id: actual_edge_id, obligation_id: actual_obligation_id, key: actual_key, })` and `assert_eq!(outcome.resolved_edges(), &[edge()]);`"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_historical_row_returns_current_entry"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_duplicate_current_rows_returns_ambiguity_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -63,15 +61,37 @@
         "item_identifier": "voluntary:CN-01"
       },
       "key": {
-        "bound_tests_set_hash": "e59f9e8c9e5e7a626e7c506c12832b150a03b2a8a7d6f24f96caf523745e9381",
-        "declaration_hash": "e888a8e320b7d448fab7d4fac24dae6c475185abf282a603be43214070a5c5cd",
+        "bound_tests_set_hash": "369111414015bbad8a834f1ee47d1dc76600a8fda845d8b907de5676e751d9ed",
+        "declaration_hash": "58803adbbe60e00a2490af7f2ccb7a4e09a61ba2214da250de1bcb6b187efe1c",
         "anchor_text_hash": "a2eb3fe459adc5b0543bffa5b597ad1b34a47bffc837a6947d203ae3d1a57036"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                })"
+        "citation": "Err(ObligationCheckError::FulfillmentCacheLookup(\n                FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                },\n            ))"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_historical_row_returns_current_entry"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_duplicate_current_rows_returns_ambiguity_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -87,15 +107,27 @@
         "item_identifier": "voluntary:CN-02"
       },
       "key": {
-        "bound_tests_set_hash": "5eddd5c9b161e7c89f2a8c772c2824f7175b46f775dc89ec5328789912d74ee4",
-        "declaration_hash": "e888a8e320b7d448fab7d4fac24dae6c475185abf282a603be43214070a5c5cd",
+        "bound_tests_set_hash": "db42afdbf24b7ce17d0a3c638a3403499f093fdc535e6908614f853bb9a7b361",
+        "declaration_hash": "58803adbbe60e00a2490af7f2ccb7a4e09a61ba2214da250de1bcb6b187efe1c",
         "anchor_text_hash": "2bcaa6bd097998bdf743836b92e2a3a65485dfae2a0695a964ce4be6854c0d09"
       },
       "verdict": {
         "kind": "fulfilled",
         "citation": "assert_eq!(outcome.resolved_edges(), &[edge()]);"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_historical_row_returns_current_entry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -111,15 +143,37 @@
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "bound_tests_set_hash": "e59f9e8c9e5e7a626e7c506c12832b150a03b2a8a7d6f24f96caf523745e9381",
-        "declaration_hash": "e888a8e320b7d448fab7d4fac24dae6c475185abf282a603be43214070a5c5cd",
+        "bound_tests_set_hash": "369111414015bbad8a834f1ee47d1dc76600a8fda845d8b907de5676e751d9ed",
+        "declaration_hash": "58803adbbe60e00a2490af7f2ccb7a4e09a61ba2214da250de1bcb6b187efe1c",
         "anchor_text_hash": "3ff88b6d083f5c2a33bf137a869a58c6c9cfcc44129391db5dd737a156ed323a"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                }) => {\n                    assert_eq!(actual_edge_id, edge_id());\n                    assert_eq!(actual_obligation_id, obligation_id());\n                    assert_eq!(actual_key, key);\n                }"
+        "citation": "for entries in\n            [vec![historical.clone(), current.clone()], vec![current.clone(), historical.clone()]]"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_historical_row_returns_current_entry"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_duplicate_current_rows_returns_ambiguity_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -135,15 +189,27 @@
         "item_identifier": "voluntary:AC-02"
       },
       "key": {
-        "bound_tests_set_hash": "c3203480092f7b5743b80de38b39901521d6b4386c5f30bcb3809c269bf1a309",
-        "declaration_hash": "e888a8e320b7d448fab7d4fac24dae6c475185abf282a603be43214070a5c5cd",
+        "bound_tests_set_hash": "34abd56a87f2430f0ca09afae6fa0ebd667c57e21051ad698cdac651740b3b9b",
+        "declaration_hash": "58803adbbe60e00a2490af7f2ccb7a4e09a61ba2214da250de1bcb6b187efe1c",
         "anchor_text_hash": "2bf538e0a37daa40874f6818500b2bbe4b2d766a646f9a788122afbeb06d4de1"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                }) => {\n                    assert_eq!(actual_edge_id, edge());\n                    assert_eq!(actual_obligation_id, obligation().id().clone());\n                    assert_eq!(actual_key, expected_key);\n                }"
+        "citation": "Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                }) => {"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_duplicate_current_rows_returns_ambiguity_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -159,7 +225,7 @@
         "item_identifier": "voluntary:IN-01"
       },
       "key": {
-        "bound_tests_set_hash": "53fffbfbc80f7970e3cd494fe4900be1642ea3a52649aafb02d29ab90845f937",
+        "bound_tests_set_hash": "d92bb245f0b8f7e6619514cb0ab73e8e89d3b2f5ce02ad3b8577bd469b04fd3c",
         "declaration_hash": "d0e647e3f7af277cbf426a1798b5266cf21b8e5cd2c068f25203b12bd242f0ce",
         "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
       },
@@ -167,7 +233,44 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(entry.key(), &current_key); assert!(matches!(entry.verdict(), ObligationFulfillmentVerdict::Fulfilled { .. }));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_historical_row_returns_current_entry"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_fingerprint_mismatch_returns_none"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_declaration_or_anchor_mismatch_returns_none"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_declaration_change_stales_verdict_as_drift"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_reports_bound_test_or_anchor_hash_changes_as_freshness_drift"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -183,15 +286,37 @@
         "item_identifier": "voluntary:IN-02"
       },
       "key": {
-        "bound_tests_set_hash": "e59f9e8c9e5e7a626e7c506c12832b150a03b2a8a7d6f24f96caf523745e9381",
+        "bound_tests_set_hash": "369111414015bbad8a834f1ee47d1dc76600a8fda845d8b907de5676e751d9ed",
         "declaration_hash": "d0e647e3f7af277cbf426a1798b5266cf21b8e5cd2c068f25203b12bd242f0ce",
         "anchor_text_hash": "3f9cea786c50c2d7a810736fd740e2d137d2076b05c3e73fb74e5a03831640a4"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries {\\n                    edge_id: actual_edge_id,\\n                    obligation_id: actual_obligation_id,\\n                    key: actual_key,\\n                })\""
+        "citation": "Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries { edge_id: actual_edge_id, obligation_id: actual_obligation_id, key: actual_key, })"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_historical_row_returns_current_entry"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_duplicate_current_rows_returns_ambiguity_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -207,15 +332,42 @@
         "item_identifier": "voluntary:CN-01"
       },
       "key": {
-        "bound_tests_set_hash": "1f626d95d98ef08d775ebd7269701f02638e57299433368f5ccd57c89c5e6135",
+        "bound_tests_set_hash": "311b78ee29b73c8aaf8fb02c3fa32f6317aeb49458cd3607f4e36f9c73e23001",
         "declaration_hash": "d0e647e3f7af277cbf426a1798b5266cf21b8e5cd2c068f25203b12bd242f0ce",
         "anchor_text_hash": "a2eb3fe459adc5b0543bffa5b597ad1b34a47bffc837a6947d203ae3d1a57036"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n                document.lookup_current(&edge_id(), &obligation_id(), &key, &current_fingerprint),\n                Ok(None)\n            ));"
+        "citation": "assert!(matches!(document.lookup_current(&edge_id(), &obligation_id(), &key, &current_fingerprint), Ok(None))); ... Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries {"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_historical_row_returns_current_entry"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_duplicate_current_rows_returns_ambiguity_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_fingerprint_mismatch_returns_none"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -231,7 +383,7 @@
         "item_identifier": "voluntary:CN-02"
       },
       "key": {
-        "bound_tests_set_hash": "5eddd5c9b161e7c89f2a8c772c2824f7175b46f775dc89ec5328789912d74ee4",
+        "bound_tests_set_hash": "db42afdbf24b7ce17d0a3c638a3403499f093fdc535e6908614f853bb9a7b361",
         "declaration_hash": "d0e647e3f7af277cbf426a1798b5266cf21b8e5cd2c068f25203b12bd242f0ce",
         "anchor_text_hash": "2bcaa6bd097998bdf743836b92e2a3a65485dfae2a0695a964ce4be6854c0d09"
       },
@@ -239,7 +391,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(outcome.resolved_edges(), &[edge()]);"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_historical_row_returns_current_entry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -255,7 +419,7 @@
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "bound_tests_set_hash": "5eddd5c9b161e7c89f2a8c772c2824f7175b46f775dc89ec5328789912d74ee4",
+        "bound_tests_set_hash": "db42afdbf24b7ce17d0a3c638a3403499f093fdc535e6908614f853bb9a7b361",
         "declaration_hash": "d0e647e3f7af277cbf426a1798b5266cf21b8e5cd2c068f25203b12bd242f0ce",
         "anchor_text_hash": "3ff88b6d083f5c2a33bf137a869a58c6c9cfcc44129391db5dd737a156ed323a"
       },
@@ -263,7 +427,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(entry.key(), &current_key);\n            assert!(matches!(entry.verdict(), ObligationFulfillmentVerdict::Fulfilled { .. }));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_historical_row_returns_current_entry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -279,7 +455,7 @@
         "item_identifier": "voluntary:AC-02"
       },
       "key": {
-        "bound_tests_set_hash": "c3203480092f7b5743b80de38b39901521d6b4386c5f30bcb3809c269bf1a309",
+        "bound_tests_set_hash": "34abd56a87f2430f0ca09afae6fa0ebd667c57e21051ad698cdac651740b3b9b",
         "declaration_hash": "d0e647e3f7af277cbf426a1798b5266cf21b8e5cd2c068f25203b12bd242f0ce",
         "anchor_text_hash": "2bf538e0a37daa40874f6818500b2bbe4b2d766a646f9a788122afbeb06d4de1"
       },
@@ -287,7 +463,19 @@
         "kind": "fulfilled",
         "citation": "Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries {"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_fulfillment_cache_lookup_with_duplicate_current_rows_returns_ambiguity_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -303,15 +491,42 @@
         "item_identifier": "voluntary:IN-01"
       },
       "key": {
-        "bound_tests_set_hash": "afdf57c34a3c46fe064168276b4bb1a035ec10936bddbb81ac97f93a54bb087f",
-        "declaration_hash": "f254cd5da97a5bf7c45d62e230c2899510dd01037f35dadf8b3912ce177379d2",
+        "bound_tests_set_hash": "91762448dc5c6860902fe7bfd27f848826f3d185880f2685bbd2894551e04cab",
+        "declaration_hash": "42985caf4a7aadeaf06563438215c370d3752256cba9a2066fde237666221bfb",
         "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(result, Err(ObligationCheckError::DriftsDetected { .. })));"
+        "citation": "for entries in\n        [vec![historical.clone(), current.clone()], vec![current.clone(), historical.clone()]]\n    {\n        let cache = ObligationFulfillmentCacheDocument::new(track(), entries);\n        let obligations = ObligationsDocument::new(track(), vec![obligation()]);\n        let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);\n\n        let outcome = interactor(Some(obligations), Some(bindings), Some(cache), None)\n            .execute(&command())\n            .unwrap();\n\n        assert_eq!(outcome.resolved_edges(), &[edge()]);\n    }"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_declaration_change_stales_verdict_as_drift"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_reports_bound_test_or_anchor_hash_changes_as_freshness_drift"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -327,15 +542,22 @@
         "item_identifier": "voluntary:IN-02"
       },
       "key": {
-        "bound_tests_set_hash": "515dabfa7974de08809b1ca232279a9c235d20793734539f01893022a464087b",
-        "declaration_hash": "f254cd5da97a5bf7c45d62e230c2899510dd01037f35dadf8b3912ce177379d2",
+        "bound_tests_set_hash": "75a88f9b9a0986367438d49574e2d1443260c46cf5e68e1cc7d53ed749fc9c54",
+        "declaration_hash": "42985caf4a7aadeaf06563438215c370d3752256cba9a2066fde237666221bfb",
         "anchor_text_hash": "3f9cea786c50c2d7a810736fd740e2d137d2076b05c3e73fb74e5a03831640a4"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "Err(ObligationCheckError::FulfillmentCacheLookup(\n                FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                },\n            )) => {"
+        "citation": "for entries in\n        [vec![fulfilled.clone(), pending.clone()], vec![pending.clone(), fulfilled.clone()]]\n    {\n        let cache = ObligationFulfillmentCacheDocument::new(track(), entries);"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -351,15 +573,22 @@
         "item_identifier": "voluntary:CN-01"
       },
       "key": {
-        "bound_tests_set_hash": "515dabfa7974de08809b1ca232279a9c235d20793734539f01893022a464087b",
-        "declaration_hash": "f254cd5da97a5bf7c45d62e230c2899510dd01037f35dadf8b3912ce177379d2",
+        "bound_tests_set_hash": "75a88f9b9a0986367438d49574e2d1443260c46cf5e68e1cc7d53ed749fc9c54",
+        "declaration_hash": "42985caf4a7aadeaf06563438215c370d3752256cba9a2066fde237666221bfb",
         "anchor_text_hash": "a2eb3fe459adc5b0543bffa5b597ad1b34a47bffc837a6947d203ae3d1a57036"
       },
       "verdict": {
         "kind": "fulfilled",
         "citation": "Err(ObligationCheckError::FulfillmentCacheLookup(\n                FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                },\n            ))"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -375,15 +604,22 @@
         "item_identifier": "voluntary:CN-02"
       },
       "key": {
-        "bound_tests_set_hash": "906fd0f9347d0d37869aa3991f7d340c734b01a62d2ad2ed2404af9b50d97954",
-        "declaration_hash": "f254cd5da97a5bf7c45d62e230c2899510dd01037f35dadf8b3912ce177379d2",
+        "bound_tests_set_hash": "4f3de1956d24543504527fb157845ad0a595f91fcdacb1e2ca74fa03ca71e673",
+        "declaration_hash": "42985caf4a7aadeaf06563438215c370d3752256cba9a2066fde237666221bfb",
         "anchor_text_hash": "2bcaa6bd097998bdf743836b92e2a3a65485dfae2a0695a964ce4be6854c0d09"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "for entries in\n        [vec![historical.clone(), current.clone()], vec![current.clone(), historical.clone()]]\n    {\n        let cache = ObligationFulfillmentCacheDocument::new(track(), entries);...        let outcome = interactor(Some(obligations), Some(bindings), Some(cache), None)\n            .execute(&command())\n            .unwrap();"
+        "citation": "for entries in\n        [vec![historical.clone(), current.clone()], vec![current.clone(), historical.clone()]]\n    {\n        let cache = ObligationFulfillmentCacheDocument::new(track(), entries);\n        let obligations = ObligationsDocument::new(track(), vec![obligation()]);\n        let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);\n\n        let outcome = interactor(Some(obligations), Some(bindings), Some(cache), None)\n            .execute(&command())\n            .unwrap();\n\n        assert_eq!(outcome.resolved_edges(), &[edge()]);\n    }"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -399,15 +635,22 @@
         "item_identifier": "voluntary:AC-01"
       },
       "key": {
-        "bound_tests_set_hash": "906fd0f9347d0d37869aa3991f7d340c734b01a62d2ad2ed2404af9b50d97954",
-        "declaration_hash": "f254cd5da97a5bf7c45d62e230c2899510dd01037f35dadf8b3912ce177379d2",
+        "bound_tests_set_hash": "4f3de1956d24543504527fb157845ad0a595f91fcdacb1e2ca74fa03ca71e673",
+        "declaration_hash": "42985caf4a7aadeaf06563438215c370d3752256cba9a2066fde237666221bfb",
         "anchor_text_hash": "3ff88b6d083f5c2a33bf137a869a58c6c9cfcc44129391db5dd737a156ed323a"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "for entries in\n        [vec![historical.clone(), current.clone()], vec![current.clone(), historical.clone()]]\n    {\n        let cache = ObligationFulfillmentCacheDocument::new(track(), entries);"
+        "citation": "for entries in\n        [vec![historical.clone(), current.clone()], vec![current.clone(), historical.clone()]]\n    {\n        let cache = ObligationFulfillmentCacheDocument::new(track(), entries);\n        let obligations = ObligationsDocument::new(track(), vec![obligation()]);\n        let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);\n\n        let outcome = interactor(Some(obligations), Some(bindings), Some(cache), None)\n            .execute(&command())\n            .unwrap();\n\n        assert_eq!(outcome.resolved_edges(), &[edge()]);\n    }"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -423,15 +666,3288 @@
         "item_identifier": "voluntary:AC-02"
       },
       "key": {
-        "bound_tests_set_hash": "515dabfa7974de08809b1ca232279a9c235d20793734539f01893022a464087b",
-        "declaration_hash": "f254cd5da97a5bf7c45d62e230c2899510dd01037f35dadf8b3912ce177379d2",
+        "bound_tests_set_hash": "75a88f9b9a0986367438d49574e2d1443260c46cf5e68e1cc7d53ed749fc9c54",
+        "declaration_hash": "42985caf4a7aadeaf06563438215c370d3752256cba9a2066fde237666221bfb",
         "anchor_text_hash": "2bf538e0a37daa40874f6818500b2bbe4b2d766a646f9a788122afbeb06d4de1"
       },
       "verdict": {
         "kind": "fulfilled",
         "citation": "Err(ObligationCheckError::FulfillmentCacheLookup(\n                FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n                    edge_id: actual_edge_id,\n                    obligation_id: actual_obligation_id,\n                    key: actual_key,\n                },\n            ))"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCachePort",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "key": {
+        "bound_tests_set_hash": "dd163efb1f05b7f7e3aa55001da8226bba4e127b3e1acfe67f2a573431d8022a",
+        "declaration_hash": "0b85f8cae2921b0e4080fc072b60684e00b3e14a942779cd523137c75241d4a3",
+        "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let selected = loaded\n        .lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint())\n        .unwrap()\n        .unwrap();\n    assert_eq!(selected.key(), &current_key);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_codec_save_then_load_round_trips"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_load_missing_cache_is_none"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_absent_fulfillment_cache_requires_evaluation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_reverifies_and_overwrites_entry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_fulfillment_cache_is_rebuilt_with_resolved_bound_tests"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCachePort",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "key": {
+        "bound_tests_set_hash": "dd163efb1f05b7f7e3aa55001da8226bba4e127b3e1acfe67f2a573431d8022a",
+        "declaration_hash": "0b85f8cae2921b0e4080fc072b60684e00b3e14a942779cd523137c75241d4a3",
+        "anchor_text_hash": "91071973616ad036c5a1ad322545d6c20047098290137122fb69172f7cbe9118"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(selected.key(), &current_key);\n    assert_eq!(selected.bound_tests(), expected_bound_tests.as_ref());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_codec_save_then_load_round_trips"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_load_missing_cache_is_none"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_absent_fulfillment_cache_requires_evaluation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_reverifies_and_overwrites_entry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_fulfillment_cache_is_rebuilt_with_resolved_bound_tests"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCachePort",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "key": {
+        "bound_tests_set_hash": "dd163efb1f05b7f7e3aa55001da8226bba4e127b3e1acfe67f2a573431d8022a",
+        "declaration_hash": "0b85f8cae2921b0e4080fc072b60684e00b3e14a942779cd523137c75241d4a3",
+        "anchor_text_hash": "9398e6445efcd3a8a4b50484bb4eea078e8e190c70c12ff370ba0965ba35c104"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(initial_check, Err(ObligationCheckError::StaleVerdicts { .. }))); ... let evaluation = run(evaluator.execute(&EvaluateTestObligationsCommand::new(...))).unwrap(); ... assert!( cache.saved.lock().unwrap().is_some(), \"evaluate must persist a replacement fulfillment cache for the next check\" ); ... let recovered_check = interactor_with_recoverable_fulfillment_cache(cache).execute(&command()).unwrap();"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_codec_save_then_load_round_trips"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_load_missing_cache_is_none"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_absent_fulfillment_cache_requires_evaluation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_reverifies_and_overwrites_entry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_fulfillment_cache_is_rebuilt_with_resolved_bound_tests"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCachePort",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:save"
+      },
+      "key": {
+        "bound_tests_set_hash": "de97b54055bbc4f76fa518f72abbf71ec031636d5eda74d9926eb45dee0cb253",
+        "declaration_hash": "0b85f8cae2921b0e4080fc072b60684e00b3e14a942779cd523137c75241d4a3",
+        "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let selected = loaded\n        .lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint())\n        .unwrap()\n        .unwrap();\n    assert_eq!(selected.key(), &current_key);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_codec_save_then_load_round_trips"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_save_rejects_excessive_entry_count_before_serializing"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_fulfillment_cache_save_failure_restores_prior_waiver_document"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCachePort",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:save"
+      },
+      "key": {
+        "bound_tests_set_hash": "de97b54055bbc4f76fa518f72abbf71ec031636d5eda74d9926eb45dee0cb253",
+        "declaration_hash": "0b85f8cae2921b0e4080fc072b60684e00b3e14a942779cd523137c75241d4a3",
+        "anchor_text_hash": "91071973616ad036c5a1ad322545d6c20047098290137122fb69172f7cbe9118"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(selected.bound_tests(), expected_bound_tests.as_ref());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_codec_save_then_load_round_trips"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_save_rejects_excessive_entry_count_before_serializing"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_fulfillment_cache_save_failure_restores_prior_waiver_document"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCachePort",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:save"
+      },
+      "key": {
+        "bound_tests_set_hash": "de97b54055bbc4f76fa518f72abbf71ec031636d5eda74d9926eb45dee0cb253",
+        "declaration_hash": "0b85f8cae2921b0e4080fc072b60684e00b3e14a942779cd523137c75241d4a3",
+        "anchor_text_hash": "9398e6445efcd3a8a4b50484bb4eea078e8e190c70c12ff370ba0965ba35c104"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(initial_check, Err(ObligationCheckError::StaleVerdicts { .. }))); ... assert!(cache.saved.lock().unwrap().is_some(), \"evaluate must persist a replacement fulfillment cache for the next check\"); ... let recovered_check = interactor_with_recoverable_fulfillment_cache(cache).execute(&command()).unwrap();"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_codec_save_then_load_round_trips"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_save_rejects_excessive_entry_count_before_serializing"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_fulfillment_cache_save_failure_restores_prior_waiver_document"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "JsonObligationFulfillmentCacheCodec",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "JsonObligationFulfillmentCacheCodec",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::test_obligation::ports::ObligationFulfillmentCachePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "0684bc905ac758a0bf672bc5825f4b8983d3d8abb7d0e82dca7c033a34f0780f",
+        "declaration_hash": "52b322f9174745d83e0b2a6eeb59da6264dea26980f213da818f544ba27c173b",
+        "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint())\" ... \"assert_eq!(selected.key(), &current_key);\" ... \"assert!(loaded.lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint()).is_err())\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_codec_save_then_load_round_trips"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_codec_replaces_stale_cache_for_subsequent_check"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_load_missing_cache_is_none"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_save_rejects_excessive_entry_count_before_serializing"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "JsonObligationFulfillmentCacheCodec",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "JsonObligationFulfillmentCacheCodec",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::test_obligation::ports::ObligationFulfillmentCachePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "0684bc905ac758a0bf672bc5825f4b8983d3d8abb7d0e82dca7c033a34f0780f",
+        "declaration_hash": "52b322f9174745d83e0b2a6eeb59da6264dea26980f213da818f544ba27c173b",
+        "anchor_text_hash": "91071973616ad036c5a1ad322545d6c20047098290137122fb69172f7cbe9118"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(selected.bound_tests(), expected_bound_tests.as_ref());\n\nassert_eq!(selected.key(), &current_key);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_codec_save_then_load_round_trips"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_codec_replaces_stale_cache_for_subsequent_check"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_load_missing_cache_is_none"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_save_rejects_excessive_entry_count_before_serializing"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "JsonObligationFulfillmentCacheCodec",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "JsonObligationFulfillmentCacheCodec",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::test_obligation::ports::ObligationFulfillmentCachePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "0684bc905ac758a0bf672bc5825f4b8983d3d8abb7d0e82dca7c033a34f0780f",
+        "declaration_hash": "52b322f9174745d83e0b2a6eeb59da6264dea26980f213da818f544ba27c173b",
+        "anchor_text_hash": "9398e6445efcd3a8a4b50484bb4eea078e8e190c70c12ff370ba0965ba35c104"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(initial_check, Err(ObligationCheckError::StaleVerdicts { .. }))); ... let evaluation = run(evaluator.execute(&EvaluateTestObligationsCommand::new(...))).unwrap(); ... let recovered_check = interactor_with_recoverable_fulfillment_cache(cache).execute(&command()).unwrap(); assert_eq!(recovered_check.resolved_edges(), &[edge()]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_codec_save_then_load_round_trips"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_codec_replaces_stale_cache_for_subsequent_check"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_load_missing_cache_is_none"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_save_rejects_excessive_entry_count_before_serializing"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "domain::tddd::test_obligation::ids::unavailable_diagnostic_message",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "GO-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "domain::tddd::test_obligation::ids::unavailable_diagnostic_message",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "70b62fb6b83a1f2f116f480625b48537b125a679aec032c0ff07581441aa730b",
+        "declaration_hash": "c69e55e6f83102408f71913f4395822421b82c590c209d63c9c966d5afc2b369",
+        "anchor_text_hash": "ca9728961510a6a49b793f4288838b30a6a5fa5f5e02d17e6f1873df646de7a5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(unavailable_diagnostic_message().as_str(), \"diagnostic detail unavailable\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::ids::tests",
+          "test_name": "test_unavailable_diagnostic_message_returns_bound_test_source_message"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::bound_tests::tests",
+          "test_name": "test_resolved_bound_tests_resolver_with_missing_source_returns_unavailable_diagnostic"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_finding"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
+        "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(result, Err(ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(message))) if message.as_str() == \"provider unavailable\")); assert!(h.fulfillment_cache.saved.lock().unwrap().is_none());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_absent_fulfillment_cache_requires_evaluation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_finding"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_absent_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::test_obligation::check::tests",
+          "test_name": "test_check_handler_with_ambiguous_current_cache_key_returns_nonzero_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
+        "anchor_text_hash": "ea73875ea10c4047021f7c664d5047480ad2e6ea9d2beffc4bb775bc46243305"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        result,\n        Err(ObligationCheckError::BindingConsistency(\n            domain::tddd::test_obligation::errors::TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id }\n        )) if edge_id == edge()\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_absent_fulfillment_cache_requires_evaluation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_finding"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_absent_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::test_obligation::check::tests",
+          "test_name": "test_check_handler_with_ambiguous_current_cache_key_returns_nonzero_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
+        "anchor_text_hash": "a2eb3fe459adc5b0543bffa5b597ad1b34a47bffc837a6947d203ae3d1a57036"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(result, Err(ObligationCheckError::FulfillmentCacheRequiresEvaluation))); ... assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. }))); ... assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. }))); ... Err(ObligationCheckError::FulfillmentCacheLookup(\n                FulfillmentCacheLookupError::AmbiguousCurrentEntries {"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_absent_fulfillment_cache_requires_evaluation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_finding"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_absent_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::test_obligation::check::tests",
+          "test_name": "test_check_handler_with_ambiguous_current_cache_key_returns_nonzero_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
+        "anchor_text_hash": "2bcaa6bd097998bdf743836b92e2a3a65485dfae2a0695a964ce4be6854c0d09"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "        assert_eq!(outcome.resolved_edges(), &[edge()]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_absent_fulfillment_cache_requires_evaluation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_finding"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_absent_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::test_obligation::check::tests",
+          "test_name": "test_check_handler_with_ambiguous_current_cache_key_returns_nonzero_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
+        "anchor_text_hash": "f420577c5989e261f5142fcbcf8ebd99c73420803493c622d16ce7ad84c25684"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(result, Err(ObligationCheckError::FulfillmentCacheRequiresEvaluation))); ... assert!(matches!(result, Err(ObligationCheckError::BindingConsistency( domain::tddd::test_obligation::errors::TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id } )) if edge_id == edge())); ... assert!(matches!(result, Err(ObligationCheckError::FulfillmentCacheLookup( FulfillmentCacheLookupError::AmbiguousCurrentEntries { ... } ))); ... assert_ne!(outcome.exit_code, 0);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_absent_fulfillment_cache_requires_evaluation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_finding"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_absent_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::test_obligation::check::tests",
+          "test_name": "test_check_handler_with_ambiguous_current_cache_key_returns_nonzero_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
+        "anchor_text_hash": "3ff88b6d083f5c2a33bf137a869a58c6c9cfcc44129391db5dd737a156ed323a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for entries in\n        [vec![historical.clone(), current.clone()], vec![current.clone(), historical.clone()]]\n    {\n        let cache = ObligationFulfillmentCacheDocument::new(track(), entries);\n        let obligations = ObligationsDocument::new(track(), vec![obligation()]);\n        let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);\n\n        let outcome = interactor(Some(obligations), Some(bindings), Some(cache), None)\n            .execute(&command())\n            .unwrap();\n\n        assert_eq!(outcome.resolved_edges(), &[edge()]);\n    }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_absent_fulfillment_cache_requires_evaluation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_finding"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_absent_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::test_obligation::check::tests",
+          "test_name": "test_check_handler_with_ambiguous_current_cache_key_returns_nonzero_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
+        "anchor_text_hash": "2bf538e0a37daa40874f6818500b2bbe4b2d766a646f9a788122afbeb06d4de1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Err(ObligationCheckError::FulfillmentCacheLookup(\n                FulfillmentCacheLookupError::AmbiguousCurrentEntries {"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_absent_fulfillment_cache_requires_evaluation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_finding"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_absent_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::test_obligation::check::tests",
+          "test_name": "test_check_handler_with_ambiguous_current_cache_key_returns_nonzero_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
+        "anchor_text_hash": "0637af9c7e989dc3b6ba0ec7df9f8045089d7140aba3f404335d24a691f4e184"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        result,\n        Err(ObligationCheckError::BindingConsistency(\n            domain::tddd::test_obligation::errors::TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id }\n        )) if edge_id == edge()\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_absent_fulfillment_cache_requires_evaluation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_finding"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_absent_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::test_obligation::check::tests",
+          "test_name": "test_check_handler_with_ambiguous_current_cache_key_returns_nonzero_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
+        "anchor_text_hash": "9398e6445efcd3a8a4b50484bb4eea078e8e190c70c12ff370ba0965ba35c104"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(initial_check, Err(ObligationCheckError::StaleVerdicts { .. }))); ... assert!(cache.saved.lock().unwrap().is_some(), \"evaluate must persist a replacement fulfillment cache for the next check\"); ... assert_eq!(recovered_check.resolved_edges(), &[edge()]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_absent_fulfillment_cache_requires_evaluation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_finding"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_absent_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::test_obligation::check::tests",
+          "test_name": "test_check_handler_with_ambiguous_current_cache_key_returns_nonzero_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "JsonObligationFulfillmentCacheCodec",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "JsonObligationFulfillmentCacheCodec",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "3497926034d0d9cfb7ba5f9f817316ba29ced3c8aafcd2139f0605f9af0c95b1",
+        "declaration_hash": "ea42487eb2a531f0a4747e45898cdc1a19ce4d3b83a39cfeb3963c6df369bfbe",
+        "anchor_text_hash": "38596737d3e9faaa99f3cd807a18aa4dba38d31cfabcdae6bc433c7a98100a59"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(entry[\"verdict\"][\"reason\"], \"asserts the opposite\");\n    assert!(entry[\"verdict\"][\"reason\"].as_str().is_some_and(|reason| !reason.is_empty()));\n\n    assert_eq!(\n        selected.bound_tests().unwrap().as_slice()[0].test_name().as_str(),\n        \"diagnostic_only_location\"\n    );\n\n    .lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint())"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_fail_verdict_json_uses_only_nested_non_empty_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_bound_tests_diagnostic_representation_does_not_change_lookup_identity"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "JsonObligationFulfillmentCacheCodec",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "JsonObligationFulfillmentCacheCodec",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "a6d4bf74965b306b79b7682f46f166d7f72cac788d22df5fb8f5438e40432c98",
+        "declaration_hash": "ea42487eb2a531f0a4747e45898cdc1a19ce4d3b83a39cfeb3963c6df369bfbe",
+        "anchor_text_hash": "5321f9c4d0e2404bba4bdd4465f7e89aca3761a23f1bef7f505e4bb2eee894aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(saved.entries()[0].bound_tests().is_some_and(|tests| !tests.as_slice().is_empty()));\n\nassert_eq!(selected.bound_tests().unwrap().as_slice()[0].test_name().as_str(), \"diagnostic_only_location\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_cache_dto_persists_resolved_bound_test_locations"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_bound_tests_diagnostic_representation_does_not_change_lookup_identity"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_fulfillment_cache_is_rebuilt_with_resolved_bound_tests"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedBoundTestsResolver",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedBoundTestsResolver",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "f2cc2fab619a2834c14cefc78e10c19be73761523939a5f78a2d5d9c17f75612",
+        "declaration_hash": "e1d55c02afdfd48816872bc12b0457fe0d0c23042fea8941819aaf3bdd4afdf9",
+        "anchor_text_hash": "91071973616ad036c5a1ad322545d6c20047098290137122fb69172f7cbe9118"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(saved.entries()[0].bound_tests().unwrap().as_slice(), &[location()]); ... assert_eq!(selected.bound_tests().unwrap().as_slice()[0].test_name().as_str(), \"diagnostic_only_location\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::bound_tests::tests",
+          "test_name": "test_resolved_bound_tests_resolver_with_scanned_source_returns_coupled_evidence"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::bound_tests::tests",
+          "test_name": "test_resolved_bound_tests_resolver_with_missing_source_returns_unavailable_diagnostic"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_reports_bound_test_or_anchor_hash_changes_as_freshness_drift"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_fail_verdict_json_uses_only_nested_non_empty_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_bound_tests_diagnostic_representation_does_not_change_lookup_identity"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedBoundTestsResolver",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedBoundTestsResolver",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "f2cc2fab619a2834c14cefc78e10c19be73761523939a5f78a2d5d9c17f75612",
+        "declaration_hash": "e1d55c02afdfd48816872bc12b0457fe0d0c23042fea8941819aaf3bdd4afdf9",
+        "anchor_text_hash": "38596737d3e9faaa99f3cd807a18aa4dba38d31cfabcdae6bc433c7a98100a59"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(selected.bound_tests().unwrap().as_slice()[0].test_name().as_str(), \"diagnostic_only_location\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::bound_tests::tests",
+          "test_name": "test_resolved_bound_tests_resolver_with_scanned_source_returns_coupled_evidence"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::bound_tests::tests",
+          "test_name": "test_resolved_bound_tests_resolver_with_missing_source_returns_unavailable_diagnostic"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_reports_bound_test_or_anchor_hash_changes_as_freshness_drift"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_fail_verdict_json_uses_only_nested_non_empty_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_bound_tests_diagnostic_representation_does_not_change_lookup_identity"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedBoundTestsResolver",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedBoundTestsResolver",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "f2cc2fab619a2834c14cefc78e10c19be73761523939a5f78a2d5d9c17f75612",
+        "declaration_hash": "e1d55c02afdfd48816872bc12b0457fe0d0c23042fea8941819aaf3bdd4afdf9",
+        "anchor_text_hash": "5321f9c4d0e2404bba4bdd4465f7e89aca3761a23f1bef7f505e4bb2eee894aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(saved.entries()[0].bound_tests().unwrap().as_slice(), &[location()]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::bound_tests::tests",
+          "test_name": "test_resolved_bound_tests_resolver_with_scanned_source_returns_coupled_evidence"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::bound_tests::tests",
+          "test_name": "test_resolved_bound_tests_resolver_with_missing_source_returns_unavailable_diagnostic"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_reports_bound_test_or_anchor_hash_changes_as_freshness_drift"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_fail_verdict_json_uses_only_nested_non_empty_reason"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_bound_tests_diagnostic_representation_does_not_change_lookup_identity"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedBoundTestsResolverPort",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedBoundTestsResolverPort",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:resolve"
+      },
+      "key": {
+        "bound_tests_set_hash": "190dafcf71a1f72b47098a5112e673bfc81697c015a038fec8f51c570c31da13",
+        "declaration_hash": "0cddd3e56ca9d15eb015a1dd74de18aeafd261f713c91496456004888718a7ba",
+        "anchor_text_hash": "91071973616ad036c5a1ad322545d6c20047098290137122fb69172f7cbe9118"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let resolution =\n            port.resolve(NonEmptyTestLocations::new(location.clone(), Vec::new())).unwrap();\n\n        assert_eq!(resolution.locations().as_slice(), &[location]);\n        assert_eq!(resolution.set_hash().as_hash(), &ContentHash::from_bytes([18; 32]));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::bound_tests::tests",
+          "test_name": "test_resolved_bound_tests_resolver_with_scanned_source_returns_coupled_evidence"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_bound_tests_diagnostic_representation_does_not_change_lookup_identity"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedBoundTestsResolverPort",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedBoundTestsResolverPort",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:resolve"
+      },
+      "key": {
+        "bound_tests_set_hash": "190dafcf71a1f72b47098a5112e673bfc81697c015a038fec8f51c570c31da13",
+        "declaration_hash": "0cddd3e56ca9d15eb015a1dd74de18aeafd261f713c91496456004888718a7ba",
+        "anchor_text_hash": "38596737d3e9faaa99f3cd807a18aa4dba38d31cfabcdae6bc433c7a98100a59"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(resolution.locations().as_slice(), &[location]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::bound_tests::tests",
+          "test_name": "test_resolved_bound_tests_resolver_with_scanned_source_returns_coupled_evidence"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_bound_tests_diagnostic_representation_does_not_change_lookup_identity"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedBoundTestsResolverPort",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedBoundTestsResolverPort",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:resolve"
+      },
+      "key": {
+        "bound_tests_set_hash": "190dafcf71a1f72b47098a5112e673bfc81697c015a038fec8f51c570c31da13",
+        "declaration_hash": "0cddd3e56ca9d15eb015a1dd74de18aeafd261f713c91496456004888718a7ba",
+        "anchor_text_hash": "5321f9c4d0e2404bba4bdd4465f7e89aca3761a23f1bef7f505e4bb2eee894aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(saved.entries()[0].bound_tests().unwrap().as_slice(), &[location]); ... assert_eq!(selected.bound_tests().unwrap().as_slice()[0].test_name().as_str(), \"diagnostic_only_location\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::bound_tests::tests",
+          "test_name": "test_resolved_bound_tests_resolver_with_scanned_source_returns_coupled_evidence"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_bound_tests_diagnostic_representation_does_not_change_lookup_identity"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedBoundTests",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedBoundTests",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "15f76ef79cfebb9f2d9aed20bb2e07c2b12faf1121392bf96e01242a716eca42",
+        "declaration_hash": "9d07a906ec4facf5376e48f32b1f5d002a405b54d79d8c70caa7ee0e2bbbeba0",
+        "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.resolved_edges(), &[edge()]);\nassert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));\nassert!(matches!(\n        result,\n        Err(ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(message)))\n            if message.as_str() == \"provider unavailable\"\n    ));\nassert!(h.fulfillment_cache.saved.lock().unwrap().is_none());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::bound_tests::tests",
+          "test_name": "test_resolved_bound_tests_resolver_with_scanned_source_returns_coupled_evidence"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::bound_tests::tests",
+          "test_name": "test_resolved_bound_tests_resolver_with_scanned_source_returns_coupled_evidence"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedBoundTests",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedBoundTests",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "a9cf2e849dcab18d9ca395e23ee399e4d2abecef37d194a7beb12b9a6f7cf46a",
+        "declaration_hash": "9d07a906ec4facf5376e48f32b1f5d002a405b54d79d8c70caa7ee0e2bbbeba0",
+        "anchor_text_hash": "5321f9c4d0e2404bba4bdd4465f7e89aca3761a23f1bef7f505e4bb2eee894aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(saved.entries()[0].bound_tests().unwrap().as_slice(), &[location()]);\n\nassert_eq!(selected.bound_tests().unwrap().as_slice()[0].test_name().as_str(),\n        \"diagnostic_only_location\")"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::bound_tests::tests",
+          "test_name": "test_resolved_bound_tests_resolver_with_scanned_source_returns_coupled_evidence"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_cache_dto_persists_resolved_bound_test_locations"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_bound_tests_diagnostic_representation_does_not_change_lookup_identity"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationsDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "c9835421bf2b1073d6764230971a4191f54f39cd6d963c76a88a6043ea0a5457",
+        "declaration_hash": "4ed37270915b9a630e1720d3a6514585d54b167c2ed77e20514e16f9d7c3b3e1",
+        "anchor_text_hash": "ea73875ea10c4047021f7c664d5047480ad2e6ea9d2beffc4bb775bc46243305"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            document.validate_voluntary_binding(&edge_id),\n            Err(TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id: actual })\n                if actual == edge_id\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_validate_voluntary_binding_with_derived_owner_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_finding"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationsDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "c9835421bf2b1073d6764230971a4191f54f39cd6d963c76a88a6043ea0a5457",
+        "declaration_hash": "4ed37270915b9a630e1720d3a6514585d54b167c2ed77e20514e16f9d7c3b3e1",
+        "anchor_text_hash": "f420577c5989e261f5142fcbcf8ebd99c73420803493c622d16ce7ad84c25684"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            document.validate_voluntary_binding(&edge_id),\n            Err(TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id: actual })\n                if actual == edge_id\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_validate_voluntary_binding_with_derived_owner_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_finding"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationsDocument",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationsDocument",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "c9835421bf2b1073d6764230971a4191f54f39cd6d963c76a88a6043ea0a5457",
+        "declaration_hash": "4ed37270915b9a630e1720d3a6514585d54b167c2ed77e20514e16f9d7c3b3e1",
+        "anchor_text_hash": "0637af9c7e989dc3b6ba0ec7df9f8045089d7140aba3f404335d24a691f4e184"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            document.validate_voluntary_binding(&edge_id),\n            Err(TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id: actual })\n                if actual == edge_id\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::obligations::tests",
+          "test_name": "test_validate_voluntary_binding_with_derived_owner_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_finding"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EdgeResolutionOutcome",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EdgeResolutionOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "bf06c391380d12ccec70e70562fa10b4d809c58a3c6c247ebbf4e32aed9cabd2",
+        "declaration_hash": "10783e98cca432dc708e4a975c4c6cc22cec79a67bab48a28803e8fa36e5bc67",
+        "anchor_text_hash": "cd061f9ac5c3d0029d334db614e25ee8f686c36f2dd9dd5ba903b4b60addf9ff"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Fail {\n            category: FulfillmentFailCategory::Contradiction,\n            reason: reason(\"asserts the opposite\"),\n        })"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_final_fail_returns_semantic_failures_after_cache_save"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_fulfillment_lane_counts_and_records"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_waiver_lane_counts"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EdgeResolutionOutcome",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EdgeResolutionOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "bf06c391380d12ccec70e70562fa10b4d809c58a3c6c247ebbf4e32aed9cabd2",
+        "declaration_hash": "10783e98cca432dc708e4a975c4c6cc22cec79a67bab48a28803e8fa36e5bc67",
+        "anchor_text_hash": "e2fe43c554e620320e7eae56be1c29d95df6b4bd43ac864823f6b331bf5177b6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Fail {\n            category: FulfillmentFailCategory::Contradiction,\n            reason: reason(\"asserts the opposite\"),\n        })"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_final_fail_returns_semantic_failures_after_cache_save"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_fulfillment_lane_counts_and_records"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_waiver_lane_counts"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EdgeResolutionOutcome",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EdgeResolutionOutcome",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "3d915d53652daf5cfcc60e2595ed4c3135f1c0fd038b3c46e546a554c32fe08d",
+        "declaration_hash": "10783e98cca432dc708e4a975c4c6cc22cec79a67bab48a28803e8fa36e5bc67",
+        "anchor_text_hash": "38596737d3e9faaa99f3cd807a18aa4dba38d31cfabcdae6bc433c7a98100a59"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "EdgeResolutionOutcome::Fulfillment(fulfillment_fail())"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_final_fail_returns_semantic_failures_after_cache_save"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::verify::tests",
+          "test_name": "test_failure_records_keep_reason_only_in_nested_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_fulfillment_lane_counts_and_records"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_waiver_lane_counts"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EdgeVerdictRecord",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EdgeVerdictRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "bf06c391380d12ccec70e70562fa10b4d809c58a3c6c247ebbf4e32aed9cabd2",
+        "declaration_hash": "84dbbe56738241b15b85b281026f328930e842222dab68af0dce4bb4aea9b4e0",
+        "anchor_text_hash": "cd061f9ac5c3d0029d334db614e25ee8f686c36f2dd9dd5ba903b4b60addf9ff"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Fail {\n            category: FulfillmentFailCategory::Contradiction,\n            reason: reason(\"asserts the opposite\"),\n        })"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_final_fail_returns_semantic_failures_after_cache_save"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_fulfillment_lane_counts_and_records"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_waiver_lane_counts"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EdgeVerdictRecord",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EdgeVerdictRecord",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "bf06c391380d12ccec70e70562fa10b4d809c58a3c6c247ebbf4e32aed9cabd2",
+        "declaration_hash": "84dbbe56738241b15b85b281026f328930e842222dab68af0dce4bb4aea9b4e0",
+        "anchor_text_hash": "e2fe43c554e620320e7eae56be1c29d95df6b4bd43ac864823f6b331bf5177b6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Fail {\n            category: FulfillmentFailCategory::Contradiction,\n            reason: reason(\"asserts the opposite\"),\n        })"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_final_fail_returns_semantic_failures_after_cache_save"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_fulfillment_lane_counts_and_records"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_waiver_lane_counts"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "5077b3864f6d11c028bde7a93de8f562a7cae7a76c77d2a58574ceec2c00d2cb",
+        "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+        "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(bound_tests_mismatch.key().bound_tests_set_hash(), current.key().bound_tests_set_hash());\nassert_ne!(declaration_mismatch.key().declaration_hash(), current.key().declaration_hash());\nassert_ne!(anchor_mismatch.key().anchor_text_hash(), current.key().anchor_text_hash());\nassert_ne!(fingerprint_mismatch.verifier_fingerprint(), current.verifier_fingerprint());\n...\nassert_eq!(saved.entries()[0].key(), current.key());\nassert_eq!(saved.entries()[0].verifier_fingerprint(), current.verifier_fingerprint());\n...\nassert!(matches!(\n    result,\n    Err(ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(message)))\n        if message.as_str() == \"provider unavailable\"\n));\nassert!(h.fulfillment_cache.saved.lock().unwrap().is_none());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_new_accepts_and_wires_declared_dependencies"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_fulfillment_cache_is_rebuilt_with_resolved_bound_tests"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluate_reuses_current_entry_after_all_cache_identity_mismatches"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "5077b3864f6d11c028bde7a93de8f562a7cae7a76c77d2a58574ceec2c00d2cb",
+        "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+        "anchor_text_hash": "ea73875ea10c4047021f7c664d5047480ad2e6ea9d2beffc4bb775bc46243305"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        result,\n        Err(ObligationEvaluateError::BindingConsistency(\n            domain::tddd::test_obligation::errors::TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id }\n        )) if edge_id == edge()\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_new_accepts_and_wires_declared_dependencies"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_fulfillment_cache_is_rebuilt_with_resolved_bound_tests"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluate_reuses_current_entry_after_all_cache_identity_mismatches"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "5077b3864f6d11c028bde7a93de8f562a7cae7a76c77d2a58574ceec2c00d2cb",
+        "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+        "anchor_text_hash": "91071973616ad036c5a1ad322545d6c20047098290137122fb69172f7cbe9118"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(saved.entries()[0].bound_tests().unwrap().as_slice(), &[location()]); ... assert!(h.fulfillment_driver.tiers.lock().unwrap().is_empty()); ... assert_eq!(saved.entries()[0].key(), current.key());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_new_accepts_and_wires_declared_dependencies"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_fulfillment_cache_is_rebuilt_with_resolved_bound_tests"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluate_reuses_current_entry_after_all_cache_identity_mismatches"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "5077b3864f6d11c028bde7a93de8f562a7cae7a76c77d2a58574ceec2c00d2cb",
+        "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+        "anchor_text_hash": "f420577c5989e261f5142fcbcf8ebd99c73420803493c622d16ce7ad84c25684"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        result,\n        Err(ObligationEvaluateError::BindingConsistency(\n            domain::tddd::test_obligation::errors::TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id }\n        )) if edge_id == edge()\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_new_accepts_and_wires_declared_dependencies"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_fulfillment_cache_is_rebuilt_with_resolved_bound_tests"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluate_reuses_current_entry_after_all_cache_identity_mismatches"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "5077b3864f6d11c028bde7a93de8f562a7cae7a76c77d2a58574ceec2c00d2cb",
+        "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+        "anchor_text_hash": "0637af9c7e989dc3b6ba0ec7df9f8045089d7140aba3f404335d24a691f4e184"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        result,\n        Err(ObligationEvaluateError::BindingConsistency(\n            domain::tddd::test_obligation::errors::TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id }\n        )) if edge_id == edge()\n    ));\n\nassert_eq!(outcome.pass_count(), 1);\nassert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_new_accepts_and_wires_declared_dependencies"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_fulfillment_cache_is_rebuilt_with_resolved_bound_tests"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluate_reuses_current_entry_after_all_cache_identity_mismatches"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "5077b3864f6d11c028bde7a93de8f562a7cae7a76c77d2a58574ceec2c00d2cb",
+        "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+        "anchor_text_hash": "5321f9c4d0e2404bba4bdd4465f7e89aca3761a23f1bef7f505e4bb2eee894aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(saved.entries()[0].bound_tests().unwrap().as_slice(), &[location()]); ... assert!(h.fulfillment_driver.tiers.lock().unwrap().is_empty()); ... assert_ne!(bound_tests_mismatch.key().bound_tests_set_hash(), current.key().bound_tests_set_hash()); assert_ne!(declaration_mismatch.key().declaration_hash(), current.key().declaration_hash()); assert_ne!(anchor_mismatch.key().anchor_text_hash(), current.key().anchor_text_hash()); assert_ne!(fingerprint_mismatch.verifier_fingerprint(), current.verifier_fingerprint());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_new_accepts_and_wires_declared_dependencies"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_fulfillment_cache_is_rebuilt_with_resolved_bound_tests"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluate_reuses_current_entry_after_all_cache_identity_mismatches"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "5077b3864f6d11c028bde7a93de8f562a7cae7a76c77d2a58574ceec2c00d2cb",
+        "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+        "anchor_text_hash": "9398e6445efcd3a8a4b50484bb4eea078e8e190c70c12ff370ba0965ba35c104"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(initial_check, Err(ObligationCheckError::StaleVerdicts { .. }))); ... assert_eq!(evaluation.pass_count(), 1); ... \"evaluate must persist a replacement fulfillment cache for the next check\" ... assert_eq!(recovered_check.resolved_edges(), &[edge()]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_new_accepts_and_wires_declared_dependencies"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_fulfillment_cache_is_rebuilt_with_resolved_bound_tests"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluate_reuses_current_entry_after_all_cache_identity_mismatches"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "5077b3864f6d11c028bde7a93de8f562a7cae7a76c77d2a58574ceec2c00d2cb",
+        "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+        "anchor_text_hash": "753b9eb475bf1c9bd7805922ce379a8289a44e27cf1b3345979352f438bde285"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        result,\n        Err(ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(message)))\n            if message.as_str() == \"provider unavailable\"\n    ));\n    assert!(h.fulfillment_cache.saved.lock().unwrap().is_none());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_new_accepts_and_wires_declared_dependencies"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_source_scan_error_is_propagated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_absent_fulfillment_cache_is_rebuilt_with_resolved_bound_tests"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluate_reuses_current_entry_after_all_cache_identity_mismatches"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_stand_in_verifier_port_error_fails_closed_without_pass_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_ownerless_voluntary_binding_is_evaluated"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_voluntary_binding_for_derived_edge_returns_consistency_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "9a3398a103734663922315a0a1fb11c6c88bd26261ee2be1f42e7ff164fcd403",
+        "declaration_hash": "f4927a106596d0248be2a0367b4a126d3865874c25bfc99352bf0b512d9eab38",
+        "anchor_text_hash": "cd061f9ac5c3d0029d334db614e25ee8f686c36f2dd9dd5ba903b4b60addf9ff"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "    assert!(entry.get(\"verdict_reason\").is_none());\n    assert_eq!(entry[\"verdict\"][\"reason\"], \"asserts the opposite\");\n    assert!(entry[\"verdict\"][\"reason\"].as_str().is_some_and(|reason| !reason.is_empty()));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_fulfillment_lane_counts_and_records"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_interactor_aggregates_status_lanes_without_gate_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_interactor_with_unresolved_or_status_read_error_returns_ok"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_final_fail_returns_semantic_failures_after_cache_save"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_fail_verdict_json_uses_only_nested_non_empty_reason"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "9a3398a103734663922315a0a1fb11c6c88bd26261ee2be1f42e7ff164fcd403",
+        "declaration_hash": "f4927a106596d0248be2a0367b4a126d3865874c25bfc99352bf0b512d9eab38",
+        "anchor_text_hash": "e2fe43c554e620320e7eae56be1c29d95df6b4bd43ac864823f6b331bf5177b6"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(entry.get(\"verdict_reason\").is_none());\n    assert_eq!(entry[\"verdict\"][\"reason\"], \"asserts the opposite\");\n    assert!(entry[\"verdict\"][\"reason\"].as_str().is_some_and(|reason| !reason.is_empty()));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_fulfillment_lane_counts_and_records"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_interactor_aggregates_status_lanes_without_gate_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::results_tests",
+          "test_name": "test_results_interactor_with_unresolved_or_status_read_error_returns_ok"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_final_fail_returns_semantic_failures_after_cache_save"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_fail_verdict_json_uses_only_nested_non_empty_reason"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheEntry",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCacheEntry",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "c5a2970a260a8269e6cb010a4ab60ab945e0d0fe413f9f59183ad439c3364a12",
+        "declaration_hash": "4e81274726d27a4a287b964bada83e094a90eeee117e0aa33da7a0673f98633b",
+        "anchor_text_hash": "3f9cea786c50c2d7a810736fd740e2d137d2076b05c3e73fb74e5a03831640a4"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.resolved_edges(), &[edge()]);\n\nmatch result {\n    Err(ObligationCheckError::FulfillmentCacheLookup(\n        FulfillmentCacheLookupError::AmbiguousCurrentEntries {\n            edge_id: actual_edge_id,\n            obligation_id: actual_obligation_id,\n            key: actual_key,\n        },\n    )) => {\n        assert_eq!(actual_edge_id, edge());\n        assert_eq!(actual_obligation_id, obligation().id().clone());\n        assert_eq!(actual_key, expected_key);\n    }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_historical_fulfillment_row_uses_current_full_key"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::check_tests",
+          "test_name": "test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheEntry",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCacheEntry",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "885364977b891d8dd171c327e3c5e7c3a16ba82f99330329cb2f328be796aa86",
+        "declaration_hash": "4e81274726d27a4a287b964bada83e094a90eeee117e0aa33da7a0673f98633b",
+        "anchor_text_hash": "91071973616ad036c5a1ad322545d6c20047098290137122fb69172f7cbe9118"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(saved.entries()[0].bound_tests().unwrap().as_slice(), &[location()]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheEntry",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCacheEntry",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "a2d46a44795dac3fd4eda871b449c9907a678985028fd9dcc2e9b9d11e05b2b6",
+        "declaration_hash": "4e81274726d27a4a287b964bada83e094a90eeee117e0aa33da7a0673f98633b",
+        "anchor_text_hash": "38596737d3e9faaa99f3cd807a18aa4dba38d31cfabcdae6bc433c7a98100a59"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(h.fulfillment_driver.tiers.lock().unwrap().is_empty());\n\nlet selected = document\n        .lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint())\n        .unwrap()\n        .expect(\"the unchanged cache key must still select the row\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_bound_tests_diagnostic_representation_does_not_change_lookup_identity"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheEntry",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCacheEntry",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "b51caaa79b4d71f75c213e14bc74a9ef076c1dae86d6939ce4d2019ab0f56594",
+        "declaration_hash": "4e81274726d27a4a287b964bada83e094a90eeee117e0aa33da7a0673f98633b",
+        "anchor_text_hash": "5321f9c4d0e2404bba4bdd4465f7e89aca3761a23f1bef7f505e4bb2eee894aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(saved.entries()[0].bound_tests().unwrap().as_slice(), &[location()]); ... \"the unchanged cache key must still select the row\" ... assert_eq!(\n        selected.bound_tests().unwrap().as_slice()[0].test_name().as_str(),\n        \"diagnostic_only_location\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::test_obligation::fulfillment_cache_codec::tests",
+          "test_name": "test_bound_tests_diagnostic_representation_does_not_change_lookup_identity"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheEntryState",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCacheEntryState",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "885364977b891d8dd171c327e3c5e7c3a16ba82f99330329cb2f328be796aa86",
+        "declaration_hash": "14312c0ce3954a115b97330936a53a8305c80a054b83b690fbfb65fb318d1623",
+        "anchor_text_hash": "91071973616ad036c5a1ad322545d6c20047098290137122fb69172f7cbe9118"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(saved.entries()[0].bound_tests().unwrap().as_slice(), &[location()]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheEntryState",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCacheEntryState",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "a3fc1bfc7ade92c6195303a82b37f7207f69407543b3429bf8047f845c75162d",
+        "declaration_hash": "14312c0ce3954a115b97330936a53a8305c80a054b83b690fbfb65fb318d1623",
+        "anchor_text_hash": "38596737d3e9faaa99f3cd807a18aa4dba38d31cfabcdae6bc433c7a98100a59"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.pass_count(), 1);\n    assert!(h.fulfillment_driver.tiers.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_cache_entry_diagnostics_do_not_add_a_lookup_identity_axis"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ObligationFulfillmentCacheEntryState",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ObligationFulfillmentCacheEntryState",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "752421cfb015ceafaa7981292aa87cf823e1f372e430b1b05bb43b77fd6b2763",
+        "declaration_hash": "14312c0ce3954a115b97330936a53a8305c80a054b83b690fbfb65fb318d1623",
+        "anchor_text_hash": "5321f9c4d0e2404bba4bdd4465f7e89aca3761a23f1bef7f505e4bb2eee894aa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(saved.entries()[0].bound_tests().unwrap().as_slice(), &[location()]); ... assert!(matches!(\n            document.lookup_current(&edge_id(), &obligation_id(), &key, &verifier_fingerprint()),\n            Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries { .. })\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::test_obligation::verdict::tests",
+          "test_name": "test_cache_entry_diagnostics_do_not_add_a_lookup_identity_axis"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedBoundTests",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedBoundTests",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "79572165278b94101a32f670e75883291518ef7b626afce83181788c8be9924e",
+        "declaration_hash": "9d07a906ec4facf5376e48f32b1f5d002a405b54d79d8c70caa7ee0e2bbbeba0",
+        "anchor_text_hash": "38596737d3e9faaa99f3cd807a18aa4dba38d31cfabcdae6bc433c7a98100a59"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(resolution.locations().as_slice(), &[location]);\n        assert_eq!(resolution.set_hash().as_hash(), &ContentHash::from_bytes([18; 32]));\n\n    assert_eq!(outcome.pass_count(), 1);\n    assert!(h.fulfillment_driver.tiers.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::bound_tests::tests",
+          "test_name": "test_resolved_bound_tests_resolver_with_scanned_source_returns_coupled_evidence"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_reuses_cache_when_bound_test_diagnostics_differ"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedBoundTests",
+        "anchor_id": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedBoundTests",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "12dd8bad0a4e1e836660a4b4290eae0efb93f71694b107f1599353168719fdf0",
+        "declaration_hash": "9d07a906ec4facf5376e48f32b1f5d002a405b54d79d8c70caa7ee0e2bbbeba0",
+        "anchor_text_hash": "91071973616ad036c5a1ad322545d6c20047098290137122fb69172f7cbe9118"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(saved.entries()[0].bound_tests().unwrap().as_slice(), &[location()]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::bound_tests::tests",
+          "test_name": "test_resolved_bound_tests_resolver_with_scanned_source_returns_coupled_evidence"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::test_obligation::evaluate::tests",
+          "test_name": "test_evaluation_persists_the_exact_resolved_bound_test_locations"
+        }
+      ]
     }
   ]
 }

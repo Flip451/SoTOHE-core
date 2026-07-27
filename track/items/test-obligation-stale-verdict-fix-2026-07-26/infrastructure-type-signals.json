@@ -1,9 +1,18 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T16:47:51Z",
-  "declaration_hash": "3f827d7dca708cfc36c3125a644846130527ffa4648949b48327ca7ba60f4014",
-  "implementation_input_hash": "eea709596722fd39f859b9a0392317f8b626d1baa233bc0531e6b6354ae9029f",
+  "generated_at": "2026-07-27T16:39:42Z",
+  "declaration_hash": "4c6198df91cddad455166aa8fa6a6aeb1144b215ce5af38ba055fefd9b036898",
+  "implementation_input_hash": "9da11f33fbaab71cb9b8b0763f8e70ae8ef7d953ed230641d20fbcd50ef25526",
   "signals": [
+    {
+      "type_name": "JsonObligationFulfillmentCacheCodec",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "usecase::test_obligation::ports::ObligationFulfillmentCachePort"
+      ]
+    },
     {
       "type_name": "ObligationFulfillmentCacheEntryDto",
       "kind_tag": "dto",
@@ -11,13 +20,10 @@
       "found_type": true
     },
     {
-      "type_name": "JsonObligationFulfillmentCacheCodec",
+      "type_name": "Sha256ContentHasher",
       "kind_tag": "secondary_adapter",
       "signal": "blue",
-      "found_type": true,
-      "found_items": [
-        "ObligationFulfillmentCachePort"
-      ]
+      "found_type": true
     }
   ]
 }

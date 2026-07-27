@@ -16,9 +16,7 @@ use crate::SpecDocumentLoadError;
 use crate::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderError;
 use crate::tddd::test_obligation::drift::{NonEmptyDrifts, NonEmptyEdgeVerdictRecords};
 use crate::tddd::test_obligation::ids::{DiagnosticMessage, NonEmptyEdgeIds, RoleName};
-use crate::tddd::test_obligation::verdict::{
-    FulfillmentCacheLookupError, FulfillmentCacheReevaluationReason,
-};
+use crate::tddd::test_obligation::verdict::FulfillmentCacheLookupError;
 
 /// Error raised while loading and validating the test-obligation rules config.
 ///
@@ -176,7 +174,7 @@ pub enum ObligationCheckError {
     /// A binding violates the derived-obligation ownership invariant.
     BindingConsistency(TestBindingConsistencyError),
     /// The fulfillment cache must be reevaluated before it can resolve an edge.
-    FulfillmentCacheRequiresEvaluation(FulfillmentCacheReevaluationReason),
+    FulfillmentCacheRequiresEvaluation,
 }
 
 /// Failure of `test-obligation evaluate` (IN-09 / IN-12 / AC-06 / AC-07).
@@ -193,12 +191,16 @@ pub enum ObligationEvaluateError {
     SpecLoad(SpecDocumentLoadError),
     /// Loading an obligations / test-bindings artifact failed.
     ArtifactLoad(ArtifactCodecError),
+    /// A binding violates the derived-obligation ownership invariant.
+    BindingConsistency(TestBindingConsistencyError),
     /// Scanning a bound test's source failed.
     TestSourceScan(TestSourceScanError),
     /// A semantic-verifier port invocation failed.
     VerifierPort(SemanticVerifierError),
     /// Loading or persisting a verdict cache failed.
     CachePersistence(VerifyCacheError),
+    /// Resolving a current fulfillment-cache entry was ambiguous.
+    FulfillmentCacheLookup(FulfillmentCacheLookupError),
     /// Evaluation confirmed one or more semantic failures.
     SemanticFailuresConfirmed {
         /// The per-edge records that failed (non-empty by construction).
@@ -326,7 +328,16 @@ mod tests {
     }
 
     fn record() -> EdgeVerdictRecord {
-        EdgeVerdictRecord::new(None, edge(), None, None, EdgeResolutionOutcome::Pending, None, None)
+        EdgeVerdictRecord::new(
+            None,
+            edge(),
+            None,
+            None,
+            EdgeResolutionOutcome::Fulfillment(
+                crate::tddd::test_obligation::verdict::ObligationFulfillmentVerdict::Pending,
+            ),
+            None,
+        )
     }
 
     fn catalogue_load_error() -> CatalogueDocumentLoaderError {
@@ -443,17 +454,10 @@ mod tests {
     }
 
     #[test]
-    fn test_check_error_carries_fulfillment_cache_reevaluation_reason() {
-        let error = ObligationCheckError::FulfillmentCacheRequiresEvaluation(
-            FulfillmentCacheReevaluationReason::LegacyRowsMissingBoundTests,
-        );
+    fn test_check_error_requires_fulfillment_cache_evaluation() {
+        let error = ObligationCheckError::FulfillmentCacheRequiresEvaluation;
 
-        assert!(matches!(
-            error,
-            ObligationCheckError::FulfillmentCacheRequiresEvaluation(
-                FulfillmentCacheReevaluationReason::LegacyRowsMissingBoundTests
-            )
-        ));
+        assert!(matches!(error, ObligationCheckError::FulfillmentCacheRequiresEvaluation));
     }
 
     #[test]
