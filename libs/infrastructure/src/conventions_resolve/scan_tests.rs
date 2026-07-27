@@ -907,3 +907,62 @@ fn test_fs_convention_requirement_adapter_surfaces_the_unrenderable_name_conditi
         "the rejection that crosses the port is the renderability one, unchanged: {source}"
     );
 }
+
+#[test]
+fn test_scan_convention_requirements_with_an_unlistable_root_fails_closed() {
+    // `knowledge/conventions` present but not a directory. A caller cannot tell
+    // this apart from a repository declaring nothing if the scan answers with an
+    // empty result, and the two mean opposite things: one is "no document
+    // requires this capability", the other is "the documents could not be looked
+    // at". The root is the one path the walk touches that `ConventionDocumentPath`
+    // rejects by design, so no document-shaped condition can name it.
+    let project = tempfile::tempdir().expect("tempdir must be created");
+    std::fs::create_dir_all(project.path().join("knowledge")).expect("knowledge must be created");
+    std::fs::write(project.path().join("knowledge/conventions"), b"not a directory")
+        .expect("the root stand-in must be written");
+
+    let result = scan_convention_requirements(project.path());
+
+    let Err(ConventionResolveError::ConventionRootUnlistable { root, .. }) = result else {
+        panic!(
+            "a convention root that cannot be listed is a structural anomaly, not an empty result"
+        );
+    };
+    assert_eq!(
+        root,
+        PathBuf::from("knowledge/conventions"),
+        "the failure names the root it could not list, repository-relative"
+    );
+}
+
+#[test]
+fn test_scan_convention_requirements_without_a_convention_root_is_an_empty_result() {
+    // The absent root stays an ordinary empty result: a repository that keeps no
+    // conventions declares nothing, which `AC-08` makes normal. Only a root that
+    // exists and cannot be listed fails closed.
+    let project = tempfile::tempdir().expect("tempdir must be created");
+
+    let scanned = scan_convention_requirements(project.path())
+        .expect("a repository with no convention tree requires nothing");
+
+    assert!(scanned.is_empty());
+}
+
+#[test]
+fn test_scan_convention_requirements_with_an_untraversable_ancestor_fails_closed() {
+    // `knowledge` is a regular file, so the guard cannot inspect the root below
+    // it and returns an inspection failure rather than a refused link. That is
+    // the arm the previous fixture did not reach: making the *root* a file lets
+    // the guard answer `Ok(true)` and pushes the failure into the listing, so it
+    // exercised a different branch than the one it was written for.
+    let project = tempfile::tempdir().expect("tempdir must be created");
+    std::fs::write(project.path().join("knowledge"), b"not a directory")
+        .expect("the ancestor stand-in must be written");
+
+    let result = scan_convention_requirements(project.path());
+
+    let Err(ConventionResolveError::ConventionRootUnlistable { root, .. }) = result else {
+        panic!("an ancestor that cannot be traversed leaves the tree undecidable, not empty");
+    };
+    assert_eq!(root, PathBuf::from("knowledge/conventions"));
+}

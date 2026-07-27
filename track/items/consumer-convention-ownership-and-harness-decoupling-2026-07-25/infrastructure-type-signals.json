@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-27T00:46:33Z",
+  "generated_at": "2026-07-27T02:24:39Z",
   "declaration_hash": "08a2a1b3f3e750467685fa06359109a953aec7126d2e69eec454c316dd84dff2",
-  "implementation_input_hash": "7b5764777825f901abf7432691165bf4d664c6be26c34800ef2e9c45b9fbf344",
+  "implementation_input_hash": "dc9ad47d81038f45861d046a0670fdaca8f64fe7a831739e6964b594bb2e81b7",
   "signals": [
     {
       "type_name": "CapabilityIdField",

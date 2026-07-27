@@ -160,12 +160,12 @@
       },
       "key": {
         "waived_reason_hash": "cf3ed2e2ae8d502a2327df88156041ef739ccfd95d2e71e06c9cb2d7af18aba1",
-        "declaration_hash": "93a726e07638959d5bccc8d2fae653f288b715f0d722b83f563c1be447efa195",
+        "declaration_hash": "37a227d0029aa787ad7c522cc852f5f2c1d7618cb3c9ace39e596b68ea50c31b",
         "anchor_text_hash": "2c8b009b849c82ccb1dbb756f2972cba4e650d06c7dbd798709555c40fe6efa4"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "methods: [], generics: [], where_predicates: []"
+        "citation": "methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }

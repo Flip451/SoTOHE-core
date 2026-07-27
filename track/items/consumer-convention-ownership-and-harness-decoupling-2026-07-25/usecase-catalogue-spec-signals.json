@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "9038260bf63d065139a6c5160eb13ac2d62b68ba3b6d185cbe3963cf19c5177e",
+  "catalogue_declaration_hash": "e9f473f5acc519cc9610ec479dfb743ab096d72c656ec02a8290a7ff16c6ada5",
   "signals": [
     {
       "type_name": "CapabilityExecError",
@@ -65,7 +65,7 @@
     {
       "type_name": "ConventionResolveError",
       "signal": "blue",
-      "entry_hash": "21b85d3c3c3744939605f7d1e1a14e11bc373f20994b135346d6e42606e7b644"
+      "entry_hash": "e7b7645e13a113e2af0f12b36859343b800b192ee834020e60f06ac61a0da3c4"
     },
     {
       "type_name": "ConventionResolveInteractor",
@@ -75,7 +75,7 @@
     {
       "type_name": "ConventionShippingCheckError",
       "signal": "blue",
-      "entry_hash": "9327f377a1feef30892c02cf0fc984244a6706f73052c5072cc492b1a93c4499"
+      "entry_hash": "3fa01dd62a89fb9ac699da090c3db8b144a68cfc06426da81459e6a3ae72119a"
     },
     {
       "type_name": "ConventionShippingCheckInteractor",

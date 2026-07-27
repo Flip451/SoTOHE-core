@@ -1099,6 +1099,16 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::conventions_resolve::scan_tests",
           "test_name": "test_scan_convention_requirements_with_an_unrenderable_directory_name_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unlistable_root_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_without_a_convention_root_is_an_empty_result"
         }
       ]
     },

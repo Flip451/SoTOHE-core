@@ -26,7 +26,7 @@
 | CapabilityExecError | error_type | modify | ProfileResolution, ExecutionModeRejected, ModelMissing, EffortMissing, UnsupportedProvider, SourceValidation, AdapterPreflight, DispatchFailed, ConventionResolutionFailed | 🔵 | 🔵 |
 | ConventionCapabilityIdError | error_type | add | Blank | 🔵 | 🔵 |
 | ConventionDocumentPathError | error_type | add | OutsideConventionRoot, NotRenderableAsRecord | 🔵 | 🔵 |
-| ConventionResolveError | error_type | add | FrontMatterUnparseable, RequiredForNotStringArray, EmptyCapabilityId, DocumentPathRejected, DocumentUnreadable | 🔵 | 🔵 |
+| ConventionResolveError | error_type | add | FrontMatterUnparseable, RequiredForNotStringArray, EmptyCapabilityId, DocumentPathRejected, DocumentUnreadable, ConventionRootUnlistable | 🔵 | 🔵 |
 | ConventionShippingCheckError | error_type | add | ConventionRootMissing, TreeUnreadable, DocumentPathRejected | 🟡 | 🔵 |
 
 ## Secondary Ports

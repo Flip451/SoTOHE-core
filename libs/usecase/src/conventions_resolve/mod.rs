@@ -200,6 +200,22 @@ pub enum ConventionResolveError {
         /// Opaque adapter diagnostic.
         detail: CapabilityFailureDetail,
     },
+    /// The convention root exists but its contents could not be listed.
+    ///
+    /// Distinct from [`Self::DocumentUnreadable`] because the root is not a
+    /// document: [`ConventionDocumentPath`] rejects it by design, so no
+    /// document-shaped variant can name it. Distinct from a normal empty result
+    /// because "no document declares this capability" and "the documents could
+    /// not be looked at" mean opposite things to a caller, and collapsing them
+    /// would report a repository whose convention tree is unreadable as one
+    /// that simply requires nothing.
+    #[error("convention root is unlistable '{root}': {detail}")]
+    ConventionRootUnlistable {
+        /// Repository-relative convention root that could not be listed.
+        root: PathBuf,
+        /// Opaque adapter diagnostic.
+        detail: CapabilityFailureDetail,
+    },
 }
 
 /// Read-only request naming the capability whose required conventions are

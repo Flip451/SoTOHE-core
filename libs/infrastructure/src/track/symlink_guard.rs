@@ -25,10 +25,7 @@ pub(crate) fn reject_symlinks_up_to_root(path: &Path) -> Result<(), std::io::Err
         }
         match ancestor.symlink_metadata() {
             Ok(meta) if meta.file_type().is_symlink() => {
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::InvalidInput,
-                    format!("refusing to follow symlink: {}", ancestor.display()),
-                ));
+                return Err(symlink_rejection(ancestor));
             }
             Ok(_) => {}
             // Missing components are OK — the caller may create them later, and a
@@ -73,10 +70,7 @@ pub fn reject_symlinks_below(path: &Path, trusted_root: &Path) -> Result<bool, s
         }
         match component.symlink_metadata() {
             Ok(meta) if meta.file_type().is_symlink() => {
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::InvalidInput,
-                    format!("refusing to follow symlink: {}", component.display()),
-                ));
+                return Err(symlink_rejection(component));
             }
             Ok(_) => {}
             // Parent doesn't exist yet (e.g., track dir not created) — that's OK
@@ -92,16 +86,64 @@ pub fn reject_symlinks_below(path: &Path, trusted_root: &Path) -> Result<bool, s
 
     // Check the leaf itself
     match path.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!("refusing to follow symlink: {}", path.display()),
-        )),
+        Ok(meta) if meta.file_type().is_symlink() => Err(symlink_rejection(path)),
         Ok(_) => Ok(true),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(false),
         Err(e) => {
             Err(std::io::Error::new(e.kind(), format!("failed to stat {}: {e}", path.display())))
         }
     }
+}
+
+/// Marker this module stamps into the rejection it raises for a symlink.
+///
+/// Kept as one constant so that producing the rejection and recognising it
+/// cannot drift apart. A caller cannot tell a refused link from an inspection
+/// failure by [`std::io::ErrorKind`] alone: this module raises `InvalidInput`
+/// for the link, and the filesystem raises the same kind for other malformed
+/// paths, so a caller matching on the kind would silently treat some
+/// undecidable roots as refused links.
+/// This module's refusal to follow a symlink, carried inside the
+/// [`std::io::Error`] it raises.
+///
+/// A private type rather than a message or an error kind, because both of those
+/// can come from something other than this module: `InvalidInput` is what the
+/// filesystem returns for a malformed path, and an inspection failure renders
+/// the inspected path into its own message, so a caller matching on either
+/// could be handed a path that impersonates a refusal. Only this module can
+/// construct this type, so a downcast answers the question exactly.
+#[derive(Debug)]
+struct SymlinkRejected {
+    component: std::path::PathBuf,
+}
+
+impl std::fmt::Display for SymlinkRejected {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "refusing to follow symlink: {}", self.component.display())
+    }
+}
+
+impl std::error::Error for SymlinkRejected {}
+
+/// Builds this module's rejection for the symlink at `component`.
+fn symlink_rejection(component: &Path) -> std::io::Error {
+    std::io::Error::new(
+        std::io::ErrorKind::InvalidInput,
+        SymlinkRejected { component: component.to_path_buf() },
+    )
+}
+
+/// Reports whether `error` is this module's refusal to follow a symlink, as
+/// opposed to a failure to inspect a component.
+///
+/// The distinction matters to a caller that treats the two differently — a
+/// refused link means the tree reached through it is not the one that was
+/// named, while an uninspectable component means the caller does not know what
+/// is there, and answering the second as if it were the first reports an
+/// unreadable tree as an empty one.
+#[must_use]
+pub(crate) fn is_symlink_rejection(error: &std::io::Error) -> bool {
+    error.get_ref().is_some_and(|inner| inner.is::<SymlinkRejected>())
 }
 
 #[cfg(test)]
@@ -224,5 +266,52 @@ mod tests {
         let leaf = link_parent.join("child");
         let err = reject_symlinks_up_to_root(&leaf).unwrap_err();
         assert!(err.to_string().contains("refusing to follow symlink"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_is_symlink_rejection_recognises_this_module_s_own_refusal() {
+        let dir = tempfile::tempdir().unwrap();
+        let target = dir.path().join("real");
+        let link = dir.path().join("link");
+        std::fs::create_dir_all(&target).unwrap();
+        std::os::unix::fs::symlink(&target, &link).unwrap();
+
+        let refusal = reject_symlinks_below(&link, dir.path()).unwrap_err();
+
+        assert!(
+            is_symlink_rejection(&refusal),
+            "the refusal this module raises is the one it recognises"
+        );
+    }
+
+    #[test]
+    fn test_is_symlink_rejection_rejects_a_lookalike_from_anywhere_else() {
+        // The discriminator is the only thing separating "this tree is reached
+        // through a link" from "this component could not be inspected", and the
+        // scanner answers the first with an empty result and the second with a
+        // failure. Neither the error kind nor the rendered message can carry
+        // that distinction: the filesystem raises `InvalidInput` for malformed
+        // paths of its own, and an inspection failure renders the inspected
+        // path into its message, so a path spelled like the refusal would
+        // impersonate one.
+        let same_kind = std::io::Error::new(std::io::ErrorKind::InvalidInput, "malformed path");
+        let same_kind_and_message = std::io::Error::new(
+            std::io::ErrorKind::InvalidInput,
+            "failed to stat refusing to follow symlink: /x",
+        );
+        let other_kind =
+            std::io::Error::new(std::io::ErrorKind::NotADirectory, "knowledge is a file");
+
+        for (name, error) in [
+            ("a same-kind failure", same_kind),
+            ("a failure whose message spells the refusal", same_kind_and_message),
+            ("an inspection failure of another kind", other_kind),
+        ] {
+            assert!(
+                !is_symlink_rejection(&error),
+                "{name} did not come from this module and must not be read as a refused link"
+            );
+        }
     }
 }

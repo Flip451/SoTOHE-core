@@ -1095,13 +1095,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "7695d828a6de87371408a3787ba2188b06b0183ebac3b028d961b3eedaa6824b",
+        "bound_tests_set_hash": "8f146a3a1b171cc7cf7c8b7ce293e227c55b6219745f497f6769d16b5ed7edbe",
         "declaration_hash": "0b6b6794541a76c741d0ece2044b168b4dced880b7ae65f150ff838c2803e01c",
         "anchor_text_hash": "8fcacd3517663b65642147deac44f3bcb1b164d156190aeb2d42d310057f95f2"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"each document below the convention tree is scanned once by its repository-relative path, nested ones included, and carries its own declarations rather than the scan's union\""
+        "citation": "assert!(\n        scan_convention_requirements(project.path()).is_err(),\n        \"an unreadable document fails the whole scan rather than dropping itself from it\"\n    );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1119,13 +1119,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "7695d828a6de87371408a3787ba2188b06b0183ebac3b028d961b3eedaa6824b",
+        "bound_tests_set_hash": "8f146a3a1b171cc7cf7c8b7ce293e227c55b6219745f497f6769d16b5ed7edbe",
         "declaration_hash": "0b6b6794541a76c741d0ece2044b168b4dced880b7ae65f150ff838c2803e01c",
         "anchor_text_hash": "51b28f2ec9290b9ea2aff6e9e206e609664c90b60219ed5b54305415af475b37"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"each document below the convention tree is scanned once by its repository-relative path, nested ones included\"; \"`AC-06` makes resolution read-only: no document is created, updated, or deleted, and no index is generated\""
+        "citation": "assert_eq!(\n        tree_snapshot(project.path()),\n        before,\n        \"`AC-06` makes resolution read-only: no document is created, updated, or deleted, and no \\\n         index is generated\"\n    );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1143,13 +1143,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "7695d828a6de87371408a3787ba2188b06b0183ebac3b028d961b3eedaa6824b",
+        "bound_tests_set_hash": "8f146a3a1b171cc7cf7c8b7ce293e227c55b6219745f497f6769d16b5ed7edbe",
         "declaration_hash": "0b6b6794541a76c741d0ece2044b168b4dced880b7ae65f150ff838c2803e01c",
         "anchor_text_hash": "2c8b009b849c82ccb1dbb756f2972cba4e650d06c7dbd798709555c40fe6efa4"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"the codec's decision reaches the caller through the scan\"; \"a `required_for` that is not an array of strings fails the scan closed\"; \"a blank capability id fails the scan closed\"; \"a document that cannot be read is one of `AC-07`'s fail-closed conditions\"; \"the rejection lifted is the renderability one and not the path escape\""
+        "citation": "let Err(ConventionResolveError::DocumentUnreadable { document, detail }) = result else {\n        panic!(\"a document that cannot be read is one of `AC-07`'s fail-closed conditions\");\n    };"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },

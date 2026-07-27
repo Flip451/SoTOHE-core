@@ -32,7 +32,7 @@ use usecase::conventions_resolve::{
 };
 
 use crate::capability_exec::{YAML_LINE_BREAKS, read_front_matter};
-use crate::track::symlink_guard::reject_symlinks_below;
+use crate::track::symlink_guard::{is_symlink_rejection, reject_symlinks_below};
 mod front_matter_dto;
 
 pub use front_matter_dto::{CapabilityIdField, ConventionFrontMatterDto};
@@ -316,11 +316,49 @@ pub fn scan_convention_requirements(
     // The link check runs first and covers `knowledge` as well, because a
     // listing of a linked root would already have produced entries from
     // another tree by the time any of them could be inspected.
-    let Ok(true) = reject_symlinks_below(&convention_root, project_root) else {
-        return Ok(Vec::new());
-    };
-    let Ok(entries) = bounded_entries(&convention_root) else {
-        return Ok(Vec::new());
+    match reject_symlinks_below(&convention_root, project_root) {
+        // A link on the way to the root, or at it: the tree reached through it
+        // is not the one the caller named, and presenting its documents under
+        // repository-relative paths would misreport where they came from.
+        Ok(false) => return Ok(Vec::new()),
+        Ok(true) => {}
+        // A link the guard refused is the same answer as `Ok(false)` for this
+        // walk: the tree behind it is not the one the caller named, so it
+        // presents no documents. The guard is asked to recognise its own
+        // rejection rather than the kind being matched here — it raises
+        // `InvalidInput` for a link and the filesystem raises the same kind for
+        // other malformed paths, so matching the kind would quietly answer an
+        // undecidable root as an ordinary empty one.
+        Err(error) if is_symlink_rejection(&error) => return Ok(Vec::new()),
+        // An absent component is a repository that keeps no conventions.
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
+        // Anything else means the guard could not decide — `knowledge` being a
+        // regular file, a component that cannot be traversed. That is a
+        // structural anomaly and fails closed for the same reason an unlistable
+        // root does: not knowing what is there is not the same as nothing.
+        Err(error) => {
+            return Err(ConventionResolveError::ConventionRootUnlistable {
+                root: PathBuf::from(CONVENTION_ROOT),
+                detail: CapabilityFailureDetail::new(error.to_string()),
+            });
+        }
+    }
+    // An absent root is a repository that keeps no conventions, which `AC-08`
+    // makes an ordinary empty result. Every other listing failure — a root that
+    // is a regular file, or a directory the process may not read — is a
+    // structural anomaly and fails closed: "no document declares this
+    // capability" and "the documents could not be looked at" mean opposite
+    // things to a caller, and returning the first for the second would report a
+    // repository whose convention tree is unreadable as one requiring nothing.
+    let entries = match bounded_entries(&convention_root) {
+        Ok(entries) => entries,
+        Err(error) if error.kind() == std::io::ErrorKind::NotFound => return Ok(Vec::new()),
+        Err(error) => {
+            return Err(ConventionResolveError::ConventionRootUnlistable {
+                root: PathBuf::from(CONVENTION_ROOT),
+                detail: CapabilityFailureDetail::new(error.to_string()),
+            });
+        }
     };
 
     let mut requirements = Vec::new();

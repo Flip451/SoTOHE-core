@@ -119,7 +119,7 @@ fn test_convention_document_path_with_a_non_utf8_name_returns_not_renderable_err
 }
 
 #[test]
-fn test_convention_resolve_error_declares_exactly_the_five_fail_closed_conditions() {
+fn test_convention_resolve_error_declares_every_variant_with_no_wildcard_arm() {
     let escaping = PathBuf::from("knowledge/adr/README.md");
     let Err(outside_root) = ConventionDocumentPath::try_new(escaping.clone()) else {
         panic!("expected an OutsideConventionRoot rejection");
@@ -141,10 +141,17 @@ fn test_convention_resolve_error_declares_exactly_the_five_fail_closed_condition
             document: document("knowledge/conventions/unreadable.md"),
             detail: CapabilityFailureDetail::new("permission denied"),
         },
+        ConventionResolveError::ConventionRootUnlistable {
+            root: PathBuf::from("knowledge/conventions"),
+            detail: CapabilityFailureDetail::new("permission denied"),
+        },
     ];
 
-    // One arm per variant and no wildcard: a sixth condition — including a
-    // variant for a normal empty resolution — stops this test compiling.
+    // One arm per variant and no wildcard: a further variant — including one
+    // for a normal empty resolution — stops this test compiling. The count is
+    // deliberately absent from the name: `AC-07` states its cases are not
+    // exhaustive, and one variant here composes two of them, so the number of
+    // variants is not the number of conditions.
     let concerned: Vec<PathBuf> = conditions
         .iter()
         .map(|condition| match condition {
@@ -159,6 +166,7 @@ fn test_convention_resolve_error_declares_exactly_the_five_fail_closed_condition
                     ConventionDocumentPathError::OutsideConventionRoot { path }
                     | ConventionDocumentPathError::NotRenderableAsRecord { path },
             } => path.clone(),
+            ConventionResolveError::ConventionRootUnlistable { root, .. } => root.clone(),
         })
         .collect();
 
@@ -170,6 +178,7 @@ fn test_convention_resolve_error_declares_exactly_the_five_fail_closed_condition
             PathBuf::from("knowledge/conventions/empty-capability-id.md"),
             escaping,
             PathBuf::from("knowledge/conventions/unreadable.md"),
+            PathBuf::from("knowledge/conventions"),
         ],
         "every condition carries the document it concerns, the escaped path through the \
          composed constructor rejection rather than a restatement of it"

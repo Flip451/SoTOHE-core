@@ -341,10 +341,30 @@ mod tests {
     /// returns its result alongside everything written there.
     ///
     /// `execute` answers the caller by printing, so what a `resolve` dispatch
-    /// hands back is only observable at the descriptor. The redirection is
-    /// process-wide and the runner gives each test its own process; the stderr
-    /// counterpart of this helper lives beside the track commands that need it.
+    /// hands back is only observable at the descriptor. The stderr counterpart of
+    /// this helper lives beside the track commands that need it.
+    ///
+    /// The redirection is **process-wide**, so two callers running at once would
+    /// each retarget the other's stdout and read the other's output. The guard
+    /// below serialises the whole redirect-run-restore sequence, because it is
+    /// the sequence and not the file that must not interleave.
+    ///
+    /// These tests require a process-per-test runner, which is what
+    /// `cargo make ci` uses. Under `cargo test` they run as threads in one
+    /// process and libtest installs a thread-local capture, so `println!` never
+    /// reaches descriptor 1 and this helper reads an empty file — a limitation
+    /// of the technique rather than a race, and one the guard cannot address.
+    /// Observing the answer at the descriptor is what makes these tests exercise
+    /// what a caller actually sees; the alternative is injecting a writer into
+    /// `execute`, which would move an output-shaping decision into the bin.
     fn capture_stdout<T>(run: impl FnOnce() -> T) -> (T, String) {
+        static STDOUT_REDIRECT: std::sync::Mutex<()> = std::sync::Mutex::new(());
+        let _serialised = STDOUT_REDIRECT.lock().unwrap_or_else(|poisoned| {
+            // A panic inside another capture leaves stdout restored by its own
+            // guard drop, so the descriptor state is sound and only the mutex
+            // is poisoned. Recovering keeps one failing test from cascading.
+            poisoned.into_inner()
+        });
         let mut capture = tempfile::tempfile().unwrap();
         let stdout_fd = std::io::stdout().as_raw_fd();
         let capture_fd = capture.as_raw_fd();
