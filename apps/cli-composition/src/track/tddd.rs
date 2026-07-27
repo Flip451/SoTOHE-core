@@ -414,6 +414,7 @@ impl TrackCompositionRoot {
         layer: Option<String>,
     ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::FsSymlinkGuard;
+        use infrastructure::tddd::feature_declaration_adapter::FsTdddFeatureDeclarationAdapter;
         use infrastructure::tddd::rustdoc_baseline_capture_adapter::RustdocBaselineCaptureAdapter;
         use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
         use usecase::baseline_capture::{
@@ -426,8 +427,14 @@ impl TrackCompositionRoot {
         let symlink_guard = Arc::new(FsSymlinkGuard::new());
         let layer_bindings = Arc::new(FsTdddLayerBindingsAdapter::new());
         let capture = Arc::new(RustdocBaselineCaptureAdapter::new());
+        let feature_declaration = Arc::new(FsTdddFeatureDeclarationAdapter::new());
 
-        let interactor = BaselineCaptureInteractor::new(symlink_guard, layer_bindings, capture);
+        let interactor = BaselineCaptureInteractor::new(
+            symlink_guard,
+            layer_bindings,
+            capture,
+            feature_declaration,
+        );
 
         interactor
             .run(BaselineCaptureRequest {

@@ -3,55 +3,7 @@
   "layer": "usecase",
   "entries": [
     {
-      "claim_hash": "6609ef2db6fa8431ace4bd031f45e0055440496393cf13167594c0e89e45e793",
-      "evidence_hash": "f15711c2a4a08a5521bbff1231ad7935764451d13ecabe453cb7282991d3919e",
-      "verdict": {
-        "kind": "pass",
-        "citation": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "BaselineCaptureError"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-02",
-          "text_label": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
-        }
-      }
-    },
-    {
-      "claim_hash": "6609ef2db6fa8431ace4bd031f45e0055440496393cf13167594c0e89e45e793",
-      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
-      "verdict": {
-        "kind": "pass",
-        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "BaselineCaptureError"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-03",
-          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
-        }
-      }
-    },
-    {
-      "claim_hash": "6609ef2db6fa8431ace4bd031f45e0055440496393cf13167594c0e89e45e793",
+      "claim_hash": "2f081bd5facf8cc8870f7b5daf3f6a623c6c9b2d356768bc7ac6cb2d2e480ffa",
       "evidence_hash": "1a47ffbd85e3395733a74240f580498f5fd9b77e568bfef9702964fd21c5e359",
       "verdict": {
         "kind": "pass",
@@ -75,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "6609ef2db6fa8431ace4bd031f45e0055440496393cf13167594c0e89e45e793",
+      "claim_hash": "2f081bd5facf8cc8870f7b5daf3f6a623c6c9b2d356768bc7ac6cb2d2e480ffa",
       "evidence_hash": "a6481a45e2bb141d792a1a8d08880fe0b6f5ad4f40a9df6524e4cdf9cc45315a",
       "verdict": {
         "kind": "pass",
@@ -99,31 +51,7 @@
       }
     },
     {
-      "claim_hash": "6062a2e6eaad966add0d5142b4d0d1e15c7e7a18f98f57f0cf53fe50fd5fdfea",
-      "evidence_hash": "f15711c2a4a08a5521bbff1231ad7935764451d13ecabe453cb7282991d3919e",
-      "verdict": {
-        "kind": "pass",
-        "citation": "Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "BaselineCaptureInteractor"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-02",
-          "text_label": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
-        }
-      }
-    },
-    {
-      "claim_hash": "6062a2e6eaad966add0d5142b4d0d1e15c7e7a18f98f57f0cf53fe50fd5fdfea",
+      "claim_hash": "c090c4e2210de043aa053794e1cecd67c47aee0bcb350a633555bdddc730d1fa",
       "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
       "verdict": {
         "kind": "pass",
@@ -147,55 +75,7 @@
       }
     },
     {
-      "claim_hash": "6062a2e6eaad966add0d5142b4d0d1e15c7e7a18f98f57f0cf53fe50fd5fdfea",
-      "evidence_hash": "73ea253ecf9f63b7158388b1b6e02fa7b5941c115b57518c35af469639048a7e",
-      "verdict": {
-        "kind": "pass",
-        "citation": "Phase 2 では type-designer が feature 宣言を baseline 取得前に author する"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "BaselineCaptureInteractor"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-02",
-          "text_label": "Phase 2 では type-designer が feature 宣言を baseline 取得前に author する"
-        }
-      }
-    },
-    {
-      "claim_hash": "6062a2e6eaad966add0d5142b4d0d1e15c7e7a18f98f57f0cf53fe50fd5fdfea",
-      "evidence_hash": "9007017fe02704e8b2624c8e40e8a8158de0c60dbf168ca39d3647b2a256673d",
-      "verdict": {
-        "kind": "pass",
-        "citation": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
-          "section_key": "types",
-          "entry_key": "BaselineCaptureInteractor"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-04",
-          "text_label": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
-        }
-      }
-    },
-    {
-      "claim_hash": "6062a2e6eaad966add0d5142b4d0d1e15c7e7a18f98f57f0cf53fe50fd5fdfea",
+      "claim_hash": "c090c4e2210de043aa053794e1cecd67c47aee0bcb350a633555bdddc730d1fa",
       "evidence_hash": "b84a61b2c9a38f9a9149ccfef9c3730db9913f9f559d1f8aa5350686a0143c18",
       "verdict": {
         "kind": "pass",

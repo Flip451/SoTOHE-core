@@ -4,6 +4,92 @@
     {
       "kind": "fulfillment",
       "obligation_id": {
+        "entry_key": "RustdocBaselineCapturePort",
+        "item_identifier": "trait_method:capture",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_feature_declaration_forwards_layer_features_to_capture"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BaselineCaptureError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_missing_feature_declaration_returns_error_before_capture"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BaselineCaptureError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_missing_feature_declaration_returns_error_before_capture"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocSchemaExporter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::schema_export::bin_target::tests",
+          "test_name": "test_build_rustdoc_args_with_features_passes_space_separated_feature_list"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "BaselineCaptureInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_feature_declaration_forwards_layer_features_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_missing_feature_declaration_returns_error_before_capture"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
         "entry_key": "TdddBaselineFeatureDeclarationPort",
         "item_identifier": "trait_method:load_for_baseline",
         "obligation_kind": "contract"
@@ -58,6 +144,21 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
           "test_name": "test_actual_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "RustdocBaselineCaptureAdapter",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::RustdocBaselineCapturePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_baseline_capture_adapter::tests",
+          "test_name": "test_capture_adapter_with_declared_features_writes_feature_gated_baseline"
         }
       ]
     },

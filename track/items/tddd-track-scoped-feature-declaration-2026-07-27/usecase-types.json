@@ -571,14 +571,6 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-02",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        },
-        {
-          "anchor": "IN-03",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        },
-        {
           "anchor": "CN-01",
           "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
         },
@@ -607,19 +599,7 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-02",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        },
-        {
           "anchor": "IN-03",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        },
-        {
-          "anchor": "AC-02",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        },
-        {
-          "anchor": "AC-04",
           "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
         },
         {

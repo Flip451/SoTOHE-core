@@ -370,6 +370,29 @@
       }
     },
     {
+      "claim_hash": "e0e8f35e6c9d959588ffca14179330ea75584cb9ab8e8c112ce9bc5ac800d0dd",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "どの型を declare するかを決める主体が、その型が抽出面に存在するためにはどの feature が可視である必要があるかを決める主体でなければならない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-06",
+          "text_label": "feature 宣言では catalogue に declare する type を抽出面へ可視化するために必要な feature を選択する。catalogue entry がない feature-gated public item は、その item だけを理由に track が feature を宣言することを要求しない"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
       "claim_hash": "82ce4a707f2f9180893206b1ecdb3ae4ffd3575446750be7491705ed48aba319",
       "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
       "verdict": {

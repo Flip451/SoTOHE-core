@@ -435,31 +435,7 @@
       }
     },
     {
-      "claim_hash": "48a905ddda30c073c175bdb12140572d6d6094a6c2ec9e5fcc3cbc32ec32503a",
-      "evidence_hash": "f15711c2a4a08a5521bbff1231ad7935764451d13ecabe453cb7282991d3919e",
-      "verdict": {
-        "kind": "pass",
-        "citation": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-          "section_key": "types",
-          "entry_key": "RustdocBaselineCaptureAdapter"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-02",
-          "text_label": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
-        }
-      }
-    },
-    {
-      "claim_hash": "48a905ddda30c073c175bdb12140572d6d6094a6c2ec9e5fcc3cbc32ec32503a",
+      "claim_hash": "e11b81a0e243a02169ff82877bd5b9f8f6567e29434029ea02392d04399b56cf",
       "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
       "verdict": {
         "kind": "pass",
@@ -483,55 +459,7 @@
       }
     },
     {
-      "claim_hash": "48a905ddda30c073c175bdb12140572d6d6094a6c2ec9e5fcc3cbc32ec32503a",
-      "evidence_hash": "73ea253ecf9f63b7158388b1b6e02fa7b5941c115b57518c35af469639048a7e",
-      "verdict": {
-        "kind": "pass",
-        "citation": "Phase 2 では type-designer が feature 宣言を baseline 取得前に author する"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-          "section_key": "types",
-          "entry_key": "RustdocBaselineCaptureAdapter"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-02",
-          "text_label": "Phase 2 では type-designer が feature 宣言を baseline 取得前に author する"
-        }
-      }
-    },
-    {
-      "claim_hash": "48a905ddda30c073c175bdb12140572d6d6094a6c2ec9e5fcc3cbc32ec32503a",
-      "evidence_hash": "9007017fe02704e8b2624c8e40e8a8158de0c60dbf168ca39d3647b2a256673d",
-      "verdict": {
-        "kind": "pass",
-        "citation": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-          "section_key": "types",
-          "entry_key": "RustdocBaselineCaptureAdapter"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-04",
-          "text_label": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
-        }
-      }
-    },
-    {
-      "claim_hash": "3d6432a12929c79132a040ff95c1a752b34d880c2d91e6efcc108b63560c37c2",
+      "claim_hash": "5abde4a83c117d95c555221da483d376a77c099cab0f6e6b80a425c9038eb0e0",
       "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
       "verdict": {
         "kind": "pass",
@@ -555,31 +483,7 @@
       }
     },
     {
-      "claim_hash": "3d6432a12929c79132a040ff95c1a752b34d880c2d91e6efcc108b63560c37c2",
-      "evidence_hash": "9007017fe02704e8b2624c8e40e8a8158de0c60dbf168ca39d3647b2a256673d",
-      "verdict": {
-        "kind": "pass",
-        "citation": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-          "section_key": "types",
-          "entry_key": "RustdocCrateAdapter"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-04",
-          "text_label": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
-        }
-      }
-    },
-    {
-      "claim_hash": "947d43bf917c29d71ef52dd919aa69ce87e8abde205e9d5969e990ebd500419d",
+      "claim_hash": "55bd1a84958c681f3154a0f042506755d403bad78d46b0a86313ba094ea022f0",
       "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
       "verdict": {
         "kind": "pass",
@@ -599,30 +503,6 @@
           "section": "in_scope",
           "element_id": "IN-03",
           "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
-        }
-      }
-    },
-    {
-      "claim_hash": "947d43bf917c29d71ef52dd919aa69ce87e8abde205e9d5969e990ebd500419d",
-      "evidence_hash": "9007017fe02704e8b2624c8e40e8a8158de0c60dbf168ca39d3647b2a256673d",
-      "verdict": {
-        "kind": "pass",
-        "citation": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-          "section_key": "types",
-          "entry_key": "RustdocSchemaExporter"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-04",
-          "text_label": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
         }
       }
     },

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "aea8905bb4ea3b9b53d7a2877b81854895956d0699a9cc99641a58ca8aeaccb4",
+  "catalogue_declaration_hash": "55641f5c2cee166ecbf1a8c5f621b3a59d921d83b84e25e87e8f5791ee54051a",
   "signals": [
     {
       "type_name": "CargoFeatureName",
@@ -30,12 +30,12 @@
     {
       "type_name": "RustdocBaselineCapturePort",
       "signal": "blue",
-      "entry_hash": "b7bb4d5855e94f35104888709b4c89a9ad937bc2d043ea9751b94d07ad6cda72"
+      "entry_hash": "bba5bae7bf728b47ded302e3424621ca0e5717b756044ae6a9116f18517dc507"
     },
     {
       "type_name": "RustdocCratePort",
       "signal": "blue",
-      "entry_hash": "fd10c881b0688df7c4a2456ab56a84b1a7ccd3352a5d16a3e4b2944d989f66ce"
+      "entry_hash": "56aa315495a78e1e49e9d100b4975c92d657f544921c38acbb042e7d9f7c9f58"
     },
     {
       "type_name": "SchemaExporter",

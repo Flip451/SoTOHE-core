@@ -1,16 +1,16 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "1ea5fabc2551efdaf41d7aee26885ccf84501bd2a12815c744b3736bef6f07c5",
+  "catalogue_declaration_hash": "3238af3711c7ad6021141b636d25deb192e20224ac5718ec896685e30be8c0ae",
   "signals": [
     {
       "type_name": "BaselineCaptureError",
       "signal": "blue",
-      "entry_hash": "6609ef2db6fa8431ace4bd031f45e0055440496393cf13167594c0e89e45e793"
+      "entry_hash": "2f081bd5facf8cc8870f7b5daf3f6a623c6c9b2d356768bc7ac6cb2d2e480ffa"
     },
     {
       "type_name": "BaselineCaptureInteractor",
       "signal": "blue",
-      "entry_hash": "6062a2e6eaad966add0d5142b4d0d1e15c7e7a18f98f57f0cf53fe50fd5fdfea"
+      "entry_hash": "c090c4e2210de043aa053794e1cecd67c47aee0bcb350a633555bdddc730d1fa"
     },
     {
       "type_name": "CatalogueImplSignalsError",

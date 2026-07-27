@@ -20,7 +20,7 @@
 | PersistentIndexLock | secondary_adapter | add | — | 🟡 | 🔵 |
 | RustdocBaselineCaptureAdapter | secondary_adapter | modify | impl RustdocBaselineCapturePort, impl Debug, impl Clone, impl Default | 🔵 | 🔵 |
 | RustdocCrateAdapter | secondary_adapter | modify | impl RustdocCratePort | 🔵 | 🔵 |
-| RustdocSchemaExporter | secondary_adapter | modify | impl SchemaExporter, impl SchemaExporterPort | 🟡 | 🔵 |
+| RustdocSchemaExporter | secondary_adapter | modify | impl SchemaExporter, impl SchemaExporterPort | 🔵 | 🔵 |
 
 ## Free Functions
 

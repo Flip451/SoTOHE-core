@@ -1,13 +1,13 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-27T05:32:28Z",
-  "declaration_hash": "1ea5fabc2551efdaf41d7aee26885ccf84501bd2a12815c744b3736bef6f07c5",
-  "implementation_input_hash": "6d40f1576b23b32d8bb8e5fd1f11ce8cb6c0d0f6a750ab789e52c86e67919887",
+  "generated_at": "2026-07-27T11:09:34Z",
+  "declaration_hash": "3238af3711c7ad6021141b636d25deb192e20224ac5718ec896685e30be8c0ae",
+  "implementation_input_hash": "b05e973379e1ff1832cf46433509b53225456e5cbfa2a9a419337f349134235b",
   "signals": [
     {
       "type_name": "BaselineCaptureError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Debug",
@@ -18,7 +18,7 @@
     {
       "type_name": "BaselineCaptureInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "BaselineCaptureService"

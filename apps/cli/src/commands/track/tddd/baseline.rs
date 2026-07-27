@@ -56,6 +56,41 @@ mod tests {
         )
     }
 
+    fn write_feature_declaration(track_dir: &std::path::Path, layers: &str) {
+        std::fs::write(
+            track_dir.join("tddd-features.json"),
+            format!(r#"{{"schema_version":1,"layers":{layers}}}"#),
+        )
+        .unwrap();
+    }
+
+    fn write_workspace_manifests(workspace_root: &std::path::Path, include_usecase: bool) {
+        let members = if include_usecase {
+            "[\"libs/domain\", \"libs/usecase\"]"
+        } else {
+            "[\"libs/domain\"]"
+        };
+        std::fs::create_dir_all(workspace_root.join("libs/domain")).unwrap();
+        std::fs::write(
+            workspace_root.join("Cargo.toml"),
+            format!("[workspace]\nmembers = {members}\nresolver = \"2\"\n"),
+        )
+        .unwrap();
+        std::fs::write(
+            workspace_root.join("libs/domain/Cargo.toml"),
+            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
+        )
+        .unwrap();
+        if include_usecase {
+            std::fs::create_dir_all(workspace_root.join("libs/usecase")).unwrap();
+            std::fs::write(
+                workspace_root.join("libs/usecase/Cargo.toml"),
+                "[package]\nname = \"usecase\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
+            )
+            .unwrap();
+        }
+    }
+
     #[test]
     fn test_baseline_capture_with_invalid_track_id_returns_error() {
         let dir = tempfile::tempdir().unwrap();
@@ -155,6 +190,8 @@ mod tests {
           ]
         }"#;
         std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+        write_workspace_manifests(dir.path(), false);
+        write_feature_declaration(&track_dir, r#"{"domain":[]}"#);
 
         // Write a minimal valid rustdoc baseline so the interactor finds it and skips.
         // Idempotency now validates `format_version`, so an empty `{}` would be rejected.
@@ -191,6 +228,8 @@ mod tests {
           ]
         }"#;
         std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+        write_workspace_manifests(dir.path(), true);
+        write_feature_declaration(&track_dir, r#"{"domain":[],"usecase":[]}"#);
 
         std::fs::write(track_dir.join("usecase-types-baseline.json"), minimal_rustdoc_json())
             .unwrap();
@@ -233,6 +272,8 @@ mod tests {
           ]
         }"#;
         std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+        write_workspace_manifests(dir.path(), true);
+        write_feature_declaration(&track_dir, r#"{"domain":[],"usecase":[]}"#);
 
         // domain baseline exists → skip; usecase baseline absent → proceeds to export → fails.
         std::fs::write(track_dir.join("domain-types-baseline.json"), minimal_rustdoc_json())

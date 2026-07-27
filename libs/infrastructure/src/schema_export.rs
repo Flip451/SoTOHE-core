@@ -19,7 +19,7 @@ use domain::schema::{
     FunctionInfo, ImplInfo, SchemaExport, SchemaExportError, SchemaExporter, TraitInfo, TypeInfo,
     TypeKind,
 };
-use domain::tddd::catalogue_v2::CrateName;
+use domain::tddd::{CargoFeatureName, catalogue_v2::CrateName};
 use rustdoc_types::{ItemEnum, Visibility};
 
 #[path = "schema_export/format_helpers.rs"]
@@ -80,6 +80,23 @@ impl RustdocSchemaExporter {
     ) -> Result<std::path::PathBuf, SchemaExportError> {
         check_nightly_available()?;
         bin_target::run_rustdoc(&self.workspace_root, crate_name)
+    }
+
+    /// Runs `cargo +nightly rustdoc --output-format json` with the validated
+    /// feature selection declared for a TDDD layer.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SchemaExportError`] when the nightly toolchain is unavailable,
+    /// Cargo cannot build the selected package and features, or the rustdoc JSON
+    /// output path cannot be resolved safely.
+    pub fn export_rustdoc_json_path_with_features(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+    ) -> Result<std::path::PathBuf, SchemaExportError> {
+        check_nightly_available()?;
+        bin_target::run_rustdoc_with_features(&self.workspace_root, crate_name, features)
     }
 
     /// Resolves a previously generated rustdoc JSON path without launching rustdoc.

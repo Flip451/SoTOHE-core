@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-27T06:57:07Z",
-  "declaration_hash": "aea8905bb4ea3b9b53d7a2877b81854895956d0699a9cc99641a58ca8aeaccb4",
-  "implementation_input_hash": "ce836d508761a8129279794b2387e3e9962e8adc0096767056e17e8d68c0a0a1",
+  "generated_at": "2026-07-27T11:48:52Z",
+  "declaration_hash": "55641f5c2cee166ecbf1a8c5f621b3a59d921d83b84e25e87e8f5791ee54051a",
+  "implementation_input_hash": "dded0c0ba1e5e5643d410da768543b2eb6097f625620e088bea6e73b5814a616",
   "signals": [
     {
       "type_name": "CargoFeatureName",
@@ -36,7 +36,7 @@
     {
       "type_name": "RustdocBaselineCapturePort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {

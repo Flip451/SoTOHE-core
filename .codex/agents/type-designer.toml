@@ -4,6 +4,7 @@ developer_instructions = """
 Use the type-designer skill before acting.
 
 Owned artifacts:
+- track/items/<id>/tddd-features.json, the per-track Cargo feature declaration
 - track/items/<id>/<layer>-types.json for each tddd.enabled layer listed in architecture-rules.json
 - generated type views and contract-map through the SoTOHE CLI only
 
@@ -13,6 +14,9 @@ Inputs:
 - knowledge/conventions/type-designer-kind-selection.md
 
 Rules:
+- Author tddd-features.json before capturing baselines; the rustdoc-invoking commands read it and
+  fail closed when it is absent. Declare every tddd.enabled layer, with an empty array for a layer
+  that needs no feature.
 - Capture baselines before editing catalogues.
 - Choose layer, role, kind, action, fields, params, returns, methods, and impls from the conventions and spec.
 - Do not update source code in this role.

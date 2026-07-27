@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 25, yellow: 0, red: 0 }
+signals: { blue: 26, yellow: 0, red: 0 }
 ---
 
 # TDDD chain ③ の rustdoc 抽出を track 単位の feature 宣言に基づかせる
@@ -32,6 +32,7 @@ signals: { blue: 25, yellow: 0, red: 0 }
 - [CN-03] declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する [adr: knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md#D5] [tasks: T001, T002, T004]
 - [CN-04] feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する [adr: knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md#D6] [tasks: T005]
 - [CN-05] 既存 command の argument syntax、stdout/stderr output format、exit-code meaning を変更せず、feature を command line から入力する経路を設けない [adr: knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md#D7] [tasks: T003, T004, T005]
+- [CN-06] feature 宣言では catalogue に declare する type を抽出面へ可視化するために必要な feature を選択する。catalogue entry がない feature-gated public item は、その item だけを理由に track が feature を宣言することを要求しない [adr: knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md#D2]
 
 ## Acceptance Criteria
 - [ ] [AC-01] track には commit 対象の feature 宣言成果物があり、全 layer の feature リストを含み、feature を持たない layer は空リストとして宣言されている [adr: knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md#D1] [tasks: T001, T002, T003]
@@ -55,5 +56,5 @@ signals: { blue: 25, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 25  🟡 0  🔴 0
+🔵 26  🟡 0  🔴 0
 

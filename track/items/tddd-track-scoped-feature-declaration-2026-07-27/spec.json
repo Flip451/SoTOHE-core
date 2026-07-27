@@ -170,6 +170,16 @@
           "anchor": "D7"
         }
       ]
+    },
+    {
+      "id": "CN-06",
+      "text": "feature 宣言では catalogue に declare する type を抽出面へ可視化するために必要な feature を選択する。catalogue entry がない feature-gated public item は、その item だけを理由に track が feature を宣言することを要求しない",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "anchor": "D2"
+        }
+      ]
     }
   ],
   "acceptance_criteria": [
@@ -291,7 +301,7 @@
     }
   ],
   "signals": {
-    "blue": 25,
+    "blue": 26,
     "yellow": 0,
     "red": 0
   }

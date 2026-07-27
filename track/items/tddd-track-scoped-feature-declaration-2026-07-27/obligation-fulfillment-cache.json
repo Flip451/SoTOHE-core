@@ -3,6 +3,150 @@
   "entries": [
     {
       "edge_id": {
+        "entry_key": "RustdocBaselineCapturePort",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RustdocBaselineCapturePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:capture"
+      },
+      "key": {
+        "bound_tests_set_hash": "04c1e309aa76a74521caaa0f0245e0b55e85d21024a4b45dd50b34f3d179fcd9",
+        "declaration_hash": "cba81fcdbfad3b9b71fa7f21056be82a914c61d88da85e736518d30e4158ff1d",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        observed.lock().unwrap().as_slice(),\n        [\n            (\"domain\".to_owned(), vec![]),\n            (\"infrastructure\".to_owned(), vec![\"semantic-dup\".to_owned()]),\n        ]\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaselineCaptureError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaselineCaptureError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "c24534ea5a8e59ba73c260a41756d0e23d5f1007406037049664cf4c2f98405f",
+        "declaration_hash": "a7e949c74469a5df06c5a1b7e6587165f36f72a40b2156c95b5c5c377c27ad27",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "    assert!(matches!(error, BaselineCaptureError::FeatureDeclaration(_)));\n    assert_eq!(captures.load(Ordering::SeqCst), 0, \"rustdoc capture must not start\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaselineCaptureError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaselineCaptureError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "c24534ea5a8e59ba73c260a41756d0e23d5f1007406037049664cf4c2f98405f",
+        "declaration_hash": "a7e949c74469a5df06c5a1b7e6587165f36f72a40b2156c95b5c5c377c27ad27",
+        "anchor_text_hash": "a6f03d4d496a6520dfecd164f5d335765406389e2967c5dff57ef31c57d08b19"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, BaselineCaptureError::FeatureDeclaration(_)));\n    assert_eq!(captures.load(Ordering::SeqCst), 0, \"rustdoc capture must not start\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "RustdocSchemaExporter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RustdocSchemaExporter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "eec59082be283c0fc4e587361f3e421cccd705d0b5e75bbfbb62212f309511f2",
+        "declaration_hash": "349111d9c8ed8dd54080b2138c87cfaad7038d8ac6e06fc606ffd904bca89528",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let args = build_rustdoc_args(\"catalogue_package\", &[\"--lib\"], &features);\n\n        assert_eq!(\n            args,\n            vec![\n                \"+nightly\",\n                \"rustdoc\",\n                \"-p\",\n                \"catalogue_package\",\n                \"--lib\",\n                \"--features\",\n                \"semantic-dup experimental\","
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaselineCaptureInteractor",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaselineCaptureInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "50ea2c8830c139f3b59f41fc2c78fcbb61c53b4ea9751ce282c7dc172e909a89",
+        "declaration_hash": "43909d2dae0f2db2ae93d71a1836a36918b378ee327b1dd4a7d65f202a3b421d",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        observed.lock().unwrap().as_slice(),\n        [\n            (\"domain\".to_owned(), vec![]),\n            (\"infrastructure\".to_owned(), vec![\"semantic-dup\".to_owned()]),\n        ]\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaselineCaptureInteractor",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaselineCaptureInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "50ea2c8830c139f3b59f41fc2c78fcbb61c53b4ea9751ce282c7dc172e909a89",
+        "declaration_hash": "43909d2dae0f2db2ae93d71a1836a36918b378ee327b1dd4a7d65f202a3b421d",
+        "anchor_text_hash": "52994ebd955ae0dfdb9f787beea721a43ffaa7b458488aa0cb0c77a12a756805"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "TdddFeatureDeclaration::try_new(\n                BTreeMap::from([(domain.clone(), vec![]), (infrastructure.clone(), vec![feature])]),\n                &[domain, infrastructure],\n            )\n\nassert_eq!(\n        observed.lock().unwrap().as_slice(),\n        [\n            (\"domain\".to_owned(), vec![]),\n            (\"infrastructure\".to_owned(), vec![\"semantic-dup\".to_owned()]),\n        ]\n    )\n\nassert!(matches!(error, BaselineCaptureError::FeatureDeclaration(_)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
         "entry_key": "TdddBaselineFeatureDeclarationPort",
         "anchor_id": {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
@@ -93,7 +237,31 @@
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            result,\n            Err(TdddActualFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddActualFeatureDeclarationPortError::Read(\n                TdddActualFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "RustdocBaselineCaptureAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RustdocBaselineCaptureAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::RustdocBaselineCapturePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "0f7a0ea2e244e88121b33efc71faed4e73f7cc54008a1aadd8292f0bd32be7e4",
+        "declaration_hash": "8f9eb97cd916d092c96ef574dea80c060120b6a737b8b1ffe773d3778c62210f",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "if [ \"$*\" != \"+nightly rustdoc -p infrastructure --lib --features semantic-dup -- -Z unstable-options --output-format json --document-hidden-items\" ]; then\n    exit 1\nfi\n...\nassert!(\n    baseline.contains(\"CodeFragmentExtractorAdapter\"),\n    \"the feature-gated public adapter must be present in the captured baseline\"\n);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },

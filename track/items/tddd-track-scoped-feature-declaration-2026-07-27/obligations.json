@@ -17,23 +17,11 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:capture' of RustdocBaselineCapturePort",
-      "declaration_hash": "b33525dcbe5fba390f26246ff0a070b7ac9549dc340409e2d71a3ece243fec50",
+      "declaration_hash": "cba81fcdbfad3b9b71fa7f21056be82a914c61d88da85e736518d30e4158ff1d",
       "spec_refs": [
         {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "IN-02"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
           "element_id": "IN-03"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-02"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-04"
         }
       ]
     },
@@ -53,19 +41,11 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:load_from_path' of RustdocCratePort",
-      "declaration_hash": "5ba7b30ea0f25a5c32f392eb86064a40590062ee70f2976479d90329ed7404c5",
+      "declaration_hash": "af6e1e4088451544ab97cc68d32b64ee8d27de39e20b7e999c6455ade73a19df",
       "spec_refs": [
         {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
           "element_id": "IN-03"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "CN-01"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-04"
         }
       ]
     },
@@ -85,19 +65,11 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract test covering 'trait_method:capture_current' of RustdocCratePort",
-      "declaration_hash": "5ba7b30ea0f25a5c32f392eb86064a40590062ee70f2976479d90329ed7404c5",
+      "declaration_hash": "af6e1e4088451544ab97cc68d32b64ee8d27de39e20b7e999c6455ade73a19df",
       "spec_refs": [
         {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
           "element_id": "IN-03"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "CN-01"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-04"
         }
       ]
     },
@@ -117,23 +89,11 @@
         "role": "Interactor"
       },
       "brief": "Author a result test covering 'entry' of BaselineCaptureInteractor",
-      "declaration_hash": "b65fd8cd6f8e818be3a3dae67473d307c13b0deda4da0b7f8dd29c94bd0409e8",
+      "declaration_hash": "43909d2dae0f2db2ae93d71a1836a36918b378ee327b1dd4a7d65f202a3b421d",
       "spec_refs": [
         {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "IN-02"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
           "element_id": "IN-03"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-02"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-04"
         },
         {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
@@ -381,19 +341,7 @@
       "spec_refs": [
         {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "IN-02"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
           "element_id": "IN-03"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-02"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-04"
         }
       ]
     },
@@ -418,14 +366,6 @@
         {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
           "element_id": "IN-03"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "CN-01"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-04"
         }
       ]
     },

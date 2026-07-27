@@ -20,6 +20,8 @@
 use std::fmt;
 use std::path::{Path, PathBuf};
 
+use crate::TrackId;
+use crate::tddd::CargoFeatureName;
 use crate::tddd::catalogue_v2::CatalogueDocument;
 
 // ---------------------------------------------------------------------------
@@ -364,6 +366,7 @@ pub trait RustdocBaselineCapturePort: Send + Sync {
     ///   May differ from the workspace that contains `items_dir` (git-worktree
     ///   capture flow).
     /// * `binding` — the TDDD layer binding resolved from `architecture-rules.json`.
+    /// * `features` — validated Cargo features declared for `binding.layer_id`.
     ///
     /// # Errors
     ///
@@ -373,9 +376,10 @@ pub trait RustdocBaselineCapturePort: Send + Sync {
     fn capture(
         &self,
         items_dir: &std::path::Path,
-        track_id: &str,
+        track_id: &TrackId,
         rustdoc_workspace: &std::path::Path,
         binding: &TdddLayerBinding,
+        features: &[CargoFeatureName],
     ) -> Result<(), BaselineCaptureIoError>;
 }
 

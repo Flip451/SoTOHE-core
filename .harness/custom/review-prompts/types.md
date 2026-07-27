@@ -1,10 +1,13 @@
 # Type Catalogue Review: Severity Policy
 
 The reviewer's role is **type-design soundness review** of the per-layer type
-catalogues `track/items/<track-id>/<layer>-types.json` (Phase 2 SSoT). The
-catalogue is the *interface contract* of each layer — it declares which types /
-traits / functions are added or modified, and how they relate to spec elements
-(`spec_refs[]`).
+catalogues `track/items/<track-id>/<layer>-types.json` and the track-scoped
+feature declaration `track/items/<track-id>/tddd-features.json` (Phase 2
+SoT). A catalogue is the *interface contract* of each layer — it declares
+which types / traits / functions are added or modified, and how they relate to
+spec elements (`spec_refs[]`). The feature declaration is the extraction
+contract: it declares the Cargo features through which each TDDD-enabled
+layer's catalogue surface is observed.
 
 Generated rendered views such as `contract-map.md` and `*-types.md` are
 read-only human reference outputs. They are not review targets and not fix
@@ -28,9 +31,27 @@ are handled by `bin/sotp signal calc-catalog-spec` / `check-catalog-spec` /
 
 ## What to report
 
-Report findings ONLY for the following categories. Each finding must cite
-either a specific entry's `key` (e.g., `domain::ReviewScopeConfig`) or a
-spec_refs/role/action mismatch.
+Report findings ONLY for the following categories. Each catalogue finding must
+cite either a specific entry's `key` (e.g., `domain::ReviewScopeConfig`) or a
+spec_refs/role/action mismatch. Each feature-declaration finding must cite the
+affected layer key.
+
+### Track-scoped feature declaration findings
+
+- **incomplete or ambiguous feature declaration**: `tddd-features.json` does
+  not declare every TDDD-enabled layer from `architecture-rules.json` exactly
+  once, omits an explicit empty list for a featureless layer, or declares a
+  layer that is not TDDD-enabled. The declaration is a committed Phase 2 SoT,
+  not a generated view.
+- **invalid Cargo feature selection**: a feature named for a layer is absent
+  from that layer's target crate `Cargo.toml`, or a non-empty selection is not
+  grounded in the feature-gated type surface the track catalogue declares.
+  Cite the layer and the mismatching Cargo feature or catalogue entry.
+- **extraction-contract drift**: the declaration and the catalogue together
+  leave a feature-gated type in the track's declared surface unobservable, or
+  select an unrelated feature without a type-contract purpose. Judge this
+  against the target crate's feature gates and catalogue entries; do not infer
+  a new product feature or require `--all-features`.
 
 ### SoT integrity findings
 

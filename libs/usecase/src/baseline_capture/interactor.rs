@@ -7,10 +7,13 @@
 use std::path::Path;
 use std::sync::Arc;
 
-use domain::SymlinkGuardPort;
+use crate::tddd_feature_declaration::TdddBaselineFeatureDeclarationPort;
+use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::{
     RustdocBaselineCapturePort, TdddLayerBindingsError, TdddLayerBindingsPort,
 };
+use domain::tddd::test_obligation::ids::DiagnosticMessage;
+use domain::{SymlinkGuardPort, TrackId};
 
 use super::service::{BaselineCaptureError, BaselineCaptureRequest, BaselineCaptureService};
 use super::validate_track_id;
@@ -33,6 +36,7 @@ pub struct BaselineCaptureInteractor {
     symlink_guard: Arc<dyn SymlinkGuardPort>,
     layer_bindings: Arc<dyn TdddLayerBindingsPort>,
     capture: Arc<dyn RustdocBaselineCapturePort>,
+    feature_declaration: Arc<dyn TdddBaselineFeatureDeclarationPort>,
 }
 
 impl BaselineCaptureInteractor {
@@ -42,8 +46,9 @@ impl BaselineCaptureInteractor {
         symlink_guard: Arc<dyn SymlinkGuardPort>,
         layer_bindings: Arc<dyn TdddLayerBindingsPort>,
         capture: Arc<dyn RustdocBaselineCapturePort>,
+        feature_declaration: Arc<dyn TdddBaselineFeatureDeclarationPort>,
     ) -> Self {
-        Self { symlink_guard, layer_bindings, capture }
+        Self { symlink_guard, layer_bindings, capture, feature_declaration }
     }
 }
 
@@ -66,83 +71,109 @@ impl BaselineCaptureService for BaselineCaptureInteractor {
 
         // Step 1: validate track_id.
         validate_track_id(&track_id)?;
+        let typed_track_id = TrackId::try_new(track_id.clone())
+            .map_err(|error| BaselineCaptureError::InvalidTrackId(diagnostic(error.to_string())))?;
 
         // Step 2: dot-dot rejection on workspace_root.
         for component in workspace_root.components() {
             use std::path::Component;
             if matches!(component, Component::ParentDir) {
-                return Err(BaselineCaptureError::SymlinkRejected {
-                    path: format!(
-                        "workspace_root '{}' contains '..' (path traversal rejected)",
-                        workspace_root.display()
-                    ),
-                });
+                return Err(BaselineCaptureError::SymlinkRejected(workspace_root.clone()));
             }
         }
 
         // Step 2: symlink guard on workspace_root (all ancestors from filesystem root).
         self.symlink_guard
             .reject_symlinks_from_root(&workspace_root)
-            .map_err(|e| BaselineCaptureError::SymlinkRejected { path: e.to_string() })?;
+            .map_err(|_| BaselineCaptureError::SymlinkRejected(workspace_root.clone()))?;
 
         // Step 2b: guard source_workspace when it differs from workspace_root.
         if let Some(ref src) = source_workspace {
             for component in src.components() {
                 use std::path::Component;
                 if matches!(component, Component::ParentDir) {
-                    return Err(BaselineCaptureError::SymlinkRejected {
-                        path: format!(
-                            "source_workspace '{}' contains '..' (path traversal rejected)",
-                            src.display()
-                        ),
-                    });
+                    return Err(BaselineCaptureError::SymlinkRejected(src.clone()));
                 }
             }
             self.symlink_guard
                 .reject_symlinks_from_root(src)
-                .map_err(|e| BaselineCaptureError::SymlinkRejected { path: e.to_string() })?;
+                .map_err(|_| BaselineCaptureError::SymlinkRejected(src.clone()))?;
         }
 
         // Step 3: derive items_dir and guard it.
         let items_dir = workspace_root.join("track").join("items");
         self.symlink_guard
             .reject_symlinks_from_root(&items_dir)
-            .map_err(|e| BaselineCaptureError::SymlinkRejected { path: e.to_string() })?;
+            .map_err(|_| BaselineCaptureError::SymlinkRejected(items_dir.clone()))?;
 
         // Step 4: resolve layer bindings.
-        let bindings =
-            self.layer_bindings.load(&workspace_root, layer.as_deref()).map_err(|e| match e {
-                TdddLayerBindingsError::LoadFailed { reason } => {
-                    BaselineCaptureError::LayerBindingsLoad { reason }
-                }
-                TdddLayerBindingsError::LayerNotFound { layer_id } => {
-                    BaselineCaptureError::LayerBindingsLoad {
-                        reason: format!(
-                            "layer '{layer_id}' not found or not tddd.enabled in \
-                             architecture-rules.json"
-                        ),
-                    }
-                }
-                TdddLayerBindingsError::NoLayers => BaselineCaptureError::NoLayers,
-            })?;
+        let bindings = self
+            .layer_bindings
+            .load(&workspace_root, layer.as_deref())
+            .map_err(map_layer_bindings_error)?;
 
         // Step 5: fail-closed when no layers found.
         if bindings.is_empty() {
             return Err(BaselineCaptureError::NoLayers);
         }
 
+        let declaration_bindings = if layer.is_some() {
+            self.layer_bindings.load(&workspace_root, None).map_err(map_layer_bindings_error)?
+        } else {
+            bindings.clone()
+        };
+        let track_dir = items_dir.join(&track_id);
+        let declaration = self
+            .feature_declaration
+            .load_for_baseline(&track_dir, &workspace_root, &declaration_bindings)
+            .map_err(BaselineCaptureError::FeatureDeclaration)?;
+
         // Resolve the rustdoc source workspace (defaults to workspace_root).
         let rustdoc_workspace: &Path = source_workspace.as_deref().unwrap_or(&workspace_root);
 
         // Step 6: per-layer capture.
         for binding in &bindings {
-            let layer_id = binding.layer_id.clone();
+            let layer_id = LayerId::try_new(binding.layer_id.clone()).map_err(|error| {
+                BaselineCaptureError::LayerBindingsLoad(diagnostic(error.to_string()))
+            })?;
+            let features = declaration.features_for(&layer_id).map_err(|error| {
+                BaselineCaptureError::LayerBindingsLoad(diagnostic(error.to_string()))
+            })?;
             self.capture
-                .capture(&items_dir, &track_id, rustdoc_workspace, binding)
-                .map_err(|e| BaselineCaptureError::CaptureFailed { layer_id, reason: e.0 })?;
+                .capture(&items_dir, &typed_track_id, rustdoc_workspace, binding, features)
+                .map_err(|error| {
+                    BaselineCaptureError::CaptureFailed(layer_id, diagnostic(error.0))
+                })?;
         }
 
         Ok(())
+    }
+}
+
+fn map_layer_bindings_error(error: TdddLayerBindingsError) -> BaselineCaptureError {
+    match error {
+        TdddLayerBindingsError::LoadFailed { reason } => {
+            BaselineCaptureError::LayerBindingsLoad(diagnostic(reason))
+        }
+        TdddLayerBindingsError::LayerNotFound { layer_id } => {
+            BaselineCaptureError::LayerBindingsLoad(diagnostic(format!(
+                "layer '{layer_id}' not found or not tddd.enabled in architecture-rules.json"
+            )))
+        }
+        TdddLayerBindingsError::NoLayers => BaselineCaptureError::NoLayers,
+    }
+}
+
+fn diagnostic(value: impl Into<String>) -> DiagnosticMessage {
+    let mut value = value.into();
+    if value.trim().is_empty() {
+        value = "baseline capture failed without diagnostic detail".to_owned();
+    }
+    loop {
+        match DiagnosticMessage::try_new(value) {
+            Ok(message) => return message,
+            Err(_) => value = "baseline capture failed without diagnostic detail".to_owned(),
+        }
     }
 }
 

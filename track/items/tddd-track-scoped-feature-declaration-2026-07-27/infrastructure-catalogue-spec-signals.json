@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "7c01f8a5f33228c144f0fb34c36823c211e0db7221f98ee018ad882575a2f63f",
+  "catalogue_declaration_hash": "4b6906ae2bb783ed276b46e0cdd808fa0accafe5fd4a0b769e8c465892ad449e",
   "signals": [
     {
       "type_name": "CodeFragmentExtractorAdapter",
@@ -50,17 +50,17 @@
     {
       "type_name": "RustdocBaselineCaptureAdapter",
       "signal": "blue",
-      "entry_hash": "48a905ddda30c073c175bdb12140572d6d6094a6c2ec9e5fcc3cbc32ec32503a"
+      "entry_hash": "e11b81a0e243a02169ff82877bd5b9f8f6567e29434029ea02392d04399b56cf"
     },
     {
       "type_name": "RustdocCrateAdapter",
       "signal": "blue",
-      "entry_hash": "3d6432a12929c79132a040ff95c1a752b34d880c2d91e6efcc108b63560c37c2"
+      "entry_hash": "5abde4a83c117d95c555221da483d376a77c099cab0f6e6b80a425c9038eb0e0"
     },
     {
       "type_name": "RustdocSchemaExporter",
       "signal": "blue",
-      "entry_hash": "947d43bf917c29d71ef52dd919aa69ce87e8abde205e9d5969e990ebd500419d"
+      "entry_hash": "55bd1a84958c681f3154a0f042506755d403bad78d46b0a86313ba094ea022f0"
     },
     {
       "type_name": "infrastructure::semantic_dup::extractor::extract_code_fragments",

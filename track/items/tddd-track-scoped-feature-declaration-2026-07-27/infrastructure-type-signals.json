@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-27T06:36:58Z",
-  "declaration_hash": "7c01f8a5f33228c144f0fb34c36823c211e0db7221f98ee018ad882575a2f63f",
-  "implementation_input_hash": "04a0d74ba29c68944c7e804c335c0e60d2de36fd16e0a3b80cbff5eddbad7548",
+  "generated_at": "2026-07-27T11:48:52Z",
+  "declaration_hash": "4b6906ae2bb783ed276b46e0cdd808fa0accafe5fd4a0b769e8c465892ad449e",
+  "implementation_input_hash": "565162516b4cf9a0e4b4ab33a0208b8996d78c7d2020d9d31fac8dd0dc09b448",
   "signals": [
     {
       "type_name": "CodeFragmentExtractorAdapter",
@@ -116,7 +116,7 @@
     {
       "type_name": "RustdocSchemaExporter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {
