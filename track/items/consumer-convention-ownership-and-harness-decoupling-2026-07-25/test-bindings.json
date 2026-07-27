@@ -1063,7 +1063,7 @@
         {
           "layer": "infrastructure",
           "module_path": "infrastructure::conventions_resolve::scan_tests",
-          "test_name": "test_scan_convention_requirements_skips_a_broken_document_link_rather_than_failing"
+          "test_name": "test_scan_convention_requirements_fails_closed_on_a_broken_document_link"
         },
         {
           "layer": "infrastructure",

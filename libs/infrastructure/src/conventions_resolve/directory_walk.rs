@@ -13,35 +13,114 @@ use std::path::{Path, PathBuf};
 use std::ffi::OsString;
 use std::os::unix::ffi::OsStringExt;
 
-use super::MAX_DIRECTORY_ENTRIES;
+/// Most entries this walk will hold from one directory listing.
+///
+/// The listing is materialised before it is walked so that descending into a
+/// subdirectory does not require keeping the parent's directory handle open:
+/// streaming it instead would hold one handle per level of nesting. Holding the
+/// listing makes its size this walk's problem rather than the filesystem's, and
+/// this is where that is answered.
+///
+/// This is not the same question [`MAX_SCAN_ENTRIES`] answers, so having both
+/// is not having two limits on one quantity. This one asks how large a single
+/// directory the walk lists may be, and its answer names that directory — a
+/// thing a person can go and look at. The whole-scan budget asks whether the
+/// tree as a whole is a convention tree at all, and its answer can only name
+/// the root. A directory of fifteen thousand entries would otherwise be
+/// reported as an oversized repository rather than as the one oversized
+/// directory it is.
+pub(super) const MAX_DIRECTORY_ENTRIES: usize = 10_000;
 
-/// Lists `directory`, holding at most [`MAX_DIRECTORY_ENTRIES`] entries.
+/// Most directory entries this walk will examine, across the whole scan.
+///
+/// The per-directory and per-document bounds are each spent and renewed at
+/// every node, so together they bound one listing and one read and nothing
+/// about the traversal as a whole: a tree of ten thousand directories each
+/// holding ten thousand documents stays inside both while costing a hundred
+/// million reads and retaining every requirement decoded along the way. This
+/// bound is the one that does not renew.
+///
+/// Counted in entries a listing produced rather than in documents kept or bytes
+/// read, because that is the unit both other costs are downstream of: every
+/// document this walk retains was first an entry it counted, and every read it
+/// performs was too. A document count would leave a tree of empty directories
+/// unbounded, and a byte count is already what `MAX_DOCUMENT_BYTES` spends per
+/// document.
+///
+/// The value is far past any convention tree a person would author — this
+/// repository's own holds a few dozen — and the bound exists for the tree that
+/// is not one: a `--project-root` pointed at something that is not a convention
+/// repository at all. That case is an accident far more often than an attack,
+/// and either way the answer is the same, which is why the walk stops at a
+/// stated number rather than at exhaustion.
+pub(super) const MAX_SCAN_ENTRIES: usize = 20_000;
+
+/// Why a listing produced no entries.
+///
+/// The two are kept apart because the caller answers them differently: an
+/// exhausted budget is a statement about the tree and is reported against the
+/// root, while a failed listing is about the directory being listed and is
+/// reported against that directory. Folding both into one [`std::io::Error`]
+/// would leave the caller matching on a message to tell them apart.
+pub(super) enum ListingError {
+    /// The whole-scan entry budget ran out while this listing was produced.
+    BudgetExhausted,
+    /// The listing failed, or the directory holds more entries than
+    /// [`MAX_DIRECTORY_ENTRIES`] allows one listing to hold.
+    Io(std::io::Error),
+}
+
+/// Lists `directory`, holding at most [`MAX_DIRECTORY_ENTRIES`] entries and
+/// charging every entry it produces to `remaining_entries`.
 ///
 /// The entries are kept in whatever order the listing yielded them. This walk
 /// deliberately does not order them: ordering convention documents belongs to
 /// [`usecase::conventions_resolve::ConventionResolution`], whose constructor
 /// sorts and deduplicates so that no consumer has to, and sorting here as well
 /// would put a second site in charge of a rule that type already owns.
-pub(super) fn bounded_entries(directory: &std::fs::File) -> std::io::Result<Vec<DirectoryEntry>> {
+///
+/// The whole-scan budget is charged here, where entries come into existence,
+/// rather than by the caller that walks them. Charging it per directory the
+/// walk descends into would bound the descents and not the enumeration: a
+/// listing is read, classified, and held in full before the caller looks at any
+/// of it, so a chain of large directories would materialise every one of them
+/// while costing a single unit each. What the budget is for is the total the
+/// walk enumerates, so the total is what it counts.
+pub(super) fn bounded_entries(
+    directory: &std::fs::File,
+    remaining_entries: &mut usize,
+) -> Result<Vec<DirectoryEntry>, ListingError> {
     // Read through a duplicate so the caller's handle keeps its own offset and
     // stays usable for the `*at` opens that follow this listing.
-    let listing = rustix::fs::Dir::read_from(directory).map_err(std::io::Error::from)?;
+    let listing =
+        rustix::fs::Dir::read_from(directory).map_err(|error| ListingError::Io(error.into()))?;
 
     let mut entries = Vec::new();
     for entry in listing {
-        let entry = entry.map_err(std::io::Error::from)?;
+        let entry = entry.map_err(|error| ListingError::Io(error.into()))?;
         let name = entry.file_name();
         // `.` and `..` are the directory itself and its parent, which this walk
         // reaches on its own terms; following them here would revisit the tree
-        // and, for `..`, climb out of it.
+        // and, for `..`, climb out of it. They are not charged either, for the
+        // same reason: every directory has both, so charging for them would
+        // make the budget partly a count of directories rather than of what is
+        // in them.
         if name == c"." || name == c".." {
             continue;
         }
+        // Charged before the entry is classified or kept, so an entry costs the
+        // same whatever it turns out to be. Classifying first would let the one
+        // case this budget exists for — an enormous tree of nodes this walk
+        // ignores — run a `stat` for every one of them free.
+        let Some(left) = remaining_entries.checked_sub(1) else {
+            return Err(ListingError::BudgetExhausted);
+        };
+        *remaining_entries = left;
         if entries.len() >= MAX_DIRECTORY_ENTRIES {
-            return Err(std::io::Error::new(
+            return Err(ListingError::Io(std::io::Error::new(
                 std::io::ErrorKind::InvalidData,
                 format!("directory holds more than {MAX_DIRECTORY_ENTRIES} entries"),
-            ));
+            )));
         }
         // A listing may decline to classify an entry — `DT_UNKNOWN`, which some
         // filesystems always return — and taking that at face value would set
@@ -50,7 +129,9 @@ pub(super) fn bounded_entries(directory: &std::fs::File) -> std::io::Result<Vec<
         // no-follow `stat`, still relative to this handle so the answer is about
         // the entry this listing produced.
         let file_type = match entry.file_type() {
-            rustix::fs::FileType::Unknown => classify_at(directory, name)?,
+            rustix::fs::FileType::Unknown => {
+                classify_at(directory, name).map_err(ListingError::Io)?
+            }
             known => known,
         };
         entries.push(DirectoryEntry {
@@ -132,16 +213,4 @@ pub(super) fn open_directory_at(
     )
     .map(std::fs::File::from)
     .map_err(std::io::Error::from)
-}
-
-/// Reports whether `error` is the kernel refusing to open a symlink.
-///
-/// A link substituted between the listing and the open is the same situation as
-/// one the listing itself reported: not a document, and skipped. Distinguishing
-/// it from a genuine failure keeps a racing consumer from turning an ordinary
-/// scan into a failure.
-pub(super) fn is_symlink_open_rejection(error: &std::io::Error) -> bool {
-    // `ELOOP` is what `O_NOFOLLOW` returns for a symlink; `ENOTDIR` is what an
-    // entry that stopped being a directory returns for `O_DIRECTORY`.
-    matches!(error.raw_os_error(), Some(libc::ELOOP) | Some(libc::ENOTDIR))
 }

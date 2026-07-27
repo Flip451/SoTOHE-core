@@ -22,7 +22,6 @@ mod front_matter_tests;
 mod scan_tests;
 
 use std::ffi::OsStr;
-use std::io::Read;
 use std::path::{Path, PathBuf};
 
 use usecase::capability_exec::CapabilityFailureDetail;
@@ -33,12 +32,14 @@ use usecase::conventions_resolve::{
 
 use crate::capability_exec::{YAML_LINE_BREAKS, read_front_matter};
 mod directory_walk;
+mod document_read;
 mod front_matter_dto;
 
 use directory_walk::{
-    DirectoryEntry, bounded_entries, is_symlink_open_rejection, open_directory_at,
+    DirectoryEntry, ListingError, MAX_SCAN_ENTRIES, bounded_entries, open_directory_at,
     open_trusted_root,
 };
+use document_read::{document_path, read_document_at, unreadable};
 
 pub use front_matter_dto::{CapabilityIdField, ConventionFrontMatterDto};
 
@@ -180,34 +181,6 @@ const CONVENTION_ROOT: &str = "knowledge/conventions";
 /// Extension of the documents `IN-05`'s `knowledge/conventions/**/*.md` names.
 const DOCUMENT_EXTENSION: &str = "md";
 
-/// Largest document this walk will read, in bytes.
-///
-/// A convention document is prose someone wrote, so nothing near this size is
-/// one. The bound is here because the alternative is not a smaller read but an
-/// uncatchable failure: reading a file whole grows an allocation to whatever
-/// the filesystem offers, and a document that is enormous — or sparse, or still
-/// being written — would exhaust the process rather than produce a value the
-/// caller can handle. Exceeding it is an unreadable document, `AC-07`'s
-/// condition this walk decides, so the bound reports through the same variant
-/// as any other failed read and names the document it stopped on.
-///
-/// This is an adapter's self-defence and not a spec condition: `AC-07` says
-/// nothing about size, and the number is a limit on what this walk will hold at
-/// once rather than a rule about what a convention document may be.
-const MAX_DOCUMENT_BYTES: u64 = 4 * 1024 * 1024;
-
-/// Most entries this walk will hold from one directory listing.
-///
-/// The listing is materialised before it is walked so that descending into a
-/// subdirectory does not require keeping the parent's directory handle open:
-/// streaming it instead would hold one handle per level down to
-/// [`MAX_DIRECTORY_DEPTH`]. Holding the listing makes its size this walk's
-/// problem rather than the filesystem's, and this is where that is answered.
-/// The same reasoning and the same reporting route as [`MAX_DOCUMENT_BYTES`]
-/// apply, and the bound sits far above any convention tree a person would
-/// author.
-pub(super) const MAX_DIRECTORY_ENTRIES: usize = 10_000;
-
 /// Deepest nesting this walk will descend to below the convention root.
 ///
 /// The walk recurses, so depth is stack rather than policy: a tree nested
@@ -230,10 +203,10 @@ const MAX_DIRECTORY_DEPTH: usize = 64;
 /// the one wrong answer it must not give. Holding each handle closes that
 /// window, because there is no second resolution left to race.
 ///
-/// This is also why the walk no longer asks the symlink guard about these
-/// components first. Checking a path and then resolving it again is what opened
-/// the window; refusing the link at the moment of the open is the same check
-/// without one.
+/// This is also why nothing checks these components before the open. A check
+/// followed by a fresh resolution is what opens the window in the first place;
+/// refusing the link at the moment of the open is the same check with no window
+/// to leave.
 ///
 /// The anchor is opened on its own terms and its failures are never absence.
 /// `NotFound` reported while descending to `knowledge` or to `conventions` is a
@@ -288,11 +261,25 @@ enum ConventionRootOpen {
 /// components below it all surface here, and a caller told only
 /// `knowledge/conventions` could not tell a mistyped project root from an
 /// unreadable convention directory.
+///
+/// The whole-scan entry budget reports through here too, rather than naming the
+/// directory the count ran out in. What that failure is about is the tree and
+/// not the node the walk happened to reach last, and the root is the only path
+/// this walk can name that stands for the tree.
 fn unlistable_root(detail: String) -> ConventionResolveError {
     ConventionResolveError::ConventionRootUnlistable {
         root: PathBuf::from(CONVENTION_ROOT),
         detail: CapabilityFailureDetail::new(detail),
     }
+}
+
+/// Builds the failure for a tree larger than this walk will enumerate.
+///
+/// One function rather than the message written at each of the two listings
+/// that can raise it, so the two cannot come to say different things about the
+/// same bound.
+fn budget_exhausted() -> ConventionResolveError {
+    unlistable_root(format!("convention tree holds more than {MAX_SCAN_ENTRIES} entries"))
 }
 
 /// Scans `project_root`'s convention tree and pairs every document with the
@@ -334,16 +321,25 @@ fn unlistable_root(detail: String) -> ConventionResolveError {
 /// turn — the codec returns a decoded view, and turning that view into a
 /// [`ConventionRequirement`] is what the scan adds.
 ///
-/// Symlinks are not followed, whether they name a directory or a document.
-/// Following one would let the walk leave the convention tree while every path
-/// it produced still looked repository-relative, which is precisely the escape
-/// the path rule exists to refuse: for a directory the walk itself would leave
-/// the tree, and for a document the path would stay inside it while the bytes
-/// came from wherever the link pointed, so the path rule would be guaranteeing
-/// nothing about what was actually read. Not descending a directory link also
-/// bounds the recursion by the real tree's depth.
+/// Symlinks are not followed, whether they name a directory or a document, and
+/// meeting one fails the scan. Following one would let the walk leave the
+/// convention tree while every path it produced still looked repository-
+/// relative, which is precisely the escape the path rule exists to refuse: for
+/// a directory the walk itself would leave the tree, and for a document the
+/// path would stay inside it while the bytes came from wherever the link
+/// pointed, so the path rule would be guaranteeing nothing about what was
+/// actually read. Not descending a directory link also bounds the recursion by
+/// the real tree's depth.
 ///
-/// That skip is applied to entries a listing reported, so it cannot see the two
+/// Refusing rather than passing over is the same distinction this walk draws at
+/// the root: a link is a document, or a subtree of them, that the walk declined
+/// to read, and a requirement set handed back without it would report
+/// conventions as absent when they exist. That refusal is not a sixth `AC-07`
+/// condition — it is the first of the five, a document this walk cannot read,
+/// decided by the link before any read is attempted.
+///
+/// That refusal is applied to entries a listing reported, so it cannot see the
+/// two
 /// components the walk reaches on its way to the root rather than by listing:
 /// `knowledge` and `knowledge/conventions` themselves. A link at either would
 /// be resolved before any entry existed to inspect, and the walk would present
@@ -353,14 +349,19 @@ fn unlistable_root(detail: String) -> ConventionResolveError {
 /// `project_root` above them is the caller's to vouch for: it is the tree the
 /// port was asked about, not something this walk resolved.
 ///
-/// A skipped link is simply not a document this walk presents, the same way a
-/// linked subdirectory contributes none. So is anything that is not a regular
-/// file — a FIFO, a socket, a device — which is excluded before the read
+/// A node that is not a regular file and not a directory — a FIFO, a socket, a
+/// device — is passed over rather than refused, and excluded before the read
 /// rather than at it, since opening a FIFO named like a document would block
-/// this walk for as long as no one wrote to it. That is a decision about which
-/// documents the walk offers and not a sixth fail-closed condition: `AC-07`
-/// names five, and none of them is "is a symbolic link" or "is not a regular
-/// file".
+/// this walk for as long as no one wrote to it. That one is a decision about
+/// which documents the walk offers and not a fail-closed condition: nothing was
+/// declined, because there is nothing there to read. `AC-07` names five
+/// conditions and "is not a regular file" is not among them.
+///
+/// The walk also stops if it examines more than `MAX_SCAN_ENTRIES` entries in
+/// total. The per-directory and per-document bounds renew at every node and so
+/// bound one listing and one read rather than the traversal; this one is what
+/// keeps a tree that is not a convention tree from costing an unbounded number
+/// of reads and an unbounded amount of retained requirements.
 ///
 /// The documents arrive in whatever order the directory listings produced, and
 /// this walk imposes none of its own. Ordering and deduplication are
@@ -378,13 +379,15 @@ fn unlistable_root(detail: String) -> ConventionResolveError {
 /// the walk was asked about could not be read at all: `project_root` itself
 /// could not be opened, a component of the convention root below it could not
 /// be opened for any reason other than being absent — a link among them — or
-/// the opened root could not be listed. An absent convention root is not one of
-/// these; it is the empty result `AC-08` allows.
+/// the opened root could not be listed, or the tree held more than
+/// `MAX_SCAN_ENTRIES` entries. An absent convention root is not one of these;
+/// it is the empty result `AC-08` allows.
 ///
 /// Returns [`ConventionResolveError::DocumentUnreadable`] when a document or a
-/// directory below the convention root cannot be read, including when either
-/// exceeds the bound this walk reads it under (`MAX_DOCUMENT_BYTES`,
-/// `MAX_DIRECTORY_ENTRIES`), [`ConventionResolveError::DocumentPathRejected`]
+/// directory below the convention root cannot be read — a link among them, and
+/// including when either exceeds the bound this walk reads it under
+/// (`MAX_DOCUMENT_BYTES`, `MAX_DIRECTORY_ENTRIES`),
+/// [`ConventionResolveError::DocumentPathRejected`]
 /// when a document or a directory the walk would descend into is named in a way
 /// [`ConventionDocumentPath::try_new`] refuses, and the failure
 /// [`parse_convention_front_matter`] or
@@ -414,22 +417,32 @@ pub fn scan_convention_requirements(
     // capability" and "the documents could not be looked at" mean opposite
     // things to a caller.
     //
-    // Mid-walk the answer differs, and deliberately: a node that turned into a
-    // link between the listing and the open is skipped, because the listing
-    // already classified it and one entry going away is not the tree going
-    // away. The root has no such fallback — nothing has said what is there yet.
+    // Nothing below the root is passed over either. An entry the listing
+    // classified as a link, and a node that became one between the listing and
+    // the open, both fail the scan: what is behind them was never read, and a
+    // walk that continued past them would hand back a requirement set missing
+    // whatever they named.
     let root_dir = match open_convention_root(project_root)? {
         ConventionRootOpen::Opened(root_dir) => root_dir,
         ConventionRootOpen::Absent => return Ok(Vec::new()),
     };
+
+    // The root's own listing is charged to the budget like any other, so the
+    // count covers everything the walk enumerates rather than everything below
+    // the first level.
+    let mut remaining_entries = MAX_SCAN_ENTRIES;
     // Every listing failure fails closed, absence included. The root is open by
     // now, so `NotFound` here is no longer evidence that it was never there: a
     // listing can report it for a directory emptied and removed underneath the
     // walk, and that is a tree this scan did not read rather than a tree with
     // nothing in it.
-    let entries = bounded_entries(&root_dir).map_err(|error| {
-        unlistable_root(format!("{CONVENTION_ROOT} could not be listed: {error}"))
-    })?;
+    let entries = match bounded_entries(&root_dir, &mut remaining_entries) {
+        Ok(entries) => entries,
+        Err(ListingError::BudgetExhausted) => return Err(budget_exhausted()),
+        Err(ListingError::Io(error)) => {
+            return Err(unlistable_root(format!("{CONVENTION_ROOT} could not be listed: {error}")));
+        }
+    };
 
     let mut requirements = Vec::new();
     scan_entries(
@@ -438,13 +451,14 @@ pub fn scan_convention_requirements(
         Path::new(CONVENTION_ROOT),
         &mut requirements,
         MAX_DIRECTORY_DEPTH,
+        &mut remaining_entries,
     )?;
     Ok(requirements)
 }
 
 /// Scans the listing `entries` of the directory at `relative_dir`, descending
-/// into real subdirectories and skipping symlinks, and appends one requirement
-/// per document.
+/// into real subdirectories and refusing links, and appends one requirement per
+/// document.
 ///
 /// `relative_dir` is a raw repository-relative path and deliberately not a
 /// [`ConventionDocumentPath`]: a directory is not a document, and requiring it
@@ -454,13 +468,17 @@ pub fn scan_convention_requirements(
 ///
 /// `remaining_depth` is how much further this walk may still descend; it is
 /// decremented per level and a subdirectory met at zero is reported unreadable
-/// rather than entered.
+/// rather than entered. `remaining_entries` is the whole scan's budget, shared
+/// by every level rather than renewed at each, and it is spent by
+/// [`bounded_entries`] as entries are produced rather than here as they are
+/// walked — the entries in hand have already been paid for.
 fn scan_entries(
     parent: &std::fs::File,
     entries: Vec<DirectoryEntry>,
     relative_dir: &Path,
     requirements: &mut Vec<ConventionRequirement>,
     remaining_depth: usize,
+    remaining_entries: &mut usize,
 ) -> Result<(), ConventionResolveError> {
     for entry in entries {
         // Held as a plain path until the entry is known to be one the walk
@@ -472,10 +490,26 @@ fn scan_entries(
         let candidate = relative_dir.join(&entry.name);
 
         // Reported by the listing itself, so this is the link and never what it
-        // points at. Every open below is `NOFOLLOW` as well, so this only saves
-        // the work: a link that survives to an open is refused there.
+        // points at.
+        //
+        // A refused link fails the scan rather than being passed over, for the
+        // same reason a linked root does: what is behind it was never looked
+        // at, and a document the walk declined to read is not a document the
+        // tree lacks. Passing over it would hand back a requirement set missing
+        // whatever the link named — a convention document kept elsewhere and
+        // linked into place, or a whole subtree of them — and a consumer would
+        // dispatch under conventions that exist and were not applied.
+        //
+        // Every link is refused, not only the ones named like a document. What
+        // a link points at can only be learned by following it, which is the
+        // one thing this walk will not do, so it cannot tell a link to a stray
+        // note from a link to a directory full of conventions. Refusing on the
+        // evidence available is the same answer the root is given.
         if entry.is_symlink {
-            continue;
+            return Err(unreadable(
+                &document_path(candidate)?,
+                "entry is a symbolic link, which this walk refuses to follow",
+            ));
         }
         if entry.is_dir {
             // Not validated on the way in. A directory is not a document and is
@@ -501,23 +535,42 @@ fn scan_entries(
             // the listing, and the listing would then walk out of the tree
             // while every path this scan builds still reads as repository-
             // relative.
+            //
+            // A node that became a link, or stopped being a directory, between
+            // the listing and this open is refused here rather than passed
+            // over. The listing having classified it does not make what is
+            // there now readable, and the walk would otherwise report a subtree
+            // it never entered as one holding nothing.
             let nested_dir = match open_directory_at(parent, &entry.name) {
                 Ok(nested_dir) => nested_dir,
-                Err(error) if is_symlink_open_rejection(&error) => continue,
                 Err(error) => return Err(unreadable(&document_path(candidate)?, &error)),
             };
-            let nested = match bounded_entries(&nested_dir) {
+            // An exhausted budget is reported against the root rather than
+            // against this directory: what ran out is the whole scan's, and
+            // naming the directory the count happened to end in would present a
+            // statement about the tree as one about a node.
+            let nested = match bounded_entries(&nested_dir, remaining_entries) {
                 Ok(nested) => nested,
-                Err(error) => return Err(unreadable(&document_path(candidate)?, &error)),
+                Err(ListingError::BudgetExhausted) => return Err(budget_exhausted()),
+                Err(ListingError::Io(error)) => {
+                    return Err(unreadable(&document_path(candidate)?, &error));
+                }
             };
-            scan_entries(&nested_dir, nested, &candidate, requirements, nested_depth)?;
+            scan_entries(
+                &nested_dir,
+                nested,
+                &candidate,
+                requirements,
+                nested_depth,
+                remaining_entries,
+            )?;
             continue;
         }
         // Anything left that is not a regular file is not a document either,
         // and is dropped here rather than at the read: a FIFO named like a
         // document would otherwise block this walk until something wrote to
         // it. This decides which nodes the walk offers; that the decision
-        // still holds when the file is opened is `read_document`'s business,
+        // still holds when the file is opened is `read_document_at`'s business,
         // since the node can be replaced in between.
         if !entry.is_file {
             continue;
@@ -540,104 +593,6 @@ fn scan_entries(
             .push(parse_convention_front_matter(&document, &content)?.into_requirement(document)?);
     }
     Ok(())
-}
-
-/// Reads the document at `path`, holding at most [`MAX_DOCUMENT_BYTES`] of it.
-///
-/// `path` is the location on disk and `document` the validated repository-relative
-/// identity the failure is reported under; the two are the same file, named the
-/// two ways this walk has to name it.
-fn read_document_at(
-    parent: &std::fs::File,
-    name: &Path,
-    document: &ConventionDocumentPath,
-) -> Result<String, ConventionResolveError> {
-    // The listing decided this entry was a regular file, but the entry and the
-    // open are two moments and the node can be replaced between them. The flags
-    // are what carry that decision into the open itself, the way
-    // `capability_exec::process::runtime_dir` opens its runtime files:
-    // `NOFOLLOW` so a link substituted here fails instead of being followed out
-    // of the tree, and `NONBLOCK` so a FIFO returns instead of waiting for a
-    // writer. What the flags cannot judge is the node's type, so the opened
-    // handle is asked directly below.
-    let file = rustix::fs::openat(
-        parent,
-        name,
-        rustix::fs::OFlags::RDONLY
-            | rustix::fs::OFlags::NONBLOCK
-            | rustix::fs::OFlags::NOFOLLOW
-            | rustix::fs::OFlags::CLOEXEC,
-        rustix::fs::Mode::empty(),
-    )
-    .map(std::fs::File::from)
-    .map_err(|error| unreadable(document, std::io::Error::from(error)))?;
-
-    // Asked of the handle rather than of the path, so it describes the file
-    // that was actually opened and not whatever the name refers to by now.
-    let opened = file.metadata().map_err(|error| unreadable(document, error))?;
-    if !opened.is_file() {
-        return Err(unreadable(document, "document is no longer a regular file"));
-    }
-
-    // One byte past the bound, so that reaching the bound exactly is a document
-    // read whole and anything longer is observably longer rather than silently
-    // truncated to the limit.
-    let mut bytes = Vec::new();
-    file.take(MAX_DOCUMENT_BYTES + 1)
-        .read_to_end(&mut bytes)
-        .map_err(|error| unreadable(document, error))?;
-    if bytes.len() as u64 > MAX_DOCUMENT_BYTES {
-        return Err(unreadable(
-            document,
-            format!("document is larger than the {MAX_DOCUMENT_BYTES}-byte read bound"),
-        ));
-    }
-
-    // Decoding after the bound rather than while reading: a document that is
-    // both oversized and not UTF-8 is reported as oversized, which is the
-    // condition that stopped the read.
-    String::from_utf8(bytes).map_err(|error| unreadable(document, error))
-}
-
-/// Lifts [`ConventionDocumentPath::try_new`]'s rejection of `candidate`.
-///
-/// The constructor makes two rejections and this walk stands differently to
-/// each. It does not present an escaping path: every candidate is a path the
-/// constructor has already accepted joined with one name a directory listing
-/// produced, and such a name is never empty, is never `.` or `..`, and carries
-/// neither a separator nor a root — so the joined path is inside the convention
-/// root whenever the path it extends was. It does present an unrenderable one,
-/// because a directory entry may be named with bytes that are not UTF-8 or that
-/// hold a line terminator, and joining such a name onto an accepted path yields
-/// a path the constructor refuses.
-///
-/// So this lift has a live producer and is not merely defensive. Its callers
-/// are placed accordingly: an entry the walk would not read is filtered before
-/// reaching here, so only a document the walk means to present, or a directory
-/// it means to descend into, can fail the scan on its name.
-///
-/// The lift would be kept even without that producer, since removing it would
-/// mean the walk deciding the path rule itself, which is exactly what having
-/// one enforcing site exists to prevent.
-fn document_path(candidate: PathBuf) -> Result<ConventionDocumentPath, ConventionResolveError> {
-    ConventionDocumentPath::try_new(candidate)
-        .map_err(|source| ConventionResolveError::DocumentPathRejected { source })
-}
-
-/// Builds the unreadable-document failure for `document`.
-///
-/// Takes the detail as anything printable rather than as an [`std::io::Error`],
-/// because not every way a document is unreadable comes from the filesystem:
-/// exceeding [`MAX_DOCUMENT_BYTES`] is this walk's own judgement about a read it
-/// will not finish.
-fn unreadable(
-    document: &ConventionDocumentPath,
-    detail: impl std::fmt::Display,
-) -> ConventionResolveError {
-    ConventionResolveError::DocumentUnreadable {
-        document: document.clone(),
-        detail: CapabilityFailureDetail::new(detail.to_string()),
-    }
 }
 
 /// Filesystem implementation of [`ConventionRequirementPort`] (`IN-05`,

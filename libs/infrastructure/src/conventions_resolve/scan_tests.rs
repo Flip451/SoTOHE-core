@@ -452,6 +452,12 @@ fn test_scan_convention_requirements_ignores_an_unrenderable_directory_holding_n
 #[cfg(unix)]
 #[test]
 fn test_scan_convention_requirements_does_not_read_a_linked_document() {
+    // Reading through the link would carry `knowledge/conventions/linked.md`, a
+    // path the rule accepts, for declarations that came from a file outside the
+    // tree entirely. Passing over it instead would hand back a requirement set
+    // missing a document that exists, which is the same wrong answer one level
+    // down from a linked root: the walk declined to read it, so it cannot
+    // report the tree as not having it.
     let project = project_with(&[
         ("knowledge/conventions/fixture-alpha.md", ADR_DOCUMENT),
         ("outside/smuggled.md", NAMING_DOCUMENT),
@@ -462,20 +468,23 @@ fn test_scan_convention_requirements_does_not_read_a_linked_document() {
     )
     .unwrap();
 
-    let scanned = scan_convention_requirements(project.path()).unwrap();
+    let result = scan_convention_requirements(project.path());
 
-    assert_eq!(
-        sorted_summaries(&scanned),
-        ["knowledge/conventions/fixture-alpha.md -> implementer, reviewer"],
-        "a link named like a document would have carried `knowledge/conventions/linked.md`, a path \
-         the rule accepts, for declarations read from a file outside the tree entirely — so what \
-         the walk hands back is bytes it read from inside the tree or nothing"
-    );
+    let Err(ConventionResolveError::DocumentUnreadable { document, detail }) = result else {
+        panic!(
+            "a document the walk refuses to follow is one it cannot read, not one that is absent"
+        );
+    };
+    assert_eq!(document.to_string(), "knowledge/conventions/linked.md");
+    assert!(detail.to_string().contains("symbolic link"), "and says why: {detail}");
 }
 
 #[cfg(unix)]
 #[test]
-fn test_scan_convention_requirements_skips_a_broken_document_link_rather_than_failing() {
+fn test_scan_convention_requirements_fails_closed_on_a_broken_document_link() {
+    // A link is refused for being a link, before anything is read through it,
+    // so where it points never comes into it. That the target is missing is not
+    // evidence the document is: nothing was looked at.
     let project = project_with(&[("knowledge/conventions/fixture-alpha.md", ADR_DOCUMENT)]);
     std::os::unix::fs::symlink(
         project.path().join("absent/target.md"),
@@ -483,24 +492,22 @@ fn test_scan_convention_requirements_skips_a_broken_document_link_rather_than_fa
     )
     .unwrap();
 
-    let scanned = scan_convention_requirements(project.path()).unwrap();
+    let result = scan_convention_requirements(project.path());
 
-    assert_eq!(
-        sorted_documents(&scanned),
-        ["knowledge/conventions/fixture-alpha.md"],
-        "a link is skipped for being a link, before anything is read through it, so a dangling one \
-         is not the unreadable document `AC-07` fails closed on — `AC-07` names five conditions \
-         and being a symbolic link is not among them"
-    );
+    let Err(ConventionResolveError::DocumentUnreadable { document, .. }) = result else {
+        panic!("a link is refused on being a link, whether or not it points at anything");
+    };
+    assert_eq!(document.to_string(), "knowledge/conventions/dangling.md");
 }
 
 #[cfg(unix)]
 #[test]
 fn test_scan_convention_requirements_does_not_list_a_linked_convention_root() {
-    // The root is reached by joining, not by listing, so the walk's own
-    // entry-level link skip never sees it: `read_dir` would resolve the link
-    // and hand back another tree's entries, which the walk would then name
-    // `knowledge/conventions/...` because that is the path it built them from.
+    // The root is reached by descending to it, not by being listed as an entry
+    // of something, so the refusal that covers entries never sees it. Its own
+    // open is what has to refuse: a listing of the link would hand back another
+    // tree's entries, which the walk would then name `knowledge/conventions/...`
+    // because that is the path it built them from.
     let project = project_with(&[("outside/conventions/smuggled.md", ADR_DOCUMENT)]);
     std::fs::create_dir_all(project.path().join("knowledge")).unwrap();
     std::os::unix::fs::symlink(
@@ -524,8 +531,9 @@ fn test_scan_convention_requirements_does_not_list_a_linked_convention_root() {
 #[cfg(unix)]
 #[test]
 fn test_scan_convention_requirements_does_not_list_a_convention_root_below_a_linked_directory() {
-    // The same escape one component higher: `knowledge` is joined too, so a
-    // link there redirects the root just as effectively as a link at the root.
+    // The same escape one component higher: the walk descends through
+    // `knowledge` too, so a link there redirects the root just as effectively
+    // as a link at the root.
     let project = project_with(&[("outside/knowledge/conventions/smuggled.md", ADR_DOCUMENT)]);
     std::os::unix::fs::symlink(
         project.path().join("outside/knowledge"),
@@ -537,8 +545,8 @@ fn test_scan_convention_requirements_does_not_list_a_convention_root_below_a_lin
 
     let Err(ConventionResolveError::ConventionRootUnlistable { root, .. }) = result else {
         panic!(
-            "every component the walk joins rather than lists is checked, not only the root \
-             itself, and a refusal one component higher is the same undecided tree"
+            "every component the walk descends through is refused on its own open, not only the \
+             root itself, and a refusal one component higher is the same undecided tree"
         );
     };
     assert_eq!(root, PathBuf::from("knowledge/conventions"));
@@ -637,7 +645,7 @@ fn test_scan_convention_requirements_does_not_read_a_node_that_is_not_a_regular_
 #[test]
 fn test_scan_convention_requirements_with_an_oversized_document_fails_closed() {
     let project = project_with(&[("knowledge/conventions/fixture-alpha.md", ADR_DOCUMENT)]);
-    let oversized = usize::try_from(super::MAX_DOCUMENT_BYTES).unwrap() + 1;
+    let oversized = usize::try_from(super::document_read::MAX_DOCUMENT_BYTES).unwrap() + 1;
     write_bytes(project.path(), "knowledge/conventions/huge.md", &vec![b'x'; oversized]);
 
     let result = scan_convention_requirements(project.path());
@@ -661,7 +669,7 @@ fn test_scan_convention_requirements_with_an_oversized_document_fails_closed() {
 fn test_scan_convention_requirements_reads_a_document_at_the_read_bound() {
     let project = project_with(&[("knowledge/conventions/fixture-alpha.md", ADR_DOCUMENT)]);
     let mut at_bound = ADR_DOCUMENT.as_bytes().to_vec();
-    at_bound.resize(usize::try_from(super::MAX_DOCUMENT_BYTES).unwrap(), b'x');
+    at_bound.resize(usize::try_from(super::document_read::MAX_DOCUMENT_BYTES).unwrap(), b'x');
     write_bytes(project.path(), "knowledge/conventions/large.md", &at_bound);
 
     let scanned = scan_convention_requirements(project.path()).unwrap();
@@ -684,7 +692,7 @@ fn test_scan_convention_requirements_with_an_oversized_subdirectory_fails_closed
         ("knowledge/conventions/fixture-sub/fixture-beta.md", NAMING_DOCUMENT),
     ]);
     let crowded = project.path().join("knowledge/conventions/fixture-sub");
-    for index in 0..=super::MAX_DIRECTORY_ENTRIES {
+    for index in 0..=super::directory_walk::MAX_DIRECTORY_ENTRIES {
         std::fs::write(crowded.join(format!("{index}.md")), NAMING_DOCUMENT).unwrap();
     }
 
@@ -751,6 +759,11 @@ fn test_scan_convention_requirements_within_the_depth_bound_reads_the_document()
 #[cfg(unix)]
 #[test]
 fn test_scan_convention_requirements_does_not_follow_a_directory_symlink() {
+    // Following the link would produce `knowledge/conventions/linked/smuggled.md`
+    // for a file that lives outside the tree, which is the escape the path rule
+    // refuses. Walking past it would be the other wrong answer: a linked
+    // subdirectory can hold conventions, and a scan that succeeds without them
+    // lets dispatch proceed under policies nobody read.
     let project = project_with(&[
         ("knowledge/conventions/fixture-alpha.md", ADR_DOCUMENT),
         ("outside/smuggled.md", NAMING_DOCUMENT),
@@ -761,13 +774,117 @@ fn test_scan_convention_requirements_does_not_follow_a_directory_symlink() {
     )
     .unwrap();
 
+    let result = scan_convention_requirements(project.path());
+
+    let Err(ConventionResolveError::DocumentUnreadable { document, .. }) = result else {
+        panic!("a subtree the walk refuses to enter is not a subtree it read and found empty");
+    };
+    assert_eq!(document.to_string(), "knowledge/conventions/linked");
+}
+
+#[test]
+fn test_scan_convention_requirements_beyond_the_whole_scan_entry_budget_fails_closed() {
+    // The per-directory bound renews at every directory, so a tree can stay
+    // inside it at every node and still be arbitrarily large. Spread just past
+    // the whole-scan budget over several directories, none of them near the
+    // per-directory bound, so what fails here can only be the aggregate one.
+    let project = project_with(&[("knowledge/conventions/fixture-alpha.md", ADR_DOCUMENT)]);
+    let per_directory = super::MAX_SCAN_ENTRIES / 4;
+    for directory in 0..4 {
+        let dir = project.path().join(format!("knowledge/conventions/bulk-{directory}"));
+        std::fs::create_dir_all(&dir).expect("the bulk directory must be created");
+        for entry in 0..per_directory {
+            std::fs::write(dir.join(format!("filler-{entry}.txt")), b"")
+                .expect("the filler entry must be written");
+        }
+    }
+
+    let result = scan_convention_requirements(project.path());
+
+    let Err(ConventionResolveError::ConventionRootUnlistable { root, detail }) = result else {
+        panic!(
+            "a tree larger than this walk will examine is one it did not read, and reporting what \
+             it managed to reach would present a partial requirement set as the whole"
+        );
+    };
+    assert_eq!(root, PathBuf::from("knowledge/conventions"));
+    assert!(detail.to_string().contains("entries"), "and says why: {detail}");
+}
+
+#[test]
+fn test_bounded_entries_charges_the_budget_for_every_entry_it_produces() {
+    // Where the budget is charged is the whole of what it bounds, and the two
+    // candidate points are not equivalent. A listing is read, classified, and
+    // held in full before its caller walks any of it, so charging as entries
+    // are walked lets a chain of large directories materialise every one of
+    // them while spending one unit per directory descended into. Charging as
+    // entries are produced is what makes the number the walk advertises the
+    // number it enforces.
+    //
+    // Asserted against the listing rather than through a scan because the two
+    // charging points do not differ in what a completed scan returns — a scan
+    // that finishes has walked exactly what it produced. What they differ in is
+    // how much is held before the same failure, which is visible here and
+    // nowhere above.
+    let directory = tempfile::tempdir().expect("tempdir must be created");
+    for entry in 0..5 {
+        std::fs::write(directory.path().join(format!("entry-{entry}.md")), b"")
+            .expect("the entry must be written");
+    }
+    let handle =
+        super::directory_walk::open_trusted_root(directory.path()).expect("the tempdir must open");
+
+    let mut remaining = 100;
+    let listed = super::directory_walk::bounded_entries(&handle, &mut remaining)
+        .unwrap_or_else(|_| panic!("a listing inside the budget must succeed"));
+
+    assert_eq!(listed.len(), 5);
+    assert_eq!(remaining, 95, "one unit per entry produced, and none for `.` or `..`");
+}
+
+#[test]
+fn test_bounded_entries_refuses_a_listing_larger_than_the_budget_left() {
+    // The budget runs out part-way through producing this listing, so the
+    // refusal comes from the listing itself rather than from whoever would have
+    // walked it. Nothing is handed back: a partial listing presented as a whole
+    // one is the same wrong answer as an empty tree presented for an unread
+    // one.
+    let directory = tempfile::tempdir().expect("tempdir must be created");
+    for entry in 0..5 {
+        std::fs::write(directory.path().join(format!("entry-{entry}.md")), b"")
+            .expect("the entry must be written");
+    }
+    let handle =
+        super::directory_walk::open_trusted_root(directory.path()).expect("the tempdir must open");
+
+    let mut remaining = 3;
+    let refused = super::directory_walk::bounded_entries(&handle, &mut remaining);
+
+    assert!(
+        matches!(refused, Err(super::ListingError::BudgetExhausted)),
+        "a listing that cannot be produced inside the budget is refused as the budget running \
+         out, not as an I/O failure of the directory"
+    );
+}
+
+#[test]
+fn test_scan_convention_requirements_within_the_whole_scan_entry_budget_reads_the_documents() {
+    // The budget refuses only what is past it. A tree comfortably inside it is
+    // scanned normally, so the bound cannot be satisfied by a walk that stops
+    // early.
+    let project = project_with(&[
+        ("knowledge/conventions/fixture-alpha.md", ADR_DOCUMENT),
+        ("knowledge/conventions/fixture-sub/fixture-beta.md", NAMING_DOCUMENT),
+    ]);
+
     let scanned = scan_convention_requirements(project.path()).unwrap();
 
     assert_eq!(
         sorted_documents(&scanned),
-        ["knowledge/conventions/fixture-alpha.md"],
-        "following the link would have produced `knowledge/conventions/linked/smuggled.md` for a \
-         file that lives outside the tree, which is the escape the path rule refuses"
+        [
+            "knowledge/conventions/fixture-alpha.md",
+            "knowledge/conventions/fixture-sub/fixture-beta.md",
+        ]
     );
 }
 
@@ -1022,11 +1139,11 @@ fn test_scan_convention_requirements_without_a_convention_root_is_an_empty_resul
 
 #[test]
 fn test_scan_convention_requirements_with_an_untraversable_ancestor_fails_closed() {
-    // `knowledge` is a regular file, so the guard cannot inspect the root below
-    // it and returns an inspection failure rather than a refused link. That is
-    // the arm the previous fixture did not reach: making the *root* a file lets
-    // the guard answer `Ok(true)` and pushes the failure into the listing, so it
-    // exercised a different branch than the one it was written for.
+    // `knowledge` is a regular file, so the descent stops one component above
+    // the root: the open of `knowledge` fails for not being a directory rather
+    // than for being a link, and the root below it is never reached. That is a
+    // different arm from the fixture that makes the *root* a file, which gets
+    // as far as opening `knowledge` and fails one level lower.
     let project = tempfile::tempdir().expect("tempdir must be created");
     std::fs::write(project.path().join("knowledge"), b"not a directory")
         .expect("the ancestor stand-in must be written");
