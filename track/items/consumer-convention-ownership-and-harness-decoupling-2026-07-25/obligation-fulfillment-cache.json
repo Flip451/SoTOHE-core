@@ -1431,13 +1431,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "18b252e6e5bbc259aa073b7d5368adb925712c6cdf07da359e8c3f6608059f5b",
+        "bound_tests_set_hash": "58c29e0ed1e5d35021994861a9cf4ff18627ed5c88504cdaa3b59367715465cd",
         "declaration_hash": "427b4d75854e868dea37e391328c61d80edd9720f413863064ace03655c1c064",
         "anchor_text_hash": "1b1ffbec0a695dd5ad0ef2aedf19b2203260b7cd306f9d0c5d44f2d3c1690f6b"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "recorded[0].discipline,\n            DisciplineText::try_new(BASE_DISCIPLINE.to_owned())?.with_conventions(\n                &ConventionResolution::from_matches(vec![\n                    convention(\"knowledge/conventions/coding-principles.md\")?,\n                    convention(\"knowledge/conventions/rust/testing.md\")?,\n                ])\n            ),"
+        "citation": "for dispatched in [&executed, &delegated] {\n            assert_eq!(listed_documents(dispatched), documents.to_vec());\n            assert!(\n                dispatched.as_str().contains(READING_OBLIGATION),\n                \"each route states the reading obligation, not merely the list it applies to\"\n            );\n        }"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1455,13 +1455,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "18b252e6e5bbc259aa073b7d5368adb925712c6cdf07da359e8c3f6608059f5b",
+        "bound_tests_set_hash": "58c29e0ed1e5d35021994861a9cf4ff18627ed5c88504cdaa3b59367715465cd",
         "declaration_hash": "427b4d75854e868dea37e391328c61d80edd9720f413863064ace03655c1c064",
         "anchor_text_hash": "e1a66265c79e71f57ca378f3fa01ef21f69a643c1f4e0cf6d4f9d49e4abf15f6"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "recorded[0].discipline,\n            DisciplineText::try_new(BASE_DISCIPLINE.to_owned())?.with_conventions(\n                &ConventionResolution::from_matches(vec![\n                    convention(\"knowledge/conventions/coding-principles.md\")?,\n                    convention(\"knowledge/conventions/rust/testing.md\")?,\n                ])\n            )"
+        "citation": "for dispatched in [&executed, &delegated] {\n            assert_eq!(listed_documents(dispatched), documents.to_vec());\n            assert!(\n                dispatched.as_str().contains(READING_OBLIGATION),\n                \"each route states the reading obligation, not merely the list it applies to\"\n            );\n        }"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1479,13 +1479,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "18b252e6e5bbc259aa073b7d5368adb925712c6cdf07da359e8c3f6608059f5b",
+        "bound_tests_set_hash": "58c29e0ed1e5d35021994861a9cf4ff18627ed5c88504cdaa3b59367715465cd",
         "declaration_hash": "427b4d75854e868dea37e391328c61d80edd9720f413863064ace03655c1c064",
         "anchor_text_hash": "ef1146cebde1234282359a696adfa10617e74044ed59045e5082ebfa2afb09a1"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n            queries.lock().expect(\"test resolver recorder lock\").len(),\n            1,\n            \"one dispatch asks the resolver once; a second call would mean a route resolving \\\n             again below the seam\"\n        ); ... assert!(matches!(\n            interactor.execute(request()?),\n            Err(CapabilityExecError::UnsupportedProvider { .. })\n        )); ... assert_eq!(queries.lock().expect(\"test resolver recorder lock\").len(), 1); ... assert!(queries.lock().expect(\"test resolver recorder lock\").is_empty());"
+        "citation": "assert_eq!(queries.lock().expect(\"test resolver recorder lock\").len(), 1); ... assert!(matches!(\n            interactor.execute(request()?),\n            Err(CapabilityExecError::UnsupportedProvider { .. })\n        )); ... assert_eq!(queries.lock().expect(\"test resolver recorder lock\").len(), 1); ... assert!(queries.lock().expect(\"test resolver recorder lock\").is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },
@@ -1503,7 +1503,7 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "18b252e6e5bbc259aa073b7d5368adb925712c6cdf07da359e8c3f6608059f5b",
+        "bound_tests_set_hash": "58c29e0ed1e5d35021994861a9cf4ff18627ed5c88504cdaa3b59367715465cd",
         "declaration_hash": "427b4d75854e868dea37e391328c61d80edd9720f413863064ace03655c1c064",
         "anchor_text_hash": "f5e419261547af48885971339527c55ba2df39a40c1e55f580abf4984345ff3f"
       },

@@ -1488,4 +1488,257 @@ mod tests {
         );
         Ok(())
     }
+
+    /// The sentence by which the composed discipline states the reading
+    /// obligation, as distinct from the list of paths that obligation applies
+    /// to. Held here as its own value because the two are separate halves of
+    /// `AC-10` and a test asserting one must not be satisfied by the other.
+    const READING_OBLIGATION: &str = "Read each of them in full";
+
+    /// The document the resolver returns for a dispatch naming `reviewer`,
+    /// distinct from [`RESOLVED_DOCUMENT`], which it returns for `implementer`.
+    /// The two exist as separate values so that a discipline composed from the
+    /// wrong dispatch's resolution is visible in the text rather than hidden
+    /// behind an answer that happens to be the same either way.
+    const REVIEWER_DOCUMENT: &str = "knowledge/conventions/review-protocol.md";
+
+    /// Convention resolver that answers according to the capability it was
+    /// asked about, and keeps every query.
+    ///
+    /// [`RecordingConventionResolveService`] answers with one fixed set, under
+    /// which a discipline carrying an earlier dispatch's resolution is
+    /// indistinguishable from one carrying its own. Keying the answer is what
+    /// makes that difference observable.
+    struct PerCapabilityConventionResolveService {
+        documents: Vec<(ConventionCapabilityId, ConventionDocumentPath)>,
+        queries: Arc<Mutex<Vec<ResolveConventionsQuery>>>,
+    }
+
+    impl ConventionResolveService for PerCapabilityConventionResolveService {
+        fn resolve(
+            &self,
+            query: ResolveConventionsQuery,
+        ) -> Result<ConventionResolution, ConventionResolveError> {
+            let matched = self
+                .documents
+                .iter()
+                .filter(|(capability, _)| *capability == query.capability)
+                .map(|(_, document)| document.clone())
+                .collect();
+            self.queries.lock().expect("test resolver recorder lock").push(query);
+            Ok(ConventionResolution::from_matches(matched))
+        }
+    }
+
+    fn per_capability_resolver(
+        queries: &Arc<Mutex<Vec<ResolveConventionsQuery>>>,
+        documents: &[(&str, &str)],
+    ) -> Result<Arc<PerCapabilityConventionResolveService>, Box<dyn std::error::Error>> {
+        let documents = documents
+            .iter()
+            .map(|(capability, path)| {
+                Ok((ConventionCapabilityId::try_new(*capability)?, convention(path)?))
+            })
+            .collect::<Result<Vec<_>, Box<dyn std::error::Error>>>()?;
+        Ok(Arc::new(PerCapabilityConventionResolveService { documents, queries: queries.clone() }))
+    }
+
+    /// Builds an interactor whose profile selects the provider that hands the
+    /// dispatch back to the host, so a test can exercise the second route
+    /// without restating the profile at each site.
+    fn delegating_interactor(
+        conventions: Arc<dyn ConventionResolveService>,
+    ) -> Result<CapabilityExecInteractor, Box<dyn std::error::Error>> {
+        let provider = ProviderName::try_new("claude")?;
+        dispatching_interactor(
+            CapabilityProfile {
+                provider: provider.clone(),
+                model: ModelName::try_new("claude-opus")?,
+                effort: ReasoningEffort::High,
+                execution_mode: ExecutionMode::OrchestratorOutput,
+            },
+            conventions,
+            vec![Arc::new(DelegatingProviderPort { provider })],
+        )
+    }
+
+    #[test]
+    fn test_capability_exec_both_routes_carry_the_reading_obligation_and_not_only_the_paths()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let documents =
+            ["knowledge/conventions/coding-principles.md", "knowledge/conventions/rust/testing.md"];
+        let dispatches = Arc::new(Mutex::new(Vec::new()));
+        let executing = dispatching_interactor(
+            profile(ExecutionMode::OrchestratorOutput)?,
+            resolver(&recorder(), &documents)?,
+            recording_provider(&dispatches)?,
+        )?;
+        let delegating = delegating_interactor(resolver(&recorder(), &documents)?)?;
+
+        executing.execute(request()?)?;
+        let outcome = delegating.execute(request()?)?;
+
+        let recorded = dispatches.lock().expect("test dispatch recorder lock");
+        let executed = recorded[0].discipline.clone();
+        let CapabilityDispatchOutcome::DelegateInHost { discipline: delegated, .. } = outcome
+        else {
+            return Err("the claude-provider dispatch delegates to the host".into());
+        };
+        // `AC-10` asks two things of each route: that the resolved paths reach
+        // the dispatched capability, and that the obligation to read every one
+        // of those documents in full reaches it too. The paths are pinned by
+        // the route assertions above; the obligation is not. Those assertions
+        // compare a whole dispatched value against `with_conventions` itself,
+        // so a render reduced to a bare bullet list — or one that softened the
+        // instruction into a suggestion — composes both sides identically and
+        // leaves every one of them green while no capability is told to read
+        // anything. This is the assertion that separates the two halves: the
+        // obligation sentence is checked as content, on both routes, and is
+        // not part of the base discipline the source port supplied.
+        for dispatched in [&executed, &delegated] {
+            assert_eq!(listed_documents(dispatched), documents.to_vec());
+            assert!(
+                dispatched.as_str().contains(READING_OBLIGATION),
+                "each route states the reading obligation, not merely the list it applies to"
+            );
+        }
+        assert!(!BASE_DISCIPLINE.contains(READING_OBLIGATION));
+        assert_eq!(
+            executed, delegated,
+            "the two routes were handed the same discipline and the same resolution, so the \
+             obligation they carry is one text and not two kept equal by review"
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_capability_exec_empty_resolution_dispatches_no_document_despite_available_declarations()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let root = trap_project_root()?;
+        let dispatches = Arc::new(Mutex::new(Vec::new()));
+        let interactor = CapabilityExecInteractor::new(
+            Arc::new(StaticProfilePort {
+                profile: profile(ExecutionMode::OrchestratorOutput)?,
+                calls: Arc::new(AtomicUsize::new(0)),
+            }),
+            Arc::new(StaticSourcePort {
+                briefing: Ok(BriefingText::try_new(format!(
+                    "perform the task\n\nconvention_refs:\n- {TRAP_BRIEFING_DOCUMENT}\n"
+                ))?),
+                discipline: Ok(DisciplineText::try_new(BASE_DISCIPLINE.to_owned())?),
+                briefing_path: CapabilityFilePath::try_new(PathBuf::from("tmp/briefing.md"))?,
+                calls: Arc::new(AtomicUsize::new(0)),
+            }),
+            resolver(&recorder(), &[])?,
+            recording_provider(&dispatches)?,
+            root.path().to_path_buf(),
+        );
+
+        interactor.execute(CapabilityExecRequest {
+            resume: CapabilityResumeRequest::Resume(TargetArtifactSet::try_new(vec![
+                TargetArtifactPath::try_new(PathBuf::from(TRAP_TRACK_ARTIFACT))?,
+            ])?),
+            ..request()?
+        })?;
+
+        let recorded = dispatches.lock().expect("test dispatch recorder lock");
+        let dispatched = &recorded[0].discipline;
+        // The sibling trap dispatch hands the resolver a non-empty answer, so a
+        // dispatcher that consulted a track artifact's `convention_refs` only
+        // when resolution came back with nothing would satisfy it and still
+        // break `AC-12`. This is that dispatcher's case: the resolver returns
+        // an empty resolution while the same three competing declarations are
+        // reachable — the track artifact under the wired root, the convention
+        // document in that root's own tree, and the briefing text the source
+        // port loaded — and the dispatched obligation still names none of them.
+        assert!(
+            listed_documents(dispatched).is_empty(),
+            "an empty resolution lists nothing to read, whatever else this dispatch could reach"
+        );
+        for trap in [TRAP_TRACK_DOCUMENT, TRAP_BRIEFING_DOCUMENT, TRAP_ON_DISK_DOCUMENT] {
+            assert!(
+                !dispatched.as_str().contains(trap),
+                "no available declaration substitutes for a resolution that matched nothing"
+            );
+        }
+        assert!(
+            dispatched.as_str().contains("returned zero"),
+            "the capability is told resolution ran and matched nothing, rather than being handed \
+             a substitute list assembled from somewhere else"
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_capability_exec_delegate_in_host_route_resolves_conventions_exactly_once()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let queries = recorder();
+        let interactor = delegating_interactor(resolver(&queries, &[RESOLVED_DOCUMENT])?)?;
+
+        interactor.execute(request()?)?;
+
+        // `AC-11`'s once-per-dispatch clause holds for whichever route runs,
+        // and the counting assertion above exercises the executing route only.
+        // A duplicate resolution is invisible to this route's payload
+        // assertion: the resolver answers the same way every time, so a second
+        // call composes the same text and a whole-value comparison stays
+        // satisfied. The call count is the only thing that sees it.
+        assert_eq!(queries.lock().expect("test resolver recorder lock").len(), 1);
+        Ok(())
+    }
+
+    #[test]
+    fn test_capability_exec_resolves_again_for_a_second_dispatch_naming_another_capability()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let queries = recorder();
+        let dispatches = Arc::new(Mutex::new(Vec::new()));
+        let interactor = dispatching_interactor(
+            profile(ExecutionMode::OrchestratorOutput)?,
+            per_capability_resolver(
+                &queries,
+                &[("implementer", RESOLVED_DOCUMENT), ("reviewer", REVIEWER_DOCUMENT)],
+            )?,
+            recording_provider(&dispatches)?,
+        )?;
+
+        interactor.execute(request()?)?;
+        interactor.execute(CapabilityExecRequest {
+            capability: CapabilityName::try_new("reviewer")?,
+            ..request()?
+        })?;
+        interactor.execute(request()?)?;
+
+        // "Once per dispatch" is a rate, not a lifetime budget: every dispatch
+        // resolves for itself. Two memoizations would survive a weaker
+        // sequence than this one. A resolution cached for the interactor's
+        // lifetime is caught by the change of capability at the second
+        // dispatch; one cached per capability is not, and is caught only by
+        // the third, which names the first capability again. Both would hand a
+        // dispatch documents resolved for an earlier one.
+        let asked = queries.lock().expect("test resolver recorder lock");
+        assert_eq!(asked.len(), 3);
+        let implementer = ConventionCapabilityId::from(&CapabilityName::try_new("implementer")?);
+        let reviewer = ConventionCapabilityId::from(&CapabilityName::try_new("reviewer")?);
+        assert_eq!(
+            asked.iter().map(|query| &query.capability).collect::<Vec<_>>(),
+            vec![&implementer, &reviewer, &implementer]
+        );
+
+        // Counting the calls does not by itself establish that each dispatch
+        // was composed from its own answer: an interactor that asked again and
+        // then dispatched the previous composition would keep the count
+        // correct. The resolver answers differently per capability, so the
+        // documents each dispatch was actually handed say which resolution
+        // reached it.
+        let recorded = dispatches.lock().expect("test dispatch recorder lock");
+        assert_eq!(
+            recorded
+                .iter()
+                .map(|dispatch| listed_documents(&dispatch.discipline))
+                .collect::<Vec<_>>(),
+            vec![vec![RESOLVED_DOCUMENT], vec![REVIEWER_DOCUMENT], vec![RESOLVED_DOCUMENT]],
+            "each dispatch carries the documents resolved for the capability it named"
+        );
+        Ok(())
+    }
 }

@@ -8,15 +8,17 @@ calls. Those file-lock hooks have since been removed, so the original protection
 AST-level file-write guard no longer exists. The retired Layer-2 blocks therefore do not protect a
 current enforcement boundary.
 
-This convention now documents the remaining Bash write guardrails and the accepted residual risks.
+This reference now documents the remaining Bash write guardrails and the accepted residual risks.
 
 ## Layered Defense
 
 ### Layer 1: `permissions.deny` (fastest — Claude Code blocks before hook execution)
 
-Commands denied: `touch`, `cp`, `mv`, `install`, `chmod`, `chown`.
-
-These commands are also in `FORBIDDEN_ALLOW` to prevent future addition to `permissions.allow`.
+Which commands are denied is stated in `.claude/settings.json` and nowhere else. That file is
+the consumer's own (`responsibility-boundary.md`): SoTOHE ships a recommended default posture
+and no CI gate enforces it, so a list repeated here would describe one repository's choices as
+if they were the guard's contract, and would go stale the first time either side moved.
+Read the file.
 
 ### Layer 2: Retired `block-direct-git-ops` file-write blocks
 
@@ -35,10 +37,6 @@ Claude Code guard keeps precise direct-git checks, `SOTP_GUARDED_GIT` keyword bl
 
 Test-file truncation is handled separately by `block-test-file-deletion`, which checks output
 redirect targets for `tests/` paths.
-
-### Layer 3: `FORBIDDEN_ALLOW` (CI enforcement)
-
-Prevents file-write command patterns from being added to `permissions.allow` in settings.json.
 
 ## Accepted Residual Risks
 
@@ -60,8 +58,7 @@ command-string scan era tried to infer dangerous behavior from shell syntax and 
 blanket blocks for redirects, `tee`, and `sed -i`. Direct git-write enforcement lives at the git
 process boundary through `.githooks/reference-transaction` and `.githooks/pre-push`.
 
-The remaining Bash-side controls are intentionally narrow: `permissions.deny` blocks a small set of
-high-risk file commands, `FORBIDDEN_ALLOW` prevents those commands from entering
-`permissions.allow`, and `block-test-file-deletion` protects test files from redirect-based
-truncation. Broader file-write safety is handled by review, CI, and the normal track workflow rather
-than by reimplementing a shell sandbox.
+The remaining Bash-side controls are intentionally narrow: whatever `permissions.deny` the
+consumer has configured, and `block-test-file-deletion`, which protects test files from
+redirect-based truncation. Broader file-write safety is handled by review, CI, and the normal
+track workflow rather than by reimplementing a shell sandbox.

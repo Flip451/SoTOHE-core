@@ -61,7 +61,7 @@ pub fn parse_adr_frontmatter(content: &str) -> Result<AdrFrontMatter, AdrFrontMa
 
 /// Reject duplicate decision IDs within a single ADR.
 ///
-/// `knowledge/conventions/adr.md` constrains `decisions[].id` to be unique
+/// `.harness/reference/adr-schema.md` constrains `decisions[].id` to be unique
 /// within one ADR; without this check, references such as
 /// `superseded_by: <adr>.md#D1` are ambiguous and lifecycle traceability
 /// breaks while `signal check-adr-user` still passes.

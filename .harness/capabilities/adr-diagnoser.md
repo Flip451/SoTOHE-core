@@ -40,7 +40,7 @@ any declared target instead. Do not infer a semantic conclusion from a byte diff
 
 **Edit judgment (Phase 0)** — briefing contains: the source filename and track id; the
 applied edit (concrete diff); the originating finding verbatim; the effective merge-target
-lifecycle judgment (`knowledge/conventions/adr.md` §Lifecycle); and, once the user has
+lifecycle judgment (`.harness/reference/adr-schema.md` §Lifecycle); and, once the user has
 adjudicated at the Phase 0 escalation, that adjudication verbatim — the adjudicated text
 becomes the comparison reference for subsequent judgments (it is not a stamp). The
 reference for「元の決定」is the latest explicitly user-approved decision set; during the

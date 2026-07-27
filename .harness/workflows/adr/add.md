@@ -16,7 +16,7 @@ The resulting ADR is a pre-track artifact that a later track-planning workflow m
 
 ## Preconditions
 
-Before starting the hearing, read `knowledge/conventions/adr.md`, `knowledge/conventions/pre-track-adr-authoring.md`, and `knowledge/adr/README.md`.
+Before starting the hearing, read `.harness/reference/adr-schema.md`, `knowledge/conventions/pre-track-adr-authoring.md`, and `knowledge/adr/README.md`.
 The conventions take precedence if an older template or index example conflicts with them.
 Confirm that a target ADR is eligible for direct amendment under the ADR lifecycle rules before using Focused or Quick mode.
 

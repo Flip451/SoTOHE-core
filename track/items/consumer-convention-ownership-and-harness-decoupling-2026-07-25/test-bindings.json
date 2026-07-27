@@ -1397,22 +1397,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::capability_exec::tests",
-          "test_name": "test_capability_exec_resolves_conventions_once_and_dispatches_the_composed_discipline"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::capability_exec::tests",
-          "test_name": "test_capability_exec_query_names_the_dispatched_capability_as_a_matching_term"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::capability_exec::tests",
-          "test_name": "test_capability_exec_resolves_conventions_before_the_execution_subject_is_chosen"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::capability_exec::tests",
-          "test_name": "test_capability_exec_typed_pipeline_dispatch_resolves_no_conventions"
+          "test_name": "test_capability_exec_both_routes_carry_the_reading_obligation_and_not_only_the_paths"
         },
         {
           "layer": "usecase",
@@ -1422,12 +1407,47 @@
         {
           "layer": "usecase",
           "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_delegate_in_host_payload_carries_the_resolved_obligation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_delegate_in_host_route_resolves_conventions_exactly_once"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_empty_resolution_dispatches_no_document_despite_available_declarations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
           "test_name": "test_capability_exec_injects_the_resolved_documents_and_nothing_else"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::capability_exec::tests",
-          "test_name": "test_capability_exec_delegate_in_host_payload_carries_the_resolved_obligation"
+          "test_name": "test_capability_exec_query_names_the_dispatched_capability_as_a_matching_term"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_again_for_a_second_dispatch_naming_another_capability"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_conventions_before_the_execution_subject_is_chosen"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_conventions_once_and_dispatches_the_composed_discipline"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_typed_pipeline_dispatch_resolves_no_conventions"
         }
       ]
     }

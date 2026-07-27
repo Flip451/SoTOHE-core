@@ -64,7 +64,7 @@ ripgrep ベースの `Grep` / `Glob` で完全置換できる検索は専用 too
 
 ## Hook Constraint
 
-Command-enforcement semantics are owned by the [bash write guard convention](../../knowledge/conventions/bash-write-guard.md)
+Command-enforcement semantics are owned by the [bash write guard reference](../../.harness/reference/guard-semantics.md)
 and its hook dispatcher. The ADR index records the governing decision. Use workflow commands
 rather than attempting to construct a guard token yourself.
 

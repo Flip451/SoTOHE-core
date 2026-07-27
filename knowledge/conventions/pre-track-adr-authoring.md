@@ -15,7 +15,7 @@ ADR は track 内成果物ではなく **track 前段階** で author が作成�
 - **作成タイミング**: ADR ファイルの **初期起草** (knowledge/adr/ への file 作成) は `/track:plan` **起動前** に user + main 対話 (または手動) で完了させる。`/track:plan` は ADR を自動生成しない。**初回 commit はその ADR を最初に必要とする track の Phase 0 (ADR-baseline commit) で行う**のが typical。ADR は track 横断資産であり 1 つの ADR が複数 track にまたがる関係 (ADR ⊇ track) を維持する。
 - **起動時の事前確認**: `/track:plan` は起動直後に、参照予定 ADR が `knowledge/adr/` に存在するかを確認する。未整備なら停止し、ADR 整備を促す (厳密モード)。
 - **状態フィールドなし**: ADR に `Status` 見出しや `approved` のような状態フィールドは作らない。ファイルが存在して内容が読めることは `/track:plan` の起動前提として十分であるが、Phase 0 の user 承認（下記の裁定境界）を代替しない。
-- **書き換え可 (pre-track 文脈に限る)**: track 前段階の user + main 対話 (または手動) で既存 ADR を直接書き換えられるのは、`knowledge/conventions/adr.md` の effective merge target 判定で **pre-merge** の ADR に限る。merge target に既に入った ADR は永続 record であり、意味上の変更は新 ADR で supersede または refinement する。track が当該 ADR を init 刻印した後の書き換えは、下記「In-track 意味変更の裁定権」節に従う (この一文を track 内の包括的な編集許可として読んではならない)。
+- **書き換え可 (pre-track 文脈に限る)**: track 前段階の user + main 対話 (または手動) で既存 ADR を直接書き換えられるのは、`.harness/reference/adr-schema.md` の effective merge target 判定で **pre-merge** の ADR に限る。merge target に既に入った ADR は永続 record であり、意味上の変更は新 ADR で supersede または refinement する。track が当該 ADR を init 刻印した後の書き換えは、下記「In-track 意味変更の裁定権」節に従う (この一文を track 内の包括的な編集許可として読んではならない)。
 - **track 内成果物からの参照**: spec.json は ADR を構造化参照 (`AdrRef { file, anchor }`) で cite できる (SoT Chain ① spec → ADR)。**入庫済みの delta draft も cite できるが、入庫前の候補は cite できない** (下記裁定権節)。型カタログ (Phase 2) は spec を `spec_refs[]` で参照し、ADR を直接 cite することは SoT Chain のレイヤースキップになるので禁止 (`type catalogue → ADR` は逆流/スキップ)。impl-plan (Phase 3) も同様に spec / 型カタログ経由で参照し、ADR を直接 cite しない。逆方向 (ADR から track 内成果物への参照) は SoT Chain 逆流なので禁止。
 - **Phase 1+ の ADR 側修正 (delta 候補)**: Phase 1+ の探索的精緻化ループで下流 signal が 🔴 になって ADR 側の意味変更が必要になった場合、入力箱 ADR を in-place 編集せず、adr-editor が delta 候補を起草する (下記裁定権節の Phase 1+ 手順)。下流 spec の 🔴 は入庫済み delta draft を cite して解消する。
 - **終端処理**: track 終端で入力箱 ADR に不意の乖離 (byte 照合の不一致) があれば守護者トリアージへ送る。入庫済み delta draft は 🟡 のまま merge 段階の user 裁定へ進む。乖離があることだけを理由に同期の accept / revert を user に求めない。
@@ -128,5 +128,5 @@ ADR の意味は user に属する。track が ADR を扱う全期間につい�
 ## Decision Reference
 
 - [knowledge/adr/README.md](../adr/README.md) — ADR 索引。本 convention の原典となる ADR はこの索引から辿る
-- [knowledge/conventions/adr.md](./adr.md) — ADR 運用の基本ルール
+- [.harness/reference/adr-schema.md](../../.harness/reference/adr-schema.md) — ADR 運用の基本ルール
 - [knowledge/conventions/workflow-ceremony-minimization.md](./workflow-ceremony-minimization.md) — 事後レビュー方式 / 事前承認限定の原則

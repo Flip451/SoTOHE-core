@@ -29,7 +29,7 @@ The unit of work is a **track** (one feature / fix / refactor) living on branch 
 
 The canonical implementation flow is **pre-track ADR → `/track:adr2pr`**:
 
-1. Author a front-matter-complete ADR under `knowledge/adr/` **before** any track exists (`knowledge/conventions/pre-track-adr-authoring.md`). YAML front-matter with grounded `decisions[]` is mandatory (`knowledge/conventions/adr.md`); ungrounded decisions are 🔴.
+1. Author a front-matter-complete ADR under `knowledge/adr/` **before** any track exists (`knowledge/conventions/pre-track-adr-authoring.md`). YAML front-matter with grounded `decisions[]` is mandatory (`.harness/reference/adr-schema.md`); ungrounded decisions are 🔴.
 2. `/track:adr2pr [<feature>] [--primary-adr <filename>.md]` — autonomous drive to a reviewed PR, no merge: init → ADR-baseline review + commit → Phase 1-3 (spec-design → type-design → impl-plan) → plan-artifacts review + commit → full-cycle (implement → DRY check → review → commit, batch-first) → pr-review. Both arguments are optional: an explicitly supplied value takes precedence, and a missing value is resolved from the conversation context and confirmed once with the user (candidate selection when resolution is not unique; a direct value request when context has no candidate) before both values are forwarded explicitly to `/track:init <feature> --primary-adr <filename>.md`. Stops with the PR open; the user merges (`/track:merge`).
 3. `/track:done` — after merge, return to the configured base branch.
 
@@ -71,7 +71,7 @@ Derived read-only views — never hand-edit, regenerate via `bin/sotp track view
 ## Rules and conventions
 
 - `.claude/rules/` — Claude Code-specific operating rules: `language.md` (language guidance), `dev-environment.md` (toolchain, cargo-make, `bin/sotp` build), `orchestration.md` (delegation), and `guardrails.md` (guards, hooks, permissions).
-- `knowledge/conventions/` — ~30 engineering conventions; the index in its `README.md` is auto-generated (`bin/sotp conventions update-index`) and lists them in reading order. Load-bearing for daily work: `track-lifecycle.md`, `branch-strategy.md`, `git-notes.md`, `task-completion-flow.md`, `pre-track-adr-authoring.md`, `adr.md`, `review-protocol.md`, `coding-principles.md`, `type-designer-kind-selection.md`, `no-upstream-restatement.md`.
+- `knowledge/conventions/` — ~30 engineering conventions; the index in its `README.md` is auto-generated (`bin/sotp conventions update-index`) and lists them in reading order. Load-bearing for daily work: `track-lifecycle.md`, `branch-strategy.md`, `git-notes.md`, `task-completion-flow.md`, `pre-track-adr-authoring.md`, `review-protocol.md`, `coding-principles.md`, `type-designer-kind-selection.md`, `no-upstream-restatement.md`.
 
 ## Workspace shape
 

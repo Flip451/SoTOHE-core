@@ -1,4 +1,4 @@
-# Convention: Architecture Decision Records (ADR)
+# Reference: Architecture Decision Records (ADR)
 
 ## Rule
 
@@ -56,18 +56,18 @@ top-level key は以下 2 つのみ (`deny_unknown_fields`):
 | `superseded` | `SupersededDecision` | 後続に置き換え (`superseded_by` 必須) |
 | `deprecated` | `DeprecatedDecision` | 置き換えなしで廃止 |
 
-dispatch の実体は `parse_adr_frontmatter`(`libs/infrastructure/src/adr_decision/parse.rs`) の status-string match で行われる。
+dispatch の実体は `parse_adr_frontmatter` の status-string match で行われる。
 
-二箱分離 model の adoption (`pre-track-adr-authoring.md` の「In-track 意味変更の裁定権」節) は `status: superseded` / `superseded_by` の適用外である: track 内で採用された delta draft による supersession / refinement は、関係を採用された delta 側の本文 (Decision / Related) にのみ記録し、対象 decision の front-matter は書き換えない (実効内容は元の決定に採用済み修正を採用順に重ねて読むことで導出する)。`status: superseded` + `superseded_by` を直接書けるのは、track 外 (pre-track 文脈) で user が supersession を明示的に確定する編集に限る。
+二箱分離 model の adoption (`knowledge/conventions/pre-track-adr-authoring.md` の「In-track 意味変更の裁定権」節) は `status: superseded` / `superseded_by` の適用外である: track 内で採用された delta draft による supersession / refinement は、関係を採用された delta 側の本文 (Decision / Related) にのみ記録し、対象 decision の front-matter は書き換えない (実効内容は元の決定に採用済み修正を採用順に重ねて読むことで導出する)。`status: superseded` + `superseded_by` を直接書けるのは、track 外 (pre-track 文脈) で user が supersession を明示的に確定する編集に限る。
 
 ### decision 個別 status とファイル全体 status の関係
 
-`pre-track-adr-authoring.md` はファイル全体の `## Status` 見出し (`Proposed` / `Accepted` / 等の summary status) を**禁止**している。本 convention の `decisions[].status` はそれとは別 axis で、**decision 粒度** の lifecycle を表す:
+`knowledge/conventions/pre-track-adr-authoring.md` はファイル全体の `## Status` 見出し (`Proposed` / `Accepted` / 等の summary status) を**禁止**している。本書の `decisions[].status` はそれとは別 axis で、**decision 粒度** の lifecycle を表す:
 
 - ファイル全体の summary status は形骸化しやすく (実装が進んでも誰も更新しない)、機械検証もできなかった → 廃止。
 - decision 個別 status は機械検証可能 (`verify-adr-signals` が typestate dispatch を通じて評価) であり、同一 ADR 内の一部だけを superseded にする場合や implementation tracking (`implemented_in` で commit を指す) を encode できる → 追加。
 
-`workflow-ceremony-minimization.md` の「人工的な状態フィールドを作らない」原則とも衝突しない:
+人工的な状態フィールドを作らないという原則とも衝突しない:
 
 - 同原則の対象は **形骸化する file-level / summary-level の状態フィールド** (実成果物と乖離するもの)。
 - decision 個別 status は機械検証で schema 整合性が CI で確認される (例: `status: implemented` なら `implemented_in` 必須 / 非 empty、欠落すれば parse 失敗) ため、形骸化リスクが構造的に低減されている。ただし `implemented_in` に記載した commit hash の実在や `superseded_by` の参照先の解決は現 CI では検証しない。
@@ -133,7 +133,7 @@ Convention から関連 ADR にリンクするには `## Decision Reference` セ
 
 ADR が effective strategy の merge target にマージされているかで扱いが変わる:
 
-- **Pre-merge (current working branch / open PR)**: ADR はまだ draft。 レビューや実装で欠陥・矛盾・見落としが判明したら **同じファイルを直接編集** して構わない。新 ADR で supersede する必要はない。pre-merge の段階で design を整える目的に沿う。ただしこの直接編集の許可は、track がその ADR を入力箱へ取り込む前 (pre-track) と、取り込んだ track の Phase 0 裁定境界までに限る — 境界後は pre-merge であっても入力箱 ADR への意味的 in-place 編集は禁止で、`pre-track-adr-authoring.md` の「In-track 意味変更の裁定権」節 (二箱分離) が正規経路になる (非意味的修正 lane、track-born delta 候補の起草・改稿もその節に従う)。
+- **Pre-merge (current working branch / open PR)**: ADR はまだ draft。 レビューや実装で欠陥・矛盾・見落としが判明したら **同じファイルを直接編集** して構わない。新 ADR で supersede する必要はない。pre-merge の段階で design を整える目的に沿う。ただしこの直接編集の許可は、track がその ADR を入力箱へ取り込む前 (pre-track) と、取り込んだ track の Phase 0 裁定境界までに限る — 境界後は pre-merge であっても入力箱 ADR への意味的 in-place 編集は禁止で、`knowledge/conventions/pre-track-adr-authoring.md` の「In-track 意味変更の裁定権」節 (二箱分離) が正規経路になる (非意味的修正 lane、track-born delta 候補の起草・改稿もその節に従う)。
   - 判定: `git log <merge_target> -- <adr-file>` が empty (当該 ADR が merge target に存在しない) なら pre-merge 扱い。`<merge_target>` は effective strategy の `merge_target()`（`BranchStrategyPort` 経由。track 内なら `metadata.json#branch_strategy_snapshot`、track 外なら `.harness/config/branch-strategy.json`）で解決する。
 - **Post-merge (merged to the merge target branch)**: ADR は永続 record として不変。semantic content の変更は新 ADR で supersede または refinement する。既存 ADR に許容される編集は (1) typo 修正、(2) broken cross-reference 修正、(3) newer ADR への back-reference 追加 のみ。
   - 新 ADR は `## Related` で旧 ADR を参照。旧 ADR は当時の decision の歴史 record として残す。

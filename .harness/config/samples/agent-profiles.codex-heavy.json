@@ -53,7 +53,7 @@
       "model": "gpt-5.6-sol",
       "reasoning_effort": "xhigh",
       "fast_model": "gpt-5.6-luna",
-      "fast_reasoning_effort": "low",
+      "fast_reasoning_effort": "medium",
       "execution_mode": "typed-pipeline"
     },
     "researcher": {

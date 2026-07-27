@@ -108,7 +108,7 @@ If the briefing asks for:
   refs (`review_finding_ref` naming a PR/round) are metadata, not body content, and are
   exempt. Self-check after editing: grep the body for `本トラック`, `このトラック`, the
   current track id, and recent commit hashes; rephrase any future-tense match.
-- **Pre-merge draft vs post-merge record** (`knowledge/conventions/adr.md` §Lifecycle):
+- **Pre-merge draft vs post-merge record** (`.harness/reference/adr-schema.md` §Lifecycle):
   - **Pre-merge detection**: run `git log <merge_target> -- <adr-file>` with the
     briefing-supplied value — empty output = pre-merge. Never hardcode a branch name.
   - Phase 0 (before the adjudication boundary): a pre-merge input ADR is amended in place

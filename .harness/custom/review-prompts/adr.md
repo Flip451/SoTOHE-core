@@ -94,4 +94,4 @@ Report findings ONLY for the following categories:
 - Backward-looking observations (how many rounds it took, history of edits)
 - Convention overlap suggestions ("this should be a convention not an ADR")
   unless the artifact unambiguously fits the convention column of the ADR vs
-  Convention table in `knowledge/conventions/adr.md`
+  Convention table in `.harness/reference/adr-schema.md`
