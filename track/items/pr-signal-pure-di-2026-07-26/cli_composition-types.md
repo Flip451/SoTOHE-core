@@ -5,5 +5,5 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | PrCompositionRoot | composition_root | modify | — | 🔵 | 🔵 |
-| SignalCompositionRoot | composition_root | modify | — | 🟡 | 🔵 |
+| SignalCompositionRoot | composition_root | modify | — | 🔵 | 🔵 |
 

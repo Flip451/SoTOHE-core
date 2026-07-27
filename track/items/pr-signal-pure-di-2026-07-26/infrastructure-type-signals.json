@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T15:32:01Z",
-  "declaration_hash": "816a97c61f9b4473abacb8184efd93c7bcd7c9d0021100d8ec9dbe93a1f27f96",
-  "implementation_input_hash": "0650c2dc84ee07261d81684f42ab673c38adbc0fc13181ccbe437a4c501d9336",
+  "generated_at": "2026-07-27T11:40:03Z",
+  "declaration_hash": "7695d0d2430abd5fef32f6a10cd698099c3c800f46bca6a514cb957dd4dccb6f",
+  "implementation_input_hash": "08015e67c9bd7c861696dbdf427df54ed8eeda763dcb95cd52951b229fe0cb3e",
   "signals": [
     {
       "type_name": "SystemPrCommandAdapter",
@@ -17,10 +17,22 @@
     {
       "type_name": "SystemSignalCommandAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "SignalCommandPort"
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Default",
+        "SignalActiveTrackResolverPort",
+        "SignalCommandPort",
+        "SignalSpecPathResolverPort"
+      ]
+    },
+    {
+      "type_name": "SystemSignalGateConfigAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "SignalGateConfigPort"
       ]
     }
   ]

@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "816a97c61f9b4473abacb8184efd93c7bcd7c9d0021100d8ec9dbe93a1f27f96",
+  "catalogue_declaration_hash": "7695d0d2430abd5fef32f6a10cd698099c3c800f46bca6a514cb957dd4dccb6f",
   "signals": [
     {
       "type_name": "SystemPrCommandAdapter",
@@ -10,7 +10,12 @@
     {
       "type_name": "SystemSignalCommandAdapter",
       "signal": "blue",
-      "entry_hash": "3290c22efa252e2560d284cb712f5fcf6070f127f6177d1820279820920cb8c5"
+      "entry_hash": "6d5417046260097359dc8c0b5102728f6b722eb8a19f1e880878a7689622dfd7"
+    },
+    {
+      "type_name": "SystemSignalGateConfigAdapter",
+      "signal": "blue",
+      "entry_hash": "92a465845fecc171061eb84d6b2be2ac8cb90facef2bdd22bb42fc411311c8dd"
     }
   ]
 }

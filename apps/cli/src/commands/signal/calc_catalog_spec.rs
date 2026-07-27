@@ -1,7 +1,8 @@
 //! `signal calc-catalog-spec` — compute and persist catalog-spec signals (chain ②).
 
 use clap::Args;
-use cli_composition::{CommandOutcome, CompositionError, SignalCompositionRoot};
+use cli_composition::{CommandOutcome, CompositionError};
+use cli_driver::signal::{SignalDriver, SignalInput};
 
 /// Arguments for `signal calc-catalog-spec`.
 ///
@@ -12,8 +13,8 @@ pub struct CalcCatalogSpecArgs {}
 
 /// Execute `signal calc-catalog-spec`.
 pub fn run(
-    app: &SignalCompositionRoot,
+    driver: &SignalDriver,
     _args: CalcCatalogSpecArgs,
 ) -> Result<CommandOutcome, CompositionError> {
-    app.signal_calc_catalog_spec()
+    Ok(driver.handle(SignalInput::CalcCatalogSpec))
 }

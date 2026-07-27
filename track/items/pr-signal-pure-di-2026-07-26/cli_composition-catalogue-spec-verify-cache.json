@@ -99,7 +99,7 @@
       }
     },
     {
-      "claim_hash": "a1355faa6a22e3cfbc5d9e5e0474e708402cdd3ffc0623dae90e170d0b07eb45",
+      "claim_hash": "b03fbde3c29af5be47966df53ad88f85464441be7dfefb371f47a6b745883554",
       "evidence_hash": "c6182d533586523fcf6b085d30c9d82bd5b0f532c672c70cc58b179ad57cff6d",
       "verdict": {
         "kind": "pass",
@@ -123,7 +123,7 @@
       }
     },
     {
-      "claim_hash": "a1355faa6a22e3cfbc5d9e5e0474e708402cdd3ffc0623dae90e170d0b07eb45",
+      "claim_hash": "b03fbde3c29af5be47966df53ad88f85464441be7dfefb371f47a6b745883554",
       "evidence_hash": "a132c3d22933c83b48a2c185452c8931926cff21a5c4871f7e736e75fed6966b",
       "verdict": {
         "kind": "pass",
@@ -147,7 +147,7 @@
       }
     },
     {
-      "claim_hash": "a1355faa6a22e3cfbc5d9e5e0474e708402cdd3ffc0623dae90e170d0b07eb45",
+      "claim_hash": "b03fbde3c29af5be47966df53ad88f85464441be7dfefb371f47a6b745883554",
       "evidence_hash": "7fa566ecb219a7005318bbed63fd5ede0ec2a9006c5817290c880a538172161c",
       "verdict": {
         "kind": "pass",
@@ -171,7 +171,31 @@
       }
     },
     {
-      "claim_hash": "a1355faa6a22e3cfbc5d9e5e0474e708402cdd3ffc0623dae90e170d0b07eb45",
+      "claim_hash": "b03fbde3c29af5be47966df53ad88f85464441be7dfefb371f47a6b745883554",
+      "evidence_hash": "3913cb5de1ece43eefcb5572fb552804eab8236462db3dd7c24924b82f288d65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli_composition-types.json",
+          "section_key": "types",
+          "entry_key": "SignalCompositionRoot"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b03fbde3c29af5be47966df53ad88f85464441be7dfefb371f47a6b745883554",
       "evidence_hash": "50742c8a86837f2c87ac7973e35ecaaf2e17d4d31b08bc449e936019d57e4850",
       "verdict": {
         "kind": "pass",

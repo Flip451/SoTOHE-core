@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T15:02:54Z",
-  "declaration_hash": "525dd9e36ada3f06f7fea62fcabc8acdfe13f4c1898f8d4ee75ca3d176eeefd5",
-  "implementation_input_hash": "ce3ec2fb250689b55cc1a29fa523a4bf8c984a403d762f964831fe12f6a62f40",
+  "generated_at": "2026-07-27T12:10:08Z",
+  "declaration_hash": "f625542b040a5145ffebf1cafa5f360003d80043232bb98f42b46097deea40f4",
+  "implementation_input_hash": "ec40c9ffab83b953b42e28d7b9360b2a3d178dd60c2edb14f09e965a635245b2",
   "signals": [
     {
       "type_name": "PrBaseOverride",
@@ -110,11 +110,39 @@
       ]
     },
     {
+      "type_name": "ResolvedSignalChainCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SignalActiveTrackResolverPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalChainExecutionReport",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug"
+      ]
+    },
+    {
       "type_name": "SignalCommand",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -124,17 +152,89 @@
     {
       "type_name": "SignalCommandInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "SignalService"
       ]
     },
     {
       "type_name": "SignalCommandPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalCommandPortError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "SignalFailureReason",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SignalGateConfigError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "SignalGateConfigPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalRootSelection",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SignalSpecPathResolverPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalStrictOverride",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Copy",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
     },
     {
       "type_name": "PrCommandOutput",
@@ -145,6 +245,12 @@
     {
       "type_name": "SignalCommandOutput",
       "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalGateName",
+      "kind_tag": "enum",
       "signal": "blue",
       "found_type": true
     }

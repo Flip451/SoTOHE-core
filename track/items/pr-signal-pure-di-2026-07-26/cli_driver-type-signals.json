@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T09:35:42Z",
-  "declaration_hash": "c4bab5421bf7a95694c6d0d95eef4373f6198d919ef2c9e9df35e63db081f107",
-  "implementation_input_hash": "52b9d05b9a1c8d1dccf483570edc82d69b469e54bd952b2e63c754bae4bcd561",
+  "generated_at": "2026-07-27T09:57:59Z",
+  "declaration_hash": "8685302dfadb86e94642e7e79cad927c11c5ccd6e12cd576a487dc17469eb3bb",
+  "implementation_input_hash": "fd9e01773c93d98295fc481d436f980154923652683a53480d33a8335d3e5fad",
   "signals": [
     {
       "type_name": "PrDriver",

@@ -37,6 +37,7 @@ mod schema_export_tests;
 #[cfg(feature = "semantic-dup")]
 pub mod semantic_dup;
 pub mod shell;
+pub mod signal;
 pub mod signal_layer_reader;
 pub mod spec;
 pub mod task_contract_codec;

@@ -226,6 +226,36 @@
           "anchor": "D5"
         }
       ]
+    },
+    {
+      "id": "AC-08",
+      "text": "Signal gate 判定は単一の usecase 境界が所有し、4 chain の判定をそこで集約する。判定に必要な入力が欠ける、または判定不能な場合、同じ境界が fail-closed を保証して通過を許可しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D5"
+        }
+      ]
+    },
+    {
+      "id": "AC-09",
+      "text": "純 DI 化の構造変更前後で、adr_user、spec_adr、catalog_spec、impl_catalog の各 chain における既存の calc / check の永続化結果と gate 判定を維持する。adr_user は calc / check ともに ADR 文書を変更せず live に判定する。spec_adr、catalog_spec、impl_catalog は calc が対応する文書を生成・更新し、check はその永続化済み文書に基づいて gate 判定し、その文書を変更しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D4"
+        }
+      ]
+    },
+    {
+      "id": "AC-10",
+      "text": "Signal gate の interim / strict mode 解決は gate 判定を所有する同一の usecase 境界が一度だけ行い、その解決結果に従って対応 chain を判定する。driver と composition root は mode を決定しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "anchor": "D5"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -251,7 +281,7 @@
     }
   ],
   "signals": {
-    "blue": 19,
+    "blue": 22,
     "yellow": 0,
     "red": 0
   }

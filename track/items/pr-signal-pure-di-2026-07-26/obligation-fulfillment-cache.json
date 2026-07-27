@@ -696,6 +696,1086 @@
         "citation": "&& push_track_id.as_str() == \"INVALID\"\n                && ensure_track_id.as_str() == \"INVALID\"\n                && review_track_id.as_str() == \"INVALID\""
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "3996ca54423e5a48885f994b45e6b0e0ebbe4540478c46136d902e7a9bf8fe80",
+        "declaration_hash": "3db2a3b102806c431b02712d90e0b08307749d1ca076aaf9516fc0d143ca9bc3",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(interactor_source.contains(\"impl SignalService for SignalCommandInteractor\"), \"the interactor must implement the driver's application-service boundary\");\nassert!(!interactor_source.contains(\"SystemSignalCommandAdapter\"), \"the interactor must not re-enter a concrete infrastructure adapter\");\nassert!(composition_source.contains(\"cli_driver::signal::SignalDriver::new(service)\"), \"the interactor must be the driver's sole execution dependency\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "3996ca54423e5a48885f994b45e6b0e0ebbe4540478c46136d902e7a9bf8fe80",
+        "declaration_hash": "3db2a3b102806c431b02712d90e0b08307749d1ca076aaf9516fc0d143ca9bc3",
+        "anchor_text_hash": "4888534bd2ae87f1a0401ba6f2dea9a33f16352c330db35724f4a9819ac36de8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!source.contains(\"SignalServiceImpl\"), \"{path} retains the legacy service\");\n        assert!(!source.contains(\"signal::shim\"), \"{path} retains the signal shim\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "3996ca54423e5a48885f994b45e6b0e0ebbe4540478c46136d902e7a9bf8fe80",
+        "declaration_hash": "3db2a3b102806c431b02712d90e0b08307749d1ca076aaf9516fc0d143ca9bc3",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n        composition_source.contains(\"cli_driver::signal::SignalDriver::new(service)\"),\n        \"the interactor must be the driver's sole execution dependency\"\n    );\n\n    assert!(\n        driver_source.contains(\"service: Arc<dyn SignalService>\"),\n        \"the driver must depend only on the usecase application service\"\n    );\n    assert!(\n        !driver_source.contains(\"SystemSignalCommandAdapter\"),\n        \"the driver must not construct or re-enter the infrastructure adapter\"\n    );\n    assert!(\n        !driver_source.contains(\"SignalCommandPort\"),\n        \"the driver must not bypass the interactor through the port\"\n    );\n\n    assert!(\n        interactor_source.contains(\"port: Arc<dyn SignalCommandPort>\"),\n        \"the interactor must own the typed execution port\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "3996ca54423e5a48885f994b45e6b0e0ebbe4540478c46136d902e7a9bf8fe80",
+        "declaration_hash": "3db2a3b102806c431b02712d90e0b08307749d1ca076aaf9516fc0d143ca9bc3",
+        "anchor_text_hash": "a56d5cadabfe199f3ca673a7ba369aa2ad26f0fe6a8d06844185774381716c0e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(commands.len(), 4);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "3996ca54423e5a48885f994b45e6b0e0ebbe4540478c46136d902e7a9bf8fe80",
+        "declaration_hash": "3db2a3b102806c431b02712d90e0b08307749d1ca076aaf9516fc0d143ca9bc3",
+        "anchor_text_hash": "0b714c87a9abc948effdac90df87045e9982cdef40f044b965737a0953d1a66a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(config.loads.load(Ordering::SeqCst), 1); ... ResolvedSignalChainCommand::CheckAdrUser { strictness: Strictness::Interim, .. }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "3996ca54423e5a48885f994b45e6b0e0ebbe4540478c46136d902e7a9bf8fe80",
+        "declaration_hash": "3db2a3b102806c431b02712d90e0b08307749d1ca076aaf9516fc0d143ca9bc3",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(output.stdout.as_deref(), Some(\"port output\"));\n        assert_eq!(output.stderr, None);\n        assert_eq!(output.exit_code, 0);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "3996ca54423e5a48885f994b45e6b0e0ebbe4540478c46136d902e7a9bf8fe80",
+        "declaration_hash": "3db2a3b102806c431b02712d90e0b08307749d1ca076aaf9516fc0d143ca9bc3",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(composition_source.contains(\"cli_driver::signal::SignalDriver::new(service)\")); ... assert!(!composition_public_api_source.contains(\"pub use infrastructure::signal::SystemSignalCommandAdapter\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalFailureReason",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalFailureReason",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "cd6fdede4c5db173db4084178e52dda31af25830a90d50d452e68f771f7a0004",
+        "declaration_hash": "522ddf87007ecba327226ee240300abb7bd0f7bac89aa0d0d7f68d48f9ca50fc",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(reason.as_str(), \"adapter diagnostic\");\n        assert_eq!(reason.to_string(), \"adapter diagnostic\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalActiveTrackResolverPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalActiveTrackResolverPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve_active_track"
+      },
+      "key": {
+        "bound_tests_set_hash": "6e3113ac51322e5087c8fb1125739edc80ba97483f6f245f96e0dc091588ad10",
+        "declaration_hash": "ee51506624a6ac94ff56e6337efef2937605439973c4443e0d2e7b4a78163dce",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            active_track_roots.lock().unwrap().as_slice(),\n            [Some(PathBuf::from(\"explicit/workspace\"))]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalActiveTrackResolverPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalActiveTrackResolverPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve_active_track"
+      },
+      "key": {
+        "bound_tests_set_hash": "6e3113ac51322e5087c8fb1125739edc80ba97483f6f245f96e0dc091588ad10",
+        "declaration_hash": "ee51506624a6ac94ff56e6337efef2937605439973c4443e0d2e7b4a78163dce",
+        "anchor_text_hash": "4888534bd2ae87f1a0401ba6f2dea9a33f16352c330db35724f4a9819ac36de8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "        assert!(!source.contains(\"SignalServiceImpl\"), \"{path} retains the legacy service\");\n        assert!(!source.contains(\"signal::shim\"), \"{path} retains the signal shim\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalSpecPathResolverPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalSpecPathResolverPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve_spec_path"
+      },
+      "key": {
+        "bound_tests_set_hash": "0b889d99918c2a3fb146f335408bba92e027fc603677e296ceb7d7613cef0ebd",
+        "declaration_hash": "c510bdc4a6b8b9cca228ab7ac51d339f9183de183e301d80667370024a1ca4eb",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(events.lock().unwrap().as_slice(), [\"spec-path\"]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalSpecPathResolverPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalSpecPathResolverPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve_spec_path"
+      },
+      "key": {
+        "bound_tests_set_hash": "0b889d99918c2a3fb146f335408bba92e027fc603677e296ceb7d7613cef0ebd",
+        "declaration_hash": "c510bdc4a6b8b9cca228ab7ac51d339f9183de183e301d80667370024a1ca4eb",
+        "anchor_text_hash": "4888534bd2ae87f1a0401ba6f2dea9a33f16352c330db35724f4a9819ac36de8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!source.contains(\"SignalServiceImpl\"), \"{path} retains the legacy service\");\n        assert!(!source.contains(\"signal::shim\"), \"{path} retains the signal shim\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "cda6d8a6f9e500cd68548b2e1b375fb4f2a12da3a29a527c6455014bee101a60",
+        "declaration_hash": "287b66f17a3875010024f6b6bf457c9d3b614ec357b2ee0cdf36efd021b130dd",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(port.0.lock().unwrap().as_slice(), [ResolvedSignalChainCommand::CheckAdrUser { project_root: SignalRootSelection::Supplied(project_root), strictness: Strictness::Interim, }]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "cda6d8a6f9e500cd68548b2e1b375fb4f2a12da3a29a527c6455014bee101a60",
+        "declaration_hash": "287b66f17a3875010024f6b6bf457c9d3b614ec357b2ee0cdf36efd021b130dd",
+        "anchor_text_hash": "4888534bd2ae87f1a0401ba6f2dea9a33f16352c330db35724f4a9819ac36de8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!source.contains(\"SignalServiceImpl\"), \"{path} retains the legacy service\");\n        assert!(!source.contains(\"signal::shim\"), \"{path} retains the signal shim\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalGateConfigPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalGateConfigPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "key": {
+        "bound_tests_set_hash": "424bd742062947aec33cfe748097c2df0eb37609191321926a42c04ef88834ba",
+        "declaration_hash": "55e0896926da85e52bdfff960dc586a001ae4333e3064b473c166547a8d7fc78",
+        "anchor_text_hash": "a56d5cadabfe199f3ca673a7ba369aa2ad26f0fe6a8d06844185774381716c0e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(commands.len(), 4);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalGateConfigPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalGateConfigPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "key": {
+        "bound_tests_set_hash": "424bd742062947aec33cfe748097c2df0eb37609191321926a42c04ef88834ba",
+        "declaration_hash": "55e0896926da85e52bdfff960dc586a001ae4333e3064b473c166547a8d7fc78",
+        "anchor_text_hash": "0b714c87a9abc948effdac90df87045e9982cdef40f044b965737a0953d1a66a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(config.loads.load(Ordering::SeqCst), 1); ... assert!(matches!(commands.as_slice(), [ ResolvedSignalChainCommand::CheckAdrUser { strictness: Strictness::Interim, .. }, ResolvedSignalChainCommand::CheckSpecAdr { .. }, ResolvedSignalChainCommand::CheckCatalogSpec { .. }, ResolvedSignalChainCommand::CheckImplCatalog { .. }, ]));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalCommandPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "5da3efca3cf65c60ac7598041239d452823a364a466817164af880b08c87c232",
+        "declaration_hash": "ae4369c153ce02cfc3762d2eac1738827189818544720e968649dd8440c60eee",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let _port: &dyn SignalCommandPort = &adapter;"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalActiveTrackResolverPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "b2c59de15cc02f33670a98c69b0a7004fbafe903ab40ce16cdf387182fbbf163",
+        "declaration_hash": "8817421b3f95fa3645838190acab19ad74b5a97fd6415ef1e1a81a03c4e9b4a8",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let _active_track_resolver: &dyn SignalActiveTrackResolverPort = &adapter;"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalSpecPathResolverPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "b2c59de15cc02f33670a98c69b0a7004fbafe903ab40ce16cdf387182fbbf163",
+        "declaration_hash": "e41a7759357eb9222598db5afa1e03853df81718077484fb2a97e6e979db15a3",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let _spec_path_resolver: &dyn SignalSpecPathResolverPort = &adapter;"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalGateConfigAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalGateConfigAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalGateConfigPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "f07dacf4f6a8cf660b56683f546957d765cd4084f510d928ddee82efc35ddcd5",
+        "declaration_hash": "b1261722f7cad79524058179c74bba5e00ab0ed175d7b66835d89a206d5dabec",
+        "anchor_text_hash": "a56d5cadabfe199f3ca673a7ba369aa2ad26f0fe6a8d06844185774381716c0e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let _port: &dyn SignalGateConfigPort = &adapter;"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalGateConfigAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalGateConfigAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalGateConfigPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "f07dacf4f6a8cf660b56683f546957d765cd4084f510d928ddee82efc35ddcd5",
+        "declaration_hash": "b1261722f7cad79524058179c74bba5e00ab0ed175d7b66835d89a206d5dabec",
+        "anchor_text_hash": "0b714c87a9abc948effdac90df87045e9982cdef40f044b965737a0953d1a66a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(matrix.resolve(ChainId::AdrUser, GateKind::Commit), Strictness::Interim);\n        assert_eq!(matrix.resolve(ChainId::ImplCatalog, GateKind::Merge), Strictness::Strict);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedSignalChainCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedSignalChainCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "67405544d2ad0341d3d1d618c02008e1686c9178f63e4ec8d548c6044d279129",
+        "declaration_hash": "d2d3bd5911b703ee227968b1e8ebb5778d484e706b30ce964c3c52b18af0b197",
+        "anchor_text_hash": "0b714c87a9abc948effdac90df87045e9982cdef40f044b965737a0953d1a66a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "ResolvedSignalChainCommand::CheckAdrUser {\n    project_root: SignalRootSelection::Supplied(project_root),\n    strictness: Strictness::Strict,\n},\nResolvedSignalChainCommand::CheckSpecAdr {\n    spec_json_path: Some(spec_json_path),\n    strictness: Strictness::Strict,\n    workspace_root: Some(workspace_root.clone()),\n},\nResolvedSignalChainCommand::CheckCatalogSpec {\n    strictness: Strictness::Strict,\n    workspace_root: Some(workspace_root.clone()),\n},\nResolvedSignalChainCommand::CheckImplCatalog {\n    strictness: Strictness::Strict,\n    workspace_root: Some(workspace_root),\n}"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedSignalChainCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedSignalChainCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "67405544d2ad0341d3d1d618c02008e1686c9178f63e4ec8d548c6044d279129",
+        "declaration_hash": "d2d3bd5911b703ee227968b1e8ebb5778d484e706b30ce964c3c52b18af0b197",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *port.0.lock().unwrap(),\n            vec![\n                ResolvedSignalChainCommand::CalcAdrUser { project_root: project_root.clone() },\n                ResolvedSignalChainCommand::CheckAdrUser {\n                    project_root: SignalRootSelection::Supplied(project_root.clone()),\n                    strictness: Strictness::Interim,\n                },"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalChainExecutionReport",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalChainExecutionReport",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "67405544d2ad0341d3d1d618c02008e1686c9178f63e4ec8d548c6044d279129",
+        "declaration_hash": "8c132424a746c737c3205389125932cdbfd0a470485804edf0bb13755f9a3e3b",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(gate_output.stderr, None);\n        assert_eq!(gate_output.exit_code, 0);\n        assert_eq!(\n            gate_output.stdout.as_deref(),"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "dd02b462d2fc2b154a906cd5df38467f7d72528c4b57f22b431a20632165ad7d",
+        "declaration_hash": "3ab37c23a729ab2cce1d84be98c3c261c27238360c787bfe669d94b1a05133dd",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            &commands[0],\n            SignalCommand::CalcAdrUser { project_root: value } if value == &project_root\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalGateConfigError",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalGateConfigError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "ab9ebdc030edb37788b539ac85c27a75f8a76e35dbc9b1908ea9d36aeb8a763c",
+        "declaration_hash": "ed0f53eade67e15bf1fdf2716f3ca400c277e741e43dca96f2f4158009cea3aa",
+        "anchor_text_hash": "a56d5cadabfe199f3ca673a7ba369aa2ad26f0fe6a8d06844185774381716c0e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(gate_config_failure.exit_code, 1);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalStrictOverride",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalStrictOverride",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "80a23518a6937c629da449ff35201c5c6c9f4ba904921c5f2a806442c364dc45",
+        "declaration_hash": "08ad1c71dd1576907d6722196263f198c3d249646ec13b0b2bc1075ccad2ffec",
+        "anchor_text_hash": "0b714c87a9abc948effdac90df87045e9982cdef40f044b965737a0953d1a66a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            port.0.lock().unwrap().as_slice(),\n            [ResolvedSignalChainCommand::CheckAdrUser {\n                project_root: SignalRootSelection::Supplied(project_root),\n                strictness: Strictness::Interim,\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalStrictOverride",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalStrictOverride",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "80a23518a6937c629da449ff35201c5c6c9f4ba904921c5f2a806442c364dc45",
+        "declaration_hash": "08ad1c71dd1576907d6722196263f198c3d249646ec13b0b2bc1075ccad2ffec",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "strictness: Strictness::Interim,"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "3f39deb631bce4491926120d792b0eb458a09b793cc61a378dd898c5b1f42f30",
+        "declaration_hash": "1a3a5b08d5831f5479b67ec596ee2165bd80b36a8d5932dab45b29af7eb4a0a8",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let root = SignalCompositionRoot::new();\n\nlet outcome = root\n    .signal_driver()\n    .handle(SignalInput::CalcAdrUser { project_root: workspace.path().to_path_buf() });\n\nassert_eq!(outcome.exit_code, 0);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "df6fb7625ce66838c8dfa5c2be89e964d590c1fa87416db84e7ed7a4e62049fb",
+        "declaration_hash": "1a3a5b08d5831f5479b67ec596ee2165bd80b36a8d5932dab45b29af7eb4a0a8",
+        "anchor_text_hash": "4888534bd2ae87f1a0401ba6f2dea9a33f16352c330db35724f4a9819ac36de8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!source.contains(\"SignalServiceImpl\"), \"{path} retains the legacy service\");\n        assert!(!source.contains(\"signal::shim\"), \"{path} retains the signal shim\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "c8ee17bdea842238b07264fd027c9507fdbbc6bf69e3262f8022266dd08e2e35",
+        "declaration_hash": "1a3a5b08d5831f5479b67ec596ee2165bd80b36a8d5932dab45b29af7eb4a0a8",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*port.0.lock().unwrap(), vec![ ResolvedSignalChainCommand::CalcAdrUser { project_root: project_root.clone() }, ResolvedSignalChainCommand::CheckAdrUser { project_root: SignalRootSelection::Supplied(project_root.clone()), strictness: Strictness::Interim, }, ResolvedSignalChainCommand::CalcSpecAdr { spec_json_path: Some(spec_json_path.clone()), workspace_root: Some(workspace_root.clone()), }, ResolvedSignalChainCommand::CheckSpecAdr { spec_json_path: Some(spec_json_path.clone()), strictness: Strictness::Strict, workspace_root: Some(workspace_root.clone()), }, ResolvedSignalChainCommand::CalcCatalogSpec, ResolvedSignalChainCommand::CheckCatalogSpec { strictness: Strictness::Strict, workspace_root: Some(workspace_root.clone()), }, ResolvedSignalChainCommand::CalcImplCatalog, ResolvedSignalChainCommand::CheckImplCatalog { strictness: Strictness::Strict, workspace_root: Some(workspace_root.clone()), }, ResolvedSignalChainCommand::CheckAdrUser { project_root: SignalRootSelection::Supplied(project_root), strictness: Strictness::Strict, }, ResolvedSignalChainCommand::CheckSpecAdr { spec_json_path: Some(spec_json_path), strictness: Strictness::Strict, workspace_root: Some(workspace_root.clone()), }, ResolvedSignalChainCommand::CheckCatalogSpec { strictness: Strictness::Strict, workspace_root: Some(workspace_root.clone()), }, ResolvedSignalChainCommand::CheckImplCatalog { strictness: Strictness::Strict, workspace_root: Some(workspace_root), } ]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "c8ee17bdea842238b07264fd027c9507fdbbc6bf69e3262f8022266dd08e2e35",
+        "declaration_hash": "1a3a5b08d5831f5479b67ec596ee2165bd80b36a8d5932dab45b29af7eb4a0a8",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!source.contains(\"SignalServiceImpl\"), \"{path} retains the legacy service\"); assert!(!source.contains(\"signal::shim\"), \"{path} retains the signal shim\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "d006ea3ad27bdc2cc077244b7239f754f744671d7174b145abf1d6be2ecab138",
+        "declaration_hash": "eb3c10ed7eca039c2f45bbf4980c9ff1bb264e81fd4df7b324d4122ae866300d",
+        "anchor_text_hash": "9b09a5d9f6a39b56453043d8ad00cbb017d26c88496c607e6456779389686596"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(std::fs::read_to_string(&spec_path).unwrap(), persisted_after_calc); ... assert_eq!(std::fs::read_to_string(adr_path).unwrap(), persisted_before_calc); ... assert_eq!(std::fs::read_to_string(signals_path).unwrap(), persisted_after_calc); ... assert_eq!(std::fs::read_to_string(signal_path).unwrap(), persisted_before_check);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "067813db30828a5b92c68e5f18baceee17f6915169e7763204f10eb24539b5e5",
+        "declaration_hash": "eb3c10ed7eca039c2f45bbf4980c9ff1bb264e81fd4df7b324d4122ae866300d",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(adapter_source.contains(\"impl SignalCommandPort for SystemSignalCommandAdapter\"), ...); assert!(!composition_public_api_source.contains(\"pub use infrastructure::signal::SystemSignalCommandAdapter\"), ...);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::calc_adr_user::run",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::calc_adr_user::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1eaf4157172c12d455f02f0c9fbce3719e44d4d1840f415e9357dec89d806917",
+        "declaration_hash": "61c401ccda16ecdd9030aaf1bd4d260f3403570de6253f5cf6083bf901bfd9aa",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(service.calls(), vec![ServiceSignalCommand::CalcAdrUser { project_root }]); ... assert_eq!(port.calls(), vec![ResolvedSignalChainCommand::CalcAdrUser { project_root }]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::calc_catalog_spec::run",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::calc_catalog_spec::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "65352d668f196ed0404a2d2fc39e4a77b6c45d605c724a039e6ef4937f5a4cb3",
+        "declaration_hash": "f8eaa45ede8944430a76aa1a75bce822fd81884ea188aaa0573deabdccc5acd6",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let outcome = calc_catalog_spec::run(&driver, CalcCatalogSpecArgs {}).unwrap();\n\n        assert_recorded_outcome(&outcome);\n        assert_eq!(service.calls(), vec![ServiceSignalCommand::CalcCatalogSpec]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::calc_impl_catalog::run",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::calc_impl_catalog::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "be9045f0f674bd26dcd331d100d6ce6b628952f9c804ab16f014773590720f4b",
+        "declaration_hash": "ff68b3273dfb89370380acdd16b23cb2650cc69f4a645ad3a0d5e1a28f4fefcb",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(service.calls(), vec![ServiceSignalCommand::CalcImplCatalog]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::calc_spec_adr::run",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::calc_spec_adr::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "ab632f58e822fbdb1e59c9b32d28dfe04951c2dadd6ee7990b9f551e4e663b28",
+        "declaration_hash": "af84613920c52aad845d0afbe5df6a8fad379ae6f98c1eb8fb09efd87a08797f",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            service.calls(),\n            vec![ServiceSignalCommand::CalcSpecAdr {\n                spec_json_path: Some(spec_json_path),\n                workspace_root: Some(workspace_root),\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::check_adr_user::run",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::check_adr_user::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "c2ab290877127f29dd372d3c3632f6ed20d4c7e2ad0395cd8a5bb3aaef456923",
+        "declaration_hash": "2e29e4f95a244f1c216b2378651723af0e83db506783464cd33129757d306c60",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "service.calls(), vec![ServiceSignalCommand::CheckAdrUser { project_root, strict_override: usecase::signal_service::SignalStrictOverride::UseGateMatrix, gate: Some(ServiceSignalGateName::Merge), workspace_root: Some(workspace_root), }]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::check_catalog_spec::run",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::check_catalog_spec::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "f999586cf3ccc1805da2998443a98c794299bc4c7ba030d03c3e859919e0411d",
+        "declaration_hash": "9680f2acc08db815d7f39972524d293fcdeb1defb51100ac0ce27904225ec393",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            service.calls(),\n            vec![ServiceSignalCommand::CheckCatalogSpec {\n                strict_override: usecase::signal_service::SignalStrictOverride::ForceStrict,\n                gate: None,\n                workspace_root: Some(workspace_root),\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::check_impl_catalog::run",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::check_impl_catalog::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "98887cf5f23b4513d6b3dc9b11f9e525a19036ff11ae56dd613a53d4b3aecead",
+        "declaration_hash": "f798cc44ffb36b734f78c71f63cdb5591bd507ccff018bbc6717717848b8fd58",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            service.calls(),\n            vec![ServiceSignalCommand::CheckImplCatalog {\n                strict_override: usecase::signal_service::SignalStrictOverride::UseGateMatrix,\n                gate: Some(ServiceSignalGateName::Commit),\n                workspace_root: Some(workspace_root),\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::check_spec_adr::run",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::check_spec_adr::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "ce8862c66956324852774aaf64d16660932a0cf187d66c6a7d33e9a10c2b3399",
+        "declaration_hash": "bdb30c2e0b9682e8115693591902d68561c037d423853f15bc9e42db2c65eb39",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "service.calls(),\n            vec![ServiceSignalCommand::CheckSpecAdr {\n                spec_json_path: Some(spec_json_path),\n                strict_override: usecase::signal_service::SignalStrictOverride::UseGateMatrix,\n                gate: Some(ServiceSignalGateName::Merge),\n                workspace_root: Some(workspace_root),\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::run_aggregate_check",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::run_aggregate_check",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "54a797a0138d7a1b8dfdb1338c36dc15f9465e6f7177bf1609f89d399f80997d",
+        "declaration_hash": "402f5b86d0fe9eeb5c4fc9d68ca0b29f799d8b6dbf2d6d9707dec23405352e69",
+        "anchor_text_hash": "a56d5cadabfe199f3ca673a7ba369aa2ad26f0fe6a8d06844185774381716c0e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(output.exit_code, 1); ... assert_eq!(output.stdout.as_deref(), Some(\"--- signal check --gate commit ---\\nchain report\\nchain report\\nchain report\\nchain report\\n--- signal check --gate commit FAILED ---\"))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandPortError",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandPortError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "ab9ebdc030edb37788b539ac85c27a75f8a76e35dbc9b1908ea9d36aeb8a763c",
+        "declaration_hash": "67eb24171bd44992cc087b0c93f22a5e74b38d7ecf68f7e98dad5bbdd53dfe0d",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(repository_failure.stderr.as_deref(), Some(\"[BLOCKED] cannot discover git repository: not a work tree; pass --workspace-root or --spec-json explicitly\")); ... assert_eq!(branch_failure.stderr.as_deref(), Some(\"[ERROR] signal calc-impl-catalog: cannot read current branch: detached HEAD\")); ... assert_eq!(missing_branch_failure.stderr.as_deref(), Some(\"[ERROR] signal calc-impl-catalog: cannot read current branch\")); ... assert_eq!(persistence_failure.stderr.as_deref(), Some(\"write denied\")); ... assert_eq!(execution_failure.stderr.as_deref(), Some(\"signal check-catalog-spec: cannot discover git repository: not a work tree\"))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalRootSelection",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalRootSelection",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "2507329a7b68955d8c13243153fa325d32bcbf504aaa46fc0ee854b44d629b73",
+        "declaration_hash": "b9149ada617ca5eaa556e13f3408a0167f5485d568f1cf2aa767970a01eff879",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "project_root: SignalRootSelection::Supplied(project_root),"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     }
   ]
 }

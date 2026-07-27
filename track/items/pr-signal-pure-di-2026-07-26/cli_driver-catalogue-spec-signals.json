@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c4bab5421bf7a95694c6d0d95eef4373f6198d919ef2c9e9df35e63db081f107",
+  "catalogue_declaration_hash": "8685302dfadb86e94642e7e79cad927c11c5ccd6e12cd576a487dc17469eb3bb",
   "signals": [
     {
       "type_name": "PrDriver",
@@ -10,7 +10,7 @@
     {
       "type_name": "SignalDriver",
       "signal": "blue",
-      "entry_hash": "8f09ee686696a9166705f9c8c0e2191b17e186923e11caa0c45b0f31eec4006b"
+      "entry_hash": "97728283dda1daa501e27b15cbeeab106c965d5aa1c04b291d50e6de24e29462"
     }
   ]
 }

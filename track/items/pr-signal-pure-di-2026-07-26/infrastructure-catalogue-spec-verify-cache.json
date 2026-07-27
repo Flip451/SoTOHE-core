@@ -99,7 +99,7 @@
       }
     },
     {
-      "claim_hash": "3290c22efa252e2560d284cb712f5fcf6070f127f6177d1820279820920cb8c5",
+      "claim_hash": "6d5417046260097359dc8c0b5102728f6b722eb8a19f1e880878a7689622dfd7",
       "evidence_hash": "c6182d533586523fcf6b085d30c9d82bd5b0f532c672c70cc58b179ad57cff6d",
       "verdict": {
         "kind": "pass",
@@ -123,7 +123,7 @@
       }
     },
     {
-      "claim_hash": "3290c22efa252e2560d284cb712f5fcf6070f127f6177d1820279820920cb8c5",
+      "claim_hash": "6d5417046260097359dc8c0b5102728f6b722eb8a19f1e880878a7689622dfd7",
       "evidence_hash": "a132c3d22933c83b48a2c185452c8931926cff21a5c4871f7e736e75fed6966b",
       "verdict": {
         "kind": "pass",
@@ -147,11 +147,11 @@
       }
     },
     {
-      "claim_hash": "3290c22efa252e2560d284cb712f5fcf6070f127f6177d1820279820920cb8c5",
+      "claim_hash": "6d5417046260097359dc8c0b5102728f6b722eb8a19f1e880878a7689622dfd7",
       "evidence_hash": "7fa566ecb219a7005318bbed63fd5ede0ec2a9006c5817290c880a538172161c",
       "verdict": {
         "kind": "pass",
-        "citation": "PR と Signal の担当 execution path は SignalServiceImpl および signal shim への runtime 参照・呼出し・逆委譲を残さない。物理削除は要求しない。"
+        "citation": "PR と Signal の担当 execution path は SignalServiceImpl および signal shim への runtime 参照・呼出し・逆委譲を残さない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -171,7 +171,31 @@
       }
     },
     {
-      "claim_hash": "3290c22efa252e2560d284cb712f5fcf6070f127f6177d1820279820920cb8c5",
+      "claim_hash": "6d5417046260097359dc8c0b5102728f6b722eb8a19f1e880878a7689622dfd7",
+      "evidence_hash": "7c50f17187e8abdc0a655a9da798cca9c54f7324ba18e003b98a482db2f5b984",
+      "verdict": {
+        "kind": "pass",
+        "citation": "純 DI 化の構造変更前後で、adr_user、spec_adr、catalog_spec、impl_catalog の各 chain における既存の calc / check の永続化結果と gate 判定を維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SystemSignalCommandAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "純 DI 化の構造変更前後で、adr_user、spec_adr、catalog_spec、impl_catalog の各 chain における既存の calc / check の永続化結果と gate 判定を維持する。adr_user は calc / check ともに ADR 文書を変更せず live に判定する。spec_adr、catalog_spec、impl_catalog は calc が対応する文書を生成・更新し、check はその永続化済み文書に基づいて gate 判定し、その文書を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6d5417046260097359dc8c0b5102728f6b722eb8a19f1e880878a7689622dfd7",
       "evidence_hash": "50742c8a86837f2c87ac7973e35ecaaf2e17d4d31b08bc449e936019d57e4850",
       "verdict": {
         "kind": "pass",
@@ -191,6 +215,30 @@
           "section": "constraint",
           "element_id": "CN-04",
           "text_label": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "92a465845fecc171061eb84d6b2be2ac8cb90facef2bdd22bb42fc411311c8dd",
+      "evidence_hash": "2ca6913e42e9657244ba900522d7bc2441a10c32a8fba46c642b8eaa274af5d5",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal gate の interim / strict mode 解決は gate 判定を所有する同一の usecase 境界が一度だけ行い"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SystemSignalGateConfigAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "Signal gate の interim / strict mode 解決は gate 判定を所有する同一の usecase 境界が一度だけ行い、その解決結果に従って対応 chain を判定する。driver と composition root は mode を決定しない。"
         }
       }
     }

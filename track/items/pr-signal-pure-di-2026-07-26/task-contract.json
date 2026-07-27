@@ -59,7 +59,43 @@
       },
       {
         "layer": "usecase",
+        "entry_key": "SignalCommandPortError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalFailureReason"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalGateConfigError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalGateConfigPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalRootSelection"
+      },
+      {
+        "layer": "usecase",
         "entry_key": "SignalCommandOutput"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalGateName"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalStrictOverride"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "ResolvedSignalChainCommand"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalChainExecutionReport"
       }
     ],
     "T003": [
@@ -72,6 +108,10 @@
       {
         "layer": "infrastructure",
         "entry_key": "SystemSignalCommandAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "SystemSignalGateConfigAdapter"
       }
     ],
     "T005": [
@@ -92,8 +132,94 @@
       {
         "layer": "cli_composition",
         "entry_key": "SignalCompositionRoot"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "SystemSignalCommandAdapter"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::signal::calc_adr_user::run"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::signal::calc_catalog_spec::run"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::signal::calc_impl_catalog::run"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::signal::calc_spec_adr::run"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::signal::check_adr_user::run"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::signal::check_catalog_spec::run"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::signal::check_impl_catalog::run"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::signal::check_spec_adr::run"
+      },
+      {
+        "layer": "cli",
+        "entry_key": "cli::commands::signal::run_aggregate_check"
       }
     ],
-    "T007": []
+    "T007": [],
+    "T008": [
+      {
+        "layer": "usecase",
+        "entry_key": "SignalCommandPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalActiveTrackResolverPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalSpecPathResolverPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalCommandInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalCommandPortError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalFailureReason"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalGateConfigError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalGateConfigPort"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "SignalRootSelection"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "SystemSignalCommandAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "SystemSignalGateConfigAdapter"
+      }
+    ]
   }
 }

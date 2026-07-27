@@ -65,7 +65,7 @@
     },
     "SignalDriver": {
       "action": "reference",
-      "docs": "Baseline-identical primary adapter retained as the sole Signal invocation and rendering surface; its injected SignalService contract remains unchanged.",
+      "docs": "Primary adapter for invoking SignalService and rendering its output.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -112,7 +112,11 @@
           "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
         },
         {
-          "anchor": "AC-02",
+          "anchor": "AC-07",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-10",
           "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
         },
         {

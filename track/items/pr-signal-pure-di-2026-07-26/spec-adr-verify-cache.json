@@ -575,6 +575,75 @@
           "decision_id": "D5"
         }
       }
+    },
+    {
+      "claim_hash": "fbf7a2dd2557d829077ce553c0fa6ef02688120acaf7a7fcadc7448cec5c1cef",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "担当文脈の実行経路は driver → usecase interactor → port の一方向かつ単一の経路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "Signal gate 判定は単一の usecase 境界が所有し、4 chain の判定をそこで集約する。判定に必要な入力が欠ける、または判定不能な場合、同じ境界が fail-closed を保証して通過を許可しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "7c50f17187e8abdc0a655a9da798cca9c54f7324ba18e003b98a482db2f5b984",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "純 DI 化の各 track は、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。構造変更の前後で、同じ入力に対して同じ外部観測可能な結果を返すことを統合テストで保証する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "純 DI 化の構造変更前後で、adr_user、spec_adr、catalog_spec、impl_catalog の各 chain における既存の calc / check の永続化結果と gate 判定を維持する。adr_user は calc / check ともに ADR 文書を変更せず live に判定する。spec_adr、catalog_spec、impl_catalog は calc が対応する文書を生成・更新し、check はその永続化済み文書に基づいて gate 判定し、その文書を変更しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "2ca6913e42e9657244ba900522d7bc2441a10c32a8fba46c642b8eaa274af5d5",
+      "evidence_hash": "c79323ebca63e63c2d86d388e2c0f6da1598f2f3c95eb2e7965df08b4eb3e2ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "担当文脈の実行経路は driver → usecase interactor → port の一方向かつ単一の経路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-10",
+          "text_label": "Signal gate の interim / strict mode 解決は gate 判定を所有する同一の usecase 境界が一度だけ行い、その解決結果に従って対応 chain を判定する。driver と composition root は mode を決定しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-1318-composition-root-pure-di-migration-initiative.md",
+          "decision_id": "D5"
+        }
+      }
     }
   ]
 }

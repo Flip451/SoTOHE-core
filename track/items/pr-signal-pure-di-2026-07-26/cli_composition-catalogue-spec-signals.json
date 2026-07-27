@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "324ce54c599b996a893475533f455e7730867b8969997e781d801112abacb885",
+  "catalogue_declaration_hash": "7c5430a8c5db6277ccc38bd4969d2e61c8f64e442bda68ce017e8b83510560ff",
   "signals": [
     {
       "type_name": "PrCompositionRoot",
@@ -10,7 +10,7 @@
     {
       "type_name": "SignalCompositionRoot",
       "signal": "blue",
-      "entry_hash": "a1355faa6a22e3cfbc5d9e5e0474e708402cdd3ffc0623dae90e170d0b07eb45"
+      "entry_hash": "b03fbde3c29af5be47966df53ad88f85464441be7dfefb371f47a6b745883554"
     }
   ]
 }

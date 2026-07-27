@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "525dd9e36ada3f06f7fea62fcabc8acdfe13f4c1898f8d4ee75ca3d176eeefd5",
+  "catalogue_declaration_hash": "f625542b040a5145ffebf1cafa5f360003d80043232bb98f42b46097deea40f4",
   "signals": [
     {
       "type_name": "PrBaseOverride",
@@ -48,14 +48,24 @@
       "entry_hash": "6e4db19e7e297ef42991b2d586b7f12e76760bba57b1682757ed906cf9f886e1"
     },
     {
+      "type_name": "ResolvedSignalChainCommand",
+      "signal": "blue",
+      "entry_hash": "13769a8ea70751a3cdbb3f60d4561ac9035b144c20ca519234558b25b0d5a4c6"
+    },
+    {
+      "type_name": "SignalChainExecutionReport",
+      "signal": "blue",
+      "entry_hash": "fa9ed1bc3455d8194b7063e4f8c17b83c2550191e743f3f6789a868283c8799d"
+    },
+    {
       "type_name": "SignalCommand",
       "signal": "blue",
-      "entry_hash": "966a60fea232c114df2bee2ae17ce232d5f0ef5b16c025f3038cd86fb874c25f"
+      "entry_hash": "ae213a89ee99edad44d78fa8f19763701ca5675438cc8045d34ec45c7261a01d"
     },
     {
       "type_name": "SignalCommandInteractor",
       "signal": "blue",
-      "entry_hash": "b4dadc23b891729081d388f80c213a87c22756ea614a3e9e740aa4d8ed7291a9"
+      "entry_hash": "692a94bd99110e55e3b38475e1aa8c5d87d1cf1824843eb8a6dd3f641cbeb7ce"
     },
     {
       "type_name": "SignalCommandOutput",
@@ -63,14 +73,59 @@
       "entry_hash": "868ddb5cf804c82c6a6ab03cd47317f6ccf57a93b133af4755983cca0a6c3af8"
     },
     {
+      "type_name": "SignalCommandPortError",
+      "signal": "blue",
+      "entry_hash": "c5e9a7e12707d6ade02086a134f1e4c3cf2801f54bd8547c6459f857063798f0"
+    },
+    {
+      "type_name": "SignalFailureReason",
+      "signal": "blue",
+      "entry_hash": "09df28ae535142c77933cb6c74a228f298134da59e3f4caefbb458b48144d554"
+    },
+    {
+      "type_name": "SignalGateConfigError",
+      "signal": "blue",
+      "entry_hash": "a63828378cd45d73cd48812670735f29a42799375a18ffb4f64362248dfaa7fb"
+    },
+    {
+      "type_name": "SignalGateName",
+      "signal": "blue",
+      "entry_hash": "085122814dc6d3389f311135d2821cecaa0e97c169502693d1113eb25d4078c0"
+    },
+    {
+      "type_name": "SignalRootSelection",
+      "signal": "blue",
+      "entry_hash": "9b46000f067d665daf0293c6fb808b96aff318ca565167a9a10dd48b6af4e78a"
+    },
+    {
+      "type_name": "SignalStrictOverride",
+      "signal": "blue",
+      "entry_hash": "d50c202dfb6c2b35c90af09bdf1ea88928e4d207fc139d60d00012ad2932c681"
+    },
+    {
       "type_name": "PrCommandPort",
       "signal": "blue",
       "entry_hash": "1dc685f21a3cc639fbe6d033c5a339acde9c8a976013f58d3e512488873d1673"
     },
     {
+      "type_name": "SignalActiveTrackResolverPort",
+      "signal": "blue",
+      "entry_hash": "6cb1118c2310d0ccfc77e11bf2d4315926a8acedfb222b004518887dfca37b0e"
+    },
+    {
       "type_name": "SignalCommandPort",
       "signal": "blue",
-      "entry_hash": "16532684037c9c800ba948828570705b5bed61662317661796a1d42922f784dc"
+      "entry_hash": "4833c9429936582b4c77645da916d5ee1b74c68fa75a5b5a457a39f44079f7c6"
+    },
+    {
+      "type_name": "SignalGateConfigPort",
+      "signal": "blue",
+      "entry_hash": "75ac7b57a4991c69f38e2b05a7ba94efb853507ccfd045fca3941e1d14f20753"
+    },
+    {
+      "type_name": "SignalSpecPathResolverPort",
+      "signal": "blue",
+      "entry_hash": "67643a845f4964b8beab0414f77e9dd746ed15b95e983e762e9e0fdd16d0ce65"
     }
   ]
 }

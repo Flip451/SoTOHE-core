@@ -72,6 +72,174 @@
         "citation": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "waived_reason_hash": "6fb2d52c7d4b1e0026b5ce869df449a2443df7e23b4857fc627216b37f7878ff",
+        "declaration_hash": "3ab37c23a729ab2cce1d84be98c3c261c27238360c787bfe669d94b1a05133dd",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "waived_reason_hash": "c4de6a2204db5d400e784456fb5ebaa5ff4f5b0436c178c76ba881d678a78654",
+        "declaration_hash": "3ab37c23a729ab2cce1d84be98c3c261c27238360c787bfe669d94b1a05133dd",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "PR と Signal の担当 execution path は driver から usecase interactor、port へ向かう一方向・単一路とし、新しい compatibility facade を完了状態として残さない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "98de1f32297f5f006eb71722938d0039e8f09fae339b17612530eb4d0c44a7dd",
+        "declaration_hash": "1a3a5b08d5831f5479b67ec596ee2165bd80b36a8d5932dab45b29af7eb4a0a8",
+        "anchor_text_hash": "772f978d32830f93890e2ae495e46168ba4b2a0fc2d05a5b69901573b4e507e6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Signal の composition root は command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、または usecase から composition への逆委譲を残さない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "waived_reason_hash": "73ecd4db93d49a0d9325c4434238a8022b0bdcd649f9dd5356f1671ef5e6a7ae",
+        "declaration_hash": "eb3c10ed7eca039c2f45bbf4980c9ff1bb264e81fd4df7b324d4122ae866300d",
+        "anchor_text_hash": "772f978d32830f93890e2ae495e46168ba4b2a0fc2d05a5b69901573b4e507e6"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Signal の composition root は command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、または usecase から composition への逆委譲を残さない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalCommandPort"
+      },
+      "key": {
+        "waived_reason_hash": "e2b217e097095d276e1e45e9902e31eb3d98ca967b2cc45f6fdfedcfd32206ac",
+        "declaration_hash": "ae4369c153ce02cfc3762d2eac1738827189818544720e968649dd8440c60eee",
+        "anchor_text_hash": "4888534bd2ae87f1a0401ba6f2dea9a33f16352c330db35724f4a9819ac36de8"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "PR と Signal の担当 execution path は SignalServiceImpl および signal shim への runtime 参照・呼出し・逆委譲を残さない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalActiveTrackResolverPort"
+      },
+      "key": {
+        "waived_reason_hash": "e2b217e097095d276e1e45e9902e31eb3d98ca967b2cc45f6fdfedcfd32206ac",
+        "declaration_hash": "8817421b3f95fa3645838190acab19ad74b5a97fd6415ef1e1a81a03c4e9b4a8",
+        "anchor_text_hash": "4888534bd2ae87f1a0401ba6f2dea9a33f16352c330db35724f4a9819ac36de8"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "PR と Signal の担当 execution path は SignalServiceImpl および signal shim への runtime 参照・呼出し・逆委譲を残さない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalSpecPathResolverPort"
+      },
+      "key": {
+        "waived_reason_hash": "e2b217e097095d276e1e45e9902e31eb3d98ca967b2cc45f6fdfedcfd32206ac",
+        "declaration_hash": "e41a7759357eb9222598db5afa1e03853df81718077484fb2a97e6e979db15a3",
+        "anchor_text_hash": "4888534bd2ae87f1a0401ba6f2dea9a33f16352c330db35724f4a9819ac36de8"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitImplDeclV2 { action: Add, trait_ref: TypeRef(\"usecase::signal_service::SignalSpecPathResolverPort\"), for_type: TypeRef(\"SystemSignalCommandAdapter\"), impl_generics: [], impl_where_predicates: [] }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ]
 }
