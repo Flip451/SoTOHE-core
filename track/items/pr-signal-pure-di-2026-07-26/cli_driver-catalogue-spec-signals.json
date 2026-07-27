@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "8685302dfadb86e94642e7e79cad927c11c5ccd6e12cd576a487dc17469eb3bb",
+  "signals": [
+    {
+      "type_name": "PrDriver",
+      "signal": "blue",
+      "entry_hash": "be91ce31ba41ef931d6734d11644be9b167a4da2add36a1aefcb120a78548007"
+    },
+    {
+      "type_name": "SignalDriver",
+      "signal": "blue",
+      "entry_hash": "97728283dda1daa501e27b15cbeeab106c965d5aa1c04b291d50e6de24e29462"
+    }
+  ]
+}

@@ -13,7 +13,6 @@ mod adr_baseline;
 mod arch;
 mod capability;
 mod catalog;
-mod cmd_outcome;
 mod codex_runtime;
 mod conventions;
 mod demo;
@@ -33,7 +32,6 @@ pub mod review_v2;
 #[cfg(feature = "semantic-dup")]
 mod semantic_dup;
 pub mod signal;
-mod signal_layer_chain;
 pub mod task_contract;
 mod telemetry;
 mod template_export;

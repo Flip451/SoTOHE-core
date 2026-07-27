@@ -1,7 +1,8 @@
 //! `signal check-impl-catalog` — evaluate impl↔catalog gate (chain ③).
 
 use clap::Args;
-use cli_composition::{CommandOutcome, CompositionError, SignalCompositionRoot};
+use cli_composition::{CommandOutcome, CompositionError};
+use cli_driver::signal::{SignalDriver, SignalInput};
 
 use super::CheckFlags;
 
@@ -18,13 +19,13 @@ pub struct CheckImplCatalogArgs {
 
 /// Execute `signal check-impl-catalog`.
 pub fn run(
-    app: &SignalCompositionRoot,
+    driver: &SignalDriver,
     args: CheckImplCatalogArgs,
 ) -> Result<CommandOutcome, CompositionError> {
     let gate = args.flags.gate_name();
-    app.signal_check_impl_catalog(
-        args.flags.strict.then_some(cli_composition::signal::Strictness::Strict),
+    Ok(driver.handle(SignalInput::CheckImplCatalog {
+        strict_override: args.flags.strict,
         gate,
-        args.flags.workspace_root,
-    )
+        workspace_root: args.flags.workspace_root,
+    }))
 }

@@ -3,7 +3,8 @@
 use std::path::PathBuf;
 
 use clap::Args;
-use cli_composition::{CommandOutcome, CompositionError, SignalCompositionRoot};
+use cli_composition::{CommandOutcome, CompositionError};
+use cli_driver::signal::{SignalDriver, SignalInput};
 
 use super::CheckFlags;
 
@@ -20,14 +21,14 @@ pub struct CheckAdrUserArgs {
 
 /// Execute `signal check-adr-user`.
 pub fn run(
-    app: &SignalCompositionRoot,
+    driver: &SignalDriver,
     args: CheckAdrUserArgs,
 ) -> Result<CommandOutcome, CompositionError> {
     let gate = args.flags.gate_name();
-    app.signal_check_adr_user(
-        args.project_root,
-        args.flags.strict.then_some(cli_composition::signal::Strictness::Strict),
+    Ok(driver.handle(SignalInput::CheckAdrUser {
+        project_root: args.project_root,
+        strict_override: args.flags.strict,
         gate,
-        args.flags.workspace_root,
-    )
+        workspace_root: args.flags.workspace_root,
+    }))
 }

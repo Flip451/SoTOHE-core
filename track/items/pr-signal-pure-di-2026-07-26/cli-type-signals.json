@@ -1,0 +1,62 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-27T10:27:02Z",
+  "declaration_hash": "c7950fe4bce18908c1bdebd354c797f94bbefdcc206c655ef62f6a79a6652589",
+  "implementation_input_hash": "590e8bfabdaf76e32948c4b3b7cff728a098cba6ce5b1e48d7230c7e900e0f14",
+  "signals": [
+    {
+      "type_name": "cli::commands::signal::calc_adr_user::run",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::signal::calc_catalog_spec::run",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::signal::calc_impl_catalog::run",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::signal::calc_spec_adr::run",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::signal::check_adr_user::run",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::signal::check_catalog_spec::run",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::signal::check_impl_catalog::run",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::signal::check_spec_adr::run",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "cli::commands::signal::run_aggregate_check",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}
