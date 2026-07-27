@@ -1,0 +1,557 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "38ef5750bbf3fde9650179949132c6e38695b658ac29472ab8e5ab845e5b34fa",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 layer に対して、その layer の crate を TDDD 抽出時にどの cargo feature 付きでビルドすべきかを対応づける。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "各 track が、各 layer crate を TDDD 抽出時にどの Cargo feature でビルドするかへ対応づける、commit 対象の専用宣言を持つ"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "17cba5d7ca9f13880b60039c2c508b921a204941baae0d9b1867bba05ea7563a",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "baseline 取得と実測取得は、同一の宣言内容を観測しなければならない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、feature-gated public item を TDDD の抽出面と signal 評価の対象にできる"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "704485e32c631b64ab7aa700ff42e73710aaf2694f11a3afb62fc314f62a5d08",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`track/items/<id>/` 配下に専用の宣言成果物を置き、各 layer に対して、その layer の crate を TDDD 抽出時にどの cargo feature 付きでビルドすべきかを対応づける。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track 配下の commit 対象の専用成果物に、各 layer とその crate をビルド時に有効化する Cargo feature のリストとの対応を宣言する。feature を必要としない layer も空リストで明示する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "f15711c2a4a08a5521bbff1231ad7935764451d13ecabe453cb7282991d3919e",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言成果物は type-designer capability が author する。Phase 2 パイプラインの先頭に置き、baseline 取得の直前に完了させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "baseline 取得と実測取得は、同一の宣言内容を観測しなければならない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "b84a61b2c9a38f9a9149ccfef9c3730db9913f9f559d1f8aa5350686a0143c18",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "したがって feature 宣言も全 track で必須であり、型に触れない track を免除しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "型を変更しない track を含むすべての track で feature 宣言を必須にし、型を変更しない track も空の catalogue と feature 宣言を持つ"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D4"
+        }
+      }
+    },
+    {
+      "claim_hash": "ada8178a1254919b400f3a0222437c4eaf373e3050d1bcce8022bc945c2e77ae",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対応する crate の `Cargo.toml` に存在しない feature を宣言した場合\n- track が宣言していない feature 配下の型を catalogue に記載した場合"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "宣言した feature が対象 crate の Cargo.toml に存在すること、および catalogue の feature-gated type が宣言済み feature の下にあることを gate で検証する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "5d678322f77aa283fb9158a5f02582e4070ce43be38cad08fa4ad460636cd828",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "具体的なファイル名と JSON schema は本 ADR では固定せず、実装 track の型設計に委ねる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "feature 宣言成果物の具体的なファイル名および JSON schema の決定。これらは Phase 2 の型設計で決定する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "e703e042f49994ac2c9f114e62685a964231e5f2caa212cd3d4d41bd1a66b75e",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "両取得を同一の宣言内容を観測しなければならない。同じパスを読むことだけではこの要件を満たさない。両取得を同一内容へ拘束する具体的な方法は本 ADR では固定せず、下流の型設計に委ねる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "baseline 取得と実測取得を同一の宣言内容へ拘束する具体的な mechanism の決定。これは下流の型設計に委ねる"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "976a911a4d1a544f657c9c78b77e9bfdfb0ce4fdd16ad2d276c935ff8b2b8e4c",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR の導入に伴い、新しいサブコマンド、引数、フラグを追加しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "feature 宣言を渡すための新規 CLI subcommand、argument、flag、または command-line 経路の追加"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "93d3f5a47f6c131e1c9b9ceb85f5b4f25d67038e603ffc48becdd589b18b8950",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "grandfathering リストを設けると、抽出が一度も観測できていなかった集合、すなわち最も乖離している可能性が高い集合を恒久的に検証対象外にすることになる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "新たに可視化される既存 public item を catalogue 化せずに除外する grandfathering list または互換経過措置"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "1a47ffbd85e3395733a74240f580498f5fd9b77e568bfef9702964fd21c5e359",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言が存在しない場合は fail-closed で停止する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "8df906b819588f97bf7c34df1009d88d92f407bd7642c9fed18d4dd9fdaaf4be",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既に永続化された JSON を読むだけのコマンドは、この宣言を要求しない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "既に永続化された JSON を読むだけの command は feature 宣言を要求しない"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "f7fb484c86c0b0bb918860861641a35f8acab86a69976fa41ef37bd150073bef",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "次の 2 つをいずれも gate で fail-closed とする。\n\n- 対応する crate の `Cargo.toml` に存在しない feature を宣言した場合\n- track が宣言していない feature 配下の型を catalogue に記載した場合"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ある feature を最初に宣言する track が、可視化されたそれらの要素を catalogue に整備する責任を負う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "93faa6cab25ed52fa6f804b10c4ba201d55cd3b1a9447eb052489650b407c9bb",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR の導入に伴い、新しいサブコマンド、引数、フラグを追加しない。既存コマンドの引数構文、stdout / stderr の出力形式、および exit code の意味も変更しない。宣言は成果物として読まれるものであり、コマンドラインから feature を渡す経路は設けない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "既存 command の argument syntax、stdout/stderr output format、exit-code meaning を変更せず、feature を command line から入力する経路を設けない"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D7"
+        }
+      }
+    },
+    {
+      "claim_hash": "82ce4a707f2f9180893206b1ecdb3ae4ffd3575446750be7491705ed48aba319",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "この成果物は commit 対象とする。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "track には commit 対象の feature 宣言成果物があり、全 layer の feature リストを含み、feature を持たない layer は空リストとして宣言されている"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "73ea253ecf9f63b7158388b1b6e02fa7b5941c115b57518c35af469639048a7e",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言成果物は type-designer capability が author する。Phase 2 パイプラインの先頭に置き、baseline 取得の直前に完了させる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "Phase 2 では type-designer が feature 宣言を baseline 取得前に author する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "a6481a45e2bb141d792a1a8d08880fe0b6f5ad4f40a9df6524e4cdf9cc45315a",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言が存在しない場合は fail-closed で停止する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "feature 宣言を欠く track で baseline 取得または実測取得を実行すると、rustdoc を呼び出さず fail-closed の失敗として終了する"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "9007017fe02704e8b2624c8e40e8a8158de0c60dbf168ca39d3647b2a256673d",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "baseline 取得と実測取得は、同一の宣言内容を観測しなければならない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "b498dced34061fafd4265a95df413cb15bc2cc8262545e6d2290345cb0a13d50",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対応する crate の `Cargo.toml` に存在しない feature を宣言した場合"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "対象 crate の Cargo.toml に存在しない feature を宣言した track は gate で fail-closed に拒否される"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "66e1ba23c84f8c4f9e3ae1f57d574d27b9ac13c8ab68b51f9ba7bac60cb47c54",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track が宣言していない feature 配下の型を catalogue に記載した場合"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue に記載した feature-gated type の feature を track が宣言していない場合、track は gate で fail-closed に拒否される"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D5"
+        }
+      }
+    },
+    {
+      "claim_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を有効化すると、その feature 配下の module が持つ既存 public 要素が新たに TDDD の射程に入る。ある feature を最初に宣言する track が、可視化されたそれらの要素を catalogue に整備する責任を負う。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D6"
+        }
+      }
+    },
+    {
+      "claim_hash": "7fee4ff6647b2b7e2536260ba8f90edda07cffbe37cd26bcfdd60340618596df",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本 ADR の導入に伴い、新しいサブコマンド、引数、フラグを追加しない。既存コマンドの引数構文、stdout / stderr の出力形式、および exit code の意味も変更しない。宣言は成果物として読まれるものであり、コマンドラインから feature を渡す経路は設けない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "導入後も既存 command の subcommand、argument syntax、stdout/stderr output format、exit-code meaning は変わらず、feature を command line から渡す route は存在しない"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "decision_id": "D7"
+        }
+      }
+    }
+  ]
+}

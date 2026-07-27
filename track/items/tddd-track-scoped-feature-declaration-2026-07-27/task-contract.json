@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "track_id": "tddd-track-scoped-feature-declaration-2026-07-27",
+  "entries": {
+    "T001": [
+      {"layer": "domain", "entry_key": "CargoFeatureName"},
+      {"layer": "domain", "entry_key": "CargoFeatureNameError"},
+      {"layer": "domain", "entry_key": "TdddFeatureDeclaration"},
+      {"layer": "domain", "entry_key": "TdddFeatureDeclarationError"},
+      {"layer": "domain", "entry_key": "TdddFeatureLookupError"}
+    ],
+    "T002": [
+      {"layer": "usecase", "entry_key": "TdddFeatureDeclarationReadError"},
+      {"layer": "usecase", "entry_key": "TdddBaselineFeatureDeclarationPort"},
+      {"layer": "usecase", "entry_key": "TdddBaselineFeatureDeclarationPortError"},
+      {"layer": "usecase", "entry_key": "TdddActualFeatureDeclarationPort"},
+      {"layer": "usecase", "entry_key": "TdddActualFeatureDeclarationPortError"},
+      {"layer": "infrastructure", "entry_key": "FsTdddFeatureDeclarationAdapter"}
+    ],
+    "T003": [
+      {"layer": "domain", "entry_key": "RustdocBaselineCapturePort"},
+      {"layer": "usecase", "entry_key": "BaselineCaptureError"},
+      {"layer": "usecase", "entry_key": "BaselineCaptureInteractor"},
+      {"layer": "infrastructure", "entry_key": "RustdocBaselineCaptureAdapter"},
+      {"layer": "infrastructure", "entry_key": "RustdocSchemaExporter"}
+    ],
+    "T004": [
+      {"layer": "domain", "entry_key": "RustdocCratePort"},
+      {"layer": "domain", "entry_key": "SchemaExporter"},
+      {"layer": "usecase", "entry_key": "CatalogueImplSignalsError"},
+      {"layer": "usecase", "entry_key": "CatalogueImplSignalsInteractor"},
+      {"layer": "usecase", "entry_key": "SchemaExporterPort"},
+      {"layer": "infrastructure", "entry_key": "RustdocCrateAdapter"},
+      {"layer": "infrastructure", "entry_key": "RustdocSchemaExporter"}
+    ],
+    "T005": [
+      {"layer": "usecase", "entry_key": "CodeFragmentExtractorError"},
+      {"layer": "usecase", "entry_key": "EmbeddingError"},
+      {"layer": "usecase", "entry_key": "SemanticIndexError"},
+      {"layer": "usecase", "entry_key": "CodeFragmentExtractorPort"},
+      {"layer": "usecase", "entry_key": "EmbeddingPort"},
+      {"layer": "usecase", "entry_key": "SemanticIndexPort"},
+      {"layer": "infrastructure", "entry_key": "CodeFragmentExtractorAdapter"},
+      {"layer": "infrastructure", "entry_key": "ExtractError"},
+      {"layer": "infrastructure", "entry_key": "FastEmbedAdapter"},
+      {"layer": "infrastructure", "entry_key": "LanceDbSemanticIndexAdapter"},
+      {"layer": "infrastructure", "entry_key": "NoopSemanticIndexPort"},
+      {"layer": "infrastructure", "entry_key": "NullInsertIndexProxy"},
+      {"layer": "infrastructure", "entry_key": "PersistentIndexLock"},
+      {"layer": "infrastructure", "entry_key": "PersistentIndexLockError"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::semantic_dup::extractor::extract_code_fragments"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock"},
+      {"layer": "infrastructure", "entry_key": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path"}
+    ]
+  }
+}

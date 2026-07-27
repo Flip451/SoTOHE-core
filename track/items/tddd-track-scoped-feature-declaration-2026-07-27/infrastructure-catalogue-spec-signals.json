@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "3837145e12f6bcd3f4edef1b1b039c67c2a96018724d2095e7bd2b6d99dda588",
+  "signals": [
+    {
+      "type_name": "CodeFragmentExtractorAdapter",
+      "signal": "blue",
+      "entry_hash": "238598f309dd49514eb9a3700114ced40d86808045110fe1017b54f090e9cd4f"
+    },
+    {
+      "type_name": "ExtractError",
+      "signal": "blue",
+      "entry_hash": "000d1a62646140f16a974534abfd894440a1e2dd0c0b30789c39ab6d4701e027"
+    },
+    {
+      "type_name": "FastEmbedAdapter",
+      "signal": "blue",
+      "entry_hash": "d4e7ca2c04aed40d83f14789464b60095bf1ad37eda001b88f493739475e2ced"
+    },
+    {
+      "type_name": "FsTdddFeatureDeclarationAdapter",
+      "signal": "blue",
+      "entry_hash": "d1a73dd5cd7b21359ff603e0bb7d12f3f335a2d9f972199c3fcef1a2b09ebd3b"
+    },
+    {
+      "type_name": "LanceDbSemanticIndexAdapter",
+      "signal": "blue",
+      "entry_hash": "90ecae55c1b57cb53acbc138aa571d84d4a4041521fb5fee2cffa2e2d8b799c1"
+    },
+    {
+      "type_name": "NoopSemanticIndexPort",
+      "signal": "blue",
+      "entry_hash": "8dac88e1090e78cb2a1d3e32aee949d514f09038dfffdb871a1b8b788616d447"
+    },
+    {
+      "type_name": "NullInsertIndexProxy",
+      "signal": "blue",
+      "entry_hash": "ed64bedc2ee3fb29c0059ba24019bb94690f11ffe57d76f58fe3708b476553ba"
+    },
+    {
+      "type_name": "PersistentIndexLock",
+      "signal": "blue",
+      "entry_hash": "1c9a5027b862a6448d6d660965bf381b6c1aabe244f58fdb6926b5e70a14ad0f"
+    },
+    {
+      "type_name": "PersistentIndexLockError",
+      "signal": "blue",
+      "entry_hash": "b28e76725a5589076c4acc61f9c3bcc001bc6ff2747a4cc91d5003361ff95b08"
+    },
+    {
+      "type_name": "RustdocBaselineCaptureAdapter",
+      "signal": "blue",
+      "entry_hash": "48a905ddda30c073c175bdb12140572d6d6094a6c2ec9e5fcc3cbc32ec32503a"
+    },
+    {
+      "type_name": "RustdocCrateAdapter",
+      "signal": "blue",
+      "entry_hash": "3d6432a12929c79132a040ff95c1a752b34d880c2d91e6efcc108b63560c37c2"
+    },
+    {
+      "type_name": "RustdocSchemaExporter",
+      "signal": "blue",
+      "entry_hash": "947d43bf917c29d71ef52dd919aa69ce87e8abde205e9d5969e990ebd500419d"
+    },
+    {
+      "type_name": "infrastructure::semantic_dup::extractor::extract_code_fragments",
+      "signal": "blue",
+      "entry_hash": "a0b469f36a09c996e741ae40b4645317fac43e86e25d300edeb2f4136135c4c1"
+    },
+    {
+      "type_name": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock",
+      "signal": "blue",
+      "entry_hash": "a91af6cf3744a9b0207bf561427e5b474cf64973890f38e041ea4f959a5d5ef5"
+    },
+    {
+      "type_name": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path",
+      "signal": "blue",
+      "entry_hash": "c634c752e84f7062ee3bde2e30cd53ab394ec387715de9199952e71631966f85"
+    }
+  ]
+}

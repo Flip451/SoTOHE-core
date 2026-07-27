@@ -1,0 +1,870 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "238598f309dd49514eb9a3700114ced40d86808045110fe1017b54f090e9cd4f",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CodeFragmentExtractorAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "238598f309dd49514eb9a3700114ced40d86808045110fe1017b54f090e9cd4f",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "CodeFragmentExtractorAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "000d1a62646140f16a974534abfd894440a1e2dd0c0b30789c39ab6d4701e027",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ExtractError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "000d1a62646140f16a974534abfd894440a1e2dd0c0b30789c39ab6d4701e027",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ExtractError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "d4e7ca2c04aed40d83f14789464b60095bf1ad37eda001b88f493739475e2ced",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FastEmbedAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "d4e7ca2c04aed40d83f14789464b60095bf1ad37eda001b88f493739475e2ced",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FastEmbedAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "d1a73dd5cd7b21359ff603e0bb7d12f3f335a2d9f972199c3fcef1a2b09ebd3b",
+      "evidence_hash": "704485e32c631b64ab7aa700ff42e73710aaf2694f11a3afb62fc314f62a5d08",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track 配下の commit 対象の専用成果物に、各 layer とその crate をビルド時に有効化する Cargo feature のリストとの対応を宣言する。feature を必要としない layer も空リストで明示する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTdddFeatureDeclarationAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track 配下の commit 対象の専用成果物に、各 layer とその crate をビルド時に有効化する Cargo feature のリストとの対応を宣言する。feature を必要としない layer も空リストで明示する"
+        }
+      }
+    },
+    {
+      "claim_hash": "d1a73dd5cd7b21359ff603e0bb7d12f3f335a2d9f972199c3fcef1a2b09ebd3b",
+      "evidence_hash": "f15711c2a4a08a5521bbff1231ad7935764451d13ecabe453cb7282991d3919e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTdddFeatureDeclarationAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
+        }
+      }
+    },
+    {
+      "claim_hash": "d1a73dd5cd7b21359ff603e0bb7d12f3f335a2d9f972199c3fcef1a2b09ebd3b",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTdddFeatureDeclarationAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "d1a73dd5cd7b21359ff603e0bb7d12f3f335a2d9f972199c3fcef1a2b09ebd3b",
+      "evidence_hash": "ada8178a1254919b400f3a0222437c4eaf373e3050d1bcce8022bc945c2e77ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言した feature が対象 crate の Cargo.toml に存在すること、および catalogue の feature-gated type が宣言済み feature の下にあることを gate で検証する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTdddFeatureDeclarationAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "宣言した feature が対象 crate の Cargo.toml に存在すること、および catalogue の feature-gated type が宣言済み feature の下にあることを gate で検証する"
+        }
+      }
+    },
+    {
+      "claim_hash": "d1a73dd5cd7b21359ff603e0bb7d12f3f335a2d9f972199c3fcef1a2b09ebd3b",
+      "evidence_hash": "1a47ffbd85e3395733a74240f580498f5fd9b77e568bfef9702964fd21c5e359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTdddFeatureDeclarationAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+        }
+      }
+    },
+    {
+      "claim_hash": "d1a73dd5cd7b21359ff603e0bb7d12f3f335a2d9f972199c3fcef1a2b09ebd3b",
+      "evidence_hash": "f7fb484c86c0b0bb918860861641a35f8acab86a69976fa41ef37bd150073bef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTdddFeatureDeclarationAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
+        }
+      }
+    },
+    {
+      "claim_hash": "90ecae55c1b57cb53acbc138aa571d84d4a4041521fb5fee2cffa2e2d8b799c1",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "LanceDbSemanticIndexAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "90ecae55c1b57cb53acbc138aa571d84d4a4041521fb5fee2cffa2e2d8b799c1",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "LanceDbSemanticIndexAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "8dac88e1090e78cb2a1d3e32aee949d514f09038dfffdb871a1b8b788616d447",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "NoopSemanticIndexPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "8dac88e1090e78cb2a1d3e32aee949d514f09038dfffdb871a1b8b788616d447",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "NoopSemanticIndexPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "ed64bedc2ee3fb29c0059ba24019bb94690f11ffe57d76f58fe3708b476553ba",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "NullInsertIndexProxy"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "ed64bedc2ee3fb29c0059ba24019bb94690f11ffe57d76f58fe3708b476553ba",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "NullInsertIndexProxy"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "1c9a5027b862a6448d6d660965bf381b6c1aabe244f58fdb6926b5e70a14ad0f",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "PersistentIndexLock"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "1c9a5027b862a6448d6d660965bf381b6c1aabe244f58fdb6926b5e70a14ad0f",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "PersistentIndexLock"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "b28e76725a5589076c4acc61f9c3bcc001bc6ff2747a4cc91d5003361ff95b08",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "PersistentIndexLockError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "b28e76725a5589076c4acc61f9c3bcc001bc6ff2747a4cc91d5003361ff95b08",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "PersistentIndexLockError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "48a905ddda30c073c175bdb12140572d6d6094a6c2ec9e5fcc3cbc32ec32503a",
+      "evidence_hash": "f15711c2a4a08a5521bbff1231ad7935764451d13ecabe453cb7282991d3919e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocBaselineCaptureAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
+        }
+      }
+    },
+    {
+      "claim_hash": "48a905ddda30c073c175bdb12140572d6d6094a6c2ec9e5fcc3cbc32ec32503a",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocBaselineCaptureAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "48a905ddda30c073c175bdb12140572d6d6094a6c2ec9e5fcc3cbc32ec32503a",
+      "evidence_hash": "73ea253ecf9f63b7158388b1b6e02fa7b5941c115b57518c35af469639048a7e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 2 では type-designer が feature 宣言を baseline 取得前に author する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocBaselineCaptureAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "Phase 2 では type-designer が feature 宣言を baseline 取得前に author する"
+        }
+      }
+    },
+    {
+      "claim_hash": "48a905ddda30c073c175bdb12140572d6d6094a6c2ec9e5fcc3cbc32ec32503a",
+      "evidence_hash": "9007017fe02704e8b2624c8e40e8a8158de0c60dbf168ca39d3647b2a256673d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocBaselineCaptureAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+        }
+      }
+    },
+    {
+      "claim_hash": "3d6432a12929c79132a040ff95c1a752b34d880c2d91e6efcc108b63560c37c2",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocCrateAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "3d6432a12929c79132a040ff95c1a752b34d880c2d91e6efcc108b63560c37c2",
+      "evidence_hash": "9007017fe02704e8b2624c8e40e8a8158de0c60dbf168ca39d3647b2a256673d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocCrateAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+        }
+      }
+    },
+    {
+      "claim_hash": "947d43bf917c29d71ef52dd919aa69ce87e8abde205e9d5969e990ebd500419d",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocSchemaExporter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "947d43bf917c29d71ef52dd919aa69ce87e8abde205e9d5969e990ebd500419d",
+      "evidence_hash": "9007017fe02704e8b2624c8e40e8a8158de0c60dbf168ca39d3647b2a256673d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocSchemaExporter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+        }
+      }
+    },
+    {
+      "claim_hash": "a0b469f36a09c996e741ae40b4645317fac43e86e25d300edeb2f4136135c4c1",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::semantic_dup::extractor::extract_code_fragments"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "a0b469f36a09c996e741ae40b4645317fac43e86e25d300edeb2f4136135c4c1",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::semantic_dup::extractor::extract_code_fragments"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "a91af6cf3744a9b0207bf561427e5b474cf64973890f38e041ea4f959a5d5ef5",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "a91af6cf3744a9b0207bf561427e5b474cf64973890f38e041ea4f959a5d5ef5",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "その feature により可視化された既存 public item が catalogue に整備され"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "c634c752e84f7062ee3bde2e30cd53ab394ec387715de9199952e71631966f85",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "c634c752e84f7062ee3bde2e30cd53ab394ec387715de9199952e71631966f85",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,1326 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "6609ef2db6fa8431ace4bd031f45e0055440496393cf13167594c0e89e45e793",
+      "evidence_hash": "f15711c2a4a08a5521bbff1231ad7935764451d13ecabe453cb7282991d3919e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BaselineCaptureError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
+        }
+      }
+    },
+    {
+      "claim_hash": "6609ef2db6fa8431ace4bd031f45e0055440496393cf13167594c0e89e45e793",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BaselineCaptureError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "6609ef2db6fa8431ace4bd031f45e0055440496393cf13167594c0e89e45e793",
+      "evidence_hash": "1a47ffbd85e3395733a74240f580498f5fd9b77e568bfef9702964fd21c5e359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BaselineCaptureError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+        }
+      }
+    },
+    {
+      "claim_hash": "6609ef2db6fa8431ace4bd031f45e0055440496393cf13167594c0e89e45e793",
+      "evidence_hash": "a6481a45e2bb141d792a1a8d08880fe0b6f5ad4f40a9df6524e4cdf9cc45315a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 宣言を欠く track で baseline 取得または実測取得を実行すると、rustdoc を呼び出さず fail-closed の失敗として終了する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BaselineCaptureError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "feature 宣言を欠く track で baseline 取得または実測取得を実行すると、rustdoc を呼び出さず fail-closed の失敗として終了する"
+        }
+      }
+    },
+    {
+      "claim_hash": "2fdc23e27cbdbfa950e8075cfbd1021141f329b2e120f876fda17890df7d7087",
+      "evidence_hash": "f15711c2a4a08a5521bbff1231ad7935764451d13ecabe453cb7282991d3919e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BaselineCaptureInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
+        }
+      }
+    },
+    {
+      "claim_hash": "2fdc23e27cbdbfa950e8075cfbd1021141f329b2e120f876fda17890df7d7087",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BaselineCaptureInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "2fdc23e27cbdbfa950e8075cfbd1021141f329b2e120f876fda17890df7d7087",
+      "evidence_hash": "73ea253ecf9f63b7158388b1b6e02fa7b5941c115b57518c35af469639048a7e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Phase 2 では type-designer が feature 宣言を baseline 取得前に author する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BaselineCaptureInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "Phase 2 では type-designer が feature 宣言を baseline 取得前に author する"
+        }
+      }
+    },
+    {
+      "claim_hash": "2fdc23e27cbdbfa950e8075cfbd1021141f329b2e120f876fda17890df7d7087",
+      "evidence_hash": "9007017fe02704e8b2624c8e40e8a8158de0c60dbf168ca39d3647b2a256673d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "BaselineCaptureInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+        }
+      }
+    },
+    {
+      "claim_hash": "a05588fc4b1c7f812ba9b75ab55ab2a431389cd063db56088adff6c1ab2d1efc",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueImplSignalsError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "a05588fc4b1c7f812ba9b75ab55ab2a431389cd063db56088adff6c1ab2d1efc",
+      "evidence_hash": "ada8178a1254919b400f3a0222437c4eaf373e3050d1bcce8022bc945c2e77ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言した feature が対象 crate の Cargo.toml に存在すること、および catalogue の feature-gated type が宣言済み feature の下にあることを gate で検証する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueImplSignalsError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "宣言した feature が対象 crate の Cargo.toml に存在すること、および catalogue の feature-gated type が宣言済み feature の下にあることを gate で検証する"
+        }
+      }
+    },
+    {
+      "claim_hash": "a05588fc4b1c7f812ba9b75ab55ab2a431389cd063db56088adff6c1ab2d1efc",
+      "evidence_hash": "1a47ffbd85e3395733a74240f580498f5fd9b77e568bfef9702964fd21c5e359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueImplSignalsError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+        }
+      }
+    },
+    {
+      "claim_hash": "a05588fc4b1c7f812ba9b75ab55ab2a431389cd063db56088adff6c1ab2d1efc",
+      "evidence_hash": "f7fb484c86c0b0bb918860861641a35f8acab86a69976fa41ef37bd150073bef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueImplSignalsError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
+        }
+      }
+    },
+    {
+      "claim_hash": "0bdb6c6ce5c501a0be2821723aed02a8a9bdaa2d3fc2caae078f0afceec86ebe",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueImplSignalsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "0bdb6c6ce5c501a0be2821723aed02a8a9bdaa2d3fc2caae078f0afceec86ebe",
+      "evidence_hash": "ada8178a1254919b400f3a0222437c4eaf373e3050d1bcce8022bc945c2e77ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言した feature が対象 crate の Cargo.toml に存在すること、および catalogue の feature-gated type が宣言済み feature の下にあることを gate で検証する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueImplSignalsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "宣言した feature が対象 crate の Cargo.toml に存在すること、および catalogue の feature-gated type が宣言済み feature の下にあることを gate で検証する"
+        }
+      }
+    },
+    {
+      "claim_hash": "0bdb6c6ce5c501a0be2821723aed02a8a9bdaa2d3fc2caae078f0afceec86ebe",
+      "evidence_hash": "f7fb484c86c0b0bb918860861641a35f8acab86a69976fa41ef37bd150073bef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueImplSignalsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
+        }
+      }
+    },
+    {
+      "claim_hash": "0bdb6c6ce5c501a0be2821723aed02a8a9bdaa2d3fc2caae078f0afceec86ebe",
+      "evidence_hash": "9007017fe02704e8b2624c8e40e8a8158de0c60dbf168ca39d3647b2a256673d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogueImplSignalsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+        }
+      }
+    },
+    {
+      "claim_hash": "3a4ea29e475e0ce7ee6b4d1ab61fe8eab6df0384cdaad1fe250750f3f5254db6",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CodeFragmentExtractorError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "3a4ea29e475e0ce7ee6b4d1ab61fe8eab6df0384cdaad1fe250750f3f5254db6",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CodeFragmentExtractorError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "f049b3557ce05ad834fedc0bc249b981464b4e9ad79a6d1c44e0f9139592938e",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "EmbeddingError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "f049b3557ce05ad834fedc0bc249b981464b4e9ad79a6d1c44e0f9139592938e",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "EmbeddingError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "1998a3fbab0279c59c96ddf594a81e54e9513ecad32d82e2f5f59e662ef6ebfd",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SemanticIndexError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "1998a3fbab0279c59c96ddf594a81e54e9513ecad32d82e2f5f59e662ef6ebfd",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "SemanticIndexError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "603c92eab1ee99d20a51d637a9cf35857671317f772f251a6083b1dd813a2f7c",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TdddActualFeatureDeclarationPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "603c92eab1ee99d20a51d637a9cf35857671317f772f251a6083b1dd813a2f7c",
+      "evidence_hash": "ada8178a1254919b400f3a0222437c4eaf373e3050d1bcce8022bc945c2e77ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言した feature が対象 crate の Cargo.toml に存在すること、および catalogue の feature-gated type が宣言済み feature の下にあることを gate で検証する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TdddActualFeatureDeclarationPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "宣言した feature が対象 crate の Cargo.toml に存在すること、および catalogue の feature-gated type が宣言済み feature の下にあることを gate で検証する"
+        }
+      }
+    },
+    {
+      "claim_hash": "603c92eab1ee99d20a51d637a9cf35857671317f772f251a6083b1dd813a2f7c",
+      "evidence_hash": "1a47ffbd85e3395733a74240f580498f5fd9b77e568bfef9702964fd21c5e359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TdddActualFeatureDeclarationPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+        }
+      }
+    },
+    {
+      "claim_hash": "603c92eab1ee99d20a51d637a9cf35857671317f772f251a6083b1dd813a2f7c",
+      "evidence_hash": "f7fb484c86c0b0bb918860861641a35f8acab86a69976fa41ef37bd150073bef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TdddActualFeatureDeclarationPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
+        }
+      }
+    },
+    {
+      "claim_hash": "603c92eab1ee99d20a51d637a9cf35857671317f772f251a6083b1dd813a2f7c",
+      "evidence_hash": "9007017fe02704e8b2624c8e40e8a8158de0c60dbf168ca39d3647b2a256673d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TdddActualFeatureDeclarationPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+        }
+      }
+    },
+    {
+      "claim_hash": "603c92eab1ee99d20a51d637a9cf35857671317f772f251a6083b1dd813a2f7c",
+      "evidence_hash": "66e1ba23c84f8c4f9e3ae1f57d574d27b9ac13c8ab68b51f9ba7bac60cb47c54",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue に記載した feature-gated type の feature を track が宣言していない場合、track は gate で fail-closed に拒否される"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TdddActualFeatureDeclarationPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue に記載した feature-gated type の feature を track が宣言していない場合、track は gate で fail-closed に拒否される"
+        }
+      }
+    },
+    {
+      "claim_hash": "c554173d3667e6b04efa61dad56354c2234f6a490142ef57d2af1d94475991b7",
+      "evidence_hash": "f15711c2a4a08a5521bbff1231ad7935764451d13ecabe453cb7282991d3919e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TdddBaselineFeatureDeclarationPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
+        }
+      }
+    },
+    {
+      "claim_hash": "c554173d3667e6b04efa61dad56354c2234f6a490142ef57d2af1d94475991b7",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TdddBaselineFeatureDeclarationPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "c554173d3667e6b04efa61dad56354c2234f6a490142ef57d2af1d94475991b7",
+      "evidence_hash": "1a47ffbd85e3395733a74240f580498f5fd9b77e568bfef9702964fd21c5e359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TdddBaselineFeatureDeclarationPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+        }
+      }
+    },
+    {
+      "claim_hash": "c554173d3667e6b04efa61dad56354c2234f6a490142ef57d2af1d94475991b7",
+      "evidence_hash": "a6481a45e2bb141d792a1a8d08880fe0b6f5ad4f40a9df6524e4cdf9cc45315a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 宣言を欠く track で baseline 取得または実測取得を実行すると、rustdoc を呼び出さず fail-closed の失敗として終了する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TdddBaselineFeatureDeclarationPortError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "feature 宣言を欠く track で baseline 取得または実測取得を実行すると、rustdoc を呼び出さず fail-closed の失敗として終了する"
+        }
+      }
+    },
+    {
+      "claim_hash": "8486ddd540929bb3a35fdbed7a0d7148e9ba685969e83c6c7bb8fcb52735e56c",
+      "evidence_hash": "704485e32c631b64ab7aa700ff42e73710aaf2694f11a3afb62fc314f62a5d08",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各 layer とその crate をビルド時に有効化する Cargo feature のリストとの対応を宣言する。feature を必要としない layer も空リストで明示する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TdddFeatureDeclarationReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track 配下の commit 対象の専用成果物に、各 layer とその crate をビルド時に有効化する Cargo feature のリストとの対応を宣言する。feature を必要としない layer も空リストで明示する"
+        }
+      }
+    },
+    {
+      "claim_hash": "8486ddd540929bb3a35fdbed7a0d7148e9ba685969e83c6c7bb8fcb52735e56c",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TdddFeatureDeclarationReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "8486ddd540929bb3a35fdbed7a0d7148e9ba685969e83c6c7bb8fcb52735e56c",
+      "evidence_hash": "1a47ffbd85e3395733a74240f580498f5fd9b77e568bfef9702964fd21c5e359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TdddFeatureDeclarationReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+        }
+      }
+    },
+    {
+      "claim_hash": "8486ddd540929bb3a35fdbed7a0d7148e9ba685969e83c6c7bb8fcb52735e56c",
+      "evidence_hash": "f7fb484c86c0b0bb918860861641a35f8acab86a69976fa41ef37bd150073bef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TdddFeatureDeclarationReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
+        }
+      }
+    },
+    {
+      "claim_hash": "3d2893030d47040aaee3fef876e9fe6fa79b57f74b9dac88cad4589f75724962",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CodeFragmentExtractorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "3d2893030d47040aaee3fef876e9fe6fa79b57f74b9dac88cad4589f75724962",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CodeFragmentExtractorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "e876d81c971b6e169fa8f9140d420dbff903a9894c318ad93e39fd3d8301a9fc",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "EmbeddingPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "e876d81c971b6e169fa8f9140d420dbff903a9894c318ad93e39fd3d8301a9fc",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "EmbeddingPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "d11413ab7d5a2107c125e3cc60194fcd586726b809b825d2399fc5a0717be51f",
+      "evidence_hash": "93faa6cab25ed52fa6f804b10c4ba201d55cd3b1a9447eb052489650b407c9bb",
+      "verdict": {
+        "kind": "pass",
+        "citation": "既存 command の argument syntax、stdout/stderr output format、exit-code meaning を変更せず"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SchemaExporterPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "既存 command の argument syntax、stdout/stderr output format、exit-code meaning を変更せず、feature を command line から入力する経路を設けない"
+        }
+      }
+    },
+    {
+      "claim_hash": "d11413ab7d5a2107c125e3cc60194fcd586726b809b825d2399fc5a0717be51f",
+      "evidence_hash": "7fee4ff6647b2b7e2536260ba8f90edda07cffbe37cd26bcfdd60340618596df",
+      "verdict": {
+        "kind": "pass",
+        "citation": "導入後も既存 command の subcommand、argument syntax、stdout/stderr output format、exit-code meaning は変わらず"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SchemaExporterPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "導入後も既存 command の subcommand、argument syntax、stdout/stderr output format、exit-code meaning は変わらず、feature を command line から渡す route は存在しない"
+        }
+      }
+    },
+    {
+      "claim_hash": "1c6ceb2374300205fc8c5e9a2c2fe7e28dff9d05197a329bb7fe2ef3b2c12d6d",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SemanticIndexPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "1c6ceb2374300205fc8c5e9a2c2fe7e28dff9d05197a329bb7fe2ef3b2c12d6d",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SemanticIndexPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "a20c0627eaf268b8b9a497f58746fba64da9e3e36e6b332801e4eee5cdd9dad2",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TdddActualFeatureDeclarationPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "a20c0627eaf268b8b9a497f58746fba64da9e3e36e6b332801e4eee5cdd9dad2",
+      "evidence_hash": "ada8178a1254919b400f3a0222437c4eaf373e3050d1bcce8022bc945c2e77ae",
+      "verdict": {
+        "kind": "pass",
+        "citation": "宣言した feature が対象 crate の Cargo.toml に存在すること、および catalogue の feature-gated type が宣言済み feature の下にあることを gate で検証する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TdddActualFeatureDeclarationPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "宣言した feature が対象 crate の Cargo.toml に存在すること、および catalogue の feature-gated type が宣言済み feature の下にあることを gate で検証する"
+        }
+      }
+    },
+    {
+      "claim_hash": "a20c0627eaf268b8b9a497f58746fba64da9e3e36e6b332801e4eee5cdd9dad2",
+      "evidence_hash": "1a47ffbd85e3395733a74240f580498f5fd9b77e568bfef9702964fd21c5e359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TdddActualFeatureDeclarationPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+        }
+      }
+    },
+    {
+      "claim_hash": "a20c0627eaf268b8b9a497f58746fba64da9e3e36e6b332801e4eee5cdd9dad2",
+      "evidence_hash": "f7fb484c86c0b0bb918860861641a35f8acab86a69976fa41ef37bd150073bef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TdddActualFeatureDeclarationPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
+        }
+      }
+    },
+    {
+      "claim_hash": "a20c0627eaf268b8b9a497f58746fba64da9e3e36e6b332801e4eee5cdd9dad2",
+      "evidence_hash": "9007017fe02704e8b2624c8e40e8a8158de0c60dbf168ca39d3647b2a256673d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TdddActualFeatureDeclarationPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+        }
+      }
+    },
+    {
+      "claim_hash": "a20c0627eaf268b8b9a497f58746fba64da9e3e36e6b332801e4eee5cdd9dad2",
+      "evidence_hash": "66e1ba23c84f8c4f9e3ae1f57d574d27b9ac13c8ab68b51f9ba7bac60cb47c54",
+      "verdict": {
+        "kind": "pass",
+        "citation": "catalogue に記載した feature-gated type の feature を track が宣言していない場合、track は gate で fail-closed に拒否される"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TdddActualFeatureDeclarationPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "catalogue に記載した feature-gated type の feature を track が宣言していない場合、track は gate で fail-closed に拒否される"
+        }
+      }
+    },
+    {
+      "claim_hash": "07be6c5cab4e3191bbb157ab2b339033cc66e942454ea69b8826df6df714191e",
+      "evidence_hash": "f15711c2a4a08a5521bbff1231ad7935764451d13ecabe453cb7282991d3919e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TdddBaselineFeatureDeclarationPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
+        }
+      }
+    },
+    {
+      "claim_hash": "07be6c5cab4e3191bbb157ab2b339033cc66e942454ea69b8826df6df714191e",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TdddBaselineFeatureDeclarationPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "07be6c5cab4e3191bbb157ab2b339033cc66e942454ea69b8826df6df714191e",
+      "evidence_hash": "1a47ffbd85e3395733a74240f580498f5fd9b77e568bfef9702964fd21c5e359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TdddBaselineFeatureDeclarationPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+        }
+      }
+    },
+    {
+      "claim_hash": "07be6c5cab4e3191bbb157ab2b339033cc66e942454ea69b8826df6df714191e",
+      "evidence_hash": "a6481a45e2bb141d792a1a8d08880fe0b6f5ad4f40a9df6524e4cdf9cc45315a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 宣言を欠く track で baseline 取得または実測取得を実行すると、rustdoc を呼び出さず fail-closed の失敗として終了する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TdddBaselineFeatureDeclarationPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "feature 宣言を欠く track で baseline 取得または実測取得を実行すると、rustdoc を呼び出さず fail-closed の失敗として終了する"
+        }
+      }
+    },
+    {
+      "claim_hash": "07be6c5cab4e3191bbb157ab2b339033cc66e942454ea69b8826df6df714191e",
+      "evidence_hash": "9007017fe02704e8b2624c8e40e8a8158de0c60dbf168ca39d3647b2a256673d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TdddBaselineFeatureDeclarationPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "baseline 取得と実測取得は同一の feature 宣言内容を観測し、宣言された feature-gated public item は両方の extracted surface に現れる"
+        }
+      }
+    }
+  ]
+}

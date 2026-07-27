@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "4256396ebf4fb252d71f19067594239e4e51c83c92f14f3b328b8759975286bc",
+  "signals": [
+    {
+      "type_name": "BaselineCaptureError",
+      "signal": "blue",
+      "entry_hash": "6609ef2db6fa8431ace4bd031f45e0055440496393cf13167594c0e89e45e793"
+    },
+    {
+      "type_name": "BaselineCaptureInteractor",
+      "signal": "blue",
+      "entry_hash": "2fdc23e27cbdbfa950e8075cfbd1021141f329b2e120f876fda17890df7d7087"
+    },
+    {
+      "type_name": "CatalogueImplSignalsError",
+      "signal": "blue",
+      "entry_hash": "a05588fc4b1c7f812ba9b75ab55ab2a431389cd063db56088adff6c1ab2d1efc"
+    },
+    {
+      "type_name": "CatalogueImplSignalsInteractor",
+      "signal": "blue",
+      "entry_hash": "0bdb6c6ce5c501a0be2821723aed02a8a9bdaa2d3fc2caae078f0afceec86ebe"
+    },
+    {
+      "type_name": "CodeFragmentExtractorError",
+      "signal": "blue",
+      "entry_hash": "3a4ea29e475e0ce7ee6b4d1ab61fe8eab6df0384cdaad1fe250750f3f5254db6"
+    },
+    {
+      "type_name": "EmbeddingError",
+      "signal": "blue",
+      "entry_hash": "f049b3557ce05ad834fedc0bc249b981464b4e9ad79a6d1c44e0f9139592938e"
+    },
+    {
+      "type_name": "SemanticIndexError",
+      "signal": "blue",
+      "entry_hash": "1998a3fbab0279c59c96ddf594a81e54e9513ecad32d82e2f5f59e662ef6ebfd"
+    },
+    {
+      "type_name": "TdddActualFeatureDeclarationPortError",
+      "signal": "blue",
+      "entry_hash": "603c92eab1ee99d20a51d637a9cf35857671317f772f251a6083b1dd813a2f7c"
+    },
+    {
+      "type_name": "TdddBaselineFeatureDeclarationPortError",
+      "signal": "blue",
+      "entry_hash": "c554173d3667e6b04efa61dad56354c2234f6a490142ef57d2af1d94475991b7"
+    },
+    {
+      "type_name": "TdddFeatureDeclarationReadError",
+      "signal": "blue",
+      "entry_hash": "8486ddd540929bb3a35fdbed7a0d7148e9ba685969e83c6c7bb8fcb52735e56c"
+    },
+    {
+      "type_name": "CodeFragmentExtractorPort",
+      "signal": "blue",
+      "entry_hash": "3d2893030d47040aaee3fef876e9fe6fa79b57f74b9dac88cad4589f75724962"
+    },
+    {
+      "type_name": "EmbeddingPort",
+      "signal": "blue",
+      "entry_hash": "e876d81c971b6e169fa8f9140d420dbff903a9894c318ad93e39fd3d8301a9fc"
+    },
+    {
+      "type_name": "SchemaExporterPort",
+      "signal": "blue",
+      "entry_hash": "d11413ab7d5a2107c125e3cc60194fcd586726b809b825d2399fc5a0717be51f"
+    },
+    {
+      "type_name": "SemanticIndexPort",
+      "signal": "blue",
+      "entry_hash": "1c6ceb2374300205fc8c5e9a2c2fe7e28dff9d05197a329bb7fe2ef3b2c12d6d"
+    },
+    {
+      "type_name": "TdddActualFeatureDeclarationPort",
+      "signal": "blue",
+      "entry_hash": "a20c0627eaf268b8b9a497f58746fba64da9e3e36e6b332801e4eee5cdd9dad2"
+    },
+    {
+      "type_name": "TdddBaselineFeatureDeclarationPort",
+      "signal": "blue",
+      "entry_hash": "07be6c5cab4e3191bbb157ab2b339033cc66e942454ea69b8826df6df714191e"
+    }
+  ]
+}
