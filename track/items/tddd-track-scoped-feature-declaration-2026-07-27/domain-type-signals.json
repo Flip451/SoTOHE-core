@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-27T11:48:52Z",
+  "generated_at": "2026-07-27T12:22:33Z",
   "declaration_hash": "55641f5c2cee166ecbf1a8c5f621b3a59d921d83b84e25e87e8f5791ee54051a",
-  "implementation_input_hash": "dded0c0ba1e5e5643d410da768543b2eb6097f625620e088bea6e73b5814a616",
+  "implementation_input_hash": "f8cd02abe1b21ad2e4a2d763d0738ed3befdf844fc31cce33ff8b9094ad4d6e8",
   "signals": [
     {
       "type_name": "CargoFeatureName",
@@ -42,7 +42,7 @@
     {
       "type_name": "RustdocCratePort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true
     },
     {

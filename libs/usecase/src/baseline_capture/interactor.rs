@@ -13,7 +13,7 @@ use domain::tddd::catalogue_v2::{
     RustdocBaselineCapturePort, TdddLayerBindingsError, TdddLayerBindingsPort,
 };
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
-use domain::{SymlinkGuardPort, TrackId};
+use domain::{SymlinkGuardError, SymlinkGuardPort, TrackId};
 
 use super::service::{BaselineCaptureError, BaselineCaptureRequest, BaselineCaptureService};
 use super::validate_track_id;
@@ -85,7 +85,7 @@ impl BaselineCaptureService for BaselineCaptureInteractor {
         // Step 2: symlink guard on workspace_root (all ancestors from filesystem root).
         self.symlink_guard
             .reject_symlinks_from_root(&workspace_root)
-            .map_err(|_| BaselineCaptureError::SymlinkRejected(workspace_root.clone()))?;
+            .map_err(map_symlink_guard_error)?;
 
         // Step 2b: guard source_workspace when it differs from workspace_root.
         if let Some(ref src) = source_workspace {
@@ -95,16 +95,14 @@ impl BaselineCaptureService for BaselineCaptureInteractor {
                     return Err(BaselineCaptureError::SymlinkRejected(src.clone()));
                 }
             }
-            self.symlink_guard
-                .reject_symlinks_from_root(src)
-                .map_err(|_| BaselineCaptureError::SymlinkRejected(src.clone()))?;
+            self.symlink_guard.reject_symlinks_from_root(src).map_err(map_symlink_guard_error)?;
         }
 
         // Step 3: derive items_dir and guard it.
         let items_dir = workspace_root.join("track").join("items");
         self.symlink_guard
             .reject_symlinks_from_root(&items_dir)
-            .map_err(|_| BaselineCaptureError::SymlinkRejected(items_dir.clone()))?;
+            .map_err(map_symlink_guard_error)?;
 
         // Step 4: resolve layer bindings.
         let bindings = self
@@ -161,6 +159,17 @@ fn map_layer_bindings_error(error: TdddLayerBindingsError) -> BaselineCaptureErr
             )))
         }
         TdddLayerBindingsError::NoLayers => BaselineCaptureError::NoLayers,
+    }
+}
+
+fn map_symlink_guard_error(error: SymlinkGuardError) -> BaselineCaptureError {
+    match error {
+        SymlinkGuardError::SymlinkFound { path } => {
+            BaselineCaptureError::SymlinkRejected(path.into())
+        }
+        SymlinkGuardError::Io { path, reason } => {
+            BaselineCaptureError::SymlinkGuardIo(path.into(), diagnostic(reason))
+        }
     }
 }
 

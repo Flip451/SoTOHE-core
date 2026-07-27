@@ -134,7 +134,7 @@ fn test_run_multi_target_binding_returns_schema_export_error() {
     let tmp = tempfile::tempdir().unwrap();
     let err = interactor.run("my-track".to_owned(), tmp.path().to_path_buf(), None).unwrap_err();
     assert!(
-        matches!(err, CatalogueImplSignalsError::SchemaExport { .. }),
+        matches!(err, CatalogueImplSignalsError::SchemaExport(_, _)),
         "multi-target binding must return SchemaExport error, got: {err:?}"
     );
 }
@@ -153,7 +153,7 @@ fn test_run_evaluation_failure_returns_evaluation_error() {
     let tmp = tempfile::tempdir().unwrap();
     let err = interactor.run("my-track".to_owned(), tmp.path().to_path_buf(), None).unwrap_err();
     assert!(
-        matches!(err, CatalogueImplSignalsError::Evaluation { .. }),
+        matches!(err, CatalogueImplSignalsError::Evaluation(_, _)),
         "expected Evaluation error, got: {err:?}"
     );
 }
@@ -172,7 +172,7 @@ fn test_run_baseline_load_failure_returns_baseline_load_error() {
     let tmp = tempfile::tempdir().unwrap();
     let err = interactor.run("my-track".to_owned(), tmp.path().to_path_buf(), None).unwrap_err();
     assert!(
-        matches!(err, CatalogueImplSignalsError::BaselineLoad { .. }),
+        matches!(err, CatalogueImplSignalsError::BaselineLoad(_, _)),
         "expected BaselineLoad error, got: {err:?}"
     );
 }

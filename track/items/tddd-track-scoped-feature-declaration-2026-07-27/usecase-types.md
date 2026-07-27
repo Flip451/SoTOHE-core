@@ -4,8 +4,8 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| BaselineCaptureError | error_type | modify | InvalidTrackId, SymlinkRejected, LayerBindingsLoad, NoLayers, CaptureFailed, FeatureDeclaration | 🔵 | 🔵 |
-| CatalogueImplSignalsError | error_type | modify | InvalidTrackId, LayerBindingsLoad, CatalogueLoad, BaselineLoad, ExtendedCrateConversion, SchemaExport, Evaluation, SymlinkRejected, NoLayers, FeatureDeclaration | 🟡 | 🔵 |
+| BaselineCaptureError | error_type | modify | InvalidTrackId, SymlinkRejected, SymlinkGuardIo, LayerBindingsLoad, NoLayers, CaptureFailed, FeatureDeclaration | 🔵 | 🔵 |
+| CatalogueImplSignalsError | error_type | modify | InvalidTrackId, LayerBindingsLoad, CatalogueLoad, BaselineLoad, ExtendedCrateConversion, SchemaExport, Evaluation, SymlinkRejected, SymlinkGuardIo, NoLayers, FeatureDeclaration | 🔵 | 🔵 |
 | CodeFragmentExtractorError | error_type | reference | ExtractionFailed | 🔵 | 🔵 |
 | EmbeddingError | error_type | reference | ModelLoadFailed, InferenceFailed | 🔵 | 🔵 |
 | SemanticIndexError | error_type | reference | OpenFailed, InsertFailed, DeleteFailed, SearchFailed | 🔵 | 🔵 |
@@ -29,5 +29,5 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | BaselineCaptureInteractor | interactor | modify | — | 🔵 | 🔵 |
-| CatalogueImplSignalsInteractor | interactor | modify | — | 🟡 | 🔵 |
+| CatalogueImplSignalsInteractor | interactor | modify | — | 🔵 | 🔵 |
 

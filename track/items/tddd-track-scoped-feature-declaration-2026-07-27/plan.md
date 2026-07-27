@@ -6,7 +6,7 @@
 GO-01: T001, T002, T003.
 GO-02: T003, T004.
 
-## Tasks (3/5 resolved)
+## Tasks (4/5 resolved)
 
 ### S1 — Declaration foundation
 
@@ -19,8 +19,8 @@ GO-02: T003, T004.
 
 > Modify baseline and actual capture ports, interactors, composition wiring, and `libs/infrastructure/src/schema_export/bin_target.rs` to use the declaration (IN-02, IN-03, IN-05).
 
-- [x] **T003**: Update `.harness/capabilities/type-designer.md` and `.harness/workflows/track/type-design.md` before their `baseline-capture` pipeline step to author `tddd-features.json`; modify `RustdocBaselineCapturePort` in `libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs`, `BaselineCaptureInteractor` and `BaselineCaptureError` in `libs/usecase/src/baseline_capture/{interactor.rs,service.rs}`, and `RustdocBaselineCaptureAdapter` in `libs/infrastructure/src/tddd/rustdoc_baseline_capture_adapter.rs`; inject `TdddBaselineFeatureDeclarationPort` through `FsTdddFeatureDeclarationAdapter` at `apps/cli-composition/src/track/tddd.rs`; extend `RustdocSchemaExporter` in `libs/infrastructure/src/schema_export.rs` and `build_rustdoc_args` in `libs/infrastructure/src/schema_export/bin_target.rs`; and add workflow and baseline-capture tests (IN-02, IN-03, IN-04, CN-01, CN-02, CN-05, AC-01, AC-02, AC-03, AC-04, AC-08).
-- [ ] **T004**: Modify `RustdocCratePort` in `libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs` and `CatalogueImplSignalsInteractor` / `CatalogueImplSignalsError` in `libs/usecase/src/catalogue_impl_signals/{interactor.rs,service.rs}`; update `RustdocCrateAdapter` in `libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs` and `RustdocSchemaExporter` in `libs/infrastructure/src/schema_export.rs`; inject `TdddActualFeatureDeclarationPort` through `FsTdddFeatureDeclarationAdapter` at `apps/cli-composition/src/track/tddd.rs`; and add actual-capture tests (IN-03, IN-05, CN-01, CN-02, CN-03, CN-05, AC-03, AC-04, AC-05, AC-06, AC-08).
+- [x] **T003**: Update `.harness/capabilities/type-designer.md` and `.harness/workflows/track/type-design.md` before their `baseline-capture` pipeline step to author `tddd-features.json`; modify `RustdocBaselineCapturePort` in `libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs`, `BaselineCaptureInteractor` and `BaselineCaptureError` in `libs/usecase/src/baseline_capture/{interactor.rs,service.rs}`, and `RustdocBaselineCaptureAdapter` in `libs/infrastructure/src/tddd/rustdoc_baseline_capture_adapter.rs`; inject `TdddBaselineFeatureDeclarationPort` through `FsTdddFeatureDeclarationAdapter` at `apps/cli-composition/src/track/tddd.rs`; extend `RustdocSchemaExporter` in `libs/infrastructure/src/schema_export.rs` and `build_rustdoc_args` in `libs/infrastructure/src/schema_export/bin_target.rs`; and add workflow and baseline-capture tests (IN-02, IN-03, IN-04, CN-01, CN-02, CN-05, CN-06, AC-01, AC-02, AC-03, AC-04, AC-08).
+- [x] **T004**: Modify `RustdocCratePort` in `libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs` and `CatalogueImplSignalsInteractor` / `CatalogueImplSignalsError` in `libs/usecase/src/catalogue_impl_signals/{interactor.rs,service.rs}`; update `RustdocCrateAdapter` in `libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs` and `RustdocSchemaExporter` in `libs/infrastructure/src/schema_export.rs`; inject `TdddActualFeatureDeclarationPort` through `FsTdddFeatureDeclarationAdapter` at `apps/cli-composition/src/track/tddd.rs`; and add actual-capture tests (IN-03, IN-05, CN-01, CN-02, CN-03, CN-05, AC-03, AC-04, AC-05, AC-06, AC-08).
 
 ### S3 — Declared semantic-dup surface
 

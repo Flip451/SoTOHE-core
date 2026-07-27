@@ -1,185 +1,299 @@
 {
   "schema_version": 2,
   "scopes": {
-    "harness-policy": {
+    "cli": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:b7eede59e03645b99b54a401621b60c2bfd71af41de50b9c45e2a1730d1fda63",
-          "at": "2026-07-27T06:10:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`blocked_cross_scope` is classified here as an “unrecoverable dependency” requiring that no manual recovery exist, but the same workflow explicitly defines it as recoverable by resolving the dependency from the orchestrator context and relaunching the scope (lines 140–141 and 294–295). This contradictory criterion can either suppress the supported recovery path or be read as permission to serialize the initial wave. Distinguish the mandatory initial single-wave dispatch from the post-dispatch `blocked_cross_scope` recovery exception, without calling that exception unrecoverable.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/review.md",
-              "line": 149,
-              "category": "convention contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:b7eede59e03645b99b54a401621b60c2bfd71af41de50b9c45e2a1730d1fda63",
-          "at": "2026-07-27T06:12:10Z"
+          "hash": "rvw1:sha256:d791f2cf8850d22f1bee4f4b5c7285453aeec7347762d0cd5587967fb4ee839e",
+          "at": "2026-07-27T10:25:06Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d6724fa0c5f3bf78f818b25b83d8775120e50a0f9cb01b26226db8108825dc26",
-          "at": "2026-07-27T06:13:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The capability’s updated pipeline numbering is internally inconsistent: after adding step 0, it still says the orchestrator receives signal counts from step 3, although signal evaluation now occurs in step 4 (and `calc-impl-catalog` is step 9). Correct the stale reference so the workflow contract identifies the actual signal-producing step.",
-              "severity": "P1",
-              "file": ".harness/capabilities/type-designer.md",
-              "line": 67,
-              "category": "workflow-contract inconsistency"
-            }
-          ],
-          "hash": "rvw1:sha256:9e574a92cfe3e94ddb1340b6f931022296bcac4a020fe689edb65f09b184ea92",
-          "at": "2026-07-27T10:25:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b44f981bdfd57e0c5ac50ed57462db23b76ff05c940fda79d7a36cde64b593bc",
-          "at": "2026-07-27T10:30:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Step 0 cannot be executed under this capability's own write contract. `Scope Ownership` permits direct writes only to `<layer>-types.json`, `Rules` restricts Edit to that file, and the Bash allow-list contains no declaration-authoring command. A conforming type-designer therefore cannot create `tddd-features.json` on a fresh track, so baseline capture fails closed. Add the declaration explicitly to the permitted direct-write/tool rules.",
-              "severity": "P1",
-              "file": ".harness/capabilities/type-designer.md",
-              "line": 94,
-              "category": "responsibility-boundary cross"
-            },
-            {
-              "message": "The new committed type-design artifact lacks its intended review routing. `.harness/config/review-scope.json` matches only `*-types.json` for the `types` scope, so `tddd-features.json` is classified as `other`, despite ADR D1 assigning it to `types`; the types reviewer policy also only covers catalogue entries. Add the artifact pattern and corresponding types-scope review policy so feature declarations cannot bypass type-design review.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/type-design.md",
-              "line": 52,
-              "category": "review-scope wiring inconsistency"
-            }
-          ],
-          "hash": "rvw1:sha256:b44f981bdfd57e0c5ac50ed57462db23b76ff05c940fda79d7a36cde64b593bc",
-          "at": "2026-07-27T10:37:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The review-routing fix remains unapplied outside this scope. `tddd-features.json` is still classified as `other` because the `types` patterns omit it, and the types reviewer policy still accepts only catalogue-entry findings. This contradicts ADR D1 and leaves the committed declaration without its required type-design review. Update both `.harness/config/review-scope.json` and `.harness/custom/review-prompts/types.md`.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/type-design.md",
-              "line": 52,
-              "category": "review-scope wiring inconsistency"
-            },
-            {
-              "message": "The new ownership and feature-declaration-first order were not synchronized across operational surfaces. `.claude/agents/type-designer.md` still advertises baseline capture as the first stage and calls this a 12-step pipeline; `.codex/agents/type-designer.toml` omits `tddd-features.json` from owned artifacts; this workflow's Outputs and `CLAUDE.md`'s Phase-2/one-writer maps also omit it. These live instructions now contradict the capability SSoT and must be updated without copying workflow logic into thin track adapters.",
-              "severity": "P1",
-              "file": ".harness/capabilities/type-designer.md",
-              "line": 55,
-              "category": "adapter-SSoT synchronization"
-            }
-          ],
-          "hash": "rvw1:sha256:105bc5d6feee81930c588825db4d8f43c62bb8c7d795d153b3da7a764fdaee5d",
-          "at": "2026-07-27T10:44:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The required review-routing fix remains unapplied outside this scope. `tddd-features.json` is still classified as `other` because the `types` patterns omit it, and the types reviewer policy still covers only catalogue entries. This contradicts ADR D1. Update `.harness/config/review-scope.json` and `.harness/custom/review-prompts/types.md`.",
-              "severity": "P1",
-              "file": ".harness/workflows/track/type-design.md",
-              "line": 52,
-              "category": "review-scope wiring inconsistency"
-            },
-            {
-              "message": "The new feature-declaration-first order still contradicts the live provider wrappers. `.claude/agents/type-designer.md` advertises baseline capture as the first stage and calls the contract a 12-step pipeline, while `.codex/agents/type-designer.toml` omits `tddd-features.json` from owned artifacts. Synchronize these cross-scope wrappers, preferably by removing duplicated pipeline detail and retaining only provider-specific framing.",
-              "severity": "P1",
-              "file": ".harness/capabilities/type-designer.md",
-              "line": 55,
-              "category": "adapter-SSoT synchronization"
-            }
-          ],
-          "hash": "rvw1:sha256:34058c843a7bd20ec0d95383322a5d1d1500e3cd2c06b6a26517b464ea5daf87",
-          "at": "2026-07-27T10:46:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:13abac5b95cf85195eb1dd9d0ead196a01ecc5a3a2158bbc4f4751cbafcf9fee",
-          "at": "2026-07-27T11:12:26Z"
+          "hash": "rvw1:sha256:d791f2cf8850d22f1bee4f4b5c7285453aeec7347762d0cd5587967fb4ee839e",
+          "at": "2026-07-27T10:27:31Z"
         }
       ]
     },
-    "adr": {
+    "infrastructure": {
       "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The versioned declaration DTO does not use `#[serde(deny_unknown_fields)]`. A future declaration containing extra fields is accepted and silently truncated, so schema-versioned input can be misinterpreted instead of failing closed.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 92,
+              "category": "serde codec break"
+            },
+            {
+              "message": "Snapshot creation writes directly to the newly created file. A concurrent baseline/actual capture can observe the snapshot after `create_new` but before `write_all`/`sync_all` completes, producing a transient mismatch or accepting an incomplete snapshot. Use an atomic temp-file write/rename or equivalent synchronization.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 287,
+              "category": "snapshot concurrency"
+            }
+          ],
+          "hash": "rvw1:sha256:ce651b026513f30c2745c70e20b850dc5c502dd5f1b76581664338173ac23966",
+          "at": "2026-07-27T04:08:35Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5ce2edadf548aa73c048b12a92127764347b1ca881c4f4923ce48b037d80b303",
-          "at": "2026-07-27T00:54:53Z"
+          "hash": "rvw1:sha256:1879b90c723866ad4952affffcf5d4f36be9823fe27f16a2ab014d2e62e91712",
+          "at": "2026-07-27T04:38:37Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "D3 は「baseline と実測が同一の宣言を読む」だけで feature 集合の乖離が構造的に不可能になるとしていますが、この commit 対象成果物は両取得の間に変更できます。baseline 後に宣言が更新されれば、同じパスを読んでも異なる feature 集合で抽出され、Context の中核要件と矛盾します。両取得を同一内容へ拘束する決定が必要です（具体的な形式は下流へ委ねられます）。",
+              "message": "Workspace member paths are joined without containment validation. An absolute member or one containing `..` can escape `workspace_root`; `reject_symlinks_below` checks symlinks but does not prove containment, allowing an out-of-root Cargo.toml to be read and accepted. Reject absolute/parent components and verify the normalized path remains under the trusted root.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 232,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "`reject_symlinks_below` deliberately excludes `trusted_root`, but the adapter never verifies that `track_dir` and `workspace_root` themselves are real directories. A symlinked root redirects declaration, snapshot, and manifest I/O, including snapshot writes. Reject symlinked trusted roots before performing any path operations.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 273,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "Deserializing `layers` directly into a `BTreeMap` silently keeps the last duplicate JSON key. A declaration containing conflicting duplicate layer entries therefore passes instead of failing closed. Use a duplicate-rejecting map deserializer, as existing infrastructure codecs do.",
               "severity": "P1",
-              "file": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
-              "line": 68,
-              "category": "inconsistent decisions within the same ADR"
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 98,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "All declaration, snapshot, and Cargo.toml reads use unbounded `std::fs::read`, so a large input can allocate until memory exhaustion before validation. Enforce an explicit byte limit using metadata plus a bounded reader and return a typed error when exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 274,
+              "category": "unbounded read"
+            },
+            {
+              "message": "The tests never exercise a successful `load_for_actual` call or concurrent baseline publishers, and omit the declared symlink, unsupported-schema, and malformed-TOML rejection paths. This leaves both a public API happy path and the snapshot concurrency/fail-closed contract unverified.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 456,
+              "category": "test coverage gap"
             }
           ],
-          "hash": "rvw1:sha256:5ce2edadf548aa73c048b12a92127764347b1ca881c4f4923ce48b037d80b303",
-          "at": "2026-07-27T00:57:45Z"
+          "hash": "rvw1:sha256:c9f778378433d1e048297f63a403213421575323279608faaa794e656866019f",
+          "at": "2026-07-27T05:15:28Z"
         },
         {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:312e3823bde4aa58374a77d63bdc6933c9f5d99fa5d28d38eb7de6c8becf6fbb",
-          "at": "2026-07-27T01:03:52Z"
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Concurrent publication of different declaration bytes is misclassified. If another writer creates the snapshot after the initial absence check, `compare_snapshot` returns a diagnostic for differing bytes, but this branch wraps it as `SnapshotWrite` instead of the declared `BaselineSnapshotMismatch`. Existing-snapshot read failures are likewise labeled as writes. Preserve mismatch versus I/O internally and map each to its correct public error; add a deterministic conflicting-publisher test.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 54,
+              "category": "error handling"
+            },
+            {
+              "message": "Cargo.toml structural validation still has silent fallbacks: non-string workspace members are skipped here, and a present but non-table `features` value is treated as an absent feature table via `unwrap_or_default` below. The adapter can therefore accept a semantically invalid manifest instead of failing closed. Reject malformed member entries and malformed `features` values with `ReadDeclaration`, while retaining an actually absent `[features]` table as the valid empty case.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 291,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:d14462b48e61c066a88aa5514efc539c4035ce8bde7239221ccd3c5c5c51f4e6",
+          "at": "2026-07-27T05:33:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The target manifest's `[features]` table is validated only by collecting its keys. Values such as `semantic-dup = 1` or arrays containing non-string entries therefore count as valid declared features even though Cargo rejects that manifest. Validate each feature value as an array of strings (or resolve features through Cargo metadata) and return `ReadDeclaration` for malformed entries.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 338,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "`clean_up_temporary` reports cleanup failures only when the original error was `Write`. If publication ends with `Mismatch` or `Read` and removal of the temporary file also fails, that I/O failure is silently discarded and a stale file is left behind. Preserve both causes or promote the cleanup failure to a typed write error instead of swallowing it.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 554,
+              "category": "error handling"
+            }
+          ],
+          "hash": "rvw1:sha256:64adcde8087d3b3cc824b80b83ad6d13671d2d8f710e772b099ffc893cc26425",
+          "at": "2026-07-27T05:44:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:312e3823bde4aa58374a77d63bdc6933c9f5d99fa5d28d38eb7de6c8becf6fbb",
-          "at": "2026-07-27T01:06:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3c59bec9944232a1bc692cf2bf9e75f686164690f3d82e579126fc4d6b731950",
-          "at": "2026-07-27T01:49:10Z"
+          "hash": "rvw1:sha256:bce2cb365db65c781736c0b56b778a145117e91bcf31b0f6f97d63f04349418e",
+          "at": "2026-07-27T05:49:40Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3c59bec9944232a1bc692cf2bf9e75f686164690f3d82e579126fc4d6b731950",
-          "at": "2026-07-27T01:51:58Z"
+          "hash": "rvw1:sha256:c184c19e7b310fbd26ce647a25d739008b118ee3efec3012c44e75aa6a2ff187",
+          "at": "2026-07-27T06:06:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f990e4aff6344a01b8daaa7833c6fd33165de9bfa72caa36215a710868c0bf29",
+          "at": "2026-07-27T06:42:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8db0bd1249f2c306fd21ef6ba904be1323b0fd0baa328b2d49366d542a213a36",
+          "at": "2026-07-27T10:25:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8db0bd1249f2c306fd21ef6ba904be1323b0fd0baa328b2d49366d542a213a36",
+          "at": "2026-07-27T10:29:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7fea5ff16508cac0cb5895953f3e0909bb6fccb262f94a258e51cbf64cb50bbe",
+          "at": "2026-07-27T11:04:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:760e83b90c10a7626c8c360d6683a0b9d166425b9c4a4d1f84248aacf7392f95",
+          "at": "2026-07-27T12:43:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:760e83b90c10a7626c8c360d6683a0b9d166425b9c4a4d1f84248aacf7392f95",
+          "at": "2026-07-27T12:46:28Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f5e2a1a1841aa488e15957c378800cb46653cdc33f01aea7b121ed3df8a1589",
+          "at": "2026-07-27T02:49:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f5e2a1a1841aa488e15957c378800cb46653cdc33f01aea7b121ed3df8a1589",
+          "at": "2026-07-27T02:52:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0456a03b249c72e6a0c0cae09c98f427a9b35da50879872fa6847304997ce68",
+          "at": "2026-07-27T06:50:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e0456a03b249c72e6a0c0cae09c98f427a9b35da50879872fa6847304997ce68",
+          "at": "2026-07-27T06:52:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8577685935d7500d73a4dcdfd4c2a9f7e208589baab7e506395ca4af1db87050",
+          "at": "2026-07-27T07:25:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8577685935d7500d73a4dcdfd4c2a9f7e208589baab7e506395ca4af1db87050",
+          "at": "2026-07-27T07:26:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8577685935d7500d73a4dcdfd4c2a9f7e208589baab7e506395ca4af1db87050",
+          "at": "2026-07-27T07:29:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d376df4f3f3c24af0aa965d2b97faef0dfaf2edcfce9c2241ec915d08788f0a5",
+          "at": "2026-07-27T11:21:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d376df4f3f3c24af0aa965d2b97faef0dfaf2edcfce9c2241ec915d08788f0a5",
+          "at": "2026-07-27T11:23:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d376df4f3f3c24af0aa965d2b97faef0dfaf2edcfce9c2241ec915d08788f0a5",
+          "at": "2026-07-27T11:23:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d376df4f3f3c24af0aa965d2b97faef0dfaf2edcfce9c2241ec915d08788f0a5",
+          "at": "2026-07-27T11:25:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af784686fa71d7a881e6e8c279afad295575186a68e63272ed969a9eaac70c68",
+          "at": "2026-07-27T14:25:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af784686fa71d7a881e6e8c279afad295575186a68e63272ed969a9eaac70c68",
+          "at": "2026-07-27T15:10:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:af784686fa71d7a881e6e8c279afad295575186a68e63272ed969a9eaac70c68",
+          "at": "2026-07-27T15:13:24Z"
         }
       ]
     },
@@ -198,67 +312,20 @@
           "findings": [],
           "hash": "rvw1:sha256:56d2f01b02cab38ff9d67f1dede68862dac0a18987b1bfa8f6e4bcb83eec1672",
           "at": "2026-07-27T10:27:55Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:73ccf7b687757807c1c9df8dff19e46a1f5f559ba9912ba628635f6de98d4d99",
-          "at": "2026-07-27T04:08:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CargoFeatureName::try_new` does not implement Cargo's feature-name grammar: it accepts invalid leading `-` (for example, `-foo`) while rejecting valid names containing `+`, `.`, or Unicode XID characters. This breaks the newtype invariant and can prevent legitimate manifest features from being declared. Match the [Cargo feature-name grammar](https://doc.rust-lang.org/stable/cargo/reference/features.html#the-features-section) and add boundary tests.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/feature_declaration.rs",
-              "line": 21,
-              "category": "broken invariant"
-            },
-            {
-              "message": "The tests do not exercise several declared rejection paths: an empty feature name, `TdddFeatureDeclarationError::UnexpectedLayer`, or `TdddFeatureLookupError::MissingLayer`. These public error contracts can regress without detection; add tests asserting each variant and payload.",
-              "severity": "P1",
-              "file": "libs/domain/src/tddd/feature_declaration.rs",
-              "line": 204,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:73ccf7b687757807c1c9df8dff19e46a1f5f559ba9912ba628635f6de98d4d99",
-          "at": "2026-07-27T04:12:24Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8f9679d0efb168c6dcee0893e198ed6cc071bdf3d35da649292dfd018d56e07c",
-          "at": "2026-07-27T04:38:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:82900a574d5c9ef35a0ce2ed1e9ef6b86c3c7b1aad2dbe722acf721256107187",
-          "at": "2026-07-27T06:07:45Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:762cdf91c52778914018464cc45e8638455fbbf2014210dc8255b2b120d3d746",
-          "at": "2026-07-27T10:25:31Z"
+          "hash": "rvw1:sha256:751ddc66bbe90599dc39bb90a2f4ad618425f9295c1acf340a291b3bc7a6da27",
+          "at": "2026-07-27T12:43:40Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:762cdf91c52778914018464cc45e8638455fbbf2014210dc8255b2b120d3d746",
-          "at": "2026-07-27T10:27:32Z"
+          "hash": "rvw1:sha256:751ddc66bbe90599dc39bb90a2f4ad618425f9295c1acf340a291b3bc7a6da27",
+          "at": "2026-07-27T12:46:12Z"
         }
       ]
     },
@@ -729,6 +796,124 @@
           "findings": [],
           "hash": "rvw1:sha256:7520224362316c48dabafa08648d16f985f2a7ca8d634a924ec69443169f09cf",
           "at": "2026-07-27T12:02:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The fulfillment bindings at lines 432–445 and 467–480 reference `test_capture_current_with_exporter_forwards_declared_features`, but that test exists only in `usecase::catalogue_impl_signals::interactor_tests`, not in `infrastructure::tddd::rustdoc_crate_adapter::tests`. Both bindings therefore point to a nonexistent test and cannot fulfill their obligations.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/test-bindings.json",
+              "line": 442,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:7a4a5761e2b93dcbd4c1efc0052bf9ad37ab468ac7751283712c5702f8c40f9b",
+          "at": "2026-07-27T12:43:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The corrected infrastructure test exists and directly exercises feature forwarding, but the file now omits fulfillment bindings for `RustdocCratePort::capture_current` and `RustdocCrateAdapter`'s `RustdocCratePort` conformance. These obligations are implemented and testable by `test_capture_current_with_exporter_forwards_declared_features`; leaving them unbound creates a coverage gap.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/test-bindings.json",
+              "line": 445,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:39a15463de1e380291fc1de35b7020f4e100fa8ccf6dc6cec45a94a763ddafe7",
+          "at": "2026-07-27T12:48:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7a4a5761e2b93dcbd4c1efc0052bf9ad37ab468ac7751283712c5702f8c40f9b",
+          "at": "2026-07-27T12:50:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `CatalogueImplSignalsInteractor` fulfillment also owns IN-05, CN-03, and AC-06, but its two bound tests cover only the successful AC-04 path and a missing frozen declaration. It omits the existing invalid-feature test, and no bound test demonstrates that a catalogue item behind an undeclared feature produces a Red/fail-closed result. Add `test_run_invalid_feature_declaration_returns_feature_declaration_error` and a focused usecase-scope AC-06 regression; leave AC-06 unfulfilled until that target exists.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/test-bindings.json",
+              "line": 447,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:0586240af91d673f330bdf69cd89c5162863b95c30215761252a9d5cf1ae94f7",
+          "at": "2026-07-27T13:21:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This fulfillment still claims AC-06, but none of its three tests exercises a catalogue type whose feature is omitted from the track declaration. The AC-04 test declares `semantic-dup`, the missing-snapshot test stops before capture, and the invalid-declaration test returns `UnknownCargoFeature` before catalogue evaluation. Add a usecase-scope regression that drives the undeclared catalogue-feature case to a Red/fail-closed result and bind it; until then AC-06 has no honest target.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/test-bindings.json",
+              "line": 447,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:486c18bbc2b623de265759761abfb620fb7d6957c77dfeecaa9ce21f16164617",
+          "at": "2026-07-27T13:25:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `load_from_path` fulfillment still names only the nonexistent-path error test, which cannot demonstrate IN-03’s same-declaration baseline/actual behavior. Adding the rewritten cross-surface regression to the separate `capture_current` obligation does not repair this obligation. Bind a test that exercises `load_from_path` in that same-declaration scenario—the rewritten interactor regression is the available candidate—or leave this edge unfulfilled.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/test-bindings.json",
+              "line": 417,
+              "category": "testing"
+            },
+            {
+              "message": "Adding the successful AC-04 regression does not make the `CatalogueImplSignalsError × IN-03` binding honest: that test returns `Ok` and never constructs the error entry, while the other test stops at a missing snapshot without testing declaration-content equality. This needs a usecase-scope regression that drives a baseline/current declaration mismatch and asserts `CatalogueImplSignalsError::FeatureDeclaration(BaselineSnapshotMismatch)`; leave the edge unbound until such a test exists.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/test-bindings.json",
+              "line": 497,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:7fee991a6a285c06e674dc235005e3d565bae4ceab227b4699f3622d5e64baa1",
+          "at": "2026-07-27T14:51:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CatalogueImplSignalsError` still cites IN-03, but its voluntary binding was removed and no replacement test exists. The successful cross-surface regression cannot discharge an error-type edge because it never constructs an error. Add a usecase-scope regression that makes the declaration port return `BaselineSnapshotMismatch` and asserts `CatalogueImplSignalsError::FeatureDeclaration(BaselineSnapshotMismatch)`, or route the upstream citation for correction; until then this cited edge remains unbound.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/test-bindings.json",
+              "line": 501,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:c8c74817b028efb20350f0ea553b0cec155a3a635a6638ab09d027733426a672",
+          "at": "2026-07-27T14:53:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:67378f7c82c9edd437444e2fd437af7d9c118a9eb16272aef72a33e6fbde678c",
+          "at": "2026-07-27T15:05:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d8304c74387bcf4e57e122c2059731e96ecfa1101ca8a6fb82e8acf06eefbd21",
+          "at": "2026-07-27T15:43:43Z"
         }
       ]
     },
@@ -1006,137 +1191,85 @@
           "findings": [],
           "hash": "rvw1:sha256:e898c73a256a415d07990ab6c8e1a67349d0248b5d1850207e574873620bfdbb",
           "at": "2026-07-27T12:03:17Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5f5e2a1a1841aa488e15957c378800cb46653cdc33f01aea7b121ed3df8a1589",
-          "at": "2026-07-27T02:49:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5f5e2a1a1841aa488e15957c378800cb46653cdc33f01aea7b121ed3df8a1589",
-          "at": "2026-07-27T02:52:36Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e0456a03b249c72e6a0c0cae09c98f427a9b35da50879872fa6847304997ce68",
-          "at": "2026-07-27T06:50:35Z"
+          "hash": "rvw1:sha256:2b904ca4c59a616e7f03c77aec119dd61830eab2158b39b5226bde95008b0e26",
+          "at": "2026-07-27T15:09:23Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:e0456a03b249c72e6a0c0cae09c98f427a9b35da50879872fa6847304997ce68",
-          "at": "2026-07-27T06:52:51Z"
+          "hash": "rvw1:sha256:2b904ca4c59a616e7f03c77aec119dd61830eab2158b39b5226bde95008b0e26",
+          "at": "2026-07-27T15:13:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::BaselineCaptureError` can represent only `SymlinkRejected(PathBuf)`, although its injected `SymlinkGuardPort` can also return `SymlinkGuardError::Io { path, reason }`. Consequently baseline capture must misclassify a stat/I/O failure as a symlink rejection and discard its reason, while the sibling actual-capture error now preserves both values. Add a distinct I/O variant carrying the path and diagnostic reason.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+              "line": 523,
+              "category": "lossy boundary downgrade"
+            }
+          ],
+          "hash": "rvw1:sha256:2b904ca4c59a616e7f03c77aec119dd61830eab2158b39b5226bde95008b0e26",
+          "at": "2026-07-27T15:14:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`BaselineCaptureError` の `docs` が、symlink rejection path と I/O payload を保持するという upstream の挙動契約を本文で再記述している。`docs` は契約を再記述せず spec/ADR anchor を参照すべき。",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+              "line": 508,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`CatalogueImplSignalsError` の `docs` が、symlink rejection path と I/O payload を保持するという upstream の挙動契約を本文で再記述している。`docs` は契約を再記述せず spec/ADR anchor を参照すべき。",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+              "line": 623,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:4ff4add2cf2523d306886c118d0b403efb990bcea3015e28439b14f08ffc4f1d",
+          "at": "2026-07-27T15:29:14Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8577685935d7500d73a4dcdfd4c2a9f7e208589baab7e506395ca4af1db87050",
-          "at": "2026-07-27T07:25:33Z"
+          "hash": "rvw1:sha256:de56866268ee1b218e2ddd3cfd8f790b25bdb13496865900c924949bb4b0f8aa",
+          "at": "2026-07-27T15:32:32Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8577685935d7500d73a4dcdfd4c2a9f7e208589baab7e506395ca4af1db87050",
-          "at": "2026-07-27T07:26:18Z"
+          "hash": "rvw1:sha256:de56866268ee1b218e2ddd3cfd8f790b25bdb13496865900c924949bb4b0f8aa",
+          "at": "2026-07-27T15:33:43Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8577685935d7500d73a4dcdfd4c2a9f7e208589baab7e506395ca4af1db87050",
-          "at": "2026-07-27T07:29:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d376df4f3f3c24af0aa965d2b97faef0dfaf2edcfce9c2241ec915d08788f0a5",
-          "at": "2026-07-27T11:21:36Z"
+          "hash": "rvw1:sha256:de56866268ee1b218e2ddd3cfd8f790b25bdb13496865900c924949bb4b0f8aa",
+          "at": "2026-07-27T15:34:04Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d376df4f3f3c24af0aa965d2b97faef0dfaf2edcfce9c2241ec915d08788f0a5",
-          "at": "2026-07-27T11:23:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d376df4f3f3c24af0aa965d2b97faef0dfaf2edcfce9c2241ec915d08788f0a5",
-          "at": "2026-07-27T11:23:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d376df4f3f3c24af0aa965d2b97faef0dfaf2edcfce9c2241ec915d08788f0a5",
-          "at": "2026-07-27T11:25:23Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d791f2cf8850d22f1bee4f4b5c7285453aeec7347762d0cd5587967fb4ee839e",
-          "at": "2026-07-27T10:25:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d791f2cf8850d22f1bee4f4b5c7285453aeec7347762d0cd5587967fb4ee839e",
-          "at": "2026-07-27T10:27:31Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2ddfb49ad9453179908790a08d22757ac1fb30c12e7ae16b2166e157665ab70b",
-          "at": "2026-07-27T04:08:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2ddfb49ad9453179908790a08d22757ac1fb30c12e7ae16b2166e157665ab70b",
-          "at": "2026-07-27T04:12:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3fa86ec72806c86de50ed11bb6deb01433d3a2149b2c14e25a47f25493f0ce16",
-          "at": "2026-07-27T10:25:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3fa86ec72806c86de50ed11bb6deb01433d3a2149b2c14e25a47f25493f0ce16",
-          "at": "2026-07-27T10:30:17Z"
+          "hash": "rvw1:sha256:de56866268ee1b218e2ddd3cfd8f790b25bdb13496865900c924949bb4b0f8aa",
+          "at": "2026-07-27T15:34:26Z"
         }
       ]
     },
@@ -1369,168 +1502,447 @@
           "findings": [],
           "hash": "rvw1:sha256:5d2ca4514806ef27c7c6b736e4f59bb00ef039bbd41661e0f30d95caa6572e0e",
           "at": "2026-07-27T12:03:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05ab9054d475b365b3e699fc30ed600e2280f948cb76e1971cdb3a49288c4612",
+          "at": "2026-07-27T12:43:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05ab9054d475b365b3e699fc30ed600e2280f948cb76e1971cdb3a49288c4612",
+          "at": "2026-07-27T12:47:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:371e02128e86301c95c330aede36eef6c692d8148c81798a676e1a46a6a5c22b",
+          "at": "2026-07-27T15:14:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 is the task that authors `tddd-features.json`, but it does not cite the newly added `CN-06`, and no other task carries that constraint; the current coverage map also lacks a `constraints[\"CN-06\"]` mapping. This leaves the feature-selection constraint uncovered despite the stated 26-element coverage. Add `CN-06` to T003's anchors and map it to T003.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
+              "line": 16,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:371e02128e86301c95c330aede36eef6c692d8148c81798a676e1a46a6a5c22b",
+          "at": "2026-07-27T15:17:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:706e56af261f0981052e65c42ce1273e0fdac43e6b885253f5a047223bdbd83a",
+          "at": "2026-07-27T15:29:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:706e56af261f0981052e65c42ce1273e0fdac43e6b885253f5a047223bdbd83a",
+          "at": "2026-07-27T15:32:34Z"
         }
       ]
     },
-    "infrastructure": {
+    "harness-policy": {
       "rounds": [
         {
           "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The versioned declaration DTO does not use `#[serde(deny_unknown_fields)]`. A future declaration containing extra fields is accepted and silently truncated, so schema-versioned input can be misinterpreted instead of failing closed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 92,
-              "category": "serde codec break"
-            },
-            {
-              "message": "Snapshot creation writes directly to the newly created file. A concurrent baseline/actual capture can observe the snapshot after `create_new` but before `write_all`/`sync_all` completes, producing a transient mismatch or accepting an incomplete snapshot. Use an atomic temp-file write/rename or equivalent synchronization.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 287,
-              "category": "snapshot concurrency"
-            }
-          ],
-          "hash": "rvw1:sha256:ce651b026513f30c2745c70e20b850dc5c502dd5f1b76581664338173ac23966",
-          "at": "2026-07-27T04:08:35Z"
-        },
-        {
-          "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1879b90c723866ad4952affffcf5d4f36be9823fe27f16a2ab014d2e62e91712",
-          "at": "2026-07-27T04:38:37Z"
+          "hash": "rvw1:sha256:b7eede59e03645b99b54a401621b60c2bfd71af41de50b9c45e2a1730d1fda63",
+          "at": "2026-07-27T06:10:41Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "Workspace member paths are joined without containment validation. An absolute member or one containing `..` can escape `workspace_root`; `reject_symlinks_below` checks symlinks but does not prove containment, allowing an out-of-root Cargo.toml to be read and accepted. Reject absolute/parent components and verify the normalized path remains under the trusted root.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 232,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "`reject_symlinks_below` deliberately excludes `trusted_root`, but the adapter never verifies that `track_dir` and `workspace_root` themselves are real directories. A symlinked root redirects declaration, snapshot, and manifest I/O, including snapshot writes. Reject symlinked trusted roots before performing any path operations.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 273,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "Deserializing `layers` directly into a `BTreeMap` silently keeps the last duplicate JSON key. A declaration containing conflicting duplicate layer entries therefore passes instead of failing closed. Use a duplicate-rejecting map deserializer, as existing infrastructure codecs do.",
+              "message": "`blocked_cross_scope` is classified here as an “unrecoverable dependency” requiring that no manual recovery exist, but the same workflow explicitly defines it as recoverable by resolving the dependency from the orchestrator context and relaunching the scope (lines 140–141 and 294–295). This contradictory criterion can either suppress the supported recovery path or be read as permission to serialize the initial wave. Distinguish the mandatory initial single-wave dispatch from the post-dispatch `blocked_cross_scope` recovery exception, without calling that exception unrecoverable.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 98,
-              "category": "non-fail-closed config"
+              "file": ".harness/workflows/track/review.md",
+              "line": 149,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:b7eede59e03645b99b54a401621b60c2bfd71af41de50b9c45e2a1730d1fda63",
+          "at": "2026-07-27T06:12:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d6724fa0c5f3bf78f818b25b83d8775120e50a0f9cb01b26226db8108825dc26",
+          "at": "2026-07-27T06:13:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The capability’s updated pipeline numbering is internally inconsistent: after adding step 0, it still says the orchestrator receives signal counts from step 3, although signal evaluation now occurs in step 4 (and `calc-impl-catalog` is step 9). Correct the stale reference so the workflow contract identifies the actual signal-producing step.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 67,
+              "category": "workflow-contract inconsistency"
+            }
+          ],
+          "hash": "rvw1:sha256:9e574a92cfe3e94ddb1340b6f931022296bcac4a020fe689edb65f09b184ea92",
+          "at": "2026-07-27T10:25:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b44f981bdfd57e0c5ac50ed57462db23b76ff05c940fda79d7a36cde64b593bc",
+          "at": "2026-07-27T10:30:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Step 0 cannot be executed under this capability's own write contract. `Scope Ownership` permits direct writes only to `<layer>-types.json`, `Rules` restricts Edit to that file, and the Bash allow-list contains no declaration-authoring command. A conforming type-designer therefore cannot create `tddd-features.json` on a fresh track, so baseline capture fails closed. Add the declaration explicitly to the permitted direct-write/tool rules.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 94,
+              "category": "responsibility-boundary cross"
             },
             {
-              "message": "All declaration, snapshot, and Cargo.toml reads use unbounded `std::fs::read`, so a large input can allocate until memory exhaustion before validation. Enforce an explicit byte limit using metadata plus a bounded reader and return a typed error when exceeded.",
+              "message": "The new committed type-design artifact lacks its intended review routing. `.harness/config/review-scope.json` matches only `*-types.json` for the `types` scope, so `tddd-features.json` is classified as `other`, despite ADR D1 assigning it to `types`; the types reviewer policy also only covers catalogue entries. Add the artifact pattern and corresponding types-scope review policy so feature declarations cannot bypass type-design review.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 274,
-              "category": "unbounded read"
+              "file": ".harness/workflows/track/type-design.md",
+              "line": 52,
+              "category": "review-scope wiring inconsistency"
+            }
+          ],
+          "hash": "rvw1:sha256:b44f981bdfd57e0c5ac50ed57462db23b76ff05c940fda79d7a36cde64b593bc",
+          "at": "2026-07-27T10:37:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The review-routing fix remains unapplied outside this scope. `tddd-features.json` is still classified as `other` because the `types` patterns omit it, and the types reviewer policy still accepts only catalogue-entry findings. This contradicts ADR D1 and leaves the committed declaration without its required type-design review. Update both `.harness/config/review-scope.json` and `.harness/custom/review-prompts/types.md`.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/type-design.md",
+              "line": 52,
+              "category": "review-scope wiring inconsistency"
             },
             {
-              "message": "The tests never exercise a successful `load_for_actual` call or concurrent baseline publishers, and omit the declared symlink, unsupported-schema, and malformed-TOML rejection paths. This leaves both a public API happy path and the snapshot concurrency/fail-closed contract unverified.",
+              "message": "The new ownership and feature-declaration-first order were not synchronized across operational surfaces. `.claude/agents/type-designer.md` still advertises baseline capture as the first stage and calls this a 12-step pipeline; `.codex/agents/type-designer.toml` omits `tddd-features.json` from owned artifacts; this workflow's Outputs and `CLAUDE.md`'s Phase-2/one-writer maps also omit it. These live instructions now contradict the capability SSoT and must be updated without copying workflow logic into thin track adapters.",
               "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 456,
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 55,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:105bc5d6feee81930c588825db4d8f43c62bb8c7d795d153b3da7a764fdaee5d",
+          "at": "2026-07-27T10:44:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The required review-routing fix remains unapplied outside this scope. `tddd-features.json` is still classified as `other` because the `types` patterns omit it, and the types reviewer policy still covers only catalogue entries. This contradicts ADR D1. Update `.harness/config/review-scope.json` and `.harness/custom/review-prompts/types.md`.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/type-design.md",
+              "line": 52,
+              "category": "review-scope wiring inconsistency"
+            },
+            {
+              "message": "The new feature-declaration-first order still contradicts the live provider wrappers. `.claude/agents/type-designer.md` advertises baseline capture as the first stage and calls the contract a 12-step pipeline, while `.codex/agents/type-designer.toml` omits `tddd-features.json` from owned artifacts. Synchronize these cross-scope wrappers, preferably by removing duplicated pipeline detail and retaining only provider-specific framing.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 55,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:34058c843a7bd20ec0d95383322a5d1d1500e3cd2c06b6a26517b464ea5daf87",
+          "at": "2026-07-27T10:46:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:13abac5b95cf85195eb1dd9d0ead196a01ecc5a3a2158bbc4f4751cbafcf9fee",
+          "at": "2026-07-27T11:12:26Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ce2edadf548aa73c048b12a92127764347b1ca881c4f4923ce48b037d80b303",
+          "at": "2026-07-27T00:54:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 は「baseline と実測が同一の宣言を読む」だけで feature 集合の乖離が構造的に不可能になるとしていますが、この commit 対象成果物は両取得の間に変更できます。baseline 後に宣言が更新されれば、同じパスを読んでも異なる feature 集合で抽出され、Context の中核要件と矛盾します。両取得を同一内容へ拘束する決定が必要です（具体的な形式は下流へ委ねられます）。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+              "line": 68,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:5ce2edadf548aa73c048b12a92127764347b1ca881c4f4923ce48b037d80b303",
+          "at": "2026-07-27T00:57:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:312e3823bde4aa58374a77d63bdc6933c9f5d99fa5d28d38eb7de6c8becf6fbb",
+          "at": "2026-07-27T01:03:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:312e3823bde4aa58374a77d63bdc6933c9f5d99fa5d28d38eb7de6c8becf6fbb",
+          "at": "2026-07-27T01:06:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c59bec9944232a1bc692cf2bf9e75f686164690f3d82e579126fc4d6b731950",
+          "at": "2026-07-27T01:49:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c59bec9944232a1bc692cf2bf9e75f686164690f3d82e579126fc4d6b731950",
+          "at": "2026-07-27T01:51:58Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:73ccf7b687757807c1c9df8dff19e46a1f5f559ba9912ba628635f6de98d4d99",
+          "at": "2026-07-27T04:08:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CargoFeatureName::try_new` does not implement Cargo's feature-name grammar: it accepts invalid leading `-` (for example, `-foo`) while rejecting valid names containing `+`, `.`, or Unicode XID characters. This breaks the newtype invariant and can prevent legitimate manifest features from being declared. Match the [Cargo feature-name grammar](https://doc.rust-lang.org/stable/cargo/reference/features.html#the-features-section) and add boundary tests.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/feature_declaration.rs",
+              "line": 21,
+              "category": "broken invariant"
+            },
+            {
+              "message": "The tests do not exercise several declared rejection paths: an empty feature name, `TdddFeatureDeclarationError::UnexpectedLayer`, or `TdddFeatureLookupError::MissingLayer`. These public error contracts can regress without detection; add tests asserting each variant and payload.",
+              "severity": "P1",
+              "file": "libs/domain/src/tddd/feature_declaration.rs",
+              "line": 204,
               "category": "test coverage gap"
             }
           ],
-          "hash": "rvw1:sha256:c9f778378433d1e048297f63a403213421575323279608faaa794e656866019f",
-          "at": "2026-07-27T05:15:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Concurrent publication of different declaration bytes is misclassified. If another writer creates the snapshot after the initial absence check, `compare_snapshot` returns a diagnostic for differing bytes, but this branch wraps it as `SnapshotWrite` instead of the declared `BaselineSnapshotMismatch`. Existing-snapshot read failures are likewise labeled as writes. Preserve mismatch versus I/O internally and map each to its correct public error; add a deterministic conflicting-publisher test.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 54,
-              "category": "error handling"
-            },
-            {
-              "message": "Cargo.toml structural validation still has silent fallbacks: non-string workspace members are skipped here, and a present but non-table `features` value is treated as an absent feature table via `unwrap_or_default` below. The adapter can therefore accept a semantically invalid manifest instead of failing closed. Reject malformed member entries and malformed `features` values with `ReadDeclaration`, while retaining an actually absent `[features]` table as the valid empty case.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 291,
-              "category": "non-fail-closed config"
-            }
-          ],
-          "hash": "rvw1:sha256:d14462b48e61c066a88aa5514efc539c4035ce8bde7239221ccd3c5c5c51f4e6",
-          "at": "2026-07-27T05:33:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The target manifest's `[features]` table is validated only by collecting its keys. Values such as `semantic-dup = 1` or arrays containing non-string entries therefore count as valid declared features even though Cargo rejects that manifest. Validate each feature value as an array of strings (or resolve features through Cargo metadata) and return `ReadDeclaration` for malformed entries.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 338,
-              "category": "non-fail-closed config"
-            },
-            {
-              "message": "`clean_up_temporary` reports cleanup failures only when the original error was `Write`. If publication ends with `Mismatch` or `Read` and removal of the temporary file also fails, that I/O failure is silently discarded and a stale file is left behind. Preserve both causes or promote the cleanup failure to a typed write error instead of swallowing it.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 554,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:64adcde8087d3b3cc824b80b83ad6d13671d2d8f710e772b099ffc893cc26425",
-          "at": "2026-07-27T05:44:11Z"
+          "hash": "rvw1:sha256:73ccf7b687757807c1c9df8dff19e46a1f5f559ba9912ba628635f6de98d4d99",
+          "at": "2026-07-27T04:12:24Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bce2cb365db65c781736c0b56b778a145117e91bcf31b0f6f97d63f04349418e",
-          "at": "2026-07-27T05:49:40Z"
+          "hash": "rvw1:sha256:8f9679d0efb168c6dcee0893e198ed6cc071bdf3d35da649292dfd018d56e07c",
+          "at": "2026-07-27T04:38:59Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:c184c19e7b310fbd26ce647a25d739008b118ee3efec3012c44e75aa6a2ff187",
-          "at": "2026-07-27T06:06:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f990e4aff6344a01b8daaa7833c6fd33165de9bfa72caa36215a710868c0bf29",
-          "at": "2026-07-27T06:42:46Z"
+          "hash": "rvw1:sha256:82900a574d5c9ef35a0ce2ed1e9ef6b86c3c7b1aad2dbe722acf721256107187",
+          "at": "2026-07-27T06:07:45Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8db0bd1249f2c306fd21ef6ba904be1323b0fd0baa328b2d49366d542a213a36",
+          "hash": "rvw1:sha256:762cdf91c52778914018464cc45e8638455fbbf2014210dc8255b2b120d3d746",
+          "at": "2026-07-27T10:25:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:762cdf91c52778914018464cc45e8638455fbbf2014210dc8255b2b120d3d746",
+          "at": "2026-07-27T10:27:32Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abbe0f9a3d3637ba70675354690ba28f6c8f76a253022cd15edd0c395ac030c1",
+          "at": "2026-07-27T12:43:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:abbe0f9a3d3637ba70675354690ba28f6c8f76a253022cd15edd0c395ac030c1",
+          "at": "2026-07-27T12:47:50Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ddfb49ad9453179908790a08d22757ac1fb30c12e7ae16b2166e157665ab70b",
+          "at": "2026-07-27T04:08:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ddfb49ad9453179908790a08d22757ac1fb30c12e7ae16b2166e157665ab70b",
+          "at": "2026-07-27T04:12:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3fa86ec72806c86de50ed11bb6deb01433d3a2149b2c14e25a47f25493f0ce16",
           "at": "2026-07-27T10:25:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8db0bd1249f2c306fd21ef6ba904be1323b0fd0baa328b2d49366d542a213a36",
-          "at": "2026-07-27T10:29:03Z"
+          "hash": "rvw1:sha256:3fa86ec72806c86de50ed11bb6deb01433d3a2149b2c14e25a47f25493f0ce16",
+          "at": "2026-07-27T10:30:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fbaf14e1d10b7ac1c82eaff07d00b31bccb73e52981d8ebecd65c172c16d7bc2",
+          "at": "2026-07-27T12:43:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SymlinkRejected(PathBuf)` is populated with the formatted `SymlinkGuardError`, not a path. For example, a symlink error produces a payload like `\"symlink detected at path: /x\"`, so callers receive a fabricated relative path instead of `/x`; the same pattern recurs for the other guard calls and in `helpers.rs`. Match the guard error and preserve its actual path (and model any I/O reason separately).",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor.rs",
+              "line": 141,
+              "category": "architecture"
+            },
+            {
+              "message": "The AC-04 regression only records the features passed to actual capture; both rustdoc methods return empty crates and the evaluator inspects neither surface. It therefore passes if the baseline omitted the feature-gated item or if actual extraction ignored the feature. Add coverage asserting that the declared gated public item appears in both baseline and current extracted surfaces.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor_tests.rs",
+              "line": 657,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:fbaf14e1d10b7ac1c82eaff07d00b31bccb73e52981d8ebecd65c172c16d7bc2",
+          "at": "2026-07-27T12:48:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This does not exercise AC-06: the mock port directly fabricates `CatalogueUsesUndeclaredFeature`, while `minimal_catalogue_doc` contains no feature-gated entry and no declaration omitting `semantic-dup` is supplied. The test therefore passes even if production never detects a catalogue/declaration mismatch. Construct the gated catalogue plus omitted-feature declaration and assert the resulting fail-closed refusal through the actual validation path.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor_tests.rs",
+              "line": 857,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:3507ba565364a1942a2cbc416f9ef86e8255c62922af3d76fdadee855805eafa",
+          "at": "2026-07-27T13:33:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The AC-06 test still implements the behavior entirely inside its fake port. The inserted `TypeEntry` has no association with `gated_feature`; that relationship exists only in separate test fields, and the test-only `if !declared_features.contains(...)` manufactures the expected rejection. It therefore passes even if production never derives a catalogue item's feature gate or rejects the mismatch. Exercise the production validation that establishes this association; if the current declared model cannot represent it, stop for the Phase 2 re-dispatch required by the briefing.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor_tests.rs",
+              "line": 872,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:736fb528ec542f16e704b7004c066ecc49297cedc7084b10240a852e48f21533",
+          "at": "2026-07-27T13:40:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The AC-06 scenario violates the frozen-declaration invariant: `EmptyFeatureDeclaration` supplies no features, yet the baseline loader returns the gated item while actual capture omits it. The fake evaluator then emits Red only for `(catalogue, baseline, actual) = (true, true, false)`, so the test proves artificial baseline/actual drift rather than an undeclared feature omitting the item from both captures. Model both extracted surfaces without the item and assert the resulting real chain-③ non-Blue outcome.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor_tests.rs",
+              "line": 527,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:fc0c3410104adfe806701dd63409d1ff89c8c2cb94d77a0b5020d61119ffbe79",
+          "at": "2026-07-27T14:36:22Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:7fea5ff16508cac0cb5895953f3e0909bb6fccb262f94a258e51cbf64cb50bbe",
-          "at": "2026-07-27T11:04:46Z"
+          "hash": "rvw1:sha256:690d1c3e52ee372a5677547565ae8913ece7f6a6a7439f78cebb9f233cc7ccbf",
+          "at": "2026-07-27T14:41:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:539853e14614bf71e42f6a9e33e6fdd507f3fe591d9943e2e31c3cb58e31c805",
+          "at": "2026-07-27T15:00:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e9c7be0efa1aa1d04286554bd0a82fb2d634e72daed953871a1b232326fa49a",
+          "at": "2026-07-27T15:29:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e9c7be0efa1aa1d04286554bd0a82fb2d634e72daed953871a1b232326fa49a",
+          "at": "2026-07-27T15:31:21Z"
         }
       ]
     }

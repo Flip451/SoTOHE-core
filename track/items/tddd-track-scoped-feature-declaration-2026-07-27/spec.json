@@ -143,7 +143,7 @@
     },
     {
       "id": "CN-03",
-      "text": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する",
+      "text": "declared feature が対象 crate の Cargo.toml に存在しない場合は fail-closed で拒否する。catalogue に記載した type が track 未宣言 feature のため extracted surface に現れない場合は、chain ③ signal を non-Blue として fail-closed で拒否する",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
@@ -235,7 +235,7 @@
     },
     {
       "id": "AC-06",
-      "text": "catalogue に記載した feature-gated type の feature を track が宣言していない場合、track は gate で fail-closed に拒否される",
+      "text": "catalogue に記載した feature-gated type の feature を track が宣言していない場合、その type は extracted surface に現れず、chain ③ signal が non-Blue となるため track は fail-closed に拒否される",
       "adr_refs": [
         {
           "file": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",

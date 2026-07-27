@@ -301,7 +301,7 @@
       }
     },
     {
-      "claim_hash": "f7fb484c86c0b0bb918860861641a35f8acab86a69976fa41ef37bd150073bef",
+      "claim_hash": "14c1bba66a6f319f05c717f82d0b8129a4728097dc13f3de40ea0f3356d0dd9b",
       "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
       "verdict": {
         "kind": "pass",
@@ -312,7 +312,7 @@
         "data": {
           "section": "constraint",
           "element_id": "CN-03",
-          "text_label": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
+          "text_label": "declared feature が対象 crate の Cargo.toml に存在しない場合は fail-closed で拒否する。catalogue に記載した type が track 未宣言 feature のため extracted surface に現れない場合は、chain ③ signal を non-Blue として fail-closed で拒否する"
         }
       },
       "evidence_origin": {
@@ -508,7 +508,7 @@
       }
     },
     {
-      "claim_hash": "66e1ba23c84f8c4f9e3ae1f57d574d27b9ac13c8ab68b51f9ba7bac60cb47c54",
+      "claim_hash": "9463ffe48f10a6aeeacaa50c3c17552024ea58bbffd7a0c5c72546ddd1432744",
       "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
       "verdict": {
         "kind": "pass",
@@ -519,7 +519,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "catalogue に記載した feature-gated type の feature を track が宣言していない場合、track は gate で fail-closed に拒否される"
+          "text_label": "catalogue に記載した feature-gated type の feature を track が宣言していない場合、その type は extracted surface に現れず、chain ③ signal が non-Blue となるため track は fail-closed に拒否される"
         }
       },
       "evidence_origin": {

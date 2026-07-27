@@ -56,6 +56,29 @@ impl SymlinkGuardPort for RejectingSymlinkGuard {
     }
 }
 
+/// Symlink guard that reports an I/O failure for every inspected path.
+struct IoFailingSymlinkGuard;
+
+impl SymlinkGuardPort for IoFailingSymlinkGuard {
+    fn reject_symlinks_from_root(&self, path: &Path) -> Result<(), SymlinkGuardError> {
+        Err(SymlinkGuardError::Io {
+            path: path.to_string_lossy().to_string(),
+            reason: "permission denied".to_owned(),
+        })
+    }
+
+    fn reject_symlinks_below(
+        &self,
+        path: &Path,
+        _trusted_root: &Path,
+    ) -> Result<(), SymlinkGuardError> {
+        Err(SymlinkGuardError::Io {
+            path: path.to_string_lossy().to_string(),
+            reason: "permission denied".to_owned(),
+        })
+    }
+}
+
 /// Layer bindings stub that returns a fixed set of bindings.
 struct StubLayerBindings {
     bindings: Vec<TdddLayerBinding>,
@@ -225,6 +248,25 @@ fn test_run_with_symlinked_workspace_root_returns_symlink_rejected() {
         matches!(err, BaselineCaptureError::SymlinkRejected(_)),
         "rejecting symlink guard must return SymlinkRejected, got: {err:?}"
     );
+}
+
+#[test]
+fn test_run_with_symlink_guard_io_preserves_path_and_reason() {
+    let interactor = BaselineCaptureInteractor::new(
+        Arc::new(IoFailingSymlinkGuard),
+        Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
+        Arc::new(SuccessCapture),
+        Arc::new(EmptyFeatureDeclaration),
+    );
+    let tmp = tempfile::tempdir().unwrap();
+
+    let err = interactor.run(valid_request(tmp.path())).unwrap_err();
+
+    assert!(matches!(
+        err,
+        BaselineCaptureError::SymlinkGuardIo(path, reason)
+            if path.as_path() == tmp.path() && reason.as_str() == "permission denied"
+    ));
 }
 
 #[test]

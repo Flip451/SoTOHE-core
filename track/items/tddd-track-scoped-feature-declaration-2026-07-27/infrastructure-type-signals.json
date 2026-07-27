@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-27T11:48:52Z",
+  "generated_at": "2026-07-27T12:22:40Z",
   "declaration_hash": "4b6906ae2bb783ed276b46e0cdd808fa0accafe5fd4a0b769e8c465892ad449e",
-  "implementation_input_hash": "565162516b4cf9a0e4b4ab33a0208b8996d78c7d2020d9d31fac8dd0dc09b448",
+  "implementation_input_hash": "7983dc1aa06a51dcc0e78716288d26136968dd492a4d213b4d0e8a57ada7c674",
   "signals": [
     {
       "type_name": "CodeFragmentExtractorAdapter",

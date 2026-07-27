@@ -9,26 +9,36 @@
 
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
 
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 use std::path::Path;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
-use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort, RustdocCratePort,
+    BaselineCaptureIoError, CatalogueDocument, CatalogueDocumentLoaderError,
+    CatalogueDocumentLoaderPort, CrateName, RustdocBaselineCapturePort, RustdocCratePort,
     RustdocCratePortError, TdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort,
 };
 use domain::tddd::extended_crate::ExtendedCrate;
 use domain::tddd::signal_evaluator::phase1_error::Phase1Error;
 use domain::tddd::signal_evaluator::port::SignalEvaluatorPort;
+use domain::tddd::{CargoFeatureName, LayerId, TdddFeatureDeclaration};
 // ThreeWaySignal is not pub-re-exported from the parent module, so it cannot be
 // reached via `use super::*` and must be imported explicitly here.
 use domain::tddd::signal_evaluator::region::{ThreeWayEvaluationReport, ThreeWaySignal};
-use domain::{SymlinkGuardError, SymlinkGuardPort};
-use rustdoc_types::{Crate, FORMAT_VERSION};
+use domain::{SymlinkGuardError, SymlinkGuardPort, TrackId};
+use rustdoc_types::{
+    Crate, FORMAT_VERSION, Id, Item, ItemEnum, ItemKind, ItemSummary, Module, Struct, Visibility,
+};
 
 use super::super::service::{CatalogueImplSignalsError, CatalogueImplSignalsService};
 use super::CatalogueImplSignalsInteractor;
+use crate::baseline_capture::{
+    BaselineCaptureInteractor, BaselineCaptureRequest, BaselineCaptureService,
+};
+use crate::tddd_feature_declaration::{
+    TdddActualFeatureDeclarationPort, TdddActualFeatureDeclarationPortError,
+    TdddBaselineFeatureDeclarationPort, TdddBaselineFeatureDeclarationPortError,
+};
 
 // -------------------------------------------------------------------------
 // Test helpers — also re-used by `happy_tests`
@@ -46,6 +56,84 @@ pub(super) fn empty_rustdoc_crate() -> Crate {
         format_version: FORMAT_VERSION,
         target: rustdoc_types::Target { triple: String::new(), target_features: vec![] },
     }
+}
+
+fn rustdoc_crate_with_gated_public_item() -> Crate {
+    let root_id = Id(0);
+    let item_id = Id(1);
+    let item_name = "FeatureGatedPublicItem";
+    let mut crate_ = empty_rustdoc_crate();
+    crate_.index.insert(
+        root_id,
+        Item {
+            id: root_id,
+            crate_id: 0,
+            name: Some("domain".to_owned()),
+            span: None,
+            visibility: Visibility::Public,
+            docs: None,
+            links: HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::Module(Module {
+                is_crate: true,
+                items: vec![item_id],
+                is_stripped: false,
+            }),
+        },
+    );
+    crate_.index.insert(
+        item_id,
+        Item {
+            id: item_id,
+            crate_id: 0,
+            name: Some(item_name.to_owned()),
+            span: None,
+            visibility: Visibility::Public,
+            docs: None,
+            links: HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::Struct(Struct {
+                kind: rustdoc_types::StructKind::Plain {
+                    fields: vec![],
+                    has_stripped_fields: false,
+                },
+                generics: rustdoc_types::Generics { params: vec![], where_predicates: vec![] },
+                impls: vec![],
+            }),
+        },
+    );
+    crate_.paths.insert(
+        item_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec!["domain".to_owned(), item_name.to_owned()],
+            kind: ItemKind::Struct,
+        },
+    );
+    crate_
+}
+
+fn rustdoc_crate_without_gated_public_item() -> Crate {
+    let root_id = Id(0);
+    let mut crate_ = empty_rustdoc_crate();
+    crate_.index.insert(
+        root_id,
+        Item {
+            id: root_id,
+            crate_id: 0,
+            name: Some("domain".to_owned()),
+            span: None,
+            visibility: Visibility::Public,
+            docs: None,
+            links: HashMap::new(),
+            attrs: vec![],
+            deprecation: None,
+            inner: ItemEnum::Module(Module { is_crate: true, items: vec![], is_stripped: false }),
+        },
+    );
+    crate_
 }
 
 pub(super) fn minimal_catalogue_doc(crate_name: &str) -> CatalogueDocument {
@@ -169,7 +257,11 @@ impl RustdocCratePort for NeverCalledRustdocPort {
         panic!("NeverCalledRustdocPort::load_from_path must not be called in these tests")
     }
 
-    fn capture_current(&self, _crate_name: &str) -> Result<Crate, RustdocCratePortError> {
+    fn capture_current(
+        &self,
+        _crate_name: &domain::tddd::catalogue_v2::CrateName,
+        _features: &[CargoFeatureName],
+    ) -> Result<Crate, RustdocCratePortError> {
         panic!("NeverCalledRustdocPort::capture_current must not be called in these tests")
     }
 }
@@ -182,7 +274,11 @@ impl RustdocCratePort for EmptyRustdocPort {
         Ok(empty_rustdoc_crate())
     }
 
-    fn capture_current(&self, _crate_name: &str) -> Result<Crate, RustdocCratePortError> {
+    fn capture_current(
+        &self,
+        _crate_name: &domain::tddd::catalogue_v2::CrateName,
+        _features: &[CargoFeatureName],
+    ) -> Result<Crate, RustdocCratePortError> {
         Ok(empty_rustdoc_crate())
     }
 }
@@ -195,9 +291,13 @@ impl RustdocCratePort for FailingRustdocPort {
         Err(RustdocCratePortError::NotFound { path: path.to_path_buf() })
     }
 
-    fn capture_current(&self, crate_name: &str) -> Result<Crate, RustdocCratePortError> {
+    fn capture_current(
+        &self,
+        crate_name: &domain::tddd::catalogue_v2::CrateName,
+        _features: &[CargoFeatureName],
+    ) -> Result<Crate, RustdocCratePortError> {
         Err(RustdocCratePortError::CaptureFailed {
-            crate_name: crate_name.to_owned(),
+            crate_name: crate_name.as_str().to_owned(),
             reason: "stub capture failure".to_owned(),
         })
     }
@@ -257,6 +357,257 @@ impl TdddLayerBindingsPort for LayerNotFoundLayerBindings {
     }
 }
 
+/// Actual-capture declaration stub that supplies no features for every requested layer.
+pub(super) struct EmptyFeatureDeclaration;
+
+impl TdddActualFeatureDeclarationPort for EmptyFeatureDeclaration {
+    fn load_for_actual(
+        &self,
+        _track_dir: &Path,
+        _workspace_root: &Path,
+        layers: &[TdddLayerBinding],
+    ) -> Result<TdddFeatureDeclaration, TdddActualFeatureDeclarationPortError> {
+        let required_layers = layers
+            .iter()
+            .map(|binding| LayerId::try_new(binding.layer_id.clone()))
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|_| TdddActualFeatureDeclarationPortError::BaselineSnapshotMismatch)?;
+        let declared_layers = required_layers
+            .iter()
+            .cloned()
+            .map(|layer| (layer, Vec::new()))
+            .collect::<BTreeMap<_, _>>();
+        TdddFeatureDeclaration::try_new(declared_layers, &required_layers)
+            .map_err(|_| TdddActualFeatureDeclarationPortError::BaselineSnapshotMismatch)
+    }
+}
+
+struct FrozenFeatureDeclaration;
+
+impl TdddBaselineFeatureDeclarationPort for FrozenFeatureDeclaration {
+    fn load_for_baseline(
+        &self,
+        _track_dir: &Path,
+        _workspace_root: &Path,
+        layers: &[TdddLayerBinding],
+    ) -> Result<TdddFeatureDeclaration, TdddBaselineFeatureDeclarationPortError> {
+        frozen_feature_declaration(layers)
+            .map_err(|_| TdddBaselineFeatureDeclarationPortError::BaselineSnapshotMismatch)
+    }
+}
+
+impl TdddActualFeatureDeclarationPort for FrozenFeatureDeclaration {
+    fn load_for_actual(
+        &self,
+        _track_dir: &Path,
+        _workspace_root: &Path,
+        layers: &[TdddLayerBinding],
+    ) -> Result<TdddFeatureDeclaration, TdddActualFeatureDeclarationPortError> {
+        frozen_feature_declaration(layers)
+            .map_err(|_| TdddActualFeatureDeclarationPortError::BaselineSnapshotMismatch)
+    }
+}
+
+fn frozen_feature_declaration(layers: &[TdddLayerBinding]) -> Result<TdddFeatureDeclaration, ()> {
+    let required_layers = layers
+        .iter()
+        .map(|binding| LayerId::try_new(binding.layer_id.clone()))
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(|_| ())?;
+    let feature = CargoFeatureName::try_new("semantic-dup".to_owned()).map_err(|_| ())?;
+    let declared_layers = required_layers
+        .iter()
+        .cloned()
+        .map(|layer| (layer, vec![feature.clone()]))
+        .collect::<BTreeMap<_, _>>();
+    TdddFeatureDeclaration::try_new(declared_layers, &required_layers).map_err(|_| ())
+}
+
+struct MissingFrozenFeatureDeclaration;
+
+impl TdddActualFeatureDeclarationPort for MissingFrozenFeatureDeclaration {
+    fn load_for_actual(
+        &self,
+        track_dir: &Path,
+        _workspace_root: &Path,
+        _layers: &[TdddLayerBinding],
+    ) -> Result<TdddFeatureDeclaration, TdddActualFeatureDeclarationPortError> {
+        Err(TdddActualFeatureDeclarationPortError::MissingBaselineSnapshot {
+            path: track_dir.join("tddd-features-baseline.json"),
+        })
+    }
+}
+
+struct MismatchedFrozenFeatureDeclaration;
+
+impl TdddActualFeatureDeclarationPort for MismatchedFrozenFeatureDeclaration {
+    fn load_for_actual(
+        &self,
+        _track_dir: &Path,
+        _workspace_root: &Path,
+        _layers: &[TdddLayerBinding],
+    ) -> Result<TdddFeatureDeclaration, TdddActualFeatureDeclarationPortError> {
+        Err(TdddActualFeatureDeclarationPortError::BaselineSnapshotMismatch)
+    }
+}
+
+struct InvalidFeatureDeclaration;
+
+impl TdddActualFeatureDeclarationPort for InvalidFeatureDeclaration {
+    fn load_for_actual(
+        &self,
+        _track_dir: &Path,
+        _workspace_root: &Path,
+        _layers: &[TdddLayerBinding],
+    ) -> Result<TdddFeatureDeclaration, TdddActualFeatureDeclarationPortError> {
+        Err(TdddActualFeatureDeclarationPortError::Read(
+            crate::tddd_feature_declaration::TdddFeatureDeclarationReadError::UnknownCargoFeature {
+                layer: LayerId::try_new("domain".to_owned()).unwrap(),
+                feature: CargoFeatureName::try_new("undeclared".to_owned()).unwrap(),
+            },
+        ))
+    }
+}
+
+struct FeatureGatedRustdocPort {
+    observed_actual_features: Arc<Mutex<Vec<Vec<String>>>>,
+}
+
+impl RustdocCratePort for FeatureGatedRustdocPort {
+    fn load_from_path(&self, _path: &Path) -> Result<Crate, RustdocCratePortError> {
+        Ok(rustdoc_crate_with_gated_public_item())
+    }
+
+    fn capture_current(
+        &self,
+        _crate_name: &CrateName,
+        features: &[CargoFeatureName],
+    ) -> Result<Crate, RustdocCratePortError> {
+        self.observed_actual_features
+            .lock()
+            .unwrap()
+            .push(features.iter().map(|feature| feature.as_str().to_owned()).collect());
+        if !features.iter().any(|feature| feature.as_str() == "semantic-dup") {
+            return Err(RustdocCratePortError::CaptureFailed {
+                crate_name: "domain".to_owned(),
+                reason: "feature-gated public item requires semantic-dup".to_owned(),
+            });
+        }
+        Ok(rustdoc_crate_with_gated_public_item())
+    }
+}
+
+struct GatedPublicItemEvaluator {
+    observed_surfaces: Arc<Mutex<Vec<(bool, bool)>>>,
+}
+
+impl SignalEvaluatorPort for GatedPublicItemEvaluator {
+    fn evaluate(
+        &self,
+        _a: ExtendedCrate,
+        baseline: Crate,
+        current: Crate,
+    ) -> Result<ThreeWayEvaluationReport, Phase1Error> {
+        let has_gated_item = |crate_: &Crate| {
+            crate_.index.values().any(|item| item.name.as_deref() == Some("FeatureGatedPublicItem"))
+        };
+        self.observed_surfaces
+            .lock()
+            .unwrap()
+            .push((has_gated_item(&baseline), has_gated_item(&current)));
+        Ok(ThreeWayEvaluationReport::new(vec![]))
+    }
+}
+
+struct RecordingBaselineCapture {
+    observed_features: Arc<Mutex<Vec<Vec<String>>>>,
+}
+
+struct CatalogueGatedItemCodec;
+
+impl domain::tddd::CatalogueToExtendedCratePort for CatalogueGatedItemCodec {
+    fn encode(
+        &self,
+        _doc: CatalogueDocument,
+    ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
+        Ok(ExtendedCrate::new(rustdoc_crate_with_gated_public_item(), BTreeMap::new()))
+    }
+}
+
+struct UndeclaredFeatureRustdocPort;
+
+impl RustdocCratePort for UndeclaredFeatureRustdocPort {
+    fn load_from_path(&self, _path: &Path) -> Result<Crate, RustdocCratePortError> {
+        Ok(rustdoc_crate_without_gated_public_item())
+    }
+
+    fn capture_current(
+        &self,
+        _crate_name: &CrateName,
+        features: &[CargoFeatureName],
+    ) -> Result<Crate, RustdocCratePortError> {
+        assert!(features.is_empty(), "the track declares no feature for the gated catalogue item");
+        Ok(rustdoc_crate_without_gated_public_item())
+    }
+}
+
+struct CatalogueItemMissingFromActualEvaluator {
+    observed_membership: Arc<Mutex<Vec<(bool, bool, bool)>>>,
+}
+
+impl SignalEvaluatorPort for CatalogueItemMissingFromActualEvaluator {
+    fn evaluate(
+        &self,
+        catalogue: ExtendedCrate,
+        baseline: Crate,
+        actual: Crate,
+    ) -> Result<ThreeWayEvaluationReport, Phase1Error> {
+        let has_gated_item = |crate_: &Crate| {
+            crate_.index.values().any(|item| item.name.as_deref() == Some("FeatureGatedPublicItem"))
+        };
+        let observed =
+            (has_gated_item(catalogue.krate()), has_gated_item(&baseline), has_gated_item(&actual));
+        self.observed_membership.lock().unwrap().push(observed);
+        let signals = if observed == (true, false, false) {
+            vec![ThreeWaySignal::new(
+                "FeatureGatedPublicItem".to_owned(),
+                domain::tddd::signal_evaluator::region::SignalRegion::SMinusC_Reference,
+            )]
+        } else {
+            vec![]
+        };
+        Ok(ThreeWayEvaluationReport::new(signals))
+    }
+}
+
+impl RustdocBaselineCapturePort for RecordingBaselineCapture {
+    fn capture(
+        &self,
+        _items_dir: &Path,
+        _track_id: &TrackId,
+        _rustdoc_workspace: &Path,
+        _binding: &TdddLayerBinding,
+        features: &[CargoFeatureName],
+    ) -> Result<(), BaselineCaptureIoError> {
+        self.observed_features
+            .lock()
+            .unwrap()
+            .push(features.iter().map(|feature| feature.as_str().to_owned()).collect());
+        Ok(())
+    }
+}
+
+struct EmptyExtendedCrateCodec;
+
+impl domain::tddd::CatalogueToExtendedCratePort for EmptyExtendedCrateCodec {
+    fn encode(
+        &self,
+        _doc: CatalogueDocument,
+    ) -> Result<ExtendedCrate, domain::tddd::NewTypeGraphCodecError> {
+        Ok(ExtendedCrate::new(empty_rustdoc_crate(), BTreeMap::new()))
+    }
+}
+
 /// No-op `SymlinkGuardPort` that always reports "no symlink found".
 ///
 /// Used as the default in tests that don't exercise the symlink guard path.
@@ -295,6 +646,29 @@ impl SymlinkGuardPort for AlwaysRejectSymlinkGuard {
     }
 }
 
+/// `SymlinkGuardPort` that fails with an I/O error for every guard call.
+struct AlwaysIoSymlinkGuard;
+
+impl SymlinkGuardPort for AlwaysIoSymlinkGuard {
+    fn reject_symlinks_from_root(&self, path: &Path) -> Result<(), SymlinkGuardError> {
+        Err(SymlinkGuardError::Io {
+            path: path.display().to_string(),
+            reason: "permission denied".to_owned(),
+        })
+    }
+
+    fn reject_symlinks_below(
+        &self,
+        path: &Path,
+        _trusted_root: &Path,
+    ) -> Result<(), SymlinkGuardError> {
+        Err(SymlinkGuardError::Io {
+            path: path.display().to_string(),
+            reason: "permission denied".to_owned(),
+        })
+    }
+}
+
 // -------------------------------------------------------------------------
 // Interactor builder helper — also re-used by `happy_tests`
 // -------------------------------------------------------------------------
@@ -312,6 +686,7 @@ pub(super) fn build_interactor(
         evaluator,
         rustdoc,
         bindings,
+        Arc::new(EmptyFeatureDeclaration),
         Arc::new(NoopSymlinkGuard),
     )
 }
@@ -322,9 +697,18 @@ pub(super) fn build_interactor_with_guard(
     evaluator: Arc<dyn SignalEvaluatorPort>,
     rustdoc: Arc<dyn RustdocCratePort>,
     bindings: Arc<dyn TdddLayerBindingsPort>,
+    feature_declaration: Arc<dyn TdddActualFeatureDeclarationPort>,
     symlink_guard: Arc<dyn SymlinkGuardPort>,
 ) -> CatalogueImplSignalsInteractor {
-    CatalogueImplSignalsInteractor::new(loader, codec, evaluator, rustdoc, bindings, symlink_guard)
+    CatalogueImplSignalsInteractor::new(
+        loader,
+        codec,
+        evaluator,
+        rustdoc,
+        bindings,
+        feature_declaration,
+        symlink_guard,
+    )
 }
 
 // -------------------------------------------------------------------------
@@ -352,7 +736,7 @@ fn test_run_workspace_root_with_dotdot_returns_symlink_rejected_error() {
     let bad_root = std::path::PathBuf::from("/tmp/../etc");
     let err = interactor.run("my-track".to_owned(), bad_root, None).unwrap_err();
     assert!(
-        matches!(err, CatalogueImplSignalsError::SymlinkRejected { .. }),
+        matches!(err, CatalogueImplSignalsError::SymlinkRejected(_)),
         "expected SymlinkRejected for dot-dot workspace_root, got: {err:?}"
     );
 }
@@ -370,7 +754,7 @@ fn test_run_invalid_track_id_returns_invalid_track_id_error() {
         .run("BAD TRACK ID!!".to_owned(), std::path::PathBuf::from("/tmp"), None)
         .unwrap_err();
     assert!(
-        matches!(err, CatalogueImplSignalsError::InvalidTrackId { .. }),
+        matches!(err, CatalogueImplSignalsError::InvalidTrackId(_)),
         "expected InvalidTrackId, got: {err:?}"
     );
 }
@@ -401,7 +785,7 @@ fn test_run_layer_bindings_load_failure_returns_layer_bindings_load_error() {
     let err =
         interactor.run("my-track".to_owned(), std::path::PathBuf::from("/tmp"), None).unwrap_err();
     assert!(
-        matches!(err, CatalogueImplSignalsError::LayerBindingsLoad { .. }),
+        matches!(err, CatalogueImplSignalsError::LayerBindingsLoad(_)),
         "expected LayerBindingsLoad, got: {err:?}"
     );
 }
@@ -419,7 +803,7 @@ fn test_run_catalogue_load_failure_returns_catalogue_load_error() {
     let err =
         interactor.run("my-track".to_owned(), std::path::PathBuf::from("/tmp"), None).unwrap_err();
     assert!(
-        matches!(err, CatalogueImplSignalsError::CatalogueLoad { .. }),
+        matches!(err, CatalogueImplSignalsError::CatalogueLoad(_, _)),
         "expected CatalogueLoad, got: {err:?}"
     );
 }
@@ -438,7 +822,7 @@ fn test_run_ext_crate_conversion_failure_returns_ext_crate_conversion_error() {
     let err =
         interactor.run("my-track".to_owned(), std::path::PathBuf::from("/tmp"), None).unwrap_err();
     assert!(
-        matches!(err, CatalogueImplSignalsError::ExtendedCrateConversion { .. }),
+        matches!(err, CatalogueImplSignalsError::ExtendedCrateConversion(_, _)),
         "expected ExtendedCrateConversion, got: {err:?}"
     );
 }
@@ -464,7 +848,7 @@ fn test_run_layer_not_found_with_layer_filter_returns_layer_bindings_load_error(
         )
         .unwrap_err();
     assert!(
-        matches!(err, CatalogueImplSignalsError::LayerBindingsLoad { .. }),
+        matches!(err, CatalogueImplSignalsError::LayerBindingsLoad(_)),
         "LayerNotFound must map to LayerBindingsLoad, got: {err:?}"
     );
 }
@@ -478,14 +862,35 @@ fn test_run_symlink_guard_rejection_returns_symlink_rejected_error() {
         Arc::new(EmptyEvaluator),
         Arc::new(NeverCalledRustdocPort),
         Arc::new(StubLayerBindings { bindings: vec![] }),
+        Arc::new(EmptyFeatureDeclaration),
         Arc::new(AlwaysRejectSymlinkGuard),
     );
     let err =
         interactor.run("my-track".to_owned(), std::path::PathBuf::from("/tmp"), None).unwrap_err();
-    assert!(
-        matches!(err, CatalogueImplSignalsError::SymlinkRejected { .. }),
-        "expected SymlinkRejected from guard port, got: {err:?}"
+    assert!(matches!(
+        err,
+        CatalogueImplSignalsError::SymlinkRejected(path) if path.as_path() == Path::new("/tmp")
+    ));
+}
+
+#[test]
+fn test_run_symlink_guard_io_preserves_path_and_reason() {
+    let interactor = build_interactor_with_guard(
+        Arc::new(FailingLoader),
+        Arc::new(FailingCodec),
+        Arc::new(EmptyEvaluator),
+        Arc::new(NeverCalledRustdocPort),
+        Arc::new(StubLayerBindings { bindings: vec![] }),
+        Arc::new(EmptyFeatureDeclaration),
+        Arc::new(AlwaysIoSymlinkGuard),
     );
+    let err =
+        interactor.run("my-track".to_owned(), std::path::PathBuf::from("/tmp"), None).unwrap_err();
+    assert!(matches!(
+        err,
+        CatalogueImplSignalsError::SymlinkGuardIo(path, reason)
+            if path.as_path() == Path::new("/tmp") && reason.as_str() == "permission denied"
+    ));
 }
 
 #[test]
@@ -502,7 +907,179 @@ fn test_run_path_traversal_in_catalogue_file_rejected() {
     let err =
         interactor.run("my-track".to_owned(), std::path::PathBuf::from("/tmp"), None).unwrap_err();
     assert!(
-        matches!(err, CatalogueImplSignalsError::SymlinkRejected { .. }),
+        matches!(err, CatalogueImplSignalsError::SymlinkRejected(_)),
         "expected SymlinkRejected for path traversal in catalogue_file, got: {err:?}"
     );
+}
+
+#[test]
+fn test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures() {
+    let binding = stub_binding("domain");
+    let doc = minimal_catalogue_doc("domain");
+    let observed_baseline_features = Arc::new(Mutex::new(Vec::new()));
+    let observed_actual_features = Arc::new(Mutex::new(Vec::new()));
+    let observed_surfaces = Arc::new(Mutex::new(Vec::new()));
+    let frozen_declaration = Arc::new(FrozenFeatureDeclaration);
+    let baseline_declaration: Arc<dyn TdddBaselineFeatureDeclarationPort> =
+        frozen_declaration.clone();
+    let actual_declaration: Arc<dyn TdddActualFeatureDeclarationPort> = frozen_declaration;
+    let workspace = tempfile::tempdir().unwrap();
+
+    let baseline_interactor = BaselineCaptureInteractor::new(
+        Arc::new(NoopSymlinkGuard),
+        Arc::new(StubLayerBindings { bindings: vec![binding.clone()] }),
+        Arc::new(RecordingBaselineCapture {
+            observed_features: Arc::clone(&observed_baseline_features),
+        }),
+        baseline_declaration,
+    );
+    baseline_interactor
+        .run(BaselineCaptureRequest {
+            track_id: "my-track".to_owned(),
+            workspace_root: workspace.path().to_path_buf(),
+            source_workspace: None,
+            layer: None,
+        })
+        .unwrap();
+
+    let interactor = build_interactor_with_guard(
+        Arc::new(StubLoader { doc }),
+        Arc::new(EmptyExtendedCrateCodec),
+        Arc::new(GatedPublicItemEvaluator { observed_surfaces: Arc::clone(&observed_surfaces) }),
+        Arc::new(FeatureGatedRustdocPort {
+            observed_actual_features: Arc::clone(&observed_actual_features),
+        }),
+        Arc::new(StubLayerBindings { bindings: vec![binding] }),
+        actual_declaration,
+        Arc::new(NoopSymlinkGuard),
+    );
+
+    interactor.run("my-track".to_owned(), workspace.path().to_path_buf(), None).unwrap();
+
+    assert_eq!(
+        observed_baseline_features.lock().unwrap().as_slice(),
+        [vec!["semantic-dup".to_owned()]],
+        "baseline rustdoc acquisition must receive the frozen declaration's feature content"
+    );
+    assert_eq!(
+        observed_actual_features.lock().unwrap().as_slice(),
+        [vec!["semantic-dup".to_owned()]],
+        "actual rustdoc acquisition must receive the same frozen declaration content"
+    );
+    assert_eq!(
+        observed_surfaces.lock().unwrap().as_slice(),
+        [(true, true)],
+        "the declared feature-gated item must be present in both baseline and actual surfaces"
+    );
+}
+
+#[test]
+fn test_run_with_undeclared_gated_catalogue_item_returns_non_blue_chain_three_signal() {
+    let binding = stub_binding("domain");
+    let observed_membership = Arc::new(Mutex::new(Vec::new()));
+    let interactor = build_interactor_with_guard(
+        Arc::new(StubLoader { doc: minimal_catalogue_doc("domain") }),
+        Arc::new(CatalogueGatedItemCodec),
+        Arc::new(CatalogueItemMissingFromActualEvaluator {
+            observed_membership: Arc::clone(&observed_membership),
+        }),
+        Arc::new(UndeclaredFeatureRustdocPort),
+        Arc::new(StubLayerBindings { bindings: vec![binding] }),
+        Arc::new(EmptyFeatureDeclaration),
+        Arc::new(NoopSymlinkGuard),
+    );
+    let workspace = tempfile::tempdir().unwrap();
+
+    let report =
+        interactor.run("my-track".to_owned(), workspace.path().to_path_buf(), None).unwrap();
+
+    assert_eq!(
+        observed_membership.lock().unwrap().as_slice(),
+        [(true, false, false)],
+        "the undeclared feature must omit the catalogue item from both extracted surfaces"
+    );
+    assert!(report.any_red, "a non-Blue chain ③ signal must fail closed");
+    assert!(
+        report.text.contains("🔴 Red"),
+        "the report must expose the non-Blue chain ③ signal: {}",
+        report.text
+    );
+}
+
+#[test]
+fn test_run_missing_frozen_declaration_stops_before_rustdoc_capture() {
+    let binding = stub_binding("domain");
+    let doc = minimal_catalogue_doc("domain");
+    let interactor = build_interactor_with_guard(
+        Arc::new(StubLoader { doc }),
+        Arc::new(EmptyExtendedCrateCodec),
+        Arc::new(EmptyEvaluator),
+        Arc::new(NeverCalledRustdocPort),
+        Arc::new(StubLayerBindings { bindings: vec![binding] }),
+        Arc::new(MissingFrozenFeatureDeclaration),
+        Arc::new(NoopSymlinkGuard),
+    );
+    let workspace = tempfile::tempdir().unwrap();
+
+    let error =
+        interactor.run("my-track".to_owned(), workspace.path().to_path_buf(), None).unwrap_err();
+
+    assert!(matches!(
+        error,
+        CatalogueImplSignalsError::FeatureDeclaration(
+            TdddActualFeatureDeclarationPortError::MissingBaselineSnapshot { .. }
+        )
+    ));
+}
+
+#[test]
+fn test_run_baseline_snapshot_mismatch_returns_feature_declaration_error_before_rustdoc_capture() {
+    let binding = stub_binding("domain");
+    let doc = minimal_catalogue_doc("domain");
+    let interactor = build_interactor_with_guard(
+        Arc::new(StubLoader { doc }),
+        Arc::new(EmptyExtendedCrateCodec),
+        Arc::new(EmptyEvaluator),
+        Arc::new(NeverCalledRustdocPort),
+        Arc::new(StubLayerBindings { bindings: vec![binding] }),
+        Arc::new(MismatchedFrozenFeatureDeclaration),
+        Arc::new(NoopSymlinkGuard),
+    );
+    let workspace = tempfile::tempdir().unwrap();
+
+    let error =
+        interactor.run("my-track".to_owned(), workspace.path().to_path_buf(), None).unwrap_err();
+
+    assert!(matches!(
+        error,
+        CatalogueImplSignalsError::FeatureDeclaration(
+            TdddActualFeatureDeclarationPortError::BaselineSnapshotMismatch
+        )
+    ));
+}
+
+#[test]
+fn test_run_invalid_feature_declaration_returns_feature_declaration_error() {
+    let binding = stub_binding("domain");
+    let doc = minimal_catalogue_doc("domain");
+    let interactor = build_interactor_with_guard(
+        Arc::new(StubLoader { doc }),
+        Arc::new(EmptyExtendedCrateCodec),
+        Arc::new(EmptyEvaluator),
+        Arc::new(NeverCalledRustdocPort),
+        Arc::new(StubLayerBindings { bindings: vec![binding] }),
+        Arc::new(InvalidFeatureDeclaration),
+        Arc::new(NoopSymlinkGuard),
+    );
+    let workspace = tempfile::tempdir().unwrap();
+
+    let error =
+        interactor.run("my-track".to_owned(), workspace.path().to_path_buf(), None).unwrap_err();
+
+    assert!(matches!(
+        error,
+        CatalogueImplSignalsError::FeatureDeclaration(TdddActualFeatureDeclarationPortError::Read(
+            crate::tddd_feature_declaration::TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }
+        ))
+    ));
 }

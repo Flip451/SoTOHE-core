@@ -4,7 +4,24 @@
 //! rejection has been moved behind [`domain::SymlinkGuardPort`] and is
 //! performed by the interactor via the injected port.
 
-use super::service::CatalogueImplSignalsError;
+use std::path::{Path, PathBuf};
+
+use domain::SymlinkGuardError;
+
+use super::service::{CatalogueImplSignalsError, diagnostic};
+
+/// Converts a symlink-guard result to the corresponding usecase error without
+/// losing the path that the guard actually inspected.
+pub(super) fn map_symlink_guard_error(error: SymlinkGuardError) -> CatalogueImplSignalsError {
+    match error {
+        SymlinkGuardError::SymlinkFound { path } => {
+            CatalogueImplSignalsError::SymlinkRejected(PathBuf::from(path))
+        }
+        SymlinkGuardError::Io { path, reason } => {
+            CatalogueImplSignalsError::SymlinkGuardIo(PathBuf::from(path), diagnostic(reason))
+        }
+    }
+}
 
 // ---------------------------------------------------------------------------
 // Path security helpers
@@ -24,15 +41,13 @@ use super::service::CatalogueImplSignalsError;
 /// the bare reserved components `.` / `..`).
 pub(super) fn validate_binding_filename(
     filename: &str,
-    context: &str,
+    _context: &str,
 ) -> Result<(), CatalogueImplSignalsError> {
     // Fast-path: explicit rejection of bare reserved path components `..` and
     // `.`.  `Path::file_name()` returns `None` for these, but checking them
     // first provides a clear early error message.
     if filename == ".." || filename == "." {
-        return Err(CatalogueImplSignalsError::SymlinkRejected {
-            path: format!("{context}: '{filename}' is a reserved path component"),
-        });
+        return Err(CatalogueImplSignalsError::SymlinkRejected(PathBuf::from(filename)));
     }
     // A plain basename has the property that `Path::file_name()` equals the
     // entire `OsStr` of the path itself.  This is false for:
@@ -49,16 +64,12 @@ pub(super) fn validate_binding_filename(
     // `file_name() == as_os_str()` invariant already handles `..` appearing as a
     // path *component* (e.g. `"../passwd"` → `file_name()` returns
     // `Some("passwd")` which differs from `as_os_str()` `"../passwd"`).
-    let path = std::path::Path::new(filename);
+    let path = Path::new(filename);
     let is_plain_filename = path.file_name() == Some(path.as_os_str())
         && !filename.contains('/')
         && !filename.contains('\\');
     if !is_plain_filename {
-        return Err(CatalogueImplSignalsError::SymlinkRejected {
-            path: format!(
-                "{context}: '{filename}' is not a plain filename (path traversal rejected)"
-            ),
-        });
+        return Err(CatalogueImplSignalsError::SymlinkRejected(PathBuf::from(filename)));
     }
     Ok(())
 }
@@ -91,32 +102,39 @@ mod tests {
         // A bare `..` must be rejected: `track_dir.join("..")` escapes the track
         // directory one level up.
         let err = validate_binding_filename("..", "catalogue_file").unwrap_err();
-        assert!(matches!(err, CatalogueImplSignalsError::SymlinkRejected { .. }));
+        assert!(matches!(
+            err,
+            CatalogueImplSignalsError::SymlinkRejected(path) if path.as_path() == Path::new("..")
+        ));
     }
 
     #[test]
     fn test_validate_binding_filename_dotdot_in_path_rejected() {
         let err = validate_binding_filename("../etc/passwd", "catalogue_file").unwrap_err();
-        assert!(matches!(err, CatalogueImplSignalsError::SymlinkRejected { .. }));
+        assert!(matches!(
+            err,
+            CatalogueImplSignalsError::SymlinkRejected(path)
+                if path.as_path() == Path::new("../etc/passwd")
+        ));
     }
 
     #[test]
     fn test_validate_binding_filename_absolute_path_rejected() {
         let err = validate_binding_filename("/etc/passwd", "catalogue_file").unwrap_err();
-        assert!(matches!(err, CatalogueImplSignalsError::SymlinkRejected { .. }));
+        assert!(matches!(err, CatalogueImplSignalsError::SymlinkRejected(_)));
     }
 
     #[test]
     fn test_validate_binding_filename_subdirectory_rejected() {
         let err = validate_binding_filename("sub/domain-types.json", "catalogue_file").unwrap_err();
-        assert!(matches!(err, CatalogueImplSignalsError::SymlinkRejected { .. }));
+        assert!(matches!(err, CatalogueImplSignalsError::SymlinkRejected(_)));
     }
 
     #[test]
     fn test_validate_binding_filename_windows_separator_rejected() {
         let err =
             validate_binding_filename("sub\\domain-types.json", "catalogue_file").unwrap_err();
-        assert!(matches!(err, CatalogueImplSignalsError::SymlinkRejected { .. }));
+        assert!(matches!(err, CatalogueImplSignalsError::SymlinkRejected(_)));
     }
 
     #[test]

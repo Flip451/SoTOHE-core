@@ -22,7 +22,7 @@ use std::path::{Path, PathBuf};
 
 use crate::TrackId;
 use crate::tddd::CargoFeatureName;
-use crate::tddd::catalogue_v2::CatalogueDocument;
+use crate::tddd::catalogue_v2::{CatalogueDocument, CrateName};
 
 // ---------------------------------------------------------------------------
 // CatalogueDocumentLoaderError
@@ -196,7 +196,7 @@ pub trait RustdocCratePort: Send + Sync {
     fn load_from_path(&self, path: &Path) -> Result<rustdoc_types::Crate, RustdocCratePortError>;
 
     /// Captures the current `rustdoc_types::Crate` via `cargo +nightly rustdoc`
-    /// (C-side live capture).
+    /// (C-side live capture) with the validated layer feature selection.
     ///
     /// # Errors
     ///
@@ -206,7 +206,8 @@ pub trait RustdocCratePort: Send + Sync {
     /// be deserialized.
     fn capture_current(
         &self,
-        crate_name: &str,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
     ) -> Result<rustdoc_types::Crate, RustdocCratePortError>;
 }
 

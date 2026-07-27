@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-27T11:09:34Z",
-  "declaration_hash": "3238af3711c7ad6021141b636d25deb192e20224ac5718ec896685e30be8c0ae",
-  "implementation_input_hash": "b05e973379e1ff1832cf46433509b53225456e5cbfa2a9a419337f349134235b",
+  "generated_at": "2026-07-27T15:31:30Z",
+  "declaration_hash": "703d4188331c9a35969c65a758dc77c2d5d6389577165c53a0235bd817ddc409",
+  "implementation_input_hash": "051a7fa8cddc561f817d7427788372ce7a73f5037b865fbb3adc0d964d251e5e",
   "signals": [
     {
       "type_name": "BaselineCaptureError",
@@ -27,7 +27,7 @@
     {
       "type_name": "CatalogueImplSignalsError",
       "kind_tag": "error_type",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Debug",
@@ -38,7 +38,7 @@
     {
       "type_name": "CatalogueImplSignalsInteractor",
       "kind_tag": "interactor",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "CatalogueImplSignalsService"

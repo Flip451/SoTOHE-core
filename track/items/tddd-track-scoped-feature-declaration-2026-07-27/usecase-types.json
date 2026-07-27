@@ -505,7 +505,7 @@
   "types": {
     "BaselineCaptureError": {
       "action": "modify",
-      "docs": "Reports baseline capture failures, including invalid or unreadable feature declarations.",
+      "docs": "Error enum for the baseline-capture application-service boundary.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -524,6 +524,16 @@
             "payload": {
               "fields": [
                 "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SymlinkGuardIo",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf",
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
               ],
               "kind": "tuple"
             }
@@ -610,7 +620,7 @@
     },
     "CatalogueImplSignalsError": {
       "action": "modify",
-      "docs": "Reports actual implementation-signal failures, including feature declaration drift.",
+      "docs": "Error enum for the catalogue implementation-signal application-service boundary.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -688,6 +698,16 @@
             "payload": {
               "fields": [
                 "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SymlinkGuardIo",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf",
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
               ],
               "kind": "tuple"
             }

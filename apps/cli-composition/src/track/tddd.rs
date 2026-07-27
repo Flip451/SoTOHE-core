@@ -537,6 +537,7 @@ impl TrackCompositionRoot {
     ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::FsSymlinkGuard;
         use infrastructure::tddd::catalogue_to_extended_crate_codec::CatalogueToExtendedCrateCodec;
+        use infrastructure::tddd::feature_declaration_adapter::FsTdddFeatureDeclarationAdapter;
         use infrastructure::tddd::rustdoc_crate_adapter::RustdocCrateAdapter;
         use infrastructure::tddd::signal_evaluator_v2::SignalEvaluatorV2;
         use infrastructure::tddd::tddd_catalogue_document_loader::FsCatalogueDocumentLoader;
@@ -552,6 +553,7 @@ impl TrackCompositionRoot {
         let evaluator = Arc::new(SignalEvaluatorV2::with_workspace_root(workspace_root.clone()));
         let rustdoc_crate_port = Arc::new(RustdocCrateAdapter::new(workspace_root.clone()));
         let layer_bindings_port = Arc::new(FsTdddLayerBindingsAdapter::new());
+        let feature_declaration_port = Arc::new(FsTdddFeatureDeclarationAdapter::new());
         let symlink_guard = Arc::new(FsSymlinkGuard::new());
 
         let interactor = CatalogueImplSignalsInteractor::new(
@@ -560,6 +562,7 @@ impl TrackCompositionRoot {
             evaluator,
             rustdoc_crate_port,
             layer_bindings_port,
+            feature_declaration_port,
             symlink_guard,
         );
 

@@ -43,6 +43,9 @@ pub enum BaselineCaptureError {
     /// A symlink was found in a guarded path.
     #[error("symlink guard rejected path: {}", .0.display())]
     SymlinkRejected(std::path::PathBuf),
+    /// A symlink guard could not inspect a path because of an I/O failure.
+    #[error("symlink guard I/O error for path '{}': {}", .0.display(), .1.as_str())]
+    SymlinkGuardIo(std::path::PathBuf, DiagnosticMessage),
     /// Failed to load the TDDD layer bindings from `architecture-rules.json`.
     #[error("layer bindings load failed: {}", .0.as_str())]
     LayerBindingsLoad(DiagnosticMessage),
@@ -90,6 +93,10 @@ mod tests {
         let variants = [
             BaselineCaptureError::InvalidTrackId(diagnostic("test reason")),
             BaselineCaptureError::SymlinkRejected(std::path::PathBuf::from("/tmp/link")),
+            BaselineCaptureError::SymlinkGuardIo(
+                std::path::PathBuf::from("/tmp/unreadable"),
+                diagnostic("permission denied"),
+            ),
             BaselineCaptureError::LayerBindingsLoad(diagnostic("test reason")),
             BaselineCaptureError::NoLayers,
             BaselineCaptureError::CaptureFailed(layer("domain"), diagnostic("test reason")),
