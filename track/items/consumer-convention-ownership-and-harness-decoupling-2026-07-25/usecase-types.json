@@ -1114,7 +1114,7 @@
     },
     "ConventionCapabilityIdError": {
       "action": "add",
-      "docs": "Construction failure of `ConventionCapabilityId`, extracted as its own type for the same reason as its sibling `ConventionDocumentPathError`: every consumer of that constructor then admits exactly this rejection rather than inheriting the resolver's whole error surface. `Blank` is a unit variant because the variant name is the whole of the diagnosis and echoing the rejected value back would add nothing to it; that payload asymmetry is also why `ConventionResolveError::EmptyCapabilityId` names the offending document instead of composing this error, whereas `DocumentPathOutsideRoot` does compose the path rejection, whose payload is the rejected path itself. An enum rather than a struct because further rejection reasons for this identifier concept belong here as sibling variants; today it carries exactly one. Construction owner: `ConventionCapabilityId::try_new` (AC-07), which holds nothing at failure time beyond the fact of the rejection.",
+      "docs": "Construction failure of `ConventionCapabilityId`, extracted as its own type for the same reason as its sibling `ConventionDocumentPathError`: every consumer of that constructor then admits exactly this rejection rather than inheriting the resolver's whole error surface. `Blank` is a unit variant because the variant name is the whole of the diagnosis and echoing the rejected value back would add nothing to it; that payload asymmetry is also why `ConventionResolveError::EmptyCapabilityId` names the offending document instead of composing this error, whereas `DocumentPathRejected` does compose the path rejection, whose payload is the rejected path itself. An enum rather than a struct because further rejection reasons for this identifier concept belong here as sibling variants; today it carries exactly one. Construction owner: `ConventionCapabilityId::try_new` (AC-07), which holds nothing at failure time beyond the fact of the rejection.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1145,7 +1145,7 @@
     },
     "ConventionDocumentPath": {
       "action": "add",
-      "docs": "Repository-relative path of a convention document. It owns one invariant — the path stays inside `knowledge/conventions/` — and `try_new` is the single enforcing site of it (AC-07): the field is private, so the resolver's scan and the shipping inventory both reach the value through this constructor, and each only lifts the resulting `ConventionDocumentPathError` into its own error type rather than re-deciding the rejection. A `tuple`-shape newtype over `PathBuf` rather than a raw path (R9), with the constructor failure extracted as `ConventionDocumentPathError` so the resolver and the shipping check can each admit exactly that rejection and nothing more. Placed in usecase rather than domain under R1's tests: its meaning is stable across two independent application operations — the resolver and the shipping check — which is why it is not a per-operation `Dto`; but the invariant it owns is a fact about one repository directory layout, so it is not independent of delivery and workflow concerns and is not domain language. `Ord` is declared because the stable ordering both operations rely on is an ordering of these values, owned here rather than re-derived by each consumer.",
+      "docs": "Repository-relative path of a convention document. It owns two invariants — the path names a document strictly inside `knowledge/conventions/`, and its rendered text is one line that still identifies the file it came from — and `try_new` is the single enforcing site of both (AC-07): the field is private, so the resolver's scan and the shipping inventory both reach the value through this constructor, and each only lifts the resulting `ConventionDocumentPathError` into its own error type rather than re-deciding the rejection. A `tuple`-shape newtype over `PathBuf` rather than a raw path (R9), with the constructor failure extracted as `ConventionDocumentPathError` so the resolver and the shipping check can each admit exactly that rejection and nothing more. Placed in usecase rather than domain under R1's tests: its meaning is stable across two independent application operations — the resolver and the shipping check — which is why it is not a per-operation `Dto`; but the invariant it owns is a fact about one repository directory layout, so it is not independent of delivery and workflow concerns and is not domain language. `Ord` is declared because the stable ordering both operations rely on is an ordering of these values, owned here rather than re-derived by each consumer.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -1177,13 +1177,25 @@
     },
     "ConventionDocumentPathError": {
       "action": "add",
-      "docs": "Construction failure of `ConventionDocumentPath`, extracted as its own type so that every consumer of that constructor names exactly the states its call can produce. Both `ConventionResolveError` and `ConventionShippingCheckError` compose it rather than each restating the rejection; without the extraction the shipping check — which reads no document contents — would have had to carry the resolver's whole error surface and admit content-parse states it cannot reach. An enum rather than a struct because the constructor is the single validation site for this path concept and further rejection reasons belong here as sibling variants; today it has exactly one. AC-07.",
+      "docs": "Construction failure of `ConventionDocumentPath`, extracted as its own type so that every consumer of that constructor names exactly the states its call can produce. Both `ConventionResolveError` and `ConventionShippingCheckError` compose it rather than each restating the rejection; without the extraction the shipping check — which reads no document contents — would have had to carry the resolver's whole error surface and admit content-parse states it cannot reach. An enum rather than a struct because the constructor is the single validation site for this path concept and each rejection reason is a sibling variant: `OutsideConventionRoot` for the containment condition and `NotRenderableAsRecord` for the record-identification condition, both owned by AC-07 and measured against the canonical record form of AC-06/IN-05. The two rules are applied in that order, so a candidate failing both is reported as escaping the root — an ordering property of this constructor, not of the anchors. The rejection sits at `try_new` rather than at the renderer so that no rendering site becomes a second definition of what a valid convention document path is. The two variants carry structurally identical payloads — the path as supplied — for different reasons. `OutsideConventionRoot` carries it because the rejected path is the diagnosis. `NotRenderableAsRecord` carries it because the path is the only place the offending bytes survive: anything derived at failure time would already be the lossy form the variant exists to refuse. That is also why its `Display` renders the path debug-escaped (`{path:?}`) instead of through `path.display()`, which is a contract detail and not a formatting preference — a `Display` of this path is precisely what the variant rejects, so it would either break the diagnostic across lines or lose which file was rejected; restoring `display()` here would silently reinstate the defect the variant exists to prevent. Construction owner for both: `ConventionDocumentPath::try_new`, which holds the supplied path at failure time. AC-06, AC-07.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
         "variants": [
           {
             "name": "OutsideConventionRoot",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NotRenderableAsRecord",
             "payload": {
               "fields": [
                 {
@@ -1204,6 +1216,10 @@
       "spec_refs": [
         {
           "anchor": "AC-07",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-06",
           "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
         }
       ]
@@ -1274,7 +1290,7 @@
     },
     "ConventionResolveError": {
       "action": "add",
-      "docs": "The structural fail-closed conditions of convention resolution, one variant each (AC-07). The normal empty states are deliberately absent from this enum: they are values of `ConventionResolution`, so no caller can confuse `nothing matched` with `resolution failed`, and no variant exists for them to drift into. Construction owners: `parse_convention_front_matter` builds `FrontMatterUnparseable` and `RequiredForNotStringArray`, and decides the first of those two; the infrastructure directory scan builds `DocumentUnreadable` and likewise decides it. The remaining three variants lift a decision made elsewhere. `RequiredForNotStringArray` is the one lift whose decision stays inside the codec's own decode rather than behind a constructor: the value's shape is settled by the element-list deserializer and each element's by the `CapabilityIdField` mirror, and the codec function names the condition for both. `EmptyCapabilityId` is built by `ConventionFrontMatterDto::into_requirement` from the rejection `ConventionCapabilityId::try_new` produced, and names the document because that constructor never sees one. `DocumentPathOutsideRoot` is built by the directory scan from the rejection `ConventionDocumentPath::try_new` produced, composing `ConventionDocumentPathError` unchanged — the rejected path is already inside it — so the rejection has one definition rather than a copy per parent error. The two constructor-based lifts are explicit: `DocumentPathOutsideRoot` holds its rejection as a `#[source]` field and this enum declares no `From` impl, so the wrap is a named site rather than an implicit `?`, and `EmptyCapabilityId` could not be a conversion at all since it adds the document. Every payload is data its builder possesses at failure time.",
+      "docs": "Convention resolution's fail-closed states (AC-07). The normal empty states are deliberately absent from this enum: they are values of `ConventionResolution`, so no caller can confuse `nothing matched` with `resolution failed`, and no variant exists for them to drift into. Construction owners: `parse_convention_front_matter` builds `FrontMatterUnparseable` and `RequiredForNotStringArray`, and decides the first of those two; the infrastructure directory scan builds `DocumentUnreadable` and likewise decides it. The remaining three variants lift a decision made elsewhere. `RequiredForNotStringArray` is the one lift whose decision stays inside the codec's own decode rather than behind a constructor: the value's shape is settled by the element-list deserializer and each element's by the `CapabilityIdField` mirror, and the codec function names the condition for both. `EmptyCapabilityId` is built by `ConventionFrontMatterDto::into_requirement` from the rejection `ConventionCapabilityId::try_new` produced, and names the document because that constructor never sees one. `DocumentPathRejected` is built by the directory scan from the rejection `ConventionDocumentPath::try_new` produced, composing `ConventionDocumentPathError` unchanged — the rejected path is already inside it — so the rejection has one definition rather than a copy per parent error. The variant is named for the category and not for one rejection in it: `ConventionDocumentPathError` carries more than one shape, so a name pinned to either shape would send a reader who hit the other looking for a failure that never happened, and would need renaming again the next time that constructor grows a rule. Naming the category is also what keeps the rule out of this enum — restating either rejection here would put a second wording of it beside the one in `ConventionDocumentPathError` — so the variant's own message stays at `the scan resolved a path that is not a convention document path` and the specific reason is read from the source. Its sibling `ConventionShippingCheckError::DocumentPathRejected` composes the same error under the same name for the same reason. The two constructor-based lifts are explicit: `DocumentPathRejected` holds its rejection as a `#[source]` field and this enum declares no `From` impl, so the wrap is a named site rather than an implicit `?`, and `EmptyCapabilityId` could not be a conversion at all since it adds the document. Every payload is data its builder possesses at failure time.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1324,7 +1340,7 @@
             }
           },
           {
-            "name": "DocumentPathOutsideRoot",
+            "name": "DocumentPathRejected",
             "payload": {
               "fields": [
                 {

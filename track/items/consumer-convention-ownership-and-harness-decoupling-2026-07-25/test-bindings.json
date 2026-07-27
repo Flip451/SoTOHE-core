@@ -117,48 +117,6 @@
     {
       "kind": "voluntary_binding",
       "edge_id": {
-        "entry_key": "ConventionResolveError",
-        "anchor_id": {
-          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
-          "element_id": "AC-07"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::resolve_error_tests",
-          "test_name": "test_convention_resolve_error_declares_exactly_the_five_fail_closed_conditions"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::resolve_error_tests",
-          "test_name": "test_document_path_outside_root_lifts_each_constructor_rejection_as_its_source"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::resolve_error_tests",
-          "test_name": "test_empty_capability_id_supplies_the_document_its_rejection_cannot_carry"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::resolve_error_tests",
-          "test_name": "test_convention_resolve_error_declares_no_from_impl_for_either_lifted_rejection"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::resolve_error_tests",
-          "test_name": "test_convention_resolve_error_display_includes_document_and_detail"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::resolve_error_tests",
-          "test_name": "test_convention_resolve_error_display_for_empty_capability_id_names_the_document"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
         "entry_key": "ConventionCapabilityId",
         "anchor_id": {
           "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
@@ -450,22 +408,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::conventions_resolve::requirement_port::tests",
-          "test_name": "test_scan_requirements_yields_one_requirement_per_scanned_document"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::requirement_port::tests",
-          "test_name": "test_scan_requirements_scans_the_caller_supplied_project_root"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::requirement_port::tests",
-          "test_name": "test_scan_requirements_surfaces_every_fail_closed_condition_as_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::requirement_port::tests",
-          "test_name": "test_scan_requirements_succeeds_for_a_scan_meeting_none_of_those_conditions"
+          "test_name": "test_convention_requirement_port_bound_implies_send_and_sync"
         },
         {
           "layer": "usecase",
@@ -475,7 +418,22 @@
         {
           "layer": "usecase",
           "module_path": "usecase::conventions_resolve::requirement_port::tests",
-          "test_name": "test_convention_requirement_port_bound_implies_send_and_sync"
+          "test_name": "test_scan_requirements_scans_the_caller_supplied_project_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_scan_requirements_succeeds_for_a_scan_meeting_none_of_those_conditions"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_scan_requirements_surfaces_every_fail_closed_condition_as_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_scan_requirements_yields_one_requirement_per_scanned_document"
         }
       ]
     },
@@ -490,12 +448,12 @@
         {
           "layer": "usecase",
           "module_path": "usecase::conventions_resolve::selection_tests",
-          "test_name": "test_select_required_conventions_returns_the_documents_declaring_the_capability"
+          "test_name": "test_select_required_conventions_applies_no_normalization_of_its_own"
         },
         {
           "layer": "usecase",
           "module_path": "usecase::conventions_resolve::selection_tests",
-          "test_name": "test_select_required_conventions_applies_no_normalization_of_its_own"
+          "test_name": "test_select_required_conventions_is_pure_over_the_already_scanned_input"
         },
         {
           "layer": "usecase",
@@ -505,7 +463,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::conventions_resolve::selection_tests",
-          "test_name": "test_select_required_conventions_with_no_matching_document_returns_an_empty_success"
+          "test_name": "test_select_required_conventions_returns_the_documents_declaring_the_capability"
         },
         {
           "layer": "usecase",
@@ -515,7 +473,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::conventions_resolve::selection_tests",
-          "test_name": "test_select_required_conventions_is_pure_over_the_already_scanned_input"
+          "test_name": "test_select_required_conventions_with_no_matching_document_returns_an_empty_success"
         }
       ]
     },
@@ -528,7 +486,7 @@
           "element_id": "IN-05"
         }
       },
-      "reason": "ConventionRequirementPort's declared surface is a single read: scan_requirements(&self, project_root: &Path) -> Result<Vec<ConventionRequirement>, ConventionResolveError>. IN-05 promises the command's returned value — the repository-relative paths of the documents whose required_for exactly matches a named capability id, without duplicates and in stable order. That promise is not expressible through this signature. The method receives no capability id, so it has no term to match against; it returns each scanned document paired with what that document declares rather than a path list, so there is nothing here to deduplicate or order, and Vec guarantees neither. A stand-in implementation can only hand back what the test gave it, so a test bound here would show the arrangement of the test rather than the anchor's promise. Matching, deduplication, and ordering are verified on the selection and result surfaces that produce them, and the scan itself at the adapter that performs it."
+      "reason": "ConventionRequirementPort's declared surface is a single read: scan_requirements(&self, project_root: &Path) -> Result<Vec<ConventionRequirement>, ConventionResolveError>. IN-05 promises the command's returned value — the repository-relative paths of the documents whose required_for exactly matches a named capability id, without duplicates and in stable order. That promise is not expressible through this signature. The method receives no capability id, so it has no term to match against; it returns each scanned document paired with what that document declares rather than a path list, so there is nothing here to deduplicate or order, and Vec guarantees neither. A stand-in implementation can only hand back what the test gave it, so a test bound here would show the arrangement of the test rather than the anchor's promise. Nothing in the declaration is left over to carry them: the whole of what it states is that a project root goes in and a fallible list of document-to-identifier pairings comes out."
     },
     {
       "kind": "waiver",
@@ -539,254 +497,7 @@
           "element_id": "AC-06"
         }
       },
-      "reason": "ConventionRequirementPort declares one method, scan_requirements(&self, project_root: &Path) -> Result<Vec<ConventionRequirement>, ConventionResolveError>. AC-06 promises two things of the command: that the paths it returns are exactly those whose required_for contains the named id, without duplicates and in stable order, and that resolving creates, updates, deletes, and indexes nothing. Neither half is expressible at this declaration. The signature takes no capability id and yields scanned documents rather than paths, so the matching, deduplication, and ordering have no expression here. The read-only half does not follow from the signature either: &self denies the caller an exclusive borrow, but says nothing about what an implementation may do to the filesystem it reads, so a test asserting read-only-ness at this declaration would assert a property the declaration does not carry. Both halves are verified on the selection and result surfaces and at the adapter that performs the read."
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "ConventionRequirementPort",
-        "anchor_id": {
-          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
-          "element_id": "AC-07"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::requirement_port::tests",
-          "test_name": "test_scan_requirements_surfaces_every_fail_closed_condition_as_an_error"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::requirement_port::tests",
-          "test_name": "test_scan_requirements_succeeds_for_a_scan_meeting_none_of_those_conditions"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "usecase::conventions_resolve::select_required_conventions",
-        "anchor_id": {
-          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
-          "element_id": "AC-06"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::selection_tests",
-          "test_name": "test_select_required_conventions_returns_the_documents_declaring_the_capability"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::selection_tests",
-          "test_name": "test_select_required_conventions_applies_no_normalization_of_its_own"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::selection_tests",
-          "test_name": "test_select_required_conventions_returns_the_canonical_resolution_not_the_scan_order"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::selection_tests",
-          "test_name": "test_select_required_conventions_is_pure_over_the_already_scanned_input"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "usecase::conventions_resolve::select_required_conventions",
-        "anchor_id": {
-          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
-          "element_id": "AC-08"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::selection_tests",
-          "test_name": "test_select_required_conventions_with_no_matching_document_returns_an_empty_success"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::selection_tests",
-          "test_name": "test_select_required_conventions_treats_documents_declaring_nothing_as_ordinary_input"
-        }
-      ]
-    },
-    {
-      "kind": "fulfillment",
-      "obligation_id": {
-        "entry_key": "infrastructure::conventions_resolve::parse_convention_front_matter",
-        "obligation_kind": "logic",
-        "item_identifier": "entry"
-      },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_decodes_a_required_for_string_array"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_without_a_block_decodes_to_the_default_value"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_without_required_for_decodes_to_the_default_value"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_with_unparseable_yaml_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_with_a_non_array_required_for_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_with_an_unclosed_block_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_with_only_a_non_string_key_decodes_to_the_default_value"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_reports_required_for_shape_beside_a_non_string_key"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_with_a_null_required_for_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_distinguishes_an_absent_required_for_from_a_null_one"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_with_an_empty_required_for_array_declares_nothing"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "infrastructure::conventions_resolve::parse_convention_front_matter",
-        "anchor_id": {
-          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
-          "element_id": "AC-06"
-        }
-      },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_decodes_a_required_for_string_array"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_tolerates_keys_it_does_not_read"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "infrastructure::conventions_resolve::parse_convention_front_matter",
-        "anchor_id": {
-          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
-          "element_id": "AC-07"
-        }
-      },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_with_unparseable_yaml_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_with_an_unclosed_block_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_with_a_non_mapping_block_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_with_a_non_array_required_for_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_reports_required_for_shape_beside_a_non_string_key"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_with_a_null_required_for_fails_closed"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_with_a_non_string_element_fails_closed"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "infrastructure::conventions_resolve::parse_convention_front_matter",
-        "anchor_id": {
-          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
-          "element_id": "AC-08"
-        }
-      },
-      "tests": [
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_without_a_block_decodes_to_the_default_value"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_without_required_for_decodes_to_the_default_value"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_with_an_empty_block_decodes_to_the_default_value"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_with_only_a_non_string_key_decodes_to_the_default_value"
-        },
-        {
-          "layer": "infrastructure",
-          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
-          "test_name": "test_parse_convention_front_matter_distinguishes_an_absent_required_for_from_a_null_one"
-        }
-      ]
+      "reason": "ConventionRequirementPort declares one method, scan_requirements(&self, project_root: &Path) -> Result<Vec<ConventionRequirement>, ConventionResolveError>. AC-06 promises two things of the command: that the paths it returns are exactly those whose required_for contains the named id, without duplicates and in stable order, and that resolving creates, updates, deletes, and indexes nothing. Neither half is expressible at this declaration. The signature takes no capability id and yields scanned documents rather than paths, so the matching, deduplication, and ordering have no expression here. The read-only half does not follow from the signature either: &self denies the caller an exclusive borrow, but says nothing about what an implementation may do to the filesystem it reads, so a test asserting read-only-ness at this declaration would assert a property the declaration does not carry. Set both halves aside and what remains of the declaration is only this: a project root goes in, and a fallible list of document-to-identifier pairings comes out. Neither half of AC-06 is any part of that."
     },
     {
       "kind": "voluntary_binding",
@@ -941,34 +652,12 @@
         {
           "layer": "usecase",
           "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_resolve_is_reachable_from_more_than_one_holder_of_one_shared_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
           "test_name": "test_resolve_separates_a_failed_read_from_a_resolution_that_matched_nothing"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::resolve_service::tests",
-          "test_name": "test_resolve_is_reachable_from_more_than_one_holder_of_one_shared_port"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "ConventionResolveService",
-        "anchor_id": {
-          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
-          "element_id": "IN-05"
-        }
-      },
-      "tests": [
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::resolve_service::tests",
-          "test_name": "test_resolve_hands_the_caller_the_canonical_resolution_and_not_a_raw_path_list"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::resolve_service::tests",
-          "test_name": "test_resolve_is_reachable_from_more_than_one_holder_of_one_shared_port"
         }
       ]
     },
@@ -981,7 +670,7 @@
           "element_id": "AC-06"
         }
       },
-      "reason": "ConventionResolveService declares one method: resolve(&self, query: ResolveConventionsQuery) -> Result<ConventionResolution, ConventionResolveError>. AC-06 promises three things of the command: that the paths it returns are exactly those whose required_for contains the named capability id under whole-value equality, that those paths arrive without duplicates and in stable order, and that resolving creates, updates, deletes and indexes nothing. This declaration establishes none of the three. The signature relates nothing in the query to the value returned, so an implementor may answer any resolution for any capability id; a stand-in bound here can only hand back what the test arranged for it, and the test would exhibit that arrangement rather than the matching AC-06 promises. Deduplication and stable order are guarantees of ConventionResolution, established where that value is constructed from its matches; this declaration selects that type as its success value and therefore inherits those guarantees rather than establishing them, so a test bound here would be verifying the returned type's constructor under this entry's name. Read-only-ness does not follow from the signature either: &self denies the caller an exclusive borrow, which says nothing about what an implementation may do to the filesystem while answering, and returning a value is not a statement that nothing was written to produce it. What this declaration does establish is narrower than any of the three and is not what AC-06 promises: that a caller receives exactly one resolution value, through exactly one operation, or else a declared failure. AC-06's three promises are verified where they are produced -- whole-value matching where a requirement compares an identifier and the selection applies that comparison, deduplication and ordering where the resolution value is constructed, and the read at the adapter that performs it."
+      "reason": "ConventionResolveService declares one method: resolve(&self, query: ResolveConventionsQuery) -> Result<ConventionResolution, ConventionResolveError>. AC-06 promises three things of the command: that the paths it returns are exactly those whose required_for contains the named capability id under whole-value equality, that those paths arrive without duplicates and in stable order, and that resolving creates, updates, deletes and indexes nothing. This declaration establishes none of the three. The signature relates nothing in the query to the value returned, so an implementor may answer any resolution for any capability id; a stand-in bound here can only hand back what the test arranged for it, and the test would exhibit that arrangement rather than the matching AC-06 promises. Deduplication and stable order are guarantees of ConventionResolution rather than of this declaration; this declaration does no more than select that type as its success value, so it inherits whatever that type guarantees instead of establishing it, and a test bound here would be exercising the returned type under this entry's name. Read-only-ness does not follow from the signature either: &self denies the caller an exclusive borrow, which says nothing about what an implementation may do to the filesystem while answering, and returning a value is not a statement that nothing was written to produce it. What this declaration does establish is narrower than any of the three and is not what AC-06 promises: that a caller receives exactly one resolution value, through exactly one operation, or else a declared failure."
     },
     {
       "kind": "fulfillment",
@@ -994,7 +683,7 @@
         {
           "layer": "usecase",
           "module_path": "usecase::conventions_resolve::resolve_service::tests",
-          "test_name": "test_interactor_scans_the_project_root_the_query_named"
+          "test_name": "test_interactor_answers_an_empty_resolution_where_nothing_matched"
         },
         {
           "layer": "usecase",
@@ -1004,24 +693,24 @@
         {
           "layer": "usecase",
           "module_path": "usecase::conventions_resolve::resolve_service::tests",
-          "test_name": "test_interactor_surfaces_a_failed_scan_as_that_failure"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::resolve_service::tests",
-          "test_name": "test_interactor_answers_an_empty_resolution_where_nothing_matched"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::resolve_service::tests",
           "test_name": "test_interactor_carries_nothing_from_one_resolution_into_the_next"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_scans_the_project_root_the_query_named"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_surfaces_a_failed_scan_as_that_failure"
         }
       ]
     },
     {
       "kind": "voluntary_binding",
       "edge_id": {
-        "entry_key": "ConventionResolveInteractor",
+        "entry_key": "ConventionCapabilityIdArg",
         "anchor_id": {
           "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
           "element_id": "IN-05"
@@ -1029,21 +718,646 @@
       },
       "tests": [
         {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::resolve_service::tests",
-          "test_name": "test_interactor_scans_the_project_root_the_query_named"
-        },
-        {
-          "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::resolve_service::tests",
-          "test_name": "test_interactor_answers_with_what_the_selection_selects_over_the_scanned_requirements"
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_resolve_input_carries_the_parsed_term_and_the_named_root_into_the_query"
         }
       ]
     },
     {
       "kind": "voluntary_binding",
       "edge_id": {
-        "entry_key": "ConventionResolveInteractor",
+        "entry_key": "ConventionCapabilityIdArg",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_capability_id_arg_parses_the_argument_the_boundary_neither_trims_nor_looks_up"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_capability_id_arg_rejects_only_the_blank_argument"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionCapabilityIdArg",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_capability_id_arg_parses_the_argument_the_boundary_neither_trims_nor_looks_up"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_resolves_a_capability_registered_in_no_registry"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolveInput",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_resolve_input_carries_the_parsed_term_and_the_named_root_into_the_query"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolveInput",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_resolve_input_carries_the_parsed_term_and_the_named_root_into_the_query"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolveInput",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_resolve_input_carries_the_parsed_term_and_the_named_root_into_the_query"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolveInput",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_resolve_input_carries_the_parsed_term_and_the_named_root_into_the_query"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_resolves_a_capability_registered_in_no_registry"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolveDriver",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_renders_the_canonical_result_as_the_machine_readable_output"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_human_display_is_rendered_from_the_same_resolution"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolveDriver",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_renders_the_canonical_result_as_the_machine_readable_output"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_reaches_no_operation_other_than_the_read"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolveDriver",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_reports_a_resolution_matching_no_document_as_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_reports_only_a_failed_read_as_a_failure"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "DisciplineText",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_appends_every_resolved_document_path"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_names_only_resolved_paths_in_resolution_order"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "DisciplineText",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_appends_every_resolved_document_path"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_composes_one_value_from_a_discipline_and_a_resolution"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "DisciplineText",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_names_only_resolved_paths_in_resolution_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_renders_an_empty_resolution_without_an_obligation"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionsCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::conventions::tests",
+          "test_name": "test_conventions_resolve_driver_answers_from_the_named_project_tree"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionsCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::conventions::tests",
+          "test_name": "test_conventions_resolve_driver_leaves_the_convention_tree_unchanged"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::conventions::tests",
+          "test_name": "test_conventions_resolve_driver_answers_from_the_named_project_tree"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::conventions_resolve::scan_convention_requirements",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_does_not_follow_a_directory_symlink"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_does_not_read_a_linked_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_hands_back_no_documents_when_one_is_unreadable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_leaves_the_convention_tree_untouched"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_pairs_each_document_with_what_its_front_matter_declares"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_produces_only_paths_inside_the_convention_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_reads_only_markdown_documents"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_scans_only_the_convention_tree_of_the_supplied_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_skips_a_broken_document_link_rather_than_failing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_surfaces_a_front_matter_failure_from_its_own_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_surfaces_a_required_for_shape_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_turns_the_decoded_view_into_a_requirement"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unreadable_document_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_without_a_convention_tree_scans_nothing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unrenderable_document_name_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unrenderable_directory_name_fails_closed"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionsCommand",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_parses_the_capability_and_the_project_root"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_dispatch_leaves_the_convention_tree_untouched"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionsCommand",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_rejects_a_blank_capability_at_parse"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_keeps_the_capability_spelled_as_typed"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionsCommand",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_dispatch_leaves_the_convention_tree_untouched"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_dispatch_prints_the_declaring_document_paths"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionsCommand",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_accepts_a_capability_registered_in_no_registry"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::conventions_resolve::parse_convention_front_matter",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_decodes_a_required_for_string_array"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_distinguishes_an_absent_required_for_from_a_null_one"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_reports_required_for_shape_beside_a_non_string_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_tolerates_keys_it_does_not_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_array_required_for_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_mapping_block_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_string_element_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_null_required_for_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_empty_block_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_empty_required_for_array_declares_nothing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_unclosed_block_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_only_a_non_string_key_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_unparseable_yaml_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_without_a_block_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_without_required_for_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_carries_a_blank_element_to_its_deciding_site"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CapabilityExecError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "CapabilityExecError is the enum of conditions that stop a dispatch before a successful outcome, declared as reporting fail-closed profile, source, preflight, or provider dispatch failures; this track adds the variant ConventionResolutionFailed { capability: CapabilityName, source: ConventionResolveError } for the resolver preflight. IN-07 promises three things of the capability exec command: that it runs the resolver for the dispatched capability ID exactly once and does so before the executing agent is decided, that in the executed outcome the obligation to read the resolved convention paths and all of their documents is injected into the provider prompt or execution input, and that in the delegate-in-host outcome that same obligation is carried in the returned payload's discipline. Every clause is a promise about a run that produced a result: a completed resolution, an injected obligation text, a returned payload. This declaration names only the conditions under which a dispatch produces no such result, so none of the three takes a form here. The count and the position cannot be read off a value: the variant carries a capability and a resolver rejection and nothing that records how many times resolution was attempted or at what point in the dispatch it was attempted, and a value built for inspection names whichever capability its construction chose rather than showing that the dispatched capability's ID was the one resolved. The two injection clauses are not merely untested here, they concern content this type never holds: no variant of this enum carries a resolved convention path, a document, a provider prompt, or a discipline payload; its variants carry a capability, a provider, an execution category, a file path, an opaque diagnostic, and the resolver's typed rejection, so no value of it can be inspected to find whether the read obligation reached a prompt or a payload. What this declaration does contribute is only the vocabulary in which such a failure is named: that a convention resolution that could not complete has a representation at all, that the representation names the capability being resolved, and that it carries the resolver's own typed rejection rather than a flattened summary of it, which is what this declaration's own text states of the variant's source field. None of that is any part of what IN-07 promises."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CapabilityExecError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "reason": "CapabilityExecError is the enum of conditions that stop a dispatch before a successful outcome; this track adds the variant ConventionResolutionFailed { capability: CapabilityName, source: ConventionResolveError }. AC-11 promises three things of a dispatch: that the resolver runs exactly once per dispatch, that the run happens before the executing agent is decided, and that a typed-pipeline capability's dispatch performs no resolver injection. None of the three is expressible at this declaration. The variant records that a resolution attempt failed and which capability it was resolving; it carries no count, so nothing in the value distinguishes one attempt from two, and a test bound here could only construct the single value the test itself chose to build. It carries no position either: the value is identical whether it was produced before or after a route was chosen, so ordering cannot be read off it. The typed-pipeline half is the absence of a resolver call in a branch this variant is never produced in, and an absence has no variant to declare; the nearest thing this enum declares, ExecutionModeRejected, carries a capability and a rejected execution category and names no injection at all, so no variant of this enum gives that absence a form either. What this declaration does establish is narrower than any of the three and is no part of what AC-11 promises: that the failure of the resolver step has a representation in this dispatch vocabulary, that the representation names the capability being resolved, and that it carries the resolver's own typed rejection rather than a flattened summary of it. A count, a position relative to the decision of an executing agent, and the absence of an injection in one execution category are none of them things this vocabulary spells, and no value of this enum can be inspected for any of the three."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "FsConventionRequirementAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::conventions_resolve::ConventionRequirementPort"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_scans_each_supplied_root_through_one_shared_receiver"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_scans_the_tree_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_surfaces_every_fail_closed_condition_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_prevents_the_path_escape_condition_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_surfaces_the_unrenderable_name_condition_through_the_port"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionRequirementPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "reason": "ConventionRequirementPort declares one method: scan_requirements(&self, project_root: &Path) -> Result<Vec<ConventionRequirement>, ConventionResolveError>. AC-07 promises that resolve fails closed on structural anomalies, and the cases it names are each a property of a document or of a resolution-target path — front matter that is not parseable YAML, a required_for that is not a string array, a blank capability id, a path outside knowledge/conventions/, an unreadable document, a path that cannot identify its file as one canonical record. This declaration takes neither a document nor a path. It takes a project root and yields either a list of pairings or a declared failure, and nothing in that signature relates any input to the condition it violates or fixes when a failure rather than a list is produced. An implementation returning a failure for every root, or none for any, satisfies the declaration exactly, so a test bound here can do no more than arrange for a value to come back and observe that it did, which exhibits the arrangement rather than the classification AC-07 promises. What this declaration does establish is that the scan is a single fallible operation, that its failure is expressed in the resolver failure vocabulary rather than as an untyped or transport-level error, and that a caller receives either every pairing the scan produced or a declared failure and never a partial list."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionResolveError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "reason": "ConventionResolveError is declared as an enum of variants, each naming one structural anomaly of convention resolution and carrying the document or path that anomaly concerns. AC-07 promises that resolve fails closed on structural anomalies, and names cases within that category. Every clause of that promise is about what happens when a resolution meets such an input: that the condition is detected, that the resolution stops, and that a failure is produced instead of a result. This declaration admits no input and performs no step. It states which failures can be named and what each one carries, so no value of it can show that an input was met, that a condition was detected, or that anything was refused; a value exists because something constructed it, and inspecting one exhibits the construction rather than a detection. The non-exhaustive clause makes the same point from the other side: AC-07 leaves its category open, while an enum is closed by definition, so the set of variants can never be the set of cases. What this declaration does establish is narrower than the promise: that each condition the vocabulary can report has a distinct name rather than a shared untyped one, that each variant carries the document or path its condition is about rather than a flattened message, and that a rejection arriving from a constructor is composed as a typed source rather than restated in this vocabulary."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionDocumentPathError",
         "anchor_id": {
           "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
           "element_id": "AC-06"
@@ -1052,25 +1366,13 @@
       "tests": [
         {
           "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::resolve_service::tests",
-          "test_name": "test_interactor_answers_with_what_the_selection_selects_over_the_scanned_requirements"
-        }
-      ]
-    },
-    {
-      "kind": "voluntary_binding",
-      "edge_id": {
-        "entry_key": "ConventionResolveInteractor",
-        "anchor_id": {
-          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
-          "element_id": "AC-08"
-        }
-      },
-      "tests": [
+          "module_path": "usecase::conventions_resolve::resolve_error_tests",
+          "test_name": "test_convention_document_path_with_a_line_terminator_returns_not_renderable_error"
+        },
         {
           "layer": "usecase",
-          "module_path": "usecase::conventions_resolve::resolve_service::tests",
-          "test_name": "test_interactor_answers_an_empty_resolution_where_nothing_matched"
+          "module_path": "usecase::conventions_resolve::resolve_error_tests",
+          "test_name": "test_convention_document_path_with_a_non_utf8_name_returns_not_renderable_error"
         }
       ]
     }

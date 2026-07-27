@@ -3,375 +3,25 @@
 //! This module deliberately contains no I/O, profile resolution, or provider
 //! dispatch. Those concerns are introduced through ports and the interactor in
 //! the follow-up task.
+//!
+//! The validated values themselves live in the private `values` submodule and
+//! are re-exported here unchanged, so `capability_exec` remains their public
+//! path; the split exists only to keep each file under the production-code
+//! line limit.
 
-use std::path::{Component, Path, PathBuf};
-use std::sync::{Arc, LazyLock};
+mod values;
 
+use std::sync::Arc;
+
+pub use values::{
+    BriefingText, CAPABILITY_EXEC_DISCIPLINE_PATH, CLAUDE_PROVIDER_NAME, CODEX_PROVIDER_NAME,
+    CapabilityFailureDetail, CapabilityFilePath, CapabilityInputValidationError, DisciplineText,
+    ExecutionMode, ModelName, ProviderName, ReasoningEffort, TargetArtifactPath, TargetArtifactSet,
+    TimeoutSeconds,
+};
+
+use crate::conventions_resolve::ConventionResolveError;
 use crate::dry_write_driver::CapabilityName;
-
-/// Validation error for a capability-dispatch input value.
-#[derive(Debug, thiserror::Error)]
-pub enum CapabilityInputValidationError {
-    /// The supplied provider name was empty.
-    #[error("provider name must not be empty")]
-    EmptyProviderName,
-    /// The supplied model name was empty.
-    #[error("model name must not be empty")]
-    EmptyModelName,
-    /// The supplied file path was empty.
-    #[error("file path must not be empty")]
-    EmptyFilePath,
-    /// The supplied file path was not a repository-relative, traversal-free path.
-    #[error("file path must be repository-relative and traversal-free")]
-    InvalidFilePath,
-    /// The supplied target-artifact collection was empty.
-    #[error("target artifact set must not be empty")]
-    EmptyTargetArtifactSet,
-    /// The supplied technical text was empty or whitespace-only.
-    #[error("content must not be empty")]
-    EmptyContent,
-    /// The supplied timeout was zero seconds.
-    #[error("timeout seconds must be greater than zero")]
-    ZeroTimeoutSeconds,
-}
-
-/// Validated technical provider identifier for capability dispatch.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ProviderName(String);
-
-impl ProviderName {
-    /// Validates and wraps a provider identifier.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`CapabilityInputValidationError::EmptyProviderName`] when
-    /// `value` is empty or whitespace-only.
-    pub fn try_new(value: impl Into<String>) -> Result<Self, CapabilityInputValidationError> {
-        let value = value.into();
-        if value.trim().is_empty() {
-            return Err(CapabilityInputValidationError::EmptyProviderName);
-        }
-        Ok(Self(value))
-    }
-
-    /// Returns the validated provider identifier.
-    #[must_use]
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-}
-
-impl std::fmt::Display for ProviderName {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        formatter.write_str(self.as_str())
-    }
-}
-
-/// Validated technical model identifier for capability dispatch.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ModelName(String);
-
-impl ModelName {
-    /// Validates and wraps a model identifier.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`CapabilityInputValidationError::EmptyModelName`] when `value`
-    /// is empty or whitespace-only.
-    pub fn try_new(value: impl Into<String>) -> Result<Self, CapabilityInputValidationError> {
-        let value = value.into();
-        if value.trim().is_empty() {
-            return Err(CapabilityInputValidationError::EmptyModelName);
-        }
-        Ok(Self(value))
-    }
-
-    /// Returns the validated model identifier.
-    #[must_use]
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-}
-
-impl std::fmt::Display for ModelName {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        formatter.write_str(self.as_str())
-    }
-}
-
-/// Validated technical file path for a capability briefing.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CapabilityFilePath(PathBuf);
-
-impl CapabilityFilePath {
-    /// Validates and wraps a briefing-file path.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`CapabilityInputValidationError::EmptyFilePath`] when `path`
-    /// has no path components, or [`CapabilityInputValidationError::InvalidFilePath`]
-    /// when `path` is absolute or contains a parent-directory component.
-    pub fn try_new(path: PathBuf) -> Result<Self, CapabilityInputValidationError> {
-        if path.as_os_str().is_empty() {
-            return Err(CapabilityInputValidationError::EmptyFilePath);
-        }
-        if path.is_absolute()
-            || path
-                .components()
-                .any(|component| matches!(component, Component::ParentDir | Component::Prefix(_)))
-        {
-            return Err(CapabilityInputValidationError::InvalidFilePath);
-        }
-        Ok(Self(path))
-    }
-
-    /// Returns the validated briefing-file path.
-    #[must_use]
-    pub fn as_path(&self) -> &Path {
-        &self.0
-    }
-}
-
-impl std::fmt::Display for CapabilityFilePath {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(formatter, "{}", self.as_path().display())
-    }
-}
-
-/// Validated normalized repository-relative artifact path used in capability
-/// session identity.
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct TargetArtifactPath {
-    path: PathBuf,
-}
-
-impl TargetArtifactPath {
-    /// Validates and normalizes a repository-relative artifact path.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`CapabilityInputValidationError::EmptyFilePath`] when `path`
-    /// has no path components, or [`CapabilityInputValidationError::InvalidFilePath`]
-    /// when it cannot identify a repository-relative artifact.
-    pub fn try_new(path: PathBuf) -> Result<Self, CapabilityInputValidationError> {
-        if path.as_os_str().is_empty() {
-            return Err(CapabilityInputValidationError::EmptyFilePath);
-        }
-        if path.is_absolute() {
-            return Err(CapabilityInputValidationError::InvalidFilePath);
-        }
-
-        let mut normalized = PathBuf::new();
-        for component in path.components() {
-            match component {
-                Component::Normal(value) => normalized.push(value),
-                Component::CurDir => {}
-                Component::ParentDir | Component::RootDir | Component::Prefix(_) => {
-                    return Err(CapabilityInputValidationError::InvalidFilePath);
-                }
-            }
-        }
-        if normalized.as_os_str().is_empty() {
-            return Err(CapabilityInputValidationError::InvalidFilePath);
-        }
-        Ok(Self { path: normalized })
-    }
-
-    /// Returns the normalized repository-relative path.
-    #[must_use]
-    pub fn as_path(&self) -> &Path {
-        &self.path
-    }
-}
-
-/// Non-empty sorted deduplicated target-artifact identity for capability resume.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct TargetArtifactSet {
-    paths: Vec<TargetArtifactPath>,
-}
-
-impl TargetArtifactSet {
-    /// Builds a canonical artifact identity from one or more validated paths.
-    ///
-    /// # Errors
-    ///
-    /// Returns only [`CapabilityInputValidationError::EmptyTargetArtifactSet`]
-    /// when `paths` is empty.
-    pub fn try_new(
-        mut paths: Vec<TargetArtifactPath>,
-    ) -> Result<Self, CapabilityInputValidationError> {
-        if paths.is_empty() {
-            return Err(CapabilityInputValidationError::EmptyTargetArtifactSet);
-        }
-        paths.sort();
-        paths.dedup();
-        Ok(Self { paths })
-    }
-
-    /// Returns the canonical sorted artifact paths.
-    #[must_use]
-    pub fn as_slice(&self) -> &[TargetArtifactPath] {
-        &self.paths
-    }
-}
-
-/// Fixed provider identifier used by the Codex adapter.
-pub static CODEX_PROVIDER_NAME: LazyLock<ProviderName> =
-    LazyLock::new(|| ProviderName("codex".to_owned()));
-
-/// Fixed provider identifier used by the Claude adapter.
-pub static CLAUDE_PROVIDER_NAME: LazyLock<ProviderName> =
-    LazyLock::new(|| ProviderName("claude".to_owned()));
-
-/// Fixed path used by the repository-owned capability discipline source.
-pub static CAPABILITY_EXEC_DISCIPLINE_PATH: LazyLock<CapabilityFilePath> = LazyLock::new(|| {
-    CapabilityFilePath(PathBuf::from(".harness/prompts/capability-exec-discipline.md"))
-});
-
-/// Validated technical briefing text loaded by a source adapter.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct BriefingText(String);
-
-impl BriefingText {
-    /// Validates and wraps briefing content.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`CapabilityInputValidationError::EmptyContent`] when `value`
-    /// is empty or whitespace-only.
-    pub fn try_new(value: String) -> Result<Self, CapabilityInputValidationError> {
-        if value.trim().is_empty() {
-            return Err(CapabilityInputValidationError::EmptyContent);
-        }
-        Ok(Self(value))
-    }
-
-    /// Returns the validated briefing text.
-    #[must_use]
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-}
-
-/// Validated technical discipline text loaded by a source adapter.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct DisciplineText(String);
-
-impl DisciplineText {
-    /// Validates and wraps discipline content.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`CapabilityInputValidationError::EmptyContent`] when `value`
-    /// is empty or whitespace-only.
-    pub fn try_new(value: String) -> Result<Self, CapabilityInputValidationError> {
-        if value.trim().is_empty() {
-            return Err(CapabilityInputValidationError::EmptyContent);
-        }
-        Ok(Self(value))
-    }
-
-    /// Returns the validated discipline text.
-    #[must_use]
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-}
-
-/// Opaque diagnostic detail carried by capability-dispatch errors.
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct CapabilityFailureDetail(String);
-
-impl CapabilityFailureDetail {
-    /// Wraps presentation-only diagnostic text.
-    #[must_use]
-    pub fn new(value: impl Into<String>) -> Self {
-        Self(value.into())
-    }
-
-    /// Returns the diagnostic text.
-    #[must_use]
-    pub fn as_str(&self) -> &str {
-        &self.0
-    }
-}
-
-impl std::fmt::Display for CapabilityFailureDetail {
-    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        formatter.write_str(self.as_str())
-    }
-}
-
-/// Execution category declared by a capability profile.
-#[derive(Debug, PartialEq, Eq)]
-pub enum ExecutionMode {
-    /// The capability returns free-form output for an orchestrator to consume.
-    OrchestratorOutput,
-    /// The capability has a fixed, machine-consumed output contract.
-    TypedPipeline,
-}
-
-impl Copy for ExecutionMode {}
-
-impl Clone for ExecutionMode {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-
-/// Provider-independent reasoning effort selected by a capability profile.
-#[derive(Debug, Copy, PartialEq, Eq)]
-pub enum ReasoningEffort {
-    /// Lowest supported reasoning effort.
-    Low,
-    /// Medium reasoning effort.
-    Medium,
-    /// High reasoning effort.
-    High,
-    /// Extra-high reasoning effort, above `High`.
-    XHigh,
-    /// Highest supported reasoning effort.
-    Max,
-}
-
-impl Clone for ReasoningEffort {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-
-/// Validated positive provider-process timeout in seconds.
-#[derive(Debug, PartialEq, Eq)]
-pub struct TimeoutSeconds(u64);
-
-impl Copy for TimeoutSeconds {}
-
-impl Clone for TimeoutSeconds {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-
-impl TimeoutSeconds {
-    /// Validates and wraps a timeout value.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`CapabilityInputValidationError::ZeroTimeoutSeconds`] when
-    /// `value` is zero.
-    pub fn try_new(value: u64) -> Result<Self, CapabilityInputValidationError> {
-        if value == 0 {
-            return Err(CapabilityInputValidationError::ZeroTimeoutSeconds);
-        }
-        Ok(Self(value))
-    }
-
-    /// Returns the validated timeout in seconds.
-    #[must_use]
-    pub fn as_secs(&self) -> u64 {
-        self.0
-    }
-}
 
 /// Request values supplied to generic capability dispatch.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -620,12 +270,26 @@ pub enum CapabilityExecError {
         /// Opaque adapter diagnostic.
         detail: CapabilityFailureDetail,
     },
+    /// The dispatch preflight could not resolve the capability's conventions.
+    ///
+    /// The resolver rejection is carried as a typed source rather than a
+    /// flattened summary, so the condition that stopped the dispatch survives
+    /// the layer boundary and a caller can still match on it. This enum
+    /// declares no `From` impl for it, keeping the wrap an explicit named site
+    /// as the lifts inside [`ConventionResolveError`] are.
+    #[error("capability convention resolution failed for '{capability}'")]
+    ConventionResolutionFailed {
+        /// Capability whose required conventions were being resolved.
+        capability: CapabilityName,
+        /// Resolver rejection this variant carries unchanged.
+        source: ConventionResolveError,
+    },
 }
 
 #[cfg(test)]
 #[allow(clippy::expect_used, clippy::indexing_slicing)]
 mod tests {
-    use std::path::PathBuf;
+    use std::path::{Path, PathBuf};
     use std::sync::atomic::{AtomicUsize, Ordering};
     use std::sync::{Arc, Mutex};
 
@@ -634,9 +298,10 @@ mod tests {
         CapabilityExecInteractor, CapabilityExecRequest, CapabilityExecService,
         CapabilityFailureDetail, CapabilityFilePath, CapabilityInputValidationError,
         CapabilityProfile, CapabilityProfilePort, CapabilityProviderPort, CapabilityResumeRequest,
-        CapabilitySourcePort, DisciplineText, ExecutionMode, ModelName, ProviderName,
-        ReasoningEffort, TargetArtifactPath, TargetArtifactSet, TimeoutSeconds,
+        CapabilitySourcePort, ConventionResolveError, DisciplineText, ExecutionMode, ModelName,
+        ProviderName, ReasoningEffort, TargetArtifactPath, TargetArtifactSet, TimeoutSeconds,
     };
+    use crate::conventions_resolve::{ConventionDocumentPath, ConventionResolution};
     use crate::dry_write_driver::CapabilityName;
 
     struct StaticProfilePort {
@@ -735,6 +400,10 @@ mod tests {
             timeout: None,
             resume: CapabilityResumeRequest::Fresh,
         })
+    }
+
+    fn convention(path: &str) -> Result<ConventionDocumentPath, Box<dyn std::error::Error>> {
+        Ok(ConventionDocumentPath::try_new(PathBuf::from(path))?)
     }
 
     fn profile(mode: ExecutionMode) -> Result<CapabilityProfile, CapabilityInputValidationError> {
@@ -861,6 +530,124 @@ mod tests {
     }
 
     #[test]
+    fn test_discipline_text_with_conventions_appends_every_resolved_document_path()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let discipline = DisciplineText::try_new("Do not stage changes.".to_owned())?;
+        let resolution = ConventionResolution::from_matches(vec![
+            convention("knowledge/conventions/coding-principles.md")?,
+            convention("knowledge/conventions/rust/testing.md")?,
+        ]);
+
+        let composed = discipline.with_conventions(&resolution);
+
+        assert!(
+            composed.as_str().starts_with("Do not stage changes."),
+            "the discipline the source adapter loaded is carried through unchanged"
+        );
+        for document in resolution.documents() {
+            assert!(
+                composed.as_str().contains(&document.to_string()),
+                "every resolved document reaches the dispatched capability, not a selection"
+            );
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn test_discipline_text_with_conventions_names_only_resolved_paths_in_resolution_order()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let discipline = DisciplineText::try_new("Do not stage changes.".to_owned())?;
+        let resolution = ConventionResolution::from_matches(vec![
+            convention("knowledge/conventions/rust/testing.md")?,
+            convention("knowledge/conventions/coding-principles.md")?,
+        ]);
+
+        let composed = discipline.with_conventions(&resolution);
+
+        let listed: Vec<&str> =
+            composed.as_str().lines().filter_map(|line| line.strip_prefix("- ")).collect();
+        let resolved: Vec<String> =
+            resolution.documents().iter().map(ToString::to_string).collect();
+        assert_eq!(
+            listed, resolved,
+            "the rendered obligation names the resolver's own document paths in its order, so \
+             no fixed convention filename can enter the text here"
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_discipline_text_with_conventions_renders_an_empty_resolution_without_an_obligation()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let discipline = DisciplineText::try_new("Do not stage changes.".to_owned())?;
+
+        let composed = discipline.with_conventions(&ConventionResolution::default());
+
+        assert!(composed.as_str().starts_with("Do not stage changes."));
+        assert!(
+            !composed.as_str().contains("knowledge/conventions"),
+            "a resolution that matched nothing names no document"
+        );
+        assert!(
+            composed.as_str().lines().all(|line| !line.starts_with("- ")),
+            "a resolution that matched nothing lists nothing to read"
+        );
+        assert!(
+            composed.as_str().contains("returned zero"),
+            "the empty case states that resolution ran and returned nothing, so it cannot be \
+             read as conventions having never been resolved"
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_discipline_text_with_conventions_composes_one_value_from_a_discipline_and_a_resolution()
+    -> Result<(), Box<dyn std::error::Error>> {
+        // The composition depends on nothing but the two values handed to it, so
+        // two dispatch routes handed the same discipline and the same resolution
+        // have no way to end up carrying different obligation texts.
+        let discipline = DisciplineText::try_new("Do not stage changes.".to_owned())?;
+        let resolution = ConventionResolution::from_matches(vec![convention(
+            "knowledge/conventions/coding-principles.md",
+        )?]);
+
+        assert_eq!(
+            discipline.with_conventions(&resolution),
+            discipline.with_conventions(&resolution)
+        );
+        Ok(())
+    }
+
+    #[test]
+    fn test_capability_exec_error_convention_resolution_failure_carries_the_typed_resolver_error()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let error = CapabilityExecError::ConventionResolutionFailed {
+            capability: CapabilityName::try_new("implementer")?,
+            source: ConventionResolveError::EmptyCapabilityId {
+                document: convention("knowledge/conventions/testing.md")?,
+            },
+        };
+
+        assert!(
+            error.to_string().contains("implementer"),
+            "the failure names the capability whose conventions were being resolved"
+        );
+        let source = std::error::Error::source(&error)
+            .and_then(|source| source.downcast_ref::<ConventionResolveError>())
+            .expect("the resolver rejection is carried as a typed source");
+        assert!(
+            matches!(
+                source,
+                ConventionResolveError::EmptyCapabilityId { document }
+                    if document.as_path() == Path::new("knowledge/conventions/testing.md")
+            ),
+            "the failing condition and its payload survive the wrap instead of being flattened \
+             into prose at the boundary"
+        );
+        Ok(())
+    }
+
+    #[test]
     fn test_capability_profile_valid_values_retained() -> Result<(), Box<dyn std::error::Error>> {
         let profile = CapabilityProfile {
             provider: ProviderName::try_new("codex")?,
@@ -952,6 +739,12 @@ mod tests {
             CapabilityExecError::DispatchFailed {
                 provider: ProviderName::try_new("codex")?,
                 detail,
+            },
+            CapabilityExecError::ConventionResolutionFailed {
+                capability: CapabilityName::try_new("implementer")?,
+                source: ConventionResolveError::EmptyCapabilityId {
+                    document: convention("knowledge/conventions/testing.md")?,
+                },
             },
         ];
 

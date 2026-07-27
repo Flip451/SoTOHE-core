@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ConventionsCommand | enum | modify | Add, UpdateIndex, VerifyIndex, Resolve | 🟡 | 🔵 |
+| ConventionsCommand | enum | modify | Add, UpdateIndex, VerifyIndex, Resolve | 🔵 | 🔵 |
 | TemplateCommand | enum | modify | Export, CheckConventionShipping | 🟡 | 🔵 |
 
 ## DTOs

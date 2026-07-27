@@ -1,13 +1,13 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T10:37:56Z",
+  "generated_at": "2026-07-26T15:39:52Z",
   "declaration_hash": "106e9adf61de17b5d5df112a06d9a484b5a8ec656720864c736888c814c496ee",
-  "implementation_input_hash": "20d04b50f8b1b4fc9e679fd17cef448812723ced6d64acfbc1052491cd726115",
+  "implementation_input_hash": "21b7e93224369fe8ebf861a5b70f8377185933afa1887a72f0f7190c6592be8c",
   "signals": [
     {
       "type_name": "ConventionsCommand",
       "kind_tag": "enum",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Debug",

@@ -324,7 +324,7 @@
       }
     },
     {
-      "claim_hash": "21f9ed2d218a0d336e41584bd7e0062b7676a605087378a2a12951392aab1ff7",
+      "claim_hash": "0697afe56138b36c30b38036ca9ce0c69d509baa08f9cb434eedb606e32e1226",
       "evidence_hash": "f202859b260fe59c39ebbe81ad3893ec5ab50e25f9bef3d378ad1461d1f1f4f3",
       "verdict": {
         "kind": "pass",
@@ -335,7 +335,7 @@
         "data": {
           "section": "in_scope",
           "element_id": "IN-10",
-          "text_label": "同一変更集合の中で、`.harness/workflows/`、`.harness/capabilities/`、`.harness/custom/`、`.agents/`、`.claude/`、top-level entry document、設定、script、production source、test fixture、overlay を含む surviving live surface の参照を、新しい `.harness` path、resolver 経由、または自己完結した実行条件へ更新する。"
+          "text_label": "同一変更集合の中で、surviving live surface の参照を、新しい `.harness` path、resolver 経由、または自己完結した実行条件へ更新する。対象には少なくとも `.harness/workflows/`、`.harness/capabilities/`、`.harness/custom/`、`.agents/`、`.claude/`、top-level entry document、設定、script、production source、test fixture、overlay を含む。"
         }
       },
       "evidence_origin": {
@@ -945,18 +945,18 @@
       }
     },
     {
-      "claim_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "claim_hash": "9cb17b4f399b2aaa703bb5635a5bdd3090cf4329f0d01efda8c837c5a6c0e2b8",
       "evidence_hash": "f202859b260fe59c39ebbe81ad3893ec5ab50e25f9bef3d378ad1461d1f1f4f3",
       "verdict": {
         "kind": "pass",
-        "citation": "読み取り専用コマンド `bin/sotp conventions resolve --capability <capability-id>` を導入する。resolver は `knowledge/conventions/**/*.md` を読み取り専用で走査し、指定された capability ID と `required_for` の要素が完全一致する文書の repository-relative path を、重複なく安定順の機械可読な正本として返す。resolver は文書の作成、更新、削除、索引生成を行わない。"
+        "citation": "読み取り専用コマンド `bin/sotp conventions resolve --capability <capability-id>`を導入する。resolver は `knowledge/conventions/**/*.md` を読み取り専用で走査し、指定された capability ID と `required_for` の要素が完全一致する文書の repository-relative path を、重複なく安定順の機械可読な正本として返す。人間向け表示を持つ場合も、その正本と同じ解決結果からレンダーする。resolver は文書の作成、更新、削除、索引生成を行わない。"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
         }
       },
       "evidence_origin": {
@@ -968,7 +968,7 @@
       }
     },
     {
-      "claim_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
+      "claim_hash": "72c6a83d70c1a46f2756ad139d7f136b0c8a757956e642cc99d181d9fc1bbe77",
       "evidence_hash": "f202859b260fe59c39ebbe81ad3893ec5ab50e25f9bef3d378ad1461d1f1f4f3",
       "verdict": {
         "kind": "pass",
@@ -979,7 +979,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-07",
-          "text_label": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+          "text_label": "resolve は構造上の異常を fail-closed とする。この分類に当たる事例には、frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合、および解決対象 path が正本の 1 record として自身のファイルを同定できない場合 (valid UTF-8 でない、または `\\n` ないし `\\r` を含む) が含まれ、いずれについても fail-closed を確認できる。この列挙は網羅ではなく、同じ分類に属する他の事例も同様に fail-closed となる。"
         }
       },
       "evidence_origin": {
@@ -991,7 +991,7 @@
       }
     },
     {
-      "claim_hash": "290d0251ec52368b3c0579660a5e2e80bb8bdafe9a8a6ba536eab6926854545f",
+      "claim_hash": "d0108139ca8681d34bb84d35ecee0facd2941428e89b81d5cd8ecdb75b168467",
       "evidence_hash": "f202859b260fe59c39ebbe81ad3893ec5ab50e25f9bef3d378ad1461d1f1f4f3",
       "verdict": {
         "kind": "pass",
@@ -1002,7 +1002,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
+          "text_label": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という状態は error にならず、正常な空結果として扱われる。"
         }
       },
       "evidence_origin": {
@@ -1175,7 +1175,7 @@
       }
     },
     {
-      "claim_hash": "1457bec7fd8f54d155e38717d3cffd5f101e47af2abecd1a896f0bd7dfa6d0c4",
+      "claim_hash": "5ba7072bc465c59c6d200969ab63dab06eeda6fc3679e43eab537db553ed91f9",
       "evidence_hash": "f202859b260fe59c39ebbe81ad3893ec5ab50e25f9bef3d378ad1461d1f1f4f3",
       "verdict": {
         "kind": "pass",
@@ -1186,7 +1186,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-16",
-          "text_label": "`.harness/workflows/`、`.harness/capabilities/`、`.harness/custom/`、`.agents/`、`.claude/`、top-level entry document、設定、script、production source、test fixture、overlay の surviving live surface に、移動済み convention の旧 path への参照が残っていない。"
+          "text_label": "surviving live surface に、移動済み convention の旧 path への参照が残っていない。対象には少なくとも `.harness/workflows/`、`.harness/capabilities/`、`.harness/custom/`、`.agents/`、`.claude/`、top-level entry document、設定、script、production source、test fixture、overlay を含み、いずれについても残存参照がないことを確認できる。この列挙は対象の下限であって上限ではなく、ここに挙がっていない surviving live surface が対象外になるわけではない。"
         }
       },
       "evidence_origin": {
@@ -1198,7 +1198,7 @@
       }
     },
     {
-      "claim_hash": "b1f95fbb22c86b21069ef7872c714d44a0ddd0e67e7d49bc84ff0c12ba9e7df8",
+      "claim_hash": "44192f108dd86dd089de07302e27f6ceac8719134ffaf73849ebb99e4eb0540e",
       "evidence_hash": "f202859b260fe59c39ebbe81ad3893ec5ab50e25f9bef3d378ad1461d1f1f4f3",
       "verdict": {
         "kind": "pass",
@@ -1209,7 +1209,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-17",
-          "text_label": "移動前 path に stub、redirect document、alias が存在せず、`track/items/**`、`track/archive/**`、既存 ADR／research note の旧 path が変更されていない。"
+          "text_label": "移動前 path に stub、redirect document、alias が存在せず、`track/items/**`、`track/archive/**`、および現行手順として参照されていない既存 ADR／research note の旧 path が変更されていない。現行手順として参照されている ADR／research note は本条の対象ではなく、surviving live surface として AC-16 の更新対象となる。"
         }
       },
       "evidence_origin": {

@@ -1,5 +1,6 @@
-//! Tests for the fail-closed condition set of [`ConventionResolveError`] and
-//! for the two rejections it lifts (spec `AC-07`).
+//! Tests for the fail-closed condition set of [`ConventionResolveError`], for
+//! the two rejections it lifts, and for the record-renderability half of the
+//! path rejection (spec `AC-07`).
 //!
 //! A separate file from the module that declares the type only so that neither
 //! outgrows the workspace module-size limit.
@@ -51,6 +52,73 @@ impl<T: From<ConventionCapabilityIdError>> LiftsCapabilityIdError<T> {
 }
 
 #[test]
+fn test_convention_document_path_with_a_line_terminator_returns_not_renderable_error() {
+    // Each name is a single file under the convention root, so nothing but the
+    // record invariant rejects it. `\n` would make one file appear as two
+    // records; a trailing `\r` is stripped by a CRLF-accepting reader, which
+    // would collapse the record onto a differently named file.
+    for offending in [
+        "knowledge/conventions/render-fixture-split\nrecord.md",
+        "knowledge/conventions/render-fixture-trailing.md\n",
+        "knowledge/conventions/render-fixture-carriage\rreturn.md",
+        "knowledge/conventions/render-fixture-crlf.md\r\n",
+    ] {
+        let supplied = PathBuf::from(offending);
+
+        let result = ConventionDocumentPath::try_new(supplied.clone());
+
+        let Err(ConventionDocumentPathError::NotRenderableAsRecord { path }) = result else {
+            panic!(
+                "'{}' cannot be one record, so it is not a document path",
+                offending.escape_debug()
+            );
+        };
+        assert_eq!(
+            path, supplied,
+            "the rejection names the offending document, as the escape rejection does"
+        );
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn test_convention_document_path_with_a_non_utf8_name_returns_not_renderable_error() {
+    use std::ffi::OsStr;
+    use std::os::unix::ffi::OsStrExt;
+
+    // Two distinct files under the convention root, differing only in one byte
+    // that is invalid UTF-8 in any position.
+    let mut first = PathBuf::from("knowledge/conventions");
+    first.push(OsStr::from_bytes(b"render-fixture-lone-byte-\x80.md"));
+    let mut second = PathBuf::from("knowledge/conventions");
+    second.push(OsStr::from_bytes(b"render-fixture-lone-byte-\xfe.md"));
+
+    assert_ne!(first, second, "the two fixtures name different files");
+    assert_eq!(
+        first.display().to_string(),
+        second.display().to_string(),
+        "their rendered forms are identical, which is why accepting them would make a record \
+         unable to say which file it came from"
+    );
+
+    for supplied in [first, second] {
+        let result = ConventionDocumentPath::try_new(supplied.clone());
+
+        let Err(ConventionDocumentPathError::NotRenderableAsRecord { path }) = result else {
+            panic!("a non-UTF-8 name has no lossless rendered form, so it is not a document path");
+        };
+        assert_eq!(
+            path, supplied,
+            "the rejection names the offending document, as the escape rejection does"
+        );
+        assert!(
+            path.to_str().is_none(),
+            "the rejected path is carried as the bytes supplied, not as a lossy substitute"
+        );
+    }
+}
+
+#[test]
 fn test_convention_resolve_error_declares_exactly_the_five_fail_closed_conditions() {
     let escaping = PathBuf::from("knowledge/adr/README.md");
     let Err(outside_root) = ConventionDocumentPath::try_new(escaping.clone()) else {
@@ -68,7 +136,7 @@ fn test_convention_resolve_error_declares_exactly_the_five_fail_closed_condition
         ConventionResolveError::EmptyCapabilityId {
             document: document("knowledge/conventions/empty-capability-id.md"),
         },
-        ConventionResolveError::DocumentPathOutsideRoot { source: outside_root },
+        ConventionResolveError::DocumentPathRejected { source: outside_root },
         ConventionResolveError::DocumentUnreadable {
             document: document("knowledge/conventions/unreadable.md"),
             detail: CapabilityFailureDetail::new("permission denied"),
@@ -86,8 +154,10 @@ fn test_convention_resolve_error_declares_exactly_the_five_fail_closed_condition
             | ConventionResolveError::DocumentUnreadable { document, .. } => {
                 document.as_path().to_path_buf()
             }
-            ConventionResolveError::DocumentPathOutsideRoot {
-                source: ConventionDocumentPathError::OutsideConventionRoot { path },
+            ConventionResolveError::DocumentPathRejected {
+                source:
+                    ConventionDocumentPathError::OutsideConventionRoot { path }
+                    | ConventionDocumentPathError::NotRenderableAsRecord { path },
             } => path.clone(),
         })
         .collect();
@@ -107,26 +177,29 @@ fn test_convention_resolve_error_declares_exactly_the_five_fail_closed_condition
 }
 
 #[test]
-fn test_document_path_outside_root_lifts_each_constructor_rejection_as_its_source() {
-    // Every shape of path that does not name a document inside the convention
-    // root: a sibling directory, a parent-directory escape, an absolute path,
-    // and the root itself.
-    for escaping in [
+fn test_document_path_rejected_lifts_each_constructor_rejection_as_its_source() {
+    // Every shape of path the constructor rejects: a sibling directory, a
+    // parent-directory escape, an absolute path, the root itself, and — inside
+    // the root but unable to be one record — a name holding a line terminator.
+    for rejected in [
         "knowledge/adr/README.md",
         "knowledge/conventions/../adr/README.md",
         "/srv/knowledge/conventions/testing.md",
         "knowledge/conventions",
+        "knowledge/conventions/lift-fixture-split\nrecord.md",
     ] {
-        let supplied = PathBuf::from(escaping);
+        let supplied = PathBuf::from(rejected);
         let Err(rejection) = ConventionDocumentPath::try_new(supplied.clone()) else {
-            panic!("'{escaping}' does not name a document inside the convention root");
+            panic!("'{}' is not a convention document path", rejected.escape_debug());
         };
 
-        let error = ConventionResolveError::DocumentPathOutsideRoot { source: rejection };
+        let error = ConventionResolveError::DocumentPathRejected { source: rejection };
 
         let cause = error.source().expect("the composed path rejection must be the error source");
-        let Some(ConventionDocumentPathError::OutsideConventionRoot { path }) =
-            cause.downcast_ref::<ConventionDocumentPathError>()
+        let Some(
+            ConventionDocumentPathError::OutsideConventionRoot { path }
+            | ConventionDocumentPathError::NotRenderableAsRecord { path },
+        ) = cause.downcast_ref::<ConventionDocumentPathError>()
         else {
             panic!("the source must be the constructor rejection itself, carried unchanged");
         };
@@ -178,7 +251,7 @@ fn test_convention_resolve_error_declares_no_from_impl_for_either_lifted_rejecti
     assert!(
         !lifts_path_error,
         "no `From<ConventionDocumentPathError>`: a caller cannot raise this error with `?`, so \
-         `DocumentPathOutsideRoot` is only ever built at a named site"
+         `DocumentPathRejected` is only ever built at a named site"
     );
     assert!(
         !lifts_capability_id_error,

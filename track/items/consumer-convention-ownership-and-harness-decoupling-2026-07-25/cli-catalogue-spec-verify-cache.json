@@ -52,7 +52,7 @@
     },
     {
       "claim_hash": "d99d6998a1f66fb369d6ea9fd34f9be7469c0d3520285e17be39e0f771080c10",
-      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "evidence_hash": "9cb17b4f399b2aaa703bb5635a5bdd3090cf4329f0d01efda8c837c5a6c0e2b8",
       "verdict": {
         "kind": "pass",
         "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
@@ -70,7 +70,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
         }
       }
     },

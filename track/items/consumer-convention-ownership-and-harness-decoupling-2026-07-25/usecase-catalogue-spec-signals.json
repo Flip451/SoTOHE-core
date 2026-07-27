@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "df4bae1aa5980be389e27a038c7f7064d9cf372e59775608abac475e6255a777",
+  "catalogue_declaration_hash": "9038260bf63d065139a6c5160eb13ac2d62b68ba3b6d185cbe3963cf19c5177e",
   "signals": [
     {
       "type_name": "CapabilityExecError",
@@ -40,17 +40,17 @@
     {
       "type_name": "ConventionCapabilityIdError",
       "signal": "blue",
-      "entry_hash": "d24945ab1aa520a9612bc09ca4d88c89f87a80deeafde78704d5cdb39a38647a"
+      "entry_hash": "82ae7f2d21a840842f452cb14b75ec986fb4fea15015284a409d9cec77d98ba6"
     },
     {
       "type_name": "ConventionDocumentPath",
       "signal": "blue",
-      "entry_hash": "6b96a9d703cb42d56b87c75d7e46b4cf6b472c16b8afda622fc897f1d1849043"
+      "entry_hash": "7b2438d4a88675c72a218496825880fd34ab74034ba9a20411aa07e1ddbb65c1"
     },
     {
       "type_name": "ConventionDocumentPathError",
       "signal": "blue",
-      "entry_hash": "ced1c0dde3fc93e8cc30aca3b1138e27b16c5f002b73552884d44d98e17369eb"
+      "entry_hash": "c945fb52d4e0f5fb1eff92b2c0c681482fc2acae3e4acc2fa8d5af87dc3edf8a"
     },
     {
       "type_name": "ConventionRequirement",
@@ -65,7 +65,7 @@
     {
       "type_name": "ConventionResolveError",
       "signal": "blue",
-      "entry_hash": "5280bd52313f87059b9fda77a08d81d3888cb63b922204447878d2dbccf663bb"
+      "entry_hash": "21b85d3c3c3744939605f7d1e1a14e11bc373f20994b135346d6e42606e7b644"
     },
     {
       "type_name": "ConventionResolveInteractor",

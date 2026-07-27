@@ -17,16 +17,16 @@
 | ConventionDocumentPath | value_object | add | — | 🔵 | 🔵 |
 | ConventionRequirement | value_object | add | — | 🔵 | 🔵 |
 | ConventionResolution | value_object | add | — | 🔵 | 🔵 |
-| DisciplineText | value_object | modify | — | 🟡 | 🔵 |
+| DisciplineText | value_object | modify | — | 🔵 | 🔵 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CapabilityExecError | error_type | modify | ProfileResolution, ExecutionModeRejected, ModelMissing, EffortMissing, UnsupportedProvider, SourceValidation, AdapterPreflight, DispatchFailed, ConventionResolutionFailed | 🟡 | 🔵 |
+| CapabilityExecError | error_type | modify | ProfileResolution, ExecutionModeRejected, ModelMissing, EffortMissing, UnsupportedProvider, SourceValidation, AdapterPreflight, DispatchFailed, ConventionResolutionFailed | 🔵 | 🔵 |
 | ConventionCapabilityIdError | error_type | add | Blank | 🔵 | 🔵 |
-| ConventionDocumentPathError | error_type | add | OutsideConventionRoot | 🔵 | 🔵 |
-| ConventionResolveError | error_type | add | FrontMatterUnparseable, RequiredForNotStringArray, EmptyCapabilityId, DocumentPathOutsideRoot, DocumentUnreadable | 🔵 | 🔵 |
+| ConventionDocumentPathError | error_type | add | OutsideConventionRoot, NotRenderableAsRecord | 🔵 | 🔵 |
+| ConventionResolveError | error_type | add | FrontMatterUnparseable, RequiredForNotStringArray, EmptyCapabilityId, DocumentPathRejected, DocumentUnreadable | 🔵 | 🔵 |
 | ConventionShippingCheckError | error_type | add | ConventionRootMissing, TreeUnreadable, DocumentPathRejected | 🟡 | 🔵 |
 
 ## Secondary Ports

@@ -82,7 +82,9 @@
       { "layer": "usecase", "entry_key": "ConventionShippingCheckInteractor" }
     ],
     "T028": [
-      { "layer": "infrastructure", "entry_key": "infrastructure::template_conventions::list_convention_documents" },
+      { "layer": "infrastructure", "entry_key": "infrastructure::template_conventions::list_convention_documents" }
+    ],
+    "T033": [
       { "layer": "infrastructure", "entry_key": "FsConventionInventoryAdapter" }
     ],
     "T029": [

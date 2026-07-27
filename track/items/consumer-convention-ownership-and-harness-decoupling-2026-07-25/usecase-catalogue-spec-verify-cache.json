@@ -148,10 +148,10 @@
     },
     {
       "claim_hash": "4a00e7889d9a09843a493d25d1eb4ec9c4f5f0bab8c87f230e3c021a846d49c1",
-      "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
+      "evidence_hash": "72c6a83d70c1a46f2756ad139d7f136b0c8a757956e642cc99d181d9fc1bbe77",
       "verdict": {
         "kind": "pass",
-        "citation": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+        "citation": "resolve は構造上の異常を fail-closed とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -166,7 +166,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-07",
-          "text_label": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+          "text_label": "resolve は構造上の異常を fail-closed とする。この分類に当たる事例には、frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合、および解決対象 path が正本の 1 record として自身のファイルを同定できない場合 (valid UTF-8 でない、または `\\n` ないし `\\r` を含む) が含まれ、いずれについても fail-closed を確認できる。この列挙は網羅ではなく、同じ分類に属する他の事例も同様に fail-closed となる。"
         }
       }
     },
@@ -292,7 +292,7 @@
     },
     {
       "claim_hash": "0b58e3919a14cedc9a39e440d8a40f74d5156eb9bc22ac79b83e9133f0a1120e",
-      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "evidence_hash": "9cb17b4f399b2aaa703bb5635a5bdd3090cf4329f0d01efda8c837c5a6c0e2b8",
       "verdict": {
         "kind": "pass",
         "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
@@ -310,7 +310,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
         }
       }
     },
@@ -339,8 +339,8 @@
       }
     },
     {
-      "claim_hash": "d24945ab1aa520a9612bc09ca4d88c89f87a80deeafde78704d5cdb39a38647a",
-      "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
+      "claim_hash": "82ae7f2d21a840842f452cb14b75ec986fb4fea15015284a409d9cec77d98ba6",
+      "evidence_hash": "72c6a83d70c1a46f2756ad139d7f136b0c8a757956e642cc99d181d9fc1bbe77",
       "verdict": {
         "kind": "pass",
         "citation": "`required_for` に空文字または空白だけの capability ID がある場合"
@@ -358,12 +358,12 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-07",
-          "text_label": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+          "text_label": "resolve は構造上の異常を fail-closed とする。この分類に当たる事例には、frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合、および解決対象 path が正本の 1 record として自身のファイルを同定できない場合 (valid UTF-8 でない、または `\\n` ないし `\\r` を含む) が含まれ、いずれについても fail-closed を確認できる。この列挙は網羅ではなく、同じ分類に属する他の事例も同様に fail-closed となる。"
         }
       }
     },
     {
-      "claim_hash": "d24945ab1aa520a9612bc09ca4d88c89f87a80deeafde78704d5cdb39a38647a",
+      "claim_hash": "82ae7f2d21a840842f452cb14b75ec986fb4fea15015284a409d9cec77d98ba6",
       "evidence_hash": "2e7e63ddcfadfcaa5712a69d6fc3f52a6825b6aeb3b7e35f56e99bb3cdeae3db",
       "verdict": {
         "kind": "pass",
@@ -387,7 +387,7 @@
       }
     },
     {
-      "claim_hash": "6b96a9d703cb42d56b87c75d7e46b4cf6b472c16b8afda622fc897f1d1849043",
+      "claim_hash": "7b2438d4a88675c72a218496825880fd34ab74034ba9a20411aa07e1ddbb65c1",
       "evidence_hash": "63e9be7c117f9eeb84db396f2bfb4fd38eab6798f16ec111cd2df8c4558f861f",
       "verdict": {
         "kind": "pass",
@@ -411,11 +411,11 @@
       }
     },
     {
-      "claim_hash": "6b96a9d703cb42d56b87c75d7e46b4cf6b472c16b8afda622fc897f1d1849043",
-      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "claim_hash": "7b2438d4a88675c72a218496825880fd34ab74034ba9a20411aa07e1ddbb65c1",
+      "evidence_hash": "9cb17b4f399b2aaa703bb5635a5bdd3090cf4329f0d01efda8c837c5a6c0e2b8",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+        "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -430,16 +430,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
         }
       }
     },
     {
-      "claim_hash": "6b96a9d703cb42d56b87c75d7e46b4cf6b472c16b8afda622fc897f1d1849043",
-      "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
+      "claim_hash": "7b2438d4a88675c72a218496825880fd34ab74034ba9a20411aa07e1ddbb65c1",
+      "evidence_hash": "72c6a83d70c1a46f2756ad139d7f136b0c8a757956e642cc99d181d9fc1bbe77",
       "verdict": {
         "kind": "pass",
-        "citation": "解決対象 path が `knowledge/conventions/` の外へ逸脱する場合"
+        "citation": "解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、および解決対象 path が正本の 1 record として自身のファイルを同定できない場合 (valid UTF-8 でない、または `\\n` ないし `\\r` を含む) が含まれ、いずれについても fail-closed を確認できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -454,16 +454,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-07",
-          "text_label": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+          "text_label": "resolve は構造上の異常を fail-closed とする。この分類に当たる事例には、frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合、および解決対象 path が正本の 1 record として自身のファイルを同定できない場合 (valid UTF-8 でない、または `\\n` ないし `\\r` を含む) が含まれ、いずれについても fail-closed を確認できる。この列挙は網羅ではなく、同じ分類に属する他の事例も同様に fail-closed となる。"
         }
       }
     },
     {
-      "claim_hash": "ced1c0dde3fc93e8cc30aca3b1138e27b16c5f002b73552884d44d98e17369eb",
-      "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
+      "claim_hash": "c945fb52d4e0f5fb1eff92b2c0c681482fc2acae3e4acc2fa8d5af87dc3edf8a",
+      "evidence_hash": "72c6a83d70c1a46f2756ad139d7f136b0c8a757956e642cc99d181d9fc1bbe77",
       "verdict": {
         "kind": "pass",
-        "citation": "解決対象 path が `knowledge/conventions/` の外へ逸脱する場合"
+        "citation": "解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、および解決対象 path が正本の 1 record として自身のファイルを同定できない場合 (valid UTF-8 でない、または `\\n` ないし `\\r` を含む) が含まれ、いずれについても fail-closed を確認できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -478,7 +478,31 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-07",
-          "text_label": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+          "text_label": "resolve は構造上の異常を fail-closed とする。この分類に当たる事例には、frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合、および解決対象 path が正本の 1 record として自身のファイルを同定できない場合 (valid UTF-8 でない、または `\\n` ないし `\\r` を含む) が含まれ、いずれについても fail-closed を確認できる。この列挙は網羅ではなく、同じ分類に属する他の事例も同様に fail-closed となる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c945fb52d4e0f5fb1eff92b2c0c681482fc2acae3e4acc2fa8d5af87dc3edf8a",
+      "evidence_hash": "9cb17b4f399b2aaa703bb5635a5bdd3090cf4329f0d01efda8c837c5a6c0e2b8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ConventionDocumentPathError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
         }
       }
     },
@@ -508,7 +532,7 @@
     },
     {
       "claim_hash": "c9cab56670d523f50631152ad98acfbab537f3cd0068eb7f6201574eadeda5e2",
-      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "evidence_hash": "9cb17b4f399b2aaa703bb5635a5bdd3090cf4329f0d01efda8c837c5a6c0e2b8",
       "verdict": {
         "kind": "pass",
         "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
@@ -526,16 +550,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
         }
       }
     },
     {
       "claim_hash": "c9cab56670d523f50631152ad98acfbab537f3cd0068eb7f6201574eadeda5e2",
-      "evidence_hash": "290d0251ec52368b3c0579660a5e2e80bb8bdafe9a8a6ba536eab6926854545f",
+      "evidence_hash": "d0108139ca8681d34bb84d35ecee0facd2941428e89b81d5cd8ecdb75b168467",
       "verdict": {
         "kind": "pass",
-        "citation": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
+        "citation": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という状態は error にならず、正常な空結果として扱われる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -550,7 +574,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
+          "text_label": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という状態は error にならず、正常な空結果として扱われる。"
         }
       }
     },
@@ -580,10 +604,10 @@
     },
     {
       "claim_hash": "5209c65eaffc220aa380beddb3a8428f119b430badf3fe46a1fc6705aff37d12",
-      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "evidence_hash": "9cb17b4f399b2aaa703bb5635a5bdd3090cf4329f0d01efda8c837c5a6c0e2b8",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+        "citation": "`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -598,16 +622,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
         }
       }
     },
     {
       "claim_hash": "5209c65eaffc220aa380beddb3a8428f119b430badf3fe46a1fc6705aff37d12",
-      "evidence_hash": "290d0251ec52368b3c0579660a5e2e80bb8bdafe9a8a6ba536eab6926854545f",
+      "evidence_hash": "d0108139ca8681d34bb84d35ecee0facd2941428e89b81d5cd8ecdb75b168467",
       "verdict": {
         "kind": "pass",
-        "citation": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
+        "citation": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という状態は error にならず、正常な空結果として扱われる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -622,16 +646,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
+          "text_label": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という状態は error にならず、正常な空結果として扱われる。"
         }
       }
     },
     {
-      "claim_hash": "5280bd52313f87059b9fda77a08d81d3888cb63b922204447878d2dbccf663bb",
-      "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
+      "claim_hash": "21b85d3c3c3744939605f7d1e1a14e11bc373f20994b135346d6e42606e7b644",
+      "evidence_hash": "72c6a83d70c1a46f2756ad139d7f136b0c8a757956e642cc99d181d9fc1bbe77",
       "verdict": {
         "kind": "pass",
-        "citation": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+        "citation": "resolve は構造上の異常を fail-closed とする。この分類に当たる事例には、frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合、および解決対象 path が正本の 1 record として自身のファイルを同定できない場合 (valid UTF-8 でない、または `\\n` ないし `\\r` を含む) が含まれ、いずれについても fail-closed を確認できる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -646,7 +670,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-07",
-          "text_label": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+          "text_label": "resolve は構造上の異常を fail-closed とする。この分類に当たる事例には、frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合、および解決対象 path が正本の 1 record として自身のファイルを同定できない場合 (valid UTF-8 でない、または `\\n` ないし `\\r` を含む) が含まれ、いずれについても fail-closed を確認できる。この列挙は網羅ではなく、同じ分類に属する他の事例も同様に fail-closed となる。"
         }
       }
     },
@@ -676,7 +700,7 @@
     },
     {
       "claim_hash": "d1622283a9cf568bbcf9f746c66bc18149eb6c7043d3b48db9263da6a96159f8",
-      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "evidence_hash": "9cb17b4f399b2aaa703bb5635a5bdd3090cf4329f0d01efda8c837c5a6c0e2b8",
       "verdict": {
         "kind": "pass",
         "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
@@ -694,16 +718,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
         }
       }
     },
     {
       "claim_hash": "d1622283a9cf568bbcf9f746c66bc18149eb6c7043d3b48db9263da6a96159f8",
-      "evidence_hash": "290d0251ec52368b3c0579660a5e2e80bb8bdafe9a8a6ba536eab6926854545f",
+      "evidence_hash": "d0108139ca8681d34bb84d35ecee0facd2941428e89b81d5cd8ecdb75b168467",
       "verdict": {
         "kind": "pass",
-        "citation": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
+        "citation": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という状態は error にならず、正常な空結果として扱われる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -718,7 +742,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
+          "text_label": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という状態は error にならず、正常な空結果として扱われる。"
         }
       }
     },
@@ -1084,10 +1108,10 @@
     },
     {
       "claim_hash": "c4779028d95d253224e14d8e630580c194d4c47764172da0d61f8b5fb07452ab",
-      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "evidence_hash": "9cb17b4f399b2aaa703bb5635a5bdd3090cf4329f0d01efda8c837c5a6c0e2b8",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し"
+        "citation": "`knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1102,16 +1126,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
         }
       }
     },
     {
       "claim_hash": "c4779028d95d253224e14d8e630580c194d4c47764172da0d61f8b5fb07452ab",
-      "evidence_hash": "e9f936735c2395b763c8590782f9508690e111e708f0f93532c3d21b4c6d17d1",
+      "evidence_hash": "72c6a83d70c1a46f2756ad139d7f136b0c8a757956e642cc99d181d9fc1bbe77",
       "verdict": {
         "kind": "pass",
-        "citation": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+        "citation": "resolve は構造上の異常を fail-closed とする。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1126,7 +1150,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-07",
-          "text_label": "frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合の 5 条件で、resolve は fail-closed となる。"
+          "text_label": "resolve は構造上の異常を fail-closed とする。この分類に当たる事例には、frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合、および解決対象 path が正本の 1 record として自身のファイルを同定できない場合 (valid UTF-8 でない、または `\\n` ないし `\\r` を含む) が含まれ、いずれについても fail-closed を確認できる。この列挙は網羅ではなく、同じ分類に属する他の事例も同様に fail-closed となる。"
         }
       }
     },
@@ -1156,10 +1180,10 @@
     },
     {
       "claim_hash": "7480709bd6331941d780ee24868992c52d537d810d0ab190adfdb20dff417bf7",
-      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "evidence_hash": "9cb17b4f399b2aaa703bb5635a5bdd3090cf4329f0d01efda8c837c5a6c0e2b8",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+        "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1174,7 +1198,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
         }
       }
     },
@@ -1228,10 +1252,10 @@
     },
     {
       "claim_hash": "fc882087f33cc14dac5051583394465760e87d5f8e01209bd17e2e6781655056",
-      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "evidence_hash": "9cb17b4f399b2aaa703bb5635a5bdd3090cf4329f0d01efda8c837c5a6c0e2b8",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+        "citation": "`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1246,16 +1270,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
         }
       }
     },
     {
       "claim_hash": "fc882087f33cc14dac5051583394465760e87d5f8e01209bd17e2e6781655056",
-      "evidence_hash": "290d0251ec52368b3c0579660a5e2e80bb8bdafe9a8a6ba536eab6926854545f",
+      "evidence_hash": "d0108139ca8681d34bb84d35ecee0facd2941428e89b81d5cd8ecdb75b168467",
       "verdict": {
         "kind": "pass",
-        "citation": "指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
+        "citation": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という状態は error にならず、正常な空結果として扱われる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -1270,7 +1294,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
+          "text_label": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という状態は error にならず、正常な空結果として扱われる。"
         }
       }
     },

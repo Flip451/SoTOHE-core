@@ -17,6 +17,7 @@ pub mod catalog_gen;
 pub mod codex_runtime;
 pub mod contract_map;
 pub mod conventions;
+pub mod conventions_resolve;
 pub mod demo;
 pub mod domain;
 pub mod dry;

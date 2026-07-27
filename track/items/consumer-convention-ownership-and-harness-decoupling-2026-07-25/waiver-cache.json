@@ -15,13 +15,13 @@
         "item_identifier": "trait_method:scan_requirements"
       },
       "key": {
-        "waived_reason_hash": "ed2632220a77c1e8f75cd33b1cfcfeeee9421f712e9788660e134796a8936840",
+        "waived_reason_hash": "3404d1d0b596be4d4e878c58f94b557e5534ba3784c7f96dc21e7c0c11df8459",
         "declaration_hash": "34288b614a17b6a468af9b109bd2838a14ace7a85a93d7f977002d135910ceda",
         "anchor_text_hash": "8fcacd3517663b65642147deac44f3bcb1b164d156190aeb2d42d310057f95f2"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "TraitEntry ... methods: [MethodDeclaration { name: MethodName(Identifier(\"scan_requirements\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"project_root\")), ty: TypeRef(\"&std::path::Path\") }], returns: TypeRef(\"Result<Vec<ConventionRequirement>, ConventionResolveError>\")"
+        "citation": "scan_requirements(&self, project_root: &Path) -> Result<Vec<ConventionRequirement>, ConventionResolveError>"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -39,13 +39,13 @@
         "item_identifier": "trait_method:scan_requirements"
       },
       "key": {
-        "waived_reason_hash": "5905413e994c647af0c634452713e5d28d103ced157cbeb9c2a464d20203b2a0",
+        "waived_reason_hash": "7ed64412193322f128c96c34039c8dbe5c21ce8f8672a9533eebb0f1761399b3",
         "declaration_hash": "34288b614a17b6a468af9b109bd2838a14ace7a85a93d7f977002d135910ceda",
-        "anchor_text_hash": "dd5ea67e02f9b406d53b2e0a770895986e169be79549fdc8440e7f7be2e7a86d"
+        "anchor_text_hash": "51b28f2ec9290b9ea2aff6e9e206e609664c90b60219ed5b54305415af475b37"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "TraitEntry { action: Add, role: SecondaryPort, methods: [MethodDeclaration { name: MethodName(Identifier(\"scan_requirements\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"project_root\")), ty: TypeRef(\"&std::path::Path\") }], returns: TypeRef(\"Result<Vec<ConventionRequirement>, ConventionResolveError>\")"
+        "citation": "Read-only driven port producing one `ConventionRequirement` per scanned document"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     },
@@ -63,13 +63,109 @@
         "item_identifier": "trait_method:resolve"
       },
       "key": {
-        "waived_reason_hash": "8cc9cf354be71fb4fb51d2b9e60d6bcd3c83e9e7575b9c590204c96ab5eb391d",
+        "waived_reason_hash": "1229c41af1109602df65eb277527be64a36901f717dc72bb148888b2c24297d6",
         "declaration_hash": "4d1a4f5492cb238b3d9407dc9e8f8e25ae90fb1932546d11c5bd8ab6553aa2d9",
-        "anchor_text_hash": "dd5ea67e02f9b406d53b2e0a770895986e169be79549fdc8440e7f7be2e7a86d"
+        "anchor_text_hash": "51b28f2ec9290b9ea2aff6e9e206e609664c90b60219ed5b54305415af475b37"
       },
       "verdict": {
         "kind": "waived",
-        "citation": "methods: [MethodDeclaration { name: MethodName(Identifier(\"resolve\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"query\")), ty: TypeRef(\"ResolveConventionsQuery\") }], returns: TypeRef(\"Result<ConventionResolution, ConventionResolveError>\") }]"
+        "citation": "TraitEntry { action: Add, role: ApplicationService, methods: [MethodDeclaration { name: MethodName(Identifier(\"resolve\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"query\")), ty: TypeRef(\"ResolveConventionsQuery\") }], returns: TypeRef(\"Result<ConventionResolution, ConventionResolveError>\") }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "waived_reason_hash": "0ae1ef818e172f78f4cc779f3161566be385ab271870a9d6a023f015853ac94c",
+        "declaration_hash": "831abcc734f73d29fd67da731d798a4a2d38293e5cb089198573e19da87e779b",
+        "anchor_text_hash": "1b1ffbec0a695dd5ad0ef2aedf19b2203260b7cd306f9d0c5d44f2d3c1690f6b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Reports fail-closed profile, source, preflight, or provider dispatch failures."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-11"
+      },
+      "key": {
+        "waived_reason_hash": "3a0f203385e314fdf5a0d75d45e2e9e6f91901ca5addd73393ee6921ce520ee9",
+        "declaration_hash": "831abcc734f73d29fd67da731d798a4a2d38293e5cb089198573e19da87e779b",
+        "anchor_text_hash": "ef1146cebde1234282359a696adfa10617e74044ed59045e5082ebfa2afb09a1"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "dispatch 一回あたり resolver の実行は一度だけであり、その実行は実行主体の決定より前に行われる。`typed-pipeline` capability の dispatch では resolver 注入が行われない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionRequirementPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionRequirementPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:scan_requirements"
+      },
+      "key": {
+        "waived_reason_hash": "eb4b43b592bde0e0fe2aab1f9830ba6ea15aa1dcc3032ef265e4a2af9ff31be4",
+        "declaration_hash": "34288b614a17b6a468af9b109bd2838a14ace7a85a93d7f977002d135910ceda",
+        "anchor_text_hash": "2c8b009b849c82ccb1dbb756f2972cba4e650d06c7dbd798709555c40fe6efa4"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitEntry { action: Add, role: SecondaryPort, methods: [MethodDeclaration { name: MethodName(Identifier(\"scan_requirements\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"project_root\")), ty: TypeRef(\"&std::path::Path\") }], returns: TypeRef(\"Result<Vec<ConventionRequirement>, ConventionResolveError>\")"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionResolveError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionResolveError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "waived_reason_hash": "cf3ed2e2ae8d502a2327df88156041ef739ccfd95d2e71e06c9cb2d7af18aba1",
+        "declaration_hash": "93a726e07638959d5bccc8d2fae653f288b715f0d722b83f563c1be447efa195",
+        "anchor_text_hash": "2c8b009b849c82ccb1dbb756f2972cba4e650d06c7dbd798709555c40fe6efa4"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: [], generics: [], where_predicates: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }

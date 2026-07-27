@@ -29,9 +29,17 @@ const CONVENTION_ROOT: &str = "knowledge/conventions";
 
 /// Repository-relative path of a convention document.
 ///
-/// The single invariant is that the path names a document strictly inside
-/// `knowledge/conventions/`; [`ConventionDocumentPath::try_new`] is the only
-/// site that establishes it, so no consumer re-checks it and none can skip it.
+/// Two invariants, both established only by
+/// [`ConventionDocumentPath::try_new`], so no consumer re-checks either and
+/// none can skip them: the path names a document strictly inside
+/// `knowledge/conventions/`, and its rendered text is one line that still
+/// identifies the file it came from.
+///
+/// The second invariant belongs here and not at the renderer because
+/// `IN-05`/`AC-06` promise a canonical result of one repository-relative path
+/// per line, and whether a candidate can be one such record is part of the
+/// question this type already answers. Deciding it at a rendering site would
+/// make that site a second definition of a valid convention document path.
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ConventionDocumentPath(PathBuf);
 
@@ -39,18 +47,25 @@ impl ConventionDocumentPath {
     /// Validates and wraps a repository-relative convention document path.
     ///
     /// `.` components are dropped; the remaining path must start with
-    /// `knowledge/conventions/` and name something below it.
+    /// `knowledge/conventions/` and name something below it, and it must
+    /// render as a single text record.
     ///
     /// # Errors
     ///
     /// Returns [`ConventionDocumentPathError::OutsideConventionRoot`] when
     /// `path` is absolute, carries a parent-directory component, resolves to
-    /// the convention root itself, or lies outside that root.
+    /// the convention root itself, or lies outside that root — that rule is
+    /// applied first, so a path failing both is reported as escaping the root.
+    /// Returns [`ConventionDocumentPathError::NotRenderableAsRecord`] when a
+    /// path inside the root does not render as one identifying line.
     pub fn try_new(path: PathBuf) -> Result<Self, ConventionDocumentPathError> {
-        match normalize_inside_root(&path) {
-            Some(normalized) => Ok(Self(normalized)),
-            None => Err(ConventionDocumentPathError::OutsideConventionRoot { path }),
+        let Some(normalized) = normalize_inside_root(&path) else {
+            return Err(ConventionDocumentPathError::OutsideConventionRoot { path });
+        };
+        if !renders_as_one_record(&normalized) {
+            return Err(ConventionDocumentPathError::NotRenderableAsRecord { path });
         }
+        Ok(Self(normalized))
     }
 
     /// Returns the validated repository-relative document path.
@@ -83,6 +98,26 @@ fn normalize_inside_root(path: &Path) -> Option<PathBuf> {
     inside.then_some(normalized)
 }
 
+/// Reports whether `path` renders as one line of text that still identifies
+/// the file it names.
+///
+/// Both halves it rejects are failures of identification rather than of
+/// appearance, which is why neither is answerable by escaping or replacing the
+/// offending bytes at render time — the escaped text would name a file that
+/// does not exist.
+///
+/// A path that is not valid UTF-8 has a rendered form only through a lossy
+/// conversion, so two distinct paths can render as the same replacement text
+/// and the reader cannot tell which file a record came from. A path holding
+/// `\n` splits into two apparent records under any line-oriented reader, and
+/// `\r` is rejected with it because a reader that accepts CRLF strips a
+/// trailing one, collapsing the record onto a different path. Nothing narrower
+/// than "valid UTF-8 and no line terminator" delivers the guarantee wanted:
+/// that the rendered line maps back to exactly one file.
+fn renders_as_one_record(path: &Path) -> bool {
+    path.to_str().is_some_and(|text| !text.contains(['\n', '\r']))
+}
+
 /// Construction failure of [`ConventionDocumentPath`].
 ///
 /// Extracted from the resolution errors so that every consumer of the
@@ -93,6 +128,18 @@ pub enum ConventionDocumentPathError {
     #[error("convention document path is outside 'knowledge/conventions/': {}", path.display())]
     OutsideConventionRoot {
         /// Rejected path, as supplied to the constructor.
+        path: PathBuf,
+    },
+    /// The candidate path does not render as one line of text identifying it.
+    #[error(
+        "convention document path is not renderable as a single record (it must be valid UTF-8 \
+         and hold no line terminator): {path:?}"
+    )]
+    NotRenderableAsRecord {
+        /// Rejected path, as supplied to the constructor. Rendered
+        /// debug-escaped rather than through `Display`, because a `Display` of
+        /// this path is precisely what the variant rejects: it would either
+        /// break the diagnostic across lines or lose which file was rejected.
         path: PathBuf,
     },
 }
@@ -126,9 +173,22 @@ pub enum ConventionResolveError {
         /// Document holding the empty capability ID.
         document: ConventionDocumentPath,
     },
-    /// A resolved path escaped the convention root.
-    #[error("resolved convention document path escapes the convention root")]
-    DocumentPathOutsideRoot {
+    /// A resolved path did not satisfy the convention document path rule.
+    ///
+    /// Both the name and the message state the category rather than the rule
+    /// that fired, because [`ConventionDocumentPathError`] has more than one
+    /// shape: it composes the escape rejection and the record-renderability
+    /// rejection alike. The earlier name `DocumentPathOutsideRoot` would tell a
+    /// reader who hit a filename holding a line terminator to look for a path
+    /// escape that never happened.
+    ///
+    /// Naming the category is also what keeps the rule out of this enum:
+    /// [`ConventionDocumentPathError`] owns every rejection reason and carries
+    /// the offending path, so restating one of them here would put a second
+    /// wording of the same rule beside the original. The specific reason is
+    /// read from the source.
+    #[error("the scan resolved a path that is not a convention document path")]
+    DocumentPathRejected {
         /// Constructor rejection this variant composes.
         source: ConventionDocumentPathError,
     },

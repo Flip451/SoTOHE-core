@@ -179,7 +179,7 @@ mod tests {
             || ConventionResolveError::EmptyCapabilityId {
                 document: document("knowledge/conventions/empty-capability-id.md"),
             },
-            || ConventionResolveError::DocumentPathOutsideRoot {
+            || ConventionResolveError::DocumentPathRejected {
                 source: ConventionDocumentPath::try_new(PathBuf::from("knowledge/adr/README.md"))
                     .expect_err("a sibling directory is outside the convention root"),
             },

@@ -100,7 +100,7 @@
     },
     {
       "claim_hash": "416db5df286e8389fb9735f33f4c6ca6976ff58c9603495579f8398f7a0f4faa",
-      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "evidence_hash": "9cb17b4f399b2aaa703bb5635a5bdd3090cf4329f0d01efda8c837c5a6c0e2b8",
       "verdict": {
         "kind": "pass",
         "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
@@ -118,16 +118,16 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
         }
       }
     },
     {
       "claim_hash": "416db5df286e8389fb9735f33f4c6ca6976ff58c9603495579f8398f7a0f4faa",
-      "evidence_hash": "290d0251ec52368b3c0579660a5e2e80bb8bdafe9a8a6ba536eab6926854545f",
+      "evidence_hash": "d0108139ca8681d34bb84d35ecee0facd2941428e89b81d5cd8ecdb75b168467",
       "verdict": {
         "kind": "pass",
-        "citation": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
+        "citation": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という状態は error にならず、正常な空結果として扱われる。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -142,7 +142,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-08",
-          "text_label": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という 3 状態は error にならず、正常な空結果として扱われる。"
+          "text_label": "frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という状態は error にならず、正常な空結果として扱われる。"
         }
       }
     },
@@ -196,7 +196,7 @@
     },
     {
       "claim_hash": "ba8e91a1d8641d80b09652c3c12aa99c3aae4ebd94f95f6f5a7cf7f80fa9ceaf",
-      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "evidence_hash": "9cb17b4f399b2aaa703bb5635a5bdd3090cf4329f0d01efda8c837c5a6c0e2b8",
       "verdict": {
         "kind": "pass",
         "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
@@ -214,7 +214,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
         }
       }
     },
@@ -364,10 +364,10 @@
     },
     {
       "claim_hash": "39410d202e3360e7a973dc5d8bd49737040144c294e370f267bc97a3f5d79bfd",
-      "evidence_hash": "b388c8f89a77ab0a3a357f8dea2e8286d81d6d3e6fa7e8e768a41b7328b9b6d9",
+      "evidence_hash": "9cb17b4f399b2aaa703bb5635a5bdd3090cf4329f0d01efda8c837c5a6c0e2b8",
       "verdict": {
         "kind": "pass",
-        "citation": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+        "citation": "文書の作成・更新・削除・索引生成を行わない。"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -382,7 +382,7 @@
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-06",
-          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。"
+          "text_label": "`bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。"
         }
       }
     },

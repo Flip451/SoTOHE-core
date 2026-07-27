@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "db6cec1761162d87cb0a47f1cd7a30b9497cd61a7b18ff553b865e035ac93693",
+  "catalogue_declaration_hash": "08a2a1b3f3e750467685fa06359109a953aec7126d2e69eec454c316dd84dff2",
   "signals": [
     {
       "type_name": "CapabilityIdField",
@@ -30,7 +30,7 @@
     {
       "type_name": "infrastructure::conventions_resolve::scan_convention_requirements",
       "signal": "blue",
-      "entry_hash": "da4268633a31e7b7d6570efa8acb34e04752b58c65e5700fa29a476b53a8a5ce"
+      "entry_hash": "d82fa388f7bd8e17259e7a17ed39bcf0c63045d74b6b6828d0e622cda008a917"
     },
     {
       "type_name": "infrastructure::template_conventions::list_convention_documents",

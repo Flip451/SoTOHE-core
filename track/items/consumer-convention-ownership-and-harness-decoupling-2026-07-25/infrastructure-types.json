@@ -35,7 +35,7 @@
     },
     "infrastructure::conventions_resolve::scan_convention_requirements": {
       "action": "add",
-      "docs": "Directory-scan seam: walks the convention tree read-only, builds a `ConventionDocumentPath` per file — that constructor decides the path rule, and this walk only lifts its rejection into `ConventionResolveError::DocumentPathOutsideRoot` — and hands each document's text to the codec. Single enforcing site of AC-07's unreadable-document condition. A `FreeFunction` (R2) and deliberately three seams apart from decoding and matching, so filesystem behaviour is testable without front-matter fixtures and neither neighbour can acquire a filesystem dependency. IN-05, AC-06.",
+      "docs": "Directory-scan seam: walks the convention tree read-only, builds a `ConventionDocumentPath` per file — that constructor decides the path rule, and this walk only lifts whatever rejection it produces, whichever condition fired, into `ConventionResolveError::DocumentPathRejected` — and hands each document's text to the codec. Single enforcing site of AC-07's unreadable-document condition. A `FreeFunction` (R2) and deliberately three seams apart from decoding and matching, so filesystem behaviour is testable without front-matter fixtures and neither neighbour can acquire a filesystem dependency. IN-05, AC-06.",
       "informal_grounds": [],
       "is_async": false,
       "params": [
