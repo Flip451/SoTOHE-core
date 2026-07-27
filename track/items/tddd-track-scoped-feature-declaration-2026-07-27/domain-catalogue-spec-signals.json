@@ -1,31 +1,31 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "47cb8f623054056056fa2bf8fad4d1682505f83fe14f3c8f145114a8d2add28c",
+  "catalogue_declaration_hash": "aea8905bb4ea3b9b53d7a2877b81854895956d0699a9cc99641a58ca8aeaccb4",
   "signals": [
     {
       "type_name": "CargoFeatureName",
       "signal": "blue",
-      "entry_hash": "766f210e77f7aff69fdb7485eacaea4a6d1e54650ace3476ed3024e3a6d17fc1"
+      "entry_hash": "a8f1e6d460fba04533306113bc1ca00e7ffc618bc4c79ee90feaa11cd45917a5"
     },
     {
       "type_name": "CargoFeatureNameError",
       "signal": "blue",
-      "entry_hash": "29d872bb11e627cd823d87e9beba9a078f99cc51cde9f17ba6ae6a3771fbd341"
+      "entry_hash": "7a008210bbb369b929657451adabc0f96a545f8b39d620fe0c845a863fda5126"
     },
     {
       "type_name": "TdddFeatureDeclaration",
       "signal": "blue",
-      "entry_hash": "7c18183533bea0467dbb04c4dfce6eb379c593985bc239ad55f8930001c8d491"
+      "entry_hash": "4ca9dfbb3d44c9997f26d26440c3d2fc981a8143b039d7e6538de7268db375d8"
     },
     {
       "type_name": "TdddFeatureDeclarationError",
       "signal": "blue",
-      "entry_hash": "6b3aad123c07f8d27b3be6718cb4a712ec0f81ecd6ec6ae82a2db659e95b381f"
+      "entry_hash": "fa0ff4d31b445a8925650fdf613c4d924ae64a15c6deccab9291b7493c66c6ef"
     },
     {
       "type_name": "TdddFeatureLookupError",
       "signal": "blue",
-      "entry_hash": "96586ca523a315ef975dd0c1d2ad8eab6953e07740c6aa7300a34a51f25e72cb"
+      "entry_hash": "d79923cfbb841b159f4e577ae2ecd7d3a5f0eafb8e67b881d0c1f1546fd927f6"
     },
     {
       "type_name": "RustdocBaselineCapturePort",

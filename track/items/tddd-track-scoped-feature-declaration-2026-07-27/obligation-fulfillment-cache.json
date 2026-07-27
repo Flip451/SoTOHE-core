@@ -1,0 +1,413 @@
+{
+  "track_id": "tddd-track-scoped-feature-declaration-2026-07-27",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPort",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_for_baseline"
+      },
+      "key": {
+        "bound_tests_set_hash": "80734ddb70ee6060c7f867439e56f0090b7edbcbada1d7bb74e4fccdd86828e3",
+        "declaration_hash": "2b6bf18a3fd6063f0062cc9a8036196ebb794afe107b6b22ab454972e0030dda",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::tddd_feature_declaration::TdddBaselineFeatureDeclarationPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "80734ddb70ee6060c7f867439e56f0090b7edbcbada1d7bb74e4fccdd86828e3",
+        "declaration_hash": "dc3ed4d8f34c811418cb1013397434c04475bddd81d88d6056ae09d2b29c9e79",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddActualFeatureDeclarationPort",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddActualFeatureDeclarationPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_for_actual"
+      },
+      "key": {
+        "bound_tests_set_hash": "238ae4beddde8656339af30316a2d0251efd10ffb83f5ba6c0e7a133775d5ea6",
+        "declaration_hash": "e62a58cbafa332df962c79e4c842b7c9b0a571c57080e63231fcb6ce9867938e",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddActualFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "238ae4beddde8656339af30316a2d0251efd10ffb83f5ba6c0e7a133775d5ea6",
+        "declaration_hash": "6e008f40c9654a80437de309a1c22aef52b8638f05fe805381b2482de0cf3b27",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddActualFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CargoFeatureNameError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CargoFeatureNameError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "8aad1c3b251146e7ff6053a8b1e40871b628ef332f15590185081ae0cd8b16ab",
+        "declaration_hash": "0e5edbf18f8a3aeb9a76d982300960abfd1ecf7e6f5fd0fca65296e5abdcd520",
+        "anchor_text_hash": "3d140a8502ba2fc59e956d918239a0fcdced0fb09a01c5b260dec2c3152734f4"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "CargoFeatureName::try_new(\"not/a-feature\".to_owned()),\n            Err(CargoFeatureNameError::InvalidFeatureName(_))\n\nCargoFeatureName::try_new(\"-foo\".to_owned()),\n            Err(CargoFeatureNameError::InvalidFeatureName(_))\n\nCargoFeatureName::try_new(String::new()),\n            Err(CargoFeatureNameError::InvalidFeatureName(reason))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CargoFeatureName",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CargoFeatureName",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "8aad1c3b251146e7ff6053a8b1e40871b628ef332f15590185081ae0cd8b16ab",
+        "declaration_hash": "716ef3d3face0ccf29ba61e2617c09ea8bb6cfe15391fcfa00b0fe510fc3887a",
+        "anchor_text_hash": "3d140a8502ba2fc59e956d918239a0fcdced0fb09a01c5b260dec2c3152734f4"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "CargoFeatureName::try_new(\"not/a-feature\".to_owned()),\n            Err(CargoFeatureNameError::InvalidFeatureName(_))\n\nCargoFeatureName::try_new(\"-foo\".to_owned()),\n            Err(CargoFeatureNameError::InvalidFeatureName(_))\n\nCargoFeatureName::try_new(String::new()),\n            Err(CargoFeatureNameError::InvalidFeatureName(reason))\n                if reason.as_str() == \"feature name must not be empty\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "fd09d211c87d7f59edcedb5fed5414efd5d1a5e373e3e995c605de08cd657881",
+        "declaration_hash": "5a25dce39433df63b76f59d21ceb9fb8f456bc0f948f710505a2d467bbb32f6d",
+        "anchor_text_hash": "1ec2142f4cac006b11e908702b5ea5a367c9edf170857016d6a46f72d6dda874"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            declaration.features_for(&layer(\"infrastructure\")).unwrap(),\n            &[feature(\"semantic-dup\")]\n        );\n        assert!(declaration.layers().contains_key(&layer(\"domain\")));\n        assert!(declaration.layers().get(&layer(\"domain\")).is_some_and(Vec::is_empty));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "fd09d211c87d7f59edcedb5fed5414efd5d1a5e373e3e995c605de08cd657881",
+        "declaration_hash": "5a25dce39433df63b76f59d21ceb9fb8f456bc0f948f710505a2d467bbb32f6d",
+        "anchor_text_hash": "849e354fdd1bf42568dab6b28d787e6154ec9a29413c4ef7476390082a4413b5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            declaration.features_for(&layer(\"infrastructure\")).unwrap(),\n            &[feature(\"semantic-dup\")]\n        );\n        assert!(declaration.layers().contains_key(&layer(\"domain\")));\n        assert!(declaration.layers().get(&layer(\"domain\")).is_some_and(Vec::is_empty));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "fd09d211c87d7f59edcedb5fed5414efd5d1a5e373e3e995c605de08cd657881",
+        "declaration_hash": "5a25dce39433df63b76f59d21ceb9fb8f456bc0f948f710505a2d467bbb32f6d",
+        "anchor_text_hash": "1392fbe4aafabba21174d99184c8ee5c92fc9a7c42bdd3ebf7268021e7468b1e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            declaration.features_for(&layer(\"infrastructure\")).unwrap(),\n            &[feature(\"semantic-dup\")]\n        );\n        assert!(declaration.layers().contains_key(&layer(\"domain\")));\n        assert!(declaration.layers().get(&layer(\"domain\")).is_some_and(Vec::is_empty));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclarationError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddFeatureDeclarationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "a3f0fdcf963a7811bf81a5ae3b5e4c097e8b69d690357db2a1d2d1bf3625ac4e",
+        "declaration_hash": "290b99faafc5eb11a943d207a8bf12b64aec3c3a68047ef2ce9079afd5cdea8d",
+        "anchor_text_hash": "1392fbe4aafabba21174d99184c8ee5c92fc9a7c42bdd3ebf7268021e7468b1e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "matches!(result, Err(TdddFeatureDeclarationError::MissingLayer(missing)) if missing == layer(\"usecase\"))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddFeatureLookupError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddFeatureLookupError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "cb65a22c7a802b5d83344bc5b23e203ef46ed43b2ccd640e51e0c737739ba14f",
+        "declaration_hash": "7798a6613122195f8be166b8213186c90b1d3d0872812039bf853329e3ee9772",
+        "anchor_text_hash": "1392fbe4aafabba21174d99184c8ee5c92fc9a7c42bdd3ebf7268021e7468b1e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "matches!(declaration.features_for(&layer(\"usecase\")), Err(TdddFeatureLookupError::MissingLayer(missing)) if missing == layer(\"usecase\"))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPortError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPortError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "80734ddb70ee6060c7f867439e56f0090b7edbcbada1d7bb74e4fccdd86828e3",
+        "declaration_hash": "768d06945ea013fae2b342f354beb310c08b928cf0c042c8927469fc987cebae",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddActualFeatureDeclarationPortError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddActualFeatureDeclarationPortError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "238ae4beddde8656339af30316a2d0251efd10ffb83f5ba6c0e7a133775d5ea6",
+        "declaration_hash": "6fe33aabfc0906ddee530ca34b743f154a2465d805a1ca6845a054b4ded68c69",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddActualFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclarationReadError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddFeatureDeclarationReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "80734ddb70ee6060c7f867439e56f0090b7edbcbada1d7bb74e4fccdd86828e3",
+        "declaration_hash": "1533457c9880bf131ae0a4d06f37c6f2ac8136533da14d3d96263c43b9817187",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclarationReadError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddFeatureDeclarationReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "47abe37514da53d2c7e789ce6ef2a70430bd9ea05e8cbf2481d860ab49ff1d7e",
+        "declaration_hash": "1533457c9880bf131ae0a4d06f37c6f2ac8136533da14d3d96263c43b9817187",
+        "anchor_text_hash": "6d4cbb78f28c7649c31707986155e9c48ae748dfbc7cb91aa58ba994f24be995"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }\n            ))\n        ))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "98da9691411352313e84154ec3b2d77ff39f2a3dd685a701342e540f8472363e",
+        "declaration_hash": "77a9e606f176b05d1c4986fe6d652cc3eb619bf5383af59ea445bc2535bf7230",
+        "anchor_text_hash": "1392fbe4aafabba21174d99184c8ee5c92fc9a7c42bdd3ebf7268021e7468b1e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"{\\\"schema_version\\\":1,\\\"layers\\\":{\\\"cli\\\":[],\\\"domain\\\":[\\\"semantic-dup\\\"]}}\" ... declaration.features_for(&domain) ... [\"semantic-dup\"] ... declaration.features_for(&cli).unwrap().is_empty()"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "47abe37514da53d2c7e789ce6ef2a70430bd9ea05e8cbf2481d860ab49ff1d7e",
+        "declaration_hash": "77a9e606f176b05d1c4986fe6d652cc3eb619bf5383af59ea445bc2535bf7230",
+        "anchor_text_hash": "6d4cbb78f28c7649c31707986155e9c48ae748dfbc7cb91aa58ba994f24be995"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ]
+}

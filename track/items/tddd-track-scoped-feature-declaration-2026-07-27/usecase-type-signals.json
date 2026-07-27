@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-27T03:15:26Z",
-  "declaration_hash": "4256396ebf4fb252d71f19067594239e4e51c83c92f14f3b328b8759975286bc",
-  "implementation_input_hash": "1e6db89b296b2e6a275de97756b23295cdd0b0bcae4a8bbb87686d8a6699be1f",
+  "generated_at": "2026-07-27T05:32:28Z",
+  "declaration_hash": "1ea5fabc2551efdaf41d7aee26885ccf84501bd2a12815c744b3736bef6f07c5",
+  "implementation_input_hash": "6d40f1576b23b32d8bb8e5fd1f11ce8cb6c0d0f6a750ab789e52c86e67919887",
   "signals": [
     {
       "type_name": "BaselineCaptureError",
@@ -47,15 +47,15 @@
     {
       "type_name": "TdddActualFeatureDeclarationPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TdddActualFeatureDeclarationPortError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
@@ -64,15 +64,15 @@
     {
       "type_name": "TdddBaselineFeatureDeclarationPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "TdddBaselineFeatureDeclarationPortError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
@@ -81,9 +81,9 @@
     {
       "type_name": "TdddFeatureDeclarationReadError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"

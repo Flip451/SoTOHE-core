@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "4256396ebf4fb252d71f19067594239e4e51c83c92f14f3b328b8759975286bc",
+  "catalogue_declaration_hash": "1ea5fabc2551efdaf41d7aee26885ccf84501bd2a12815c744b3736bef6f07c5",
   "signals": [
     {
       "type_name": "BaselineCaptureError",
@@ -10,7 +10,7 @@
     {
       "type_name": "BaselineCaptureInteractor",
       "signal": "blue",
-      "entry_hash": "2fdc23e27cbdbfa950e8075cfbd1021141f329b2e120f876fda17890df7d7087"
+      "entry_hash": "6062a2e6eaad966add0d5142b4d0d1e15c7e7a18f98f57f0cf53fe50fd5fdfea"
     },
     {
       "type_name": "CatalogueImplSignalsError",
@@ -20,7 +20,7 @@
     {
       "type_name": "CatalogueImplSignalsInteractor",
       "signal": "blue",
-      "entry_hash": "0bdb6c6ce5c501a0be2821723aed02a8a9bdaa2d3fc2caae078f0afceec86ebe"
+      "entry_hash": "eb8fe7d4b6136081413c6179268cd06319d30dad378aa0ee26802fe96e72c077"
     },
     {
       "type_name": "CodeFragmentExtractorError",
@@ -40,17 +40,17 @@
     {
       "type_name": "TdddActualFeatureDeclarationPortError",
       "signal": "blue",
-      "entry_hash": "603c92eab1ee99d20a51d637a9cf35857671317f772f251a6083b1dd813a2f7c"
+      "entry_hash": "6e2ac3827c34ca4508ce549d62876546985940fc02f6cf474fd059d1abbe3e1f"
     },
     {
       "type_name": "TdddBaselineFeatureDeclarationPortError",
       "signal": "blue",
-      "entry_hash": "c554173d3667e6b04efa61dad56354c2234f6a490142ef57d2af1d94475991b7"
+      "entry_hash": "63ce3514396cdf21fc6eb6a7b50a13797889d25e3f500e086d88ee1f9ff8885b"
     },
     {
       "type_name": "TdddFeatureDeclarationReadError",
       "signal": "blue",
-      "entry_hash": "8486ddd540929bb3a35fdbed7a0d7148e9ba685969e83c6c7bb8fcb52735e56c"
+      "entry_hash": "0fbeddc9e61b6bc4772ae6d243b009573609828d9fcd93a0b14c5b070749aff4"
     },
     {
       "type_name": "CodeFragmentExtractorPort",
@@ -75,12 +75,12 @@
     {
       "type_name": "TdddActualFeatureDeclarationPort",
       "signal": "blue",
-      "entry_hash": "a20c0627eaf268b8b9a497f58746fba64da9e3e36e6b332801e4eee5cdd9dad2"
+      "entry_hash": "4bdbad1184910e9a8cbfe5aa5b0dce8c9f8685d92930a3deb65b85710803ac8f"
     },
     {
       "type_name": "TdddBaselineFeatureDeclarationPort",
       "signal": "blue",
-      "entry_hash": "07be6c5cab4e3191bbb157ab2b339033cc66e942454ea69b8826df6df714191e"
+      "entry_hash": "d3384df3587c5eace37b28c5160c9dd2c654b3f7d8f475e30cc8416144c8eb35"
     }
   ]
 }

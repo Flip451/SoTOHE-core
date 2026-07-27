@@ -252,6 +252,16 @@
           "anchor": "D7"
         }
       ]
+    },
+    {
+      "id": "AC-09",
+      "text": "layer の Cargo feature list の各要素は Cargo feature-name grammar に適合しなければならず、malformed token は fail-closed で拒否される。これは token の構文妥当性を検証する基準であり、構文上は妥当でも対象 crate の Cargo.toml に存在しない feature を拒否する AC-05 とは別の failure mode である",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+          "anchor": "D1"
+        }
+      ]
     }
   ],
   "related_conventions": [
@@ -281,7 +291,7 @@
     }
   ],
   "signals": {
-    "blue": 24,
+    "blue": 25,
     "yellow": 0,
     "red": 0
   }

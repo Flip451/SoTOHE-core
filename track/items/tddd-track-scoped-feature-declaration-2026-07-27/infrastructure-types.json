@@ -76,91 +76,92 @@
   },
   "inherent_impls": [
     {
-      "type_name": "FsTdddFeatureDeclarationAdapter",
       "methods": [
         {
-          "name": "new",
-          "receiver": null,
-          "params": [],
-          "returns": "Self",
-          "is_async": false,
           "generics": [],
           "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "receiver": null,
+          "returns": "Self",
           "where_predicates": []
         }
-      ]
+      ],
+      "type_name": "FsTdddFeatureDeclarationAdapter"
     },
     {
-      "type_name": "RustdocBaselineCaptureAdapter",
       "methods": [
         {
-          "name": "new",
-          "receiver": null,
-          "params": [],
-          "returns": "Self",
-          "is_async": false,
           "generics": [],
           "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "receiver": null,
+          "returns": "Self",
           "where_predicates": []
         }
-      ]
+      ],
+      "type_name": "RustdocBaselineCaptureAdapter"
     },
     {
-      "type_name": "RustdocCrateAdapter",
       "methods": [
         {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "new",
-          "receiver": null,
           "params": [
             {
               "name": "workspace_root",
               "ty": "std::path::PathBuf"
             }
           ],
+          "receiver": null,
           "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
           "where_predicates": []
         }
-      ]
+      ],
+      "type_name": "RustdocCrateAdapter"
     },
     {
-      "type_name": "RustdocSchemaExporter",
       "methods": [
         {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "new",
-          "receiver": null,
           "params": [
             {
               "name": "workspace_root",
               "ty": "std::path::PathBuf"
             }
           ],
+          "receiver": null,
           "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
           "where_predicates": []
         },
         {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "export_rustdoc_json_path",
-          "receiver": "&self",
           "params": [
             {
               "name": "crate_name",
               "ty": "&str"
             }
           ],
+          "receiver": "&self",
           "returns": "Result<std::path::PathBuf, domain::schema::SchemaExportError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
           "where_predicates": []
         },
         {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "export_rustdoc_json_path_with_features",
-          "receiver": "&self",
           "params": [
             {
               "name": "crate_name",
@@ -171,105 +172,105 @@
               "ty": "&[domain::tddd::CargoFeatureName]"
             }
           ],
+          "receiver": "&self",
           "returns": "Result<std::path::PathBuf, domain::schema::SchemaExportError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
           "where_predicates": []
         },
         {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "existing_rustdoc_json_path",
-          "receiver": "&self",
           "params": [
             {
               "name": "crate_name",
               "ty": "&str"
             }
           ],
+          "receiver": "&self",
           "returns": "Result<std::path::PathBuf, domain::schema::SchemaExportError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
           "where_predicates": []
         }
-      ]
+      ],
+      "type_name": "RustdocSchemaExporter"
     },
     {
-      "type_name": "FastEmbedAdapter",
       "methods": [
         {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "new",
-          "receiver": null,
           "params": [],
+          "receiver": null,
           "returns": "Result<Self, usecase::semantic_dup::EmbeddingError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
           "where_predicates": []
         }
-      ]
+      ],
+      "type_name": "FastEmbedAdapter"
     },
     {
-      "type_name": "LanceDbSemanticIndexAdapter",
       "methods": [
         {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "new",
-          "receiver": null,
           "params": [
             {
               "name": "db_path",
               "ty": "std::path::PathBuf"
             }
           ],
-          "returns": "Result<Self, usecase::semantic_dup::SemanticIndexError>",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
-          "where_predicates": []
-        }
-      ]
-    },
-    {
-      "type_name": "CodeFragmentExtractorAdapter",
-      "methods": [
-        {
-          "name": "new",
           "receiver": null,
-          "params": [],
-          "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
+          "returns": "Result<Self, usecase::semantic_dup::SemanticIndexError>",
           "where_predicates": []
         }
-      ]
+      ],
+      "type_name": "LanceDbSemanticIndexAdapter"
     },
     {
-      "type_name": "PersistentIndexLockError",
       "methods": [
         {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "type_name": "CodeFragmentExtractorAdapter"
+    },
+    {
+      "methods": [
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "contains",
-          "receiver": "&self",
           "params": [
             {
               "name": "s",
               "ty": "&str"
             }
           ],
+          "receiver": "&self",
           "returns": "bool",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
           "where_predicates": []
         }
-      ]
+      ],
+      "type_name": "PersistentIndexLockError"
     },
     {
-      "type_name": "NullInsertIndexProxy",
       "methods": [
         {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
           "name": "new",
-          "receiver": null,
           "params": [
             {
               "name": "inner",
@@ -280,13 +281,12 @@
               "ty": "PersistentIndexLock"
             }
           ],
+          "receiver": null,
           "returns": "Self",
-          "is_async": false,
-          "generics": [],
-          "has_default_impl": false,
           "where_predicates": []
         }
-      ]
+      ],
+      "type_name": "NullInsertIndexProxy"
     }
   ],
   "layer": "infrastructure",
@@ -547,23 +547,7 @@
           "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
         },
         {
-          "anchor": "IN-02",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        },
-        {
-          "anchor": "IN-03",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        },
-        {
-          "anchor": "IN-05",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        },
-        {
-          "anchor": "CN-01",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        },
-        {
-          "anchor": "CN-03",
+          "anchor": "AC-05",
           "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
         }
       ]

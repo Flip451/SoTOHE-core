@@ -3,11 +3,11 @@
   "layer": "domain",
   "entries": [
     {
-      "claim_hash": "766f210e77f7aff69fdb7485eacaea4a6d1e54650ace3476ed3024e3a6d17fc1",
-      "evidence_hash": "704485e32c631b64ab7aa700ff42e73710aaf2694f11a3afb62fc314f62a5d08",
+      "claim_hash": "a8f1e6d460fba04533306113bc1ca00e7ffc618bc4c79ee90feaa11cd45917a5",
+      "evidence_hash": "41b68d35ab25d59f4f16870acfa514ce1d17b992307c52abd7aeabe555efbfed",
       "verdict": {
         "kind": "pass",
-        "citation": "各 layer とその crate をビルド時に有効化する Cargo feature のリストとの対応を宣言する"
+        "citation": "各要素は Cargo feature-name grammar に適合しなければならず、malformed token は fail-closed で拒否される。これは token の構文妥当性を検証する基準"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -20,66 +20,18 @@
       "evidence_origin": {
         "kind": "spec_element",
         "data": {
-          "section": "in_scope",
-          "element_id": "IN-01",
-          "text_label": "track 配下の commit 対象の専用成果物に、各 layer とその crate をビルド時に有効化する Cargo feature のリストとの対応を宣言する。feature を必要としない layer も空リストで明示する"
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "layer の Cargo feature list の各要素は Cargo feature-name grammar に適合しなければならず、malformed token は fail-closed で拒否される。これは token の構文妥当性を検証する基準であり、構文上は妥当でも対象 crate の Cargo.toml に存在しない feature を拒否する AC-05 とは別の failure mode である"
         }
       }
     },
     {
-      "claim_hash": "766f210e77f7aff69fdb7485eacaea4a6d1e54650ace3476ed3024e3a6d17fc1",
-      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "claim_hash": "7a008210bbb369b929657451adabc0f96a545f8b39d620fe0c845a863fda5126",
+      "evidence_hash": "41b68d35ab25d59f4f16870acfa514ce1d17b992307c52abd7aeabe555efbfed",
       "verdict": {
         "kind": "pass",
-        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/domain-types.json",
-          "section_key": "types",
-          "entry_key": "CargoFeatureName"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-03",
-          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
-        }
-      }
-    },
-    {
-      "claim_hash": "766f210e77f7aff69fdb7485eacaea4a6d1e54650ace3476ed3024e3a6d17fc1",
-      "evidence_hash": "f7fb484c86c0b0bb918860861641a35f8acab86a69976fa41ef37bd150073bef",
-      "verdict": {
-        "kind": "pass",
-        "citation": "または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/domain-types.json",
-          "section_key": "types",
-          "entry_key": "CargoFeatureName"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "constraint",
-          "element_id": "CN-03",
-          "text_label": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
-        }
-      }
-    },
-    {
-      "claim_hash": "29d872bb11e627cd823d87e9beba9a078f99cc51cde9f17ba6ae6a3771fbd341",
-      "evidence_hash": "704485e32c631b64ab7aa700ff42e73710aaf2694f11a3afb62fc314f62a5d08",
-      "verdict": {
-        "kind": "pass",
-        "citation": "各 layer とその crate をビルド時に有効化する Cargo feature のリストとの対応を宣言する"
+        "citation": "malformed token は fail-closed で拒否される。これは token の構文妥当性を検証する基準であり"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -92,38 +44,14 @@
       "evidence_origin": {
         "kind": "spec_element",
         "data": {
-          "section": "in_scope",
-          "element_id": "IN-01",
-          "text_label": "track 配下の commit 対象の専用成果物に、各 layer とその crate をビルド時に有効化する Cargo feature のリストとの対応を宣言する。feature を必要としない layer も空リストで明示する"
+          "section": "acceptance_criteria",
+          "element_id": "AC-09",
+          "text_label": "layer の Cargo feature list の各要素は Cargo feature-name grammar に適合しなければならず、malformed token は fail-closed で拒否される。これは token の構文妥当性を検証する基準であり、構文上は妥当でも対象 crate の Cargo.toml に存在しない feature を拒否する AC-05 とは別の failure mode である"
         }
       }
     },
     {
-      "claim_hash": "29d872bb11e627cd823d87e9beba9a078f99cc51cde9f17ba6ae6a3771fbd341",
-      "evidence_hash": "f7fb484c86c0b0bb918860861641a35f8acab86a69976fa41ef37bd150073bef",
-      "verdict": {
-        "kind": "pass",
-        "citation": "または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/domain-types.json",
-          "section_key": "types",
-          "entry_key": "CargoFeatureNameError"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "constraint",
-          "element_id": "CN-03",
-          "text_label": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
-        }
-      }
-    },
-    {
-      "claim_hash": "7c18183533bea0467dbb04c4dfce6eb379c593985bc239ad55f8930001c8d491",
+      "claim_hash": "4ca9dfbb3d44c9997f26d26440c3d2fc981a8143b039d7e6538de7268db375d8",
       "evidence_hash": "38ef5750bbf3fde9650179949132c6e38695b658ac29472ab8e5ab845e5b34fa",
       "verdict": {
         "kind": "pass",
@@ -147,7 +75,7 @@
       }
     },
     {
-      "claim_hash": "7c18183533bea0467dbb04c4dfce6eb379c593985bc239ad55f8930001c8d491",
+      "claim_hash": "4ca9dfbb3d44c9997f26d26440c3d2fc981a8143b039d7e6538de7268db375d8",
       "evidence_hash": "704485e32c631b64ab7aa700ff42e73710aaf2694f11a3afb62fc314f62a5d08",
       "verdict": {
         "kind": "pass",
@@ -171,31 +99,7 @@
       }
     },
     {
-      "claim_hash": "7c18183533bea0467dbb04c4dfce6eb379c593985bc239ad55f8930001c8d491",
-      "evidence_hash": "b84a61b2c9a38f9a9149ccfef9c3730db9913f9f559d1f8aa5350686a0143c18",
-      "verdict": {
-        "kind": "pass",
-        "citation": "型を変更しない track を含むすべての track で feature 宣言を必須にし、型を変更しない track も空の catalogue と feature 宣言を持つ"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/domain-types.json",
-          "section_key": "types",
-          "entry_key": "TdddFeatureDeclaration"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-04",
-          "text_label": "型を変更しない track を含むすべての track で feature 宣言を必須にし、型を変更しない track も空の catalogue と feature 宣言を持つ"
-        }
-      }
-    },
-    {
-      "claim_hash": "7c18183533bea0467dbb04c4dfce6eb379c593985bc239ad55f8930001c8d491",
+      "claim_hash": "4ca9dfbb3d44c9997f26d26440c3d2fc981a8143b039d7e6538de7268db375d8",
       "evidence_hash": "82ce4a707f2f9180893206b1ecdb3ae4ffd3575446750be7491705ed48aba319",
       "verdict": {
         "kind": "pass",
@@ -219,7 +123,7 @@
       }
     },
     {
-      "claim_hash": "6b3aad123c07f8d27b3be6718cb4a712ec0f81ecd6ec6ae82a2db659e95b381f",
+      "claim_hash": "fa0ff4d31b445a8925650fdf613c4d924ae64a15c6deccab9291b7493c66c6ef",
       "evidence_hash": "704485e32c631b64ab7aa700ff42e73710aaf2694f11a3afb62fc314f62a5d08",
       "verdict": {
         "kind": "pass",
@@ -243,55 +147,7 @@
       }
     },
     {
-      "claim_hash": "6b3aad123c07f8d27b3be6718cb4a712ec0f81ecd6ec6ae82a2db659e95b381f",
-      "evidence_hash": "b84a61b2c9a38f9a9149ccfef9c3730db9913f9f559d1f8aa5350686a0143c18",
-      "verdict": {
-        "kind": "pass",
-        "citation": "型を変更しない track を含むすべての track で feature 宣言を必須にし、型を変更しない track も空の catalogue と feature 宣言を持つ"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/domain-types.json",
-          "section_key": "types",
-          "entry_key": "TdddFeatureDeclarationError"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-04",
-          "text_label": "型を変更しない track を含むすべての track で feature 宣言を必須にし、型を変更しない track も空の catalogue と feature 宣言を持つ"
-        }
-      }
-    },
-    {
-      "claim_hash": "6b3aad123c07f8d27b3be6718cb4a712ec0f81ecd6ec6ae82a2db659e95b381f",
-      "evidence_hash": "f7fb484c86c0b0bb918860861641a35f8acab86a69976fa41ef37bd150073bef",
-      "verdict": {
-        "kind": "pass",
-        "citation": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/domain-types.json",
-          "section_key": "types",
-          "entry_key": "TdddFeatureDeclarationError"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "constraint",
-          "element_id": "CN-03",
-          "text_label": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
-        }
-      }
-    },
-    {
-      "claim_hash": "96586ca523a315ef975dd0c1d2ad8eab6953e07740c6aa7300a34a51f25e72cb",
+      "claim_hash": "d79923cfbb841b159f4e577ae2ecd7d3a5f0eafb8e67b881d0c1f1546fd927f6",
       "evidence_hash": "704485e32c631b64ab7aa700ff42e73710aaf2694f11a3afb62fc314f62a5d08",
       "verdict": {
         "kind": "pass",
@@ -311,30 +167,6 @@
           "section": "in_scope",
           "element_id": "IN-01",
           "text_label": "track 配下の commit 対象の専用成果物に、各 layer とその crate をビルド時に有効化する Cargo feature のリストとの対応を宣言する。feature を必要としない layer も空リストで明示する"
-        }
-      }
-    },
-    {
-      "claim_hash": "96586ca523a315ef975dd0c1d2ad8eab6953e07740c6aa7300a34a51f25e72cb",
-      "evidence_hash": "b84a61b2c9a38f9a9149ccfef9c3730db9913f9f559d1f8aa5350686a0143c18",
-      "verdict": {
-        "kind": "pass",
-        "citation": "型を変更しない track も空の catalogue と feature 宣言を持つ"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/domain-types.json",
-          "section_key": "types",
-          "entry_key": "TdddFeatureLookupError"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-04",
-          "text_label": "型を変更しない track を含むすべての track で feature 宣言を必須にし、型を変更しない track も空の catalogue と feature 宣言を持つ"
         }
       }
     },

@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-27T03:28:52Z",
-  "declaration_hash": "3837145e12f6bcd3f4edef1b1b039c67c2a96018724d2095e7bd2b6d99dda588",
-  "implementation_input_hash": "eea709596722fd39f859b9a0392317f8b626d1baa233bc0531e6b6354ae9029f",
+  "generated_at": "2026-07-27T06:36:58Z",
+  "declaration_hash": "7c01f8a5f33228c144f0fb34c36823c211e0db7221f98ee018ad882575a2f63f",
+  "implementation_input_hash": "04a0d74ba29c68944c7e804c335c0e60d2de36fd16e0a3b80cbff5eddbad7548",
   "signals": [
     {
       "type_name": "CodeFragmentExtractorAdapter",
@@ -39,9 +39,9 @@
     {
       "type_name": "FsTdddFeatureDeclarationAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Default",

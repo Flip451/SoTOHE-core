@@ -1,1 +1,316 @@
-{"track_id": "tddd-track-scoped-feature-declaration-2026-07-27", "records": []}
+{
+  "track_id": "tddd-track-scoped-feature-declaration-2026-07-27",
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPort",
+        "item_identifier": "trait_method:load_for_baseline",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "item_identifier": "trait_impl:usecase::tddd_feature_declaration::TdddBaselineFeatureDeclarationPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "TdddActualFeatureDeclarationPort",
+        "item_identifier": "trait_method:load_for_actual",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "item_identifier": "trait_impl:usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CargoFeatureNameError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_invalid_token_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_leading_hyphen_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_empty_value_returns_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CargoFeatureName",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_invalid_token_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_leading_hyphen_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_empty_value_returns_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_total_layers_succeeds"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_total_layers_succeeds"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_total_layers_succeeds"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclarationError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_missing_layer_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_unexpected_layer_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_duplicate_feature_returns_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddFeatureLookupError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_lookup_for_missing_layer_returns_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPortError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddActualFeatureDeclarationPortError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclarationReadError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclarationReadError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_unknown_cargo_feature_returns_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_featureless_layer_preserves_empty_feature_list"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_unknown_cargo_feature_returns_error"
+        }
+      ]
+    }
+  ]
+}

@@ -130,6 +130,21 @@
       "trait_ref": "core::error::Error"
     },
     {
+      "action": "add",
+      "for_type": "TdddFeatureDeclarationError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TdddFeatureDeclarationError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TdddFeatureDeclarationError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
       "for_type": "CargoFeatureNameError",
       "trait_ref": "core::fmt::Debug"
     },
@@ -142,6 +157,21 @@
       "trait_ref": "core::error::Error"
     },
     {
+      "action": "add",
+      "for_type": "CargoFeatureNameError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CargoFeatureNameError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CargoFeatureNameError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
       "for_type": "TdddFeatureLookupError",
       "trait_ref": "core::fmt::Debug"
     },
@@ -152,6 +182,21 @@
     {
       "for_type": "TdddFeatureLookupError",
       "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "TdddFeatureLookupError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TdddFeatureLookupError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TdddFeatureLookupError",
+      "trait_ref": "core::cmp::Eq"
     }
   ],
   "traits": {
@@ -321,7 +366,7 @@
         "shape": {
           "fields": [],
           "has_stripped_fields": true,
-          "kind": "plain"
+          "kind": "tuple"
         }
       },
       "methods": [],
@@ -331,15 +376,7 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-01",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        },
-        {
-          "anchor": "IN-03",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        },
-        {
-          "anchor": "CN-03",
+          "anchor": "AC-09",
           "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
         }
       ]
@@ -369,11 +406,7 @@
       },
       "spec_refs": [
         {
-          "anchor": "IN-01",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        },
-        {
-          "anchor": "CN-03",
+          "anchor": "AC-09",
           "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
         }
       ]
@@ -402,10 +435,6 @@
         },
         {
           "anchor": "IN-01",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        },
-        {
-          "anchor": "IN-04",
           "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
         },
         {
@@ -466,14 +495,6 @@
         {
           "anchor": "IN-01",
           "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        },
-        {
-          "anchor": "IN-04",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        },
-        {
-          "anchor": "CN-03",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
         }
       ]
     },
@@ -503,10 +524,6 @@
       "spec_refs": [
         {
           "anchor": "IN-01",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        },
-        {
-          "anchor": "IN-04",
           "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
         }
       ]

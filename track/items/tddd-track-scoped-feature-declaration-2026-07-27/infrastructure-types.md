@@ -13,7 +13,7 @@
 |------|------|--------|---------|--------|----------|
 | CodeFragmentExtractorAdapter | secondary_adapter | add | impl CodeFragmentExtractorPort, impl Debug, impl Default | 🟡 | 🔵 |
 | FastEmbedAdapter | secondary_adapter | add | impl EmbeddingPort, impl Debug | 🟡 | 🔵 |
-| FsTdddFeatureDeclarationAdapter | secondary_adapter | add | impl TdddBaselineFeatureDeclarationPort, impl TdddActualFeatureDeclarationPort, impl Debug, impl Clone, impl Default | 🟡 | 🔵 |
+| FsTdddFeatureDeclarationAdapter | secondary_adapter | add | impl TdddBaselineFeatureDeclarationPort, impl TdddActualFeatureDeclarationPort, impl Debug, impl Clone, impl Default | 🔵 | 🔵 |
 | LanceDbSemanticIndexAdapter | secondary_adapter | add | impl SemanticIndexPort, impl Debug, impl Drop | 🟡 | 🔵 |
 | NoopSemanticIndexPort | secondary_adapter | add | impl SemanticIndexPort | 🟡 | 🔵 |
 | NullInsertIndexProxy | secondary_adapter | add | impl SemanticIndexPort | 🟡 | 🔵 |

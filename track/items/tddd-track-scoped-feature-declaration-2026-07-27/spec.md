@@ -1,7 +1,7 @@
 <!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
 ---
 version: "1.0"
-signals: { blue: 24, yellow: 0, red: 0 }
+signals: { blue: 25, yellow: 0, red: 0 }
 ---
 
 # TDDD chain ③ の rustdoc 抽出を track 単位の feature 宣言に基づかせる
@@ -42,6 +42,7 @@ signals: { blue: 24, yellow: 0, red: 0 }
 - [ ] [AC-06] catalogue に記載した feature-gated type の feature を track が宣言していない場合、track は gate で fail-closed に拒否される [adr: knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md#D5] [tasks: T002, T004]
 - [ ] [AC-07] feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる [adr: knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md#D6] [tasks: T005]
 - [ ] [AC-08] 導入後も既存 command の subcommand、argument syntax、stdout/stderr output format、exit-code meaning は変わらず、feature を command line から渡す route は存在しない [adr: knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md#D7] [tasks: T003, T004, T005]
+- [ ] [AC-09] layer の Cargo feature list の各要素は Cargo feature-name grammar に適合しなければならず、malformed token は fail-closed で拒否される。これは token の構文妥当性を検証する基準であり、構文上は妥当でも対象 crate の Cargo.toml に存在しない feature を拒否する AC-05 とは別の failure mode である [adr: knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md#D1] [tasks: T001]
 
 ## Related Conventions (Required Reading)
 - knowledge/conventions/coding-principles.md#No Panics in Library Code
@@ -54,5 +55,5 @@ signals: { blue: 24, yellow: 0, red: 0 }
 ## Signal Summary
 
 ### Stage 1: Spec Signals
-🔵 24  🟡 0  🔴 0
+🔵 25  🟡 0  🔴 0
 

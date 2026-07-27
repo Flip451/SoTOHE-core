@@ -147,7 +147,7 @@
       }
     },
     {
-      "claim_hash": "d1a73dd5cd7b21359ff603e0bb7d12f3f335a2d9f972199c3fcef1a2b09ebd3b",
+      "claim_hash": "bea678c596a40e27d6e23c6387adf6c80b0871d1f3d6a2c8d39fdc8566de6886",
       "evidence_hash": "704485e32c631b64ab7aa700ff42e73710aaf2694f11a3afb62fc314f62a5d08",
       "verdict": {
         "kind": "pass",
@@ -171,11 +171,11 @@
       }
     },
     {
-      "claim_hash": "d1a73dd5cd7b21359ff603e0bb7d12f3f335a2d9f972199c3fcef1a2b09ebd3b",
-      "evidence_hash": "f15711c2a4a08a5521bbff1231ad7935764451d13ecabe453cb7282991d3919e",
+      "claim_hash": "bea678c596a40e27d6e23c6387adf6c80b0871d1f3d6a2c8d39fdc8566de6886",
+      "evidence_hash": "b498dced34061fafd4265a95df413cb15bc2cc8262545e6d2290345cb0a13d50",
       "verdict": {
         "kind": "pass",
-        "citation": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
+        "citation": "対象 crate の Cargo.toml に存在しない feature を宣言した track は gate で fail-closed に拒否される"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -188,105 +188,9 @@
       "evidence_origin": {
         "kind": "spec_element",
         "data": {
-          "section": "in_scope",
-          "element_id": "IN-02",
-          "text_label": "feature 宣言は type-designer capability が Phase 2 パイプラインの最初に、baseline 取得の直前に author する"
-        }
-      }
-    },
-    {
-      "claim_hash": "d1a73dd5cd7b21359ff603e0bb7d12f3f335a2d9f972199c3fcef1a2b09ebd3b",
-      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
-      "verdict": {
-        "kind": "pass",
-        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-          "section_key": "types",
-          "entry_key": "FsTdddFeatureDeclarationAdapter"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-03",
-          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
-        }
-      }
-    },
-    {
-      "claim_hash": "d1a73dd5cd7b21359ff603e0bb7d12f3f335a2d9f972199c3fcef1a2b09ebd3b",
-      "evidence_hash": "ada8178a1254919b400f3a0222437c4eaf373e3050d1bcce8022bc945c2e77ae",
-      "verdict": {
-        "kind": "pass",
-        "citation": "宣言した feature が対象 crate の Cargo.toml に存在すること、および catalogue の feature-gated type が宣言済み feature の下にあることを gate で検証する"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-          "section_key": "types",
-          "entry_key": "FsTdddFeatureDeclarationAdapter"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "in_scope",
-          "element_id": "IN-05",
-          "text_label": "宣言した feature が対象 crate の Cargo.toml に存在すること、および catalogue の feature-gated type が宣言済み feature の下にあることを gate で検証する"
-        }
-      }
-    },
-    {
-      "claim_hash": "d1a73dd5cd7b21359ff603e0bb7d12f3f335a2d9f972199c3fcef1a2b09ebd3b",
-      "evidence_hash": "1a47ffbd85e3395733a74240f580498f5fd9b77e568bfef9702964fd21c5e359",
-      "verdict": {
-        "kind": "pass",
-        "citation": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-          "section_key": "types",
-          "entry_key": "FsTdddFeatureDeclarationAdapter"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "constraint",
-          "element_id": "CN-01",
-          "text_label": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
-        }
-      }
-    },
-    {
-      "claim_hash": "d1a73dd5cd7b21359ff603e0bb7d12f3f335a2d9f972199c3fcef1a2b09ebd3b",
-      "evidence_hash": "f7fb484c86c0b0bb918860861641a35f8acab86a69976fa41ef37bd150073bef",
-      "verdict": {
-        "kind": "pass",
-        "citation": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-          "section_key": "types",
-          "entry_key": "FsTdddFeatureDeclarationAdapter"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "constraint",
-          "element_id": "CN-03",
-          "text_label": "declared feature が対象 crate の Cargo.toml に存在しない場合、または catalogue が undeclared feature 配下の type を記載する場合は、いずれも fail-closed で拒否する"
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "対象 crate の Cargo.toml に存在しない feature を宣言した track は gate で fail-closed に拒否される"
         }
       }
     },

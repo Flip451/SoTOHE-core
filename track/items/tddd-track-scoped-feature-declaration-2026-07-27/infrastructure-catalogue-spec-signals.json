@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "3837145e12f6bcd3f4edef1b1b039c67c2a96018724d2095e7bd2b6d99dda588",
+  "catalogue_declaration_hash": "7c01f8a5f33228c144f0fb34c36823c211e0db7221f98ee018ad882575a2f63f",
   "signals": [
     {
       "type_name": "CodeFragmentExtractorAdapter",
@@ -20,7 +20,7 @@
     {
       "type_name": "FsTdddFeatureDeclarationAdapter",
       "signal": "blue",
-      "entry_hash": "d1a73dd5cd7b21359ff603e0bb7d12f3f335a2d9f972199c3fcef1a2b09ebd3b"
+      "entry_hash": "bea678c596a40e27d6e23c6387adf6c80b0871d1f3d6a2c8d39fdc8566de6886"
     },
     {
       "type_name": "LanceDbSemanticIndexAdapter",

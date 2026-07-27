@@ -1,15 +1,15 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-27T03:28:51Z",
-  "declaration_hash": "47cb8f623054056056fa2bf8fad4d1682505f83fe14f3c8f145114a8d2add28c",
-  "implementation_input_hash": "a52155e22a182a93cd60843a9d56dcbb68315a404f2fc1316fbd46cbadca55f0",
+  "generated_at": "2026-07-27T06:57:07Z",
+  "declaration_hash": "aea8905bb4ea3b9b53d7a2877b81854895956d0699a9cc99641a58ca8aeaccb4",
+  "implementation_input_hash": "ce836d508761a8129279794b2387e3e9962e8adc0096767056e17e8d68c0a0a1",
   "signals": [
     {
       "type_name": "CargoFeatureName",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -22,12 +22,15 @@
     {
       "type_name": "CargoFeatureNameError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
         "Debug",
         "Display",
-        "Error"
+        "Eq",
+        "Error",
+        "PartialEq"
       ]
     },
     {
@@ -45,9 +48,9 @@
     {
       "type_name": "TdddFeatureDeclaration",
       "kind_tag": "value_object",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -57,23 +60,29 @@
     {
       "type_name": "TdddFeatureDeclarationError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
         "Debug",
         "Display",
-        "Error"
+        "Eq",
+        "Error",
+        "PartialEq"
       ]
     },
     {
       "type_name": "TdddFeatureLookupError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
         "Debug",
         "Display",
-        "Error"
+        "Eq",
+        "Error",
+        "PartialEq"
       ]
     },
     {

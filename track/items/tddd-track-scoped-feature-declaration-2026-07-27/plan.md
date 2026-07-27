@@ -6,14 +6,14 @@
 GO-01: T001, T002, T003.
 GO-02: T003, T004.
 
-## Tasks (0/5 resolved)
+## Tasks (2/5 resolved)
 
 ### S1 — Declaration foundation
 
 > Add validated declaration values in `libs/domain/src/tddd/feature_declaration.rs` and the filesystem port adapter in `libs/infrastructure/src/tddd/feature_declaration_adapter.rs` (GO-01, IN-01, IN-04).
 
-- [ ] **T001**: Add `CargoFeatureName`, `CargoFeatureNameError`, `TdddFeatureDeclaration`, `TdddFeatureDeclarationError`, and `TdddFeatureLookupError` in `libs/domain/src/tddd/feature_declaration.rs`; export the module through `libs/domain/src/tddd/mod.rs`; and add their unit tests (GO-01, IN-01, IN-04, CN-03, AC-01).
-- [ ] **T002**: Add `TdddFeatureDeclarationReadError`, `TdddBaselineFeatureDeclarationPort`, `TdddBaselineFeatureDeclarationPortError`, `TdddActualFeatureDeclarationPort`, and `TdddActualFeatureDeclarationPortError` in `libs/usecase/src/tddd_feature_declaration.rs`; export the module from `libs/usecase/src/lib.rs`; implement and export both client-specific port traits on `FsTdddFeatureDeclarationAdapter` in `libs/infrastructure/src/tddd/feature_declaration_adapter.rs`; and add adapter tests (IN-01, IN-03, IN-05, CN-01, CN-03, AC-03, AC-05, AC-06).
+- [x] **T001**: Add `CargoFeatureName`, `CargoFeatureNameError`, `TdddFeatureDeclaration`, `TdddFeatureDeclarationError`, and `TdddFeatureLookupError` in `libs/domain/src/tddd/feature_declaration.rs`; export the module through `libs/domain/src/tddd/mod.rs`; and add their unit tests (GO-01, IN-01, IN-04, CN-03, AC-01, AC-09).
+- [x] **T002**: Add `TdddFeatureDeclarationReadError`, `TdddBaselineFeatureDeclarationPort`, `TdddBaselineFeatureDeclarationPortError`, `TdddActualFeatureDeclarationPort`, and `TdddActualFeatureDeclarationPortError` in `libs/usecase/src/tddd_feature_declaration.rs`; export the module from `libs/usecase/src/lib.rs`; implement and export both client-specific port traits on `FsTdddFeatureDeclarationAdapter` in `libs/infrastructure/src/tddd/feature_declaration_adapter.rs`; and add adapter tests (IN-01, IN-03, IN-05, CN-01, CN-03, AC-03, AC-05, AC-06).
 
 ### S2 — Feature-aware capture paths
 

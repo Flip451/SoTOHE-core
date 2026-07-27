@@ -4,16 +4,16 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CargoFeatureName | value_object | add | — | 🟡 | 🔵 |
-| TdddFeatureDeclaration | value_object | add | — | 🟡 | 🔵 |
+| CargoFeatureName | value_object | add | — | 🔵 | 🔵 |
+| TdddFeatureDeclaration | value_object | add | — | 🔵 | 🔵 |
 
 ## Error Types
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CargoFeatureNameError | error_type | add | InvalidFeatureName | 🟡 | 🔵 |
-| TdddFeatureDeclarationError | error_type | add | MissingLayer, UnexpectedLayer, DuplicateFeature | 🟡 | 🔵 |
-| TdddFeatureLookupError | error_type | add | MissingLayer | 🟡 | 🔵 |
+| CargoFeatureNameError | error_type | add | InvalidFeatureName | 🔵 | 🔵 |
+| TdddFeatureDeclarationError | error_type | add | MissingLayer, UnexpectedLayer, DuplicateFeature | 🔵 | 🔵 |
+| TdddFeatureLookupError | error_type | add | MissingLayer | 🔵 | 🔵 |
 
 ## Secondary Ports
 
