@@ -232,29 +232,6 @@
       }
     },
     {
-      "claim_hash": "93d3f5a47f6c131e1c9b9ceb85f5b4f25d67038e603ffc48becdd589b18b8950",
-      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
-      "verdict": {
-        "kind": "pass",
-        "citation": "grandfathering リストを設けると、抽出が一度も観測できていなかった集合、すなわち最も乖離している可能性が高い集合を恒久的に検証対象外にすることになる。"
-      },
-      "claim_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "out_of_scope",
-          "element_id": "OS-04",
-          "text_label": "新たに可視化される既存 public item を catalogue 化せずに除外する grandfathering list または互換経過措置"
-        }
-      },
-      "evidence_origin": {
-        "kind": "adr_decision",
-        "data": {
-          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
-          "decision_id": "D6"
-        }
-      }
-    },
-    {
       "claim_hash": "1a47ffbd85e3395733a74240f580498f5fd9b77e568bfef9702964fd21c5e359",
       "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
       "verdict": {
@@ -320,29 +297,6 @@
         "data": {
           "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
           "decision_id": "D5"
-        }
-      }
-    },
-    {
-      "claim_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
-      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
-      "verdict": {
-        "kind": "pass",
-        "citation": "ある feature を最初に宣言する track が、可視化されたそれらの要素を catalogue に整備する責任を負う。"
-      },
-      "claim_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "constraint",
-          "element_id": "CN-04",
-          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
-        }
-      },
-      "evidence_origin": {
-        "kind": "adr_decision",
-        "data": {
-          "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
-          "decision_id": "D6"
         }
       }
     },
@@ -531,25 +485,48 @@
       }
     },
     {
-      "claim_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
-      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "claim_hash": "ee5153d82ad6f2593a307e32378df4b9fbb77c12f9a5d1e9a34c95717ca44b1f",
+      "evidence_hash": "cc5868664eda6a0e893a20f14f2a1f2cd6018ae68ba3cede653db18a2f251f0a",
       "verdict": {
         "kind": "pass",
-        "citation": "feature を有効化すると、その feature 配下の module が持つ既存 public 要素が新たに TDDD の射程に入る。ある feature を最初に宣言する track が、可視化されたそれらの要素を catalogue に整備する責任を負う。"
+        "citation": "| 存在し、宣言と一致 | **Blue** |"
       },
       "claim_origin": {
         "kind": "spec_element",
         "data": {
           "section": "acceptance_criteria",
           "element_id": "AC-07",
-          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+          "text_label": "feature を宣言する track では、その track が追加または変更した feature-gated public item について、catalogue entry が implementation と整合し、必要な feature が宣言されていれば implementation-to-catalogue signal を blue と評価できる"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-04-11-0001-baseline-reverse-signals.md",
+          "decision_id": "3."
+        }
+      }
+    },
+    {
+      "claim_hash": "ee5153d82ad6f2593a307e32378df4b9fbb77c12f9a5d1e9a34c95717ca44b1f",
+      "evidence_hash": "38bc586a8e322dd906b4da90b802ac7ff82cf138feb67d7de54e60807f0ee93d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「対応する crate の `Cargo.toml` に存在しない feature を宣言した場合」「track が宣言していない feature 配下の型を catalogue に記載した場合」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を宣言する track では、その track が追加または変更した feature-gated public item について、catalogue entry が implementation と整合し、必要な feature が宣言されていれば implementation-to-catalogue signal を blue と評価できる"
         }
       },
       "evidence_origin": {
         "kind": "adr_decision",
         "data": {
           "file_path": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
-          "decision_id": "D6"
+          "decision_id": "D5"
         }
       }
     },

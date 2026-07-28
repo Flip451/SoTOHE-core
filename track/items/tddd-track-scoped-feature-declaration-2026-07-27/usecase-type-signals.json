@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-28T07:46:26Z",
-  "declaration_hash": "d8e6be0fec66952086f83784c00ff5afc0fd3e40514585677a80c9b1b20d68fb",
+  "generated_at": "2026-07-28T10:45:55Z",
+  "declaration_hash": "5aa7b67ea33061d108c778848ec4b3ece53c725df32b6cf6b4926cfb7f723578",
   "implementation_input_hash": "07bd16f4a58a4ae3365da28bfca11e800f5d637cf93c359eb8e8b717a6e087c8",
   "signals": [
     {
@@ -116,43 +116,7 @@
       ]
     },
     {
-      "type_name": "CodeFragmentExtractorError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "CodeFragmentExtractorPort",
-      "kind_tag": "secondary_port",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "EmbeddingError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "EmbeddingPort",
-      "kind_tag": "secondary_port",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
       "type_name": "SchemaExporterPort",
-      "kind_tag": "secondary_port",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "SemanticIndexError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "SemanticIndexPort",
       "kind_tag": "secondary_port",
       "signal": "blue",
       "found_type": true

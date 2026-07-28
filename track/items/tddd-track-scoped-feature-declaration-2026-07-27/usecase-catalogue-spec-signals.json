@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "d8e6be0fec66952086f83784c00ff5afc0fd3e40514585677a80c9b1b20d68fb",
+  "catalogue_declaration_hash": "5aa7b67ea33061d108c778848ec4b3ece53c725df32b6cf6b4926cfb7f723578",
   "signals": [
     {
       "type_name": "BaselineCaptureError",
@@ -21,21 +21,6 @@
       "type_name": "CatalogueImplSignalsInteractor",
       "signal": "blue",
       "entry_hash": "eb8fe7d4b6136081413c6179268cd06319d30dad378aa0ee26802fe96e72c077"
-    },
-    {
-      "type_name": "CodeFragmentExtractorError",
-      "signal": "blue",
-      "entry_hash": "3a4ea29e475e0ce7ee6b4d1ab61fe8eab6df0384cdaad1fe250750f3f5254db6"
-    },
-    {
-      "type_name": "EmbeddingError",
-      "signal": "blue",
-      "entry_hash": "f049b3557ce05ad834fedc0bc249b981464b4e9ad79a6d1c44e0f9139592938e"
-    },
-    {
-      "type_name": "SemanticIndexError",
-      "signal": "blue",
-      "entry_hash": "1998a3fbab0279c59c96ddf594a81e54e9513ecad32d82e2f5f59e662ef6ebfd"
     },
     {
       "type_name": "TdddActualFeatureDeclarationPortError",
@@ -63,24 +48,9 @@
       "entry_hash": "64a342ea1caf4ae7b019446b3d156635609d689b3ab4c41e6c103d037d8a179c"
     },
     {
-      "type_name": "CodeFragmentExtractorPort",
-      "signal": "blue",
-      "entry_hash": "4e0dac63eef4bcd440bbeb49c1c01a82b3b478dc8212614651c5657e18daaffe"
-    },
-    {
-      "type_name": "EmbeddingPort",
-      "signal": "blue",
-      "entry_hash": "e876d81c971b6e169fa8f9140d420dbff903a9894c318ad93e39fd3d8301a9fc"
-    },
-    {
       "type_name": "SchemaExporterPort",
       "signal": "blue",
       "entry_hash": "d11413ab7d5a2107c125e3cc60194fcd586726b809b825d2399fc5a0717be51f"
-    },
-    {
-      "type_name": "SemanticIndexPort",
-      "signal": "blue",
-      "entry_hash": "ce951eec108712fad8516f32d4c547a5d923e66500569948060bb41232e7818b"
     },
     {
       "type_name": "TdddActualFeatureDeclarationPort",

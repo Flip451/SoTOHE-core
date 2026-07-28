@@ -25,11 +25,11 @@
       {"layer": "infrastructure", "entry_key": "RustdocSchemaExporter"}
     ],
     "T004": [
-      {"layer": "domain", "entry_key": "RustdocCratePort"},
       {"layer": "domain", "entry_key": "SchemaExporter"},
+      {"layer": "domain", "entry_key": "RustdocCratePort"},
+      {"layer": "usecase", "entry_key": "SchemaExporterPort"},
       {"layer": "usecase", "entry_key": "CatalogueImplSignalsError"},
       {"layer": "usecase", "entry_key": "CatalogueImplSignalsInteractor"},
-      {"layer": "usecase", "entry_key": "SchemaExporterPort"},
       {"layer": "infrastructure", "entry_key": "RustdocCrateAdapter"},
       {"layer": "infrastructure", "entry_key": "RustdocSchemaExporter"}
     ],
@@ -54,25 +54,6 @@
         "layer": "infrastructure",
         "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
       }
-    ],
-    "T005": [
-      {"layer": "usecase", "entry_key": "CodeFragmentExtractorError"},
-      {"layer": "usecase", "entry_key": "EmbeddingError"},
-      {"layer": "usecase", "entry_key": "SemanticIndexError"},
-      {"layer": "usecase", "entry_key": "CodeFragmentExtractorPort"},
-      {"layer": "usecase", "entry_key": "EmbeddingPort"},
-      {"layer": "usecase", "entry_key": "SemanticIndexPort"},
-      {"layer": "infrastructure", "entry_key": "CodeFragmentExtractorAdapter"},
-      {"layer": "infrastructure", "entry_key": "ExtractError"},
-      {"layer": "infrastructure", "entry_key": "FastEmbedAdapter"},
-      {"layer": "infrastructure", "entry_key": "LanceDbSemanticIndexAdapter"},
-      {"layer": "infrastructure", "entry_key": "NoopSemanticIndexPort"},
-      {"layer": "infrastructure", "entry_key": "NullInsertIndexProxy"},
-      {"layer": "infrastructure", "entry_key": "PersistentIndexLock"},
-      {"layer": "infrastructure", "entry_key": "PersistentIndexLockError"},
-      {"layer": "infrastructure", "entry_key": "infrastructure::semantic_dup::extractor::extract_code_fragments"},
-      {"layer": "infrastructure", "entry_key": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock"},
-      {"layer": "infrastructure", "entry_key": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path"}
     ]
   }
 }

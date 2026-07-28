@@ -1,51 +1,11 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "fceaf10d4b621c56d10e5371c47e493dd91efe7737374c6c57b7057f2d5f6be5",
+  "catalogue_declaration_hash": "890d87c60b6d68759ed369e62aa70465d8cd1f5884536ddd25153455d6b83833",
   "signals": [
-    {
-      "type_name": "CodeFragmentExtractorAdapter",
-      "signal": "blue",
-      "entry_hash": "df96a7bdca07ec41bd6b69124c1a8742cd1698dd559853d3fd2c6b3effb9cbd4"
-    },
-    {
-      "type_name": "ExtractError",
-      "signal": "blue",
-      "entry_hash": "45f75936a3c2bf8f69222513e8e290b7da5a9824c99f2dc496c3ab5a7824c35b"
-    },
-    {
-      "type_name": "FastEmbedAdapter",
-      "signal": "blue",
-      "entry_hash": "d1144d3b40c0e7c84776bb1056c425e29de51fb1cec86288b03653645bc17bef"
-    },
     {
       "type_name": "FsTdddFeatureDeclarationAdapter",
       "signal": "blue",
       "entry_hash": "bea678c596a40e27d6e23c6387adf6c80b0871d1f3d6a2c8d39fdc8566de6886"
-    },
-    {
-      "type_name": "LanceDbSemanticIndexAdapter",
-      "signal": "blue",
-      "entry_hash": "fe05cdec5cf7cbfb81be8be38bfb7d40beca85e06a6ec393f66c91633beb02c4"
-    },
-    {
-      "type_name": "NoopSemanticIndexPort",
-      "signal": "blue",
-      "entry_hash": "1b5736da35ab045fdd8f71b189d3e9005ca8ccd54c9f4f992759c33f971d45f4"
-    },
-    {
-      "type_name": "NullInsertIndexProxy",
-      "signal": "blue",
-      "entry_hash": "0574cad17d77f5b8646245e0f23f5a30b360b505a620ac5ddf29892ecee63b53"
-    },
-    {
-      "type_name": "PersistentIndexLock",
-      "signal": "blue",
-      "entry_hash": "737d8600be9978eea590f7900b732442cee80d4d7958dd5714498ac289daab53"
-    },
-    {
-      "type_name": "PersistentIndexLockError",
-      "signal": "blue",
-      "entry_hash": "caea12ee187d73ad64570719523e7d20d660e33679fba7cab0d9eae60070a925"
     },
     {
       "type_name": "RustdocBaselineCaptureAdapter",
@@ -66,21 +26,6 @@
       "type_name": "TypeSignalsExecutorAdapter",
       "signal": "blue",
       "entry_hash": "93ea1f4963d515901332bc3ff9fcea78128e5940a048ab7353bd0192d69c0595"
-    },
-    {
-      "type_name": "infrastructure::semantic_dup::extractor::extract_code_fragments",
-      "signal": "blue",
-      "entry_hash": "fcc0ae68c7fb30e4223b6f490c733cd18c8f85078db9380191f8a10b6b1756a1"
-    },
-    {
-      "type_name": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock",
-      "signal": "blue",
-      "entry_hash": "f6267b12bc7362bc58eb0c2b8d62bfd58355fa47fc4feb64f90aa34753c521ad"
-    },
-    {
-      "type_name": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path",
-      "signal": "blue",
-      "entry_hash": "4dd4076355699f49ee855ddb0b6fa285e72140c2f8aae89b168a34697ff1584a"
     },
     {
       "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",

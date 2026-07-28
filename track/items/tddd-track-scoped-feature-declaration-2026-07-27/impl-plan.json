@@ -18,17 +18,12 @@
     },
     {
       "id": "T004",
-      "description": "Modify `RustdocCratePort` in `libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs` and `CatalogueImplSignalsInteractor` / `CatalogueImplSignalsError` in `libs/usecase/src/catalogue_impl_signals/{interactor.rs,service.rs}`; update `RustdocCrateAdapter` in `libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs` and `RustdocSchemaExporter` in `libs/infrastructure/src/schema_export.rs`; inject `TdddActualFeatureDeclarationPort` through `FsTdddFeatureDeclarationAdapter` at `apps/cli-composition/src/track/tddd.rs`; and add actual-capture tests (IN-03, IN-05, CN-01, CN-02, CN-03, CN-05, AC-03, AC-04, AC-05, AC-06, AC-08).",
+      "description": "Declare unchanged `SchemaExporter` and `SchemaExporterPort` as `reference` referents required to express the `RustdocSchemaExporter` change; this task does not modify either interface. Modify `RustdocCratePort` in `libs/domain/src/tddd/catalogue_v2/catalogue_impl_signals_ports.rs` and `CatalogueImplSignalsInteractor` / `CatalogueImplSignalsError` in `libs/usecase/src/catalogue_impl_signals/{interactor.rs,service.rs}`; update `RustdocCrateAdapter` in `libs/infrastructure/src/tddd/rustdoc_crate_adapter.rs` and `RustdocSchemaExporter` in `libs/infrastructure/src/schema_export.rs`; inject `TdddActualFeatureDeclarationPort` through `FsTdddFeatureDeclarationAdapter` at `apps/cli-composition/src/track/tddd.rs`; and add actual-capture tests (IN-03, IN-05, CN-01, CN-02, CN-03, CN-05, AC-03, AC-04, AC-05, AC-06, AC-08).",
       "status": "done"
     },
     {
       "id": "T006",
       "description": "Modify `TypeSignalsInteractor`, `TypeSignalsError`, and `TypeSignalsExecutorPort` in `libs/usecase/src/type_signals/{interactor.rs,service.rs,ports.rs}`, `TypeSignalsExecutorAdapter` in `libs/infrastructure/src/tddd/type_signals_executor_adapter.rs`, and `execute_type_signals_for_layer` in `libs/infrastructure/src/tddd/type_signals_evaluator.rs`; inject `TdddActualFeatureDeclarationPort` through `FsTdddFeatureDeclarationAdapter` at `libs/infrastructure/src/signal.rs::SystemSignalCommandAdapter::calc_impl` and `apps/cli-composition/src/track/tddd.rs`; and add canonical signal-calculation tests (IN-03, CN-01, AC-03, AC-04).",
-      "status": "done"
-    },
-    {
-      "id": "T005",
-      "description": "Complete the catalogue-declared `semantic-dup` public items in `libs/infrastructure/src/semantic_dup/{extractor.rs,fragment_extractor_adapter.rs,embedding.rs,index.rs,noop_adapter.rs,null_insert_proxy.rs}` and their corresponding usecase ports/errors; add feature-enabled rustdoc and signal regression coverage (CN-04, CN-05, AC-07, AC-08).",
       "status": "done"
     }
   ],
@@ -59,16 +54,6 @@
           "T003",
           "T004",
           "T006"
-        ]
-      },
-      {
-        "id": "S3",
-        "title": "Declared semantic-dup surface",
-        "description": [
-          "Complete the feature-selected public infrastructure surface under `libs/infrastructure/src/semantic_dup/` and verify its implementation signals (CN-04, AC-07)."
-        ],
-        "task_ids": [
-          "T005"
         ]
       }
     ]

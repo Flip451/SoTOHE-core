@@ -1,7 +1,7 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-28T08:09:03Z",
-  "declaration_hash": "fceaf10d4b621c56d10e5371c47e493dd91efe7737374c6c57b7057f2d5f6be5",
+  "generated_at": "2026-07-28T10:45:56Z",
+  "declaration_hash": "890d87c60b6d68759ed369e62aa70465d8cd1f5884536ddd25153455d6b83833",
   "implementation_input_hash": "f0e2fbd70f56f153a78b9e669ac06458711e998db372e9d93546ef9a7b37711d",
   "signals": [
     {
@@ -52,72 +52,6 @@
     },
     {
       "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "CodeFragmentExtractorAdapter",
-      "kind_tag": "secondary_adapter",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "ExtractError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "FastEmbedAdapter",
-      "kind_tag": "secondary_adapter",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "LanceDbSemanticIndexAdapter",
-      "kind_tag": "secondary_adapter",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "NoopSemanticIndexPort",
-      "kind_tag": "secondary_adapter",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "NullInsertIndexProxy",
-      "kind_tag": "secondary_adapter",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "PersistentIndexLock",
-      "kind_tag": "secondary_adapter",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "PersistentIndexLockError",
-      "kind_tag": "error_type",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "infrastructure::semantic_dup::extractor::extract_code_fragments",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock",
-      "kind_tag": "free_function",
-      "signal": "blue",
-      "found_type": true
-    },
-    {
-      "type_name": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path",
       "kind_tag": "free_function",
       "signal": "blue",
       "found_type": true

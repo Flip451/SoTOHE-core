@@ -1,22 +1,7 @@
 ---
 adr_id: 2026-04-11-0001-baseline-reverse-signals
 decisions:
-  - id: "1."
-    status: accepted
-    grandfathered: true
-  - id: "2."
-    status: accepted
-    grandfathered: true
-  - id: "3."
-    status: accepted
-    grandfathered: true
-  - id: "4."
-    status: accepted
-    grandfathered: true
-  - id: "5."
-    status: accepted
-    grandfathered: true
-  - id: "7."
+  - id: 2026-04-11-0001-baseline-reverse-signals_grandfathered
     status: accepted
     grandfathered: true
 ---
