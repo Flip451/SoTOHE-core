@@ -334,10 +334,9 @@ fn test_phase0_track_with_no_artifacts_passes() {
     // (Phase 0 / 1 / 2 — pre-implementation), spec/plan existence checks
     // are skipped. A branch-materialized v6 track that only has metadata
     // must therefore pass even without spec.md / spec.json / plan.md.
-    // This implements "file existence = phase status" from
-    // knowledge/conventions/workflow-ceremony-minimization.md and
-    // supersedes the prior Planned-fallback-with-artifact-validation
-    // behavior introduced by T025.
+    // This implements file existence as the phase status and supersedes
+    // the prior Planned-fallback-with-artifact-validation behavior
+    // introduced by T025.
     let tmp = TempDir::new().unwrap();
     let dir = tmp.path().join(TRACK_ITEMS_DIR).join("phase0-track");
     fs::create_dir_all(&dir).unwrap();

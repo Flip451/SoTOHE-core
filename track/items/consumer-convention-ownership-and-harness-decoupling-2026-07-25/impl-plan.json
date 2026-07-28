@@ -109,17 +109,17 @@
     {
       "id": "T019",
       "description": "本 task の所有領域は、T018 が扱う type-designer を除く D6 対象 capability 記述と review prompt に残る、consumer 所有規約への固定 path 参照である。既知の対象面は `.harness/capabilities/spec-designer.md`、`impl-planner.md`、`implementer.md`、`adr-editor.md`、`rollback-diagnoser.md` と `.harness/custom/review-prompts/domain.md` の 6 面で、この列挙は下限であって上限ではない — この所有領域に属する surviving live surface が他にあれば、そこに残る固定 path 参照も同一変更集合で解消する。所有領域外 (type-designer 面、および文書移動に伴う旧 path 参照) は本 task では触らない。IN-09 が指定する移行分類に従い、capability 側は dispatcher 注入で受け取る形へ置き換え、review prompt 側は resolver 注入以外の手段で解消する。Size estimate — harness-policy: ~130 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-09`, `#IN-10`, `#CN-05`, `#CN-06`, `#CN-07`, `#AC-13`, `#AC-15`, `#AC-16`.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T020",
       "description": "本 task の所有領域は、出荷される production source と test fixture に残る source-only convention への参照である (文書移動に伴う旧 path 参照は T012 / T017 の所有領域であり、本 task では触らない)。既知の対象は次のとおり: `libs/domain/src/spec.rs`、`libs/infrastructure/src/spec/codec.rs`、`libs/infrastructure/src/spec/render.rs`、`libs/infrastructure/src/tddd/semantic_verify_codec.rs`、`libs/infrastructure/src/verify/latest_track.rs` と `latest_track_tests.rs`。この列挙は下限であって上限ではない — 上記の所有領域に属する参照が他の出荷対象 production source / test fixture に残っていれば、それも同一変更集合で解消する。`CLAUDE.md` と `.harness/config/template-boundary.json` に残る source-only 文書への言及も同時に整理する。Size estimate — domain: ~4 prod + ~0 test lines; infrastructure: ~8 prod + ~4 test lines; harness-policy: ~12 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-02`, `#IN-09`, `#IN-10`, `#CN-07`, `#AC-03`, `#AC-15`, `#AC-16`.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T034",
       "description": "source 側 `knowledge/conventions/coding-principles.md` に `required_for: [spec-designer, impl-planner]` を付与する。T019 と同一変更集合に置く。Size estimate — harness-policy: ~5 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-09`, `#IN-10`, `#AC-13`, `#AC-15`.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T021",

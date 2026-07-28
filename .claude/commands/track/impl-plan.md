@@ -11,7 +11,9 @@ User invokes this command as `/track:impl-plan`. No arguments.
 ## Claude Code invocation constraints
 
 Write a briefing containing the track id, paths to `spec.json` and each `<layer>-types.json`,
-and paths to the related ADR(s) and conventions. Then run
+and paths to the related ADR(s). Do not put convention paths in the briefing: the capability
+dispatcher resolves the `impl-planner` convention set and delivers it with the dispatch, and
+that resolution is the complete convention input (workflow SSoT § Inputs). Then run
 `bin/sotp capability exec impl-planner --host claude --briefing-file tmp/impl-planner-briefing.md`.
 The dispatcher resolves `capabilities.impl-planner` internally from
 `.harness/config/agent-profiles.json` and either completes the dispatch or returns the

@@ -22,7 +22,12 @@ See `.harness/capabilities/spec-designer.md` for the capability's full operation
   stop and instruct the caller to run the `init` workflow first.
 - **ADR path(s)** — referenced ADRs under `knowledge/adr/` (resolved from `metadata.json`
   context or caller briefing).
-- **Related conventions** — paths under `knowledge/conventions/` relevant to the feature.
+
+Conventions are **not** an input to this workflow. The `spec-designer` capability reads exactly
+the convention set the capability dispatcher resolves and delivers with the dispatch, and treats
+that set as complete — including when it resolves to zero documents
+(`.harness/capabilities/spec-designer.md` § Design Principles). This workflow neither selects nor
+forwards convention paths.
 
 ## Sequence
 
@@ -38,8 +43,11 @@ full internal pipeline). The briefing must include:
 
 - Track id and the path `track/items/<track-id>/metadata.json`
 - Path(s) to the referenced ADR(s) under `knowledge/adr/`
-- Paths to the related conventions under `knowledge/conventions/`
 - Any explicit constraints from the ADR that scope the behavioral contract
+
+The briefing must **not** carry convention paths. The capability's convention set comes solely
+from the dispatcher's resolution; adding a hand-picked path here would make an unresolved
+document an input and would leave a zero-document resolution non-authoritative.
 
 The capability owns writing `track/items/<track-id>/spec.json`, rendering `spec.md`, and
 evaluating the spec → ADR signal (🔵🟡🔴). The workflow does not duplicate these steps.

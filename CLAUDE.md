@@ -16,7 +16,7 @@ spec.json (per track)
 implementation (libs/, apps/, permanent)
 ```
 
-Each downstream artifact must cite its direct upstream (no layer skipping, no reverse references). References are machine-evaluated as signals — 🔵 grounded / 🟡 grounded but must be resolved before track end / 🔴 broken. Gates are built only from these signals plus binary checks; there are no artificial `approved` / `Status` states (`knowledge/conventions/workflow-ceremony-minimization.md`). How a gate consumes signals is declared per **chain × gate** in `.harness/config/signal-gates.json` — `interim` (🔴 blocks, 🟡 warns and passes) or `strict` (🟡 also blocks). Chains: `adr_user` (ADR decision grounding), `spec_adr` (spec → ADR), `catalog_spec` (catalogue → spec), `impl_catalog` (implementation → catalogue). Committed defaults:
+Each downstream artifact must cite its direct upstream (no layer skipping, no reverse references). References are machine-evaluated as signals — 🔵 grounded / 🟡 grounded but must be resolved before track end / 🔴 broken. Gates are built only from these signals plus binary checks; there are no artificial `approved` / `Status` states — a gate is expressed as file existence plus signal evaluation, never as a status field an artifact carries. How a gate consumes signals is declared per **chain × gate** in `.harness/config/signal-gates.json` — `interim` (🔴 blocks, 🟡 warns and passes) or `strict` (🟡 also blocks). Chains: `adr_user` (ADR decision grounding), `spec_adr` (spec → ADR), `catalog_spec` (catalogue → spec), `impl_catalog` (implementation → catalogue). Committed defaults:
 
 - commit gate — `spec_adr` / `catalog_spec` strict; `adr_user` / `impl_catalog` interim (in-progress implementation may carry 🟡 into a commit, but design-chain references must already be grounded)
 - merge gate — strict on all four chains
@@ -65,7 +65,6 @@ Derived read-only views — never hand-edit, regenerate via `bin/sotp track view
 - The orchestrator never edits SoT files directly (1 file = 1 writer): ADR → `adr-editor`, `spec.json` → `spec-designer`, catalogues → `type-designer`, `impl-plan.json` → `impl-planner`. Task state transitions go through `bin/sotp track transition`.
 - No change reaches merge without a reviewer-capability verdict; the default is a local cycle to `zero_findings` before every commit (plan artifacts included), and the PR-review lane defers that verdict rather than waiving it. Inline self-review is never a substitute (`.harness/policies/review-protocol.md`).
 - Do not manually copy, edit, or remove ADR baseline records. A missing init snapshot blocks review and commit; a byte mismatch blocks commit and track-aware CI (not review — a Phase 0 draft divergence is normal). Use the sanctioned snapshot, restore, and diagnoser routes.
-- Enforce rules by mechanism (type system > CI gate > hook > lint > docs), and prefer type-safe abstractions over lint/doc rules (`knowledge/conventions/{enforce-by-mechanism,prefer-type-safe-abstractions}.md`).
 - Read `.claude/rules/orchestration.md` and `.claude/rules/guardrails.md` before making changes.
 
 ## Rules and conventions

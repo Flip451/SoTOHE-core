@@ -56,6 +56,11 @@ active track. The track id is taken from the current branch (`track/<id>`).
 - Any ADR cited by the failing spec element(s) under `knowledge/adr/`.
 - Any source files referenced by Blocked entries or reviewer findings (Rust crates under `libs/`
   and `apps/`).
+- Every project-wide convention the dispatcher resolved for this capability. Their paths and the
+  obligation to read them arrive with the dispatch; do not assume a filename, do not assume a
+  section structure inside them, and do not re-resolve them yourself. A resolution of zero
+  documents is a valid state — the project declares no convention this capability must weigh —
+  and leaves this bullet with no target rather than in error.
 
 The mandatory read step exists so the routing decision reflects the full SoT chain, not just the
 immediate finding text. A capability invocation that emits a routing decision without reading
@@ -80,7 +85,7 @@ Pick exactly one of the following five classes for `routing_target`:
 |--------|---------|------------------|
 | `adr` | An architectural decision needed to ground the finding is absent from any ADR, or an existing ADR's decision is ambiguous enough to admit the finding as a permitted interpretation. | The finding references a principle (e.g., hexagonal purity, layer placement) that no ADR explicitly decides; or the spec elements citing the relevant ADR all carry `informal_grounds[]` rather than `adr_refs[]`. |
 | `spec` | The ADR decides the question, but Phase 1 spec.json did not capture the decision as an actionable acceptance criterion / constraint / in-scope element. | An ADR D-anchor exists for the topic, but no spec element cites it (or the spec element is too vague to drive implementation). |
-| `type` | The spec captures the decision correctly, but the per-layer `<layer>-types.json` catalogue has an architectural defect (wrong layer placement, missing entry, wrong `role`, wrong `action`, wrong shape, conflict with `architecture-rules.json`). | A spec acceptance criterion grounds a type concept, but no catalogue entry exists for it, or the entry sits in the wrong layer, or its `role` violates `prefer-type-safe-abstractions.md` / `type-designer-kind-selection.md` R1. |
+| `type` | The spec captures the decision correctly, but the per-layer `<layer>-types.json` catalogue has an architectural defect (wrong layer placement, missing entry, wrong `role`, wrong `action`, wrong shape, conflict with `architecture-rules.json`). | A spec acceptance criterion grounds a type concept, but no catalogue entry exists for it, or the entry sits in the wrong layer, or its `role` violates a placement or type-shape rule declared by a convention resolved for this capability. |
 | `impl_plan` | The ADR, spec, and catalogue all correctly express the design, but the Phase 3 impl-plan task list does not describe the implementation work that would close the finding. | A finding targets a behavior that no `impl-plan.json` task description mentions, or a task's `attributed_entries` map misses an entry whose change is required. |
 | `impl` | The entire design chain (ADR → spec → catalogue → impl-plan) is consistent, and the finding is a pure source-side contract violation. | A test fails, a method signature drift, an obviously incorrect branch in source — design documents do not need editing; the source itself must be fixed. |
 

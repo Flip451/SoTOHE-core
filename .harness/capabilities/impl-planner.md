@@ -76,10 +76,10 @@ Do NOT emit Rust code, trait signatures, module trees, or `TypeDefinitionKind` s
 
 ## Design Principles (cite, don't enumerate)
 
-Apply `knowledge/conventions/prefer-type-safe-abstractions.md` (Newtype / Enum-first / Typestate) and `knowledge/conventions/coding-principles.md` (error handling / no panics / module size / documentation) at the **plan level**:
+Apply the project-wide conventions resolved for this capability at the **plan level**. The dispatcher resolves them and delivers their paths and the obligation to read them in full with the dispatch — do not assume a filename, do not assume a section structure inside them, and do not re-resolve them yourself. A resolution of **zero documents is a valid state**: the project declares no additional plan-level rules, and the boundaries below are then the complete guidance.
 
 - Respect hexagonal layer placement when deciding task batching (tasks modifying one layer often group together)
-- Respect enum-first / typestate / newtype decisions already made by the type-designer — task descriptions should not propose different type shapes
+- Respect the type shapes already chosen by the type-designer — task descriptions should not propose different ones
 - Honour per-task size targets (`<500` lines per task commit is the reviewability guideline; review cost scales roughly O(N^2) with diff size, so splitting M tasks reduces cost to O(N^2/M)); split large tasks when needed
 
 ## Scope Ownership

@@ -23,8 +23,13 @@ See `.harness/capabilities/impl-planner.md` for the capability's full operationa
 - **`track/items/<track-id>/<layer>-types.json`** — at least one must exist for every
   TDDD-enabled layer (Phase 2 completed). If none exist, stop and instruct the caller to run
   the `type-design` workflow first.
-- **ADR path(s)** and **related conventions** — paths under `knowledge/adr/` and
-  `knowledge/conventions/` for the feature domain.
+- **ADR path(s)** — paths under `knowledge/adr/` for the feature domain.
+
+Conventions are **not** an input to this workflow. The `impl-planner` capability reads exactly
+the convention set the capability dispatcher resolves and delivers with the dispatch, and treats
+that set as complete — including when it resolves to zero documents
+(`.harness/capabilities/impl-planner.md` § Design Principles). This workflow neither selects nor
+forwards convention paths.
 
 ## Sequence
 
@@ -44,7 +49,10 @@ internal pipeline). The briefing must include:
 
 - Track id and paths to `track/items/<track-id>/spec.json` and each `<layer>-types.json`
 - Path(s) to the referenced ADR(s) under `knowledge/adr/`
-- Paths to related conventions under `knowledge/conventions/`
+
+The briefing must **not** carry convention paths. The capability's convention set comes solely
+from the dispatcher's resolution; adding a hand-picked path here would make an unresolved
+document an input and would leave a zero-document resolution non-authoritative.
 
 The capability owns writing `track/items/<track-id>/impl-plan.json`,
 `track/items/<track-id>/task-coverage.json`, and `track/items/<track-id>/task-contract.json`,

@@ -72,7 +72,7 @@ pub fn render_spec(doc: &SpecDocument) -> String {
 /// Free-form line 1
 ///
 /// ## Related Conventions (Required Reading)
-/// - knowledge/conventions/source-attribution.md#intro
+/// - knowledge/conventions/x.md#intro
 /// ```
 #[must_use]
 pub fn render_spec_with_coverage(
@@ -405,7 +405,7 @@ mod tests {
             vec![
                 SpecSection::new("Custom Section Title", vec!["Free-form line 1".into()]).unwrap(),
             ],
-            vec![conv_ref("knowledge/conventions/source-attribution.md", "intro")],
+            vec![conv_ref("knowledge/conventions/x.md", "intro")],
             Some(SignalCounts::new(3, 1, 0)),
         )
         .unwrap()
@@ -655,7 +655,7 @@ mod tests {
         let doc = make_full_doc();
         let output = render_spec(&doc);
         assert!(output.contains("## Related Conventions (Required Reading)\n"));
-        assert!(output.contains("- knowledge/conventions/source-attribution.md#intro\n"));
+        assert!(output.contains("- knowledge/conventions/x.md#intro\n"));
     }
 
     #[test]
