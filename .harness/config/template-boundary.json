@@ -52,7 +52,6 @@
     { "pattern": "compose.dev.yml", "classification": "include" },
     { "pattern": "knowledge/README.md", "classification": "include" },
     { "pattern": "knowledge/conventions/README.md", "classification": "include" },
-    { "pattern": "knowledge/conventions/catalogue-schema-reference.md", "classification": "include" },
     { "pattern": "knowledge/conventions/coding-principles.md", "classification": "include" },
     { "pattern": "knowledge/conventions/dry-check-workflow.md", "classification": "exclude" },
     { "pattern": "knowledge/conventions/enforce-by-mechanism.md", "classification": "include" },

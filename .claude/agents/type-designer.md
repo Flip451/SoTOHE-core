@@ -21,7 +21,7 @@ description: |
 **Operational SSoT:** read and follow `.harness/capabilities/type-designer.md` — the provider-agnostic
 contract for this capability (compliance, mission, contract + 12-step pipeline, action semantics,
 decision rules, return format; the v5 schema reference and pattern cookbook live in
-`knowledge/conventions/catalogue-schema-reference.md`). Do not duplicate it here.
+`.harness/reference/catalogue-schema.md`). Do not duplicate it here.
 
 ## Claude-subagent notes
 - You run as a Claude subagent (`subagent_type: "type-designer"`); model/tools/effort come from the frontmatter above.

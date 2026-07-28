@@ -11,7 +11,7 @@ TDDD 型カタログ v5 の schema 詳細リファレンス。wire format / role
 - 生成物の**保守・デバッグ** (signal 🟡/🔴 の原因調査を含む)
 - 生成コマンドを経ない**手直し編集**の正確性確認
 
-> **Authority note**: schema の権威は sotp の実装側にある。本書は記述的な参照文書 (descriptive mirror) であり、canonical SSoT はソースコード — 具体的には `libs/domain/src/tddd/catalogue_v2/` (`CatalogueDocument`, `TypeEntry`, `TraitEntry`, `FunctionEntry`, `TraitImplDeclV2`, `InherentImplDeclV2`) と `libs/infrastructure/src/tddd/catalogue_document_codec/` — である。本書の記述と実装が乖離した場合は **sotp 側を正とし**、本書を修正する。記述が疑わしいときは source を読み、Open Question として報告する。
+> **Authority note**: schema の拘束は `bin/sotp` の catalogue validation が fail-closed に実施する。本書は記述的な参照文書 (descriptive mirror) であり、`CatalogueDocument` / `TypeEntry` / `TraitEntry` / `FunctionEntry` / `TraitImplDeclV2` / `InherentImplDeclV2` と catalogue document codec の contract を説明する。本書の記述と `bin/sotp` の validation 挙動が乖離した場合は **sotp 側を正とし**、本書を修正する。記述が疑わしいときは `bin/sotp catalog check` で該当 catalogue を検証し、CLI が検証できない主張は Open Question として報告する。
 
 ## Scope
 
@@ -218,7 +218,7 @@ A `unit` shape carries no `fields` payload at the schema level, so a unit struct
 
 ### `has_stripped_fields`: private (non-`pub`) fields
 
-rustdoc **omits private fields** from the public API JSON and sets `has_stripped_fields: true` on the C-side struct shape. The catalogue (A-side) MUST mirror this, or the type → source signal stays 🟡 **forever — even after the type is fully implemented** — because the structural-equality evaluator returns `Mismatch` the instant the flag differs (`structural_eq.rs`: `if asf != bsf { return false; }`):
+rustdoc **omits private fields** from the public API JSON and sets `has_stripped_fields: true` on the C-side struct shape. The catalogue (A-side) MUST mirror this, or the type → source signal stays 🟡 **forever — even after the type is fully implemented** — because the structural-equality evaluator returns `Mismatch` the instant the flag differs (`structs_structurally_equal`: `if asf != bsf { return false; }`):
 
 - In `fields`, list **only the `pub` fields** — private fields are absent on both sides, so never list them.
 - Set `"has_stripped_fields": true` **iff the struct has ≥1 private field**. Leaving it `false` on a struct that actually has a private field is a permanent 🟡 — the single most common interactor / service-wrapper miss.
@@ -313,8 +313,6 @@ Concrete catalogue shapes. In the generate + annotate workflow the skeletons are
 > **Schema Reference takes precedence.** The cookbook examples below are written in the normative **v5 wire format**: `role` uses the discriminated-object form for type-section and trait-section entries (e.g. `"role": { "ValueObject": {} }`, `"role": { "SecondaryPort": {} }`), while function-section entries keep the plain-string form (`"role": "UseCaseFunction"` — `FunctionRole` is a fieldless enum, wired as `role: String` in the codec DTO). If a cookbook literal ever diverges from the schema reference sections above, the schema reference sections win.
 
 > **Layer-name disclaimer.** The cookbook examples below use the layer / crate name placeholders `<core-crate>` (a layer that may host roles like `"ValueObject"` / `"SecondaryPort"`) and `<adapter-crate>` (a layer that may host roles like `"SecondaryAdapter"`). For *this* workspace, the actual names are listed in `architecture-rules.json` and the legal role × layer combinations are specified in `knowledge/conventions/type-designer-kind-selection.md` § R1. Substitute the placeholders for the real names — do not copy the placeholders verbatim into the JSON. The catalogue file name follows the pattern `<layer>-types.json` (e.g. `<core-crate>-types.json`); locate the legal layer names from the SSoT pair.
->
-> For a worked example in a real catalogue, consult the latest tracks under `track/items/<id>/` — each track ships `<layer>-types.json` files that show how the layer names from `architecture-rules.json` are substituted in.
 
 Patterns 1 and 3 show complete documents with `"schema_version": 5`. Patterns 2, 4–8 show partial BTreeMap sections (e.g. `"types": { ... }`) extracted from a full document for conciseness; they use `jsonc` fences because some contain `//` annotation comments. The codec accepts only `"schema_version": 5` — versions 1–4 are rejected fail-closed (v4 with a migration prompt).
 
@@ -734,12 +732,12 @@ A `reference` entry's methods / fields do not drive Phase 2 structural equality:
 
 ## Review Checklist
 
-- 本書の記述を根拠に catalogue entry を評価する際は、疑わしい記述を必ず `libs/domain/src/tddd/catalogue_v2/` / `libs/infrastructure/src/tddd/catalogue_document_codec/` の実装と突き合わせる (本書は mirror であり authority ではない)。
-- 本書を更新する変更が入った場合、schema 実装側の変更に由来するか (追随更新) を確認する — 本書単独での schema 変更提案は無効。
+- 本書の記述を根拠に catalogue entry を評価する際は、疑わしい記述を `bin/sotp catalog check` で検証する。CLI が検証できない主張は Open Question として報告する (本書は mirror であり authority ではない)。
+- 本書を更新する変更が入った場合、`bin/sotp` の schema validation の変更に由来するか (追随更新) を確認する — 本書単独での schema 変更提案は無効。
 
 ## Related Documents
 
 - `.harness/capabilities/type-designer.md` — 生成 + 注釈 workflow の手順書 (capability operational SSoT)
 - `knowledge/conventions/type-designer-kind-selection.md` — role / kind 選定の拘束ルール (R1-R10)
 - `knowledge/adr/README.md` — 設計判断の索引（履歴を確認する必要がある場合）
-- `libs/domain/src/tddd/catalogue_v2/` / `libs/infrastructure/src/tddd/catalogue_document_codec/` — schema authority (canonical SSoT)
+- `bin/sotp catalog check` — catalogue の consumer-available validation

@@ -51,7 +51,7 @@ Workflow logic SSoT for workflow-backed track commands is `.harness/workflows/tr
 | Reviewer briefings (per layer / per SoT scope) | `.harness/custom/review-prompts/*.md` |
 | Track identity (Phase 0) | `track/items/<id>/metadata.json` |
 | Behavioral contract (Phase 1) | `track/items/<id>/spec.json` |
-| Type contracts (Phase 2) | `track/items/<id>/<layer>-types.json` (schema: `knowledge/conventions/catalogue-schema-reference.md`) |
+| Type contracts (Phase 2) | `track/items/<id>/<layer>-types.json` (schema: `.harness/reference/catalogue-schema.md`) |
 | Implementation plan / spec coverage / contract attribution (Phase 3) | `track/items/<id>/impl-plan.json` + `task-coverage.json` + `task-contract.json` |
 | Architectural decisions | `knowledge/adr/` (index: `knowledge/adr/README.md`) |
 | ADR baseline ledger and verbatim copies | `track/items/<id>/adr-baseline/` (written only by `bin/sotp adr-baseline snapshot`) |

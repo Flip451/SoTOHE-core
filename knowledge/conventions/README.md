@@ -56,7 +56,6 @@
 
 <!-- convention-docs:start -->
 - `testing.md`: Testing Convention
-- `catalogue-schema-reference.md`: Catalogue Schema Reference (v5)
 - `coding-principles.md`: Coding Principles Convention
 - `dry-check-workflow.md`: DRY Check Workflow Convention
 - `enforce-by-mechanism.md`: Enforce by Mechanism Convention
