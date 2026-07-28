@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-28T15:34:10Z",
+  "generated_at": "2026-07-28T15:50:32Z",
   "declaration_hash": "6dfa8a2c4f24ee92e46c159e3176f838a8c46e264778dcf3bff0ab6aca715eb7",
-  "implementation_input_hash": "7d53b42f5c1ce44e7b3a4651992d817c3363a9aa475e09a7abd35b1370c3f352",
+  "implementation_input_hash": "6abcfdcebd81fabbda1b92b8fda81ba55b546c0a0bfad52f8f449012efae0ed4",
   "signals": [
     {
       "type_name": "CapabilityIdField",
@@ -31,9 +31,9 @@
     {
       "type_name": "FsConventionInventoryAdapter",
       "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Default",
         "usecase::template_conventions::ConventionInventoryPort"
       ]

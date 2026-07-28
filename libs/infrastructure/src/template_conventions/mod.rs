@@ -24,6 +24,8 @@
 //! own answer about links or about how much of a tree to enumerate.
 
 #[cfg(test)]
+mod adapter_tests;
+#[cfg(test)]
 mod inventory_tests;
 
 use std::ffi::OsStr;
@@ -31,7 +33,7 @@ use std::path::{Path, PathBuf};
 
 use domain::tddd::catalogue_linter::FreeText;
 use usecase::conventions_resolve::ConventionDocumentPath;
-use usecase::template_conventions::ConventionShippingCheckError;
+use usecase::template_conventions::{ConventionInventoryPort, ConventionShippingCheckError};
 
 use crate::conventions_resolve::directory_walk::{
     DirectoryEntry, ListingError, MAX_SCAN_ENTRIES, bounded_entries, open_directory_at,
@@ -335,5 +337,44 @@ impl<'tree> Inventory<'tree> {
             path,
             reason: FreeText::new(reason.to_string()),
         }
+    }
+}
+
+/// Filesystem implementation of [`ConventionInventoryPort`] (`IN-11`, `AC-18`).
+///
+/// Stateless: the tree to inventory arrives as an argument, so the adapter reads
+/// no ambient location. That is what makes one value serve both sides of the
+/// shipping comparison — the exported tree and the overlay are walked by the
+/// same rules because they are walked by the same adapter, and a difference the
+/// check reports can therefore only come from what the trees hold. Wiring two
+/// instances, or an instance carrying a root, would satisfy the same signature
+/// and lose that.
+///
+/// It exists as a unit struct rather than as the free function alone because the
+/// port is injected as a trait object, which a free function cannot satisfy.
+pub struct FsConventionInventoryAdapter;
+
+impl FsConventionInventoryAdapter {
+    /// Creates the adapter.
+    #[must_use]
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl Default for FsConventionInventoryAdapter {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
+impl ConventionInventoryPort for FsConventionInventoryAdapter {
+    /// Delegates to [`list_convention_documents`] unchanged, so the port's
+    /// promise and the walk's behaviour cannot drift apart.
+    fn list_conventions(
+        &self,
+        tree_root: &Path,
+    ) -> Result<Vec<ConventionDocumentPath>, ConventionShippingCheckError> {
+        list_convention_documents(tree_root)
     }
 }

@@ -164,7 +164,7 @@
     {
       "id": "T033",
       "description": "`FsConventionInventoryAdapter` を実装し、T028 の `list_convention_documents` へ委譲する。adapter の contract_conformance obligation を tempdir fixture で果たす。T028 の後に置き、同一 batch には入れない (両者とも infrastructure scope)。Size estimate — infrastructure: ~45 prod + ~205 test lines (計 ~250)。`track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-11`, `#AC-18`, `#OUT-04`.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T029",

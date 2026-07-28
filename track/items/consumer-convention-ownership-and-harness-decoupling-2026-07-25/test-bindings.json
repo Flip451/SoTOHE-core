@@ -1807,6 +1807,62 @@
         }
       },
       "reason": "list_convention_documents is declared as a synchronous free function — list_convention_documents(tree_root: &std::path::Path) -> Result<Vec<ConventionDocumentPath>, ConventionShippingCheckError> — that walks the convention directory of the tree named by tree_root and hands back one tree-relative identity per document that tree ships, reading no file contents. Unlike a declaration whose tests can only drive a stand-in, a test at this one drives the real operation against real directory trees, so what it reads back is what the walk found on disk rather than what the test arranged. AC-18 promises three things: that template smoke checks, against an exported tree, that source conventions beyond the overlay are not shipped; that this succeeds on the changed repository; and that no dead-reference check extracting convention paths from prose has been added. None of the three is within reach at this declaration, and the reason is not that the trees under test are synthetic. The first clause asserts that a check was put and answered. This function's entire result is one tree's documents, and a list of documents is neither a comparison of two trees nor a finding about either, so inventorying a tree — however genuinely, and however closely the tree resembles an export — establishes at most that the tree was inventoried. The declaration admits one tree root and cannot name a second, so the non-shipping question cannot be stated in its vocabulary at all, let alone answered in it. The second clause asserts that a particular run succeeded on the changed repository. Success here is an Ok carrying a listing rather than a verdict, and the tree read is whichever location the caller names, so nothing this function returns distinguishes the changed repository from any other directory tree, and the value it returns is not the outcome whose success is being asserted. Whether template smoke acquires such an item, and whether that item's run succeeds, are settled by whatever wires this walk into a smoke run, and no wiring is representable in a function signature. The third clause is an absence in a repository. This function takes a tree root and returns that tree's own document paths; that vocabulary cannot spell which checks a repository contains. That it opens no document and parses no front matter, and so extracts nothing from any prose, is a statement about what this walk does rather than evidence that no such extraction was added elsewhere. What this declaration does establish is narrower than any of the three and belongs to the inventory step rather than to a run: that the tree inventoried is the one the caller named and never an ambient location; that documents are identified relative to that tree, without which two inventories could not be compared at all; that a tree holding no convention root is a failure rather than an inventory of nothing, so an export cannot answer by being empty; and that a document whose contents are malformed is inventoried like any other, because nothing here opens one. None of that is any part of what AC-18 promises."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "FsConventionInventoryAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::template_conventions::ConventionInventoryPort"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_lists_the_documents_a_tree_ships_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_inventories_both_trees_through_one_injected_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_inventories_each_named_tree_through_one_shared_receiver"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_presents_a_document_it_could_not_have_parsed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_leaves_the_trees_it_inventories_untouched"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_surfaces_every_fail_closed_condition_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_surfaces_the_rejected_document_path_through_the_port"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "FsConventionInventoryAdapter",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "FsConventionInventoryAdapter is declared as a stateless unit struct that implements ConventionInventoryPort by delegating to the filesystem inventory walk: its one method takes a tree root and hands back one tree-relative identity per convention document that tree ships, reading no file contents. Its tests drive it through the trait object against real directory trees, so what they read back is what the walk found on disk rather than what a stand-in was arranged to return, and the values they assert on are the adapter's own. AC-18 promises three things: that template smoke checks, against an exported tree, that source conventions beyond the overlay are not shipped; that this succeeds on the changed repository; and that no dead-reference check extracting convention paths from prose has been added. None of the three is within reach at this declaration, and the reason is neither that the trees are synthetic nor that the walk is borrowed. The first clause asserts that a check was put and answered. This declaration's entire result is one tree's documents, and a list of documents is neither a comparison of two trees nor a finding about either; a test may inventory an export-shaped tree and an overlay-shaped tree through one value and subtract the one listing from the other, but the subtraction is the test's own step and not this declaration's, so what the adapter establishes stops at each listing. Its method admits one tree root and cannot name a second, so the non-shipping question cannot be stated in its vocabulary, let alone answered in it, and being reachable as a trait object says which callers may hold it rather than that any caller does. The second clause asserts that a particular run succeeded on the changed repository. Success there is a property of that run's outcome, whereas here an Ok carries a listing and an Err carries a condition that prevented one, so nothing this method returns is the check's verdict; and the tree read is whichever location the caller names, so no result distinguishes the changed repository from any other directory tree. What acquires such a check in a smoke run, and whether that run succeeds, are settled by whatever wires this adapter in, and no wiring is representable in an implementation of this method. The third clause is an absence in a repository. A method that takes a tree root and returns that tree's own document paths cannot spell which checks a repository contains; that it opens no document and so extracts nothing from any prose is a statement about what this adapter reads, not evidence that no such extraction exists elsewhere. What this declaration does establish is narrower than any of the three and belongs to the inventorying step rather than to a run: that the tree inventoried is the one the caller named and never an ambient location; that one stateless value answers for either tree, so the two sides cannot be walked by different rules; that identities are tree-relative and therefore comparable across two inventories at all; that a malformed document is presented like any other, because nothing here opens one; and that a condition preventing an inventory reaches the port's caller as itself rather than as a shorter list. None of that is any part of what AC-18 promises."
     }
   ]
 }

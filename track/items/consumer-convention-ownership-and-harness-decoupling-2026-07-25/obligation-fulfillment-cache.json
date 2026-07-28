@@ -3431,6 +3431,67 @@
           "test_name": "test_list_convention_documents_ignores_an_unrenderable_name_that_is_not_a_document"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsConventionInventoryAdapter",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsConventionInventoryAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::template_conventions::ConventionInventoryPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "4bd9c19c116308a162dea82e421972ecbb106fc858bf95216a0da2e254792302",
+        "declaration_hash": "27c76fddfefa7ea561c19d9fb63dcae482581e60c9d8958211321a6bb9606fad",
+        "anchor_text_hash": "0d8bcb7b6139fbd92056795f9ccd8bb834d9efea32f8501529a2b539795d9e75"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        unsupplied.iter().map(ToString::to_string).collect::<Vec<_>>(),\n        [\"knowledge/conventions/leaked-source.md\"],\n        \"the document both trees hold is one and the same value across the two inventories, so \\\n         subtracting one from the other names exactly the document the export ships beyond what \\\n         the overlay supplies\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_lists_the_documents_a_tree_ships_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_inventories_both_trees_through_one_injected_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_inventories_each_named_tree_through_one_shared_receiver"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_presents_a_document_it_could_not_have_parsed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_leaves_the_trees_it_inventories_untouched"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_surfaces_every_fail_closed_condition_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_surfaces_the_rejected_document_path_through_the_port"
+        }
+      ]
     }
   ]
 }

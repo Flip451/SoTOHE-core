@@ -11,7 +11,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| FsConventionInventoryAdapter | secondary_adapter | add | impl ConventionInventoryPort, impl Default | 🟡 | 🔵 |
+| FsConventionInventoryAdapter | secondary_adapter | add | impl ConventionInventoryPort, impl Default | 🔵 | 🔵 |
 | FsConventionRequirementAdapter | secondary_adapter | add | impl ConventionRequirementPort, impl Default | 🔵 | 🔵 |
 
 ## Free Functions
