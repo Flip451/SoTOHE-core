@@ -6,6 +6,8 @@ use std::path::PathBuf;
 use std::collections::BTreeMap;
 
 use domain::schema::SchemaExportError;
+use domain::tddd::CargoFeatureName;
+use domain::tddd::catalogue_v2::CrateName;
 use domain::tddd::type_signals_doc::{
     CatalogueDeclarationHash, ImplementationInputHash, TypeSignalsDocument,
     TypeSignalsReuseDecision, decide_type_signals_reuse,
@@ -16,7 +18,11 @@ use crate::schema_export::RustdocSchemaExporter;
 use crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec;
 
 pub(super) trait RustdocJsonPathProvider {
-    fn export_rustdoc_json_path(&self, crate_name: &str) -> Result<PathBuf, SchemaExportError>;
+    fn export_rustdoc_json_path(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+    ) -> Result<PathBuf, SchemaExportError>;
     fn existing_rustdoc_json_path(&self, crate_name: &str) -> Result<PathBuf, SchemaExportError>;
 }
 
@@ -46,8 +52,12 @@ pub(super) fn reuse_decision_for_recorded_document(
 }
 
 impl RustdocJsonPathProvider for RustdocSchemaExporter {
-    fn export_rustdoc_json_path(&self, crate_name: &str) -> Result<PathBuf, SchemaExportError> {
-        Self::export_rustdoc_json_path(self, crate_name)
+    fn export_rustdoc_json_path(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+    ) -> Result<PathBuf, SchemaExportError> {
+        Self::export_rustdoc_json_path_with_features(self, crate_name, features)
     }
 
     fn existing_rustdoc_json_path(&self, crate_name: &str) -> Result<PathBuf, SchemaExportError> {
@@ -60,12 +70,18 @@ impl RustdocJsonPathProvider for RustdocSchemaExporter {
 mod tests {
     use super::{RustdocJsonPathProvider, existing_rustdoc_content};
     use domain::schema::SchemaExportError;
+    use domain::tddd::CargoFeatureName;
+    use domain::tddd::catalogue_v2::CrateName;
     use std::path::PathBuf;
 
     struct FixedPathProvider(PathBuf);
 
     impl RustdocJsonPathProvider for FixedPathProvider {
-        fn export_rustdoc_json_path(&self, _: &str) -> Result<PathBuf, SchemaExportError> {
+        fn export_rustdoc_json_path(
+            &self,
+            _: &CrateName,
+            _: &[CargoFeatureName],
+        ) -> Result<PathBuf, SchemaExportError> {
             Err(SchemaExportError::CrateNotFound("fixture".to_owned()))
         }
 
@@ -90,6 +106,7 @@ pub struct RustdocLaunchObserver {
     json_paths: BTreeMap<String, PathBuf>,
     fallback_json_path: Option<PathBuf>,
     launches: std::sync::Arc<std::sync::Mutex<BTreeMap<String, usize>>>,
+    feature_selections: std::sync::Arc<std::sync::Mutex<BTreeMap<String, Vec<Vec<String>>>>>,
     before_export: Option<std::sync::Arc<dyn Fn() + Send + Sync>>,
 }
 
@@ -112,6 +129,7 @@ impl RustdocLaunchObserver {
             json_paths: BTreeMap::new(),
             fallback_json_path: Some(json_path),
             launches: std::sync::Arc::new(std::sync::Mutex::new(BTreeMap::new())),
+            feature_selections: std::sync::Arc::new(std::sync::Mutex::new(BTreeMap::new())),
             before_export: None,
         }
     }
@@ -125,6 +143,7 @@ impl RustdocLaunchObserver {
             json_paths,
             fallback_json_path: None,
             launches: std::sync::Arc::new(std::sync::Mutex::new(BTreeMap::new())),
+            feature_selections: std::sync::Arc::new(std::sync::Mutex::new(BTreeMap::new())),
             before_export: None,
         }
     }
@@ -141,6 +160,7 @@ impl RustdocLaunchObserver {
             json_paths: BTreeMap::new(),
             fallback_json_path: Some(json_path),
             launches: std::sync::Arc::new(std::sync::Mutex::new(BTreeMap::new())),
+            feature_selections: std::sync::Arc::new(std::sync::Mutex::new(BTreeMap::new())),
             before_export: Some(before_export),
         }
     }
@@ -156,6 +176,15 @@ impl RustdocLaunchObserver {
         self.launches.lock().map_or(0, |launches| launches.get(crate_name).copied().unwrap_or(0))
     }
 
+    /// Returns every feature selection supplied to simulated rustdoc for one crate.
+    #[must_use]
+    pub fn feature_selections_for(&self, crate_name: &str) -> Vec<Vec<String>> {
+        self.feature_selections.lock().map_or_else(
+            |_| Vec::new(),
+            |selections| selections.get(crate_name).cloned().unwrap_or_default(),
+        )
+    }
+
     fn json_path_for(&self, crate_name: &str) -> Result<PathBuf, SchemaExportError> {
         self.json_paths
             .get(crate_name)
@@ -167,14 +196,24 @@ impl RustdocLaunchObserver {
 
 #[cfg(feature = "test-helpers")]
 impl RustdocJsonPathProvider for RustdocLaunchObserver {
-    fn export_rustdoc_json_path(&self, crate_name: &str) -> Result<PathBuf, SchemaExportError> {
+    fn export_rustdoc_json_path(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+    ) -> Result<PathBuf, SchemaExportError> {
         if let Some(before_export) = &self.before_export {
             before_export();
         }
         if let Ok(mut launches) = self.launches.lock() {
-            *launches.entry(crate_name.to_owned()).or_default() += 1;
+            *launches.entry(crate_name.as_str().to_owned()).or_default() += 1;
         }
-        self.json_path_for(crate_name)
+        if let Ok(mut selections) = self.feature_selections.lock() {
+            selections
+                .entry(crate_name.as_str().to_owned())
+                .or_default()
+                .push(features.iter().map(|feature| feature.as_str().to_owned()).collect());
+        }
+        self.json_path_for(crate_name.as_str())
     }
 
     fn existing_rustdoc_json_path(&self, crate_name: &str) -> Result<PathBuf, SchemaExportError> {

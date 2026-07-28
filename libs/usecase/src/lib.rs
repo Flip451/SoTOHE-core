@@ -66,6 +66,7 @@ pub mod skill_compliance;
 pub mod spec_adr_signal;
 pub mod task_completion;
 pub mod task_ops;
+pub mod tddd_feature_declaration;
 pub mod telemetry;
 pub mod template_conventions;
 pub mod template_export;

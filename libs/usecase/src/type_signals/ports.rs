@@ -4,6 +4,7 @@ use std::fmt;
 use std::path::Path;
 
 use domain::TrackId;
+use domain::tddd::CargoFeatureName;
 use domain::tddd::catalogue_v2::TdddLayerBinding;
 
 /// Opaque diagnostic returned by the infrastructure evaluator adapter.
@@ -30,5 +31,6 @@ pub trait TypeSignalsExecutorPort: Send + Sync {
         track_id: &TrackId,
         workspace_root: &Path,
         binding: &TdddLayerBinding,
+        features: &[CargoFeatureName],
     ) -> Result<(), TypeSignalsExecutionError>;
 }

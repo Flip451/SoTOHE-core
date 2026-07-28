@@ -29,5 +29,18 @@ pub use service::{BaselineCaptureError, BaselineCaptureRequest, BaselineCaptureS
 pub(crate) fn validate_track_id(id: &str) -> Result<(), BaselineCaptureError> {
     domain::TrackId::try_new(id)
         .map(|_| ())
-        .map_err(|e| BaselineCaptureError::InvalidTrackId { reason: e.to_string() })
+        .map_err(|error| BaselineCaptureError::InvalidTrackId(diagnostic(error.to_string())))
+}
+
+fn diagnostic(value: String) -> domain::tddd::test_obligation::ids::DiagnosticMessage {
+    let mut value = value;
+    if value.trim().is_empty() {
+        value = "invalid track id".to_owned();
+    }
+    loop {
+        match domain::tddd::test_obligation::ids::DiagnosticMessage::try_new(value) {
+            Ok(message) => return message,
+            Err(_) => value = "invalid track id".to_owned(),
+        }
+    }
 }

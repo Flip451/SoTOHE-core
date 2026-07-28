@@ -23,7 +23,19 @@
         "kind": "fulfilled",
         "citation": "paths.sort();\n\n        let ordered: Vec<String> = paths.iter().map(ToString::to_string).collect();\n        assert_eq!(\n            ordered,\n            [\n                \"knowledge/conventions/adr.md\",\n                \"knowledge/conventions/rust/naming.md\",\n                \"knowledge/conventions/testing.md\",\n            ]\n        );\n\n        assert_eq!(resolved.to_string(), \"knowledge/conventions/testing.md\");"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_paths_sort_in_stable_lexicographic_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_display_renders_repository_relative_path"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -47,7 +59,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n            resolved.as_path(),\n            Path::new(\"knowledge/conventions/testing.md\"),\n            \"`.` components must be dropped rather than rejected\"\n        );\n...\nassert_eq!(\n            ordered,\n            [\n                \"knowledge/conventions/adr.md\",\n                \"knowledge/conventions/rust/naming.md\",\n                \"knowledge/conventions/testing.md\",\n            ]\n        );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_current_dir_prefix_normalizes_and_succeeds"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_paths_sort_in_stable_lexicographic_order"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -71,7 +95,39 @@
         "kind": "fulfilled",
         "citation": "assert!(\n            matches!(result, Err(ConventionDocumentPathError::OutsideConventionRoot { .. })),\n            \"a parent-directory component can leave the convention root, so it is rejected\"\n        );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_parent_dir_escape_returns_outside_convention_root_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_absolute_path_returns_outside_convention_root_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_sibling_directory_returns_outside_convention_root_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_root_directory_itself_returns_outside_convention_root_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_path_inside_root_succeeds"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_nested_path_inside_root_succeeds"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -95,7 +151,24 @@
         "kind": "fulfilled",
         "citation": "let Err(ConventionDocumentPathError::OutsideConventionRoot { path }) = result else {\n            panic!(\"expected an OutsideConventionRoot rejection\");\n        };"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_error_retains_supplied_path"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_parent_dir_escape_returns_outside_convention_root_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_absolute_path_returns_outside_convention_root_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -119,7 +192,24 @@
         "kind": "fulfilled",
         "citation": "let id = ConventionCapabilityId::try_new(\"consumer-house-style\")\n            .expect(\"an identifier registered nowhere is still a valid matching term\");\n\n        assert_eq!(id.as_str(), \"consumer-house-style\");"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_accepts_a_non_blank_identifier_unchanged"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_rejects_empty_and_whitespace_only_identifiers"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_accepts_an_identifier_registered_in_no_registry"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -143,7 +233,24 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(padded.as_str(), \" reviewer \", \"the value is preserved byte-for-byte, so the match stays a literal whole-value comparison rather than a normalize-then-compare\"); ... assert!(!requirement.requires(&capability(near_miss)), \"'{near_miss}' is not the declared identifier, so it must not match\")"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_preserves_surrounding_whitespace_verbatim"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_from_capability_name_carries_the_trimmed_key_value"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_requirement_requires_only_on_whole_value_capability_id_match"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -167,7 +274,14 @@
         "kind": "fulfilled",
         "citation": "let id = ConventionCapabilityId::try_new(\"consumer-house-style\")\n            .expect(\"an identifier registered nowhere is still a valid matching term\");"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_accepts_an_identifier_registered_in_no_registry"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -191,7 +305,19 @@
         "kind": "fulfilled",
         "citation": "for blank in [\"\", \"   \", \"\\t\", \"\\n\", \" \\t\\n \"] {\n            assert!(\n                matches!(\n                    ConventionCapabilityId::try_new(blank),\n                    Err(ConventionCapabilityIdError::Blank)\n                ),\n                \"'{blank:?}' carries no identifier, which is the rejection this value admits\"\n            );\n        }"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_rejects_empty_and_whitespace_only_identifiers"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_rejection_renders_the_blank_condition"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -215,7 +341,19 @@
         "kind": "fulfilled",
         "citation": "for blank in [\"\", \"   \", \"\\t\", \"\\n\", \" \\t\\n \"] {\n            assert!(\n                matches!(\n                    ConventionCapabilityId::try_new(blank),\n                    Err(ConventionCapabilityIdError::Blank)\n                ),\n                \"'{blank:?}' carries no identifier, which is the rejection this value admits\"\n            );\n        }"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_rejects_empty_and_whitespace_only_identifiers"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_rejection_renders_the_blank_condition"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -239,7 +377,14 @@
         "kind": "fulfilled",
         "citation": "assert!(requirement.requires(&capability(\"implementer\")));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_requirement_pairs_the_scanned_document_with_the_capabilities_it_declares"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -263,7 +408,14 @@
         "kind": "fulfilled",
         "citation": "assert!(requirement.requires(&capability(\"implementer\"))); ... assert!(\n                !requirement.requires(&capability(near_miss)),\n                \"'{near_miss}' is not the declared identifier, so it must not match\"\n            );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_requirement_requires_only_on_whole_value_capability_id_match"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -287,7 +439,14 @@
         "kind": "fulfilled",
         "citation": "let requirement =\n            ConventionRequirement::new(document(\"knowledge/conventions/git-notes.md\"), Vec::new());\n\n        assert_eq!(requirement.document(), &document(\"knowledge/conventions/git-notes.md\"));\n        assert!(!requirement.requires(&capability(\"implementer\")));\n        assert!(!requirement.requires(&capability(\"reviewer\")));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_requirement_without_declared_capabilities_requires_nothing"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -311,7 +470,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n            paths,\n            [\"knowledge/conventions/adr.md\", \"knowledge/conventions/testing.md\"],\n            \"a document matched twice by the scan appears once in the result\"\n        );\n\nassert_eq!(\n            paths,\n            [\n                \"knowledge/conventions/adr.md\",\n                \"knowledge/conventions/rust/naming.md\",\n                \"knowledge/conventions/testing.md\",\n            ],\n            \"the result is in stable repository-relative path order\"\n        );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_resolution_from_matches_deduplicates_repeated_documents"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_resolution_from_matches_orders_documents_independently_of_scan_order"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -335,7 +506,19 @@
         "kind": "fulfilled",
         "citation": "\"a document matched twice by the scan appears once in the result\"; \"the result is in stable repository-relative path order\""
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_resolution_from_matches_deduplicates_repeated_documents"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_resolution_from_matches_orders_documents_independently_of_scan_order"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -359,7 +542,14 @@
         "kind": "fulfilled",
         "citation": "let resolution = ConventionResolution::from_matches(Vec::new());\n\n        assert!(resolution.is_empty());\n        assert!(resolution.documents().is_empty());\n        assert_eq!(\n            resolution,\n            ConventionResolution::default(),\n            \"matching no document yields the ordinary empty result, not a failure\"\n        );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_resolution_with_zero_matches_is_an_empty_success_value"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -383,7 +573,14 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(query.capability.as_str(), \"implementer\");\n        assert_eq!(query.project_root, PathBuf::from(\"/srv/consumer-project\"));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_resolve_conventions_query_carries_the_requested_capability_and_project_root"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -407,7 +604,14 @@
         "kind": "fulfilled",
         "citation": "for blank in [\"\", \"   \", \"\\t\"] {\n            assert!(\n                ConventionCapabilityId::try_new(blank).is_err(),\n                \"an empty capability id is the one rejection this value carries\"\n            );\n        }\n\n        for accepted in [\"implementer\", \"team::custom-lint\", \"SHOUTING_ID\", \"x\", \" padded \"] {\n            let query = ResolveConventionsQuery {\n                capability: ConventionCapabilityId::try_new(accepted)\n                    .expect(\"a non-blank capability id is accepted as-is\"),\n                project_root: PathBuf::from(\".\"),\n            };\n            assert_eq!(\n                query.capability.as_str(),\n                accepted,\n                \"the query carries the requested identifier verbatim, so the match it feeds \\\n                 compares the value the caller actually named\"\n            );\n        }"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_resolve_conventions_query_capability_rejects_only_empty_or_blank_identifiers"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -431,7 +635,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(query.capability, unregistered);\n        assert_eq!(query.capability.as_str(), \"consumer-house-style\");"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_resolve_conventions_query_accepts_a_capability_id_registered_in_no_registry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_resolve_conventions_query_capability_rejects_only_empty_or_blank_identifiers"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -455,7 +671,39 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n        paths(&from_one),\n        [\n            \"knowledge/conventions/adr.md\",\n            \"knowledge/conventions/rust/naming.md\",\n            \"knowledge/conventions/testing.md\",\n        ],\n        \"the matches are returned through the result's canonical constructor, so they carry its deduplication and ordering rather than the order they were scanned in\"\n    );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_applies_no_normalization_of_its_own"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_is_pure_over_the_already_scanned_input"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_returns_the_canonical_resolution_not_the_scan_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_returns_the_documents_declaring_the_capability"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_treats_documents_declaring_nothing_as_ordinary_input"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_with_no_matching_document_returns_an_empty_success"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -479,7 +727,39 @@
         "kind": "fulfilled",
         "citation": "assert!(resolved.is_empty());\n    assert_eq!(\n        select_required_conventions(&[], &capability(\"implementer\")),\n        resolved,"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_applies_no_normalization_of_its_own"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_is_pure_over_the_already_scanned_input"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_returns_the_canonical_resolution_not_the_scan_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_returns_the_documents_declaring_the_capability"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_treats_documents_declaring_nothing_as_ordinary_input"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_with_no_matching_document_returns_an_empty_success"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -503,7 +783,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(field.as_str(), \" implementer \");\n\nassert!(\n        !requirement.requires(&capability(\"implementer\")),\n        \"a padded element is a different identifier, so trimming it here would decide a match \\\n         the usecase comparison is supposed to decide\"\n    );\nassert!(requirement.requires(&capability(\" implementer \")));\nassert!(\n        !requirement.requires(&capability(\"reviewer\")),\n        \"case is not folded either, for the same reason\"\n    );\nassert!(requirement.requires(&capability(\"Reviewer\")));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_capability_id_field_borrows_the_wire_text_verbatim"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_preserves_element_text_verbatim"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -527,7 +819,14 @@
         "kind": "fulfilled",
         "citation": "assert!(\n            matches!(error, ConventionResolveError::RequiredForNotStringArray { .. }),\n            \"a non-string element is a shape error decided while decoding, distinct from the \\\n             empty-identifier condition: {error}\"\n        );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_string_element_fails_closed"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -551,7 +850,14 @@
         "kind": "fulfilled",
         "citation": "let matched = requirement_from(content).unwrap();\n\nassert_eq!(matched, [\"consumer-house-style\"]);"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_unregistered_capability_id_decodes_it_unchanged"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -575,7 +881,24 @@
         "kind": "fulfilled",
         "citation": "assert!(\n        !requirement.requires(&capability(\"implementer\")),\n        \"a padded element is a different identifier, so trimming it here would decide a match \\\n         the usecase comparison is supposed to decide\"\n    );\n    assert!(requirement.requires(&capability(\" implementer \")));\n    assert!(\n        !requirement.requires(&capability(\"reviewer\")),\n        \"case is not folded either, for the same reason\"\n    );\n    assert!(requirement.requires(&capability(\"Reviewer\")));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_decodes_a_required_for_string_array"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_preserves_element_text_verbatim"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_ignores_a_non_string_key_beside_required_for"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -599,7 +922,19 @@
         "kind": "fulfilled",
         "citation": "assert!(\n            matches!(error, ConventionResolveError::EmptyCapabilityId { .. }),\n            \"the identifier constructor's rejection is translated here, not decided again: \\\n             {error}\"\n        );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_convention_front_matter_dto_translates_a_blank_element_into_empty_capability_id"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_convention_front_matter_dto_rejects_a_blank_element_among_accepted_ones"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -623,7 +958,29 @@
         "kind": "fulfilled",
         "citation": "`ConventionFrontMatterDto::default().into_requirement(document()).unwrap()` and `assert!(!requirement.requires(&capability(\"implementer\")));` ; `parse_convention_front_matter(&document(), content).unwrap().into_requirement(document()).unwrap()` and `assert!(!requirement.requires(&capability(\"implementer\")), \"a document without front matter requires nothing, which is a normal empty state\");` ; `assert_eq!(requirement_from(content).unwrap(), Vec::<String>::new(), \"an absent required_for is the same empty state as an absent block\")`"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_default_convention_front_matter_dto_requires_nothing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_without_a_block_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_without_required_for_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_only_a_non_string_key_decodes_to_the_default_value"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -647,7 +1004,24 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n            paths(&resolved),\n            [\"knowledge/conventions/adr.md\", \"knowledge/conventions/testing.md\"],"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_resolve_hands_the_caller_the_canonical_resolution_and_not_a_raw_path_list"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_resolve_is_reachable_from_more_than_one_holder_of_one_shared_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_resolve_separates_a_failed_read_from_a_resolution_that_matched_nothing"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -671,7 +1045,34 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(resolved, select_required_conventions(&scanned, &capability(\"implementer\")));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_answers_an_empty_resolution_where_nothing_matched"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_answers_with_what_the_selection_selects_over_the_scanned_requirements"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_carries_nothing_from_one_resolution_into_the_next"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_scans_the_project_root_the_query_named"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_surfaces_a_failed_scan_as_that_failure"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -695,7 +1096,34 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(resolved, select_required_conventions(&scanned, &capability(\"implementer\")));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_answers_an_empty_resolution_where_nothing_matched"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_answers_with_what_the_selection_selects_over_the_scanned_requirements"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_carries_nothing_from_one_resolution_into_the_next"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_scans_the_project_root_the_query_named"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_surfaces_a_failed_scan_as_that_failure"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -719,7 +1147,34 @@
         "kind": "fulfilled",
         "citation": "let resolved = interactor\n                .resolve(query(\"implementer\"))\n                .expect(\"matching no document is not a fail-closed condition\");\n\n            assert_eq!(\n                resolved,\n                ConventionResolution::default(),"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_answers_an_empty_resolution_where_nothing_matched"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_answers_with_what_the_selection_selects_over_the_scanned_requirements"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_carries_nothing_from_one_resolution_into_the_next"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_scans_the_project_root_the_query_named"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_surfaces_a_failed_scan_as_that_failure"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -743,7 +1198,14 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n            *query,\n            ResolveConventionsQuery {\n                capability: ConventionCapabilityId::try_new(requested).unwrap(),\n                project_root: PathBuf::from(PROJECT_ROOT),\n            },"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_resolve_input_carries_the_parsed_term_and_the_named_root_into_the_query"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -767,7 +1229,19 @@
         "kind": "fulfilled",
         "citation": "\"a padded argument stays a different identifier here, which is what keeps the match an exact one rather than a normalize-then-compare\""
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_capability_id_arg_parses_the_argument_the_boundary_neither_trims_nor_looks_up"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_capability_id_arg_rejects_only_the_blank_argument"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -791,7 +1265,19 @@
         "kind": "fulfilled",
         "citation": "let outcome = driver.handle(input(\"consumer-house-style\", PROJECT_ROOT));\n\nassert_eq!(\n        outcome.exit_code, 0,\n        \"no step of this path consults `.harness/capabilities/` or `agent-profiles.json`, so an \\\n         unregistered identifier has no state in which the command fails for want of a \\\n         registration\"\n    );\nassert_eq!(outcome.stdout.as_deref(), Some(\"knowledge/conventions/house-style.md\"));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_capability_id_arg_parses_the_argument_the_boundary_neither_trims_nor_looks_up"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_resolves_a_capability_registered_in_no_registry"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -815,7 +1301,14 @@
         "kind": "fulfilled",
         "citation": "ResolveConventionsQuery {\n                capability: ConventionCapabilityId::try_new(requested).unwrap(),\n                project_root: PathBuf::from(PROJECT_ROOT),\n            }"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_resolve_input_carries_the_parsed_term_and_the_named_root_into_the_query"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -839,7 +1332,14 @@
         "kind": "fulfilled",
         "citation": "\"the identifier the caller named reaches the resolver spelled exactly as typed\""
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_resolve_input_carries_the_parsed_term_and_the_named_root_into_the_query"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -863,7 +1363,14 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n            *query,\n            ResolveConventionsQuery {\n                capability: ConventionCapabilityId::try_new(requested).unwrap(),\n                project_root: PathBuf::from(PROJECT_ROOT),\n            },"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_resolve_input_carries_the_parsed_term_and_the_named_root_into_the_query"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -887,7 +1394,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n            *query,\n            ResolveConventionsQuery {\n                capability: ConventionCapabilityId::try_new(requested).unwrap(),\n                project_root: PathBuf::from(PROJECT_ROOT),\n            },"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_resolve_input_carries_the_parsed_term_and_the_named_root_into_the_query"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_resolves_a_capability_registered_in_no_registry"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -911,7 +1430,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n        rendered, expected,\n        \"the machine-readable output is one line per document the resolution holds, in the order \\\n         it holds them, with nothing added, dropped, reordered, or written beside them\"\n    );\n    assert_eq!(outcome.exit_code, 0);"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_renders_the_canonical_result_as_the_machine_readable_output"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_human_display_is_rendered_from_the_same_resolution"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -935,7 +1466,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n        rendered, expected,\n        \"the machine-readable output is one line per document the resolution holds, in the order \\\n         it holds them, with nothing added, dropped, reordered, or written beside them\"\n    );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_renders_the_canonical_result_as_the_machine_readable_output"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_reaches_no_operation_other_than_the_read"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -959,7 +1502,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(outcome.exit_code, 0, \"an empty result is an answer, not a failure\");"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_reports_a_resolution_matching_no_document_as_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_reports_only_a_failed_read_as_a_failure"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -983,7 +1538,19 @@
         "kind": "fulfilled",
         "citation": "for document in resolution.documents() {\n            assert!(\n                composed.as_str().contains(&document.to_string()),\n                \"every resolved document reaches the dispatched capability, not a selection\"\n            );\n        }"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_appends_every_resolved_document_path"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_names_only_resolved_paths_in_resolution_order"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1007,7 +1574,19 @@
         "kind": "fulfilled",
         "citation": "\"every resolved document reaches the dispatched capability, not a selection\""
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_appends_every_resolved_document_path"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_composes_one_value_from_a_discipline_and_a_resolution"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1031,7 +1610,19 @@
         "kind": "fulfilled",
         "citation": "\"the rendered obligation names the resolver's own document paths in its order, so no fixed convention filename can enter the text here\""
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_names_only_resolved_paths_in_resolution_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_renders_an_empty_resolution_without_an_obligation"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1055,7 +1646,14 @@
         "kind": "fulfilled",
         "citation": "assert!(\n            answer.contains(\"wiring-probe-alpha.md\"),\n            \"the answer did not come from the named project tree: {answer:?}\"\n        );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::conventions::tests",
+          "test_name": "test_conventions_resolve_driver_answers_from_the_named_project_tree"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1079,7 +1677,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(outcome.exit_code, 0, \"resolution failed: {:?}\", outcome.stderr);\n        assert_eq!(convention_tree(project.path()), before);"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::conventions::tests",
+          "test_name": "test_conventions_resolve_driver_leaves_the_convention_tree_unchanged"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::conventions::tests",
+          "test_name": "test_conventions_resolve_driver_answers_from_the_named_project_tree"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1103,7 +1713,99 @@
         "kind": "fulfilled",
         "citation": "\"`AC-06` makes resolution read-only: no document is created, updated, or deleted, and no index is generated\""
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_does_not_follow_a_directory_symlink"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_does_not_read_a_linked_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_hands_back_no_documents_when_one_is_unreadable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_leaves_the_convention_tree_untouched"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_pairs_each_document_with_what_its_front_matter_declares"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_produces_only_paths_inside_the_convention_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_reads_only_markdown_documents"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_scans_only_the_convention_tree_of_the_supplied_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_fails_closed_on_a_broken_document_link"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_surfaces_a_front_matter_failure_from_its_own_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_surfaces_a_required_for_shape_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_turns_the_decoded_view_into_a_requirement"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unreadable_document_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_without_a_convention_tree_scans_nothing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unrenderable_document_name_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unrenderable_directory_name_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unlistable_root_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_without_a_convention_root_is_an_empty_result"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1127,7 +1829,99 @@
         "kind": "fulfilled",
         "citation": "let Err(ConventionResolveError::DocumentUnreadable { document, detail }) = result else {\n        panic!(\"a document that cannot be read is one of `AC-07`'s fail-closed conditions\");\n    };"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_does_not_follow_a_directory_symlink"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_does_not_read_a_linked_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_hands_back_no_documents_when_one_is_unreadable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_leaves_the_convention_tree_untouched"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_pairs_each_document_with_what_its_front_matter_declares"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_produces_only_paths_inside_the_convention_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_reads_only_markdown_documents"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_scans_only_the_convention_tree_of_the_supplied_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_fails_closed_on_a_broken_document_link"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_surfaces_a_front_matter_failure_from_its_own_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_surfaces_a_required_for_shape_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_turns_the_decoded_view_into_a_requirement"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unreadable_document_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_without_a_convention_tree_scans_nothing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unrenderable_document_name_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unrenderable_directory_name_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unlistable_root_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_without_a_convention_root_is_an_empty_result"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1151,7 +1945,99 @@
         "kind": "fulfilled",
         "citation": "let result = scan_convention_requirements(project.path());\n\n    let Err(ConventionResolveError::DocumentUnreadable { document, detail }) = result else {\n        panic!(\"a document that cannot be read is one of `AC-07`'s fail-closed conditions\");\n    };"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_does_not_follow_a_directory_symlink"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_does_not_read_a_linked_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_hands_back_no_documents_when_one_is_unreadable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_leaves_the_convention_tree_untouched"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_pairs_each_document_with_what_its_front_matter_declares"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_produces_only_paths_inside_the_convention_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_reads_only_markdown_documents"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_scans_only_the_convention_tree_of_the_supplied_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_fails_closed_on_a_broken_document_link"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_surfaces_a_front_matter_failure_from_its_own_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_surfaces_a_required_for_shape_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_turns_the_decoded_view_into_a_requirement"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unreadable_document_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_without_a_convention_tree_scans_nothing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unrenderable_document_name_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unrenderable_directory_name_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unlistable_root_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_without_a_convention_root_is_an_empty_result"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1175,7 +2061,19 @@
         "kind": "fulfilled",
         "citation": "TestCli::try_parse_from([\"test\", \"resolve\", \"--capability\", \"implementer\"]).unwrap();"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_parses_the_capability_and_the_project_root"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_dispatch_leaves_the_convention_tree_untouched"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1199,7 +2097,19 @@
         "kind": "fulfilled",
         "citation": "assert!(result.is_err(), \"blank capability {blank:?} must be rejected while parsing\");\nassert_eq!(capability, \" implementer \".parse().unwrap());\nassert_ne!(\n    capability,\n    \"implementer\".parse::<ConventionCapabilityIdArg>().unwrap(),\n    \"the boundary must not trim the identifier into a different match term\"\n);"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_rejects_a_blank_capability_at_parse"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_keeps_the_capability_spelled_as_typed"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1223,7 +2133,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(convention_tree(dir.path()), before);"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_dispatch_leaves_the_convention_tree_untouched"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_dispatch_prints_the_declaring_document_paths"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1247,7 +2169,14 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(exit, std::process::ExitCode::SUCCESS);\nassert_eq!(\n            stdout.lines().collect::<Vec<_>>(),\n            vec![\"knowledge/conventions/obscure.md\"],\n            \"an identifier in no registry must resolve to the document declaring it\"\n        );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_accepts_a_capability_registered_in_no_registry"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1271,7 +2200,89 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n        declared(&dto),\n        [\"implementer\", \"reviewer\"],\n        \"decoding hands back a view carrying the elements the document declared, as it spelled \\\n         them and in the order it listed them\"\n    );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_decodes_a_required_for_string_array"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_distinguishes_an_absent_required_for_from_a_null_one"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_reports_required_for_shape_beside_a_non_string_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_tolerates_keys_it_does_not_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_array_required_for_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_mapping_block_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_string_element_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_null_required_for_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_empty_block_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_empty_required_for_array_declares_nothing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_unclosed_block_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_only_a_non_string_key_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_unparseable_yaml_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_without_a_block_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_without_required_for_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_carries_a_blank_element_to_its_deciding_site"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1295,7 +2306,89 @@
         "kind": "fulfilled",
         "citation": "assert!(matches!(error, ConventionResolveError::FrontMatterUnparseable { .. }));\n\nassert!(matches!(result, Err(ConventionResolveError::RequiredForNotStringArray { .. })))"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_decodes_a_required_for_string_array"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_distinguishes_an_absent_required_for_from_a_null_one"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_reports_required_for_shape_beside_a_non_string_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_tolerates_keys_it_does_not_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_array_required_for_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_mapping_block_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_string_element_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_null_required_for_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_empty_block_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_empty_required_for_array_declares_nothing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_unclosed_block_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_only_a_non_string_key_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_unparseable_yaml_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_without_a_block_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_without_required_for_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_carries_a_blank_element_to_its_deciding_site"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1319,7 +2412,89 @@
         "kind": "fulfilled",
         "citation": "assert!(\n        absent.is_ok(),\n        \"a document declaring no `required_for` is a normal empty state (AC-08)\"\n    );\n\nlet requirement = parse_convention_front_matter(&document(), content)\n        .unwrap()\n        .into_requirement(document())\n        .unwrap();"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_decodes_a_required_for_string_array"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_distinguishes_an_absent_required_for_from_a_null_one"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_reports_required_for_shape_beside_a_non_string_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_tolerates_keys_it_does_not_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_array_required_for_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_mapping_block_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_string_element_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_null_required_for_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_empty_block_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_empty_required_for_array_declares_nothing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_unclosed_block_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_only_a_non_string_key_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_unparseable_yaml_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_without_a_block_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_without_required_for_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_carries_a_blank_element_to_its_deciding_site"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1332,18 +2507,45 @@
       "obligation_id": {
         "entry_key": "FsConventionRequirementAdapter",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::conventions_resolve::ConventionRequirementPort"
+        "item_identifier": "trait_impl:usecase::conventions_resolve::requirement_port::ConventionRequirementPort"
       },
       "key": {
         "bound_tests_set_hash": "49c98d6db83ac7e4fc9b76405f7ae076da000ad11f73563db2d061f8f082c865",
-        "declaration_hash": "54a9ae98b7bcb60aa957ace09254d7f62913898e69acb5bde31528b32f04d904",
+        "declaration_hash": "30202f165d0ed31d341c8de627ece2746c92468e99f08d21423bd25b0947cf00",
         "anchor_text_hash": "8fcacd3517663b65642147deac44f3bcb1b164d156190aeb2d42d310057f95f2"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let scanned = port.scan_requirements(project.path()).unwrap();\n\n    assert_eq!(\n        sorted_summaries(&scanned),\n        [\n            \"knowledge/conventions/fixture-alpha.md -> implementer, reviewer\",\n            \"knowledge/conventions/fixture-sub/fixture-beta.md -> implementer\",\n        ]"
+        "citation": "assert_eq!(\n        sorted_summaries(&scanned),\n        [\n            \"knowledge/conventions/fixture-alpha.md -> implementer, reviewer\",\n            \"knowledge/conventions/fixture-sub/fixture-beta.md -> implementer\",\n        ],"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_scans_each_supplied_root_through_one_shared_receiver"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_scans_the_tree_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_surfaces_every_fail_closed_condition_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_prevents_the_path_escape_condition_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_surfaces_the_unrenderable_name_condition_through_the_port"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1356,18 +2558,45 @@
       "obligation_id": {
         "entry_key": "FsConventionRequirementAdapter",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::conventions_resolve::ConventionRequirementPort"
+        "item_identifier": "trait_impl:usecase::conventions_resolve::requirement_port::ConventionRequirementPort"
       },
       "key": {
         "bound_tests_set_hash": "49c98d6db83ac7e4fc9b76405f7ae076da000ad11f73563db2d061f8f082c865",
-        "declaration_hash": "54a9ae98b7bcb60aa957ace09254d7f62913898e69acb5bde31528b32f04d904",
+        "declaration_hash": "30202f165d0ed31d341c8de627ece2746c92468e99f08d21423bd25b0947cf00",
         "anchor_text_hash": "51b28f2ec9290b9ea2aff6e9e206e609664c90b60219ed5b54305415af475b37"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n        sorted_summaries(&scanned),\n        [\n            \"knowledge/conventions/fixture-alpha.md -> implementer, reviewer\",\n            \"knowledge/conventions/fixture-sub/fixture-beta.md -> implementer\",\n        ],"
+        "citation": "assert_eq!(\n        sorted_summaries(&scanned),\n        [\n            \"knowledge/conventions/fixture-alpha.md -> implementer, reviewer\",\n            \"knowledge/conventions/fixture-sub/fixture-beta.md -> implementer\",\n        ],\n        \"the port call reads the documents actually on disk, so injecting the adapter is what \\\n         gives the caller a real scan\"\n    );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_scans_each_supplied_root_through_one_shared_receiver"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_scans_the_tree_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_surfaces_every_fail_closed_condition_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_prevents_the_path_escape_condition_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_surfaces_the_unrenderable_name_condition_through_the_port"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1380,18 +2609,45 @@
       "obligation_id": {
         "entry_key": "FsConventionRequirementAdapter",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::conventions_resolve::ConventionRequirementPort"
+        "item_identifier": "trait_impl:usecase::conventions_resolve::requirement_port::ConventionRequirementPort"
       },
       "key": {
         "bound_tests_set_hash": "49c98d6db83ac7e4fc9b76405f7ae076da000ad11f73563db2d061f8f082c865",
-        "declaration_hash": "54a9ae98b7bcb60aa957ace09254d7f62913898e69acb5bde31528b32f04d904",
+        "declaration_hash": "30202f165d0ed31d341c8de627ece2746c92468e99f08d21423bd25b0947cf00",
         "anchor_text_hash": "2c8b009b849c82ccb1dbb756f2972cba4e650d06c7dbd798709555c40fe6efa4"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(\n        sorted_documents(&scanned),\n        [\n            \"knowledge/conventions/..fixture-hidden.md\",\n            \"knowledge/conventions/fixture-alpha.md\",\n            \"knowledge/conventions/fixture-sub/..fixture-deep.md\",\n            \"knowledge/conventions/fixture-sub/deeper/fixture-deepest.md\",\n        ],\n        \"the port answers with the documents inside the convention root and with nothing from \\\n         outside it\"\n    );"
+        "citation": "let Err(ConventionResolveError::DocumentUnreadable { document, .. }) = result else {\n        panic!(\"the adapter surfaces the scan's fail-closed condition as itself\");\n    };"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_scans_each_supplied_root_through_one_shared_receiver"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_scans_the_tree_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_surfaces_every_fail_closed_condition_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_prevents_the_path_escape_condition_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_surfaces_the_unrenderable_name_condition_through_the_port"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1415,7 +2671,19 @@
         "kind": "fulfilled",
         "citation": "let Err(ConventionDocumentPathError::NotRenderableAsRecord { path }) = result else {\n            panic!(\n                \"'{}' cannot be one record, so it is not a document path\",\n                offending.escape_debug()\n            );\n        };"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_error_tests",
+          "test_name": "test_convention_document_path_with_a_line_terminator_returns_not_renderable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_error_tests",
+          "test_name": "test_convention_document_path_with_a_non_utf8_name_returns_not_renderable_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1439,7 +2707,64 @@
         "kind": "fulfilled",
         "citation": "for dispatched in [&executed, &delegated] {\n            assert_eq!(listed_documents(dispatched), documents.to_vec());\n            assert!(\n                dispatched.as_str().contains(READING_OBLIGATION),\n                \"each route states the reading obligation, not merely the list it applies to\"\n            );\n        }"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_both_routes_carry_the_reading_obligation_and_not_only_the_paths"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_convention_resolution_failure_stops_before_the_provider"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_delegate_in_host_payload_carries_the_resolved_obligation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_delegate_in_host_route_resolves_conventions_exactly_once"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_empty_resolution_dispatches_no_document_despite_available_declarations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_injects_the_resolved_documents_and_nothing_else"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_query_names_the_dispatched_capability_as_a_matching_term"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_again_for_a_second_dispatch_naming_another_capability"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_conventions_before_the_execution_subject_is_chosen"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_conventions_once_and_dispatches_the_composed_discipline"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_typed_pipeline_dispatch_resolves_no_conventions"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1463,7 +2788,64 @@
         "kind": "fulfilled",
         "citation": "for dispatched in [&executed, &delegated] {\n            assert_eq!(listed_documents(dispatched), documents.to_vec());\n            assert!(\n                dispatched.as_str().contains(READING_OBLIGATION),\n                \"each route states the reading obligation, not merely the list it applies to\"\n            );\n        }"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_both_routes_carry_the_reading_obligation_and_not_only_the_paths"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_convention_resolution_failure_stops_before_the_provider"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_delegate_in_host_payload_carries_the_resolved_obligation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_delegate_in_host_route_resolves_conventions_exactly_once"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_empty_resolution_dispatches_no_document_despite_available_declarations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_injects_the_resolved_documents_and_nothing_else"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_query_names_the_dispatched_capability_as_a_matching_term"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_again_for_a_second_dispatch_naming_another_capability"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_conventions_before_the_execution_subject_is_chosen"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_conventions_once_and_dispatches_the_composed_discipline"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_typed_pipeline_dispatch_resolves_no_conventions"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1487,7 +2869,64 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(queries.lock().expect(\"test resolver recorder lock\").len(), 1); ... assert!(matches!(\n            interactor.execute(request()?),\n            Err(CapabilityExecError::UnsupportedProvider { .. })\n        )); ... assert_eq!(queries.lock().expect(\"test resolver recorder lock\").len(), 1); ... assert!(queries.lock().expect(\"test resolver recorder lock\").is_empty());"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_both_routes_carry_the_reading_obligation_and_not_only_the_paths"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_convention_resolution_failure_stops_before_the_provider"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_delegate_in_host_payload_carries_the_resolved_obligation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_delegate_in_host_route_resolves_conventions_exactly_once"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_empty_resolution_dispatches_no_document_despite_available_declarations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_injects_the_resolved_documents_and_nothing_else"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_query_names_the_dispatched_capability_as_a_matching_term"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_again_for_a_second_dispatch_naming_another_capability"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_conventions_before_the_execution_subject_is_chosen"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_conventions_once_and_dispatches_the_composed_discipline"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_typed_pipeline_dispatch_resolves_no_conventions"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1511,7 +2950,64 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(listed_documents(dispatched), vec![RESOLVED_DOCUMENT]);\n        for trap in [TRAP_TRACK_DOCUMENT, TRAP_BRIEFING_DOCUMENT, TRAP_ON_DISK_DOCUMENT] {\n            assert!(\n                !dispatched.as_str().contains(trap),"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_both_routes_carry_the_reading_obligation_and_not_only_the_paths"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_convention_resolution_failure_stops_before_the_provider"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_delegate_in_host_payload_carries_the_resolved_obligation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_delegate_in_host_route_resolves_conventions_exactly_once"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_empty_resolution_dispatches_no_document_despite_available_declarations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_injects_the_resolved_documents_and_nothing_else"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_query_names_the_dispatched_capability_as_a_matching_term"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_again_for_a_second_dispatch_naming_another_capability"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_conventions_before_the_execution_subject_is_chosen"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_conventions_once_and_dispatches_the_composed_discipline"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_typed_pipeline_dispatch_resolves_no_conventions"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1535,7 +3031,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(query.exported_root, PathBuf::from(\"/var/tmp/export-42\"));\n    assert_eq!(query.overlay_dir, PathBuf::from(\"overlay\"));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_contract_tests",
+          "test_name": "test_check_convention_shipping_query_carries_both_tree_roots_verbatim"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_contract_tests",
+          "test_name": "test_check_convention_shipping_query_compares_by_both_roots"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1559,7 +3067,19 @@
         "kind": "fulfilled",
         "citation": "let ConventionShippingVerdict::UnsuppliedDocumentsShipped { documents } = verdict else {\n        panic!(\"expected the violating verdict\");\n    };\n    let named: Vec<String> = documents.as_slice().iter().map(ToString::to_string).collect();\n    assert_eq!(\n        named,\n        [\n            \"knowledge/conventions/language-policy.md\",\n            \"knowledge/conventions/typed-deserialization.md\",\n        ],"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_contract_tests",
+          "test_name": "test_convention_shipping_verdict_conforming_carries_no_document"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_contract_tests",
+          "test_name": "test_convention_shipping_verdict_violation_names_the_offending_documents"
+        }
+      ]
     }
   ]
 }

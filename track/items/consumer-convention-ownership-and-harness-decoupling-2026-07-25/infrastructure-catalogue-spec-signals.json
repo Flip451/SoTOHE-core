@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "08a2a1b3f3e750467685fa06359109a953aec7126d2e69eec454c316dd84dff2",
+  "catalogue_declaration_hash": "6dfa8a2c4f24ee92e46c159e3176f838a8c46e264778dcf3bff0ab6aca715eb7",
   "signals": [
     {
       "type_name": "CapabilityIdField",

@@ -1,0 +1,225 @@
+{
+  "crate_name": "cli",
+  "functions": {
+    "cli::commands::signal::calc_adr_user::run": {
+      "action": "modify",
+      "docs": null,
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "driver",
+          "ty": "&cli_driver::signal::SignalDriver"
+        },
+        {
+          "name": "args",
+          "ty": "CalcAdrUserArgs"
+        }
+      ],
+      "returns": "core::result::Result<cli_composition::CommandOutcome, cli_composition::CompositionError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-07",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "cli::commands::signal::calc_catalog_spec::run": {
+      "action": "modify",
+      "docs": null,
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "driver",
+          "ty": "&cli_driver::signal::SignalDriver"
+        },
+        {
+          "name": "_args",
+          "ty": "CalcCatalogSpecArgs"
+        }
+      ],
+      "returns": "core::result::Result<cli_composition::CommandOutcome, cli_composition::CompositionError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-07",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "cli::commands::signal::calc_impl_catalog::run": {
+      "action": "modify",
+      "docs": null,
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "driver",
+          "ty": "&cli_driver::signal::SignalDriver"
+        },
+        {
+          "name": "_args",
+          "ty": "CalcImplCatalogArgs"
+        }
+      ],
+      "returns": "core::result::Result<cli_composition::CommandOutcome, cli_composition::CompositionError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-07",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "cli::commands::signal::calc_spec_adr::run": {
+      "action": "modify",
+      "docs": null,
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "driver",
+          "ty": "&cli_driver::signal::SignalDriver"
+        },
+        {
+          "name": "args",
+          "ty": "CalcSpecAdrArgs"
+        }
+      ],
+      "returns": "core::result::Result<cli_composition::CommandOutcome, cli_composition::CompositionError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-07",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "cli::commands::signal::check_adr_user::run": {
+      "action": "modify",
+      "docs": null,
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "driver",
+          "ty": "&cli_driver::signal::SignalDriver"
+        },
+        {
+          "name": "args",
+          "ty": "CheckAdrUserArgs"
+        }
+      ],
+      "returns": "core::result::Result<cli_composition::CommandOutcome, cli_composition::CompositionError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-07",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "cli::commands::signal::check_catalog_spec::run": {
+      "action": "modify",
+      "docs": null,
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "driver",
+          "ty": "&cli_driver::signal::SignalDriver"
+        },
+        {
+          "name": "args",
+          "ty": "CheckCatalogSpecArgs"
+        }
+      ],
+      "returns": "core::result::Result<cli_composition::CommandOutcome, cli_composition::CompositionError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-07",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "cli::commands::signal::check_impl_catalog::run": {
+      "action": "modify",
+      "docs": null,
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "driver",
+          "ty": "&cli_driver::signal::SignalDriver"
+        },
+        {
+          "name": "args",
+          "ty": "CheckImplCatalogArgs"
+        }
+      ],
+      "returns": "core::result::Result<cli_composition::CommandOutcome, cli_composition::CompositionError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-07",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "cli::commands::signal::check_spec_adr::run": {
+      "action": "modify",
+      "docs": null,
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "driver",
+          "ty": "&cli_driver::signal::SignalDriver"
+        },
+        {
+          "name": "args",
+          "ty": "CheckSpecAdrArgs"
+        }
+      ],
+      "returns": "core::result::Result<cli_composition::CommandOutcome, cli_composition::CompositionError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-07",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "cli::commands::signal::run_aggregate_check": {
+      "action": "modify",
+      "docs": null,
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "driver",
+          "ty": "&cli_driver::signal::SignalDriver"
+        },
+        {
+          "name": "args",
+          "ty": "SignalCheckArgs"
+        }
+      ],
+      "returns": "core::result::Result<cli_composition::CommandOutcome, cli_composition::CompositionError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-08",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "cli",
+  "schema_version": 5,
+  "traits": {},
+  "types": {}
+}

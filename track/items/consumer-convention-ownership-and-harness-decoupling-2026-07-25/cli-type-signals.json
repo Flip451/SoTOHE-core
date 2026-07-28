@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-28T05:54:07Z",
+  "generated_at": "2026-07-28T13:26:02Z",
   "declaration_hash": "106e9adf61de17b5d5df112a06d9a484b5a8ec656720864c736888c814c496ee",
-  "implementation_input_hash": "0242110896b02a41f093f7fb7d47076784c9f39f5347a04ee513e42ede0db666",
+  "implementation_input_hash": "f661ed76b75568a6a65945e0a4da167460c5c02b73b59f8e022c58092902f47c",
   "signals": [
     {
       "type_name": "ConventionsCommand",

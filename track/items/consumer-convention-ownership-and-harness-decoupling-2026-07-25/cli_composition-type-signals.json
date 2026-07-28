@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-28T05:54:08Z",
+  "generated_at": "2026-07-28T13:26:03Z",
   "declaration_hash": "c300fe70f1d2e798648158ca7f8486c4385bcbd9c0d2844d0aebe78f12e67cb1",
-  "implementation_input_hash": "1bba6c27af7300524e503af2c07c8e0710f123cdcf59c7fcebbc26ba0c439ea6",
+  "implementation_input_hash": "28c911bc6664bbaf731e24dfef913b13fd35a89cdcbdc3f70b5c46d1455fceb9",
   "signals": [
     {
       "type_name": "ConventionsCompositionRoot",

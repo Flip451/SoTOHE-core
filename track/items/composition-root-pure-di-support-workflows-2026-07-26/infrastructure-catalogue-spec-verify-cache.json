@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "67adc0240ce7bdaa2fff49d80ae5fe6ad7799c1f0f7c01528eaacdf94a42cdaf",
+      "evidence_hash": "643f8576b7ea37c752f7a0713a04fe5d9336fc862eb03fc2a110cb1e3f3bb911",
+      "verdict": {
+        "kind": "pass",
+        "citation": "semantic-dup feature 有効時に、composition 内の SemanticDupDriverPort implementation または composition execution methods を経由せず、single one-way execution path で index build、check、find similar、index measure quality を実行する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SemanticDupDriverAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "SemanticDup は semantic-dup feature 有効時に、composition 内の SemanticDupDriverPort implementation または composition execution methods を経由せず、single one-way execution path で index build、check、find similar、index measure quality を実行する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "67adc0240ce7bdaa2fff49d80ae5fe6ad7799c1f0f7c01528eaacdf94a42cdaf",
+      "evidence_hash": "3e29231c88d8f14463cf9fd93a4b86d580777f032e612425c86d73d7de43f42d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SemanticDupDriverAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "三つの Support workflow の各 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "67adc0240ce7bdaa2fff49d80ae5fe6ad7799c1f0f7c01528eaacdf94a42cdaf",
+      "evidence_hash": "6a1c7ebef15065b9d0352f83b8b6a7456f2db3740e69b8a0d9afe64e80d8de4e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "SemanticDupDriverAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 execution path から、composition root 上の command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    }
+  ]
+}

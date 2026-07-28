@@ -11,6 +11,7 @@
 //! treated as absent, so the only recovery path is re-evaluation (IN-09 / IN-12 /
 //! CN-04 / AC-05 / AC-06).
 
+use crate::tddd::test_obligation::binding::NonEmptyTestLocations;
 use crate::tddd::test_obligation::hashes::{
     AnchorTextHash, BoundTestsSetHash, DeclarationHash, VerifierPromptFingerprint, WaivedReasonHash,
 };
@@ -19,6 +20,22 @@ use crate::tddd::test_obligation::ids::{
 };
 use crate::tddd::test_obligation::vocab::FulfillmentFailCategory;
 use crate::{EvidenceCitation, TrackId, ValidationError};
+use thiserror::Error;
+
+/// Failure from resolving a fulfillment-cache entry for current inputs.
+#[derive(Debug, Clone, PartialEq, Eq, Error)]
+pub enum FulfillmentCacheLookupError {
+    /// More than one entry matches the complete current cache identity.
+    #[error("ambiguous fulfillment-cache entries for {edge_id:?} and {obligation_id:?}")]
+    AmbiguousCurrentEntries {
+        /// The edge whose current entry was ambiguous.
+        edge_id: TestObligationEdgeId,
+        /// The obligation whose current entry was ambiguous.
+        obligation_id: TestObligationId,
+        /// The complete cache key shared by the ambiguous entries.
+        key: ObligationFulfillmentCacheKey,
+    },
+}
 
 /// Validated known-bad calibration-probe detection rate as a `0..=100` percentage.
 ///
@@ -127,6 +144,28 @@ impl ObligationFulfillmentCacheKey {
     }
 }
 
+/// Legacy-or-identified fulfillment-cache row state.
+///
+/// An identified row always carries the verifier fingerprint that establishes
+/// verdict validity. Its resolved bound-test locations are optional diagnostic
+/// evidence and do not participate in cache identity. Rows without a verifier
+/// fingerprint are represented explicitly as [`Self::Legacy`].
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum ObligationFulfillmentCacheEntryState {
+    /// A row without verifier identity.
+    Legacy,
+    /// A row with verifier identity and optional diagnostic evidence.
+    Identified {
+        /// The verifier prompt that produced this verdict.
+        verifier_fingerprint: VerifierPromptFingerprint,
+        /// The resolved test locations whose set hash is in the cache key.
+        ///
+        /// This is diagnostic evidence only and is not required for a verdict
+        /// to retain its verifier identity.
+        bound_tests: Option<NonEmptyTestLocations>,
+    },
+}
+
 /// A single frozen obligation-fulfillment verdict entry.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ObligationFulfillmentCacheEntry {
@@ -134,7 +173,7 @@ pub struct ObligationFulfillmentCacheEntry {
     obligation_id: TestObligationId,
     key: ObligationFulfillmentCacheKey,
     verdict: ObligationFulfillmentVerdict,
-    verifier_fingerprint: Option<VerifierPromptFingerprint>,
+    state: ObligationFulfillmentCacheEntryState,
 }
 
 impl ObligationFulfillmentCacheEntry {
@@ -145,9 +184,9 @@ impl ObligationFulfillmentCacheEntry {
         obligation_id: TestObligationId,
         key: ObligationFulfillmentCacheKey,
         verdict: ObligationFulfillmentVerdict,
-        verifier_fingerprint: Option<VerifierPromptFingerprint>,
+        state: ObligationFulfillmentCacheEntryState,
     ) -> Self {
-        Self { edge_id, obligation_id, key, verdict, verifier_fingerprint }
+        Self { edge_id, obligation_id, key, verdict, state }
     }
 
     /// Returns the obligation edge this verdict is frozen against.
@@ -179,7 +218,23 @@ impl ObligationFulfillmentCacheEntry {
     /// `None` denotes a legacy cache entry and is fail-closed by readers.
     #[must_use]
     pub fn verifier_fingerprint(&self) -> Option<&VerifierPromptFingerprint> {
-        self.verifier_fingerprint.as_ref()
+        match &self.state {
+            ObligationFulfillmentCacheEntryState::Legacy => None,
+            ObligationFulfillmentCacheEntryState::Identified { verifier_fingerprint, .. } => {
+                Some(verifier_fingerprint)
+            }
+        }
+    }
+
+    /// Returns the persisted bound-test locations for diagnostics.
+    #[must_use]
+    pub fn bound_tests(&self) -> Option<&NonEmptyTestLocations> {
+        match &self.state {
+            ObligationFulfillmentCacheEntryState::Legacy => None,
+            ObligationFulfillmentCacheEntryState::Identified { bound_tests, .. } => {
+                bound_tests.as_ref()
+            }
+        }
     }
 }
 
@@ -207,6 +262,39 @@ impl ObligationFulfillmentCacheDocument {
     #[must_use]
     pub fn entries(&self) -> &[ObligationFulfillmentCacheEntry] {
         &self.entries
+    }
+
+    /// Finds the unique entry that matches the complete current cache identity.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`FulfillmentCacheLookupError::AmbiguousCurrentEntries`] when
+    /// multiple entries match the current identity.
+    #[allow(clippy::result_large_err)]
+    pub fn lookup_current(
+        &self,
+        edge_id: &TestObligationEdgeId,
+        obligation_id: &TestObligationId,
+        key: &ObligationFulfillmentCacheKey,
+        verifier_fingerprint: &VerifierPromptFingerprint,
+    ) -> Result<Option<&ObligationFulfillmentCacheEntry>, FulfillmentCacheLookupError> {
+        let mut matches = self.entries.iter().filter(|entry| {
+            entry.edge_id() == edge_id
+                && entry.obligation_id() == obligation_id
+                && entry.key() == key
+                && entry.verifier_fingerprint() == Some(verifier_fingerprint)
+        });
+        let Some(entry) = matches.next() else {
+            return Ok(None);
+        };
+        if matches.next().is_some() {
+            return Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries {
+                edge_id: edge_id.clone(),
+                obligation_id: obligation_id.clone(),
+                key: key.clone(),
+            });
+        }
+        Ok(Some(entry))
     }
 }
 
@@ -343,8 +431,12 @@ impl WaiverCacheDocument {
 mod tests {
     use super::*;
     use crate::ContentHash;
+    use crate::tddd::LayerId;
     use crate::tddd::semantic_verify::CatalogueEntryKey;
-    use crate::tddd::test_obligation::ids::{TestObligationAnchorId, TestObligationItemIdentifier};
+    use crate::tddd::test_obligation::binding::{NonEmptyTestLocations, TestLocation};
+    use crate::tddd::test_obligation::ids::{
+        TestFunctionName, TestModulePath, TestObligationAnchorId, TestObligationItemIdentifier,
+    };
     use crate::tddd::test_obligation::vocab::TestObligationKind;
 
     #[test]
@@ -402,6 +494,31 @@ mod tests {
 
     fn verifier_fingerprint() -> VerifierPromptFingerprint {
         VerifierPromptFingerprint::new(ContentHash::from_bytes([5u8; 32]))
+    }
+
+    fn fixture_location() -> TestLocation {
+        TestLocation::new(
+            LayerId::try_new("domain".to_owned()).unwrap(),
+            TestModulePath::try_new("fixture".to_owned()).unwrap(),
+            TestFunctionName::try_new("entry".to_owned()).unwrap(),
+        )
+    }
+
+    fn cache_entry(
+        edge_id: TestObligationEdgeId,
+        obligation_id: TestObligationId,
+        key: ObligationFulfillmentCacheKey,
+        verdict: ObligationFulfillmentVerdict,
+        verifier_fingerprint: Option<VerifierPromptFingerprint>,
+    ) -> ObligationFulfillmentCacheEntry {
+        let state = match verifier_fingerprint {
+            Some(verifier_fingerprint) => ObligationFulfillmentCacheEntryState::Identified {
+                verifier_fingerprint,
+                bound_tests: Some(NonEmptyTestLocations::new(fixture_location(), Vec::new())),
+            },
+            None => ObligationFulfillmentCacheEntryState::Legacy,
+        };
+        ObligationFulfillmentCacheEntry::new(edge_id, obligation_id, key, verdict, state)
     }
 
     #[test]
@@ -474,7 +591,7 @@ mod tests {
     #[test]
     fn test_fulfillment_cache_document_round_trips() {
         let fingerprint = verifier_fingerprint();
-        let entry = ObligationFulfillmentCacheEntry::new(
+        let entry = cache_entry(
             edge_id(),
             obligation_id(),
             fulfillment_key(),
@@ -490,6 +607,49 @@ mod tests {
             panic!("expected exactly one fulfillment cache entry");
         };
         assert_eq!(entry.verifier_fingerprint(), Some(&fingerprint));
+    }
+
+    #[test]
+    fn test_identified_cache_entry_without_diagnostics_retains_fingerprint() {
+        let fingerprint = verifier_fingerprint();
+        let entry = ObligationFulfillmentCacheEntry::new(
+            edge_id(),
+            obligation_id(),
+            fulfillment_key(),
+            ObligationFulfillmentVerdict::Pending,
+            ObligationFulfillmentCacheEntryState::Identified {
+                verifier_fingerprint: fingerprint.clone(),
+                bound_tests: None,
+            },
+        );
+
+        assert_eq!(entry.verifier_fingerprint(), Some(&fingerprint));
+        assert_eq!(entry.bound_tests(), None);
+    }
+
+    #[test]
+    fn test_fulfillment_cache_lookup_with_absent_diagnostics_finds_current_entry() {
+        let fingerprint = verifier_fingerprint();
+        let key = fulfillment_key();
+        let entry = ObligationFulfillmentCacheEntry::new(
+            edge_id(),
+            obligation_id(),
+            key.clone(),
+            ObligationFulfillmentVerdict::Pending,
+            ObligationFulfillmentCacheEntryState::Identified {
+                verifier_fingerprint: fingerprint.clone(),
+                bound_tests: None,
+            },
+        );
+        let document = ObligationFulfillmentCacheDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![entry.clone()],
+        );
+
+        assert_eq!(
+            document.lookup_current(&edge_id(), &obligation_id(), &key, &fingerprint),
+            Ok(Some(&entry))
+        );
     }
 
     #[test]
@@ -517,5 +677,228 @@ mod tests {
         let waiver = WaiverCacheDocument::new(TrackId::try_new("t").unwrap(), vec![]);
         assert!(fulfillment.entries().is_empty());
         assert!(waiver.entries().is_empty());
+    }
+
+    #[test]
+    fn test_fulfillment_cache_lookup_with_historical_row_returns_current_entry() {
+        let fingerprint = verifier_fingerprint();
+        let current_key = fulfillment_key();
+        let historical_key = ObligationFulfillmentCacheKey::new(
+            BoundTestsSetHash::new(ContentHash::from_bytes([9u8; 32])),
+            DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
+            AnchorTextHash::new(ContentHash::from_bytes([3u8; 32])),
+        );
+        let historical = cache_entry(
+            edge_id(),
+            obligation_id(),
+            historical_key,
+            ObligationFulfillmentVerdict::Fulfilled { citation: citation("historical cite") },
+            Some(fingerprint.clone()),
+        );
+        let current = cache_entry(
+            edge_id(),
+            obligation_id(),
+            current_key.clone(),
+            ObligationFulfillmentVerdict::Fulfilled { citation: citation("cite") },
+            Some(fingerprint.clone()),
+        );
+        for entries in
+            [vec![historical.clone(), current.clone()], vec![current.clone(), historical.clone()]]
+        {
+            let document = ObligationFulfillmentCacheDocument::new(
+                TrackId::try_new("my-track").unwrap(),
+                entries,
+            );
+
+            let Ok(Some(entry)) =
+                document.lookup_current(&edge_id(), &obligation_id(), &current_key, &fingerprint)
+            else {
+                panic!("current entry must be found regardless of cache row order");
+            };
+
+            assert_eq!(entry.key(), &current_key);
+            assert!(matches!(entry.verdict(), ObligationFulfillmentVerdict::Fulfilled { .. }));
+        }
+    }
+
+    #[test]
+    fn test_fulfillment_cache_lookup_with_duplicate_current_rows_returns_ambiguity_error() {
+        let fingerprint = verifier_fingerprint();
+        let key = fulfillment_key();
+        let fulfilled = cache_entry(
+            edge_id(),
+            obligation_id(),
+            key.clone(),
+            ObligationFulfillmentVerdict::Fulfilled { citation: citation("cite") },
+            Some(fingerprint.clone()),
+        );
+        let pending = cache_entry(
+            edge_id(),
+            obligation_id(),
+            key.clone(),
+            ObligationFulfillmentVerdict::Pending,
+            Some(fingerprint.clone()),
+        );
+
+        for entries in
+            [vec![fulfilled.clone(), pending.clone()], vec![pending.clone(), fulfilled.clone()]]
+        {
+            let document = ObligationFulfillmentCacheDocument::new(
+                TrackId::try_new("my-track").unwrap(),
+                entries,
+            );
+
+            match document.lookup_current(&edge_id(), &obligation_id(), &key, &fingerprint) {
+                Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries {
+                    edge_id: actual_edge_id,
+                    obligation_id: actual_obligation_id,
+                    key: actual_key,
+                }) => {
+                    assert_eq!(actual_edge_id, edge_id());
+                    assert_eq!(actual_obligation_id, obligation_id());
+                    assert_eq!(actual_key, key);
+                }
+                other => {
+                    panic!(
+                        "expected ambiguity error with the complete cache identity, got {other:?}"
+                    )
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn test_fulfillment_cache_lookup_with_fingerprint_mismatch_returns_none() {
+        let key = fulfillment_key();
+        let current_fingerprint = verifier_fingerprint();
+        let mismatched_entry = cache_entry(
+            edge_id(),
+            obligation_id(),
+            key.clone(),
+            ObligationFulfillmentVerdict::Fulfilled { citation: citation("cite") },
+            Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([6u8; 32]))),
+        );
+        let legacy_entry = cache_entry(
+            edge_id(),
+            obligation_id(),
+            key.clone(),
+            ObligationFulfillmentVerdict::Fulfilled { citation: citation("cite") },
+            None,
+        );
+
+        for entry in [mismatched_entry, legacy_entry] {
+            let document = ObligationFulfillmentCacheDocument::new(
+                TrackId::try_new("my-track").unwrap(),
+                vec![entry],
+            );
+
+            assert!(matches!(
+                document.lookup_current(&edge_id(), &obligation_id(), &key, &current_fingerprint),
+                Ok(None)
+            ));
+        }
+    }
+
+    #[test]
+    fn test_fulfillment_cache_lookup_with_declaration_or_anchor_mismatch_returns_none() {
+        let current_key = fulfillment_key();
+        let fingerprint = verifier_fingerprint();
+        let mismatched_keys = [
+            ObligationFulfillmentCacheKey::new(
+                current_key.bound_tests_set_hash().clone(),
+                DeclarationHash::new(ContentHash::from_bytes([6u8; 32])),
+                current_key.anchor_text_hash().clone(),
+            ),
+            ObligationFulfillmentCacheKey::new(
+                current_key.bound_tests_set_hash().clone(),
+                current_key.declaration_hash().clone(),
+                AnchorTextHash::new(ContentHash::from_bytes([7u8; 32])),
+            ),
+        ];
+
+        for mismatched_key in mismatched_keys {
+            let entry = cache_entry(
+                edge_id(),
+                obligation_id(),
+                mismatched_key,
+                ObligationFulfillmentVerdict::Fulfilled { citation: citation("cite") },
+                Some(fingerprint.clone()),
+            );
+            let document = ObligationFulfillmentCacheDocument::new(
+                TrackId::try_new("my-track").unwrap(),
+                vec![entry],
+            );
+
+            assert!(matches!(
+                document.lookup_current(&edge_id(), &obligation_id(), &current_key, &fingerprint),
+                Ok(None)
+            ));
+        }
+    }
+
+    #[test]
+    fn test_cache_entry_diagnostics_do_not_add_a_lookup_identity_axis() {
+        let key = fulfillment_key();
+        let second_locations = NonEmptyTestLocations::new(
+            TestLocation::new(
+                LayerId::try_new("domain".to_owned()).unwrap(),
+                TestModulePath::try_new("domain::tests".to_owned()).unwrap(),
+                TestFunctionName::try_new("test_second".to_owned()).unwrap(),
+            ),
+            Vec::new(),
+        );
+        let first = ObligationFulfillmentCacheEntry::new(
+            edge_id(),
+            obligation_id(),
+            key.clone(),
+            ObligationFulfillmentVerdict::Pending,
+            ObligationFulfillmentCacheEntryState::Identified {
+                verifier_fingerprint: verifier_fingerprint(),
+                bound_tests: None,
+            },
+        );
+        let second = ObligationFulfillmentCacheEntry::new(
+            edge_id(),
+            obligation_id(),
+            key.clone(),
+            ObligationFulfillmentVerdict::Pending,
+            ObligationFulfillmentCacheEntryState::Identified {
+                verifier_fingerprint: verifier_fingerprint(),
+                bound_tests: Some(second_locations.clone()),
+            },
+        );
+
+        assert_eq!(first.bound_tests(), None);
+        assert_eq!(second.bound_tests(), Some(&second_locations));
+        assert_ne!(first.bound_tests(), second.bound_tests());
+        let document = ObligationFulfillmentCacheDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![first, second],
+        );
+        assert!(matches!(
+            document.lookup_current(&edge_id(), &obligation_id(), &key, &verifier_fingerprint()),
+            Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries { .. })
+        ));
+    }
+
+    #[test]
+    fn test_fulfillment_cache_lookup_with_legacy_row_returns_none() {
+        let key = fulfillment_key();
+        let entry = ObligationFulfillmentCacheEntry::new(
+            edge_id(),
+            obligation_id(),
+            key.clone(),
+            ObligationFulfillmentVerdict::Fulfilled { citation: citation("cite") },
+            ObligationFulfillmentCacheEntryState::Legacy,
+        );
+        let document = ObligationFulfillmentCacheDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![entry],
+        );
+
+        assert_eq!(
+            document.lookup_current(&edge_id(), &obligation_id(), &key, &verifier_fingerprint()),
+            Ok(None)
+        );
     }
 }

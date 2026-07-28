@@ -11,7 +11,8 @@
 
 use std::path::{Path, PathBuf};
 
-use domain::tddd::catalogue_v2::{RustdocCratePort, RustdocCratePortError};
+use domain::tddd::CargoFeatureName;
+use domain::tddd::catalogue_v2::{CrateName, RustdocCratePort, RustdocCratePortError};
 
 use crate::schema_export::RustdocSchemaExporter;
 use crate::tddd::baseline_rustdoc_codec::{BaselineRustdocCodec, BaselineRustdocCodecError};
@@ -104,7 +105,8 @@ impl RustdocCratePort for RustdocCrateAdapter {
     /// cannot be deserialized.
     fn capture_current(
         &self,
-        crate_name: &str,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
     ) -> Result<rustdoc_types::Crate, RustdocCratePortError> {
         // Security: guard workspace_root against being a symlink before invoking the
         // exporter. A symlinked workspace root could redirect `cargo rustdoc` to run
@@ -113,7 +115,7 @@ impl RustdocCratePort for RustdocCrateAdapter {
         match self.workspace_root.symlink_metadata() {
             Ok(meta) if meta.file_type().is_symlink() => {
                 return Err(RustdocCratePortError::CaptureFailed {
-                    crate_name: crate_name.to_owned(),
+                    crate_name: crate_name.as_str().to_owned(),
                     reason: format!(
                         "symlink guard: refusing to use symlinked workspace_root: {}",
                         self.workspace_root.display()
@@ -123,7 +125,7 @@ impl RustdocCratePort for RustdocCrateAdapter {
             Ok(_) => {}
             Err(e) => {
                 return Err(RustdocCratePortError::CaptureFailed {
-                    crate_name: crate_name.to_owned(),
+                    crate_name: crate_name.as_str().to_owned(),
                     reason: format!(
                         "symlink guard: cannot stat workspace_root '{}': {e}",
                         self.workspace_root.display()
@@ -133,27 +135,39 @@ impl RustdocCratePort for RustdocCrateAdapter {
         }
 
         let exporter = RustdocSchemaExporter::new(self.workspace_root.clone());
-
-        // Run cargo +nightly rustdoc and get the JSON file path.
-        let json_path = exporter.export_rustdoc_json_path(crate_name).map_err(|e| {
-            RustdocCratePortError::CaptureFailed {
-                crate_name: crate_name.to_owned(),
-                reason: e.to_string(),
-            }
-        })?;
-
-        // Read and parse the generated JSON.
-        let json_content = std::fs::read_to_string(&json_path).map_err(|e| {
-            RustdocCratePortError::Io { path: json_path.clone(), reason: e.to_string() }
-        })?;
-
-        BaselineRustdocCodec::from_json(&json_content).map_err(|e| {
-            RustdocCratePortError::ParseFailed {
-                crate_name: crate_name.to_owned(),
-                reason: e.to_string(),
-            }
+        capture_current_with_exporter(crate_name, features, |target, selected_features| {
+            exporter.export_rustdoc_json_path_with_features(target, selected_features)
         })
     }
+}
+
+fn capture_current_with_exporter<F>(
+    crate_name: &CrateName,
+    features: &[CargoFeatureName],
+    export: F,
+) -> Result<rustdoc_types::Crate, RustdocCratePortError>
+where
+    F: FnOnce(
+        &CrateName,
+        &[CargoFeatureName],
+    ) -> Result<PathBuf, domain::schema::SchemaExportError>,
+{
+    // Run cargo +nightly rustdoc and get the JSON file path.
+    let json_path =
+        export(crate_name, features).map_err(|e| RustdocCratePortError::CaptureFailed {
+            crate_name: crate_name.as_str().to_owned(),
+            reason: e.to_string(),
+        })?;
+
+    // Read and parse the generated JSON.
+    let json_content = std::fs::read_to_string(&json_path).map_err(|e| {
+        RustdocCratePortError::Io { path: json_path.clone(), reason: e.to_string() }
+    })?;
+
+    BaselineRustdocCodec::from_json(&json_content).map_err(|e| RustdocCratePortError::ParseFailed {
+        crate_name: crate_name.as_str().to_owned(),
+        reason: e.to_string(),
+    })
 }
 
 // ---------------------------------------------------------------------------
@@ -163,6 +177,8 @@ impl RustdocCratePort for RustdocCrateAdapter {
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
+    use std::sync::{Arc, Mutex};
+
     use super::*;
 
     #[test]
@@ -243,11 +259,33 @@ mod tests {
         std::os::unix::fs::symlink(&real_ws, &link_ws).unwrap();
 
         let adapter = RustdocCrateAdapter::new(link_ws);
-        let err = adapter.capture_current("some_crate").unwrap_err();
+        let crate_name = CrateName::new("some_crate".to_owned()).unwrap();
+        let err = adapter.capture_current(&crate_name, &[]).unwrap_err();
         assert!(
             matches!(err, RustdocCratePortError::CaptureFailed { .. }),
             "expected CaptureFailed (symlink workspace_root rejection), got: {err}"
         );
+    }
+
+    #[test]
+    fn test_capture_current_with_exporter_forwards_declared_features() {
+        let crate_name = CrateName::new("domain".to_owned()).unwrap();
+        let features = [CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap()];
+        let observed_features = Arc::new(Mutex::new(Vec::new()));
+        let observed_features_for_export = Arc::clone(&observed_features);
+
+        let error =
+            capture_current_with_exporter(&crate_name, &features, move |_target, selected| {
+                *observed_features_for_export.lock().unwrap() =
+                    selected.iter().map(|feature| feature.as_str().to_owned()).collect();
+                Err(domain::schema::SchemaExportError::RustdocFailed(
+                    "stub exporter failure".to_owned(),
+                ))
+            })
+            .unwrap_err();
+
+        assert!(matches!(error, RustdocCratePortError::CaptureFailed { .. }));
+        assert_eq!(*observed_features.lock().unwrap(), vec!["semantic-dup"]);
     }
 
     #[test]

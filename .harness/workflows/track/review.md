@@ -160,6 +160,19 @@ No cross-scope ordering constraint exists for the initial wave. A
 `blocked_cross_scope` terminal status is the recovery exception: resolve that dependency, then
 relaunch the affected scope as specified below.
 
+The initial wave is unconditional. Serializing scopes to avoid a failure the orchestrator can
+recover from manually is never permitted, and every interference between concurrent fixers is
+such a failure: build-lock contention, a fixer's CI run observing another scope's in-flight edit,
+and anything else a relaunch or an orchestrator-run gate resolves are recoverable failures, not
+ordering constraints — the orchestrator's own authoritative `cargo make ci` run settles the tree
+regardless of what a concurrent fixer reported. When unsure, the orchestrator must establish that
+no manual recovery exists before withholding any scope from the wave; anticipated interference
+never qualifies.
+
+`blocked_cross_scope` does not license serializing the initial wave. It is a terminal status a
+scope reports *after* it has been dispatched, and its handling — resolve the dependency, then
+relaunch that scope — is itself the manual recovery this rule requires.
+
 Fix boundaries are disjoint: the CLI derives the review partition from
 `.harness/config/review-scope.json` (named groups plus the mandatory `other` complement), so
 every file belongs to exactly one scope, and each fixer may modify only its own scope's file

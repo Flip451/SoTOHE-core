@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "55641f5c2cee166ecbf1a8c5f621b3a59d921d83b84e25e87e8f5791ee54051a",
+  "signals": [
+    {
+      "type_name": "CargoFeatureName",
+      "signal": "blue",
+      "entry_hash": "a8f1e6d460fba04533306113bc1ca00e7ffc618bc4c79ee90feaa11cd45917a5"
+    },
+    {
+      "type_name": "CargoFeatureNameError",
+      "signal": "blue",
+      "entry_hash": "7a008210bbb369b929657451adabc0f96a545f8b39d620fe0c845a863fda5126"
+    },
+    {
+      "type_name": "TdddFeatureDeclaration",
+      "signal": "blue",
+      "entry_hash": "4ca9dfbb3d44c9997f26d26440c3d2fc981a8143b039d7e6538de7268db375d8"
+    },
+    {
+      "type_name": "TdddFeatureDeclarationError",
+      "signal": "blue",
+      "entry_hash": "fa0ff4d31b445a8925650fdf613c4d924ae64a15c6deccab9291b7493c66c6ef"
+    },
+    {
+      "type_name": "TdddFeatureLookupError",
+      "signal": "blue",
+      "entry_hash": "d79923cfbb841b159f4e577ae2ecd7d3a5f0eafb8e67b881d0c1f1546fd927f6"
+    },
+    {
+      "type_name": "RustdocBaselineCapturePort",
+      "signal": "blue",
+      "entry_hash": "bba5bae7bf728b47ded302e3424621ca0e5717b756044ae6a9116f18517dc507"
+    },
+    {
+      "type_name": "RustdocCratePort",
+      "signal": "blue",
+      "entry_hash": "56aa315495a78e1e49e9d100b4975c92d657f544921c38acbb042e7d9f7c9f58"
+    },
+    {
+      "type_name": "SchemaExporter",
+      "signal": "blue",
+      "entry_hash": "8cdfca6f448b2c252982d0a6b4ea3e506ad4469236b11a35f6238faed8e93d5a"
+    }
+  ]
+}

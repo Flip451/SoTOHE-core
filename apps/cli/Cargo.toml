@@ -16,6 +16,7 @@ semantic-dup = ["cli_composition/semantic-dup"]
 workspace = true
 
 [dev-dependencies]
+domain = { path = "../../libs/domain" }
 infrastructure = { path = "../../libs/infrastructure" }
 rstest = { workspace = true }
 rustdoc-types = "0.57"

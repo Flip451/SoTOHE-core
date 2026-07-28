@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-28T09:31:16Z",
-  "declaration_hash": "08a2a1b3f3e750467685fa06359109a953aec7126d2e69eec454c316dd84dff2",
-  "implementation_input_hash": "4ad0a9e83ab56347bdc9f9e70426f7dcaed909ebcf10060c1f21356f9850dfd6",
+  "generated_at": "2026-07-28T13:31:58Z",
+  "declaration_hash": "6dfa8a2c4f24ee92e46c159e3176f838a8c46e264778dcf3bff0ab6aca715eb7",
+  "implementation_input_hash": "bb9d5902d346dd37825dc9f857023b665ce97f7b1ebf87458bd921c6d7005f76",
   "signals": [
     {
       "type_name": "CapabilityIdField",
@@ -34,8 +34,8 @@
       "signal": "yellow",
       "found_type": false,
       "missing_items": [
-        "ConventionInventoryPort",
-        "Default"
+        "Default",
+        "usecase::template_conventions::ConventionInventoryPort"
       ]
     },
     {
@@ -44,8 +44,8 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "ConventionRequirementPort",
-        "Default"
+        "Default",
+        "usecase::conventions_resolve::requirement_port::ConventionRequirementPort"
       ]
     },
     {

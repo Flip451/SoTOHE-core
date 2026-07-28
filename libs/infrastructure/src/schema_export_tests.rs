@@ -6,7 +6,11 @@
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::indexing_slicing)]
 mod tests {
+    use std::collections::BTreeSet;
+
     use domain::schema::{SchemaExporter, TypeKind};
+    use domain::tddd::{CargoFeatureName, catalogue_v2::CrateName};
+    use serde_json::Value;
 
     use crate::schema_export::RustdocSchemaExporter;
     use crate::schema_export_codec;
@@ -68,6 +72,43 @@ mod tests {
         let schema = exporter.export("domain").unwrap();
 
         assert!(!schema.impls().is_empty(), "expected impls to be non-empty");
+    }
+
+    #[test]
+    #[ignore = "requires nightly toolchain"]
+    fn test_export_infrastructure_with_semantic_dup_exposes_catalogued_public_surface() {
+        let exporter = RustdocSchemaExporter::new(workspace_root());
+        let crate_name = CrateName::new("infrastructure".to_owned()).unwrap();
+        let features = [CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap()];
+
+        let json_path =
+            exporter.export_rustdoc_json_path_with_features(&crate_name, &features).unwrap();
+        let document: Value = serde_json::from_slice(&std::fs::read(json_path).unwrap()).unwrap();
+        let item_names = document["index"]
+            .as_object()
+            .unwrap()
+            .values()
+            .filter_map(|item| item["name"].as_str())
+            .collect::<BTreeSet<_>>();
+
+        for expected in [
+            "CodeFragmentExtractorAdapter",
+            "ExtractError",
+            "FastEmbedAdapter",
+            "LanceDbSemanticIndexAdapter",
+            "NoopSemanticIndexPort",
+            "NullInsertIndexProxy",
+            "PersistentIndexLock",
+            "PersistentIndexLockError",
+            "extract_code_fragments",
+            "acquire_persistent_index_lock",
+            "persistent_index_lock_path",
+        ] {
+            assert!(
+                item_names.contains(expected),
+                "semantic-dup rustdoc surface must include {expected}; found: {item_names:?}"
+            );
+        }
     }
 
     #[test]

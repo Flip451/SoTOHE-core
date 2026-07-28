@@ -862,6 +862,7 @@ dependencies = [
  "clap",
  "cli_composition",
  "cli_driver",
+ "domain",
  "infrastructure",
  "libc",
  "rstest",
@@ -2033,6 +2034,7 @@ dependencies = [
  "serde_json",
  "strum 0.27.2",
  "thiserror",
+ "unicode-ident",
 ]
 
 [[package]]

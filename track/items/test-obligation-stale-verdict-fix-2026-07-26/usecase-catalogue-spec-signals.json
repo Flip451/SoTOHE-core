@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "53a6c25244e65fd0ddb7e98d30649f61a301b2c5c81377b1a4deea890f9d5784",
+  "signals": [
+    {
+      "type_name": "CheckTestObligationsInteractor",
+      "signal": "blue",
+      "entry_hash": "76a0dab1690024c0b3e43148ddb01d52b25d74ff8813f0b888b797090abbd477"
+    },
+    {
+      "type_name": "EvaluateTestObligationsInteractor",
+      "signal": "blue",
+      "entry_hash": "2a360a88e5988744419f53d74e6f3c1e6d75db4901654994687873971c475c2c"
+    },
+    {
+      "type_name": "ResolvedBoundTests",
+      "signal": "blue",
+      "entry_hash": "2ad4ae27f2cc3bb1ee918d3ea420c303cce2c368484cc41520a57636fb3f3143"
+    },
+    {
+      "type_name": "ResolvedBoundTestsResolver",
+      "signal": "blue",
+      "entry_hash": "0462ea6e78e934bfccaa8ea03fe2c69d194650a48ee3f6cfbe1e93ab928797a2"
+    },
+    {
+      "type_name": "TestObligationResultsInteractor",
+      "signal": "blue",
+      "entry_hash": "7fed0e9e9df64ca689375a94bf34bd5a5319a8e2cb6bfb8d6209c0921efbf9df"
+    },
+    {
+      "type_name": "ContentHasherPort",
+      "signal": "blue",
+      "entry_hash": "d6324745b3a96bcac3bc4dc409e0aed856b2d905be578b1423e76e2de472d19d"
+    },
+    {
+      "type_name": "ObligationFulfillmentCachePort",
+      "signal": "blue",
+      "entry_hash": "4f80c4266e996f0be78c3fd0c101ba9b1747ded68d9b913417cd16c2fad5cfcf"
+    },
+    {
+      "type_name": "ResolvedBoundTestsResolverPort",
+      "signal": "blue",
+      "entry_hash": "db1b67080a673e52e9ded2956aed283cd0998a80d345ef52d04db5a58aa7a8c4"
+    }
+  ]
+}

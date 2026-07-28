@@ -1,0 +1,129 @@
+{
+  "crate_name": "cli_driver",
+  "functions": {},
+  "layer": "cli_driver",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "PrDriver": {
+      "action": "reference",
+      "docs": "Baseline-identical primary adapter retained as the sole PR invocation and rendering surface; its injected PrCommandService contract remains unchanged.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "Arc<dyn PrCommandService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "PrInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "pr",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "SignalDriver": {
+      "action": "reference",
+      "docs": "Primary adapter for invoking SignalService and rendering its output.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "service",
+              "ty": "Arc<dyn SignalService>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "handle",
+          "params": [
+            {
+              "name": "input",
+              "ty": "SignalInput"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "CommandOutcome"
+        }
+      ],
+      "module_path": "signal",
+      "role": {
+        "PrimaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    }
+  }
+}

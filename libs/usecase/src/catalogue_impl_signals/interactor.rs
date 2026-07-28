@@ -11,16 +11,18 @@ use std::sync::Arc;
 
 use domain::SymlinkGuardPort;
 use domain::tddd::CatalogueToExtendedCratePort;
+use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::{
-    CatalogueDocumentLoaderPort, RustdocCratePort, TdddLayerBindingsPort,
+    CatalogueDocumentLoaderPort, CrateName, RustdocCratePort, TdddLayerBindingsPort,
 };
 use domain::tddd::signal_evaluator::{SignalEvaluatorPort, ThreeWaySignal, ThreeWaySignalKind};
 
-use super::helpers::validate_binding_filename;
+use super::helpers::{map_symlink_guard_error, validate_binding_filename};
 use super::service::{
-    CatalogueImplSignalsError, CatalogueImplSignalsReport, CatalogueImplSignalsService,
+    CatalogueImplSignalsError, CatalogueImplSignalsReport, CatalogueImplSignalsService, diagnostic,
 };
 use super::validate_track_id;
+use crate::tddd_feature_declaration::TdddActualFeatureDeclarationPort;
 
 // ---------------------------------------------------------------------------
 // Interactor
@@ -51,6 +53,7 @@ pub struct CatalogueImplSignalsInteractor {
     evaluator: Arc<dyn SignalEvaluatorPort>,
     rustdoc_crate_port: Arc<dyn RustdocCratePort>,
     layer_bindings_port: Arc<dyn TdddLayerBindingsPort>,
+    feature_declaration_port: Arc<dyn TdddActualFeatureDeclarationPort>,
     symlink_guard: Arc<dyn SymlinkGuardPort>,
 }
 
@@ -63,6 +66,7 @@ impl CatalogueImplSignalsInteractor {
         evaluator: Arc<dyn SignalEvaluatorPort>,
         rustdoc_crate_port: Arc<dyn RustdocCratePort>,
         layer_bindings_port: Arc<dyn TdddLayerBindingsPort>,
+        feature_declaration_port: Arc<dyn TdddActualFeatureDeclarationPort>,
         symlink_guard: Arc<dyn SymlinkGuardPort>,
     ) -> Self {
         Self {
@@ -71,6 +75,7 @@ impl CatalogueImplSignalsInteractor {
             evaluator,
             rustdoc_crate_port,
             layer_bindings_port,
+            feature_declaration_port,
             symlink_guard,
         }
     }
@@ -129,17 +134,12 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
         for component in workspace_root.components() {
             use std::path::Component;
             if matches!(component, Component::ParentDir) {
-                return Err(CatalogueImplSignalsError::SymlinkRejected {
-                    path: format!(
-                        "workspace_root '{}' contains '..' (path traversal rejected)",
-                        workspace_root.display()
-                    ),
-                });
+                return Err(CatalogueImplSignalsError::SymlinkRejected(workspace_root.clone()));
             }
         }
         self.symlink_guard
             .reject_symlinks_from_root(&workspace_root)
-            .map_err(|e| CatalogueImplSignalsError::SymlinkRejected { path: e.to_string() })?;
+            .map_err(map_symlink_guard_error)?;
 
         // Derive items directory from workspace root (convention: workspace_root/track/items).
         // Security: check the full path from the filesystem root down to items_dir
@@ -151,22 +151,20 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
         let items_dir = workspace_root.join("track").join("items");
         self.symlink_guard
             .reject_symlinks_from_root(&items_dir)
-            .map_err(|e| CatalogueImplSignalsError::SymlinkRejected { path: e.to_string() })?;
+            .map_err(map_symlink_guard_error)?;
         let track_dir = items_dir.join(&track_id);
 
         // Resolve layer bindings via injected port (no std::fs in usecase).
         let bindings = self.layer_bindings_port.load(&workspace_root, layer.as_deref()).map_err(
             |e| match e {
                 domain::tddd::catalogue_v2::TdddLayerBindingsError::LoadFailed { reason } => {
-                    CatalogueImplSignalsError::LayerBindingsLoad { reason }
+                    CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(reason))
                 }
                 domain::tddd::catalogue_v2::TdddLayerBindingsError::LayerNotFound { layer_id } => {
-                    CatalogueImplSignalsError::LayerBindingsLoad {
-                        reason: format!(
-                            "layer '{layer_id}' not found or not tddd.enabled in \
+                    CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(format!(
+                        "layer '{layer_id}' not found or not tddd.enabled in \
                              architecture-rules.json"
-                        ),
-                    }
+                    )))
                 }
                 domain::tddd::catalogue_v2::TdddLayerBindingsError::NoLayers => {
                     CatalogueImplSignalsError::NoLayers
@@ -178,11 +176,28 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
             return Err(CatalogueImplSignalsError::NoLayers);
         }
 
+        let declaration_bindings = if layer.is_some() {
+            self.layer_bindings_port.load(&workspace_root, None).map_err(|e| {
+                CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(e.to_string()))
+            })?
+        } else {
+            bindings.clone()
+        };
+        let declaration = self
+            .feature_declaration_port
+            .load_for_actual(&track_dir, &workspace_root, &declaration_bindings)
+            .map_err(CatalogueImplSignalsError::FeatureDeclaration)?;
+
         let mut report = String::new();
         let mut total_red: usize = 0;
 
         for binding in &bindings {
             let layer_id = &binding.layer_id;
+            let typed_layer_id = LayerId::try_new(layer_id.clone()).map_err(|error| {
+                CatalogueImplSignalsError::LayerBindingsLoad(diagnostic(format!(
+                    "invalid layer binding: {error}"
+                )))
+            })?;
 
             // --- Step 1: Load CatalogueDocument (TypeGraph A source) ---
             // Guard: validate that catalogue_file is a plain filename (no `..` or
@@ -194,20 +209,20 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
             // path traversal via a malicious symlinked track directory.
             self.symlink_guard
                 .reject_symlinks_below(&catalogue_path, &items_dir)
-                .map_err(|e| CatalogueImplSignalsError::SymlinkRejected { path: e.to_string() })?;
+                .map_err(map_symlink_guard_error)?;
             let doc = self.catalogue_loader.load(&catalogue_path).map_err(|e| {
-                CatalogueImplSignalsError::CatalogueLoad {
-                    layer_id: layer_id.clone(),
-                    reason: e.to_string(),
-                }
+                CatalogueImplSignalsError::CatalogueLoad(
+                    typed_layer_id.clone(),
+                    diagnostic(e.to_string()),
+                )
             })?;
 
             // --- Step 2: Convert CatalogueDocument → ExtendedCrate (A) ---
             let extended_a = self.ext_crate_codec.encode(doc).map_err(|e| {
-                CatalogueImplSignalsError::ExtendedCrateConversion {
-                    layer_id: layer_id.clone(),
-                    reason: e.to_string(),
-                }
+                CatalogueImplSignalsError::ExtendedCrateConversion(
+                    typed_layer_id.clone(),
+                    diagnostic(e.to_string()),
+                )
             })?;
 
             // --- Step 3: Load baseline (TypeGraph B) ---
@@ -218,13 +233,13 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
             // Guard: same symlink rejection for the baseline path.
             self.symlink_guard
                 .reject_symlinks_below(&baseline_path, &items_dir)
-                .map_err(|e| CatalogueImplSignalsError::SymlinkRejected { path: e.to_string() })?;
+                .map_err(map_symlink_guard_error)?;
             let baseline_b =
                 self.rustdoc_crate_port.load_from_path(&baseline_path).map_err(|e| {
-                    CatalogueImplSignalsError::BaselineLoad {
-                        layer_id: layer_id.clone(),
-                        reason: e.to_string(),
-                    }
+                    CatalogueImplSignalsError::BaselineLoad(
+                        typed_layer_id.clone(),
+                        diagnostic(e.to_string()),
+                    )
                 })?;
 
             // --- Step 4: Capture current TypeGraph (C) ---
@@ -234,39 +249,51 @@ impl CatalogueImplSignalsService for CatalogueImplSignalsInteractor {
             // We therefore require exactly one target: empty is an error, and
             // multi-target is an error (fail-closed) until the port supports aggregation.
             let target_crate = match binding.targets.as_slice() {
-                [single] => single.as_str(),
+                [single] => CrateName::new(single.clone()).map_err(|error| {
+                    CatalogueImplSignalsError::SchemaExport(
+                        typed_layer_id.clone(),
+                        diagnostic(format!("invalid schema_export target: {error}")),
+                    )
+                })?,
                 [] => {
-                    return Err(CatalogueImplSignalsError::SchemaExport {
-                        layer_id: layer_id.clone(),
-                        reason: "schema_export.targets is empty".to_owned(),
-                    });
+                    return Err(CatalogueImplSignalsError::SchemaExport(
+                        typed_layer_id.clone(),
+                        diagnostic("schema_export.targets is empty"),
+                    ));
                 }
                 _ => {
-                    return Err(CatalogueImplSignalsError::SchemaExport {
-                        layer_id: layer_id.clone(),
-                        reason: format!(
+                    return Err(CatalogueImplSignalsError::SchemaExport(
+                        typed_layer_id.clone(),
+                        diagnostic(format!(
                             "layer has {} schema_export.targets; only single-target layers \
                              are supported (multi-crate aggregation requires port extension)",
                             binding.targets.len()
-                        ),
-                    });
+                        )),
+                    ));
                 }
             };
 
-            let current_c = self.rustdoc_crate_port.capture_current(target_crate).map_err(|e| {
-                CatalogueImplSignalsError::SchemaExport {
-                    layer_id: layer_id.clone(),
-                    reason: e.to_string(),
-                }
+            let features = declaration.features_for(&typed_layer_id).map_err(|error| {
+                CatalogueImplSignalsError::SchemaExport(
+                    typed_layer_id.clone(),
+                    diagnostic(format!("feature declaration omitted layer: {error}")),
+                )
             })?;
+            let current_c =
+                self.rustdoc_crate_port.capture_current(&target_crate, features).map_err(|e| {
+                    CatalogueImplSignalsError::SchemaExport(
+                        typed_layer_id.clone(),
+                        diagnostic(e.to_string()),
+                    )
+                })?;
 
             // --- Step 5: Evaluate ---
             let eval_report =
                 self.evaluator.evaluate(extended_a, baseline_b, current_c).map_err(|e| {
-                    CatalogueImplSignalsError::Evaluation {
-                        layer_id: layer_id.clone(),
-                        reason: e.to_string(),
-                    }
+                    CatalogueImplSignalsError::Evaluation(
+                        typed_layer_id.clone(),
+                        diagnostic(e.to_string()),
+                    )
                 })?;
 
             // --- Step 6: Format the report section ---

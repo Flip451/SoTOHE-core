@@ -1312,7 +1312,7 @@
       "obligation_id": {
         "entry_key": "FsConventionRequirementAdapter",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::conventions_resolve::ConventionRequirementPort"
+        "item_identifier": "trait_impl:usecase::conventions_resolve::requirement_port::ConventionRequirementPort"
       },
       "tests": [
         {

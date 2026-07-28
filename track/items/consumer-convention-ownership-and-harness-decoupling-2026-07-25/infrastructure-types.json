@@ -180,7 +180,7 @@
     },
     {
       "for_type": "FsConventionRequirementAdapter",
-      "trait_ref": "usecase::conventions_resolve::ConventionRequirementPort"
+      "trait_ref": "usecase::conventions_resolve::requirement_port::ConventionRequirementPort"
     },
     {
       "for_type": "FsConventionRequirementAdapter",

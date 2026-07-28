@@ -8,6 +8,7 @@
 use std::path::Path;
 
 use domain::TrackId;
+use domain::tddd::CargoFeatureName;
 use domain::tddd::catalogue_v2::TdddLayerBinding as DomainTdddLayerBinding;
 use usecase::type_signals::{TypeSignalsExecutionError, TypeSignalsExecutorPort};
 
@@ -125,6 +126,7 @@ impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
         track_id: &TrackId,
         workspace_root: &Path,
         binding: &DomainTdddLayerBinding,
+        features: &[CargoFeatureName],
     ) -> Result<(), TypeSignalsExecutionError> {
         // Security: validate items_dir first, before any binding-dependent
         // early-exit paths.  This ensures a symlinked items_dir is rejected
@@ -191,6 +193,7 @@ impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
                 valid_track_id,
                 workspace_root,
                 &infra_binding,
+                features,
                 observer,
             ),
             None => execute_type_signals_for_layer(
@@ -198,6 +201,7 @@ impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
                 valid_track_id,
                 workspace_root,
                 &infra_binding,
+                features,
             ),
         };
         #[cfg(not(feature = "test-helpers"))]
@@ -206,6 +210,7 @@ impl TypeSignalsExecutorPort for TypeSignalsExecutorAdapter {
             valid_track_id,
             workspace_root,
             &infra_binding,
+            features,
         );
 
         execution.map(|_exit| ()).map_err(|e| TypeSignalsExecutionError(e.0))
@@ -234,6 +239,60 @@ mod tests {
         TrackId::try_new("my-track").unwrap()
     }
 
+    #[cfg(feature = "test-helpers")]
+    fn minimal_rustdoc_json() -> String {
+        format!(
+            r#"{{"root":0,"crate_version":null,"includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
+            rustdoc_types::FORMAT_VERSION
+        )
+    }
+
+    #[cfg(feature = "test-helpers")]
+    fn setup_feature_aware_workspace() -> (tempfile::TempDir, std::path::PathBuf) {
+        let workspace = tempfile::tempdir().unwrap();
+        let root = workspace.path();
+        let items_dir = root.join("track/items");
+        let track_dir = items_dir.join("my-track");
+        std::fs::create_dir_all(root.join("libs/infrastructure/src")).unwrap();
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            root.join("Cargo.toml"),
+            "[workspace]\nmembers = [\"libs/infrastructure\"]\nresolver = \"2\"\n",
+        )
+        .unwrap();
+        std::fs::write(
+            root.join("Cargo.lock"),
+            "version = 4\n\n[[package]]\nname = \"infrastructure\"\nversion = \"0.1.0\"\n",
+        )
+        .unwrap();
+        std::fs::write(
+            root.join("libs/infrastructure/Cargo.toml"),
+            "[package]\nname = \"infrastructure\"\nversion = \"0.1.0\"\nedition = \"2024\"\n\n[features]\nsemantic-dup = []\n",
+        )
+        .unwrap();
+        std::fs::write(root.join("libs/infrastructure/src/lib.rs"), "pub struct Fixture;\n")
+            .unwrap();
+        std::fs::write(
+            track_dir.join("infrastructure-types.json"),
+            "{\n  \"schema_version\": 5,\n  \"crate_name\": \"infrastructure\",\n  \"layer\": \"infrastructure\",\n  \"types\": {},\n  \"traits\": {},\n  \"functions\": {}\n}\n",
+        )
+        .unwrap();
+        let rustdoc_path = root.join("infrastructure-rustdoc.json");
+        let rustdoc_json = minimal_rustdoc_json();
+        std::fs::write(&rustdoc_path, &rustdoc_json).unwrap();
+        std::fs::write(track_dir.join("infrastructure-types-baseline.json"), rustdoc_json).unwrap();
+
+        (workspace, rustdoc_path)
+    }
+
+    #[cfg(feature = "test-helpers")]
+    fn nightly_toolchain_available() -> bool {
+        std::process::Command::new("rustup")
+            .args(["run", "nightly", "rustc", "-Vv"])
+            .status()
+            .is_ok_and(|status| status.success())
+    }
+
     #[test]
     fn test_to_infra_binding_preserves_layer_id() {
         let domain = domain_binding("domain");
@@ -242,6 +301,37 @@ mod tests {
         assert_eq!(infra.catalogue_file(), "domain-types.json");
         assert_eq!(infra.baseline_file(), "domain-types-baseline.json");
         assert_eq!(infra.targets(), &["domain"]);
+    }
+
+    #[cfg(feature = "test-helpers")]
+    #[test]
+    fn test_evaluate_layer_with_declared_features_forwards_them_to_rustdoc() {
+        if !nightly_toolchain_available() {
+            eprintln!("skipping feature-forwarding adapter test: nightly toolchain is unavailable");
+            return;
+        }
+        let (workspace, rustdoc_path) = setup_feature_aware_workspace();
+        let items_dir = workspace.path().join("track/items");
+        let declared_feature = CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap();
+        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+        let adapter = TypeSignalsExecutorAdapter::with_rustdoc_launch_observer(observer.clone());
+
+        adapter
+            .evaluate_layer(
+                &items_dir,
+                &track_id(),
+                workspace.path(),
+                &domain_binding("infrastructure"),
+                std::slice::from_ref(&declared_feature),
+            )
+            .unwrap();
+
+        assert_eq!(observer.launches_for("infrastructure"), 1);
+        assert_eq!(
+            observer.feature_selections_for("infrastructure"),
+            vec![vec!["semantic-dup".to_owned()]],
+            "the executor adapter must pass the declaration-derived feature selection to rustdoc"
+        );
     }
 
     #[test]
@@ -254,8 +344,13 @@ mod tests {
         // No catalogue file written
 
         let adapter = TypeSignalsExecutorAdapter::new();
-        let result =
-            adapter.evaluate_layer(&items_dir, &track_id(), dir.path(), &domain_binding("domain"));
+        let result = adapter.evaluate_layer(
+            &items_dir,
+            &track_id(),
+            dir.path(),
+            &domain_binding("domain"),
+            &[],
+        );
         assert!(result.is_err(), "absent catalogue must fail closed");
     }
 
@@ -271,6 +366,7 @@ mod tests {
             &track_id(),
             workspace.path(),
             &domain_binding("domain"),
+            &[],
         );
 
         assert!(
@@ -296,6 +392,7 @@ mod tests {
             &track_id(),
             workspace.path(),
             &domain_binding("domain"),
+            &[],
         );
 
         assert!(
@@ -321,7 +418,8 @@ mod tests {
         };
 
         let adapter = TypeSignalsExecutorAdapter::new();
-        let result = adapter.evaluate_layer(&items_dir, &track_id(), dir.path(), &multi_binding);
+        let result =
+            adapter.evaluate_layer(&items_dir, &track_id(), dir.path(), &multi_binding, &[]);
         assert!(result.is_err(), "multi-target + absent catalogue must fail closed");
     }
 
@@ -343,7 +441,8 @@ mod tests {
         };
 
         let adapter = TypeSignalsExecutorAdapter::new();
-        let result = adapter.evaluate_layer(&items_dir, &track_id(), dir.path(), &multi_binding);
+        let result =
+            adapter.evaluate_layer(&items_dir, &track_id(), dir.path(), &multi_binding, &[]);
         assert!(
             result.is_err(),
             "multi-target + present catalogue must return Err (fail-closed, CN-02)"
@@ -364,8 +463,13 @@ mod tests {
         // track_dir is intentionally absent.
 
         let adapter = TypeSignalsExecutorAdapter::new();
-        let result =
-            adapter.evaluate_layer(&items_dir, &track_id(), dir.path(), &domain_binding("domain"));
+        let result = adapter.evaluate_layer(
+            &items_dir,
+            &track_id(),
+            dir.path(),
+            &domain_binding("domain"),
+            &[],
+        );
         assert!(
             result.is_err(),
             "missing track dir must return Err (fail-closed per ADR 2026-06-01-0406 D1)"
@@ -395,7 +499,8 @@ mod tests {
         };
 
         let adapter = TypeSignalsExecutorAdapter::new();
-        let result = adapter.evaluate_layer(&items_dir, &track_id(), dir.path(), &multi_binding);
+        let result =
+            adapter.evaluate_layer(&items_dir, &track_id(), dir.path(), &multi_binding, &[]);
         assert!(
             result.is_err(),
             "multi-target + missing track dir must return Err (fail-closed per ADR 2026-06-01-0406 D1)"

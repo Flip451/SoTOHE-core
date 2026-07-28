@@ -1,0 +1,1516 @@
+//! Filesystem implementation of the client-specific TDDD feature declaration ports.
+
+use std::collections::{BTreeMap, BTreeSet};
+use std::fs::File;
+use std::io::Read as _;
+use std::path::{Component, Path, PathBuf};
+
+use domain::tddd::catalogue_v2::{NonEmptyVec, TdddLayerBinding};
+use domain::tddd::test_obligation::ids::DiagnosticMessage;
+use domain::tddd::{CargoFeatureName, LayerId, TdddFeatureDeclaration};
+use serde::de::{MapAccess, Visitor};
+use serde::{Deserialize, Deserializer};
+use usecase::tddd_feature_declaration::{
+    TdddActualFeatureDeclarationPort, TdddActualFeatureDeclarationPortError,
+    TdddBaselineFeatureDeclarationPort, TdddBaselineFeatureDeclarationPortError,
+    TdddFeatureDeclarationReadError,
+};
+
+use crate::track::symlink_guard::{reject_symlinks_below, reject_symlinks_up_to_root};
+
+#[path = "feature_declaration_adapter/snapshot.rs"]
+mod snapshot;
+
+#[cfg(test)]
+use snapshot::write_first_snapshot_after_temporary_write;
+use snapshot::{SnapshotPublicationError, write_first_snapshot};
+
+const DECLARATION_FILE: &str = "tddd-features.json";
+const SNAPSHOT_FILE: &str = "tddd-features-baseline.json";
+const MAX_READ_BYTES: usize = 1024 * 1024;
+
+/// Filesystem adapter shared by baseline and actual feature-declaration clients.
+#[derive(Debug, Clone, Default)]
+pub struct FsTdddFeatureDeclarationAdapter;
+
+impl FsTdddFeatureDeclarationAdapter {
+    /// Creates a filesystem-backed feature declaration adapter.
+    #[must_use]
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+impl TdddBaselineFeatureDeclarationPort for FsTdddFeatureDeclarationAdapter {
+    fn load_for_baseline(
+        &self,
+        track_dir: &Path,
+        workspace_root: &Path,
+        layers: &[TdddLayerBinding],
+    ) -> Result<TdddFeatureDeclaration, TdddBaselineFeatureDeclarationPortError> {
+        validate_trusted_roots(track_dir, workspace_root)
+            .map_err(TdddBaselineFeatureDeclarationPortError::Read)?;
+        let (declaration, bytes) = load_declaration(track_dir, workspace_root, layers)
+            .map_err(TdddBaselineFeatureDeclarationPortError::Read)?;
+        let snapshot_path = track_dir.join(SNAPSHOT_FILE);
+        match read_bytes(&snapshot_path, track_dir) {
+            Ok(Some(snapshot)) if snapshot == bytes => Ok(declaration),
+            Ok(Some(_)) => Err(TdddBaselineFeatureDeclarationPortError::BaselineSnapshotMismatch),
+            Ok(None) => {
+                if let Some(baseline_paths) = existing_layer_baseline_paths(track_dir, layers)
+                    .map_err(TdddBaselineFeatureDeclarationPortError::Read)?
+                {
+                    return Err(
+                        TdddBaselineFeatureDeclarationPortError::MissingDeclarationSnapshotWithExistingBaselines {
+                            baseline_paths,
+                        },
+                    );
+                }
+                match write_first_snapshot(&snapshot_path, track_dir, &bytes) {
+                    Ok(()) => Ok(declaration),
+                    Err(SnapshotPublicationError::Mismatch) => {
+                        Err(TdddBaselineFeatureDeclarationPortError::BaselineSnapshotMismatch)
+                    }
+                    Err(SnapshotPublicationError::Read(reason)) => {
+                        Err(TdddBaselineFeatureDeclarationPortError::Read(read_error(
+                            &snapshot_path,
+                            reason.as_str().to_owned(),
+                        )))
+                    }
+                    Err(SnapshotPublicationError::Write(reason)) => {
+                        Err(TdddBaselineFeatureDeclarationPortError::SnapshotWrite {
+                            path: snapshot_path,
+                            reason,
+                        })
+                    }
+                }
+            }
+            Err(reason) => Err(TdddBaselineFeatureDeclarationPortError::Read(read_error(
+                &snapshot_path,
+                reason.as_str().to_owned(),
+            ))),
+        }
+    }
+}
+
+impl TdddActualFeatureDeclarationPort for FsTdddFeatureDeclarationAdapter {
+    fn load_for_actual(
+        &self,
+        track_dir: &Path,
+        workspace_root: &Path,
+        layers: &[TdddLayerBinding],
+    ) -> Result<TdddFeatureDeclaration, TdddActualFeatureDeclarationPortError> {
+        validate_trusted_roots(track_dir, workspace_root)
+            .map_err(TdddActualFeatureDeclarationPortError::Read)?;
+        let (declaration, bytes) = load_declaration(track_dir, workspace_root, layers)
+            .map_err(TdddActualFeatureDeclarationPortError::Read)?;
+        let snapshot_path = track_dir.join(SNAPSHOT_FILE);
+        let snapshot = read_bytes(&snapshot_path, track_dir).map_err(|reason| {
+            TdddActualFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration {
+                    path: snapshot_path.clone(),
+                    reason,
+                },
+            )
+        })?;
+        let snapshot =
+            snapshot.ok_or(TdddActualFeatureDeclarationPortError::MissingBaselineSnapshot {
+                path: snapshot_path,
+            })?;
+        if snapshot == bytes {
+            Ok(declaration)
+        } else {
+            Err(TdddActualFeatureDeclarationPortError::BaselineSnapshotMismatch)
+        }
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct FeatureDeclarationDto {
+    schema_version: u32,
+    #[serde(deserialize_with = "deserialize_layer_map")]
+    layers: BTreeMap<String, Vec<String>>,
+}
+
+/// Deserializes layer declarations while rejecting duplicate layer keys.
+///
+/// Serde's standard map implementation uses last-wins semantics, which would make an ambiguous
+/// declaration silently select one layer configuration. The visitor follows the strict map pattern
+/// used by the other infrastructure codecs.
+fn deserialize_layer_map<'de, D>(deserializer: D) -> Result<BTreeMap<String, Vec<String>>, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    struct StrictLayerMapVisitor;
+
+    impl<'de> Visitor<'de> for StrictLayerMapVisitor {
+        type Value = BTreeMap<String, Vec<String>>;
+
+        fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            formatter.write_str("a map from layer name to Cargo feature list")
+        }
+
+        fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
+        where
+            A: MapAccess<'de>,
+        {
+            let mut layers = BTreeMap::new();
+            while let Some(layer) = map.next_key::<String>()? {
+                let features = map.next_value()?;
+                if layers.insert(layer.clone(), features).is_some() {
+                    return Err(serde::de::Error::custom(format!(
+                        "duplicate key '{layer}' in feature declaration layers"
+                    )));
+                }
+            }
+            Ok(layers)
+        }
+    }
+
+    deserializer.deserialize_map(StrictLayerMapVisitor)
+}
+
+fn validate_trusted_roots(
+    track_dir: &Path,
+    workspace_root: &Path,
+) -> Result<(), TdddFeatureDeclarationReadError> {
+    validate_trusted_directory(track_dir)?;
+    validate_trusted_directory(workspace_root)
+}
+
+fn validate_trusted_directory(path: &Path) -> Result<(), TdddFeatureDeclarationReadError> {
+    reject_symlinks_up_to_root(path).map_err(|error| read_error(path, error.to_string()))?;
+    let metadata = path.symlink_metadata().map_err(|error| read_error(path, error.to_string()))?;
+    if !metadata.is_dir() {
+        return Err(read_error(path, "trusted root must be an existing directory".to_owned()));
+    }
+    Ok(())
+}
+
+fn load_declaration(
+    track_dir: &Path,
+    workspace_root: &Path,
+    bindings: &[TdddLayerBinding],
+) -> Result<(TdddFeatureDeclaration, Vec<u8>), TdddFeatureDeclarationReadError> {
+    let declaration_path = track_dir.join(DECLARATION_FILE);
+    let bytes = read_bytes(&declaration_path, track_dir).map_err(|reason| {
+        TdddFeatureDeclarationReadError::ReadDeclaration { path: declaration_path.clone(), reason }
+    })?;
+    let bytes = bytes.ok_or_else(|| TdddFeatureDeclarationReadError::MissingDeclaration {
+        path: declaration_path.clone(),
+    })?;
+    let dto: FeatureDeclarationDto = serde_json::from_slice(&bytes).map_err(|error| {
+        TdddFeatureDeclarationReadError::DecodeDeclaration {
+            path: declaration_path.clone(),
+            reason: diagnostic(error.to_string()),
+        }
+    })?;
+    if dto.schema_version != 1 {
+        return Err(TdddFeatureDeclarationReadError::DecodeDeclaration {
+            path: declaration_path,
+            reason: diagnostic(format!(
+                "unsupported tddd feature declaration schema version {}",
+                dto.schema_version
+            )),
+        });
+    }
+
+    let required_layers = bindings
+        .iter()
+        .map(|binding| parse_layer(&binding.layer_id, &declaration_path))
+        .collect::<Result<Vec<_>, _>>()?;
+    let mut declaration_layers = BTreeMap::new();
+    for (layer, features) in dto.layers {
+        let layer = parse_layer(&layer, &declaration_path)?;
+        let features = features
+            .into_iter()
+            .map(|feature| {
+                CargoFeatureName::try_new(feature).map_err(|error| {
+                    TdddFeatureDeclarationReadError::DecodeDeclaration {
+                        path: declaration_path.clone(),
+                        reason: diagnostic(error.to_string()),
+                    }
+                })
+            })
+            .collect::<Result<Vec<_>, _>>()?;
+        declaration_layers.insert(layer, features);
+    }
+    let declaration = TdddFeatureDeclaration::try_new(declaration_layers, &required_layers)
+        .map_err(|error| TdddFeatureDeclarationReadError::DecodeDeclaration {
+            path: declaration_path,
+            reason: diagnostic(error.to_string()),
+        })?;
+    validate_cargo_features(&declaration, workspace_root, bindings)?;
+    Ok((declaration, bytes))
+}
+
+fn existing_layer_baseline_paths(
+    track_dir: &Path,
+    layers: &[TdddLayerBinding],
+) -> Result<Option<NonEmptyVec<PathBuf>>, TdddFeatureDeclarationReadError> {
+    let mut paths = Vec::new();
+    for binding in layers {
+        let baseline_path = validated_baseline_path(track_dir, binding)?;
+        if reject_symlinks_below(&baseline_path, track_dir)
+            .map_err(|error| read_error(&baseline_path, error.to_string()))?
+        {
+            paths.push(baseline_path);
+        }
+    }
+    let mut paths = paths.into_iter();
+    let Some(first) = paths.next() else {
+        return Ok(None);
+    };
+    Ok(Some(NonEmptyVec::new(first, paths.collect())))
+}
+
+/// Resolves a layer baseline filename beneath its trusted track directory.
+///
+/// `TdddLayerBinding::baseline_file` is a filename, not a relative path. Rejecting every
+/// separator makes that contract explicit and prevents a hostile binding from redirecting the
+/// existence probe outside the track before the symlink guard runs.
+fn validated_baseline_path(
+    track_dir: &Path,
+    binding: &TdddLayerBinding,
+) -> Result<PathBuf, TdddFeatureDeclarationReadError> {
+    let baseline_file = Path::new(&binding.baseline_file);
+    if binding.baseline_file.contains('/') || binding.baseline_file.contains('\\') {
+        return Err(invalid_baseline_filename(track_dir, binding));
+    }
+    let mut components = baseline_file.components();
+    let Some(Component::Normal(filename)) = components.next() else {
+        return Err(invalid_baseline_filename(track_dir, binding));
+    };
+    if components.next().is_some() {
+        return Err(invalid_baseline_filename(track_dir, binding));
+    }
+    let path = track_dir.join(filename);
+    if !path.starts_with(track_dir) {
+        return Err(invalid_baseline_filename(track_dir, binding));
+    }
+    Ok(path)
+}
+
+fn invalid_baseline_filename(
+    track_dir: &Path,
+    binding: &TdddLayerBinding,
+) -> TdddFeatureDeclarationReadError {
+    read_error(
+        track_dir,
+        format!(
+            "layer '{}' baseline file '{}' must be a safe bare filename",
+            binding.layer_id, binding.baseline_file
+        ),
+    )
+}
+
+fn parse_layer(value: &str, path: &Path) -> Result<LayerId, TdddFeatureDeclarationReadError> {
+    LayerId::try_new(value.to_owned()).map_err(|error| {
+        TdddFeatureDeclarationReadError::DecodeDeclaration {
+            path: path.to_path_buf(),
+            reason: diagnostic(error.to_string()),
+        }
+    })
+}
+
+fn validate_cargo_features(
+    declaration: &TdddFeatureDeclaration,
+    workspace_root: &Path,
+    bindings: &[TdddLayerBinding],
+) -> Result<(), TdddFeatureDeclarationReadError> {
+    for binding in bindings {
+        let layer = parse_layer(&binding.layer_id, workspace_root)?;
+        let features = declaration.features_for(&layer).map_err(|error| {
+            TdddFeatureDeclarationReadError::DecodeDeclaration {
+                path: workspace_root.to_path_buf(),
+                reason: diagnostic(error.to_string()),
+            }
+        })?;
+        let defined_features = manifest_features(workspace_root, binding)?;
+        for feature in features {
+            if !defined_features.contains(feature.as_str()) {
+                return Err(TdddFeatureDeclarationReadError::UnknownCargoFeature {
+                    layer: layer.clone(),
+                    feature: feature.clone(),
+                });
+            }
+        }
+    }
+    Ok(())
+}
+
+fn manifest_features(
+    workspace_root: &Path,
+    binding: &TdddLayerBinding,
+) -> Result<BTreeSet<String>, TdddFeatureDeclarationReadError> {
+    let target = binding.targets.first().ok_or_else(|| {
+        TdddFeatureDeclarationReadError::ReadDeclaration {
+            path: workspace_root.to_path_buf(),
+            reason: diagnostic(format!("layer '{}' has no rustdoc target", binding.layer_id)),
+        }
+    })?;
+    if binding.targets.len() != 1 {
+        return Err(TdddFeatureDeclarationReadError::ReadDeclaration {
+            path: workspace_root.to_path_buf(),
+            reason: diagnostic(format!(
+                "layer '{}' has multiple rustdoc targets",
+                binding.layer_id
+            )),
+        });
+    }
+    let workspace_manifest = workspace_root.join("Cargo.toml");
+    let workspace_text = read_text(&workspace_manifest, workspace_root)?;
+    let workspace: toml::Value = toml::from_str(&workspace_text).map_err(|error| {
+        TdddFeatureDeclarationReadError::ReadDeclaration {
+            path: workspace_manifest.clone(),
+            reason: diagnostic(error.to_string()),
+        }
+    })?;
+    let members = workspace
+        .get("workspace")
+        .and_then(|value| value.get("members"))
+        .and_then(toml::Value::as_array)
+        .ok_or_else(|| TdddFeatureDeclarationReadError::ReadDeclaration {
+            path: workspace_manifest.clone(),
+            reason: diagnostic("workspace Cargo.toml has no members array".to_owned()),
+        })?;
+    let member_paths = members
+        .iter()
+        .map(|member| {
+            let member = member.as_str().ok_or_else(|| {
+                read_error(
+                    &workspace_manifest,
+                    "workspace Cargo.toml members entries must be strings".to_owned(),
+                )
+            })?;
+            normalize_workspace_member(member, &workspace_manifest)
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    for member_path in member_paths {
+        let manifest_path = workspace_root.join(member_path).join("Cargo.toml");
+        if !manifest_path.starts_with(workspace_root) {
+            return Err(read_error(
+                &workspace_manifest,
+                "workspace member resolves outside trusted workspace root".to_owned(),
+            ));
+        }
+        let manifest_text = read_text(&manifest_path, workspace_root)?;
+        let manifest: toml::Value = toml::from_str(&manifest_text).map_err(|error| {
+            TdddFeatureDeclarationReadError::ReadDeclaration {
+                path: manifest_path.clone(),
+                reason: diagnostic(error.to_string()),
+            }
+        })?;
+        let package_name = manifest
+            .get("package")
+            .and_then(|value| value.get("name"))
+            .and_then(toml::Value::as_str);
+        if package_name == Some(target) {
+            return validate_manifest_features(&manifest, &manifest_path);
+        }
+    }
+    Err(TdddFeatureDeclarationReadError::ReadDeclaration {
+        path: workspace_manifest,
+        reason: diagnostic(format!("could not resolve Cargo manifest for target '{target}'")),
+    })
+}
+
+fn validate_manifest_features(
+    manifest: &toml::Value,
+    manifest_path: &Path,
+) -> Result<BTreeSet<String>, TdddFeatureDeclarationReadError> {
+    let (mut features, suppressed_implicit_features) = match manifest.get("features") {
+        Some(features) => validate_explicit_manifest_features(features, manifest_path)?,
+        None => (BTreeSet::new(), BTreeSet::new()),
+    };
+    features.extend(
+        optional_dependency_names(manifest).difference(&suppressed_implicit_features).cloned(),
+    );
+    Ok(features)
+}
+
+/// Returns explicit Cargo features and optional dependencies whose implicit feature is suppressed.
+fn validate_explicit_manifest_features(
+    features: &toml::Value,
+    manifest_path: &Path,
+) -> Result<(BTreeSet<String>, BTreeSet<String>), TdddFeatureDeclarationReadError> {
+    let table = features.as_table().ok_or_else(|| {
+        read_error(manifest_path, "Cargo.toml features value must be a table".to_owned())
+    })?;
+    let mut suppressed_implicit_features = BTreeSet::new();
+    for (feature, definition) in table {
+        let Some(entries) = definition.as_array() else {
+            return Err(read_error(
+                manifest_path,
+                format!("Cargo feature '{feature}' must be an array of strings"),
+            ));
+        };
+        for entry in entries {
+            let Some(entry) = entry.as_str() else {
+                return Err(read_error(
+                    manifest_path,
+                    format!("Cargo feature '{feature}' must be an array of strings"),
+                ));
+            };
+            if let Some(dependency) = entry.strip_prefix("dep:") {
+                suppressed_implicit_features.insert(dependency.to_owned());
+            }
+        }
+    }
+    Ok((table.keys().cloned().collect(), suppressed_implicit_features))
+}
+
+/// Finds optional dependencies across Cargo's dependency tables.
+fn optional_dependency_names(manifest: &toml::Value) -> BTreeSet<String> {
+    let mut names = BTreeSet::new();
+    for dependency_table in ["dependencies", "dev-dependencies", "build-dependencies"] {
+        collect_optional_dependency_names(manifest.get(dependency_table), &mut names);
+    }
+    if let Some(targets) = manifest.get("target").and_then(toml::Value::as_table) {
+        for target in targets.values() {
+            for dependency_table in ["dependencies", "dev-dependencies", "build-dependencies"] {
+                collect_optional_dependency_names(target.get(dependency_table), &mut names);
+            }
+        }
+    }
+    names
+}
+
+fn collect_optional_dependency_names(
+    dependencies: Option<&toml::Value>,
+    names: &mut BTreeSet<String>,
+) {
+    let Some(dependencies) = dependencies.and_then(toml::Value::as_table) else {
+        return;
+    };
+    for (name, dependency) in dependencies {
+        if dependency
+            .as_table()
+            .and_then(|table| table.get("optional"))
+            .and_then(toml::Value::as_bool)
+            == Some(true)
+        {
+            names.insert(name.clone());
+        }
+    }
+}
+
+fn normalize_workspace_member(
+    member: &str,
+    workspace_manifest: &Path,
+) -> Result<PathBuf, TdddFeatureDeclarationReadError> {
+    let member_path = Path::new(member);
+    let mut normalized = PathBuf::new();
+    for component in member_path.components() {
+        match component {
+            Component::Normal(component) => normalized.push(component),
+            Component::CurDir => {}
+            Component::ParentDir | Component::RootDir | Component::Prefix(_) => {
+                return Err(read_error(
+                    workspace_manifest,
+                    format!("workspace member '{member}' is not a safe relative path"),
+                ));
+            }
+        }
+    }
+    if normalized.as_os_str().is_empty() {
+        return Err(read_error(
+            workspace_manifest,
+            "workspace member path must not be empty".to_owned(),
+        ));
+    }
+    Ok(normalized)
+}
+
+fn read_text(path: &Path, trusted_root: &Path) -> Result<String, TdddFeatureDeclarationReadError> {
+    let bytes = read_bytes(path, trusted_root).map_err(|reason| {
+        TdddFeatureDeclarationReadError::ReadDeclaration { path: path.to_path_buf(), reason }
+    })?;
+    let bytes = bytes.ok_or_else(|| TdddFeatureDeclarationReadError::ReadDeclaration {
+        path: path.to_path_buf(),
+        reason: diagnostic("file not found".to_owned()),
+    })?;
+    String::from_utf8(bytes).map_err(|error| TdddFeatureDeclarationReadError::ReadDeclaration {
+        path: path.to_path_buf(),
+        reason: diagnostic(error.to_string()),
+    })
+}
+
+fn read_bytes(path: &Path, trusted_root: &Path) -> Result<Option<Vec<u8>>, DiagnosticMessage> {
+    match reject_symlinks_below(path, trusted_root) {
+        Ok(true) => read_limited_file(path).map(Some),
+        Ok(false) => Ok(None),
+        Err(error) => Err(diagnostic(error.to_string())),
+    }
+}
+
+fn read_limited_file(path: &Path) -> Result<Vec<u8>, DiagnosticMessage> {
+    let metadata = std::fs::metadata(path).map_err(|error| diagnostic(error.to_string()))?;
+    if !metadata.is_file() {
+        return Err(diagnostic(format!("expected regular file: {}", path.display())));
+    }
+    if metadata.len() > MAX_READ_BYTES as u64 {
+        return Err(file_size_limit_error(path));
+    }
+
+    let mut file = File::open(path).map_err(|error| diagnostic(error.to_string()))?;
+    let mut bytes = Vec::new();
+    std::io::Read::by_ref(&mut file)
+        .take((MAX_READ_BYTES + 1) as u64)
+        .read_to_end(&mut bytes)
+        .map_err(|error| diagnostic(error.to_string()))?;
+    if bytes.len() > MAX_READ_BYTES {
+        return Err(file_size_limit_error(path));
+    }
+    Ok(bytes)
+}
+
+fn file_size_limit_error(path: &Path) -> DiagnosticMessage {
+    diagnostic(format!(
+        "file exceeds maximum permitted size of {MAX_READ_BYTES} bytes: {}",
+        path.display()
+    ))
+}
+
+fn read_error(path: &Path, reason: String) -> TdddFeatureDeclarationReadError {
+    TdddFeatureDeclarationReadError::ReadDeclaration {
+        path: path.to_path_buf(),
+        reason: diagnostic(reason),
+    }
+}
+
+fn diagnostic(message: String) -> DiagnosticMessage {
+    let mut text = if message.trim().is_empty() {
+        "feature declaration operation failed".to_owned()
+    } else {
+        message
+    };
+    loop {
+        match DiagnosticMessage::try_new(text) {
+            Ok(message) => return message,
+            Err(_) => text = "feature declaration operation failed".to_owned(),
+        }
+    }
+}
+
+#[cfg(test)]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+
+    fn binding(layer_id: &str, target: &str) -> TdddLayerBinding {
+        binding_with_baseline(layer_id, target, &format!("{layer_id}-types-baseline.json"))
+    }
+
+    fn binding_with_baseline(
+        layer_id: &str,
+        target: &str,
+        baseline_file: &str,
+    ) -> TdddLayerBinding {
+        TdddLayerBinding {
+            layer_id: layer_id.to_owned(),
+            catalogue_file: format!("{layer_id}-types.json"),
+            baseline_file: baseline_file.to_owned(),
+            targets: vec![target.to_owned()],
+        }
+    }
+
+    fn setup_workspace() -> tempfile::TempDir {
+        let workspace = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(workspace.path().join("libs/domain")).unwrap();
+        std::fs::write(
+            workspace.path().join("Cargo.toml"),
+            "[workspace]\nmembers = [\"libs/domain\"]\nresolver = \"2\"\n",
+        )
+        .unwrap();
+        std::fs::write(
+            workspace.path().join("libs/domain/Cargo.toml"),
+            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2024\"\n[features]\nsemantic-dup = []\n",
+        )
+        .unwrap();
+        workspace
+    }
+
+    fn write_declaration(track_dir: &Path, contents: &str) {
+        std::fs::write(track_dir.join(DECLARATION_FILE), contents).unwrap();
+    }
+
+    fn write_domain_manifest(workspace: &Path, contents: &str) {
+        std::fs::write(workspace.join("libs/domain/Cargo.toml"), contents).unwrap();
+    }
+
+    #[test]
+    fn test_baseline_port_with_valid_declaration_creates_snapshot() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[\"semantic-dup\"]}}",
+        );
+        let declaration = FsTdddFeatureDeclarationAdapter::new()
+            .load_for_baseline(track.path(), workspace.path(), &[binding("domain", "domain")])
+            .unwrap();
+        let features = declaration.features_for(&LayerId::try_new("domain").unwrap()).unwrap();
+        assert_eq!(features.first().unwrap().as_str(), "semantic-dup");
+        assert!(track.path().join(SNAPSHOT_FILE).exists());
+    }
+
+    #[test]
+    fn test_baseline_port_with_existing_layer_baselines_and_no_snapshot_returns_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[],\"usecase\":[]}}",
+        );
+        let domain_baseline = track.path().join("domain-types-baseline.json");
+        let usecase_baseline = track.path().join("usecase-types-baseline.json");
+        std::fs::write(&domain_baseline, "domain baseline").unwrap();
+        std::fs::write(&usecase_baseline, "usecase baseline").unwrap();
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain"), binding("usecase", "domain")],
+        );
+
+        assert!(matches!(
+            &result,
+            Err(
+                TdddBaselineFeatureDeclarationPortError::MissingDeclarationSnapshotWithExistingBaselines { .. }
+            )
+        ));
+        let message = match &result {
+            Err(error) => error.to_string(),
+            Ok(_) => return,
+        };
+        let Err(
+            TdddBaselineFeatureDeclarationPortError::MissingDeclarationSnapshotWithExistingBaselines {
+                baseline_paths,
+            },
+        ) = result
+        else {
+            return;
+        };
+        assert!(message.contains(&domain_baseline.display().to_string()));
+        assert!(message.contains(&usecase_baseline.display().to_string()));
+        assert!(message.contains("delete those baselines and re-capture"));
+        assert_eq!(baseline_paths.as_slice(), &[domain_baseline, usecase_baseline]);
+        assert!(!track.path().join(SNAPSHOT_FILE).exists());
+    }
+
+    #[test]
+    fn test_baseline_port_with_absolute_baseline_filename_returns_error_without_snapshot() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let outside_baseline = outside.path().join("domain-types-baseline.json");
+        std::fs::write(&outside_baseline, "outside baseline").unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding_with_baseline("domain", "domain", &outside_baseline.display().to_string())],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration { .. }
+            ))
+        ));
+        assert!(!track.path().join(SNAPSHOT_FILE).exists());
+    }
+
+    #[test]
+    fn test_baseline_port_with_parent_traversal_baseline_filename_returns_error_without_snapshot() {
+        let workspace = setup_workspace();
+        let container = tempfile::tempdir().unwrap();
+        let track_path = container.path().join("track");
+        std::fs::create_dir(&track_path).unwrap();
+        std::fs::write(container.path().join("domain-types-baseline.json"), "outside baseline")
+            .unwrap();
+        write_declaration(&track_path, "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            &track_path,
+            workspace.path(),
+            &[binding_with_baseline("domain", "domain", "../domain-types-baseline.json")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration { .. }
+            ))
+        ));
+        assert!(!track_path.join(SNAPSHOT_FILE).exists());
+    }
+
+    #[test]
+    fn test_baseline_port_with_separator_in_baseline_filename_returns_error_without_snapshot() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        std::fs::create_dir(track.path().join("nested")).unwrap();
+        std::fs::write(track.path().join("nested/domain-types-baseline.json"), "baseline").unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding_with_baseline("domain", "domain", "nested/domain-types-baseline.json")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration { .. }
+            ))
+        ));
+        assert!(!track.path().join(SNAPSHOT_FILE).exists());
+    }
+
+    #[test]
+    fn test_baseline_port_with_backslash_in_baseline_filename_returns_error_without_snapshot() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding_with_baseline("domain", "domain", "nested\\\\domain-types-baseline.json")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration { .. }
+            ))
+        ));
+        assert!(!track.path().join(SNAPSHOT_FILE).exists());
+    }
+
+    #[test]
+    fn test_baseline_port_with_existing_snapshot_and_layer_baseline_returns_declaration() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        let declaration = "{\"schema_version\":1,\"layers\":{\"domain\":[]}}";
+        write_declaration(track.path(), declaration);
+        std::fs::write(track.path().join(SNAPSHOT_FILE), declaration).unwrap();
+        std::fs::write(track.path().join("domain-types-baseline.json"), "domain baseline").unwrap();
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_baseline_port_with_mismatched_snapshot_returns_snapshot_mismatch() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+        std::fs::write(
+            track.path().join(SNAPSHOT_FILE),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[\"semantic-dup\"]}}",
+        )
+        .unwrap();
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::BaselineSnapshotMismatch)
+        ));
+    }
+
+    #[test]
+    fn test_baseline_port_with_featureless_layer_preserves_empty_feature_list() {
+        let workspace = setup_workspace();
+        std::fs::create_dir_all(workspace.path().join("apps/cli")).unwrap();
+        std::fs::write(
+            workspace.path().join("Cargo.toml"),
+            "[workspace]\nmembers = [\"libs/domain\", \"apps/cli\"]\nresolver = \"2\"\n",
+        )
+        .unwrap();
+        std::fs::write(
+            workspace.path().join("apps/cli/Cargo.toml"),
+            "[package]\nname = \"cli\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
+        )
+        .unwrap();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"cli\":[],\"domain\":[\"semantic-dup\"]}}",
+        );
+
+        let declaration = FsTdddFeatureDeclarationAdapter::new()
+            .load_for_baseline(
+                track.path(),
+                workspace.path(),
+                &[binding("domain", "domain"), binding("cli", "cli")],
+            )
+            .unwrap();
+
+        let domain = LayerId::try_new("domain").unwrap();
+        let cli = LayerId::try_new("cli").unwrap();
+        assert_eq!(
+            declaration
+                .features_for(&domain)
+                .unwrap()
+                .iter()
+                .map(CargoFeatureName::as_str)
+                .collect::<Vec<_>>(),
+            ["semantic-dup"]
+        );
+        assert!(declaration.features_for(&cli).unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_baseline_port_with_optional_dependency_and_no_features_table_accepts_implicit_feature()
+    {
+        let workspace = setup_workspace();
+        write_domain_manifest(
+            workspace.path(),
+            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2024\"\n[dependencies]\nimplicit-feature = { version = \"1\", optional = true }\n",
+        );
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[\"implicit-feature\"]}}",
+        );
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_baseline_port_with_unreferenced_optional_dependency_accepts_implicit_feature() {
+        let workspace = setup_workspace();
+        write_domain_manifest(
+            workspace.path(),
+            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2024\"\n[features]\nexplicit = []\n[dependencies]\nimplicit-feature = { version = \"1\", optional = true }\n",
+        );
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[\"implicit-feature\"]}}",
+        );
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_baseline_port_with_dep_referenced_optional_dependency_returns_unknown_feature() {
+        let workspace = setup_workspace();
+        write_domain_manifest(
+            workspace.path(),
+            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2024\"\n[features]\nexplicit = [\"dep:implicit-feature\"]\n[dependencies]\nimplicit-feature = { version = \"1\", optional = true }\n",
+        );
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[\"implicit-feature\"]}}",
+        );
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn test_baseline_port_with_nonexistent_feature_and_optional_dependency_returns_unknown_feature()
+    {
+        let workspace = setup_workspace();
+        write_domain_manifest(
+            workspace.path(),
+            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2024\"\n[dependencies]\nimplicit-feature = { version = \"1\", optional = true }\n",
+        );
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[\"nonexistent\"]}}",
+        );
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn test_actual_port_without_baseline_snapshot_returns_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_actual(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+        assert!(matches!(
+            result,
+            Err(TdddActualFeatureDeclarationPortError::MissingBaselineSnapshot { .. })
+        ));
+    }
+
+    #[test]
+    fn test_actual_port_without_declaration_returns_missing_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_actual(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+        assert!(matches!(
+            result,
+            Err(TdddActualFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::MissingDeclaration { .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn test_actual_port_with_matching_baseline_snapshot_returns_declaration() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        let adapter = FsTdddFeatureDeclarationAdapter::new();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[\"semantic-dup\"]}}",
+        );
+        adapter
+            .load_for_baseline(track.path(), workspace.path(), &[binding("domain", "domain")])
+            .unwrap();
+
+        let declaration = adapter
+            .load_for_actual(track.path(), workspace.path(), &[binding("domain", "domain")])
+            .unwrap();
+
+        let layer = LayerId::try_new("domain").unwrap();
+        assert_eq!(
+            declaration.features_for(&layer).unwrap().first().unwrap().as_str(),
+            "semantic-dup"
+        );
+    }
+
+    #[test]
+    fn test_baseline_port_without_declaration_returns_missing_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::MissingDeclaration { .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn test_baseline_port_with_invalid_declaration_returns_decode_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(track.path(), "not JSON");
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::DecodeDeclaration { .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn test_baseline_port_with_unsupported_schema_returns_decode_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(track.path(), "{\"schema_version\":2,\"layers\":{\"domain\":[]}}");
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            &result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::DecodeDeclaration { .. }
+            ))
+        ));
+        let Err(TdddBaselineFeatureDeclarationPortError::Read(
+            TdddFeatureDeclarationReadError::DecodeDeclaration { reason, .. },
+        )) = result
+        else {
+            return;
+        };
+        assert!(reason.as_str().contains("unsupported"));
+    }
+
+    #[test]
+    fn test_baseline_port_with_unknown_declaration_field_returns_decode_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[]},\"future_field\":true}",
+        );
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            &result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::DecodeDeclaration { .. }
+            ))
+        ));
+        let Err(TdddBaselineFeatureDeclarationPortError::Read(
+            TdddFeatureDeclarationReadError::DecodeDeclaration { reason, .. },
+        )) = result
+        else {
+            return;
+        };
+        assert!(reason.as_str().contains("unknown field"));
+    }
+
+    #[test]
+    fn test_baseline_port_with_duplicate_layer_key_returns_decode_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[],\"domain\":[\"semantic-dup\"]}}",
+        );
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            &result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::DecodeDeclaration { .. }
+            ))
+        ));
+        let Err(TdddBaselineFeatureDeclarationPortError::Read(
+            TdddFeatureDeclarationReadError::DecodeDeclaration { reason, .. },
+        )) = result
+        else {
+            return;
+        };
+        assert!(reason.as_str().contains("duplicate key"));
+    }
+
+    #[test]
+    fn test_baseline_port_with_large_declaration_returns_read_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        std::fs::write(track.path().join(DECLARATION_FILE), vec![b'x'; MAX_READ_BYTES + 1])
+            .unwrap();
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            &result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration { .. }
+            ))
+        ));
+        let Err(TdddBaselineFeatureDeclarationPortError::Read(
+            TdddFeatureDeclarationReadError::ReadDeclaration { reason, .. },
+        )) = result
+        else {
+            return;
+        };
+        assert!(reason.as_str().contains("maximum permitted size"));
+    }
+
+    #[test]
+    fn test_baseline_port_with_malformed_workspace_manifest_returns_read_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        std::fs::write(workspace.path().join("Cargo.toml"), "[workspace\nmembers = [").unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration { .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn test_baseline_port_with_non_string_workspace_member_returns_read_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        std::fs::write(
+            workspace.path().join("Cargo.toml"),
+            "[workspace]\nmembers = [\"libs/domain\", 1]\nresolver = \"2\"\n",
+        )
+        .unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration { .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn test_baseline_port_with_non_table_features_returns_read_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        std::fs::write(
+            workspace.path().join("libs/domain/Cargo.toml"),
+            "features = []\n[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
+        )
+        .unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration { .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn test_baseline_port_with_non_string_feature_entry_returns_read_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        std::fs::write(
+            workspace.path().join("libs/domain/Cargo.toml"),
+            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2024\"\n[features]\nsemantic-dup = [1]\n",
+        )
+        .unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[\"semantic-dup\"]}}",
+        );
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration { .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn test_baseline_port_with_out_of_root_workspace_member_returns_read_error() {
+        let workspace = setup_workspace();
+        let outside = tempfile::tempdir().unwrap();
+        std::fs::write(
+            outside.path().join("Cargo.toml"),
+            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2024\"\n",
+        )
+        .unwrap();
+        std::fs::write(
+            workspace.path().join("Cargo.toml"),
+            "[workspace]\nmembers = [\"../outside\"]\nresolver = \"2\"\n",
+        )
+        .unwrap();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            &result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration { .. }
+            ))
+        ));
+        let Err(TdddBaselineFeatureDeclarationPortError::Read(
+            TdddFeatureDeclarationReadError::ReadDeclaration { reason, .. },
+        )) = result
+        else {
+            return;
+        };
+        assert!(reason.as_str().contains("safe relative path"));
+    }
+
+    #[test]
+    fn test_baseline_port_with_unknown_cargo_feature_returns_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[\"unknown\"]}}",
+        );
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn test_actual_port_with_unknown_cargo_feature_returns_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        let adapter = FsTdddFeatureDeclarationAdapter::new();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+        adapter
+            .load_for_baseline(track.path(), workspace.path(), &[binding("domain", "domain")])
+            .unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[\"unknown\"]}}",
+        );
+
+        let result =
+            adapter.load_for_actual(track.path(), workspace.path(), &[binding("domain", "domain")]);
+
+        assert!(matches!(
+            result,
+            Err(TdddActualFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn test_actual_port_with_changed_declaration_returns_snapshot_mismatch() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+        let adapter = FsTdddFeatureDeclarationAdapter::new();
+        adapter
+            .load_for_baseline(track.path(), workspace.path(), &[binding("domain", "domain")])
+            .unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[\"semantic-dup\"]}}",
+        );
+        let result =
+            adapter.load_for_actual(track.path(), workspace.path(), &[binding("domain", "domain")]);
+        assert!(matches!(
+            result,
+            Err(TdddActualFeatureDeclarationPortError::BaselineSnapshotMismatch)
+        ));
+    }
+
+    #[test]
+    fn test_snapshot_write_does_not_expose_partial_file() {
+        let track = tempfile::tempdir().unwrap();
+        let snapshot = track.path().join(SNAPSHOT_FILE);
+        let bytes = vec![b'x'; 64 * 1024];
+        let (temporary_ready_sender, temporary_ready_receiver) = std::sync::mpsc::channel();
+        let (publish_sender, publish_receiver) = std::sync::mpsc::channel();
+        let writer_path = snapshot.clone();
+        let writer_bytes = bytes.clone();
+        let trusted_root = track.path().to_path_buf();
+
+        std::thread::scope(|scope| {
+            let writer = scope.spawn(move || {
+                write_first_snapshot_after_temporary_write(
+                    &writer_path,
+                    &trusted_root,
+                    &writer_bytes,
+                    |_| {
+                        temporary_ready_sender.send(()).unwrap();
+                        publish_receiver.recv().unwrap();
+                    },
+                )
+            });
+
+            temporary_ready_receiver.recv().unwrap();
+            assert_eq!(read_bytes(&snapshot, track.path()).unwrap(), None);
+            assert!(!snapshot.exists());
+            publish_sender.send(()).unwrap();
+            assert!(writer.join().unwrap().is_ok());
+        });
+
+        assert_eq!(std::fs::read(&snapshot).unwrap(), bytes);
+    }
+
+    #[test]
+    fn test_snapshot_conflicting_concurrent_publisher_returns_mismatch() {
+        let track = tempfile::tempdir().unwrap();
+        let snapshot = track.path().join(SNAPSHOT_FILE);
+        let result = write_first_snapshot_after_temporary_write(
+            &snapshot,
+            track.path(),
+            b"first declaration",
+            |_| std::fs::write(&snapshot, b"second declaration").unwrap(),
+        );
+
+        assert!(matches!(result, Err(SnapshotPublicationError::Mismatch)));
+    }
+
+    #[test]
+    fn test_concurrent_baseline_publishers_accept_the_same_declaration() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+        let barrier = std::sync::Barrier::new(2);
+
+        std::thread::scope(|scope| {
+            let first = scope.spawn(|| {
+                barrier.wait();
+                FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+                    track.path(),
+                    workspace.path(),
+                    &[binding("domain", "domain")],
+                )
+            });
+            let second = scope.spawn(|| {
+                barrier.wait();
+                FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+                    track.path(),
+                    workspace.path(),
+                    &[binding("domain", "domain")],
+                )
+            });
+            assert!(first.join().unwrap().is_ok());
+            assert!(second.join().unwrap().is_ok());
+        });
+
+        assert!(track.path().join(SNAPSHOT_FILE).is_file());
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_baseline_port_with_symlinked_track_root_returns_read_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+        let links = tempfile::tempdir().unwrap();
+        let symlinked_track = links.path().join("track");
+        std::os::unix::fs::symlink(track.path(), &symlinked_track).unwrap();
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            &symlinked_track,
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration { .. }
+            ))
+        ));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_baseline_port_with_symlinked_workspace_root_returns_read_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+        let links = tempfile::tempdir().unwrap();
+        let symlinked_workspace = links.path().join("workspace");
+        std::os::unix::fs::symlink(workspace.path(), &symlinked_workspace).unwrap();
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            &symlinked_workspace,
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration { .. }
+            ))
+        ));
+    }
+}

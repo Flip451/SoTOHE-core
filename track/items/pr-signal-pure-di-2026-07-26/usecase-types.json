@@ -1,0 +1,1945 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "core::option::Option<Self>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_valid",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "type_name": "PrIdentifier"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "u64"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_secs",
+          "params": [],
+          "receiver": "self",
+          "returns": "u64"
+        }
+      ],
+      "type_name": "PrPollIntervalSeconds"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "u64"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_secs",
+          "params": [],
+          "receiver": "self",
+          "returns": "u64"
+        }
+      ],
+      "type_name": "PrPollTimeoutSeconds"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "port",
+              "ty": "std::sync::Arc<dyn SignalCommandPort>"
+            },
+            {
+              "name": "active_track_resolver",
+              "ty": "std::sync::Arc<dyn SignalActiveTrackResolverPort>"
+            },
+            {
+              "name": "spec_path_resolver",
+              "ty": "std::sync::Arc<dyn SignalSpecPathResolverPort>"
+            },
+            {
+              "name": "gate_config",
+              "ty": "std::sync::Arc<dyn SignalGateConfigPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "SignalCommandInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "port",
+              "ty": "std::sync::Arc<dyn PrCommandPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "PrCommandInteractor"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "PrTrackIdOverride"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "core::option::Option<Self>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "is_valid",
+          "params": [],
+          "receiver": "&self",
+          "returns": "bool"
+        }
+      ],
+      "type_name": "PrBaseOverride"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "SignalFailureReason"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "PrIdentifier",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PrIdentifier",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PrIdentifier",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "PrIdentifier",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "PrIdentifier",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "PrPollIntervalSeconds",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PrPollIntervalSeconds",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PrPollIntervalSeconds",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "PrPollIntervalSeconds",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "PrPollIntervalSeconds",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "PrPollIntervalSeconds",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "PrPollTimeoutSeconds",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PrPollTimeoutSeconds",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PrPollTimeoutSeconds",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "PrPollTimeoutSeconds",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "PrPollTimeoutSeconds",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "PrPollTimeoutSeconds",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "PrReviewCycleMode",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PrReviewCycleMode",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PrReviewCycleMode",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "PrReviewCycleMode",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "PrReviewCycleMode",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "PrReviewCycleMode",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "PrCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PrCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PrCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "PrCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "PrCommandInteractor",
+      "trait_ref": "PrCommandService"
+    },
+    {
+      "for_type": "SignalCommandInteractor",
+      "trait_ref": "SignalService"
+    },
+    {
+      "action": "reference",
+      "for_type": "SignalGateName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "SignalGateName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "SignalGateName",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "action": "reference",
+      "for_type": "SignalGateName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "reference",
+      "for_type": "SignalGateName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "action": "reference",
+      "for_type": "PrCommandOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "PrCommandOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "SignalCommandOutput",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "SignalCommandOutput",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PrTrackIdOverride",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PrTrackIdOverride",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PrTrackIdOverride",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "PrTrackIdOverride",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "PrTrackIdOverride",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "PrBaseOverride",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "PrBaseOverride",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "PrBaseOverride",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "PrBaseOverride",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "PrBaseOverride",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "SignalStrictOverride",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalStrictOverride",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalStrictOverride",
+      "trait_ref": "core::marker::Copy"
+    },
+    {
+      "for_type": "SignalStrictOverride",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalStrictOverride",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "ResolvedSignalChainCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ResolvedSignalChainCommand",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ResolvedSignalChainCommand",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ResolvedSignalChainCommand",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalGateConfigError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalGateConfigError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "SignalGateConfigError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "SignalChainExecutionReport",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalChainExecutionReport",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalCommandPortError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalCommandPortError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "SignalCommandPortError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "SignalFailureReason",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalFailureReason",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalFailureReason",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalFailureReason",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "SignalFailureReason",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "SignalRootSelection",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "SignalRootSelection",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "SignalRootSelection",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "SignalRootSelection",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {
+    "PrCommandPort": {
+      "action": "add",
+      "docs": "Typed driven port for PR command execution; the usecase interactor validates legacy driver-facing primitives into PrCommand before crossing this boundary. Filesystem, Git/GitHub, terminal, and polling operations intentionally complete inline at this synchronous blocking CLI boundary.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "command",
+              "ty": "PrCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "PrCommandOutput"
+        }
+      ],
+      "module_path": "pr",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "SignalActiveTrackResolverPort": {
+      "action": "add",
+      "docs": "SignalCommandInteractor owns active-track discovery through this synchronous single-operation secondary port. Add unrelated discovery concerns as separate ports; implementations and focused doubles evolve only with this operation. The operation's producible error subset is SignalCommandPortError::{RepositoryDiscovery, BranchAbsent, BranchReadFailure}.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve_active_track",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "Option<&std::path::Path>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::TrackId, SignalCommandPortError>"
+        }
+      ],
+      "module_path": "signal_service",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "SignalCommandPort": {
+      "action": "add",
+      "docs": "SignalCommandInteractor owns resolved command dispatch through this synchronous single-operation secondary port. Active-track and spec-path resolution evolve through their dedicated ports; implementations and focused doubles change only with execute.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "execute",
+          "params": [
+            {
+              "name": "command",
+              "ty": "ResolvedSignalChainCommand"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<SignalChainExecutionReport, SignalCommandPortError>"
+        }
+      ],
+      "module_path": "signal_service",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "SignalGateConfigPort": {
+      "action": "add",
+      "docs": "Synchronous driven port for loading one local SignalGateMatrix. The bounded single-file read completes before command dispatch, so the contract remains synchronous.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "Option<&std::path::Path>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::SignalGateMatrix, SignalGateConfigError>"
+        }
+      ],
+      "module_path": "signal_service",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-08",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    },
+    "SignalSpecPathResolverPort": {
+      "action": "add",
+      "docs": "SignalCommandInteractor owns Signal spec-path resolution through this synchronous single-operation secondary port. Add unrelated path concerns as separate ports; implementations and focused doubles evolve only with this operation. The operation's producible error subset is SignalCommandPortError::{RepositoryDiscovery, SpecPathResolution}.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve_spec_path",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "Option<&std::path::Path>"
+            },
+            {
+              "name": "spec_json_path",
+              "ty": "Option<&std::path::Path>"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<std::path::PathBuf, SignalCommandPortError>"
+        }
+      ],
+      "module_path": "signal_service",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "core::marker::Send",
+        "core::marker::Sync"
+      ]
+    }
+  },
+  "types": {
+    "PrBaseOverride": {
+      "action": "add",
+      "docs": "Usecase-boundary value object for an explicitly supplied PR base override. It owns the exact-nonempty invariant and preserves accepted text without normalization; reconnaissance found no existing value object with that invariant.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "pr",
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            {
+              "name": "non_empty_pr_base_override",
+              "predicate": {
+                "SelfMethod": "is_valid"
+              }
+            }
+          ]
+        }
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "PrCommand": {
+      "action": "add",
+      "docs": "Typed application command for the PR command family. Its variant set is intentionally closed and exhaustive; workspace consumers must match every variant, so additions require coordinated compiler-checked updates.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Push",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "core::option::Option<PrTrackIdOverride>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Ensure",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "core::option::Option<PrTrackIdOverride>"
+                },
+                {
+                  "name": "base",
+                  "ty": "core::option::Option<PrBaseOverride>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Status",
+            "payload": {
+              "fields": [
+                "PrIdentifier"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "WaitAndMerge",
+            "payload": {
+              "fields": [
+                {
+                  "name": "pr",
+                  "ty": "PrIdentifier"
+                },
+                {
+                  "name": "interval",
+                  "ty": "PrPollIntervalSeconds"
+                },
+                {
+                  "name": "timeout",
+                  "ty": "PrPollTimeoutSeconds"
+                },
+                {
+                  "name": "method",
+                  "ty": "core::option::Option<domain::branch_strategy::MergeMethod>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "TriggerReview",
+            "payload": {
+              "fields": [
+                "PrIdentifier"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "PollReview",
+            "payload": {
+              "fields": [
+                {
+                  "name": "pr",
+                  "ty": "PrIdentifier"
+                },
+                {
+                  "name": "trigger_timestamp",
+                  "ty": "domain::timestamp::Timestamp"
+                },
+                {
+                  "name": "interval",
+                  "ty": "PrPollIntervalSeconds"
+                },
+                {
+                  "name": "timeout",
+                  "ty": "PrPollTimeoutSeconds"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ReviewCycle",
+            "payload": {
+              "fields": [
+                {
+                  "name": "track_id",
+                  "ty": "core::option::Option<PrTrackIdOverride>"
+                },
+                {
+                  "name": "mode",
+                  "ty": "PrReviewCycleMode"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pr",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "PrCommandInteractor": {
+      "action": "modify",
+      "docs": "Dependency-bearing implementation of the existing PrCommandService primary port; replaces seven injected execution closures with one typed PrCommandPort and owns primitive-to-command validation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "pr",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "PrCommandOutput": {
+      "action": "reference",
+      "docs": "Baseline-identical usecase output DTO reused by the PR port, interactor, and driver to preserve stdout, stderr, and exit-code behavior. Optional String fields carry truly opaque presentation text with no domain invariant; u8 exactly models the existing process exit-code range.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "exit_code",
+              "ty": "u8"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "success",
+          "params": [
+            {
+              "name": "msg",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "failure",
+          "params": [
+            {
+              "name": "msg",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "with_exit_code",
+          "params": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "exit_code",
+              "ty": "u8"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "pr",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "PrIdentifier": {
+      "action": "add",
+      "docs": "Usecase-boundary value object for a non-empty GitHub PR number or selector. Reconnaissance found no existing typed PR selector; the raw String accepted by try_new is only the unvalidated transport representation and is never stored or passed as the PR concept before validation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "pr",
+      "role": {
+        "ValueObject": {
+          "invariants": [
+            {
+              "name": "non_empty_pr_identifier",
+              "predicate": {
+                "SelfMethod": "is_valid"
+              }
+            }
+          ]
+        }
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "PrPollIntervalSeconds": {
+      "action": "add",
+      "docs": "Usecase-boundary value object for the PR polling interval in seconds. The interval concept is stable across wait-and-merge and review-polling operations, owns the seconds-unit distinction without a rejecting value invariant, and is independent of CLI syntax, workflow mechanics, persistence, and infrastructure.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "pr",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "PrPollTimeoutSeconds": {
+      "action": "add",
+      "docs": "Usecase-boundary value object for the PR polling timeout in seconds. The timeout concept is stable across wait-and-merge and review-polling operations, owns the seconds-unit distinction without a rejecting value invariant, and is independent of CLI syntax, workflow mechanics, persistence, and infrastructure.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "pr",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "PrReviewCycleMode": {
+      "action": "add",
+      "docs": "Finite usecase-boundary value selecting whether a PR review cycle starts fresh or resumes saved trigger state. Its Start and Resume variant set is intentionally closed and exhaustive; workspace consumers must match every variant, so additions require coordinated compiler-checked updates.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Start",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Resume",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "pr",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "PrTrackIdOverride": {
+      "action": "add",
+      "docs": "Usecase-boundary value object for the optional PR track-id argument. It preserves arbitrary transport text without validation or normalization and remains distinct from the validated domain TrackId; reconnaissance found no equivalent boundary type.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "pr",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "ResolvedSignalChainCommand": {
+      "action": "add",
+      "docs": "Closed and exhaustive resolved command vocabulary accepted by SignalCommandPort.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CalcAdrUser",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CheckAdrUser",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "SignalRootSelection"
+                },
+                {
+                  "name": "strictness",
+                  "ty": "domain::Strictness"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CalcSpecAdr",
+            "payload": {
+              "fields": [
+                {
+                  "name": "spec_json_path",
+                  "ty": "Option<std::path::PathBuf>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "Option<std::path::PathBuf>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CheckSpecAdr",
+            "payload": {
+              "fields": [
+                {
+                  "name": "spec_json_path",
+                  "ty": "Option<std::path::PathBuf>"
+                },
+                {
+                  "name": "strictness",
+                  "ty": "domain::Strictness"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "Option<std::path::PathBuf>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CalcCatalogSpec",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CheckCatalogSpec",
+            "payload": {
+              "fields": [
+                {
+                  "name": "strictness",
+                  "ty": "domain::Strictness"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "Option<std::path::PathBuf>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CalcImplCatalog",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CheckImplCatalog",
+            "payload": {
+              "fields": [
+                {
+                  "name": "strictness",
+                  "ty": "domain::Strictness"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "Option<std::path::PathBuf>"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal_service",
+      "role": {
+        "Command": {}
+      },
+  "spec_refs": [
+    {
+      "anchor": "AC-10",
+      "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "SignalChainExecutionReport": {
+      "action": "add",
+      "docs": "Completed Signal operation report containing a structured outcome and opaque presentation text.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "outcome",
+              "ty": "domain::verify::VerifyOutcome"
+            },
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "signal_service",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "SignalCommand": {
+      "action": "add",
+      "docs": "Closed and exhaustive driver-facing Signal command vocabulary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "CalcAdrUser",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CheckAdrUser",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "strict_override",
+                  "ty": "SignalStrictOverride"
+                },
+                {
+                  "name": "gate",
+                  "ty": "core::option::Option<SignalGateName>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "core::option::Option<std::path::PathBuf>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CalcSpecAdr",
+            "payload": {
+              "fields": [
+                {
+                  "name": "spec_json_path",
+                  "ty": "core::option::Option<std::path::PathBuf>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "core::option::Option<std::path::PathBuf>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CheckSpecAdr",
+            "payload": {
+              "fields": [
+                {
+                  "name": "spec_json_path",
+                  "ty": "core::option::Option<std::path::PathBuf>"
+                },
+                {
+                  "name": "strict_override",
+                  "ty": "SignalStrictOverride"
+                },
+                {
+                  "name": "gate",
+                  "ty": "core::option::Option<SignalGateName>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "core::option::Option<std::path::PathBuf>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CalcCatalogSpec",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CheckCatalogSpec",
+            "payload": {
+              "fields": [
+                {
+                  "name": "strict_override",
+                  "ty": "SignalStrictOverride"
+                },
+                {
+                  "name": "gate",
+                  "ty": "core::option::Option<SignalGateName>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "core::option::Option<std::path::PathBuf>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CalcImplCatalog",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CheckImplCatalog",
+            "payload": {
+              "fields": [
+                {
+                  "name": "strict_override",
+                  "ty": "SignalStrictOverride"
+                },
+                {
+                  "name": "gate",
+                  "ty": "core::option::Option<SignalGateName>"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "core::option::Option<std::path::PathBuf>"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "CheckGate",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "core::option::Option<std::path::PathBuf>"
+                },
+                {
+                  "name": "spec_json_path",
+                  "ty": "core::option::Option<std::path::PathBuf>"
+                },
+                {
+                  "name": "gate",
+                  "ty": "SignalGateName"
+                },
+                {
+                  "name": "workspace_root",
+                  "ty": "core::option::Option<std::path::PathBuf>"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal_service",
+      "role": {
+        "Command": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "SignalCommandInteractor": {
+      "action": "add",
+      "docs": "SignalService implementation backed by the segregated Signal command, active-track, spec-path, and gate-config secondary ports; sole fail-closed policy enforcement owner.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "signal_service",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-02",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-10",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "SignalCommandOutput": {
+      "action": "reference",
+      "docs": "Baseline-identical usecase output DTO reused by the Signal port, interactor, and driver to preserve stdout, stderr, and exit-code behavior. Optional String fields carry truly opaque presentation text with no domain invariant; u8 exactly models the existing process exit-code range.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            },
+            {
+              "name": "exit_code",
+              "ty": "u8"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "success",
+          "params": [
+            {
+              "name": "stdout",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "failure",
+          "params": [
+            {
+              "name": "stderr",
+              "ty": "Option<String>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "signal_service",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "SignalCommandPortError": {
+      "action": "add",
+      "docs": "Closed execution-port failure identities; diagnostic-bearing variants carry opaque, sanitized adapter-boundary reason text.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RepositoryDiscovery",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "SignalFailureReason"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "BranchAbsent",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "BranchReadFailure",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "SignalFailureReason"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "SpecPathResolution",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "SignalFailureReason"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Persistence",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "SignalFailureReason"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Execution",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "SignalFailureReason"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal_service",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "SignalFailureReason": {
+      "action": "add",
+      "docs": "Application-boundary wrapper for opaque, adapter-sanitized diagnostic text; the text has no constrained domain vocabulary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "signal_service",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "SignalGateConfigError": {
+      "action": "add",
+      "docs": "Closed and exhaustive gate-configuration error taxonomy. Each reason is opaque, sanitized diagnostic text owned by the adapter boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "RepositoryDiscovery",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "SignalFailureReason"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ConfigurationNotFound",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ConfigurationInvalid",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "SignalFailureReason"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal_service",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-08",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "SignalGateName": {
+      "action": "reference",
+      "docs": "Application-boundary gate selector. The Commit and Merge variant set is intentionally closed and exhaustive; adding a gate requires coordinated match updates.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Commit",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "Merge",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal_service",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-10",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "SignalRootSelection": {
+      "action": "add",
+      "docs": "Closed and exhaustive usecase-boundary root-selection value with distinct supplied-path and discovery identities; a supplied path retains its exact value, including an empty path.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Supplied",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Discover",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal_service",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "SignalStrictOverride": {
+      "action": "add",
+      "docs": "Application-boundary value object preserving the two legal meanings of the CLI strict flag: use the selected gate-matrix cell or force strict. It prevents a transport bool from leaking into policy resolution.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "UseGateMatrix",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "ForceStrict",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "signal_service",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-10",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/pr-signal-pure-di-2026-07-26/spec.json"
+        }
+      ]
+    }
+  }
+}

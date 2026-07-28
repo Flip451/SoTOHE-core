@@ -1,0 +1,95 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-28T04:10:16Z",
+  "declaration_hash": "55641f5c2cee166ecbf1a8c5f621b3a59d921d83b84e25e87e8f5791ee54051a",
+  "implementation_input_hash": "3ec39700f4d6fca127703d46b8b0ec16b114d2700398322eef8963952b28b9f6",
+  "signals": [
+    {
+      "type_name": "CargoFeatureName",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "Hash",
+        "Ord",
+        "PartialEq",
+        "PartialOrd"
+      ]
+    },
+    {
+      "type_name": "CargoFeatureNameError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "Error",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "RustdocBaselineCapturePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "RustdocCratePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TdddFeatureDeclaration",
+      "kind_tag": "value_object",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "TdddFeatureDeclarationError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "Error",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "TdddFeatureLookupError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Display",
+        "Eq",
+        "Error",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "SchemaExporter",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

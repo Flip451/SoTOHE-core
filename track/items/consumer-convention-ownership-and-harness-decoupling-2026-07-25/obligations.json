@@ -365,7 +365,7 @@
       "id": {
         "entry_key": "FsConventionRequirementAdapter",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::conventions_resolve::ConventionRequirementPort"
+        "item_identifier": "trait_impl:usecase::conventions_resolve::requirement_port::ConventionRequirementPort"
       },
       "target_entry": {
         "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
@@ -376,8 +376,8 @@
         "kind": "trait_impl",
         "role": "SecondaryPort"
       },
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::conventions_resolve::ConventionRequirementPort' of FsConventionRequirementAdapter",
-      "declaration_hash": "54a9ae98b7bcb60aa957ace09254d7f62913898e69acb5bde31528b32f04d904",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::conventions_resolve::requirement_port::ConventionRequirementPort' of FsConventionRequirementAdapter",
+      "declaration_hash": "30202f165d0ed31d341c8de627ece2746c92468e99f08d21423bd25b0947cf00",
       "spec_refs": [
         {
           "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
@@ -409,7 +409,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::template_conventions::ConventionInventoryPort' of FsConventionInventoryAdapter",
-      "declaration_hash": "07c822e70c741cfd552ba76574e75533f51621ef40bf99bfe821e19d02c7da1e",
+      "declaration_hash": "27c76fddfefa7ea561c19d9fb63dcae482581e60c9d8958211321a6bb9606fad",
       "spec_refs": [
         {
           "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",

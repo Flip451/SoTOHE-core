@@ -41,7 +41,8 @@
     },
     "types": {
       "patterns": [
-        "track/items/<track-id>/*-types.json"
+        "track/items/<track-id>/*-types.json",
+        "track/items/<track-id>/tddd-features.json"
       ],
       "briefing_file": ".harness/custom/review-prompts/types.md"
     },

@@ -20,7 +20,9 @@
 use std::fmt;
 use std::path::{Path, PathBuf};
 
-use crate::tddd::catalogue_v2::CatalogueDocument;
+use crate::TrackId;
+use crate::tddd::CargoFeatureName;
+use crate::tddd::catalogue_v2::{CatalogueDocument, CrateName};
 
 // ---------------------------------------------------------------------------
 // CatalogueDocumentLoaderError
@@ -194,7 +196,7 @@ pub trait RustdocCratePort: Send + Sync {
     fn load_from_path(&self, path: &Path) -> Result<rustdoc_types::Crate, RustdocCratePortError>;
 
     /// Captures the current `rustdoc_types::Crate` via `cargo +nightly rustdoc`
-    /// (C-side live capture).
+    /// (C-side live capture) with the validated layer feature selection.
     ///
     /// # Errors
     ///
@@ -204,7 +206,8 @@ pub trait RustdocCratePort: Send + Sync {
     /// be deserialized.
     fn capture_current(
         &self,
-        crate_name: &str,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
     ) -> Result<rustdoc_types::Crate, RustdocCratePortError>;
 }
 
@@ -364,6 +367,7 @@ pub trait RustdocBaselineCapturePort: Send + Sync {
     ///   May differ from the workspace that contains `items_dir` (git-worktree
     ///   capture flow).
     /// * `binding` — the TDDD layer binding resolved from `architecture-rules.json`.
+    /// * `features` — validated Cargo features declared for `binding.layer_id`.
     ///
     /// # Errors
     ///
@@ -373,9 +377,10 @@ pub trait RustdocBaselineCapturePort: Send + Sync {
     fn capture(
         &self,
         items_dir: &std::path::Path,
-        track_id: &str,
+        track_id: &TrackId,
         rustdoc_workspace: &std::path::Path,
         binding: &TdddLayerBinding,
+        features: &[CargoFeatureName],
     ) -> Result<(), BaselineCaptureIoError>;
 }
 

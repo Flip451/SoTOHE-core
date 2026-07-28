@@ -1,0 +1,653 @@
+{
+  "track_id": "pr-signal-pure-di-2026-07-26",
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "PrBaseOverride",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:non_empty_pr_base_override"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "PrBaseOverride"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "ValueObject"
+      },
+      "brief": "Author a boundary test covering 'invariant:non_empty_pr_base_override' of PrBaseOverride",
+      "declaration_hash": "4fd32ab2a3e69f1d07a6293947e8cae1c9de129ab035f197e1259fd84e0ad6c2",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "PrCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "PrCommandInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of PrCommandInteractor",
+      "declaration_hash": "d7313d327f9a8a1a5a037ab52af7260209e31e4d7c76de348fbb129b593aed07",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "PrIdentifier",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:non_empty_pr_identifier"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "PrIdentifier"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "ValueObject"
+      },
+      "brief": "Author a boundary test covering 'invariant:non_empty_pr_identifier' of PrIdentifier",
+      "declaration_hash": "45ff22aeefe386107c7c3ad3adb44939da0b7eb9a64d020d9f0bf9f38e163a5c",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SignalCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "SignalCommandInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of SignalCommandInteractor",
+      "declaration_hash": "3db2a3b102806c431b02712d90e0b08307749d1ca076aaf9516fc0d143ca9bc3",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-08"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "PrCommandPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "PrCommandPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:execute' of PrCommandPort",
+      "declaration_hash": "790babd669b598fdbaea6958bcc41730273a1ca8520cf8a893dd94c7e021e50a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SignalActiveTrackResolverPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve_active_track"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "SignalActiveTrackResolverPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:resolve_active_track' of SignalActiveTrackResolverPort",
+      "declaration_hash": "ee51506624a6ac94ff56e6337efef2937605439973c4443e0d2e7b4a78163dce",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SignalCommandPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "SignalCommandPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:execute' of SignalCommandPort",
+      "declaration_hash": "287b66f17a3875010024f6b6bf457c9d3b614ec357b2ee0cdf36efd021b130dd",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SignalGateConfigPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "SignalGateConfigPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load' of SignalGateConfigPort",
+      "declaration_hash": "55e0896926da85e52bdfff960dc586a001ae4333e3064b473c166547a8d7fc78",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-08"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-10"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SignalSpecPathResolverPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve_spec_path"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "SignalSpecPathResolverPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:resolve_spec_path' of SignalSpecPathResolverPort",
+      "declaration_hash": "c510bdc4a6b8b9cca228ab7ac51d339f9183de183e301d80667370024a1ca4eb",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pr::PrCommandPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "SystemPrCommandAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::pr::PrCommandPort' of SystemPrCommandAdapter",
+      "declaration_hash": "2e70c060ac01e921a5be20756e6e79d8298d6419ca166ac3a61451c2313c5f86",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalCommandPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "SystemSignalCommandAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::signal_service::SignalCommandPort' of SystemSignalCommandAdapter",
+      "declaration_hash": "ae4369c153ce02cfc3762d2eac1738827189818544720e968649dd8440c60eee",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalActiveTrackResolverPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "SystemSignalCommandAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::signal_service::SignalActiveTrackResolverPort' of SystemSignalCommandAdapter",
+      "declaration_hash": "8817421b3f95fa3645838190acab19ad74b5a97fd6415ef1e1a81a03c4e9b4a8",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalSpecPathResolverPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "SystemSignalCommandAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::signal_service::SignalSpecPathResolverPort' of SystemSignalCommandAdapter",
+      "declaration_hash": "e41a7759357eb9222598db5afa1e03853df81718077484fb2a97e6e979db15a3",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "SystemSignalGateConfigAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalGateConfigPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "SystemSignalGateConfigAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::signal_service::SignalGateConfigPort' of SystemSignalGateConfigAdapter",
+      "declaration_hash": "b1261722f7cad79524058179c74bba5e00ab0ed175d7b66835d89a206d5dabec",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-08"
+        },
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-10"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::signal::run_aggregate_check",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::signal::run_aggregate_check"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::signal::run_aggregate_check",
+      "declaration_hash": "402f5b86d0fe9eeb5c4fc9d68ca0b29f799d8b6dbf2d6d9707dec23405352e69",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::signal::calc_adr_user::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::signal::calc_adr_user::run"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::signal::calc_adr_user::run",
+      "declaration_hash": "61c401ccda16ecdd9030aaf1bd4d260f3403570de6253f5cf6083bf901bfd9aa",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::signal::calc_catalog_spec::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::signal::calc_catalog_spec::run"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::signal::calc_catalog_spec::run",
+      "declaration_hash": "f8eaa45ede8944430a76aa1a75bce822fd81884ea188aaa0573deabdccc5acd6",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::signal::calc_impl_catalog::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::signal::calc_impl_catalog::run"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::signal::calc_impl_catalog::run",
+      "declaration_hash": "ff68b3273dfb89370380acdd16b23cb2650cc69f4a645ad3a0d5e1a28f4fefcb",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::signal::calc_spec_adr::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::signal::calc_spec_adr::run"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::signal::calc_spec_adr::run",
+      "declaration_hash": "af84613920c52aad845d0afbe5df6a8fad379ae6f98c1eb8fb09efd87a08797f",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::signal::check_adr_user::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::signal::check_adr_user::run"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::signal::check_adr_user::run",
+      "declaration_hash": "2e29e4f95a244f1c216b2378651723af0e83db506783464cd33129757d306c60",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::signal::check_catalog_spec::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::signal::check_catalog_spec::run"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::signal::check_catalog_spec::run",
+      "declaration_hash": "9680f2acc08db815d7f39972524d293fcdeb1defb51100ac0ce27904225ec393",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::signal::check_impl_catalog::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::signal::check_impl_catalog::run"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::signal::check_impl_catalog::run",
+      "declaration_hash": "f798cc44ffb36b734f78c71f63cdb5591bd507ccff018bbc6717717848b8fd58",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "cli::commands::signal::check_spec_adr::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+        "section_key": "functions",
+        "entry_key": "cli::commands::signal::check_spec_adr::run"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of cli::commands::signal::check_spec_adr::run",
+      "declaration_hash": "bdb30c2e0b9682e8115693591902d68561c037d423853f15bc9e42db2c65eb39",
+      "spec_refs": [
+        {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    }
+  ]
+}

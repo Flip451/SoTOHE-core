@@ -1,0 +1,325 @@
+{
+  "track_id": "test-obligation-stale-verdict-fix-2026-07-26",
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "domain::tddd::test_obligation::ids::unavailable_diagnostic_message",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+        "section_key": "functions",
+        "entry_key": "domain::tddd::test_obligation::ids::unavailable_diagnostic_message"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of domain::tddd::test_obligation::ids::unavailable_diagnostic_message",
+      "declaration_hash": "c69e55e6f83102408f71913f4395822421b82c590c209d63c9c966d5afc2b369",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "GO-02"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CheckTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "CheckTestObligationsInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of CheckTestObligationsInteractor",
+      "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-02"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-03"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-01"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-02"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-06"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "EvaluateTestObligationsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "EvaluateTestObligationsInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of EvaluateTestObligationsInteractor",
+      "declaration_hash": "57718c9badd5c550f7c65dee8837fe23e0cacc2bd4a7cf4cbd13ba4143b48340",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-03"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ResolvedBoundTestsResolver",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "ResolvedBoundTestsResolver"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of ResolvedBoundTestsResolver",
+      "declaration_hash": "e1d55c02afdfd48816872bc12b0457fe0d0c23042fea8941819aaf3bdd4afdf9",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-05"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TestObligationResultsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "TestObligationResultsInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of TestObligationResultsInteractor",
+      "declaration_hash": "f4927a106596d0248be2a0367b4a126d3865874c25bfc99352bf0b512d9eab38",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-04"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ObligationFulfillmentCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ObligationFulfillmentCachePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load' of ObligationFulfillmentCachePort",
+      "declaration_hash": "0b85f8cae2921b0e4080fc072b60684e00b3e14a942779cd523137c75241d4a3",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-06"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ObligationFulfillmentCachePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:save"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ObligationFulfillmentCachePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:save' of ObligationFulfillmentCachePort",
+      "declaration_hash": "0b85f8cae2921b0e4080fc072b60684e00b3e14a942779cd523137c75241d4a3",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-06"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ResolvedBoundTestsResolverPort",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:resolve"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ResolvedBoundTestsResolverPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:resolve' of ResolvedBoundTestsResolverPort",
+      "declaration_hash": "0cddd3e56ca9d15eb015a1dd74de18aeafd261f713c91496456004888718a7ba",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-05"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "JsonObligationFulfillmentCacheCodec",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::test_obligation::ports::ObligationFulfillmentCachePort"
+      },
+      "target_entry": {
+        "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "JsonObligationFulfillmentCacheCodec"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::test_obligation::ports::ObligationFulfillmentCachePort' of JsonObligationFulfillmentCacheCodec",
+      "declaration_hash": "52b322f9174745d83e0b2a6eeb59da6264dea26980f213da818f544ba27c173b",
+      "spec_refs": [
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",
+          "element_id": "AC-06"
+        }
+      ]
+    }
+  ]
+}

@@ -3,7 +3,8 @@
 use std::path::PathBuf;
 
 use clap::Args;
-use cli_composition::{CommandOutcome, CompositionError, SignalCompositionRoot};
+use cli_composition::{CommandOutcome, CompositionError};
+use cli_driver::signal::{SignalDriver, SignalInput};
 
 /// Arguments for `signal calc-spec-adr`.
 #[derive(Args, Debug)]
@@ -21,8 +22,11 @@ pub struct CalcSpecAdrArgs {
 
 /// Execute `signal calc-spec-adr`.
 pub fn run(
-    app: &SignalCompositionRoot,
+    driver: &SignalDriver,
     args: CalcSpecAdrArgs,
 ) -> Result<CommandOutcome, CompositionError> {
-    app.signal_calc_spec_adr(args.spec_json, args.workspace_root)
+    Ok(driver.handle(SignalInput::CalcSpecAdr {
+        spec_json_path: args.spec_json,
+        workspace_root: args.workspace_root,
+    }))
 }

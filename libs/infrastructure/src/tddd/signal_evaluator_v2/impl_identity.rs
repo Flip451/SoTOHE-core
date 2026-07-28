@@ -100,9 +100,10 @@ pub(crate) fn is_compiler_internal_trait(normalized_trait_name: &str) -> bool {
 /// Trait path normalization (via `normalize_impl_trait_path`):
 /// - Local-crate trait paths (`crate::MyTrait`, bare `MyTrait`,
 ///   `{crate_name}::MyTrait`) are reduced to their last segment so that S-side
-///   codec paths and C-side rustdoc paths produce the same key. The domain and
-///   usecase `TypeSignalsExecutorPort` paths are retained because the catalogue
-///   explicitly models their replacement as separate delete/add identities.
+///   codec paths and C-side rustdoc paths produce the same key.
+/// - Workspace-external trait paths from `domain` and `usecase` are preserved
+///   with their canonical crate path. They are distinct trait identities even
+///   when their last path segment is the same.
 /// - External crate paths (e.g. `serde::Serialize`) are preserved verbatim to
 ///   prevent collisions between distinct traits sharing the same short name.
 ///
@@ -298,23 +299,25 @@ pub(crate) fn build_impl_identity_map(krate: &Crate, crate_name: &str) -> BTreeM
                             "core" | "alloc" => {
                                 crate::tddd::type_ref_parser::core_canonical_path(&joined)
                             }
-                            "domain" | "usecase" if joined == "TypeSignalsExecutorPort" => {
-                                format!("{ext_crate_name}::{joined}")
-                            }
-                            "domain" | "usecase" => joined,
+                            "domain" | "usecase" => format!("{ext_crate_name}::{joined}"),
                             other => format!("{other}::{joined}"),
                         }
                     } else if let Some(first_seg) = ps.path.first() {
-                        // Most workspace trait identities are historically normalised to their
-                        // short name. The TypeSignals executor port is the exception: its
-                        // domain-to-usecase migration is modelled as delete/add, so collapsing
-                        // the two qualified paths would hide both declared changes.
-                        let is_executor_port = ps.path.last().is_some_and(|last| {
-                            last == "TypeSignalsExecutorPort"
-                                && matches!(first_seg.as_str(), "domain" | "usecase")
-                        });
-                        if is_executor_port {
-                            joined
+                        // `domain` and `usecase` are external workspace crates from the
+                        // perspective of this crate. Their trait identities must retain the
+                        // canonical crate path: collapsing either to a short name would make
+                        // e.g. the two distinct `ObligationFulfillmentCachePort` traits collide.
+                        let ext_crate_name = krate
+                            .external_crates
+                            .get(&ps.crate_id)
+                            .map(|ec| ec.name.as_str())
+                            .unwrap_or("");
+                        if matches!(ext_crate_name, "domain" | "usecase") {
+                            if first_seg.as_str() == ext_crate_name {
+                                joined
+                            } else {
+                                format!("{ext_crate_name}::{joined}")
+                            }
                         } else {
                             ps.path.last().unwrap_or(first_seg).to_string()
                         }

@@ -27,6 +27,7 @@ pub mod contract_map_content;
 pub mod contract_map_options;
 pub mod contract_map_renderer;
 pub mod extended_crate;
+pub mod feature_declaration;
 pub mod layer_id;
 pub mod new_typegraph_codec_error;
 pub mod primitive_occurrence_scanner;
@@ -51,6 +52,10 @@ pub use contract_map_renderer::{
     ContractMapRendererError,
 };
 pub use extended_crate::ExtendedCrate;
+pub use feature_declaration::{
+    CargoFeatureName, CargoFeatureNameError, TdddFeatureDeclaration, TdddFeatureDeclarationError,
+    TdddFeatureLookupError,
+};
 pub use layer_id::LayerId;
 pub use new_typegraph_codec_error::NewTypeGraphCodecError;
 pub use signal_evaluator::{

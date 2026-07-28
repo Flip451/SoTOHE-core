@@ -5,6 +5,9 @@
 
 use std::path::PathBuf;
 
+use crate::tddd_feature_declaration::TdddBaselineFeatureDeclarationPortError;
+use domain::tddd::LayerId;
+use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use thiserror::Error;
 
 // ---------------------------------------------------------------------------
@@ -35,34 +38,26 @@ pub struct BaselineCaptureRequest {
 #[derive(Debug, Error)]
 pub enum BaselineCaptureError {
     /// The track ID format is invalid.
-    #[error("invalid track id: {reason}")]
-    InvalidTrackId {
-        /// Human-readable reason from the domain validator.
-        reason: String,
-    },
+    #[error("invalid track id: {}", .0.as_str())]
+    InvalidTrackId(DiagnosticMessage),
     /// A symlink was found in a guarded path.
-    #[error("symlink guard rejected path: {path}")]
-    SymlinkRejected {
-        /// The rejected path (as a string for Display).
-        path: String,
-    },
+    #[error("symlink guard rejected path: {}", .0.display())]
+    SymlinkRejected(std::path::PathBuf),
+    /// A symlink guard could not inspect a path because of an I/O failure.
+    #[error("symlink guard I/O error for path '{}': {}", .0.display(), .1.as_str())]
+    SymlinkGuardIo(std::path::PathBuf, DiagnosticMessage),
     /// Failed to load the TDDD layer bindings from `architecture-rules.json`.
-    #[error("layer bindings load failed: {reason}")]
-    LayerBindingsLoad {
-        /// Human-readable reason.
-        reason: String,
-    },
+    #[error("layer bindings load failed: {}", .0.as_str())]
+    LayerBindingsLoad(DiagnosticMessage),
     /// No TDDD-enabled layers found.
     #[error("no TDDD-enabled layers found in architecture-rules.json")]
     NoLayers,
     /// The rustdoc baseline capture failed for a specific layer.
-    #[error("baseline capture failed for layer '{layer_id}': {reason}")]
-    CaptureFailed {
-        /// Layer id for which capture failed.
-        layer_id: String,
-        /// Human-readable reason.
-        reason: String,
-    },
+    #[error("baseline capture failed for layer '{}': {}", .0, .1.as_str())]
+    CaptureFailed(LayerId, DiagnosticMessage),
+    /// The feature declaration could not be loaded or frozen for baseline capture.
+    #[error("feature declaration failed: {0}")]
+    FeatureDeclaration(TdddBaselineFeatureDeclarationPortError),
 }
 
 // ---------------------------------------------------------------------------
@@ -96,18 +91,30 @@ mod tests {
     #[test]
     fn test_baseline_capture_error_display_covers_all_variants() {
         let variants = [
-            BaselineCaptureError::InvalidTrackId { reason: "test reason".to_owned() },
-            BaselineCaptureError::SymlinkRejected { path: "/tmp/link".to_owned() },
-            BaselineCaptureError::LayerBindingsLoad { reason: "test reason".to_owned() },
+            BaselineCaptureError::InvalidTrackId(diagnostic("test reason")),
+            BaselineCaptureError::SymlinkRejected(std::path::PathBuf::from("/tmp/link")),
+            BaselineCaptureError::SymlinkGuardIo(
+                std::path::PathBuf::from("/tmp/unreadable"),
+                diagnostic("permission denied"),
+            ),
+            BaselineCaptureError::LayerBindingsLoad(diagnostic("test reason")),
             BaselineCaptureError::NoLayers,
-            BaselineCaptureError::CaptureFailed {
-                layer_id: "domain".to_owned(),
-                reason: "test reason".to_owned(),
-            },
+            BaselineCaptureError::CaptureFailed(layer("domain"), diagnostic("test reason")),
+            BaselineCaptureError::FeatureDeclaration(
+                TdddBaselineFeatureDeclarationPortError::BaselineSnapshotMismatch,
+            ),
         ];
         for v in &variants {
             let msg = v.to_string();
             assert!(!msg.is_empty(), "Display must produce non-empty output for {v:?}");
         }
+    }
+
+    fn diagnostic(value: &str) -> DiagnosticMessage {
+        DiagnosticMessage::try_new(value.to_owned()).unwrap()
+    }
+
+    fn layer(value: &str) -> LayerId {
+        LayerId::try_new(value.to_owned()).unwrap()
     }
 }

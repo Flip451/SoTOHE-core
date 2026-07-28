@@ -655,3 +655,22 @@ fn extract_similar_fragments(
 
     Ok(fragments)
 }
+
+#[cfg(test)]
+mod tests {
+    #![allow(clippy::unwrap_used)]
+
+    use usecase::semantic_dup::SemanticIndexPort as _;
+
+    use super::LanceDbSemanticIndexAdapter;
+
+    #[test]
+    fn test_lance_db_semantic_index_adapter_insert_batch_empty_is_noop() {
+        let workspace = tempfile::tempdir().unwrap();
+        let adapter = LanceDbSemanticIndexAdapter::new(workspace.path().join("index")).unwrap();
+
+        let result = adapter.insert_batch(&[]);
+
+        assert!(result.is_ok(), "an empty batch must not create or mutate an index table");
+    }
+}

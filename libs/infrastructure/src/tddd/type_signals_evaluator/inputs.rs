@@ -3,7 +3,9 @@
 use std::io;
 use std::path::Path;
 
-use domain::tddd::type_signals_doc::ImplementationInputHash;
+use domain::tddd::CargoFeatureName;
+use domain::tddd::type_signals_doc::{ImplementationInputHash, Sha256Digest};
+use sha2::Digest as _;
 
 use super::{EvaluateSignalsError, build_inputs};
 use crate::tddd::type_signals_codec;
@@ -42,15 +44,35 @@ pub(super) fn read_utf8_file_limited(
 pub(super) fn hash_workspace_inputs(
     workspace_root: &Path,
     target_crate: &str,
+    features: &[CargoFeatureName],
 ) -> Result<ImplementationInputHash, EvaluateSignalsError> {
-    build_inputs::hash_implementation_inputs(workspace_root, target_crate)
-        .map(ImplementationInputHash::new)
+    let implementation_hash =
+        build_inputs::hash_implementation_inputs(workspace_root, target_crate)?;
+    implementation_hash_with_feature_selection(implementation_hash, features)
+}
+
+fn implementation_hash_with_feature_selection(
+    implementation_hash: Sha256Digest,
+    features: &[CargoFeatureName],
+) -> Result<ImplementationInputHash, EvaluateSignalsError> {
+    let mut hasher = sha2::Sha256::new();
+    hasher.update(b"type-signals-feature-selection-v1\0");
+    hasher.update(implementation_hash.as_str().as_bytes());
+    for feature in features {
+        hasher.update(feature.as_str().as_bytes());
+        hasher.update([0]);
+    }
+    let digest = Sha256Digest::try_new(format!("{:x}", hasher.finalize())).map_err(|error| {
+        EvaluateSignalsError(format!("failed to construct implementation-input digest: {error}"))
+    })?;
+    Ok(ImplementationInputHash::new(digest))
 }
 
 /// Rejects persistence when inputs change while rustdoc or evaluation is running.
 pub(super) fn verify_evaluation_inputs_unchanged(
     workspace_root: &Path,
     target_crate: &str,
+    features: &[CargoFeatureName],
     catalogue_path: &Path,
     initial_declaration_hash: &domain::CatalogueDeclarationHash,
     initial_implementation_input_hash: &ImplementationInputHash,
@@ -67,7 +89,9 @@ pub(super) fn verify_evaluation_inputs_unchanged(
             "catalogue changed during type-signal evaluation".to_owned(),
         ));
     }
-    if hash_workspace_inputs(workspace_root, target_crate)? != *initial_implementation_input_hash {
+    if hash_workspace_inputs(workspace_root, target_crate, features)?
+        != *initial_implementation_input_hash
+    {
         return Err(EvaluateSignalsError(
             "implementation inputs changed during type-signal evaluation".to_owned(),
         ));
@@ -78,10 +102,28 @@ pub(super) fn verify_evaluation_inputs_unchanged(
 #[cfg(test)]
 #[allow(clippy::unwrap_used)]
 mod tests {
-    use super::read_utf8_file_limited;
+    use super::{implementation_hash_with_feature_selection, read_utf8_file_limited};
+    use domain::tddd::CargoFeatureName;
+    use domain::tddd::type_signals_doc::Sha256Digest;
 
     #[test]
     fn test_read_utf8_file_limited_rejects_missing_file() {
         assert!(read_utf8_file_limited(std::path::Path::new("missing"), 1).is_err());
+    }
+
+    #[test]
+    fn test_implementation_hash_changes_when_feature_selection_changes() {
+        let base = Sha256Digest::try_new("0".repeat(64)).unwrap();
+        let no_features = implementation_hash_with_feature_selection(base.clone(), &[]).unwrap();
+        let semantic_dup = implementation_hash_with_feature_selection(
+            base,
+            &[CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap()],
+        )
+        .unwrap();
+
+        assert_ne!(
+            no_features, semantic_dup,
+            "a changed rustdoc feature selection must force a fresh type-signal extraction"
+        );
     }
 }

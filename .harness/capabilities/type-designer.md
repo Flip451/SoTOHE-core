@@ -52,14 +52,15 @@ Translate the track's ADR (design decisions) and spec.json (behavioral contract)
 - Fill every generated `$todo` hole with the designed judgment content (intent / docs / design slots)
 - Ensure in-crate type references use **last-segment names only** (e.g., `TrackId`, not `<this-crate>::track::TrackId`) — paths that lack a `crate::` / `self::` / `super::` prefix but contain `::` are treated by the A-codec as cross-crate FQNs; using a bare multi-segment path for an in-crate type produces an unresolved cross-crate reference instead of resolving locally. Cross-crate references use FQN with `::` (e.g., `<other-crate>::module::TypeName`), where `<other-crate>` is the workspace crate name from `architecture-rules.json`. Standard-library types not in the A-codec auto-resolve set (e.g. `std::path::PathBuf`) must use their full path even when the usage context is within the same crate — they are NOT in-crate types.
 
-The specialist owns each `<layer>-types.json` and its derived views for this track, executed in the canonical order **baseline → generate + annotate → signals → views**:
+The specialist owns each `<layer>-types.json`, the track-scoped `tddd-features.json`, and their derived views for this track, executed in the canonical order **feature declaration → baseline → generate + annotate → signals → views**:
 
-1. captures baselines of the current code state
-2. generates the catalogue entries via the `sotp catalog` verbs and annotates the generated skeletons (informed by ADR + spec + reconnaissance from the pre-catalogue baseline-graph reads — see the Internal pipeline below)
-3. generates the catalogue → spec signal JSON via `bin/sotp signal calc-catalog-spec` and evaluates the type → spec signal via `bin/sotp signal calc-impl-catalog`, capturing per-layer blue / yellow / red counts
-4. regenerates the per-layer rendered views (contract-map md, `<layer>-types.md` via `sync_rendered_views`, plus the baseline-graph reconnaissance views from step 2's pre-work)
+1. authors `track/items/<id>/tddd-features.json` with every TDDD-enabled layer from `architecture-rules.json`, including explicit empty arrays for featureless layers; each non-empty feature list is grounded in the target crate's Cargo.toml
+2. captures baselines of the current code state
+3. generates the catalogue entries via the `sotp catalog` verbs and annotates the generated skeletons (informed by ADR + spec + reconnaissance from the pre-catalogue baseline-graph reads — see the Internal pipeline below)
+4. generates the catalogue → spec signal JSON via `bin/sotp signal calc-catalog-spec` and evaluates the type → spec signal via `bin/sotp signal calc-impl-catalog`, capturing per-layer blue / yellow / red counts
+5. regenerates the per-layer rendered views (contract-map md, `<layer>-types.md` via `sync_rendered_views`, plus the baseline-graph reconnaissance views from step 2's pre-work)
 
-The orchestrator receives the per-layer signal counts from step 3 and decides whether Phase 2 passes.
+The orchestrator receives the per-layer signal counts from step 4 and decides whether Phase 2 passes.
 
 **Reconnaissance first**: every layer pass begins with the reconnaissance procedure defined in the Internal pipeline (baseline-capture → baseline-graph rendering depth=1 + depth=2 → Read both depth outputs) so the generation intent is grounded in the existing workspace inventory before any kind / action decision is made. This reconnaissance is **internal preparation only** — the inventory and intermediate outputs are NOT echoed back to the orchestrator's final message. The reconnaissance step **must not be skipped**: it is a precondition for sound kind selection and for distinguishing `add` (no pre-existing type) from `modify` / `reference` / `delete` (pre-existing type) actions.
 
@@ -87,7 +88,13 @@ The type-designer operates on decisions already made at the ADR + spec level —
 
 ### Internal pipeline (all executed by this capability, per layer in scope)
 
-The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase and absorb the existing workspace inventory **before** any generation intent is fixed. Steps 1–5 are internal preparation — do NOT surface their outputs in the final report. Skipping any step is forbidden, including step 12 — emitting the final message before step 12 passes is a contract violation regardless of whether the specialist believes the earlier steps succeeded.
+The pipeline is fixed at **13 steps**. Step 0 and steps 1–5 prepare the declaration and absorb the existing workspace inventory **before** any generation intent is fixed. They are internal preparation — do NOT surface their outputs in the final report. Skipping any step is forbidden, including step 12 — emitting the final message before step 12 passes is a contract violation regardless of whether the specialist believes the earlier steps succeeded.
+
+0. **Author the track-scoped feature declaration before baseline capture**:
+   - Write `track/items/<id>/tddd-features.json` with `schema_version: 1` and a `layers` map containing every TDDD-enabled layer from `architecture-rules.json` exactly once.
+   - Use an explicit empty list for each featureless layer; do not omit a layer or infer absence as an empty selection.
+   - For every listed feature, confirm the target crate declares it in its `Cargo.toml`. This artifact is the sole feature input for rustdoc extraction; never add a CLI argument, flag, or subcommand route for it.
+   - Complete this authoring before step 1. Baseline capture fails closed when the declaration is absent and snapshots its bytes for the later actual capture.
 
 1. **Capture baseline** of the source state at track start:
    ```
@@ -226,7 +233,7 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
 
     If **any** expected path is still missing after all required steps have run, identify which step was responsible (the parenthetical mapping above), re-run that step, and re-validate.
 
-    **12b. Signal freshness (count-match for catalogue-spec-signals)** — even with all steps run, a step-9 partial failure (e.g. only some layers processed) can leave a stale `<layer>-catalogue-spec-signals.json` for the remaining layers. To detect this, run:
+    **12b. Signal freshness (count-match for catalogue-spec-signals)** — even with all steps run, a step-8 partial failure (e.g. only some layers processed) can leave a stale `<layer>-catalogue-spec-signals.json` for the remaining layers. To detect this, run:
 
     ```
     bin/sotp signal check-catalog-spec
@@ -462,7 +469,7 @@ Wire-format validity (role vocabulary membership, entry-name validity, function-
 
 ## Scope Ownership
 
-- **Writes permitted**: `track/items/<id>/<layer>-types.json` — generated and appended by the `bin/sotp catalog` verbs (`init` / `add` / `import` / `cite`); the Edit tool touches it only for annotation (`$todo` fill-in) and post-generation adjustment. Do NOT compose a whole catalogue document by hand with the Write tool. Baseline files (`<layer>-types-baseline.json`), baseline-graph output (`<layer>-graph-d1/index.md` + `<layer>-graph-d2/<cluster>.md`, Reality View), and contract-map (`contract-map.md`) are generated by `bin/sotp` CLI commands. Per-layer catalogue → spec signal JSON (`<layer>-catalogue-spec-signals.json`) is generated by `bin/sotp signal calc-catalog-spec`. Per-layer type → spec signal JSON (`<layer>-type-signals.json`) is generated by `bin/sotp signal calc-impl-catalog`. Per-layer catalogue view (`<layer>-types.md`) is generated by `bin/sotp track views sync`. Do NOT write these generated files directly via Write/Edit.
+- **Writes permitted**: `track/items/<id>/tddd-features.json` — author this declaration directly with Write/Edit in Step 0 before baseline capture; and `track/items/<id>/<layer>-types.json` — generated and appended by the `bin/sotp catalog` verbs (`init` / `add` / `import` / `cite`), with Edit only for annotation (`$todo` fill-in) and post-generation adjustment. Do NOT compose a whole catalogue document by hand with the Write tool. Baseline files (`<layer>-types-baseline.json`), baseline-graph output (`<layer>-graph-d1/index.md` + `<layer>-graph-d2/<cluster>.md`, Reality View), and contract-map (`contract-map.md`) are generated by `bin/sotp` CLI commands. Per-layer catalogue → spec signal JSON (`<layer>-catalogue-spec-signals.json`) is generated by `bin/sotp signal calc-catalog-spec`. Per-layer type → spec signal JSON (`<layer>-type-signals.json`) is generated by `bin/sotp signal calc-impl-catalog`. Per-layer catalogue view (`<layer>-types.md`) is generated by `bin/sotp track views sync`. Do NOT write these generated files directly via Write/Edit.
 - **Writes forbidden**: any other track's artifacts, other capabilities' SSoT files (`spec.json`, `impl-plan.json`, `task-coverage.json`, `task-contract.json`, `metadata.json`), any file under `knowledge/adr/` or `knowledge/conventions/`, any source code, and track task-state transitions through `bin/sotp track transition`; this capability has no task-state transition authority. The test-obligation enrollment artifacts (`obligations.json` / `test-bindings.json`) are also outside this capability's write set: the enclosing `type-design` workflow materializes them in the mandatory terminal derive step it owns (`.harness/workflows/track/type-design.md` Step 4), re-running `bin/sotp test-obligation derive` after every catalogue (re-)generation — never delete or edit them from this capability. `plan.md` must not be edited directly via Write/Edit — it is regenerated as a side effect of `bin/sotp track views sync` (Step 11), which is required by this pipeline.
 - **Bash usage**: restricted to `bin/sotp` CLI invocations required by the internal pipeline (`bin/sotp catalog init` / `add` / `import` / `cite` / `check`, `bin/sotp catalogue-lint check-active-track`, `bin/sotp track baseline-capture`, `bin/sotp track baseline-graph`, `bin/sotp track contract-map`, `bin/sotp signal calc-catalog-spec`, `bin/sotp signal calc-impl-catalog`, `bin/sotp track views sync`, `bin/sotp signal check-catalog-spec`). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
 - Do not spawn further agents (keep type-designer output deterministic).
@@ -474,7 +481,7 @@ Per `.harness/policies/sot-reentry-sequencing.md`, a re-entry dispatch of this c
 
 ## Rules
 
-- Use `Read`, `Grep`, `Glob` for exploring catalogues / baselines / code; `Edit` on `<layer>-types.json` only for annotation (`$todo` fill-in / post-generation adjustment — entry skeletons come from the `bin/sotp catalog` verbs, never from a hand-composed Write); `Bash` only for the `bin/sotp` CLI invocations enumerated in Scope Ownership
+- Use `Read`, `Grep`, `Glob` for exploring catalogues / baselines / code; use `Write`/`Edit` on `tddd-features.json` only to author or correct the Step 0 feature declaration; use `Edit` on `<layer>-types.json` only for annotation (`$todo` fill-in / post-generation adjustment — entry skeletons come from the `bin/sotp catalog` verbs, never from a hand-composed Write); `Bash` only for the `bin/sotp` CLI invocations enumerated in Scope Ownership
 - Do not use `Bash(cat/grep/head/tail/sed/awk)` — dedicated tools only
 - Do not run `git` commands
 - Do not modify `spec.json`, `metadata.json`, `impl-plan.json`, `task-coverage.json`, `task-contract.json` directly. Do not edit `plan.md` directly via Write/Edit — it is regenerated by the required `bin/sotp track views sync` (Step 11)

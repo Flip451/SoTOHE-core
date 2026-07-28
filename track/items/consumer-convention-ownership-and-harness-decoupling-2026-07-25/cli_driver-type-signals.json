@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-26T16:00:17Z",
+  "generated_at": "2026-07-28T13:25:50Z",
   "declaration_hash": "9869ef883a9ab5e60f8a8d91d90d3199f37ac84a676be6e87518477feabeb860",
-  "implementation_input_hash": "52963e3c16e0fe47e29682476804c2465b6f29af97f44106598c3c13a2f93f5c",
+  "implementation_input_hash": "8f4693ea24811bb2f28bd46006da89c074e531ca23cc970e5bb253a68bc2c9e1",
   "signals": [
     {
       "type_name": "ConventionCapabilityIdArg",

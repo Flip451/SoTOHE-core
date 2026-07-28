@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "bea678c596a40e27d6e23c6387adf6c80b0871d1f3d6a2c8d39fdc8566de6886",
+      "evidence_hash": "704485e32c631b64ab7aa700ff42e73710aaf2694f11a3afb62fc314f62a5d08",
+      "verdict": {
+        "kind": "pass",
+        "citation": "track 配下の commit 対象の専用成果物に、各 layer とその crate をビルド時に有効化する Cargo feature のリストとの対応を宣言する。feature を必要としない layer も空リストで明示する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTdddFeatureDeclarationAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "track 配下の commit 対象の専用成果物に、各 layer とその crate をビルド時に有効化する Cargo feature のリストとの対応を宣言する。feature を必要としない layer も空リストで明示する"
+        }
+      }
+    },
+    {
+      "claim_hash": "bea678c596a40e27d6e23c6387adf6c80b0871d1f3d6a2c8d39fdc8566de6886",
+      "evidence_hash": "b498dced34061fafd4265a95df413cb15bc2cc8262545e6d2290345cb0a13d50",
+      "verdict": {
+        "kind": "pass",
+        "citation": "対象 crate の Cargo.toml に存在しない feature を宣言した track は gate で fail-closed に拒否される"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "FsTdddFeatureDeclarationAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "対象 crate の Cargo.toml に存在しない feature を宣言した track は gate で fail-closed に拒否される"
+        }
+      }
+    },
+    {
+      "claim_hash": "e11b81a0e243a02169ff82877bd5b9f8f6567e29434029ea02392d04399b56cf",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocBaselineCaptureAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "5abde4a83c117d95c555221da483d376a77c099cab0f6e6b80a425c9038eb0e0",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocCrateAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "55bd1a84958c681f3154a0f042506755d403bad78d46b0a86313ba094ea022f0",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "RustdocSchemaExporter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "93ea1f4963d515901332bc3ff9fcea78128e5940a048ab7353bd0192d69c0595",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsExecutorAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "81b3834d9af7b584bf75dc58ed45ded29dbcb2463d6c468f47b47ecd96ddec4c",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    }
+  ]
+}

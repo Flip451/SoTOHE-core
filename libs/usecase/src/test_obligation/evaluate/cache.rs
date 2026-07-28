@@ -3,7 +3,7 @@
 use domain::tddd::test_obligation::hashes::VerifierPromptFingerprint;
 use domain::tddd::test_obligation::ids::{TestObligationEdgeId, TestObligationId};
 use domain::tddd::test_obligation::verdict::{
-    ObligationFulfillmentCacheDocument, ObligationFulfillmentCacheKey,
+    FulfillmentCacheLookupError, ObligationFulfillmentCacheDocument, ObligationFulfillmentCacheKey,
     ObligationFulfillmentVerdict, WaiverCacheDocument, WaiverCacheKey, WaiverVerdict,
 };
 
@@ -18,18 +18,14 @@ pub(super) fn cached_fulfillment_verdict(
     obligation_id: &TestObligationId,
     key: &ObligationFulfillmentCacheKey,
     verifier_fingerprint: &VerifierPromptFingerprint,
-) -> Option<ObligationFulfillmentVerdict> {
-    cache?
-        .entries()
-        .iter()
-        .find(|entry| {
-            entry.edge_id() == edge_id
-                && entry.obligation_id() == obligation_id
-                && entry.key() == key
-                && entry.verifier_fingerprint() == Some(verifier_fingerprint)
-                && !matches!(entry.verdict(), ObligationFulfillmentVerdict::Pending)
-        })
-        .map(|entry| entry.verdict().clone())
+) -> Result<Option<ObligationFulfillmentVerdict>, FulfillmentCacheLookupError> {
+    let Some(cache) = cache else {
+        return Ok(None);
+    };
+    Ok(cache
+        .lookup_current(edge_id, obligation_id, key, verifier_fingerprint)?
+        .filter(|entry| !matches!(entry.verdict(), ObligationFulfillmentVerdict::Pending))
+        .map(|entry| entry.verdict().clone()))
 }
 
 /// Returns a frozen waiver verdict only when the edge, owner, complete
@@ -60,6 +56,7 @@ pub(super) fn cached_waiver_verdict(
 #[allow(clippy::unwrap_used)]
 mod tests {
     use domain::tddd::semantic_verify::CatalogueEntryKey;
+    use domain::tddd::test_obligation::binding::NonEmptyTestLocations;
     use domain::tddd::test_obligation::hashes::{
         AnchorTextHash, BoundTestsSetHash, DeclarationHash, WaivedReasonHash,
     };
@@ -67,8 +64,8 @@ mod tests {
         TestObligationAnchorId, TestObligationItemIdentifier,
     };
     use domain::tddd::test_obligation::verdict::{
-        ObligationFulfillmentCacheDocument, ObligationFulfillmentCacheEntry, WaiverCacheDocument,
-        WaiverCacheEntry,
+        ObligationFulfillmentCacheDocument, ObligationFulfillmentCacheEntry,
+        ObligationFulfillmentCacheEntryState, WaiverCacheDocument, WaiverCacheEntry,
     };
     use domain::tddd::test_obligation::vocab::TestObligationKind;
     use domain::{ContentHash, EvidenceCitation, TrackId, ValidationError};
@@ -118,12 +115,36 @@ mod tests {
         TrackId::try_new("cache-tests").unwrap()
     }
 
+    fn cache_entry(
+        edge_id: TestObligationEdgeId,
+        obligation_id: TestObligationId,
+        key: ObligationFulfillmentCacheKey,
+        verdict: ObligationFulfillmentVerdict,
+        verifier_fingerprint: Option<VerifierPromptFingerprint>,
+    ) -> ObligationFulfillmentCacheEntry {
+        let location = domain::tddd::test_obligation::binding::TestLocation::new(
+            domain::tddd::LayerId::try_new("usecase".to_owned()).unwrap(),
+            domain::tddd::test_obligation::ids::TestModulePath::try_new("fixture".to_owned())
+                .unwrap(),
+            domain::tddd::test_obligation::ids::TestFunctionName::try_new("entry".to_owned())
+                .unwrap(),
+        );
+        let state = match verifier_fingerprint {
+            Some(verifier_fingerprint) => ObligationFulfillmentCacheEntryState::Identified {
+                verifier_fingerprint,
+                bound_tests: Some(NonEmptyTestLocations::new(location, Vec::new())),
+            },
+            None => ObligationFulfillmentCacheEntryState::Legacy,
+        };
+        ObligationFulfillmentCacheEntry::new(edge_id, obligation_id, key, verdict, state)
+    }
+
     fn fulfillment_cache(
         verdict: ObligationFulfillmentVerdict,
     ) -> ObligationFulfillmentCacheDocument {
         ObligationFulfillmentCacheDocument::new(
             track(),
-            vec![ObligationFulfillmentCacheEntry::new(
+            vec![cache_entry(
                 edge(),
                 obligation(),
                 fulfillment_key(),
@@ -145,7 +166,10 @@ mod tests {
             &fulfillment_key(),
             &fingerprint(),
         );
-        assert!(found.is_none(), "cached Pending must re-verify, not replay: {found:?}");
+        assert!(
+            found.as_ref().unwrap().is_none(),
+            "cached Pending must re-verify, not replay: {found:?}"
+        );
     }
 
     #[test]
@@ -161,7 +185,7 @@ mod tests {
             &fulfillment_key(),
             &fingerprint(),
         );
-        assert_eq!(found, Some(verdict), "adjudicated verdicts stay frozen");
+        assert_eq!(found, Ok(Some(verdict)), "adjudicated verdicts stay frozen");
         Ok(())
     }
 

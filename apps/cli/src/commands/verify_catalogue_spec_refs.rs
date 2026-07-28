@@ -1,8 +1,7 @@
 //! `sotp verify catalogue-spec-refs` — binary gate for SoT Chain ② integrity
 //! (dangling anchor / stale signals).
 //!
-//! Thin CLI wrapper: delegates to
-//! `cli_composition::verify::execute_catalogue_spec_refs` and maps the
+//! Thin CLI wrapper: obtains the fully wired Verify driver and maps its
 //! `CommandOutcome` result to a process exit code.
 //!
 //! ADR reference: `2026-04-23-0344-catalogue-spec-signal-activation.md`
@@ -11,6 +10,9 @@
 use std::path::PathBuf;
 use std::process::ExitCode;
 
+use cli_composition::VerifyCompositionRoot;
+use cli_driver::verify::{TrackId, VerifyInput};
+
 use crate::CliError;
 
 /// Entry point for `sotp verify catalogue-spec-refs`.
@@ -18,29 +20,29 @@ use crate::CliError;
 /// Used by integration tests only — production dispatch is handled by
 /// `cli_composition::CliApp::verify_catalogue_spec_refs`.
 ///
-/// Delegates to `cli_composition::verify::execute_catalogue_spec_refs` and maps
-/// the `CommandOutcome` exit code to an `ExitCode`, forwarding any stdout/stderr
-/// to the appropriate streams.
+/// Delegates to the fully wired `VerifyDriver` and maps the `CommandOutcome`
+/// exit code to an `ExitCode`, forwarding any stdout/stderr to the appropriate
+/// streams.
 ///
 /// # Errors
 ///
-/// Returns `CliError` when the track id is invalid or any fatal I/O /
-/// configuration error occurs. Integrity violations are NOT reported via
-/// `Err` — they are printed to stderr and reflected in the exit code
-/// (non-zero on any finding).
+/// Returns `CliError` when the track id is invalid. Verification failures are
+/// printed to stderr and reflected in the exit code (non-zero on any finding).
 pub fn execute_verify_catalogue_spec_refs(
     items_dir: PathBuf,
     track_id: String,
     workspace_root: PathBuf,
     skip_stale: bool,
 ) -> Result<ExitCode, CliError> {
-    let outcome = cli_composition::verify::execute_catalogue_spec_refs(
-        items_dir,
-        track_id,
-        workspace_root,
-        skip_stale,
-    )
-    .map_err(|e| CliError::Message(e.to_string()))?;
+    let track_id = TrackId::try_new(track_id)
+        .map_err(|error| CliError::Message(format!("invalid track ID: {error}")))?;
+    let outcome =
+        VerifyCompositionRoot::new().verify_driver().handle(VerifyInput::CatalogueSpecRefs {
+            track_id: Some(track_id),
+            items_dir,
+            workspace_root,
+            skip_stale,
+        });
 
     if let Some(stdout) = &outcome.stdout {
         println!("{stdout}");
@@ -199,7 +201,7 @@ mod tests {
     // `any_enabled_catalogue_present` would return false, producing a false
     // PASS. The verifier must surface a clear error instead.
     #[test]
-    fn verify_fails_when_track_dir_missing() {
+    fn verify_returns_failure_when_track_dir_is_missing() {
         let dir = tempfile::tempdir().unwrap();
         let ws = dir.path().to_path_buf();
         let items_dir = ws.join("track/items");
@@ -209,7 +211,11 @@ mod tests {
 
         let result =
             execute_verify_catalogue_spec_refs(items_dir, "no-such-track".to_owned(), ws, true);
-        assert!(result.is_err(), "non-existent track directory must fail-closed: {result:?}");
+        assert_eq!(
+            result.unwrap(),
+            ExitCode::FAILURE,
+            "non-existent track directory must fail-closed"
+        );
     }
 
     // ADR D2.3: catalogue absent + spec.json absent → silent PASS (Phase 0/1).
@@ -240,7 +246,7 @@ mod tests {
     // spec.json, ref integrity cannot be verified. Treat as a hard error to
     // surface the contract violation rather than silently bypassing.
     #[test]
-    fn verify_fails_when_catalogue_present_and_spec_absent() {
+    fn verify_returns_failure_when_catalogue_present_and_spec_is_absent() {
         let dir = tempfile::tempdir().unwrap();
         let ws = dir.path().to_path_buf();
         let track_id = "test-track";
@@ -253,9 +259,10 @@ mod tests {
         // Deliberately no spec.json.
 
         let result = execute_verify_catalogue_spec_refs(items_dir, track_id.to_owned(), ws, true);
-        assert!(
-            result.is_err(),
-            "catalogue present + spec.json absent must FAIL (SoT Chain ② violation)"
+        assert_eq!(
+            result.unwrap(),
+            ExitCode::FAILURE,
+            "catalogue present + spec.json absent must fail closed"
         );
     }
 

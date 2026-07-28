@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "layer": "infrastructure",
+  "entries": [
+    {
+      "claim_hash": "5697ff53517c7522bf7f755249d2611866235e45dd5babc469545bb92b660c58",
+      "evidence_hash": "043f03d951675c1a78b81b1568590afec369f97d569ffa4776f9e35b6c6e1dc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fulfillment cache 行に、hash の根拠となった resolved `bound_tests` を診断専用情報として記録する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "JsonObligationFulfillmentCacheCodec"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "fulfillment cache 行に、hash の根拠となった resolved `bound_tests` を診断専用情報として記録する。この情報は調査可能性を高めるが、cache key の同一性軸を増やさず、bound tests 集合 hash を含む既存の三つ組規律を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5697ff53517c7522bf7f755249d2611866235e45dd5babc469545bb92b660c58",
+      "evidence_hash": "15da3dc7bd290beaba756f25c9587eeb7410ec6b89d5bbc86a5e8635a8837cf2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "診断情報は、fulfillment cache 行の resolved `bound_tests` と、失敗 `evaluate` entry の唯一かつ非空の `entries[].verdict.reason` に限定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "JsonObligationFulfillmentCacheCodec"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "診断情報は、fulfillment cache 行の resolved `bound_tests` と、失敗 `evaluate` entry の唯一かつ非空の `entries[].verdict.reason` に限定する。これらは観測用であり、current verdict の選択は D6 の hash 三つ組と D16 の verifier-prompt fingerprint だけで決まり、診断情報による別の cache key または採用経路を作らない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5697ff53517c7522bf7f755249d2611866235e45dd5babc469545bb92b660c58",
+      "evidence_hash": "fa9ecf10c47417e61f8d654063d5e12fd655906e131523b2779fd6dfc19fe5b9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`evaluate` が書く fulfillment cache 行に resolved `bound_tests` が診断情報として記録されることを検証する。cache key の一致判定は `bound_tests` 表現ではなく、bound tests 集合 hash・entry 宣言 hash・anchor hash と fingerprint により決まり、診断情報を key の軸に含めないことも検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "JsonObligationFulfillmentCacheCodec"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`evaluate` が書く fulfillment cache 行に resolved `bound_tests` が診断情報として記録されることを検証する。cache key の一致判定は `bound_tests` 表現ではなく、bound tests 集合 hash・entry 宣言 hash・anchor hash と fingerprint により決まり、診断情報を key の軸に含めないことも検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5697ff53517c7522bf7f755249d2611866235e45dd5babc469545bb92b660c58",
+      "evidence_hash": "d708aa8a0ff480f7d50ee6f60f1cfb4fbd6dea4f979bfc4155f07287730fbb33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧形式または stale な fulfillment cache 行を含む active track fixture で、初回の `check` が必要な finding を fail-closed に返し、`evaluate` による現行 verdict の正規再評価後の `check` が、手動 cache 編集・削除または force / lenient flag なしに成功することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "JsonObligationFulfillmentCacheCodec"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "旧形式または stale な fulfillment cache 行を含む active track fixture で、初回の `check` が必要な finding を fail-closed に返し、`evaluate` による現行 verdict の正規再評価後の `check` が、手動 cache 編集・削除または force / lenient flag なしに成功することを検証する。これにより、この gate 自身を通る実装 batch の回復経路を維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "76b5ff73943407b8aa404c48966a4710de136b91968edf591ce475a2625db7b1",
+      "evidence_hash": "043f03d951675c1a78b81b1568590afec369f97d569ffa4776f9e35b6c6e1dc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fulfillment cache 行に、hash の根拠となった resolved `bound_tests` を診断専用情報として記録する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationFulfillmentCacheEntryDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "fulfillment cache 行に、hash の根拠となった resolved `bound_tests` を診断専用情報として記録する。この情報は調査可能性を高めるが、cache key の同一性軸を増やさず、bound tests 集合 hash を含む既存の三つ組規律を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "76b5ff73943407b8aa404c48966a4710de136b91968edf591ce475a2625db7b1",
+      "evidence_hash": "fa9ecf10c47417e61f8d654063d5e12fd655906e131523b2779fd6dfc19fe5b9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`evaluate` が書く fulfillment cache 行に resolved `bound_tests` が診断情報として記録されることを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationFulfillmentCacheEntryDto"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`evaluate` が書く fulfillment cache 行に resolved `bound_tests` が診断情報として記録されることを検証する。cache key の一致判定は `bound_tests` 表現ではなく、bound tests 集合 hash・entry 宣言 hash・anchor hash と fingerprint により決まり、診断情報を key の軸に含めないことも検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ff022977afe5964ea1d057a287a02a77f64bb7a72b96cc7a4a7c87d778765e54",
+      "evidence_hash": "8f357df9e87bcd0a91ceb9251222d39577b550300882bac29037c9b1afb2375d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fulfillment verdict の cache reader は、bound tests 集合 hash・entry 宣言 hash・anchor hash の三つ組と現在の verifier-prompt fingerprint を一貫して照合する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "Sha256ContentHasher"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "fulfillment verdict の cache reader は、bound tests 集合 hash・entry 宣言 hash・anchor hash の三つ組と現在の verifier-prompt fingerprint を一貫して照合する。`evaluate` の再利用判定と `check` の freshness 判定は、同一 edge に複数の過去行があっても同じ現行 entry を認識する。`evaluate` が verifier provider の解決不能を受けた場合は VerifierPort error を呼出元へ伝播し、成功した評価または current fulfilled verdict として扱わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ff022977afe5964ea1d057a287a02a77f64bb7a72b96cc7a4a7c87d778765e54",
+      "evidence_hash": "043f03d951675c1a78b81b1568590afec369f97d569ffa4776f9e35b6c6e1dc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「hash の根拠となった resolved `bound_tests` を診断専用情報として記録する。」"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "Sha256ContentHasher"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "fulfillment cache 行に、hash の根拠となった resolved `bound_tests` を診断専用情報として記録する。この情報は調査可能性を高めるが、cache key の同一性軸を増やさず、bound tests 集合 hash を含む既存の三つ組規律を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ff022977afe5964ea1d057a287a02a77f64bb7a72b96cc7a4a7c87d778765e54",
+      "evidence_hash": "15da3dc7bd290beaba756f25c9587eeb7410ec6b89d5bbc86a5e8635a8837cf2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "current verdict の選択は D6 の hash 三つ組と D16 の verifier-prompt fingerprint だけで決まり"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "Sha256ContentHasher"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "診断情報は、fulfillment cache 行の resolved `bound_tests` と、失敗 `evaluate` entry の唯一かつ非空の `entries[].verdict.reason` に限定する。これらは観測用であり、current verdict の選択は D6 の hash 三つ組と D16 の verifier-prompt fingerprint だけで決まり、診断情報による別の cache key または採用経路を作らない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ff022977afe5964ea1d057a287a02a77f64bb7a72b96cc7a4a7c87d778765e54",
+      "evidence_hash": "fa9ecf10c47417e61f8d654063d5e12fd655906e131523b2779fd6dfc19fe5b9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`evaluate` が書く fulfillment cache 行に resolved `bound_tests` が診断情報として記録されることを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "Sha256ContentHasher"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`evaluate` が書く fulfillment cache 行に resolved `bound_tests` が診断情報として記録されることを検証する。cache key の一致判定は `bound_tests` 表現ではなく、bound tests 集合 hash・entry 宣言 hash・anchor hash と fingerprint により決まり、診断情報を key の軸に含めないことも検証する。"
+        }
+      }
+    }
+  ]
+}

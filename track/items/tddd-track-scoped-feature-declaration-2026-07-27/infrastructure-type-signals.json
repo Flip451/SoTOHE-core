@@ -1,0 +1,60 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-28T10:45:56Z",
+  "declaration_hash": "890d87c60b6d68759ed369e62aa70465d8cd1f5884536ddd25153455d6b83833",
+  "implementation_input_hash": "f0e2fbd70f56f153a78b9e669ac06458711e998db372e9d93546ef9a7b37711d",
+  "signals": [
+    {
+      "type_name": "FsTdddFeatureDeclarationAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Default",
+        "usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPort",
+        "usecase::tddd_feature_declaration::TdddBaselineFeatureDeclarationPort"
+      ]
+    },
+    {
+      "type_name": "RustdocBaselineCaptureAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocBaselineCapturePort"
+      ]
+    },
+    {
+      "type_name": "RustdocCrateAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort"
+      ]
+    },
+    {
+      "type_name": "RustdocSchemaExporter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeSignalsExecutorAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "usecase::type_signals::ports::TypeSignalsExecutorPort"
+      ]
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

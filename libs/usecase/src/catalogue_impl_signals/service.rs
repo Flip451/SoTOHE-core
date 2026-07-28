@@ -7,6 +7,9 @@
 
 use std::path::PathBuf;
 
+use crate::tddd_feature_declaration::TdddActualFeatureDeclarationPortError;
+use domain::tddd::LayerId;
+use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use thiserror::Error;
 
 // ---------------------------------------------------------------------------
@@ -37,76 +40,61 @@ pub struct CatalogueImplSignalsReport {
 /// Covers: invalid track id, layer-bindings load failure, catalogue load
 /// failure, baseline load failure, ExtendedCrate conversion failure, schema
 /// export failure (rustdoc C capture), signal evaluation failure, symlink guard
-/// rejection, and no TDDD-enabled layers found.
+/// rejection or I/O failure, and no TDDD-enabled layers found.
 ///
 /// [source: ADR 2026-05-11-2330 D2]
 #[derive(Debug, Error)]
 pub enum CatalogueImplSignalsError {
     /// The track ID format is invalid.
-    #[error("invalid track id: {reason}")]
-    InvalidTrackId {
-        /// Human-readable reason from the domain validator.
-        reason: String,
-    },
+    #[error("invalid track id: {}", .0.as_str())]
+    InvalidTrackId(DiagnosticMessage),
     /// Failed to load the TDDD layer bindings from `architecture-rules.json`.
     ///
     /// Covers both "file could not be read or parsed" (`LoadFailed`) and
     /// "requested layer not found or not `tddd.enabled`" (`LayerNotFound`)
     /// from [`domain::tddd::catalogue_v2::TdddLayerBindingsError`].
-    #[error("layer bindings load failed: {reason}")]
-    LayerBindingsLoad {
-        /// Human-readable reason.
-        reason: String,
-    },
+    #[error("layer bindings load failed: {}", .0.as_str())]
+    LayerBindingsLoad(DiagnosticMessage),
     /// Failed to load the catalogue document for a layer.
-    #[error("catalogue load failed for layer '{layer_id}': {reason}")]
-    CatalogueLoad {
-        /// Layer id for which loading failed.
-        layer_id: String,
-        /// Human-readable reason.
-        reason: String,
-    },
+    #[error("catalogue load failed for layer '{layer}': {reason}", layer = .0, reason = .1.as_str())]
+    CatalogueLoad(LayerId, DiagnosticMessage),
     /// Failed to load the baseline rustdoc JSON for a layer.
-    #[error("baseline load failed for layer '{layer_id}': {reason}")]
-    BaselineLoad {
-        /// Layer id for which loading failed.
-        layer_id: String,
-        /// Human-readable reason.
-        reason: String,
-    },
+    #[error("baseline load failed for layer '{layer}': {reason}", layer = .0, reason = .1.as_str())]
+    BaselineLoad(LayerId, DiagnosticMessage),
     /// Failed to convert `CatalogueDocument` → `ExtendedCrate`.
-    #[error("ExtendedCrate conversion failed for layer '{layer_id}': {reason}")]
-    ExtendedCrateConversion {
-        /// Layer id for which conversion failed.
-        layer_id: String,
-        /// Human-readable reason.
-        reason: String,
-    },
+    #[error("ExtendedCrate conversion failed for layer '{layer}': {reason}", layer = .0, reason = .1.as_str())]
+    ExtendedCrateConversion(LayerId, DiagnosticMessage),
     /// Failed to capture the current rustdoc JSON (C-side).
-    #[error("schema export failed for layer '{layer_id}': {reason}")]
-    SchemaExport {
-        /// Layer id for which capture failed.
-        layer_id: String,
-        /// Human-readable reason.
-        reason: String,
-    },
+    #[error("schema export failed for layer '{layer}': {reason}", layer = .0, reason = .1.as_str())]
+    SchemaExport(LayerId, DiagnosticMessage),
     /// Signal evaluation failed for a layer.
-    #[error("signal evaluation failed for layer '{layer_id}': {reason}")]
-    Evaluation {
-        /// Layer id for which evaluation failed.
-        layer_id: String,
-        /// Human-readable reason.
-        reason: String,
-    },
+    #[error("signal evaluation failed for layer '{layer}': {reason}", layer = .0, reason = .1.as_str())]
+    Evaluation(LayerId, DiagnosticMessage),
     /// A symlink guard rejected a path.
-    #[error("symlink guard rejected path: {path}")]
-    SymlinkRejected {
-        /// The rejected path (as a string for Display).
-        path: String,
-    },
+    #[error("symlink guard rejected path: {}", .0.display())]
+    SymlinkRejected(PathBuf),
+    /// A symlink guard could not inspect a path because of an I/O failure.
+    #[error("symlink guard I/O error for path '{}': {}", .0.display(), .1.as_str())]
+    SymlinkGuardIo(PathBuf, DiagnosticMessage),
     /// No TDDD-enabled layers found.
     #[error("no TDDD-enabled layers found in architecture-rules.json")]
     NoLayers,
+    /// The actual-capture feature declaration could not be loaded or verified.
+    #[error("feature declaration error: {0}")]
+    FeatureDeclaration(TdddActualFeatureDeclarationPortError),
+}
+
+pub(super) fn diagnostic(value: impl Into<String>) -> DiagnosticMessage {
+    let mut value = value.into();
+    if value.trim().is_empty() {
+        value = "catalogue implementation signal evaluation failed".to_owned();
+    }
+    loop {
+        if let Ok(message) = DiagnosticMessage::try_new(value) {
+            return message;
+        }
+        value = "catalogue implementation signal evaluation failed".to_owned();
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -148,6 +136,14 @@ pub trait CatalogueImplSignalsService: Send + Sync {
 mod tests {
     use super::*;
 
+    fn test_diagnostic(value: &str) -> DiagnosticMessage {
+        DiagnosticMessage::try_new(value.to_owned()).unwrap()
+    }
+
+    fn test_layer_id(value: &str) -> LayerId {
+        LayerId::try_new(value.to_owned()).unwrap()
+    }
+
     #[test]
     fn test_catalogue_impl_signals_report_any_red_reflects_red_signals() {
         let report_no_red = CatalogueImplSignalsReport {
@@ -166,30 +162,37 @@ mod tests {
     #[test]
     fn test_catalogue_impl_signals_error_display_covers_all_variants() {
         let variants = [
-            CatalogueImplSignalsError::InvalidTrackId { reason: "test reason".to_owned() },
-            CatalogueImplSignalsError::LayerBindingsLoad { reason: "test reason".to_owned() },
-            CatalogueImplSignalsError::CatalogueLoad {
-                layer_id: "domain".to_owned(),
-                reason: "test reason".to_owned(),
-            },
-            CatalogueImplSignalsError::BaselineLoad {
-                layer_id: "domain".to_owned(),
-                reason: "test reason".to_owned(),
-            },
-            CatalogueImplSignalsError::ExtendedCrateConversion {
-                layer_id: "domain".to_owned(),
-                reason: "test reason".to_owned(),
-            },
-            CatalogueImplSignalsError::SchemaExport {
-                layer_id: "domain".to_owned(),
-                reason: "test reason".to_owned(),
-            },
-            CatalogueImplSignalsError::Evaluation {
-                layer_id: "domain".to_owned(),
-                reason: "test reason".to_owned(),
-            },
-            CatalogueImplSignalsError::SymlinkRejected { path: "/tmp/symlink".to_owned() },
+            CatalogueImplSignalsError::InvalidTrackId(test_diagnostic("test reason")),
+            CatalogueImplSignalsError::LayerBindingsLoad(test_diagnostic("test reason")),
+            CatalogueImplSignalsError::CatalogueLoad(
+                test_layer_id("domain"),
+                test_diagnostic("test reason"),
+            ),
+            CatalogueImplSignalsError::BaselineLoad(
+                test_layer_id("domain"),
+                test_diagnostic("test reason"),
+            ),
+            CatalogueImplSignalsError::ExtendedCrateConversion(
+                test_layer_id("domain"),
+                test_diagnostic("test reason"),
+            ),
+            CatalogueImplSignalsError::SchemaExport(
+                test_layer_id("domain"),
+                test_diagnostic("test reason"),
+            ),
+            CatalogueImplSignalsError::Evaluation(
+                test_layer_id("domain"),
+                test_diagnostic("test reason"),
+            ),
+            CatalogueImplSignalsError::SymlinkRejected(PathBuf::from("/tmp/symlink")),
+            CatalogueImplSignalsError::SymlinkGuardIo(
+                PathBuf::from("/tmp/unreadable"),
+                test_diagnostic("permission denied"),
+            ),
             CatalogueImplSignalsError::NoLayers,
+            CatalogueImplSignalsError::FeatureDeclaration(
+                TdddActualFeatureDeclarationPortError::BaselineSnapshotMismatch,
+            ),
         ];
         for v in &variants {
             let msg = v.to_string();
@@ -199,10 +202,10 @@ mod tests {
 
     #[test]
     fn test_catalogue_impl_signals_error_display_contains_context() {
-        let err = CatalogueImplSignalsError::CatalogueLoad {
-            layer_id: "infra".to_owned(),
-            reason: "file missing".to_owned(),
-        };
+        let err = CatalogueImplSignalsError::CatalogueLoad(
+            test_layer_id("infra"),
+            test_diagnostic("file missing"),
+        );
         let msg = err.to_string();
         assert!(msg.contains("infra"), "Display must include layer_id");
         assert!(msg.contains("file missing"), "Display must include reason");
