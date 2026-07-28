@@ -124,7 +124,7 @@
     {
       "id": "T021",
       "description": "`overlay/knowledge/conventions/type-designer-kind-selection.md` を新規供給し、role × layer マトリクス本体をここに置く。`required_for: [type-designer, rollback-diagnoser]` の frontmatter を付与する。T035 の後に実施する。Size estimate — other: ~360 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-04`, `#IN-08`, `#IN-09`, `#IN-10`, `#CN-04`, `#CN-08`, `#AC-05`, `#AC-13`, `#AC-14`, `#AC-15`.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T022",
