@@ -31,7 +31,7 @@ specific `task_id` or `section.id`, or quote the offending text.
   prose. Flag the restatement itself regardless of whether an anchor cite
   (`AC-NN` / `IN-NN` / `CN-NN` / spec element id) accompanies it — the
   permitted form is target + operation + anchor cite only. Cite
-  `knowledge/conventions/no-upstream-restatement.md`.
+  `.harness/policies/no-upstream-restatement.md`.
 - **dependency cycle or wrong ordering**: a task list whose declared
   dependencies form a cycle, or whose declared order would force later tasks
   to refer to artifacts not yet created (e.g., T003 modifies a briefing file

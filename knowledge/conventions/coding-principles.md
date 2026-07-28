@@ -1,3 +1,9 @@
+---
+required_for:
+  - spec-designer
+  - impl-planner
+---
+
 # Coding Principles Convention
 
 ## Purpose

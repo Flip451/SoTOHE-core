@@ -1,3 +1,9 @@
+---
+required_for:
+  - type-designer
+  - rollback-diagnoser
+---
+
 # Type-Designer Kind Selection Convention
 
 ## Purpose
@@ -36,7 +42,7 @@
 > - v5 kind (構造軸): `types` は `kind: { "kind": "struct" | "enum" | "type_alias", ... }` で記述する
 > - 旧 v2 の `type_definitions` / `TypeDefinitionKind` は廃止済みで、codec は受け付けない。
 >
-> 本マトリクスは **層配置** の制約のみを規定する。各 role / entry に必要な具体的フィールド (`kind`, `methods` 等) および top-level の `trait_impls` / `inherent_impls` (impl block を独立 entry として持つ array) の定義は `libs/domain/src/tddd/catalogue_v2/` の `TypeEntry` / `TraitEntry` / `FunctionEntry` / `TraitImplDeclV2` / `InherentImplDeclV2` / `CatalogueDocument` を正本とする。
+> 本マトリクスは **層配置** の制約のみを規定する。各 role / entry に必要な具体的フィールド (`kind`, `methods` 等) および top-level の `trait_impls` / `inherent_impls` (impl block を独立 entry として持つ array) は `.harness/reference/catalogue-schema.md` を参照する。対応する symbol は `TypeEntry` / `TraitEntry` / `FunctionEntry` / `TraitImplDeclV2` / `InherentImplDeclV2` / `CatalogueDocument` である。
 
 | role (v5) | domain | usecase | infrastructure | cli | cli_composition | cli_driver | 配置根拠 |
 |---|---|---|---|---|---|---|---|
@@ -117,7 +123,7 @@ behavior を持つ struct は以下のいずれかに振り分ける:
 - 依存なし stateless → `role: FreeFunction` (R2)
 - 依存あり (port を呼び出す) → `role: Interactor` (usecase) または `role: SecondaryAdapter` (infrastructure)
 - 集約構築 → `role: Factory`
-- 状態遷移あり → typestate cluster (`role: ValueObject` で各 state を typestate marker 付き `struct` として表現し、遷移メソッドを `methods` に宣言。wire format は `knowledge/conventions/catalogue-schema-reference.md`「The `kind` field」節を参照)
+- 状態遷移あり → typestate cluster (`role: ValueObject` で各 state を typestate marker 付き `struct` として表現し、遷移メソッドを `methods` に宣言。wire format は `.harness/reference/catalogue-schema.md`「The `kind` field」節を参照)
 - 値の同一性ではなく domain behavior を中心にする struct → `role: DomainService` (R6)
 
 ### R4. Kind Distribution Reconnaissance (起草前の偵察義務)
@@ -283,7 +289,7 @@ R1 で domain 概念と分類された概念 (ユビキタス言語に現れる�
 - `parse_adr_frontmatter` を `role: FreeFunction` で `infrastructure-types.json` の `functions` エントリに置く (R2)
 - `evaluate_adr_decision` を `role: FreeFunction` で `domain-types.json` の `functions` エントリに置く (R2 + R1: `FreeFunction` は layer-flexible)
 - `AdrDecisionCommon { id, user_decision_ref, ... }` を `role: ValueObject` で domain の `types` エントリに置く (R3: 検証済み shared payload で behavior なし)
-- `ProposedDecision` / `AcceptedDecision` / ... を `role: ValueObject` + typestate marker 付き `struct` で domain に置き、`AdrDecisionEntry` を `role: ValueObject` + `kind: { "kind": "enum" }` の wrapper として並置 (decision tree: state machine + heterogeneous Vec。typestate の wire format は `knowledge/conventions/catalogue-schema-reference.md`「The `kind` field」節を参照)
+- `ProposedDecision` / `AcceptedDecision` / ... を `role: ValueObject` + typestate marker 付き `struct` で domain に置き、`AdrDecisionEntry` を `role: ValueObject` + `kind: { "kind": "enum" }` の wrapper として並置 (decision tree: state machine + heterogeneous Vec。typestate の wire format は `.harness/reference/catalogue-schema.md`「The `kind` field」節を参照)
 - `FsAdrFileAdapter` を `role: SecondaryAdapter` で infrastructure の `types` エントリに置く (R1: `SecondaryAdapter` は infrastructure ONLY)
 - baseline 由来の `ReviewReader` port を当該 track の `domain-types.json` に `action: "reference"` で `role: SecondaryPort` の `traits` エントリとして declare する (R7: declare により `FsReviewStore -.impl.-> ReviewReader` edge が contract-map に出る)
 - `methods[].returns` フィールドに `"Result<AdrFrontMatter, AdrFrontMatterCodecError>"` と完全型文字列を書く (R8: `extract_type_names()` が `AdrFrontMatter` / `AdrFrontMatterCodecError` への edge を生成できる)
@@ -295,7 +301,7 @@ R1 で domain 概念と分類された概念 (ユビキタス言語に現れる�
 - `AdrSignalsVerifyAdapter` を `role: UseCase` で `infrastructure-types.json` に起草 (R1 違反: `UseCase` は usecase ONLY)
   - 正しい修正: usecase 層に `role: Interactor` + `role: ApplicationService` ペアを置き、infrastructure には `role: SecondaryAdapter` を置く
 - 状態遷移を持つ ADR decision を `role: ValueObject` + `kind: { "kind": "enum" }` (`DecisionStatus { Proposed, Accepted, ... }`) で起草し、別 entry に `role: ValueObject` + `kind: { "kind": "struct", "shape": { "kind": "plain", "fields": [...], "has_stripped_fields": false } }` (`status: DecisionStatus`, `implemented_in: Option<String>`) を置く (R3 違反 + 決定木違反)
-  - 正しい修正: typestate cluster + enum wrapper (`role: ValueObject` + typestate marker 付き `struct` で各 state を起草し、heterogeneous Vec 用の enum wrapper を `role: ValueObject` + `kind: { "kind": "enum" }` で追加。typestate の wire format は `knowledge/conventions/catalogue-schema-reference.md`「The `kind` field」節を参照)
+  - 正しい修正: typestate cluster + enum wrapper (`role: ValueObject` + typestate marker 付き `struct` で各 state を起草し、heterogeneous Vec 用の enum wrapper を `role: ValueObject` + `kind: { "kind": "enum" }` で追加。typestate の wire format は `.harness/reference/catalogue-schema.md`「The `kind` field」節を参照)
 - 「他の role が fit しないので」という理由で `role: ValueObject` を選ぶ (R5 違反)
   - 正しい修正: 決定木を再適用 → `role: FreeFunction` 候補を検討 → それでも確定しないなら `## Open Questions` に escalation
 - `FsReviewStore` (baseline 由来の `ReviewReader` / `ReviewWriter` port を implement する adapter) を `infrastructure-types.json` に `role: SecondaryAdapter` で起草したが、当該 track の catalogue に `ReviewReader` / `ReviewWriter` の `role: SecondaryPort` entry を declare しない (R7 違反: declare 漏れによる `-.impl.->` edge の silently skip)
@@ -327,14 +333,12 @@ type-designer 自身および reviewer は draft 段階で以下を確認する:
 - 第三線: track ごとの reviewer briefing (`tmp/reviewer-runtime/briefing-{scope}.md`) で本 convention を参照し、R1〜R10 の checklist を review 観点として明示する。`.harness/custom/review-prompts/<scope>.md` は利用者所有の severity policy であり、framework methodology の enforcement source にはしない
 - 第四線: `bin/sotp signal calc-impl-catalog` の signal 評価 (catalogue → spec の trace integrity)。role 違反は第二線で signal 評価より先に draft 段階で却下するため、検証の網としては最終 backstop の位置づけ
 
-将来の自動化候補: catalogue codec (`libs/infrastructure/src/tddd/catalogue_document_codec/`) で R1 layer-role マトリクスを machine-readable に表現し、`bin/sotp` の codec validation で reject する (`forbidden` 組合せ → codec error)。
+将来の自動化候補: catalogue validation で R1 layer-role マトリクスを machine-readable に表現し、`bin/sotp` の validation で reject する (`forbidden` 組合せ → codec error)。
 
 ## Related Documents
 
 - `knowledge/conventions/prefer-type-safe-abstractions.md` — enum-first / typestate / newtype の design principle (本 convention は role 選定への適用)
-- `knowledge/conventions/pre-track-adr-authoring.md` — ADR 配置規則 (catalogue の上流 SSoT)
+- `.harness/policies/pre-track-adr-authoring.md` — ADR 配置規則 (catalogue の上流 SSoT)
 - `architecture-rules.json` — TDDD 対応層の SSoT (R1 layer 列挙の根拠)
-- `libs/domain/src/tddd/catalogue_v2/roles.rs` — `DataRole` / `ContractRole` / `FunctionRole` enum 定義 (現行 schema の role 正本; v2 の `TypeDefinitionKind` に相当)
-- `libs/domain/src/tddd/catalogue_v2/entries.rs` — `TypeEntry` / `TraitEntry` / `FunctionEntry` + `TypeKindV2` / `CompositePattern` 定義 (現行 schema の型正本)
-- `libs/infrastructure/src/tddd/catalogue_document_codec/` — v5 catalogue serde codec (将来の R1 自動化候補; TypeKindDto / PatternDto 等の wire format 定義)
+- `.harness/reference/catalogue-schema.md` — v5 wire format と `DataRole` / `ContractRole` / `FunctionRole` / `TypeEntry` / `TraitEntry` / `FunctionEntry` / `TypeKindV2` / `StructKind` / `StructShape` / `TypestateMarker` / `TraitImplDeclV2` / `InherentImplDeclV2` の参照
 - `knowledge/adr/README.md` — 設計判断の索引（履歴を確認する必要がある場合）

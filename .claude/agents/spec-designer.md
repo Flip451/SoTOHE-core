@@ -1,7 +1,7 @@
 ---
 name: spec-designer
-model: claude-opus-4-7[1m]
-effort: max
+model: claude-opus-5
+effort: high
 tools:
   - Read
   - Grep

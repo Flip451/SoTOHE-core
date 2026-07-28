@@ -14,7 +14,8 @@ Violations of the role statement above are always reportable. The following prio
 - **purity violation by trait or generic**: a `T: Reader` bound that effectively
   forces an `std::io::Read` dependency the syn scanner cannot see (e.g., via
   a re-export), or a generic constraint that lets infrastructure leak into
-  usecase. Cite `coding-principles.md` §Usecase Layer Purity.
+  usecase. Name the runtime dependency the bound admits and the re-export path
+  that hides it from the scanner.
 - **implicit time / env / process dependency**: a function that reads
   `SystemTime` / `env::var()` or spawns a process directly, or calls an
   undocumented abstraction that merely hides the same runtime access.
@@ -23,11 +24,11 @@ Violations of the role statement above are always reportable. The following prio
   usecase-owned secondary ports whose runtime adapters are injected.
 - **business logic leak**: a calculation, branching, or decision that belongs
   in `domain` (e.g., a comparison that should be a domain method on a
-  Newtype) executed in usecase. Cite `coding-principles.md` §Usecase Layer
-  Purity for the inverse boundary: usecase orchestrates, domain decides.
+  Newtype) executed in usecase. The boundary runs the other way here: usecase
+  orchestrates, domain decides. Name the domain type the decision belongs on.
 - **port placement mistake**: a port defined in usecase that should live in
   domain (a port abstracting a domain concept, not an infrastructure
-  capability). Cite `type-designer-kind-selection.md` R1.
+  capability). Name the concept the port abstracts.
 - **direct infrastructure reference**: any non-test code in usecase importing
   from `infrastructure::*` (even via re-export). Cite `architecture-rules.json`.
 - **error type confusion**: the usecase error enum re-exposes infrastructure

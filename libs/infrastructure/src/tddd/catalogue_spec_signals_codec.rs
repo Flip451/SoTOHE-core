@@ -79,8 +79,8 @@ pub struct CatalogueSpecSignalsDocumentDto {
 ///
 /// `entry_hash` is a REQUIRED field (64-char lowercase hex SHA-256 of the
 /// catalogue entry's canonical JSON subtree). Absent `entry_hash` triggers
-/// a typed-deserialization error — no fallback (no-backward-compat convention
-/// / CN-10 of ADR `2026-05-27-1601-sot-chain-semantic-review-gate.md`).
+/// a typed-deserialization error — no fallback (CN-10 of ADR
+/// `2026-05-27-1601-sot-chain-semantic-review-gate.md`).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct CatalogueSpecSignalDto {

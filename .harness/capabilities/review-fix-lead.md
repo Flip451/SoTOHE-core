@@ -58,7 +58,7 @@ in `.harness/config/review-scope.json`.
 ## ADR baseline semantic freeze
 
 When a finding requires *any* edit to an ADR, never make that edit yourself. Under the two-box
-model (`knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権), the
+model (`.harness/policies/pre-track-adr-authoring.md` §In-track 意味変更の裁定権), the
 orchestrator routes every ADR change through adr-editor and adr-diagnoser: Phase 0 uses the
 in-place convergence or user-present hearing lane; after the Phase 0 adjudication boundary,
 semantic changes use the delta lane and proposed non-semantic changes use the
@@ -146,7 +146,11 @@ Priority handling:
 After applying fixes:
 
 1. Run `cargo make ci-rust` to verify fixes compile.
-2. **Cross-doc ref sync** (mandatory after editing `spec.json` or `impl-plan.json`): spec /
+2. If any fix edited source, before re-invoking the reviewer repeat the pre-review verification
+   required by `.harness/policies/implementation-delegation.md#R2. review 起動前に配置を検証する`.
+   The review-fix lead owns this repeat because its source edits occur after the earlier
+   placement verification; documentation-only fixes do not require it.
+3. **Cross-doc ref sync** (mandatory after editing `spec.json` or `impl-plan.json`): spec /
    impl-plan anchor changes can cause catalogue `spec_refs[].anchor` to go stale. Run
    `cargo make verify-plan-artifact-refs` explicitly (not included in `cargo make ci-rust`; only
    in `cargo make ci`). Note: catalogue `spec_refs[]` has no `hash` field (removed in
@@ -168,7 +172,7 @@ Keep N small (1–3) to avoid context bloat.
 ## Architecture guard
 
 Before modifying any file, verify it belongs to the correct architecture layer per
-`knowledge/conventions/impl-delegation-arch-guard.md`:
+`.harness/policies/implementation-delegation.md`:
 
 - Domain types and domain ports stay in `libs/domain/`
 - Usecase interactors and usecase ports stay in `libs/usecase/`

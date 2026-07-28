@@ -43,4 +43,4 @@ track ワークフローの形式的手順 (ceremony) を最小化し、WIP コ�
 ## Decision Reference
 
 - [knowledge/adr/README.md](../adr/README.md) — ADR 索引。本 convention の原典となる ADR はこの索引から辿る
-- [knowledge/conventions/adr.md](./adr.md) — ADR 化の基準
+- [.harness/reference/adr-schema.md](../../.harness/reference/adr-schema.md) — ADR 化の基準

@@ -1,3 +1,11 @@
+---
+required_for:
+  - type-designer
+  - spec-designer
+  - impl-planner
+  - rollback-diagnoser
+---
+
 # Prefer Type-Safe Abstractions Convention
 
 ## Rule

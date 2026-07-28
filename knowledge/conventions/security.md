@@ -82,7 +82,7 @@ When adding a new sensitive directory to this project:
 > `.claude/settings.json` contains the expected `Read`/`Grep` deny entries) is the **consumer's
 > responsibility**, not SoTOHE's. SoTOHE ships recommended deny entries as defaults and documents
 > the intent here, but does not hard-fail CI against them. See
-> `knowledge/conventions/responsibility-boundary.md` for the provide-not-enforce principle.
+> `.harness/policies/consumer-ownership.md` for the provide-not-enforce principle.
 
 ## Secrets Management
 

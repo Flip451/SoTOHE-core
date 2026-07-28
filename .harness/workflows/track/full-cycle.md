@@ -143,6 +143,15 @@ Branch on the dfl terminal state (four mutually-exclusive outcomes):
   Commit. Escalate for manual resolution.
 - **`failed`**: stop the loop and report the error. Do NOT proceed.
 
+**Post-DFP R2 repeat.** The Step 1b guard measures diff size only, so it cannot see a DFP edit
+that relocates a type across a layer boundary or reimplements dependency-layer logic. On the
+`completed` path, dfl edited the working tree after the `implement` workflow's Step 5
+verification ran, so before proceeding to Review repeat the pre-review verification required by
+`.harness/policies/implementation-delegation.md#R2. review 起動前に配置を検証する`. That policy
+owns the verification's steps; this workflow owns repeating it at every boundary where source is
+mutated between that verification and Review. The `skipped` path launches no dfl and mutates
+nothing, so the Step 5 verification still holds and no repeat is required there.
+
 **Step 1d: Orchestrator marks completed tasks done**
 
 After CI passes and DFP reaches `skipped` or `completed`, the orchestrator marks each successfully
@@ -158,7 +167,10 @@ reach full-model `zero_findings` in every required scope.
 
 **Back-edge (RFP → DFP fixpoint)**: review fixes can reintroduce duplication and shift
 per-scope diff totals. After Review reaches `zero_findings`, re-run Step 1b, Step 1c (DFP),
-and the post-DFP Step 1b guard before returning to Review or Commit. Iterate until the same
+and the post-DFP Step 1b guard before returning to Review or Commit. On this back-edge the
+review fixers themselves mutated source, so the Step 1c R2 repeat applies unconditionally —
+perform it after the post-DFP Step 1b guard and before returning to Review, whatever the
+back-edge DFP's terminal state. Iterate until the same
 pass has Step 1b measurements recorded at both mutation boundaries, the DRY gate stays
 Approved, and review stays `zero_findings` with no new edits. Ceiling overflow remains
 advisory and does not block convergence.
@@ -239,8 +251,10 @@ Otherwise, skip (file absence = no observations).
 |------|------|---------|
 | 1 | Track branch and active tasks found | OK / stop |
 | 1c | DFP terminal state | skipped/completed → Step 1d; blocked/failed → halt |
+| 1c | R2 placement verification repeated after a `completed` DFP | pass / fail |
 | 1d | Successful batch tasks marked `done` before review | OK / stop |
 | 2 | Review `zero_findings` all required scopes | completed / blocked / failed |
+| 2 | R2 placement verification repeated on each back-edge pass | pass / fail |
 | 3 | `cargo make track-commit-message` (CI + track-aware gates + DRY check) | OK / ERROR |
 | 4 | `git status --short` empty | OK / unexpected dirty state |
 

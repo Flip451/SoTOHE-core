@@ -24,8 +24,13 @@ See `.harness/capabilities/type-designer.md` for the capability's full operation
 - **`architecture-rules.json`** — source of truth for TDDD-enabled layers; the capability
   uses this to determine which layers to process. Every TDDD-enabled layer is processed; the
   capability handles per-layer selection internally.
-- **ADR path(s)** and **related conventions** — paths under `knowledge/adr/` and
-  `knowledge/conventions/` for the feature domain.
+- **ADR path(s)** — paths under `knowledge/adr/` for the feature domain.
+
+Conventions are **not** an input to this workflow. The `type-designer` capability reads exactly
+the convention set the capability dispatcher resolves and delivers with the dispatch, and treats
+that set as complete — including when it resolves to zero documents
+(`.harness/capabilities/type-designer.md` § Compliance). This workflow neither selects nor
+forwards convention paths.
 
 ## Sequence
 
@@ -43,7 +48,10 @@ full internal pipeline). The briefing must include:
 - Track id and the path `track/items/<track-id>/spec.json`
 - Path to `architecture-rules.json` (source of truth for TDDD-enabled layers)
 - Path(s) to the referenced ADR(s) under `knowledge/adr/`
-- Paths to related conventions under `knowledge/conventions/`
+
+The briefing must **not** carry convention paths. The capability's convention set comes solely
+from the dispatcher's resolution; adding a hand-picked path here would make an unresolved
+document an input and would leave a zero-document resolution non-authoritative.
 
 The capability owns baseline capture, each `<layer>-types.json` write, all rendered views
 (type-graph md, contract-map.md, `<layer>-type-signals.md`), and the type → spec signal

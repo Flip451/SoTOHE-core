@@ -14,7 +14,10 @@ Write a briefing to `tmp/spec-designer-briefing.md` containing:
 
 - Track id and `track/items/<track-id>/metadata.json` path
 - Paths to the referenced ADR(s) under `knowledge/adr/`
-- Paths to the related conventions under `knowledge/conventions/`
+
+Do not put convention paths in the briefing: the capability dispatcher resolves the
+`spec-designer` convention set and delivers it with the dispatch, and that resolution is the
+complete convention input (workflow SSoT § Inputs).
 
 Then run `bin/sotp capability exec spec-designer --host claude --briefing-file tmp/spec-designer-briefing.md`.
 The dispatcher resolves `capabilities.spec-designer` internally from

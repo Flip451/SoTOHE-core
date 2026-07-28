@@ -58,8 +58,7 @@ Define which crates may depend on which crates.
    `.harness/capabilities/{implementer,dry-fix-lead,review-fix-lead,rollback-diagnoser}.md`,
    `.harness/custom/review-prompts/{cli,cli_composition,cli_driver,domain,infrastructure,types,usecase}.md`,
    and applicable `knowledge/conventions/` references (especially
-   `coding-principles.md`, `type-designer-kind-selection.md`, and
-   `impl-delegation-arch-guard.md`).
+   `coding-principles.md` and `type-designer-kind-selection.md`).
 
 ## Step 5: Validation Gates
 

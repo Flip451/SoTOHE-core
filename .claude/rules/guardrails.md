@@ -17,7 +17,7 @@ Core guardrails:
 ## Permission Guardrails
 
 `permissions.allow` in `.claude/settings.json` is the template consumer's responsibility
-(`knowledge/conventions/responsibility-boundary.md`): SoTOHE ships a recommended default allowlist
+(`.harness/policies/consumer-ownership.md`): SoTOHE ships a recommended default allowlist
 and documents which commands are safe vs dangerous to allow, but does **not** CI-enforce it. The
 lists below are guidance, not a gate — the consumer owns their permission posture.
 
@@ -64,7 +64,7 @@ ripgrep ベースの `Grep` / `Glob` で完全置換できる検索は専用 too
 
 ## Hook Constraint
 
-Command-enforcement semantics are owned by the [bash write guard convention](../../knowledge/conventions/bash-write-guard.md)
+Command-enforcement semantics are owned by the [bash write guard reference](../../.harness/reference/guard-semantics.md)
 and its hook dispatcher. The ADR index records the governing decision. Use workflow commands
 rather than attempting to construct a guard token yourself.
 
@@ -141,9 +141,9 @@ Inline review within Claude Code's main context (self-review) is not a substitut
 
 Operational details live in:
 
-- `knowledge/conventions/branch-strategy.md`
-- `knowledge/conventions/track-lifecycle.md`
-- `knowledge/conventions/git-notes.md`
+- `.harness/policies/branch-strategy.md`
+- `.harness/policies/track-lifecycle.md`
+- `.harness/policies/git-notes.md`
 - `README.md`
 - `.claude/settings.json`
 - `.claude/hooks/`

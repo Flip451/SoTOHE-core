@@ -1,0 +1,321 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::conventions_resolve::parse_convention_front_matter": {
+      "action": "add",
+      "docs": "Front-matter codec seam: decodes one document's text into `ConventionFrontMatterDto`. Its own body is the deciding site of AC-07's YAML-parse condition — block closure, YAML well-formedness, and the mapping requirement are all checked here. The `required_for` shape condition is decided in two places and neither is this body: the value's own shape by the bespoke element-list deserializer this decode runs through, written as `deserialize_any` rather than `deserialize_seq` so the format's sequence coercion is never reached, and each element's by `CapabilityIdField`. This function lifts both. What is unique to it is the reporting — it is the sole construction owner of the two decode variants of `ConventionResolveError`, so however the decode fails there is one site that names the condition. Kept a `FreeFunction` (R2: no state, no dependency) and separate from the directory scan so that decode behaviour is testable from strings alone, and so a document defect cannot be raised by any other layer. Reuses the crate-internal front-matter block reader already used by provider-definition parsing rather than adding a second block scanner (design self-check 12). AC-06, AC-08.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "document",
+          "ty": "&usecase::conventions_resolve::ConventionDocumentPath"
+        },
+        {
+          "name": "content",
+          "ty": "&str"
+        }
+      ],
+      "returns": "Result<ConventionFrontMatterDto, usecase::conventions_resolve::ConventionResolveError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "infrastructure::conventions_resolve::scan_convention_requirements": {
+      "action": "add",
+      "docs": "Directory-scan seam: walks the convention tree read-only, builds a `ConventionDocumentPath` per file — that constructor decides the path rule, and this walk only lifts whatever rejection it produces, whichever condition fired, into `ConventionResolveError::DocumentPathRejected` — and hands each document's text to the codec. Single enforcing site of AC-07's unreadable-document condition. A `FreeFunction` (R2) and deliberately three seams apart from decoding and matching, so filesystem behaviour is testable without front-matter fixtures and neither neighbour can acquire a filesystem dependency. IN-05, AC-06.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "project_root",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "Result<Vec<usecase::conventions_resolve::ConventionRequirement>, usecase::conventions_resolve::ConventionResolveError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "infrastructure::template_conventions::list_convention_documents": {
+      "action": "add",
+      "docs": "Tree-inventory seam: walks a tree's convention directory read-only and returns one `ConventionDocumentPath` per document, tree-relative so the exported tree and the overlay tree yield directly comparable identities rather than paths that must be normalised before comparison. Single enforcing site of the two tree-access conditions, `ConventionRootMissing` and `TreeUnreadable`; the third, `DocumentPathRejected`, it only lifts — `ConventionDocumentPath::try_new` decides the path rule, and what this walk adds is the `tree_root` that constructor is never told, since the same document path can be rejected while inventorying either tree. It reads no file contents and parses no front matter, which is what keeps a malformed document from turning a shipping question into a parse failure — and is why it does not reuse `scan_convention_requirements`, whose whole purpose is that decode. A `FreeFunction` (R2), separate from the set comparison for the same seam reason as the resolver's scan. IN-11, AC-18.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "tree_root",
+          "ty": "&std::path::Path"
+        }
+      ],
+      "returns": "Result<Vec<usecase::conventions_resolve::ConventionDocumentPath>, usecase::template_conventions::ConventionShippingCheckError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "FsConventionRequirementAdapter"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "CapabilityIdField"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "into_requirement",
+          "params": [
+            {
+              "name": "document",
+              "ty": "usecase::conventions_resolve::ConventionDocumentPath"
+            }
+          ],
+          "receiver": "self",
+          "returns": "Result<usecase::conventions_resolve::ConventionRequirement, usecase::conventions_resolve::ConventionResolveError>"
+        }
+      ],
+      "type_name": "ConventionFrontMatterDto"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "type_name": "FsConventionInventoryAdapter"
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "CapabilityIdField",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CapabilityIdField",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CapabilityIdField",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CapabilityIdField",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CapabilityIdField",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "for_type": "ConventionFrontMatterDto",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ConventionFrontMatterDto",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "ConventionFrontMatterDto",
+      "trait_ref": "serde_core::de::Deserialize<'de>"
+    },
+    {
+      "for_type": "FsConventionRequirementAdapter",
+      "trait_ref": "usecase::conventions_resolve::requirement_port::ConventionRequirementPort"
+    },
+    {
+      "for_type": "FsConventionRequirementAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "for_type": "FsConventionInventoryAdapter",
+      "trait_ref": "usecase::template_conventions::ConventionInventoryPort"
+    },
+    {
+      "for_type": "FsConventionInventoryAdapter",
+      "trait_ref": "core::default::Default"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "CapabilityIdField": {
+      "action": "add",
+      "docs": "Deserializable serde-boundary mirror of one `required_for` element — the R9 mirror-type pattern, since the validated capability identifier is a serde-free usecase value. Its deserialization is the deciding site of the element half of AC-07's `required_for` shape condition: giving the element a type of its own is what rejects a non-string element while the element is being read, and `parse_convention_front_matter` only lifts that rejection into `ConventionResolveError::RequiredForNotStringArray`. That is also what keeps the rejection separately observable from the empty-element one, which `ConventionCapabilityId::try_new` decides later, whereas a raw `String` would collapse both into one untyped parse failure. Its single field holds unvalidated wire text and is never exposed, so no caller can mistake it for a validated identifier. That text reaches `ConventionCapabilityId::try_new` exactly as the document spelled it: this adapter performs no trimming or case folding of its own, because any normalisation here would silently decide matches that the usecase comparison is supposed to decide. AC-06, AC-09.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "conventions_resolve",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "ConventionFrontMatterDto": {
+      "action": "add",
+      "docs": "Serde view of a convention document's YAML front matter, carrying only the optional `required_for` list of `CapabilityIdField` mirrors. Unknown keys are tolerated by design, because consumer documents own their own metadata and this codec has no business rejecting fields it does not read. Its `Default` value is also what a document with no front-matter block decodes to, so AC-08's two absent-metadata states share one representation and no caller has to distinguish them. `into_requirement` does not decide the empty-identifier condition — `ConventionCapabilityId::try_new` is its enforcing site, and this method has no way to produce an identifier except by calling it. What the method owns is the translation: it maps each element's `ConventionCapabilityIdError` onto `ConventionResolveError::EmptyCapabilityId` and supplies the document, which that constructor is never handed. The conversion lives on the DTO rather than in the directory scan because this is where the unvalidated elements are held, and it takes `self` by value so no caller can keep them once the validated requirement exists. AC-06.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "conventions_resolve",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "FsConventionInventoryAdapter": {
+      "action": "add",
+      "docs": "Filesystem implementation of `ConventionInventoryPort`, delegating to `list_convention_documents` (IN-11, AC-18). One adapter serves both sides of the comparison, so the two inventories cannot drift in walking rules. Kept as a stateless unit struct rather than folded into the free function it wraps — R2's trait-boundary exception, since the port is injected as a trait object and a free function cannot satisfy one; this mirrors the neighbouring `FsConventionRequirementAdapter` shape.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "template_conventions",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "FsConventionRequirementAdapter": {
+      "action": "add",
+      "docs": "Filesystem implementation of `ConventionRequirementPort`, delegating to `scan_convention_requirements` (IN-05, AC-06, AC-07). Kept as a stateless unit struct rather than folded into that free function — R2 would otherwise fold a zero-field single-method type away, but the port is injected as a trait object, which a free function cannot satisfy; this mirrors the existing `FsConventionsAdapter` shape.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "conventions_resolve",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    }
+  }
+}

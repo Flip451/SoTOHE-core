@@ -13,51 +13,51 @@
   },
   "capabilities": {
     "orchestrator": {
-      "provider": "codex",
-      "model": "gpt-5.6-terra",
+      "provider": "claude",
+      "model": "claude-opus-5",
       "reasoning_effort": "high",
       "execution_mode": "typed-pipeline"
     },
     "spec-designer": {
-      "provider": "codex",
-      "model": "gpt-5.6-terra",
+      "provider": "claude",
+      "model": "claude-opus-5",
       "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "impl-planner": {
-      "provider": "codex",
-      "model": "gpt-5.6-terra",
-      "reasoning_effort": "high",
+      "provider": "claude",
+      "model": "claude-opus-5",
+      "reasoning_effort": "medium",
       "execution_mode": "orchestrator-output"
     },
     "type-designer": {
-      "provider": "codex",
-      "model": "gpt-5.6-sol",
+      "provider": "claude",
+      "model": "claude-opus-5",
       "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "adr-editor": {
-      "provider": "codex",
-      "model": "gpt-5.6-sol",
+      "provider": "claude",
+      "model": "claude-opus-5",
       "reasoning_effort": "high",
       "execution_mode": "orchestrator-output"
     },
     "rollback-diagnoser": {
-      "provider": "codex",
-      "model": "gpt-5.6-sol",
-      "reasoning_effort": "high",
+      "provider": "claude",
+      "model": "claude-opus-5",
+      "reasoning_effort": "xhigh",
       "execution_mode": "orchestrator-output"
     },
     "adr-diagnoser": {
-      "provider": "codex",
-      "model": "gpt-5.6-sol",
-      "reasoning_effort": "high",
+      "provider": "claude",
+      "model": "claude-opus-5",
+      "reasoning_effort": "xhigh",
       "execution_mode": "orchestrator-output"
     },
     "implementer": {
-      "provider": "codex",
-      "model": "gpt-5.6-terra",
-      "reasoning_effort": "high",
+      "provider": "claude",
+      "model": "claude-opus-5",
+      "reasoning_effort": "medium",
       "execution_mode": "orchestrator-output"
     },
     "reviewer": {
@@ -65,13 +65,13 @@
       "model": "gpt-5.6-sol",
       "fast_model": "gpt-5.6-luna",
       "reasoning_effort": "xhigh",
-      "fast_reasoning_effort": "low",
+      "fast_reasoning_effort": "medium",
       "execution_mode": "typed-pipeline"
     },
     "researcher": {
-      "provider": "codex",
-      "model": "gpt-5.6-terra",
-      "reasoning_effort": "high",
+      "provider": "claude",
+      "model": "claude-opus-5",
+      "reasoning_effort": "medium",
       "execution_mode": "orchestrator-output"
     },
     "review-fix-lead": {

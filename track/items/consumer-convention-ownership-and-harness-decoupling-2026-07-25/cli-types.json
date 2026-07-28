@@ -1,0 +1,290 @@
+{
+  "crate_name": "cli",
+  "functions": {},
+  "layer": "cli",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "ConventionsCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "ConventionsCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "modify",
+      "for_type": "ConventionsCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "for_type": "TemplateConventionShippingArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TemplateConventionShippingArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "for_type": "TemplateConventionShippingArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "modify",
+      "for_type": "TemplateCommand",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TemplateCommand",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    },
+    {
+      "action": "modify",
+      "for_type": "TemplateCommand",
+      "trait_ref": "clap_builder::derive::Subcommand"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportArgs",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportArgs",
+      "trait_ref": "clap_builder::derive::Args"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateExportArgs",
+      "trait_ref": "clap_builder::derive::FromArgMatches"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "ConventionsCommand": {
+      "action": "modify",
+      "docs": "Convention document management subcommands. This track adds the read-only `Resolve` variant (IN-05, IN-06, AC-06, AC-09); the existing add / update-index / verify-index variants are untouched. The capability argument is typed as the boundary mirror `ConventionCapabilityIdArg` rather than `String` (R9), so the rejection `ConventionCapabilityId::try_new` performs happens while clap is still parsing and no unvalidated value travels inward; it is that mirror rather than the `capability exec` argument's `CapabilityNameArg` because this argument is the query side of an exact-match comparison and must reach the resolver spelled exactly as the caller typed it. This variant is the fixed point of the `Resolve` mirror chain's field order: clap renders declaration order in `--help`, and every sibling variant of this enum places `project_root` last, so `cli_driver::ConventionResolveInput` and `usecase::ResolveConventionsQuery` follow this order rather than the reverse.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Add",
+            "payload": {
+              "fields": [
+                {
+                  "name": "name",
+                  "ty": "String"
+                },
+                {
+                  "name": "slug",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "title",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "summary",
+                  "ty": "Option<String>"
+                },
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UpdateIndex",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "VerifyIndex",
+            "payload": {
+              "fields": [
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "Resolve",
+            "payload": {
+              "fields": [
+                {
+                  "name": "capability",
+                  "ty": "cli_driver::conventions_resolve::ConventionCapabilityIdArg"
+                },
+                {
+                  "name": "project_root",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::conventions",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "IN-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-09",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "TemplateCommand": {
+      "action": "modify",
+      "docs": "Template-boundary subcommands. This track adds the read-only `CheckConventionShipping` variant (IN-11, AC-18); the existing `Export` variant and its args are untouched. The new variant carries its own args struct rather than reusing `TemplateExportArgs`, because the two argument sets have no common subset — the check names an already-produced tree plus its overlay, the export names the four inputs it consumes — and a shared struct would have to make both halves optional, admitting argument combinations neither subcommand accepts.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Export",
+            "payload": {
+              "fields": [
+                "TemplateExportArgs"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CheckConventionShipping",
+            "payload": {
+              "fields": [
+                "TemplateConventionShippingArgs"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "commands::template",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "TemplateConventionShippingArgs": {
+      "action": "add",
+      "docs": "Clap arg surface of the non-shipping check (IN-11, AC-18). Both roots are required arguments with no default, matching the export command's fully-deterministic argument style, so the check cannot silently inspect a tree the caller did not name. Both stay `PathBuf` for the reason recorded on `ConventionShippingCheckInput`. `overlay_dir` keeps the name it has on `TemplateExportArgs` because it denotes the same directory, and diverging would make the two subcommands look like they take different things.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "exported_root",
+              "ty": "std::path::PathBuf"
+            },
+            {
+              "name": "overlay_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::template",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        },
+        {
+          "anchor": "AC-18",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    },
+    "TemplateExportArgs": {
+      "action": "reference",
+      "docs": "Baseline-identical export arg surface, unchanged by this track; declared so the `TemplateCommand::Export` variant's payload edge stays visible next to the newly added check variant.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [
+            {
+              "name": "workspace_root",
+              "ty": "PathBuf"
+            },
+            {
+              "name": "manifest_path",
+              "ty": "PathBuf"
+            },
+            {
+              "name": "overlay_dir",
+              "ty": "PathBuf"
+            },
+            {
+              "name": "output_dir",
+              "ty": "PathBuf"
+            }
+          ],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "commands::template",
+      "role": {
+        "Dto": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-11",
+          "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json"
+        }
+      ]
+    }
+  }
+}

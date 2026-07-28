@@ -31,8 +31,29 @@ Report findings ONLY for the following categories:
 - **decision obscured by excess detail**: operational procedures, schemas, gate
   wiring, or exhaustive enumerations embedded in the ADR body that belong to
   `knowledge/conventions/`, capability contracts, or workflow SSoTs and bury
-  the decision. Report as a conciseness violation; the fix is deletion or an
-  explicit delegation sentence, never further elaboration inside the ADR.
+  the decision. The test is removability: report it only when deleting the
+  passage would leave every recorded decision unchanged. Report as a
+  conciseness violation; the fix is deletion, or delegation to a document that
+  already exists — never further elaboration inside the ADR, and never
+  delegation to a document that has yet to be written, which deletes the
+  decision instead of relocating it. Three things are outside this category:
+  - The canonical status of content marked `<!-- illustrative, non-canonical -->`.
+    Marking code and schema examples that way is required of ADR authors, so a
+    marked example must not be reported as an unauthorized commitment. The
+    marker settles that one question and no other: it does not license
+    unbounded length. An example long enough to bury the decision it
+    illustrates remains reportable under this category, on the same
+    removability test.
+  - A concrete identifier — a command, flag, path, or outcome name — that is
+    itself the subject of the decision. When an ADR decides what a surface is,
+    naming that surface is the decision, not detail wrapped around it.
+  - A prohibition or a fail-closed condition that the ADR itself decides.
+    Delegating one of those to a downstream document turns it back into an
+    open implementation choice, so it cannot be relocated without being
+    overturned. This does not extend to a prohibition the ADR merely restates
+    from a workflow or capability SSoT that already records it: deleting a
+    restatement leaves every recorded decision unchanged, so it stays
+    reportable on the ordinary removability test.
 - **inconsistent decisions within the same ADR**: two `### Dn` items inside one
   ADR that contradict each other, or a Decision section that contradicts the
   ADR's own Context / Rejected Alternatives narrative.
@@ -73,4 +94,4 @@ Report findings ONLY for the following categories:
 - Backward-looking observations (how many rounds it took, history of edits)
 - Convention overlap suggestions ("this should be a convention not an ADR")
   unless the artifact unambiguously fits the convention column of the ADR vs
-  Convention table in `knowledge/conventions/adr.md`
+  Convention table in `.harness/reference/adr-schema.md`

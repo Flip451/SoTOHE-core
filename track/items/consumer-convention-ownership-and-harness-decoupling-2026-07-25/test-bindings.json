@@ -1,0 +1,2033 @@
+{
+  "track_id": "consumer-convention-ownership-and-harness-decoupling-2026-07-25",
+  "records": [
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionDocumentPath",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_paths_sort_in_stable_lexicographic_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_display_renders_repository_relative_path"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionDocumentPath",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_current_dir_prefix_normalizes_and_succeeds"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_paths_sort_in_stable_lexicographic_order"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionDocumentPath",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_parent_dir_escape_returns_outside_convention_root_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_absolute_path_returns_outside_convention_root_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_sibling_directory_returns_outside_convention_root_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_root_directory_itself_returns_outside_convention_root_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_path_inside_root_succeeds"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_nested_path_inside_root_succeeds"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionDocumentPathError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_error_retains_supplied_path"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_parent_dir_escape_returns_outside_convention_root_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_document_path_with_absolute_path_returns_outside_convention_root_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionCapabilityId",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_accepts_a_non_blank_identifier_unchanged"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_rejects_empty_and_whitespace_only_identifiers"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_accepts_an_identifier_registered_in_no_registry"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionCapabilityId",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_preserves_surrounding_whitespace_verbatim"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_from_capability_name_carries_the_trimmed_key_value"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_requirement_requires_only_on_whole_value_capability_id_match"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionCapabilityId",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_accepts_an_identifier_registered_in_no_registry"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionCapabilityIdError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_rejects_empty_and_whitespace_only_identifiers"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_rejection_renders_the_blank_condition"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionCapabilityIdError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_rejects_empty_and_whitespace_only_identifiers"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::capability_id::tests",
+          "test_name": "test_convention_capability_id_rejection_renders_the_blank_condition"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionRequirement",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_requirement_pairs_the_scanned_document_with_the_capabilities_it_declares"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionRequirement",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_requirement_requires_only_on_whole_value_capability_id_match"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionRequirement",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_requirement_without_declared_capabilities_requires_nothing"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolution",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_resolution_from_matches_deduplicates_repeated_documents"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_resolution_from_matches_orders_documents_independently_of_scan_order"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolution",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_resolution_from_matches_deduplicates_repeated_documents"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_resolution_from_matches_orders_documents_independently_of_scan_order"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolution",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_convention_resolution_with_zero_matches_is_an_empty_success_value"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ResolveConventionsQuery",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_resolve_conventions_query_carries_the_requested_capability_and_project_root"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ResolveConventionsQuery",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_resolve_conventions_query_capability_rejects_only_empty_or_blank_identifiers"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ResolveConventionsQuery",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_resolve_conventions_query_accepts_a_capability_id_registered_in_no_registry"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::tests",
+          "test_name": "test_resolve_conventions_query_capability_rejects_only_empty_or_blank_identifiers"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ConventionRequirementPort",
+        "item_identifier": "trait_method:scan_requirements",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_convention_requirement_port_bound_implies_send_and_sync"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_scan_requirements_reads_through_a_shared_receiver_across_threads"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_scan_requirements_scans_the_caller_supplied_project_root"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_scan_requirements_succeeds_for_a_scan_meeting_none_of_those_conditions"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_scan_requirements_surfaces_every_fail_closed_condition_as_an_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::requirement_port::tests",
+          "test_name": "test_scan_requirements_yields_one_requirement_per_scanned_document"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "usecase::conventions_resolve::select_required_conventions",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_applies_no_normalization_of_its_own"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_is_pure_over_the_already_scanned_input"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_returns_the_canonical_resolution_not_the_scan_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_returns_the_documents_declaring_the_capability"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_treats_documents_declaring_nothing_as_ordinary_input"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::selection_tests",
+          "test_name": "test_select_required_conventions_with_no_matching_document_returns_an_empty_success"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionRequirementPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "reason": "ConventionRequirementPort's declared surface is a single read: scan_requirements(&self, project_root: &Path) -> Result<Vec<ConventionRequirement>, ConventionResolveError>. IN-05 promises the command's returned value — the repository-relative paths of the documents whose required_for exactly matches a named capability id, without duplicates and in stable order. That promise is not expressible through this signature. The method receives no capability id, so it has no term to match against; it returns each scanned document paired with what that document declares rather than a path list, so there is nothing here to deduplicate or order, and Vec guarantees neither. A stand-in implementation can only hand back what the test gave it, so a test bound here would show the arrangement of the test rather than the anchor's promise. Nothing in the declaration is left over to carry them: the whole of what it states is that a project root goes in and a fallible list of document-to-identifier pairings comes out."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionRequirementPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "ConventionRequirementPort declares one method, scan_requirements(&self, project_root: &Path) -> Result<Vec<ConventionRequirement>, ConventionResolveError>. AC-06 promises two things of the command: that the paths it returns are exactly those whose required_for contains the named id, without duplicates and in stable order, and that resolving creates, updates, deletes, and indexes nothing. Neither half is expressible at this declaration. The signature takes no capability id and yields scanned documents rather than paths, so the matching, deduplication, and ordering have no expression here. The read-only half does not follow from the signature either: &self denies the caller an exclusive borrow, but says nothing about what an implementation may do to the filesystem it reads, so a test asserting read-only-ness at this declaration would assert a property the declaration does not carry. Set both halves aside and what remains of the declaration is only this: a project root goes in, and a fallible list of document-to-identifier pairings comes out. Neither half of AC-06 is any part of that."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityIdField",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_capability_id_field_borrows_the_wire_text_verbatim"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_preserves_element_text_verbatim"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityIdField",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_string_element_fails_closed"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CapabilityIdField",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_unregistered_capability_id_decodes_it_unchanged"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionFrontMatterDto",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_decodes_a_required_for_string_array"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_preserves_element_text_verbatim"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_ignores_a_non_string_key_beside_required_for"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionFrontMatterDto",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_convention_front_matter_dto_translates_a_blank_element_into_empty_capability_id"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_convention_front_matter_dto_rejects_a_blank_element_among_accepted_ones"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionFrontMatterDto",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_default_convention_front_matter_dto_requires_nothing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_without_a_block_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_without_required_for_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_only_a_non_string_key_decodes_to_the_default_value"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ConventionResolveService",
+        "item_identifier": "trait_method:resolve",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_resolve_hands_the_caller_the_canonical_resolution_and_not_a_raw_path_list"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_resolve_is_reachable_from_more_than_one_holder_of_one_shared_port"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_resolve_separates_a_failed_read_from_a_resolution_that_matched_nothing"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionResolveService",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "reason": "ConventionResolveService declares one method: resolve(&self, query: ResolveConventionsQuery) -> Result<ConventionResolution, ConventionResolveError>. AC-06 promises three things of the command: that the paths it returns are exactly those whose required_for contains the named capability id under whole-value equality, that those paths arrive without duplicates and in stable order, and that resolving creates, updates, deletes and indexes nothing. This declaration establishes none of the three. The signature relates nothing in the query to the value returned, so an implementor may answer any resolution for any capability id; a stand-in bound here can only hand back what the test arranged for it, and the test would exhibit that arrangement rather than the matching AC-06 promises. Deduplication and stable order are guarantees of ConventionResolution rather than of this declaration; this declaration does no more than select that type as its success value, so it inherits whatever that type guarantees instead of establishing it, and a test bound here would be exercising the returned type under this entry's name. Read-only-ness does not follow from the signature either: &self denies the caller an exclusive borrow, which says nothing about what an implementation may do to the filesystem while answering, and returning a value is not a statement that nothing was written to produce it. What this declaration does establish is narrower than any of the three and is not what AC-06 promises: that a caller receives exactly one resolution value, through exactly one operation, or else a declared failure."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ConventionResolveInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_answers_an_empty_resolution_where_nothing_matched"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_answers_with_what_the_selection_selects_over_the_scanned_requirements"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_carries_nothing_from_one_resolution_into_the_next"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_scans_the_project_root_the_query_named"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_service::tests",
+          "test_name": "test_interactor_surfaces_a_failed_scan_as_that_failure"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionCapabilityIdArg",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_resolve_input_carries_the_parsed_term_and_the_named_root_into_the_query"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionCapabilityIdArg",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_capability_id_arg_parses_the_argument_the_boundary_neither_trims_nor_looks_up"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_capability_id_arg_rejects_only_the_blank_argument"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionCapabilityIdArg",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_capability_id_arg_parses_the_argument_the_boundary_neither_trims_nor_looks_up"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_resolves_a_capability_registered_in_no_registry"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolveInput",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_resolve_input_carries_the_parsed_term_and_the_named_root_into_the_query"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolveInput",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_resolve_input_carries_the_parsed_term_and_the_named_root_into_the_query"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolveInput",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_resolve_input_carries_the_parsed_term_and_the_named_root_into_the_query"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolveInput",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_resolve_input_carries_the_parsed_term_and_the_named_root_into_the_query"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_resolves_a_capability_registered_in_no_registry"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolveDriver",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_renders_the_canonical_result_as_the_machine_readable_output"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_human_display_is_rendered_from_the_same_resolution"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolveDriver",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_renders_the_canonical_result_as_the_machine_readable_output"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_reaches_no_operation_other_than_the_read"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionResolveDriver",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_reports_a_resolution_matching_no_document_as_success"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::conventions_resolve::driver_tests",
+          "test_name": "test_driver_reports_only_a_failed_read_as_a_failure"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "DisciplineText",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_appends_every_resolved_document_path"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_names_only_resolved_paths_in_resolution_order"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "DisciplineText",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_appends_every_resolved_document_path"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_composes_one_value_from_a_discipline_and_a_resolution"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "DisciplineText",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "CN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_names_only_resolved_paths_in_resolution_order"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_discipline_text_with_conventions_renders_an_empty_resolution_without_an_obligation"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionsCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::conventions::tests",
+          "test_name": "test_conventions_resolve_driver_answers_from_the_named_project_tree"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionsCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::conventions::tests",
+          "test_name": "test_conventions_resolve_driver_leaves_the_convention_tree_unchanged"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::conventions::tests",
+          "test_name": "test_conventions_resolve_driver_answers_from_the_named_project_tree"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::conventions_resolve::scan_convention_requirements",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_does_not_follow_a_directory_symlink"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_does_not_read_a_linked_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_hands_back_no_documents_when_one_is_unreadable"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_leaves_the_convention_tree_untouched"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_pairs_each_document_with_what_its_front_matter_declares"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_produces_only_paths_inside_the_convention_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_reads_only_markdown_documents"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_scans_only_the_convention_tree_of_the_supplied_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_fails_closed_on_a_broken_document_link"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_surfaces_a_front_matter_failure_from_its_own_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_surfaces_a_required_for_shape_failure"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_turns_the_decoded_view_into_a_requirement"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unreadable_document_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_without_a_convention_tree_scans_nothing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unrenderable_document_name_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unrenderable_directory_name_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_with_an_unlistable_root_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_scan_convention_requirements_without_a_convention_root_is_an_empty_result"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionsCommand",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_parses_the_capability_and_the_project_root"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_dispatch_leaves_the_convention_tree_untouched"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionsCommand",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_rejects_a_blank_capability_at_parse"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_keeps_the_capability_spelled_as_typed"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionsCommand",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_dispatch_leaves_the_convention_tree_untouched"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_dispatch_prints_the_declaring_document_paths"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionsCommand",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::conventions::tests",
+          "test_name": "test_conventions_resolve_accepts_a_capability_registered_in_no_registry"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::conventions_resolve::parse_convention_front_matter",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_decodes_a_required_for_string_array"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_distinguishes_an_absent_required_for_from_a_null_one"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_reports_required_for_shape_beside_a_non_string_key"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_tolerates_keys_it_does_not_read"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_array_required_for_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_mapping_block_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_non_string_element_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_a_null_required_for_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_empty_block_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_empty_required_for_array_declares_nothing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_an_unclosed_block_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_only_a_non_string_key_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_with_unparseable_yaml_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_without_a_block_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_without_required_for_decodes_to_the_default_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::front_matter_tests",
+          "test_name": "test_parse_convention_front_matter_carries_a_blank_element_to_its_deciding_site"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CapabilityExecError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "reason": "CapabilityExecError is the enum of conditions that stop a dispatch before a successful outcome, declared as reporting fail-closed profile, source, preflight, or provider dispatch failures; this track adds the variant ConventionResolutionFailed { capability: CapabilityName, source: ConventionResolveError } for the resolver preflight. IN-07 promises three things of the capability exec command: that it runs the resolver for the dispatched capability ID exactly once and does so before the executing agent is decided, that in the executed outcome the obligation to read the resolved convention paths and all of their documents is injected into the provider prompt or execution input, and that in the delegate-in-host outcome that same obligation is carried in the returned payload's discipline. Every clause is a promise about a run that produced a result: a completed resolution, an injected obligation text, a returned payload. This declaration names only the conditions under which a dispatch produces no such result, so none of the three takes a form here. The count and the position cannot be read off a value: the variant carries a capability and a resolver rejection and nothing that records how many times resolution was attempted or at what point in the dispatch it was attempted, and a value built for inspection names whichever capability its construction chose rather than showing that the dispatched capability's ID was the one resolved. The two injection clauses are not merely untested here, they concern content this type never holds: no variant of this enum carries a resolved convention path, a document, a provider prompt, or a discipline payload; its variants carry a capability, a provider, an execution category, a file path, an opaque diagnostic, and the resolver's typed rejection, so no value of it can be inspected to find whether the read obligation reached a prompt or a payload. What this declaration does contribute is only the vocabulary in which such a failure is named: that a convention resolution that could not complete has a representation at all, that the representation names the capability being resolved, and that it carries the resolver's own typed rejection rather than a flattened summary of it, which is what this declaration's own text states of the variant's source field. None of that is any part of what IN-07 promises."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CapabilityExecError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "reason": "CapabilityExecError is the enum of conditions that stop a dispatch before a successful outcome; this track adds the variant ConventionResolutionFailed { capability: CapabilityName, source: ConventionResolveError }. AC-11 promises three things of a dispatch: that the resolver runs exactly once per dispatch, that the run happens before the executing agent is decided, and that a typed-pipeline capability's dispatch performs no resolver injection. None of the three is expressible at this declaration. The variant records that a resolution attempt failed and which capability it was resolving; it carries no count, so nothing in the value distinguishes one attempt from two, and a test bound here could only construct the single value the test itself chose to build. It carries no position either: the value is identical whether it was produced before or after a route was chosen, so ordering cannot be read off it. The typed-pipeline half is the absence of a resolver call in a branch this variant is never produced in, and an absence has no variant to declare; the nearest thing this enum declares, ExecutionModeRejected, carries a capability and a rejected execution category and names no injection at all, so no variant of this enum gives that absence a form either. What this declaration does establish is narrower than any of the three and is no part of what AC-11 promises: that the failure of the resolver step has a representation in this dispatch vocabulary, that the representation names the capability being resolved, and that it carries the resolver's own typed rejection rather than a flattened summary of it. A count, a position relative to the decision of an executing agent, and the absence of an injection in one execution category are none of them things this vocabulary spells, and no value of this enum can be inspected for any of the three."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "FsConventionRequirementAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::conventions_resolve::requirement_port::ConventionRequirementPort"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_scans_each_supplied_root_through_one_shared_receiver"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_scans_the_tree_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_surfaces_every_fail_closed_condition_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_prevents_the_path_escape_condition_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::conventions_resolve::scan_tests",
+          "test_name": "test_fs_convention_requirement_adapter_surfaces_the_unrenderable_name_condition_through_the_port"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionRequirementPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "reason": "ConventionRequirementPort declares one method: scan_requirements(&self, project_root: &Path) -> Result<Vec<ConventionRequirement>, ConventionResolveError>. AC-07 promises that resolve fails closed on structural anomalies, and the cases it names are each a property of a document or of a resolution-target path — front matter that is not parseable YAML, a required_for that is not a string array, a blank capability id, a path outside knowledge/conventions/, an unreadable document, a path that cannot identify its file as one canonical record. This declaration takes neither a document nor a path. It takes a project root and yields either a list of pairings or a declared failure, and nothing in that signature relates any input to the condition it violates or fixes when a failure rather than a list is produced. An implementation returning a failure for every root, or none for any, satisfies the declaration exactly, so a test bound here can do no more than arrange for a value to come back and observe that it did, which exhibits the arrangement rather than the classification AC-07 promises. What this declaration does establish is that the scan is a single fallible operation, that its failure is expressed in the resolver failure vocabulary rather than as an untyped or transport-level error, and that a caller receives either every pairing the scan produced or a declared failure and never a partial list."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionResolveError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "reason": "ConventionResolveError is declared as an enum of variants, each naming one structural anomaly of convention resolution and carrying the document or path that anomaly concerns. AC-07 promises that resolve fails closed on structural anomalies, and names cases within that category. Every clause of that promise is about what happens when a resolution meets such an input: that the condition is detected, that the resolution stops, and that a failure is produced instead of a result. This declaration admits no input and performs no step. It states which failures can be named and what each one carries, so no value of it can show that an input was met, that a condition was detected, or that anything was refused; a value exists because something constructed it, and inspecting one exhibits the construction rather than a detection. The non-exhaustive clause makes the same point from the other side: AC-07 leaves its category open, while an enum is closed by definition, so the set of variants can never be the set of cases. What this declaration does establish is narrower than the promise: that each condition the vocabulary can report has a distinct name rather than a shared untyped one, that each variant carries the document or path its condition is about rather than a flattened message, and that a rejection arriving from a constructor is composed as a typed source rather than restated in this vocabulary."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionDocumentPathError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_error_tests",
+          "test_name": "test_convention_document_path_with_a_line_terminator_returns_not_renderable_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::conventions_resolve::resolve_error_tests",
+          "test_name": "test_convention_document_path_with_a_non_utf8_name_returns_not_renderable_error"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "CapabilityExecInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_both_routes_carry_the_reading_obligation_and_not_only_the_paths"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_convention_resolution_failure_stops_before_the_provider"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_delegate_in_host_payload_carries_the_resolved_obligation"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_delegate_in_host_route_resolves_conventions_exactly_once"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_empty_resolution_dispatches_no_document_despite_available_declarations"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_injects_the_resolved_documents_and_nothing_else"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_query_names_the_dispatched_capability_as_a_matching_term"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_again_for_a_second_dispatch_naming_another_capability"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_conventions_before_the_execution_subject_is_chosen"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_resolves_conventions_once_and_dispatches_the_composed_discipline"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::capability_exec::tests",
+          "test_name": "test_capability_exec_typed_pipeline_dispatch_resolves_no_conventions"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CheckConventionShippingQuery",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_contract_tests",
+          "test_name": "test_check_convention_shipping_query_carries_both_tree_roots_verbatim"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_contract_tests",
+          "test_name": "test_check_convention_shipping_query_compares_by_both_roots"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "CheckConventionShippingQuery",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "CheckConventionShippingQuery is declared as the read-only request naming the two trees the check compares — a plain struct of exported_root: std::path::PathBuf and overlay_dir: std::path::PathBuf, in the Query role, declaring no operation of its own. AC-18 promises three things: that template smoke checks the non-shipping of source conventions beyond the overlay against an exported tree, that this succeeds on the changed repository, and that no dead-reference check extracting convention paths from prose has been added. What this declaration is, by its own text, is the request the comparison comes to; naming the two trees is the whole of its subject matter. A request is not the comparison it asks for, and it is further still from the comparison's outcome. The first clause asserts that a check ran against an exported tree, while a request records only which tree would be the subject, never that any tree was inspected. The second asserts that such a run succeeded, and success is a fact about a run's outcome: this declaration has no field, variant, or operation in which an outcome could appear, since the whole of what it holds is two locations. A value of it exists because something constructed it, so what a test reads back from one is the pair of roots that test itself chose to write, and that pair is identical whether a check ever ran against those trees or not. The third clause is an absence in a repository, and two filesystem locations say nothing about which checks a repository does or does not contain. What this declaration does establish is narrower than any of the three and is a property of the request rather than of a run: that the comparison is posed as a single value naming both sides at once, so no caller can ask it of an exported tree without also naming the overlay the tree is measured against; that both sides are caller-chosen locations admitting no rejection, so posing the question carries no failure state of its own; and that the constrained concept in this slice is the document identity inside a tree rather than the tree root, which is why both sides stay opaque paths and only ConventionDocumentPath is typed. None of that is any part of what AC-18 promises."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionShippingVerdict",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_contract_tests",
+          "test_name": "test_convention_shipping_verdict_conforming_carries_no_document"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_contract_tests",
+          "test_name": "test_convention_shipping_verdict_violation_names_the_offending_documents"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionShippingVerdict",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "ConventionShippingVerdict is declared as an enum of two variants — Conforming, carrying nothing, and UnsuppliedDocumentsShipped { documents: NonEmptyVec<ConventionDocumentPath> } — and declares no operation of its own. AC-18 promises that template smoke checks the non-shipping of source conventions beyond the overlay against an exported tree and succeeds on the changed repository, and that no dead-reference check extracting convention paths from prose has been added. The first two clauses assert that a run happened and that its result was success. A value of this declaration exists because something constructed it, and a constructed Conforming is the value the constructing test chose to build; nothing about it distinguishes an outcome a run produced from one written down directly, so no test bound here can witness that a check ran against an exported tree, still less that running it on a repository succeeded. Success in this promise is a fact about a run, while this declaration spells only what an outcome may look like. That distinction is the whole of the gap: what this declaration does establish is the form of the answer — that the answer has exactly two states and no third, that a violating one always names at least one document because its payload is a non-empty collection, and that the offending documents travel as the typed paths themselves rather than as a count, so no consumer can report the violation without being able to name it. Those are properties of how an outcome is shaped, which is a different proposition from a checking run having occurred and returned success. The remaining clause is an absence in a repository; that this payload is made of path identities says nothing about which checks a repository does or does not contain."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "reason": "ConventionShippingCheckError is declared as an enum of three variants — ConventionRootMissing { tree_root }, TreeUnreadable { path, reason }, and DocumentPathRejected { tree_root, source } — and declares no operation of its own. IN-11 promises that template smoke acquires an item which, against an exported tree, checks that no source convention beyond the overlay's supply is shipped: an item that exists, that takes an exported tree as its subject, and that settles that question. This declaration takes no subject and settles nothing. Its own text places it outside the question entirely: a detected violation is deliberately not among its variants, because non-overlay documents in the export are the check's normal finding and are carried by ConventionShippingVerdict, so this enum stays reserved for states in which the question could not be answered at all. What it contributes to an item that checks is therefore negative — ConventionRootMissing exists so an exported tree with no conventions directory fails rather than passing vacuously — and not passing vacuously is a property of what the check does when it meets such a tree, not a property of any value. Its own text also places the production of every variant elsewhere: every variant of it is built by the infrastructure inventory, which also decides the first two, and every payload is data that walk possesses at failure time. A test bound here can therefore only construct a value and read its payload back, exhibiting its own construction rather than showing that an inspected tree yielded that condition instead of an answer. What this declaration does establish is narrower and is no part of IN-11's promise: that the unanswerable states are named distinctly from the check's normal finding, that each names the tree its condition concerns, and that DocumentPathRejected composes the constructor's own typed rejection rather than restating the rule, adding only the tree_root that attributes it."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "ConventionShippingCheckError is declared as an enum of three variants — ConventionRootMissing { tree_root }, TreeUnreadable { path, reason }, and DocumentPathRejected { tree_root, source } — and declares no operation of its own. AC-18 promises three things: that template smoke checks the non-shipping of source conventions beyond the overlay against an exported tree, that this succeeds on the changed repository, and that no dead-reference check extracting convention paths from prose has been added. The first two are statements about a run and its outcome. This declaration admits no input and performs no step, so nothing here can show that a check ran; and the outcome clause is doubly out of reach, because by its own text this enum is reserved for states in which the question could not be answered at all, so a successful run has no representation among its variants to inspect. Its own text also places the production of every variant elsewhere: every variant of it is built by the infrastructure inventory, and every payload is data that walk possesses at failure time — a value existing here exists because a test constructed it, and reading its payload back exhibits that construction. The third clause is an absence in a repository, and no variant can spell an absence. The nearest thing this declaration states to it is that this check reads no document contents, so the content-parse conditions are unreachable on this path and must not be representable in this error type; that is a statement about what this vocabulary may name, and a vocabulary that cannot name a check is not evidence that no such check exists. What this declaration does establish is narrower than any of the three: that a non-answer has a representation distinct from the check's normal finding, that each variant names the tree or path its condition concerns, and that a constructor rejection arrives composed as a typed source rather than restated in this vocabulary."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ConventionInventoryPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:list_conventions"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::inventory_port_tests",
+          "test_name": "test_list_conventions_inventories_the_tree_the_caller_named"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::inventory_port_tests",
+          "test_name": "test_list_conventions_identifies_documents_tree_relative_so_two_trees_compare"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::inventory_port_tests",
+          "test_name": "test_list_conventions_cannot_report_a_document_defect_as_a_shipping_finding"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::inventory_port_tests",
+          "test_name": "test_list_conventions_surfaces_every_condition_that_prevents_an_inventory"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionInventoryPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "ConventionInventoryPort is declared as a read-only driven port with one synchronous method — list_conventions(&self, tree_root: &std::path::Path) -> Result<Vec<ConventionDocumentPath>, ConventionShippingCheckError> — that lists the convention documents a given tree ships, identified tree-relative so the exported tree and the overlay tree yield comparable values. What a test at this declaration can witness is how that listing behaves: that the tree listed is the one the caller named and never an ambient location, that a document found under either root arrives as one and the same value so two inventories are comparable at all, and that a condition preventing a listing reaches the caller as ConventionShippingCheckError rather than as a shorter list. Because the declaration is a trait, such a test drives some implementor and reads back what that implementor produced; when the implementor is a stand-in, what comes back is the listing the test itself arranged, so the reading exhibits the port's shape and the arrangement. AC-18 promises three things: that template smoke checks the non-shipping of source conventions beyond the overlay against an exported tree, that this succeeds on the changed repository, and that no dead-reference check extracting convention paths from prose has been added. None of the three is within reach at this declaration, and that holds even of an implementor which really walked a tree. The first clause asserts that a check ran: this method answers with the documents a tree holds, and a list of documents is neither a comparison nor a finding, so listing a tree — however genuinely — establishes at most that the tree was listed, never that the non-shipping question was put or answered. The second asserts that a run succeeded on the changed repository, and success is a property of that run's outcome; here Ok is a list and Err is a condition that prevented one, so nothing this method can return is the check's verdict, and the tree it reads is whichever location a caller names rather than any particular repository. The third clause is an absence in a repository, and a method that takes a tree root and hands back that tree's own documents says nothing about which checks a repository contains; the nearest the declaration comes to the subject is that this port names paths and is deliberately not the port whose contract is to decode required_for front matter, which states what this port reads and not what other checks exist. What this declaration does establish is narrower than any of the three and belongs to the listing step rather than to a run: that the tree is a parameter, so one port answers for the exported tree and for the overlay and the two sides cannot be walked by different rules; that identities are tree-relative, without which the two inventories could not be compared at all; and that a document defect cannot enter as a shipping finding, because this port never opens a document. None of that is any part of what AC-18 promises."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "usecase::template_conventions::select_unsupplied_conventions",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::unsupplied_selection_tests",
+          "test_name": "test_select_unsupplied_conventions_names_the_shipped_documents_the_overlay_does_not_supply"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::unsupplied_selection_tests",
+          "test_name": "test_select_unsupplied_conventions_is_conforming_when_the_export_ships_only_supplied_documents"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::unsupplied_selection_tests",
+          "test_name": "test_select_unsupplied_conventions_deduplicates_and_stably_orders_the_offending_documents"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::unsupplied_selection_tests",
+          "test_name": "test_select_unsupplied_conventions_ignores_documents_the_overlay_supplies_but_the_export_lacks"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ConventionShippingCheckService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_check_tests",
+          "test_name": "test_check_hands_a_shipping_violation_back_as_a_verdict_and_not_as_a_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_check_tests",
+          "test_name": "test_check_reports_a_tree_it_could_not_inventory_as_a_failure_and_not_as_a_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_check_tests",
+          "test_name": "test_check_is_reachable_from_more_than_one_holder_of_one_shared_port"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckService",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "ConventionShippingCheckService declares one synchronous method under a Send + Sync bound: check(&self, query: CheckConventionShippingQuery) -> Result<ConventionShippingVerdict, ConventionShippingCheckError>. AC-18 promises three things: that template smoke checks the non-shipping of source conventions beyond the overlay against an exported tree, that this succeeds on the changed repository, and that no dead-reference check extracting convention paths from prose has been added. The first two are statements about a run and its outcome, and the second is what puts both out of reach here. This declaration is a trait, so a test at it drives some implementor and reads back that implementor's answer; and its subject is whatever tree the request carries, which makes the operation indifferent to which repository produced that tree. Nothing it can return therefore distinguishes the changed repository from any other, and success on that repository is a property of one particular run rather than of the operation this declaration names. The declaration is equally silent about template smoke. What it says about its own placement is why the check is a port of its own rather than a second method on the export service — the two operations are asymmetric on side effects, on collaborators and on read/write model, and folding them together would put a consumer of the export inside the export's own consistency boundary — which fixes where this operation sits relative to an export, not that any smoke item invokes it. Whether template smoke acquires such an item, and whether that item's run succeeds, are settled by whatever wires this port into a smoke run, and no wiring is representable in a method signature. The third clause is an absence in a repository. This declaration admits one request naming two trees and answers one verdict or one failure; that vocabulary cannot spell which checks a repository contains, and a declaration which names no prose and extracts no path from any is not evidence that no such extraction was added elsewhere. What this declaration does establish is narrower than any of the three and belongs to the shape of the answer rather than to a run: that the check's subject is named by the request and never by an ambient location; that a detected violation is a verdict and therefore an Ok, so no implementor may report a shipping violation as a failure; and that the failure arm is reserved for a question which could not be answered at all, so a verdict and an unanswerable state cannot be read into one another. None of that is any part of what AC-18 promises."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ConventionShippingCheckInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_check_tests",
+          "test_name": "test_interactor_inventories_both_trees_through_the_one_port_it_was_given"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_check_tests",
+          "test_name": "test_interactor_answers_with_what_the_comparison_selects_over_the_two_inventories"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_check_tests",
+          "test_name": "test_interactor_reports_conforming_when_the_exported_tree_ships_only_supplied_documents"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_check_tests",
+          "test_name": "test_interactor_surfaces_a_tree_it_could_not_inventory_as_that_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_check_tests",
+          "test_name": "test_interactor_carries_nothing_from_one_check_into_the_next"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckInteractor",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "ConventionShippingCheckInteractor implements ConventionShippingCheckService by asking its injected ConventionInventoryPort to list the exported tree and overlay, then selecting the unsupplied documents. AC-18 promises three different repository-level facts: that template smoke runs this non-shipping check against an exported tree, that the run succeeds on the changed repository, and that no dead-reference check extracting convention paths from prose was added. Every bound interactor test uses ScriptedInventory and synthetic roots, so its Conforming result demonstrates only the comparison of listings arranged by that test. It cannot establish that template smoke invokes the interactor, that any invocation ran on this repository's exported tree and succeeded, or that an unrelated prose-path check is absent. The interactor does establish the narrower implementation property that both listings are obtained through the one injected inventory and the resulting selection is returned as the service verdict; those are not any of AC-18's three promises."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::template_conventions::list_convention_documents",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_names_every_document_an_exported_tree_ships"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_yields_identities_two_trees_can_be_compared_by"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_inventories_the_tree_it_was_named_and_no_ambient_location"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_inventories_only_markdown_documents"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_inventories_a_document_it_could_not_have_parsed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_leaves_the_tree_untouched"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_without_a_convention_root_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_does_not_report_a_linked_convention_root_as_missing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_does_not_read_a_dangling_ancestor_link_as_a_missing_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_with_a_tree_root_that_does_not_exist_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_refuses_a_linked_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_refuses_a_linked_subdirectory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_passes_over_a_node_that_is_not_a_regular_file"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_beyond_the_entry_ceiling_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_with_an_oversized_directory_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_below_the_depth_bound_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_within_the_depth_bound_inventories_the_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_attributes_a_rejected_document_path_to_its_own_tree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_ignores_an_unrenderable_name_that_is_not_a_document"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::template_conventions::list_convention_documents",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "list_convention_documents is declared as a synchronous free function — list_convention_documents(tree_root: &std::path::Path) -> Result<Vec<ConventionDocumentPath>, ConventionShippingCheckError> — that walks the convention directory of the tree named by tree_root and hands back one tree-relative identity per document that tree ships, reading no file contents. Unlike a declaration whose tests can only drive a stand-in, a test at this one drives the real operation against real directory trees, so what it reads back is what the walk found on disk rather than what the test arranged. AC-18 promises three things: that template smoke checks, against an exported tree, that source conventions beyond the overlay are not shipped; that this succeeds on the changed repository; and that no dead-reference check extracting convention paths from prose has been added. None of the three is within reach at this declaration, and the reason is not that the trees under test are synthetic. The first clause asserts that a check was put and answered. This function's entire result is one tree's documents, and a list of documents is neither a comparison of two trees nor a finding about either, so inventorying a tree — however genuinely, and however closely the tree resembles an export — establishes at most that the tree was inventoried. The declaration admits one tree root and cannot name a second, so the non-shipping question cannot be stated in its vocabulary at all, let alone answered in it. The second clause asserts that a particular run succeeded on the changed repository. Success here is an Ok carrying a listing rather than a verdict, and the tree read is whichever location the caller names, so nothing this function returns distinguishes the changed repository from any other directory tree, and the value it returns is not the outcome whose success is being asserted. Whether template smoke acquires such an item, and whether that item's run succeeds, are settled by whatever wires this walk into a smoke run, and no wiring is representable in a function signature. The third clause is an absence in a repository. This function takes a tree root and returns that tree's own document paths; that vocabulary cannot spell which checks a repository contains. That it opens no document and parses no front matter, and so extracts nothing from any prose, is a statement about what this walk does rather than evidence that no such extraction was added elsewhere. What this declaration does establish is narrower than any of the three and belongs to the inventory step rather than to a run: that the tree inventoried is the one the caller named and never an ambient location; that documents are identified relative to that tree, without which two inventories could not be compared at all; that a tree holding no convention root is a failure rather than an inventory of nothing, so an export cannot answer by being empty; and that a document whose contents are malformed is inventoried like any other, because nothing here opens one. None of that is any part of what AC-18 promises."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "FsConventionInventoryAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::template_conventions::ConventionInventoryPort"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_lists_the_documents_a_tree_ships_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_inventories_both_trees_through_one_injected_value"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_inventories_each_named_tree_through_one_shared_receiver"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_presents_a_document_it_could_not_have_parsed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_leaves_the_trees_it_inventories_untouched"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_surfaces_every_fail_closed_condition_through_the_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::adapter_tests",
+          "test_name": "test_fs_convention_inventory_adapter_surfaces_the_rejected_document_path_through_the_port"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "FsConventionInventoryAdapter",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "FsConventionInventoryAdapter is declared as a stateless unit struct that implements ConventionInventoryPort by delegating to the filesystem inventory walk: its one method takes a tree root and hands back one tree-relative identity per convention document that tree ships, reading no file contents. Its tests drive it through the trait object against real directory trees, so what they read back is what the walk found on disk rather than what a stand-in was arranged to return, and the values they assert on are the adapter's own. AC-18 promises three things: that template smoke checks, against an exported tree, that source conventions beyond the overlay are not shipped; that this succeeds on the changed repository; and that no dead-reference check extracting convention paths from prose has been added. None of the three is within reach at this declaration, and the reason is neither that the trees are synthetic nor that the walk is borrowed. The first clause asserts that a check was put and answered. This declaration's entire result is one tree's documents, and a list of documents is neither a comparison of two trees nor a finding about either; a test may inventory an export-shaped tree and an overlay-shaped tree through one value and subtract the one listing from the other, but the subtraction is the test's own step and not this declaration's, so what the adapter establishes stops at each listing. Its method admits one tree root and cannot name a second, so the non-shipping question cannot be stated in its vocabulary, let alone answered in it, and being reachable as a trait object says which callers may hold it rather than that any caller does. The second clause asserts that a particular run succeeded on the changed repository. Success there is a property of that run's outcome, whereas here an Ok carries a listing and an Err carries a condition that prevented one, so nothing this method returns is the check's verdict; and the tree read is whichever location the caller names, so no result distinguishes the changed repository from any other directory tree. What acquires such a check in a smoke run, and whether that run succeeds, are settled by whatever wires this adapter in, and no wiring is representable in an implementation of this method. The third clause is an absence in a repository. A method that takes a tree root and returns that tree's own document paths cannot spell which checks a repository contains; that it opens no document and so extracts nothing from any prose is a statement about what this adapter reads, not evidence that no such extraction exists elsewhere. What this declaration does establish is narrower than any of the three and belongs to the inventorying step rather than to a run: that the tree inventoried is the one the caller named and never an ambient location; that one stateless value answers for either tree, so the two sides cannot be walked by different rules; that identities are tree-relative and therefore comparable across two inventories at all; that a malformed document is presented like any other, because nothing here opens one; and that a condition preventing an inventory reaches the port's caller as itself rather than as a shorter list. None of that is any part of what AC-18 promises."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckInput",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::template_conventions::driver_tests",
+          "test_name": "test_input_carries_both_tree_roots_into_the_query_untransposed"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckInput",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "ConventionShippingCheckInput is declared as the typed input the check is dispatched with — a plain struct of exported_root: std::path::PathBuf and overlay_dir: std::path::PathBuf, in the Dto role, declaring no operation of its own. AC-18 promises three things: that template smoke checks, against an exported tree, that source conventions beyond the overlay are not shipped; that this succeeds on the changed repository; and that no dead-reference check extracting convention paths from prose has been added. What this declaration is, by its own text, is the pair of locations a request names; naming them is the whole of its subject matter. A pair of locations is not the check it is handed to, and it is further still from that check's outcome. The first clause asserts that a check ran against an exported tree, while this declaration records only which tree would be the subject, never that any tree was inspected. The second asserts that such a run succeeded, and success is a fact about a run's outcome: there is no field, variant, or operation here in which an outcome could appear, since the whole of what it holds is two paths. A value of it exists because something constructed it, so what a test reads back from one is the pair of roots that test itself wrote, and that pair is identical whether a check ever ran against those trees or not. The third clause is an absence in a repository, and two filesystem locations say nothing about which checks a repository does or does not contain. What this declaration does establish is narrower than any of the three and is a property of the request rather than of a run: that the check's subject is named as a single value carrying both sides at once, so no caller can pose the question about an exported tree without also naming the supply it is measured against; and that both sides stay opaque paths admitting no rejection, because the invariant that matters in this slice belongs to the document identities inside a tree rather than to the tree root. None of that is any part of what AC-18 promises."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckDriver",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::template_conventions::driver_tests",
+          "test_name": "test_driver_settles_the_shipping_question_with_the_exit_code_a_gate_reads"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::template_conventions::driver_tests",
+          "test_name": "test_driver_names_every_unsupplied_document_and_summarises_none_of_them"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckDriver",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "ConventionShippingCheckDriver is declared as the primary adapter of the non-shipping check: it holds an injected ConventionShippingCheckService, and its one operation maps that service's two verdicts and its error type onto the process outcome, adding no rule of its own. AC-18 promises three things: that template smoke checks, against an exported tree, that source conventions beyond the overlay are not shipped; that this succeeds on the changed repository; and that no dead-reference check extracting convention paths from prose has been added. The first two are statements about a run and its outcome, and the injected collaborator is what puts both out of reach here. A test at this declaration drives some implementor of that service and reads back the answer that implementor gave; when the implementor is a stand-in, the verdict rendered is the verdict the test arranged, so what the reading exhibits is the mapping and the arrangement rather than any tree having been inspected. Even driven by an implementor that really walked a tree, the subject would be whatever roots the caller named, so nothing this operation returns distinguishes the changed repository from any other pair of directories, and success on that repository is a property of one particular run rather than of the mapping this declaration performs. The declaration is equally silent about template smoke: what it says of its own placement is that it exists as its own driver rather than as a second arm of the export driver, which fixes where it sits relative to an export and not that any smoke item invokes it. Whether template smoke acquires such an item, and whether that item's run succeeds, are settled by whatever invokes this adapter, and no invocation is representable in the adapter itself. The third clause is an absence in a repository; a declaration that renders a verdict about two named trees cannot spell which checks a repository contains. What it does establish is narrower than any of the three: that the two verdicts are distinguishable by process outcome, so a violation cannot be reported while the process reports success; that a violating outcome names every offending document rather than counting them, which is the last step at which the verdict's own guarantee could have been discarded; and that a condition preventing an answer arrives carrying that condition's own message rather than as a clean tree. None of that is any part of what AC-18 promises."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TemplateConventionShippingArgs",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::template::tests",
+          "test_name": "test_check_convention_shipping_parses_both_tree_roots"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::template::tests",
+          "test_name": "test_check_convention_shipping_infers_neither_tree_root"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "TemplateConventionShippingArgs",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "TemplateConventionShippingArgs is declared as the argument surface of the non-shipping check — a plain struct of exported_root: std::path::PathBuf and overlay_dir: std::path::PathBuf, in the Dto role, whose two roots are required arguments with no default — and declares no operation of its own. AC-18 promises three things: that template smoke checks, against an exported tree, that source conventions beyond the overlay are not shipped; that this succeeds on the changed repository; and that no dead-reference check extracting convention paths from prose has been added. An argument surface is the form in which a question may be posed, and none of the three is about the form of a question. The first clause asserts that a check ran against an exported tree; a test at this declaration parses a command line and reads back what parsing produced, which shows that a tree could be named and never that one was inspected. The second asserts that such a run succeeded on the changed repository, and this declaration has no field, variant, or operation in which an outcome could appear at all; nor does it name any particular repository, since what it accepts is whatever locations a caller supplies. The third clause is an absence in a repository, and two required path arguments say nothing about which checks a repository contains. What this declaration does establish is narrower than any of the three and belongs to how the question is posed rather than to a run: that both trees are named explicitly, so neither side of the comparison can be inferred from the working directory, from surrounding configuration, or from the sibling argument, and the subject of any answer is therefore unambiguous; and that the check's arguments are its own rather than the export's, so the two operations cannot be invoked with each other's inputs. None of that is any part of what AC-18 promises."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TemplateCommand",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::template::tests",
+          "test_name": "test_check_convention_shipping_parses_both_tree_roots"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::template::tests",
+          "test_name": "test_check_convention_shipping_does_not_accept_the_exports_arguments"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "TemplateCommand",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "TemplateCommand is declared as the enum of template-boundary subcommands, to which this track adds a CheckConventionShipping variant carrying its own args struct alongside the untouched Export variant; it declares no operation of its own. AC-18 promises three things: that template smoke checks, against an exported tree, that source conventions beyond the overlay are not shipped; that this succeeds on the changed repository; and that no dead-reference check extracting convention paths from prose has been added. An enum of subcommands states which invocations are admissible, and admissibility is not any of the three. The first clause asserts that a check ran against an exported tree: a variant existing means such a command can be named, and a test at this declaration reads back the variant that parsing selected, which is the selection the test itself supplied on a command line. That a command is invocable is not that any caller invoked it, still less that a particular tree was inspected. The second asserts that a run succeeded on the changed repository; this declaration carries arguments inward and no outcome outward, so there is nothing here in which success could be represented, and nothing that distinguishes one repository from another. The third clause is an absence in a repository, and a closed set of subcommand variants can only say what this command family admits, not what checks exist elsewhere in a repository; that this enum names no prose-scanning variant is a statement about its own membership rather than evidence about anything outside it. What this declaration does establish is narrower than any of the three: that the check is admissible as its own subcommand rather than as a mode of the export, and that it carries its own argument set, so the two subcommands have no argument combination in common and neither can be invoked with the other's inputs. None of that is any part of what AC-18 promises."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TemplateCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::template_export::tests",
+          "test_name": "convention_shipping_check_passes_a_tree_shipping_only_the_overlays_supply"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::template_export::tests",
+          "test_name": "convention_shipping_check_names_every_source_convention_the_overlay_does_not_supply"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::template_export::tests",
+          "test_name": "convention_shipping_check_wiring_injects_one_adapter_instance"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "TemplateCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "TemplateCompositionRoot is declared as the composition root of the template command family, to which this track adds an accessor wiring FsConventionInventoryAdapter into ConventionShippingCheckInteractor and injecting that into ConventionShippingCheckDriver, with the existing export wiring unchanged and pure DI only. Unlike a declaration whose tests can drive only a stand-in, a test here builds the wired stack and runs it against real directory trees, so what it reads back is what the filesystem walk found. AC-18 promises three things: that template smoke checks, against an exported tree, that source conventions beyond the overlay are not shipped; that this succeeds on the changed repository; and that no dead-reference check extracting convention paths from prose has been added. None of the three is within reach here, and the reason is not that the trees are synthetic. The first clause is about template smoke having such an item. What this declaration produces is a driver: something that can be run, held by whoever asked for it. A test proving that the assembled driver answers correctly about two real trees shows the item is constructible and behaves, not that any smoke run reaches for it; which runs invoke it is settled outside this declaration, and an invocation is not representable in an accessor that returns a driver. The second clause asserts that a run succeeded on the changed repository, and success there is a property of that particular run. The trees this declaration's tests answer about are the ones those tests built, and the driver it hands back answers about whichever trees its caller names, so no result obtainable here distinguishes the changed repository from any other pair of directories. The third clause is an absence in a repository; a declaration whose entire vocabulary is which collaborators are constructed and injected cannot spell which checks a repository contains. What this declaration does establish is narrower than any of the three and belongs to the assembly rather than to a run: that the check's adapter is constructed once and injected once, so both sides of the comparison are walked by identical rules and a reported difference cannot be an artefact of two differently-behaving walks; and that the assembled stack reaches the real inventory on both sides, passing a tree that ships only the overlay's supply and failing one that ships more while naming every offending document. None of that is any part of what AC-18 promises."
+    }
+  ]
+}

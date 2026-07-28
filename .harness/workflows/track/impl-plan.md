@@ -7,8 +7,8 @@
 
 ## Mission
 
-Author the implementation plan for the current track — `track/items/<id>/impl-plan.json` and
-`task-coverage.json` — via the `impl-planner` capability (Phase 3). The workflow is
+Author the implementation plan for the current track — `track/items/<id>/impl-plan.json`,
+`task-coverage.json`, and `task-contract.json` — via the `impl-planner` capability (Phase 3). The workflow is
 single-shot: invoke the capability once, receive its binary gate verdict, and return. Re-invocation
 on ERROR is the caller's responsibility (`plan` workflow). The `impl-planner` capability owns
 all file writes and gate evaluation internally.
@@ -23,8 +23,13 @@ See `.harness/capabilities/impl-planner.md` for the capability's full operationa
 - **`track/items/<track-id>/<layer>-types.json`** — at least one must exist for every
   TDDD-enabled layer (Phase 2 completed). If none exist, stop and instruct the caller to run
   the `type-design` workflow first.
-- **ADR path(s)** and **related conventions** — paths under `knowledge/adr/` and
-  `knowledge/conventions/` for the feature domain.
+- **ADR path(s)** — paths under `knowledge/adr/` for the feature domain.
+
+Conventions are **not** an input to this workflow. The `impl-planner` capability reads exactly
+the convention set the capability dispatcher resolves and delivers with the dispatch, and treats
+that set as complete — including when it resolves to zero documents
+(`.harness/capabilities/impl-planner.md` § Design Principles). This workflow neither selects nor
+forwards convention paths.
 
 ## Sequence
 
@@ -44,10 +49,14 @@ internal pipeline). The briefing must include:
 
 - Track id and paths to `track/items/<track-id>/spec.json` and each `<layer>-types.json`
 - Path(s) to the referenced ADR(s) under `knowledge/adr/`
-- Paths to related conventions under `knowledge/conventions/`
 
-The capability owns writing `track/items/<track-id>/impl-plan.json` and
-`track/items/<track-id>/task-coverage.json`, and evaluating the task-coverage binary gate
+The briefing must **not** carry convention paths. The capability's convention set comes solely
+from the dispatcher's resolution; adding a hand-picked path here would make an unresolved
+document an input and would leave a zero-document resolution non-authoritative.
+
+The capability owns writing `track/items/<track-id>/impl-plan.json`,
+`track/items/<track-id>/task-coverage.json`, and `track/items/<track-id>/task-contract.json`,
+and evaluating the task-coverage binary gate
 (OK / ERROR). The workflow does not duplicate these steps.
 
 **Step 3: Receive and surface the gate verdict**
@@ -77,6 +86,7 @@ task count, and any gate error details to the caller without re-reading the outp
 
 - `track/items/<id>/impl-plan.json` (written by the capability)
 - `track/items/<id>/task-coverage.json` (written by the capability)
+- `track/items/<id>/task-contract.json` (written by the capability)
 - Binary gate verdict: **OK** or **ERROR** + error details
 - Task count (surfaced to caller from capability output)
 - No commit is created by this workflow

@@ -22,7 +22,7 @@ User invokes this command as `/track:plan`. `$ARGUMENTS`:
 - **Phase 0**: invoke `/track:init`, `/track:review`, then `/track:commit`; their transition
   rules and inputs are owned by the plan workflow SSoT.
 - **Phase 0 governing convention**: apply
-  `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権` as the sole
+  `.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権` as the sole
   normative source for Phase 0. This adapter states no procedure of its own for that phase.
 - **Phase writer dispatch** — write the phase briefing, then invoke the matching
   `bin/sotp capability exec <capability> --host claude --briefing-file <path>` command. The
@@ -54,7 +54,7 @@ User invokes this command as `/track:plan`. `$ARGUMENTS`:
 On completion, present:
 
 1. Per-phase gate results (🔵🟡🔴 / OK / ERROR) and final `max_retry` counters per loop.
-2. Generated track artifact paths (`metadata.json` / `spec.json` / `<layer>-types.json` / `impl-plan.json` / `task-coverage.json`).
+2. Generated track artifact paths (`metadata.json` / `spec.json` / `<layer>-types.json` / `impl-plan.json` / `task-coverage.json` / `task-contract.json`).
 3. Back-and-forth edits that occurred (target artifact and its writer).
 4. Input-box divergence triage results (if any) and the admitted delta drafts left 🟡 for
    the merge-stage adjudication — no synchronous termination decision is requested.

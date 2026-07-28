@@ -229,10 +229,10 @@ enum SemanticVerdictDto {
 /// `claim_origin` / `evidence_origin` are intentionally **required** (no
 /// `serde(default)`, no `Option<...>` fallback). Old `schema_version: 1` cache
 /// files written before these fields existed fail with a missing-field serde
-/// error on decode. This is by design per `knowledge/conventions/no-backward-compat.md`:
-/// new schemas / behaviours apply to active tracks only; non-active (completed
-/// / archived) track caches are write-protected and are not touched by new
-/// code in normal operation. The `schema_version` field is intentionally kept
+/// error on decode. This is by design: a new schema applies to active tracks
+/// only, and non-active (completed / archived) track caches are write-protected
+/// and are not touched by new code in normal operation, so no compatibility
+/// shim is owed to them. The `schema_version` field is intentionally kept
 /// at `1` (no bump) because the rejection mechanism is the missing-field
 /// serde error itself (impl-plan §S002, spec CN-05).
 ///

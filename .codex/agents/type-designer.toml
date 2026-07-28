@@ -11,7 +11,10 @@ Owned artifacts:
 Inputs:
 - track/items/<id>/spec.json
 - Target ADRs under knowledge/adr/
-- knowledge/conventions/type-designer-kind-selection.md
+- The project-wide conventions delivered with this dispatch; read every one of them. The
+  resolution may be empty, which is a valid state and not an error.
+- architecture-rules.json and the shipped catalogue-lint configuration, for the machine
+  constraints on role x layer placement
 
 Rules:
 - Author tddd-features.json before capturing baselines; the rustdoc-invoking commands read it and

@@ -123,8 +123,16 @@ impl CodexReviewer {
             "{base}\n\n\
              ## Review scope: `{scope}`\n\n\
              Review ONLY the following files (this is the `{scope}` scope).\n\
-             Re-read the CURRENT file list and CURRENT diff, then fully re-adjudicate this entire scope.\n\
-             You have read-only access to the repo — use `git diff` to see changes.\n\n\
+             Re-read the CURRENT file list and CURRENT diff, then fully re-adjudicate this entire scope.\n\n\
+             ## How to inspect the repository\n\n\
+             You have read-only access to the working tree. Shell commands are available, but the\n\
+             sandbox rejects any command wrapped as `bash -lc \"...\"` or `/bin/bash -lc \"...\"`.\n\
+             Issue commands directly instead — for example `git diff -- <path>` or\n\
+             `rg -n <pattern> <path>`. If a command is rejected for that reason, reissue it in\n\
+             direct form; do not abandon the investigation.\n\n\
+             Read the listed files and the current diff before deciding. A verdict produced\n\
+             without reading them is invalid — in particular, returning `zero_findings` without\n\
+             having inspected the diff is not a pass.\n\n\
              Files:\n{file_list}",
             base = self.base_prompt,
             scope = scope_label,

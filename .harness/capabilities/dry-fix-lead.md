@@ -40,7 +40,7 @@ move it outward in a way that reverses dependency direction.
 Files this capability must NOT edit, regardless of DRY findings:
 
 - SoT / generated artifacts: `knowledge/adr/*.md`, `track/items/**` (spec.json / catalogues /
-  impl-plan / task-coverage / review.json / dry-check.json / rendered `*.md`),
+  impl-plan / task-coverage / task-contract / review.json / dry-check.json / rendered `*.md`),
   `.harness/config/agent-profiles.json`, `.gitignore`.
 - Any other track under `track/items/<other-track>/`.
 - Track task-state transitions through `bin/sotp track transition`; this capability has no
@@ -50,7 +50,7 @@ If a genuine violation can only be resolved by editing an out-of-boundary file, 
 with the file list and rationale.
 
 Architecture-layer rules still apply. When refactoring across layers, ensure the edit respects
-`architecture-rules.json` and `knowledge/conventions/impl-delegation-arch-guard.md`.
+`architecture-rules.json` and `.harness/policies/implementation-delegation.md`.
 
 ## Internal pipeline
 
@@ -134,7 +134,7 @@ must escalate.
 ## Architecture guard
 
 Before modifying any file, verify it belongs to the correct architecture layer per
-`knowledge/conventions/impl-delegation-arch-guard.md`:
+`.harness/policies/implementation-delegation.md`:
 
 - Domain types and domain ports stay in `libs/domain/`
 - Usecase interactors and usecase ports stay in `libs/usecase/`

@@ -22,7 +22,7 @@ Violations of the role statement above are always reportable. The following prio
   symlink-rejection tests in `scope_config_loader.rs`.
 - **panic-able adapter**: `unwrap()` / `expect()` / index access in adapter
   code that runs in production (not test). Adapter errors must map to a
-  typed error enum, not panic. Cite `coding-principles.md` §No Panics.
+  typed error enum, not panic.
 - **port impl missing a domain trait method**: adapter `impl X for Y` whose
   trait surface is incomplete and silently uses a default `unimplemented!()`
   or a no-op, breaking the contract upstream code relies on.
@@ -41,9 +41,9 @@ Violations of the role statement above are always reportable. The following prio
   `apps/cli-composition` (reverse-direction dependency, violates
   `architecture-rules.json`).
 - **non-fail-closed config**: a config loader that returns a default on
-  parse error / missing file when the convention says fail-closed
-  (`coding-principles.md` + the existing loader patterns reject
-  fallback-to-default for security-relevant configs).
+  parse error / missing file where the config decides a security-relevant or
+  gate-relevant outcome. The existing loader patterns in this crate reject
+  fallback-to-default for such configs; cite the loader you are comparing against.
 
 ## What NOT to report
 

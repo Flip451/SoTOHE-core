@@ -8,15 +8,15 @@
 ## Mission
 
 Perform every in-track write to `knowledge/adr/*.md` under the two-box model
-(`knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権). The edit is
+(`.harness/policies/pre-track-adr-authoring.md` §In-track 意味変更の裁定権). The edit is
 always triggered by a concrete recorded input relayed through the orchestrator — never by
 style preferences or proactive restructuring. Every applied edit is subsequently judged or
 classified by `adr-diagnoser`; this capability edits, it never adjudicates.
 
 This capability is **write-only to `knowledge/adr/*.md`** (including the hand-maintained
 index rows in `knowledge/adr/README.md` for drafts it creates or deletes). It must not edit
-spec.json, type catalogues, metadata.json, impl-plan.json, task-coverage.json, or any other
-artifact.
+spec.json, type catalogues, metadata.json, impl-plan.json, task-coverage.json,
+task-contract.json, or any other artifact.
 
 ## Invocation contract
 
@@ -74,7 +74,7 @@ The briefing from the orchestrator must include:
 
 | aspect | adr-editor (this capability) | spec-designer | impl-planner | type-designer |
 |---|---|---|---|---|
-| output | `knowledge/adr/*.md` edits + draft authoring | `spec.json` + `spec.md` | `impl-plan.json` + `task-coverage.json` | `<layer>-types.json` + rendered views |
+| output | `knowledge/adr/*.md` edits + draft authoring | `spec.json` + `spec.md` | `impl-plan.json` + `task-coverage.json` + `task-contract.json` | `<layer>-types.json` + rendered views |
 | trigger | Phase 0 loop / delta lane / user-decision implementation | `/track:spec-design` (Phase 1) | `/track:impl-plan` (Phase 3) | `/track:type-design` (Phase 2) |
 | scope | working tree only, no commit, no snapshot | writes own SSoT + rendered view | writes own SSoT files | writes own SSoT + rendered views |
 
@@ -108,7 +108,7 @@ If the briefing asks for:
   refs (`review_finding_ref` naming a PR/round) are metadata, not body content, and are
   exempt. Self-check after editing: grep the body for `本トラック`, `このトラック`, the
   current track id, and recent commit hashes; rephrase any future-tense match.
-- **Pre-merge draft vs post-merge record** (`knowledge/conventions/adr.md` §Lifecycle):
+- **Pre-merge draft vs post-merge record** (`.harness/reference/adr-schema.md` §Lifecycle):
   - **Pre-merge detection**: run `git log <merge_target> -- <adr-file>` with the
     briefing-supplied value — empty output = pre-merge. Never hardcode a branch name.
   - Phase 0 (before the adjudication boundary): a pre-merge input ADR is amended in place
@@ -184,8 +184,8 @@ deleting a draft). Do NOT spawn further agents.
 - Use `Read`, `Grep`, `Glob` for exploration; do not use `Bash(cat/grep/head)`.
 - The single permitted git command is the read-only `git log <merge_target> -- <adr-file>`
   for pre-merge detection.
-- Do not modify spec.json, metadata.json, impl-plan.json, task-coverage.json, or any
-  catalogue file.
+- Do not modify spec.json, metadata.json, impl-plan.json, task-coverage.json,
+  task-contract.json, or any catalogue file.
 - Store reasoning in session memory, not on disk.
 
 ## Session resume

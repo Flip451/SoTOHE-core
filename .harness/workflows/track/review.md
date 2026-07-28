@@ -25,8 +25,9 @@ briefing preparation, and capability dispatching.
   the branch does not match this pattern, stop and instruct the caller to switch first.
 - **Track context** — `spec.md`, `plan.md`, `metadata.json`, and all conventions listed in the
   `## Related Conventions (Required Reading)` section of `spec.md` (or `plan.md` for legacy
-  tracks). For exact type signatures / module trees / Mermaid diagrams, `## Canonical Blocks`
-  in `plan.md` is the source of truth.
+  tracks). Use the corresponding `<layer>-types.json` catalogue entries for exact type
+  signatures and module trees, and `impl-plan.json` for task execution detail. Rendered views
+  provide context but do not replace those machine-readable sources.
 - **Primary ADR sources** — Phase-0 init-kind ledger records are the orchestrator's primary-ADR
   designation records; no separate primary identity exists. The review prelude requires a
   nonempty init-record designation set and verifies every recorded ledger copy. It does not
@@ -99,9 +100,28 @@ For each scope reporting `required`, write `tmp/reviewer-runtime/briefing-{scope
 ## Review Checklist
 {scope-specific checklist items — keep this list short and observable}
 
+## Architecture Constraints
+{for a scope carrying source-editing artifacts, the R1 constraints below; otherwise omit this
+section}
+
+## Architecture Verification Checklist
+{the checks named by R3 below; omit this section only for a scope carrying no source-editing
+artifacts}
+
 ## Known Accepted Deviations
 {scope-specific notes for findings that should be dismissed}
 ```
+
+A scope whose file list carries source-editing artifacts must include the
+`## Architecture Constraints` section required by
+`.harness/policies/implementation-delegation.md#R1. 委譲時に architecture 制約を注入する`.
+Extract its placement decisions and call flow from the track ADR / plan artifacts and its
+crate, path, and dependency constraints from `architecture-rules.json`; the policy owns the
+required content and this workflow owns injecting it into the review-fixer dispatch.
+
+That same scope must include the `## Architecture Verification Checklist` section required by
+`.harness/policies/implementation-delegation.md#R3. review briefing に検査項目を渡す`. That
+policy owns the checks the section carries; this workflow owns emitting the section.
 
 Every briefing must include one sentence requiring that findings matching the severity policy
 be enumerated in full for the round — all matches reported, not truncated after the first
@@ -109,7 +129,7 @@ finding — with the same sentence stating that the severity constraints themsel
 unchanged.
 
 For an ADR scope, every briefing must reference
-`knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`. This standing
+`.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権`. This standing
 methodology is not a consumer-owned severity preference and cannot be relaxed by a scope policy.
 
 The CLI auto-injects the scope file list and severity policy. Do NOT hand-author the
@@ -176,7 +196,7 @@ capability directly.
 
 **ADR-scope repair lane (before re-launching the affected review).** The orchestrator, rather
 than `review-fix-lead`, owns any ADR change requested by an ADR-scoped finding, per
-`knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`. The lane forks
+`.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権`. The lane forks
 on the Phase 0 adjudication boundary:
 
 - **Before the boundary (Phase 0 baseline-review loop)**: when the recorded reviewer finding
@@ -262,7 +282,7 @@ Final round fixer terminal statuses:
 
 **Single-scope re-entry round (back-and-forth re-convergence surface)**
 
-Back-and-forth loops (the `plan` workflow's Phase 1/Phase 2 loops and the `diagnose` workflow's post-routing descent, per `knowledge/conventions/sot-reentry-sequencing.md`) re-converge one edited upstream scope without launching the Step 4 all-required-scopes wave. The single-scope round reuses this workflow's building blocks unchanged: run Step 1 (`bin/sotp adr-baseline check-review`), prepare the target scope's briefing per Step 3, then dispatch that one scope through the same provider-neutral wrapper used by Steps 4-5 — `cargo make track-local-review-fix -- --scope {scope} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md --round-type fast`, then `--round-type final` — to `zero_findings`, honoring the same fixer terminal statuses, the ADR-scope repair lane when the scope is `adr`, and re-launches after applied fixes. Downstream scopes deliberately stay un-launched: their re-entry follows only after this upstream scope re-converges. This surface changes no gate: `bin/sotp review check-approved` and the commit gate still require every required scope to be approved before any commit.
+Back-and-forth loops (the `plan` workflow's Phase 1/Phase 2 loops and the `diagnose` workflow's post-routing descent, per `.harness/policies/sot-reentry-sequencing.md`) re-converge one edited upstream scope without launching the Step 4 all-required-scopes wave. The single-scope round reuses this workflow's building blocks unchanged: run Step 1 (`bin/sotp adr-baseline check-review`), prepare the target scope's briefing per Step 3, then dispatch that one scope through the same provider-neutral wrapper used by Steps 4-5 — `cargo make track-local-review-fix -- --scope {scope} --briefing-file tmp/reviewer-runtime/briefing-{scope}.md --round-type fast`, then `--round-type final` — to `zero_findings`, honoring the same fixer terminal statuses, the ADR-scope repair lane when the scope is `adr`, and re-launches after applied fixes. Downstream scopes deliberately stay un-launched: their re-entry follows only after this upstream scope re-converges. This surface changes no gate: `bin/sotp review check-approved` and the commit gate still require every required scope to be approved before any commit.
 
 **Step 6: Final validation**
 

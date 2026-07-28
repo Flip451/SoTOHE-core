@@ -1,0 +1,80 @@
+<!-- Generated from spec.json — DO NOT EDIT DIRECTLY -->
+---
+version: "1.0"
+signals: { blue: 47, yellow: 0, red: 0 }
+---
+
+# consumer 規約の所有権分離と harness 固定依存の撤去
+
+## Goal
+
+- [GO-01] consumer が所有する規約と harness が所有する実行契約・schema を path で判別できる出荷境界へ分離し、テンプレート出力側の `knowledge/conventions/` の内容が overlay からの供給だけで決まる状態にする。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D1, knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D2, knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D3]
+- [GO-02] capability が consumer 規約を固定ファイル名ではなく project-owned な frontmatter metadata 経由で取得できるようにする。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D4]
+- [GO-03] canonical dispatch 境界で consumer 規約の解決を一度だけ行い、その解決結果が外部 provider 実行と in-host 委譲の双方で実行主体へ届く状態にする。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D6]
+
+## Scope
+
+### In Scope
+- [IN-01] `.harness/config/template-boundary.json` で `knowledge/conventions` をディレクトリ単位の `overlay` 一件として分類し、既存のファイル単位 `include` / `exclude` エントリ群を置き換える。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D1] [tasks: T024]
+- [IN-02] D2 の移動表に列挙された各文書を、表が指定する `.harness/policies/` または `.harness/reference/` の target path へ移す。`impl-delegation-arch-guard.md` は provider 非依存の委譲手順と architecture guard の実行責務を `.harness/policies/implementation-delegation.md` へ分割し、残余は既存の所有先に残す。`workflow-ceremony-minimization.md` は source 側にのみ残す。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D2] [tasks: T012, T013, T014, T015, T016, T017, T020, T032]
+- [IN-03] `.harness/policies` と `.harness/reference` の分類エントリを `.harness/config/template-boundary.json` に新設し、未分類 path による export の fail-closed 拒否を発生させずに両ディレクトリを出荷できるようにする。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D2] [tasks: T012, T013, T024]
+- [IN-04] 初期 overlay として `overlay/knowledge/conventions/` に `coding-principles.md`、`testing.md`、`security.md`、`prefer-type-safe-abstractions.md`、`type-designer-kind-selection.md` と `README.md` を consumer-neutral な内容で供給する。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D3] [tasks: T021, T022, T023]
+- [IN-05] 読み取り専用コマンド `bin/sotp conventions resolve --capability <capability-id>` を導入し、`knowledge/conventions/**/*.md` を走査して `required_for` の要素が指定 capability ID と完全一致する文書の repository-relative path を、重複なく安定順の機械可読な正本として返す。人間向け表示を持つ場合も同じ解決結果からレンダーする。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D4] [tasks: T001, T002, T003, T004, T005, T006, T007, T008]
+- [IN-06] `required_for` の capability ID を非空文字列の完全一致だけで解決し、`.harness/capabilities/` や `agent-profiles.json` への登録有無を検証しない open-ended な値として扱う。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D5] [tasks: T002, T007, T008]
+- [IN-07] `bin/sotp capability exec <capability> --host <host> --briefing-file <path>` が実行主体を決定する前に対象 capability ID で resolver を一度だけ実行し、解決した規約 path と全文書を読む義務を、`executed` では provider prompt／実行入力へ注入し、`delegate-in-host` では返却 payload の `discipline` に含める。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D6] [tasks: T009, T010, T011]
+- [IN-08] type design の責務を、role 語彙と catalogue schema (`.harness/reference/`)、汎用的な選定・生成・注釈手順 (`.harness/capabilities/type-designer.md`)、機械制約 (`architecture-rules.json` と catalogue lint)、`required_for: [type-designer]` を持つ consumer convention (project 固有の選定規則) へ分解し、role × layer マトリクス本体を consumer convention 側に置く。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D8] [tasks: T018, T021, T035]
+- [IN-09] 移行前に include されていた convention への track 成果物以外からの live reference を全件監査し、harness 共通契約・単一 SSoT への吸収・resolver 注入への置換・非規範的参照の削除・source-only 参照の除去という D9 の分類に従って移行する。review CLI と `.harness/custom/review-prompts/` の固定 convention 参照も監査対象とし、resolver 注入以外の手段で解消する。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D9] [tasks: T012, T013, T014, T015, T016, T017, T018, T019, T020, T021, T022, T032, T034, T035]
+- [IN-10] 同一変更集合の中で、surviving live surface の参照を、新しい `.harness` path、resolver 経由、または自己完結した実行条件へ更新する。対象には少なくとも `.harness/workflows/`、`.harness/capabilities/`、`.harness/custom/`、`.agents/`、`.claude/`、top-level entry document、設定、script、production source、test fixture、overlay を含む。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D10] [tasks: T012, T013, T014, T015, T016, T017, T018, T019, T020, T021, T022, T024, T032, T034, T035]
+- [IN-11] template smoke に、export 済み tree を対象として overlay 以外の source convention が出荷されていないことを検査する項目を持たせる。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D10] [tasks: T025, T026, T027, T028, T033, T029, T030, T031]
+
+### Out of Scope
+- [OUT-01] 既存の convention 作成・更新・削除・索引機能 (`conventions add` / `update-index` / `verify-index`) の存廃、再設計、または仕様変更は対象外とする。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D4] [tasks: T005, T006, T007, T008, T024, T029, T030, T031]
+- [OUT-02] review 用 CLI、scope ごとの briefing 合成、および `typed-pipeline` capability への resolver 注入は対象外とする。scope ごとに consumer convention を自動選択する代替機構も本変更に含めない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D6, knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D9] [tasks: T009, T010, T011, T018, T019]
+- [OUT-03] `spec.json` 等の track 成果物に記録された `convention_refs` を dispatcher が探索・解決・合成することは対象外とする。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D7] [tasks: T010, T011]
+- [OUT-04] workflow／capability／entry document の散文から convention path を抽出する dead-reference 検査と、そのためだけの新たな契約や再発検出機構の導入は対象外とする。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D10] [tasks: T020, T026, T028, T033, T031]
+- [OUT-05] 移動前 path の stub、redirect document、alias の作成は対象外とする。`track/items/**`、`track/archive/**`、および現行手順として参照されていない既存 ADR／research note の旧 path は遡及更新せず、dead live reference として扱わない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D10] [tasks: T012, T013, T014, T015, T016, T017, T024, T032]
+- [OUT-06] 未登録・タイプミスの capability ID を resolver が error へ変換すること、および typo と未使用 custom capability を機械的に区別する診断の導入は対象外とする。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D5] [tasks: T002, T003, T007, T008]
+- [OUT-07] dispatcher を経由しない Agent／skill の直接起動を supported entrypoint として追加すること、およびそこへ同等の規約解決 preflight を別実装することは対象外とする。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D6] [tasks: T010, T011]
+
+## Constraints
+- [CN-01] 分類は入れ子にできないため、`knowledge/conventions` はディレクトリ単位の `overlay` 一件で表現する。`exclude` は overlay からの供給経路を持たないため採らない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D1] [tasks: T024]
+- [CN-02] consumer が削除すると workflow または capability の意味が変わる実行契約や schema を overlay convention に置いてはならない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D1, knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D2] [tasks: T012, T013, T014, T015, T016, T017, T021, T022, T023, T024, T032]
+- [CN-03] `.harness/workflows/` に policy／reference 文書を混在させず、workflow は必要な `.harness/policies/` / `.harness/reference/` 文書を直接参照する。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D2] [tasks: T012, T013, T014, T015, T016, T017, T032]
+- [CN-04] overlay 版の規約は SoTOHE-core の crate 名、内部 path、JST 運用を含まない consumer-neutral な初期値とし、利用者が改稿・改名・削除できる project-owned rule として供給する。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D3] [tasks: T021, T022, T023]
+- [CN-05] dispatcher が注入するのは resolver が `required_for` に対して返した project-wide convention だけとし、host orchestrator は resolver を再実行せず、規約本文を独自に要約しない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D6, knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D7] [tasks: T009, T010, T011, T019]
+- [CN-06] D6 対象 capability は consumer convention の固定ファイル名も、その文書内の固定節見出しも参照しない。実行結果が project-wide convention を根拠として示す場合は、その実行で resolver が返した実際の文書 path を使う。harness 自身が所有する policy／reference への固定参照はこの禁止対象ではない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D7, knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D8] [tasks: T018, T019]
+- [CN-07] 「参照を文章に置き換える」移行は D9 の分類 2 または 4 の場合だけに行う。複数箇所で共有する規範を各 consumer へ複製したり、consumer が変更すべき規約を harness 文面へ固定化したりしてはならない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D9] [tasks: T017, T018, T019, T020]
+- [CN-08] harness が所有するのは role 語彙、`KindLayerConstraint` という rule 種別と検査意味論、および type-designer が lint gate を通す義務までとし、role × layer マトリクスの層値と本体は consumer 所有の規約に置く。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D8] [tasks: T018, T021]
+
+## Acceptance Criteria
+- [ ] [AC-01] `.harness/config/template-boundary.json` に `knowledge/conventions` の `overlay` エントリが一件だけ存在し、`knowledge/conventions/` 配下のファイル単位エントリが残っていない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D1] [tasks: T024]
+- [ ] [AC-02] export 済み tree の `knowledge/conventions/` の内容が `overlay/knowledge/conventions/` の供給内容と一致し、overlay に含まれない source convention は出荷されない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D1, knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D3] [tasks: T021, T022, T023, T024, T031]
+- [ ] [AC-03] D2 の移動表の各行について、文書が target path に存在し移動元 path には存在しない。`.harness/policies/implementation-delegation.md` は provider 非依存の委譲手順と architecture guard の実行責務を持ち、layer 名・role × layer 配置・利用プロジェクトが選択する設計方針を含まない。`workflow-ceremony-minimization.md` は source 側に存在し、export 済み tree には存在しない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D2] [tasks: T012, T013, T014, T015, T016, T017, T020, T032]
+- [ ] [AC-04] `.harness/policies` と `.harness/reference` が `.harness/config/template-boundary.json` で分類されており、両ディレクトリ配下のファイルを含む export が未分類 path による fail-closed 拒否なしに成功する。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D2] [tasks: T012, T013, T024]
+- [ ] [AC-05] 初期 overlay の `knowledge/conventions/` は D3 が列挙する 5 規約と `README.md` だけを含み、`enforce-by-mechanism.md`、`filesystem-persistence-guard.md`、`language-policy.md`、`typed-deserialization.md` を含まない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D3] [tasks: T021, T022, T023, T024]
+- [ ] [AC-06] `bin/sotp conventions resolve --capability <id>` は、`required_for` に当該 ID を完全一致で含む `knowledge/conventions/**/*.md` の repository-relative path を重複なく安定順で返し、文書の作成・更新・削除・索引生成を行わない。機械可読な正本の受け渡し形式は 1 record あたり 1 path であり、1 record は厳密に 1 個のファイルを同定する。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D4] [tasks: T001, T002, T003, T004, T005, T006, T007, T008]
+- [ ] [AC-07] resolve は構造上の異常を fail-closed とする。この分類に当たる事例には、frontmatter が YAML として解析できない場合、`required_for` が文字列配列でない場合、`required_for` に空文字または空白だけの capability ID がある場合、解決対象 path が `knowledge/conventions/` の外へ逸脱する場合、対象文書を読み取れない場合、および解決対象 path が正本の 1 record として自身のファイルを同定できない場合 (valid UTF-8 でない、または `\n` ないし `\r` を含む) が含まれ、いずれについても fail-closed を確認できる。この列挙は網羅ではなく、同じ分類に属する他の事例も同様に fail-closed となる。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D4] [tasks: T001, T002, T005, T006]
+- [ ] [AC-08] frontmatter がない文書、`required_for` がない文書、指定 capability に一致する文書がゼロ件という状態は error にならず、正常な空結果として扱われる。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D4] [tasks: T002, T003, T004, T005, T007]
+- [ ] [AC-09] `.harness/capabilities/` にも `agent-profiles.json` にも登録されていない非空 capability ID を指定した resolve が error にならず、その ID を `required_for` に持つ文書を解決結果として返す。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D5] [tasks: T002, T007, T008]
+- [ ] [AC-10] `orchestrator-output` capability の dispatch において、`CAPABILITY_EXEC_OUTCOME: executed` では解決した規約 path と全文書を読む義務が provider の実行入力に含まれ、`CAPABILITY_EXEC_OUTCOME: delegate-in-host` では同じ義務が返却 payload の `discipline` に含まれることを、両経路それぞれについて確認できる。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D6] [tasks: T009, T010, T011]
+- [ ] [AC-11] dispatch 一回あたり resolver の実行は一度だけであり、その実行は実行主体の決定より前に行われる。`typed-pipeline` capability の dispatch では resolver 注入が行われない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D6] [tasks: T009, T010, T011]
+- [ ] [AC-12] dispatcher が注入する規約は resolver の解決結果だけであり、track 成果物の `convention_refs` を読み取らない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D7] [tasks: T010, T011]
+- [ ] [AC-13] `.harness/capabilities/type-designer.md` を含む D6 対象 capability の手順は、consumer convention の固定ファイル名も固定節見出しも参照せず、resolver が返した convention 群を読む形で project 固有規則を確認する。resolver が 0 件を返す状態でもその確認手順は error にならない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D8] [tasks: T018, T019, T021, T022, T034, T035]
+- [ ] [AC-14] role × layer マトリクス本体は `required_for: [type-designer]` を持つ consumer convention に存在し、出荷 catalogue-lint config の `permitted_layers` はその写像として整合する。harness 側 reference にはマトリクス本体が存在しない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D8] [tasks: T018, T021, T035]
+- [ ] [AC-15] 移行前に include されていた convention への track 成果物以外の live reference が、D9 の 5 分類のいずれかに従って移行済みであり、review CLI と `.harness/custom/review-prompts/` に consumer 所有規約への固定参照が残らない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D9] [tasks: T012, T013, T014, T015, T018, T019, T020, T021, T022, T032, T034, T035]
+- [ ] [AC-16] surviving live surface に、移動済み convention の旧 path への参照が残っていない。対象には少なくとも `.harness/workflows/`、`.harness/capabilities/`、`.harness/custom/`、`.agents/`、`.claude/`、top-level entry document、設定、script、production source、test fixture、overlay を含み、いずれについても残存参照がないことを確認できる。この列挙は対象の下限であって上限ではなく、ここに挙がっていない surviving live surface が対象外になるわけではない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D10] [tasks: T012, T013, T014, T015, T016, T017, T018, T019, T020, T024, T032]
+- [ ] [AC-17] 移動前 path に stub、redirect document、alias が存在せず、`track/items/**`、`track/archive/**`、および現行手順として参照されていない既存 ADR／research note の旧 path が変更されていない。現行手順として参照されている ADR／research note は本条の対象ではなく、surviving live surface として AC-16 の更新対象となる。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D10] [tasks: T012, T013, T014, T015, T016, T017, T032]
+- [ ] [AC-18] template smoke が export 済み tree に対して overlay 以外の source convention の非出荷を検査し、変更後のリポジトリで成功する。散文から convention path を抽出する dead-reference 検査は追加されていない。 [adr: knowledge/adr/2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md#D10] [tasks: T025, T026, T027, T028, T033, T029, T030, T031]
+
+## Related Conventions (Required Reading)
+- knowledge/conventions/coding-principles.md#Rules
+- knowledge/conventions/testing.md#Rules
+- knowledge/conventions/prefer-type-safe-abstractions.md#Rules
+- knowledge/conventions/enforce-by-mechanism.md#Rules
+- knowledge/conventions/no-backward-compat.md#Rules
+
+## Signal Summary
+
+### Stage 1: Spec Signals
+🔵 47  🟡 0  🔴 0
+
