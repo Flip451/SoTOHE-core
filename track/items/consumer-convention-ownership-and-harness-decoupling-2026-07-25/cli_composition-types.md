@@ -5,5 +5,5 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | ConventionsCompositionRoot | composition_root | modify | — | 🔵 | 🔵 |
-| TemplateCompositionRoot | composition_root | modify | — | 🟡 | 🔵 |
+| TemplateCompositionRoot | composition_root | modify | — | 🔵 | 🔵 |
 

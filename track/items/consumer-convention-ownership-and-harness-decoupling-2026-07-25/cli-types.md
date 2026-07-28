@@ -5,12 +5,12 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | ConventionsCommand | enum | modify | Add, UpdateIndex, VerifyIndex, Resolve | 🔵 | 🔵 |
-| TemplateCommand | enum | modify | Export, CheckConventionShipping | 🟡 | 🔵 |
+| TemplateCommand | enum | modify | Export, CheckConventionShipping | 🔵 | 🔵 |
 
 ## DTOs
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| TemplateConventionShippingArgs | dto | add | — | 🟡 | 🔵 |
+| TemplateConventionShippingArgs | dto | add | — | 🔵 | 🔵 |
 | TemplateExportArgs | dto | reference | — | 🔵 | 🔵 |
 

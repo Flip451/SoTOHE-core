@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-28T13:25:50Z",
+  "generated_at": "2026-07-28T16:27:09Z",
   "declaration_hash": "9869ef883a9ab5e60f8a8d91d90d3199f37ac84a676be6e87518477feabeb860",
-  "implementation_input_hash": "8f4693ea24811bb2f28bd46006da89c074e531ca23cc970e5bb253a68bc2c9e1",
+  "implementation_input_hash": "322aeece6b264c736dc8b3f201bfd90aab1649f6a99a6b729b13738cfabf0dbc",
   "signals": [
     {
       "type_name": "ConventionCapabilityIdArg",
@@ -38,15 +38,15 @@
     {
       "type_name": "ConventionShippingCheckDriver",
       "kind_tag": "primary_adapter",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ConventionShippingCheckInput",
       "kind_tag": "dto",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",

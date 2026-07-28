@@ -1863,6 +1863,171 @@
         }
       },
       "reason": "FsConventionInventoryAdapter is declared as a stateless unit struct that implements ConventionInventoryPort by delegating to the filesystem inventory walk: its one method takes a tree root and hands back one tree-relative identity per convention document that tree ships, reading no file contents. Its tests drive it through the trait object against real directory trees, so what they read back is what the walk found on disk rather than what a stand-in was arranged to return, and the values they assert on are the adapter's own. AC-18 promises three things: that template smoke checks, against an exported tree, that source conventions beyond the overlay are not shipped; that this succeeds on the changed repository; and that no dead-reference check extracting convention paths from prose has been added. None of the three is within reach at this declaration, and the reason is neither that the trees are synthetic nor that the walk is borrowed. The first clause asserts that a check was put and answered. This declaration's entire result is one tree's documents, and a list of documents is neither a comparison of two trees nor a finding about either; a test may inventory an export-shaped tree and an overlay-shaped tree through one value and subtract the one listing from the other, but the subtraction is the test's own step and not this declaration's, so what the adapter establishes stops at each listing. Its method admits one tree root and cannot name a second, so the non-shipping question cannot be stated in its vocabulary, let alone answered in it, and being reachable as a trait object says which callers may hold it rather than that any caller does. The second clause asserts that a particular run succeeded on the changed repository. Success there is a property of that run's outcome, whereas here an Ok carries a listing and an Err carries a condition that prevented one, so nothing this method returns is the check's verdict; and the tree read is whichever location the caller names, so no result distinguishes the changed repository from any other directory tree. What acquires such a check in a smoke run, and whether that run succeeds, are settled by whatever wires this adapter in, and no wiring is representable in an implementation of this method. The third clause is an absence in a repository. A method that takes a tree root and returns that tree's own document paths cannot spell which checks a repository contains; that it opens no document and so extracts nothing from any prose is a statement about what this adapter reads, not evidence that no such extraction exists elsewhere. What this declaration does establish is narrower than any of the three and belongs to the inventorying step rather than to a run: that the tree inventoried is the one the caller named and never an ambient location; that one stateless value answers for either tree, so the two sides cannot be walked by different rules; that identities are tree-relative and therefore comparable across two inventories at all; that a malformed document is presented like any other, because nothing here opens one; and that a condition preventing an inventory reaches the port's caller as itself rather than as a shorter list. None of that is any part of what AC-18 promises."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckInput",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::template_conventions::driver_tests",
+          "test_name": "test_input_carries_both_tree_roots_into_the_query_untransposed"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckInput",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "ConventionShippingCheckInput is declared as the typed input the check is dispatched with — a plain struct of exported_root: std::path::PathBuf and overlay_dir: std::path::PathBuf, in the Dto role, declaring no operation of its own. AC-18 promises three things: that template smoke checks, against an exported tree, that source conventions beyond the overlay are not shipped; that this succeeds on the changed repository; and that no dead-reference check extracting convention paths from prose has been added. What this declaration is, by its own text, is the pair of locations a request names; naming them is the whole of its subject matter. A pair of locations is not the check it is handed to, and it is further still from that check's outcome. The first clause asserts that a check ran against an exported tree, while this declaration records only which tree would be the subject, never that any tree was inspected. The second asserts that such a run succeeded, and success is a fact about a run's outcome: there is no field, variant, or operation here in which an outcome could appear, since the whole of what it holds is two paths. A value of it exists because something constructed it, so what a test reads back from one is the pair of roots that test itself wrote, and that pair is identical whether a check ever ran against those trees or not. The third clause is an absence in a repository, and two filesystem locations say nothing about which checks a repository does or does not contain. What this declaration does establish is narrower than any of the three and is a property of the request rather than of a run: that the check's subject is named as a single value carrying both sides at once, so no caller can pose the question about an exported tree without also naming the supply it is measured against; and that both sides stay opaque paths admitting no rejection, because the invariant that matters in this slice belongs to the document identities inside a tree rather than to the tree root. None of that is any part of what AC-18 promises."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckDriver",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::template_conventions::driver_tests",
+          "test_name": "test_driver_settles_the_shipping_question_with_the_exit_code_a_gate_reads"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::template_conventions::driver_tests",
+          "test_name": "test_driver_names_every_unsupplied_document_and_summarises_none_of_them"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckDriver",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "ConventionShippingCheckDriver is declared as the primary adapter of the non-shipping check: it holds an injected ConventionShippingCheckService, and its one operation maps that service's two verdicts and its error type onto the process outcome, adding no rule of its own. AC-18 promises three things: that template smoke checks, against an exported tree, that source conventions beyond the overlay are not shipped; that this succeeds on the changed repository; and that no dead-reference check extracting convention paths from prose has been added. The first two are statements about a run and its outcome, and the injected collaborator is what puts both out of reach here. A test at this declaration drives some implementor of that service and reads back the answer that implementor gave; when the implementor is a stand-in, the verdict rendered is the verdict the test arranged, so what the reading exhibits is the mapping and the arrangement rather than any tree having been inspected. Even driven by an implementor that really walked a tree, the subject would be whatever roots the caller named, so nothing this operation returns distinguishes the changed repository from any other pair of directories, and success on that repository is a property of one particular run rather than of the mapping this declaration performs. The declaration is equally silent about template smoke: what it says of its own placement is that it exists as its own driver rather than as a second arm of the export driver, which fixes where it sits relative to an export and not that any smoke item invokes it. Whether template smoke acquires such an item, and whether that item's run succeeds, are settled by whatever invokes this adapter, and no invocation is representable in the adapter itself. The third clause is an absence in a repository; a declaration that renders a verdict about two named trees cannot spell which checks a repository contains. What it does establish is narrower than any of the three: that the two verdicts are distinguishable by process outcome, so a violation cannot be reported while the process reports success; that a violating outcome names every offending document rather than counting them, which is the last step at which the verdict's own guarantee could have been discarded; and that a condition preventing an answer arrives carrying that condition's own message rather than as a clean tree. None of that is any part of what AC-18 promises."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TemplateConventionShippingArgs",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::template::tests",
+          "test_name": "test_check_convention_shipping_parses_both_tree_roots"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::template::tests",
+          "test_name": "test_check_convention_shipping_infers_neither_tree_root"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "TemplateConventionShippingArgs",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "TemplateConventionShippingArgs is declared as the argument surface of the non-shipping check — a plain struct of exported_root: std::path::PathBuf and overlay_dir: std::path::PathBuf, in the Dto role, whose two roots are required arguments with no default — and declares no operation of its own. AC-18 promises three things: that template smoke checks, against an exported tree, that source conventions beyond the overlay are not shipped; that this succeeds on the changed repository; and that no dead-reference check extracting convention paths from prose has been added. An argument surface is the form in which a question may be posed, and none of the three is about the form of a question. The first clause asserts that a check ran against an exported tree; a test at this declaration parses a command line and reads back what parsing produced, which shows that a tree could be named and never that one was inspected. The second asserts that such a run succeeded on the changed repository, and this declaration has no field, variant, or operation in which an outcome could appear at all; nor does it name any particular repository, since what it accepts is whatever locations a caller supplies. The third clause is an absence in a repository, and two required path arguments say nothing about which checks a repository contains. What this declaration does establish is narrower than any of the three and belongs to how the question is posed rather than to a run: that both trees are named explicitly, so neither side of the comparison can be inferred from the working directory, from surrounding configuration, or from the sibling argument, and the subject of any answer is therefore unambiguous; and that the check's arguments are its own rather than the export's, so the two operations cannot be invoked with each other's inputs. None of that is any part of what AC-18 promises."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TemplateCommand",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::template::tests",
+          "test_name": "test_check_convention_shipping_parses_both_tree_roots"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::template::tests",
+          "test_name": "test_check_convention_shipping_does_not_accept_the_exports_arguments"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "TemplateCommand",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "TemplateCommand is declared as the enum of template-boundary subcommands, to which this track adds a CheckConventionShipping variant carrying its own args struct alongside the untouched Export variant; it declares no operation of its own. AC-18 promises three things: that template smoke checks, against an exported tree, that source conventions beyond the overlay are not shipped; that this succeeds on the changed repository; and that no dead-reference check extracting convention paths from prose has been added. An enum of subcommands states which invocations are admissible, and admissibility is not any of the three. The first clause asserts that a check ran against an exported tree: a variant existing means such a command can be named, and a test at this declaration reads back the variant that parsing selected, which is the selection the test itself supplied on a command line. That a command is invocable is not that any caller invoked it, still less that a particular tree was inspected. The second asserts that a run succeeded on the changed repository; this declaration carries arguments inward and no outcome outward, so there is nothing here in which success could be represented, and nothing that distinguishes one repository from another. The third clause is an absence in a repository, and a closed set of subcommand variants can only say what this command family admits, not what checks exist elsewhere in a repository; that this enum names no prose-scanning variant is a statement about its own membership rather than evidence about anything outside it. What this declaration does establish is narrower than any of the three: that the check is admissible as its own subcommand rather than as a mode of the export, and that it carries its own argument set, so the two subcommands have no argument combination in common and neither can be invoked with the other's inputs. None of that is any part of what AC-18 promises."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TemplateCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::template_export::tests",
+          "test_name": "convention_shipping_check_passes_a_tree_shipping_only_the_overlays_supply"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::template_export::tests",
+          "test_name": "convention_shipping_check_names_every_source_convention_the_overlay_does_not_supply"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::template_export::tests",
+          "test_name": "convention_shipping_check_wiring_injects_one_adapter_instance"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "TemplateCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "TemplateCompositionRoot is declared as the composition root of the template command family, to which this track adds an accessor wiring FsConventionInventoryAdapter into ConventionShippingCheckInteractor and injecting that into ConventionShippingCheckDriver, with the existing export wiring unchanged and pure DI only. Unlike a declaration whose tests can drive only a stand-in, a test here builds the wired stack and runs it against real directory trees, so what it reads back is what the filesystem walk found. AC-18 promises three things: that template smoke checks, against an exported tree, that source conventions beyond the overlay are not shipped; that this succeeds on the changed repository; and that no dead-reference check extracting convention paths from prose has been added. None of the three is within reach here, and the reason is not that the trees are synthetic. The first clause is about template smoke having such an item. What this declaration produces is a driver: something that can be run, held by whoever asked for it. A test proving that the assembled driver answers correctly about two real trees shows the item is constructible and behaves, not that any smoke run reaches for it; which runs invoke it is settled outside this declaration, and an invocation is not representable in an accessor that returns a driver. The second clause asserts that a run succeeded on the changed repository, and success there is a property of that particular run. The trees this declaration's tests answer about are the ones those tests built, and the driver it hands back answers about whichever trees its caller names, so no result obtainable here distinguishes the changed repository from any other pair of directories. The third clause is an absence in a repository; a declaration whose entire vocabulary is which collaborators are constructed and injected cannot spell which checks a repository contains. What this declaration does establish is narrower than any of the three and belongs to the assembly rather than to a run: that the check's adapter is constructed once and injected once, so both sides of the comparison are walked by identical rules and a reported difference cannot be an artefact of two differently-behaving walks; and that the assembled stack reaches the real inventory on both sides, passing a tree that ships only the overlay's supply and failing one that ships more while naming every offending document. None of that is any part of what AC-18 promises."
     }
   ]
 }

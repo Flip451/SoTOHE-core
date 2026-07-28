@@ -411,7 +411,7 @@ args = ["run", "--quiet", "-p", "cli", "--", "signal", "check-catalog-spec", "--
 
 [tasks.template-export-smoke-local]
 private = true
-description = "[internal] Source-repo smoke gate: export the template tree to a fresh tmp dir OUTSIDE the workspace root, then run the exported tree's own gates with the ambient toolchain: skeleton fmt/clippy/test, exported-Makefile parseability, shipped-workflow cargo-make task coverage, no exported workspace-CLI cargo run, the exported tree's file-based `bin/sotp verify` gates (layers / module-size / canonical-modules / arch-docs / doc-links / purity trio, exercising the exported architecture-rules.json), deny.toml validation (bans/licenses/sources) when cargo-deny is available, plus the three post-export `bin/sotp` transplant checks required by ADR 2026-07-08-0541 (spec IN-05, AC-02, AC-07, CN-08, CN-09): (a) `bin/sotp` exists, (b) executable bit set on unix, (c) `bin/sotp --help` exits 0. Uses `cargo run -p cli -- template export` (not the source bin/sotp) so the gate runs unchanged inside ci-container, where the host-built bin/sotp is absent. Scope boundary (OS-10/CN-09): the gate only asserts export success and exported-tree structural health; it deliberately does not hard-fail on consumer-owned config VALUES and skips when source-only overlay artifacts are absent."
+description = "[internal] Source-repo smoke gate: export the template tree to a fresh tmp dir OUTSIDE the workspace root, then run the exported tree's own gates with the ambient toolchain: skeleton fmt/clippy/test, convention non-shipping against the source overlay (spec IN-11, AC-02, AC-18 — the overlay path is resolved to an absolute path BEFORE the `cd` into the export, so the check can never compare the exported tree against itself), exported-Makefile parseability, shipped-workflow cargo-make task coverage, no exported workspace-CLI cargo run, the exported tree's file-based `bin/sotp verify` gates (layers / module-size / canonical-modules / arch-docs / doc-links / purity trio, exercising the exported architecture-rules.json), deny.toml validation (bans/licenses/sources) when cargo-deny is available, plus the three post-export `bin/sotp` transplant checks required by ADR 2026-07-08-0541 (spec IN-05, AC-02, AC-07, CN-08, CN-09): (a) `bin/sotp` exists, (b) executable bit set on unix, (c) `bin/sotp --help` exits 0. Uses `cargo run -p cli -- template export` (not the source bin/sotp) so the gate runs unchanged inside ci-container, where the host-built bin/sotp is absent. Scope boundary (OS-10/CN-09): the gate only asserts export success and exported-tree structural health; it deliberately does not hard-fail on consumer-owned config VALUES and skips when source-only overlay artifacts are absent."
 script_runner = "@shell"
 script = ['''
 set -e
@@ -420,6 +420,13 @@ if [ ! -d "$OVERLAY_DIR" ]; then
   echo "[SKIP] template-export-smoke-local: source overlay tree absent; skipping source-repo smoke."
   exit 0
 fi
+# Absolute overlay path, resolved HERE — before the `cd "$SMOKE_OUT"` further down.
+# The convention-shipping check runs after that `cd`, and the overlay it measures
+# the export against lives in the source repo. A relative path expanded afterwards
+# would name a location inside the exported tree instead, so the check would be
+# comparing the export against a part of itself rather than against the supply a
+# consumer receives — which is the one thing this check exists to rule out.
+OVERLAY_ABS="$(cd "$OVERLAY_DIR" && pwd)"
 
 # The output dir must live OUTSIDE the workspace root: the exporter fail-closes when
 # the output path is inside the source root. Use a fresh mktemp dir (a sibling of the
@@ -462,6 +469,14 @@ fi
 # smoke resilient to skeleton Cargo.lock drift.
 export CARGO_TARGET_DIR="$SMOKE_OUT/target"
 cd "$SMOKE_OUT"
+# Convention non-shipping check (spec IN-11, AC-02, AC-18): the exported tree must
+# ship the overlay's conventions and no other source convention. Both trees are
+# named absolutely — `$OVERLAY_ABS` was resolved before this `cd`, and the exported
+# root is the mktemp path rather than `.` — so neither location depends on the
+# working directory this block runs in. Failure names every offending document.
+bin/sotp template check-convention-shipping \
+  --exported-root "$SMOKE_OUT" \
+  --overlay-dir "$OVERLAY_ABS"
 bin/sotp conventions update-index
 for convention in knowledge/conventions/*.md; do
   name="$(basename "$convention")"

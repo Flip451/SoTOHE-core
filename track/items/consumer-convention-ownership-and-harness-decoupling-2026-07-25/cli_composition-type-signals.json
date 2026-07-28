@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-28T13:26:03Z",
+  "generated_at": "2026-07-28T16:19:44Z",
   "declaration_hash": "c300fe70f1d2e798648158ca7f8486c4385bcbd9c0d2844d0aebe78f12e67cb1",
-  "implementation_input_hash": "28c911bc6664bbaf731e24dfef913b13fd35a89cdcbdc3f70b5c46d1455fceb9",
+  "implementation_input_hash": "c493241682afc2e291cc4460188f9fe7d03f1c319701630a6ac5eccdd99a306a",
   "signals": [
     {
       "type_name": "ConventionsCompositionRoot",
@@ -16,7 +16,7 @@
     {
       "type_name": "TemplateCompositionRoot",
       "kind_tag": "composition_root",
-      "signal": "yellow",
+      "signal": "blue",
       "found_type": true,
       "found_items": [
         "Debug",

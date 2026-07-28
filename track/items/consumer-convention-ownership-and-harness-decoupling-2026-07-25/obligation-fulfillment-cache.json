@@ -3492,6 +3492,186 @@
           "test_name": "test_fs_convention_inventory_adapter_surfaces_the_rejected_document_path_through_the_port"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckInput",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionShippingCheckInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "0599497c902ecad72c474a435a16839f7226a7ff494e4cefe0f8b45a6a6a819b",
+        "declaration_hash": "054b37d99a37af6a7e6cbd93a4dba7a1b2f97ce1fd4b444db11b870b705e7d06",
+        "anchor_text_hash": "0d8bcb7b6139fbd92056795f9ccd8bb834d9efea32f8501529a2b539795d9e75"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        *query,\n        CheckConventionShippingQuery {\n            exported_root: PathBuf::from(EXPORTED_ROOT),\n            overlay_dir: PathBuf::from(OVERLAY_DIR),\n        },"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::template_conventions::driver_tests",
+          "test_name": "test_input_carries_both_tree_roots_into_the_query_untransposed"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckDriver",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionShippingCheckDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "ba1ffe0a60852ae6549c9e86b018932387266eff09a42c259232d6d05d249b2c",
+        "declaration_hash": "03b4b2dab923b025e87fffc90162fe44bdfc1fc9ad53249c9f058437540bbc92",
+        "anchor_text_hash": "0d8bcb7b6139fbd92056795f9ccd8bb834d9efea32f8501529a2b539795d9e75"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(passed.exit_code, 0, \"a tree shipping only the overlay's supply passes\");\n    assert_eq!(failed.exit_code, 1, \"a tree shipping an unsupplied convention fails\");\n\n        assert_eq!(\n            named, expected,\n            \"every offending document is named, on a line of its own, in the order the verdict \\\n             holds them, with none dropped and none folded into a summary\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::template_conventions::driver_tests",
+          "test_name": "test_driver_settles_the_shipping_question_with_the_exit_code_a_gate_reads"
+        },
+        {
+          "layer": "cli_driver",
+          "module_path": "cli_driver::template_conventions::driver_tests",
+          "test_name": "test_driver_names_every_unsupplied_document_and_summarises_none_of_them"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TemplateConventionShippingArgs",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TemplateConventionShippingArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "5ade38cdc869cdcc41ad220162e1d9894940845324445268f9dbeb2e76e0622f",
+        "declaration_hash": "e37089c8bdf3c9c3e9b2e7675d5331a02db7a443ee6391b366ddf5d502c99e5a",
+        "anchor_text_hash": "0d8bcb7b6139fbd92056795f9ccd8bb834d9efea32f8501529a2b539795d9e75"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(exported_root, PathBuf::from(\"/tmp/template-export-smoke\"));\n        assert_eq!(overlay_dir, PathBuf::from(\"/srv/sotohe/overlay\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::template::tests",
+          "test_name": "test_check_convention_shipping_parses_both_tree_roots"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::template::tests",
+          "test_name": "test_check_convention_shipping_infers_neither_tree_root"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TemplateCommand",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TemplateCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "a28456b9339c68363e4edd37d906ecfb346e655e25b5906a4df52949d46b7eba",
+        "declaration_hash": "bd71e7c74223a1643c590971bf2264ccec1dcd573dfdafa1f831c066f046a8e4",
+        "anchor_text_hash": "0d8bcb7b6139fbd92056795f9ccd8bb834d9efea32f8501529a2b539795d9e75"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let TemplateCommand::CheckConventionShipping(TemplateConventionShippingArgs {\n            exported_root,\n            overlay_dir,\n        }) = cli.cmd"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::template::tests",
+          "test_name": "test_check_convention_shipping_parses_both_tree_roots"
+        },
+        {
+          "layer": "cli",
+          "module_path": "cli::commands::template::tests",
+          "test_name": "test_check_convention_shipping_does_not_accept_the_exports_arguments"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TemplateCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TemplateCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "51972d01efac915588e9ac8091884253b4fc865eee4eb576f3350931ed2cf745",
+        "declaration_hash": "2593e97ae9cb54a16a89d15234a55d0f203488829002bd50a15d5706cbc49bed",
+        "anchor_text_hash": "0d8bcb7b6139fbd92056795f9ccd8bb834d9efea32f8501529a2b539795d9e75"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 1, \"an export shipping an unsupplied convention fails\");\n        let reported = outcome.stderr.expect(\"the violation is reported\");\n        for name in unsupplied {\n            assert!(\n                reported.contains(&format!(\"knowledge/conventions/{name}\")),\n                \"every offending document is named rather than counted; {name} is missing from: \\\n                 {reported}\"\n            );\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::template_export::tests",
+          "test_name": "convention_shipping_check_passes_a_tree_shipping_only_the_overlays_supply"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::template_export::tests",
+          "test_name": "convention_shipping_check_names_every_source_convention_the_overlay_does_not_supply"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::template_export::tests",
+          "test_name": "convention_shipping_check_wiring_injects_one_adapter_instance"
+        }
+      ]
     }
   ]
 }
