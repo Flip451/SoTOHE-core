@@ -21,19 +21,18 @@
 use domain::SpecDocument;
 use domain::tddd::semantic_verify::ModelTier;
 use domain::tddd::test_obligation::binding::{
-    TestBindingRecord, TestBindingsDocument, TestLocation,
+    NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument, TestLocation,
 };
-use domain::tddd::test_obligation::errors::{ObligationEvaluateError, TestSourceScanError};
-use domain::tddd::test_obligation::hashes::{
-    AnchorTextHash, BoundTestsSetHash, DeclarationHash, WaivedReasonHash,
-};
+use domain::tddd::test_obligation::errors::ObligationEvaluateError;
+use domain::tddd::test_obligation::hashes::{AnchorTextHash, DeclarationHash, WaivedReasonHash};
 use domain::tddd::test_obligation::ids::{TestObligationEdgeId, TestObligationId, WaivedReason};
 use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
 use domain::tddd::test_obligation::pair::{
     AnchorText, EntryDeclaration, ObligationFulfillmentPair, TestsSource, WaiverPair,
 };
 use domain::tddd::test_obligation::verdict::{
-    ObligationFulfillmentCacheDocument, ObligationFulfillmentCacheEntry,
+    FulfillmentCacheLookupError, ObligationFulfillmentCacheDocument,
+    ObligationFulfillmentCacheEntry, ObligationFulfillmentCacheEntryState,
     ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict, WaiverCacheDocument,
     WaiverCacheEntry, WaiverCacheKey, WaiverVerdict,
 };
@@ -41,10 +40,12 @@ use domain::tddd::test_obligation::verdict::{
 use super::cache::{cached_fulfillment_verdict, cached_waiver_verdict};
 use super::edges::{find_obligation, resolve_anchor_text, synthetic_obligation_id};
 use super::verify::{
-    map_verifier_error, record_fulfillment, record_pending_edge, record_pending_obligation_edges,
-    record_pending_obligation_id, record_waiver,
+    map_verifier_error, record_fulfillment, record_pending_fulfillment_edge,
+    record_pending_obligation_edges, record_pending_obligation_id, record_pending_waiver_edge,
+    record_waiver,
 };
 use super::{EvaluateTestObligationsInteractor, Tally};
+use crate::test_obligation::bound_tests::ResolvedBoundTests;
 use crate::test_obligation::{
     LoadedCatalogueDocument, find_declaration_text_from_loaded,
     obligation_declaration_text_from_loaded,
@@ -65,12 +66,14 @@ pub(super) enum PlannedAction {
 pub(super) enum ImmediateOutcome {
     PendingObligationId(TestObligationId),
     PendingObligationEdges(TestObligation),
-    PendingEdge(TestObligationEdgeId),
+    PendingFulfillmentEdge(TestObligationEdgeId),
+    PendingWaiverEdge(TestObligationEdgeId),
     FulfillmentCached {
         edge_id: TestObligationEdgeId,
         obligation_id: TestObligationId,
         key: ObligationFulfillmentCacheKey,
         verdict: ObligationFulfillmentVerdict,
+        resolved_bound_tests: ResolvedBoundTests,
     },
     WaiverCached {
         edge_id: TestObligationEdgeId,
@@ -86,6 +89,7 @@ pub(super) struct FulfillmentLlmTask {
     pub(super) edge_id: TestObligationEdgeId,
     pub(super) obligation_id: TestObligationId,
     pub(super) key: ObligationFulfillmentCacheKey,
+    pub(super) resolved_bound_tests: ResolvedBoundTests,
     pub(super) tests_source: String,
     pub(super) declaration: String,
     pub(super) anchor_text: String,
@@ -207,7 +211,9 @@ impl EvaluateTestObligationsInteractor {
                 continue;
             }
             let Some(anchor_text) = resolve_anchor_text(spec, anchor.element_id()) else {
-                plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(edge_id)));
+                plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingFulfillmentEdge(
+                    edge_id,
+                )));
                 continue;
             };
             self.emit_fulfillment_action(
@@ -243,14 +249,16 @@ impl EvaluateTestObligationsInteractor {
         if !owners.is_empty() {
             let Some(anchor_text) = resolve_anchor_text(spec, edge_id.anchor_id().element_id())
             else {
-                plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(edge_id.clone())));
+                plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingFulfillmentEdge(
+                    edge_id.clone(),
+                )));
                 return Ok(());
             };
             for obligation in owners {
                 let Some(declaration) =
                     obligation_declaration_text_from_loaded(catalogues, obligation)
                 else {
-                    plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(
+                    plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingFulfillmentEdge(
                         edge_id.clone(),
                     )));
                     continue;
@@ -274,7 +282,9 @@ impl EvaluateTestObligationsInteractor {
         let Some((declaration, anchor_text, declaration_hash)) =
             self.resolve_edge(edge_id, catalogues, spec)
         else {
-            plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(edge_id.clone())));
+            plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingFulfillmentEdge(
+                edge_id.clone(),
+            )));
             return Ok(());
         };
         self.emit_fulfillment_action(
@@ -307,14 +317,16 @@ impl EvaluateTestObligationsInteractor {
         if !owners.is_empty() {
             let Some(anchor_text) = resolve_anchor_text(spec, edge_id.anchor_id().element_id())
             else {
-                plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(edge_id.clone())));
+                plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingWaiverEdge(
+                    edge_id.clone(),
+                )));
                 return Ok(());
             };
             for obligation in owners {
                 let Some(declaration) =
                     obligation_declaration_text_from_loaded(catalogues, obligation)
                 else {
-                    plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(
+                    plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingWaiverEdge(
                         edge_id.clone(),
                     )));
                     continue;
@@ -335,7 +347,9 @@ impl EvaluateTestObligationsInteractor {
         let Some((declaration, anchor_text, _declaration_hash)) =
             self.resolve_edge(edge_id, catalogues, spec)
         else {
-            plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingEdge(edge_id.clone())));
+            plan.push(PlannedAction::Immediate(ImmediateOutcome::PendingWaiverEdge(
+                edge_id.clone(),
+            )));
             return Ok(());
         };
         self.emit_waiver_action(
@@ -404,28 +418,43 @@ impl EvaluateTestObligationsInteractor {
         existing_fulfillment_cache: Option<&ObligationFulfillmentCacheDocument>,
         plan: &mut Vec<PlannedAction>,
     ) -> Result<(), ObligationEvaluateError> {
-        let (tests_source, bound_hash) = self.bound_tests(tests)?;
+        let locations = NonEmptyTestLocations::try_new(tests.to_vec())
+            .map_err(|_| super::invalid_input_error("bound_tests"))?;
+        let (resolved_bound_tests, tests_source) = self
+            .resolved_bound_tests_resolver
+            .resolve_source(locations)
+            .map_err(ObligationEvaluateError::TestSourceScan)?;
+        let bound_hash = resolved_bound_tests.set_hash().clone();
         let anchor_hash = AnchorTextHash::new(self.hasher.sha256(anchor_text.as_bytes()));
         let key = ObligationFulfillmentCacheKey::new(bound_hash, declaration_hash, anchor_hash);
-        if let Some(verdict) = cached_fulfillment_verdict(
+        let cached_verdict = cached_fulfillment_verdict(
             existing_fulfillment_cache,
             &edge_id,
             &obligation_id,
             &key,
             &self.fulfillment_verifier_fingerprint,
-        ) {
-            plan.push(PlannedAction::Immediate(ImmediateOutcome::FulfillmentCached {
-                edge_id,
-                obligation_id,
-                key,
-                verdict,
-            }));
-            return Ok(());
+        );
+        // `check` reports a complete-key ambiguity as corrupt cache state.  In
+        // contrast, evaluate is the recovery path: it re-verifies the pair and
+        // replaces the cache document, so no arbitrary stored verdict is used.
+        match cached_verdict {
+            Ok(Some(verdict)) => {
+                plan.push(PlannedAction::Immediate(ImmediateOutcome::FulfillmentCached {
+                    edge_id,
+                    obligation_id,
+                    key,
+                    verdict,
+                    resolved_bound_tests,
+                }));
+                return Ok(());
+            }
+            Ok(None) | Err(FulfillmentCacheLookupError::AmbiguousCurrentEntries { .. }) => {}
         }
         plan.push(PlannedAction::Fulfillment(FulfillmentLlmTask {
             edge_id,
             obligation_id,
             key,
+            resolved_bound_tests,
             tests_source,
             declaration: declaration.to_owned(),
             anchor_text: anchor_text.to_owned(),
@@ -446,7 +475,7 @@ impl EvaluateTestObligationsInteractor {
         tally: &mut Tally,
         fulfillment_entries: &mut Vec<ObligationFulfillmentCacheEntry>,
         waiver_entries: &mut Vec<WaiverCacheEntry>,
-    ) {
+    ) -> Result<(), ObligationEvaluateError> {
         let mut f_iter = fulfillment_verdicts.into_iter();
         let mut w_iter = waiver_verdicts.into_iter();
         for action in plan {
@@ -458,14 +487,18 @@ impl EvaluateTestObligationsInteractor {
                     ImmediateOutcome::PendingObligationEdges(obligation) => {
                         record_pending_obligation_edges(&obligation, tally);
                     }
-                    ImmediateOutcome::PendingEdge(edge_id) => {
-                        record_pending_edge(edge_id, tally);
+                    ImmediateOutcome::PendingFulfillmentEdge(edge_id) => {
+                        record_pending_fulfillment_edge(edge_id, tally);
+                    }
+                    ImmediateOutcome::PendingWaiverEdge(edge_id) => {
+                        record_pending_waiver_edge(edge_id, tally);
                     }
                     ImmediateOutcome::FulfillmentCached {
                         edge_id,
                         obligation_id,
                         key,
                         verdict,
+                        resolved_bound_tests,
                     } => {
                         record_fulfillment(&edge_id, &verdict, tally);
                         fulfillment_entries.push(ObligationFulfillmentCacheEntry::new(
@@ -473,7 +506,10 @@ impl EvaluateTestObligationsInteractor {
                             obligation_id,
                             key,
                             verdict,
-                            Some(self.fulfillment_verifier_fingerprint.clone()),
+                            ObligationFulfillmentCacheEntryState::Identified {
+                                verifier_fingerprint: self.fulfillment_verifier_fingerprint.clone(),
+                                bound_tests: Some(resolved_bound_tests.locations().clone()),
+                            },
                         ));
                     }
                     ImmediateOutcome::WaiverCached { edge_id, obligation_id, key, verdict } => {
@@ -493,7 +529,7 @@ impl EvaluateTestObligationsInteractor {
                     // any shortfall is a caller bug, but we still fail closed
                     // by recording the edge as pending instead of panicking.
                     let Some(verdict) = f_iter.next() else {
-                        record_pending_edge_task(task.edge_id, tally);
+                        record_pending_fulfillment_edge(task.edge_id, tally);
                         continue;
                     };
                     record_fulfillment(&task.edge_id, &verdict, tally);
@@ -502,12 +538,15 @@ impl EvaluateTestObligationsInteractor {
                         task.obligation_id,
                         task.key,
                         verdict,
-                        Some(self.fulfillment_verifier_fingerprint.clone()),
+                        ObligationFulfillmentCacheEntryState::Identified {
+                            verifier_fingerprint: self.fulfillment_verifier_fingerprint.clone(),
+                            bound_tests: Some(task.resolved_bound_tests.locations().clone()),
+                        },
                     ));
                 }
                 PlannedAction::Waiver(task) => {
                     let Some(verdict) = w_iter.next() else {
-                        record_pending_edge_task(task.edge_id, tally);
+                        record_pending_waiver_edge(task.edge_id, tally);
                         continue;
                     };
                     record_waiver(&task.edge_id, &verdict, tally);
@@ -521,6 +560,7 @@ impl EvaluateTestObligationsInteractor {
                 }
             }
         }
+        Ok(())
     }
 
     /// Builds a `SemanticEscalationFuture` wrapper that returns
@@ -572,32 +612,6 @@ impl EvaluateTestObligationsInteractor {
         })
     }
 
-    /// Concatenates bound test bodies (shared with the calibration probe).
-    ///
-    /// Extracted from `mod.rs` so `plan.rs` can share the single
-    /// `TestSourceScannerPort` boundary the interactor exposes.
-    pub(super) fn bound_tests(
-        &self,
-        tests: &[TestLocation],
-    ) -> Result<(String, BoundTestsSetHash), ObligationEvaluateError> {
-        let mut source = String::new();
-        for location in tests {
-            let body = self
-                .source_scanner
-                .scan_test_body(location)
-                .map_err(ObligationEvaluateError::TestSourceScan)?
-                .ok_or_else(|| {
-                    ObligationEvaluateError::TestSourceScan(TestSourceScanError::Io(super::diag(
-                        "bound test source not found",
-                    )))
-                })?;
-            source.push_str(&body);
-            source.push('\n');
-        }
-        let hash = BoundTestsSetHash::new(self.hasher.sha256(source.as_bytes()));
-        Ok((source, hash))
-    }
-
     /// Catalogue-only edge resolution — used when no derived obligation owns
     /// the edge.
     fn resolve_edge(
@@ -634,13 +648,6 @@ fn build_waiver_pair_input(task: &WaiverLlmTask) -> Result<WaiverPair, Obligatio
     let anchor_text = AnchorText::try_new(task.anchor_text.clone())
         .map_err(|_| invalid_input_error("anchor_text"))?;
     Ok(WaiverPair::new(task.reason.clone(), entry_declaration, anchor_text))
-}
-
-/// Fail-closed fallback for the caller-bug case where verdict counts do not
-/// line up with the plan's LLM tasks: report the edge as pending so the gate
-/// still blocks instead of panicking.
-fn record_pending_edge_task(edge_id: TestObligationEdgeId, tally: &mut Tally) {
-    record_pending_edge(edge_id, tally);
 }
 
 fn invalid_input_error(field: &str) -> ObligationEvaluateError {

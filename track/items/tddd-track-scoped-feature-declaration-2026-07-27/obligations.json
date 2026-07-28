@@ -285,7 +285,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::tddd_feature_declaration::TdddBaselineFeatureDeclarationPort' of FsTdddFeatureDeclarationAdapter",
-      "declaration_hash": "dc3ed4d8f34c811418cb1013397434c04475bddd81d88d6056ae09d2b29c9e79",
+      "declaration_hash": "c126550d7e85863f2fd9bc63b6130eecf637188335bec8a40b744b7688ed3b4a",
       "spec_refs": [
         {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
@@ -309,7 +309,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPort' of FsTdddFeatureDeclarationAdapter",
-      "declaration_hash": "6e008f40c9654a80437de309a1c22aef52b8638f05fe805381b2482de0cf3b27",
+      "declaration_hash": "a0b94d4ce7ae854320d956267c1b110aae89893ff684f2e78d84355f7060cba5",
       "spec_refs": [
         {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
@@ -321,7 +321,7 @@
       "id": {
         "entry_key": "RustdocBaselineCaptureAdapter",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::RustdocBaselineCapturePort"
+        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocBaselineCapturePort"
       },
       "target_entry": {
         "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
@@ -332,8 +332,8 @@
         "kind": "trait_impl",
         "role": "SecondaryPort"
       },
-      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::catalogue_v2::RustdocBaselineCapturePort' of RustdocBaselineCaptureAdapter",
-      "declaration_hash": "8f9eb97cd916d092c96ef574dea80c060120b6a737b8b1ffe773d3778c62210f",
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocBaselineCapturePort' of RustdocBaselineCaptureAdapter",
+      "declaration_hash": "59a339d46b0fc1b9efadda514d7f19e702efdbf58de1181fcda37a0896decec2",
       "spec_refs": [
         {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
@@ -345,7 +345,7 @@
       "id": {
         "entry_key": "RustdocCrateAdapter",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::RustdocCratePort"
+        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort"
       },
       "target_entry": {
         "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
@@ -356,8 +356,8 @@
         "kind": "trait_impl",
         "role": "SecondaryPort"
       },
-      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::catalogue_v2::RustdocCratePort' of RustdocCrateAdapter",
-      "declaration_hash": "1bc4b32a8f7d0056887e2831c9b5865ce64cc8b7fe3ff2fd4ea77e2664ba1383",
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort' of RustdocCrateAdapter",
+      "declaration_hash": "14a662ed8e4e9f19817862fe821f8496e4c181f921e4eb72477c7ced5c6fd2b4",
       "spec_refs": [
         {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
@@ -381,7 +381,7 @@
         "role": "SecondaryPort"
       },
       "brief": "Author a contract_conformance test covering 'trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort' of TypeSignalsExecutorAdapter",
-      "declaration_hash": "c848bf66048376ba4352b30ae1c41ca78a67bf9be91d23da06fe404ee09dc663",
+      "declaration_hash": "d7238671b4ec530ea096152c34ac7da8e10d3d02f7928eccfaaba4c54ca0f6a0",
       "spec_refs": [
         {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",

@@ -26,8 +26,7 @@ pub use domain::tddd::test_obligation::ids::{
 };
 use domain::tddd::test_obligation::obligations::ObligationsDocument;
 use domain::tddd::test_obligation::ports::{
-    ObligationFulfillmentCachePort, ObligationsArtifactPort, TestBindingsArtifactPort,
-    TestSourceScannerPort, WaiverCachePort,
+    ObligationsArtifactPort, TestBindingsArtifactPort, TestSourceScannerPort, WaiverCachePort,
 };
 use domain::tddd::test_obligation::scope::UncitedSpecElementFinding;
 use domain::tddd::test_obligation::verdict::{
@@ -39,6 +38,7 @@ pub use domain::tddd::test_obligation::vocab::{FulfillmentFailCategory, TestObli
 use crate::pre_review_gate::{ImplPlanReaderPort, TaskContractReaderPort};
 
 use super::diag;
+use super::ports::ObligationFulfillmentCachePort;
 use super::results_status::collect_status_lane_summaries;
 
 /// Verdict-chain lane discriminant for the results output (IN-10 / AC-09).
@@ -408,12 +408,11 @@ fn fulfillment_lanes(
         };
         match entry.verdict() {
             ObligationFulfillmentVerdict::Fulfilled { .. } => counts.pass += 1,
-            ObligationFulfillmentVerdict::Fail { category, .. } => {
+            ObligationFulfillmentVerdict::Fail { .. } => {
                 counts.fail += 1;
                 records.push(fulfillment_record(
                     entry,
-                    EdgeResolutionOutcome::Fail(category.clone()),
-                    fulfillment_verdict_reason(entry.verdict()),
+                    EdgeResolutionOutcome::Fulfillment(entry.verdict().clone()),
                     bindings,
                 ));
             }
@@ -421,8 +420,7 @@ fn fulfillment_lanes(
                 counts.pending += 1;
                 records.push(fulfillment_record(
                     entry,
-                    EdgeResolutionOutcome::Pending,
-                    None,
+                    EdgeResolutionOutcome::Fulfillment(entry.verdict().clone()),
                     bindings,
                 ));
             }
@@ -455,8 +453,7 @@ fn waiver_lane(
                 counts.fail += 1;
                 records.push(waiver_record(
                     entry.edge_id(),
-                    EdgeResolutionOutcome::Fail(FulfillmentFailCategory::CentralUnverified),
-                    waiver_verdict_reason(entry.verdict()),
+                    EdgeResolutionOutcome::Waiver(entry.verdict().clone()),
                     bindings,
                     obligations,
                 ));
@@ -465,8 +462,7 @@ fn waiver_lane(
                 counts.pending += 1;
                 records.push(waiver_record(
                     entry.edge_id(),
-                    EdgeResolutionOutcome::Pending,
-                    None,
+                    EdgeResolutionOutcome::Waiver(entry.verdict().clone()),
                     bindings,
                     obligations,
                 ));
@@ -488,7 +484,6 @@ fn waiver_lane(
 fn fulfillment_record(
     entry: &domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheEntry,
     outcome: EdgeResolutionOutcome,
-    verdict_reason: Option<domain::tddd::test_obligation::ids::DiagnosticMessage>,
     bindings: Option<&TestBindingsDocument>,
 ) -> EdgeVerdictRecord {
     let (claim_source, evidence_source) =
@@ -499,7 +494,6 @@ fn fulfillment_record(
         claim_source,
         evidence_source,
         outcome,
-        verdict_reason,
         None,
     )
 }
@@ -508,7 +502,6 @@ fn fulfillment_record(
 fn waiver_record(
     edge_id: &TestObligationEdgeId,
     outcome: EdgeResolutionOutcome,
-    verdict_reason: Option<domain::tddd::test_obligation::ids::DiagnosticMessage>,
     bindings: Option<&TestBindingsDocument>,
     obligations: Option<&ObligationsDocument>,
 ) -> EdgeVerdictRecord {
@@ -527,7 +520,6 @@ fn waiver_record(
         claim_source,
         evidence_source,
         outcome,
-        verdict_reason,
         None,
     )
 }
@@ -600,28 +592,6 @@ fn bound_tests_source(
         .collect::<Vec<_>>()
         .join(", ");
     diag(&locations)
-}
-
-/// Extracts the failure explanation from a fulfillment verdict.
-fn fulfillment_verdict_reason(
-    verdict: &ObligationFulfillmentVerdict,
-) -> Option<domain::tddd::test_obligation::ids::DiagnosticMessage> {
-    match verdict {
-        ObligationFulfillmentVerdict::Fail { reason, .. } => Some(reason.clone()),
-        ObligationFulfillmentVerdict::Fulfilled { .. } | ObligationFulfillmentVerdict::Pending => {
-            None
-        }
-    }
-}
-
-/// Extracts the failure explanation from a waiver verdict.
-fn waiver_verdict_reason(
-    verdict: &WaiverVerdict,
-) -> Option<domain::tddd::test_obligation::ids::DiagnosticMessage> {
-    match verdict {
-        WaiverVerdict::Fail { reason } => Some(reason.clone()),
-        WaiverVerdict::Waived { .. } | WaiverVerdict::Pending => None,
-    }
 }
 
 /// Resolves the layer of a fulfillment obligation via its binding test

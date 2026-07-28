@@ -62,8 +62,23 @@
       "tests": [
         {
           "layer": "infrastructure",
-          "module_path": "infrastructure::schema_export::bin_target::tests",
-          "test_name": "test_build_rustdoc_args_with_features_passes_space_separated_feature_list"
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_valid_declaration_creates_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_with_matching_baseline_snapshot_returns_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_baseline_snapshot_mismatch_returns_feature_declaration_error_before_rustdoc_capture"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_with_declared_features_forwards_them_to_rustdoc"
         }
       ]
     },
@@ -151,7 +166,7 @@
       "kind": "fulfillment",
       "obligation_id": {
         "entry_key": "RustdocBaselineCaptureAdapter",
-        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::RustdocBaselineCapturePort",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocBaselineCapturePort",
         "obligation_kind": "contract_conformance"
       },
       "tests": [
@@ -488,7 +503,7 @@
       "obligation_id": {
         "entry_key": "RustdocCrateAdapter",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::RustdocCratePort"
+        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort"
       },
       "tests": [
         {

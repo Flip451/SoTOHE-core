@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "c507c4263ca0d0967aa9c6b650da09eaa20ff1b0208cf435e026cdd36e139b2b",
+  "catalogue_declaration_hash": "fceaf10d4b621c56d10e5371c47e493dd91efe7737374c6c57b7057f2d5f6be5",
   "signals": [
     {
       "type_name": "CodeFragmentExtractorAdapter",

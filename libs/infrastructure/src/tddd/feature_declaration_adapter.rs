@@ -331,10 +331,7 @@ fn manifest_features(
             .and_then(|value| value.get("name"))
             .and_then(toml::Value::as_str);
         if package_name == Some(target) {
-            return match manifest.get("features") {
-                None => Ok(BTreeSet::new()),
-                Some(features) => validate_manifest_features(features, &manifest_path),
-            };
+            return validate_manifest_features(&manifest, &manifest_path);
         }
     }
     Err(TdddFeatureDeclarationReadError::ReadDeclaration {
@@ -344,12 +341,28 @@ fn manifest_features(
 }
 
 fn validate_manifest_features(
-    features: &toml::Value,
+    manifest: &toml::Value,
     manifest_path: &Path,
 ) -> Result<BTreeSet<String>, TdddFeatureDeclarationReadError> {
+    let (mut features, suppressed_implicit_features) = match manifest.get("features") {
+        Some(features) => validate_explicit_manifest_features(features, manifest_path)?,
+        None => (BTreeSet::new(), BTreeSet::new()),
+    };
+    features.extend(
+        optional_dependency_names(manifest).difference(&suppressed_implicit_features).cloned(),
+    );
+    Ok(features)
+}
+
+/// Returns explicit Cargo features and optional dependencies whose implicit feature is suppressed.
+fn validate_explicit_manifest_features(
+    features: &toml::Value,
+    manifest_path: &Path,
+) -> Result<(BTreeSet<String>, BTreeSet<String>), TdddFeatureDeclarationReadError> {
     let table = features.as_table().ok_or_else(|| {
         read_error(manifest_path, "Cargo.toml features value must be a table".to_owned())
     })?;
+    let mut suppressed_implicit_features = BTreeSet::new();
     for (feature, definition) in table {
         let Some(entries) = definition.as_array() else {
             return Err(read_error(
@@ -357,14 +370,54 @@ fn validate_manifest_features(
                 format!("Cargo feature '{feature}' must be an array of strings"),
             ));
         };
-        if entries.iter().any(|entry| entry.as_str().is_none()) {
-            return Err(read_error(
-                manifest_path,
-                format!("Cargo feature '{feature}' must be an array of strings"),
-            ));
+        for entry in entries {
+            let Some(entry) = entry.as_str() else {
+                return Err(read_error(
+                    manifest_path,
+                    format!("Cargo feature '{feature}' must be an array of strings"),
+                ));
+            };
+            if let Some(dependency) = entry.strip_prefix("dep:") {
+                suppressed_implicit_features.insert(dependency.to_owned());
+            }
         }
     }
-    Ok(table.keys().cloned().collect())
+    Ok((table.keys().cloned().collect(), suppressed_implicit_features))
+}
+
+/// Finds optional dependencies across Cargo's dependency tables.
+fn optional_dependency_names(manifest: &toml::Value) -> BTreeSet<String> {
+    let mut names = BTreeSet::new();
+    for dependency_table in ["dependencies", "dev-dependencies", "build-dependencies"] {
+        collect_optional_dependency_names(manifest.get(dependency_table), &mut names);
+    }
+    if let Some(targets) = manifest.get("target").and_then(toml::Value::as_table) {
+        for target in targets.values() {
+            for dependency_table in ["dependencies", "dev-dependencies", "build-dependencies"] {
+                collect_optional_dependency_names(target.get(dependency_table), &mut names);
+            }
+        }
+    }
+    names
+}
+
+fn collect_optional_dependency_names(
+    dependencies: Option<&toml::Value>,
+    names: &mut BTreeSet<String>,
+) {
+    let Some(dependencies) = dependencies.and_then(toml::Value::as_table) else {
+        return;
+    };
+    for (name, dependency) in dependencies {
+        if dependency
+            .as_table()
+            .and_then(|table| table.get("optional"))
+            .and_then(toml::Value::as_bool)
+            == Some(true)
+        {
+            names.insert(name.clone());
+        }
+    }
 }
 
 fn normalize_workspace_member(
@@ -648,6 +701,10 @@ mod tests {
         std::fs::write(track_dir.join(DECLARATION_FILE), contents).unwrap();
     }
 
+    fn write_domain_manifest(workspace: &Path, contents: &str) {
+        std::fs::write(workspace.join("libs/domain/Cargo.toml"), contents).unwrap();
+    }
+
     #[test]
     fn test_baseline_port_with_valid_declaration_creates_snapshot() {
         let workspace = setup_workspace();
@@ -704,6 +761,106 @@ mod tests {
             ["semantic-dup"]
         );
         assert!(declaration.features_for(&cli).unwrap().is_empty());
+    }
+
+    #[test]
+    fn test_baseline_port_with_optional_dependency_and_no_features_table_accepts_implicit_feature()
+    {
+        let workspace = setup_workspace();
+        write_domain_manifest(
+            workspace.path(),
+            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2024\"\n[dependencies]\nimplicit-feature = { version = \"1\", optional = true }\n",
+        );
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[\"implicit-feature\"]}}",
+        );
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_baseline_port_with_unreferenced_optional_dependency_accepts_implicit_feature() {
+        let workspace = setup_workspace();
+        write_domain_manifest(
+            workspace.path(),
+            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2024\"\n[features]\nexplicit = []\n[dependencies]\nimplicit-feature = { version = \"1\", optional = true }\n",
+        );
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[\"implicit-feature\"]}}",
+        );
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_baseline_port_with_dep_referenced_optional_dependency_returns_unknown_feature() {
+        let workspace = setup_workspace();
+        write_domain_manifest(
+            workspace.path(),
+            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2024\"\n[features]\nexplicit = [\"dep:implicit-feature\"]\n[dependencies]\nimplicit-feature = { version = \"1\", optional = true }\n",
+        );
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[\"implicit-feature\"]}}",
+        );
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }
+            ))
+        ));
+    }
+
+    #[test]
+    fn test_baseline_port_with_nonexistent_feature_and_optional_dependency_returns_unknown_feature()
+    {
+        let workspace = setup_workspace();
+        write_domain_manifest(
+            workspace.path(),
+            "[package]\nname = \"domain\"\nversion = \"0.1.0\"\nedition = \"2024\"\n[dependencies]\nimplicit-feature = { version = \"1\", optional = true }\n",
+        );
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[\"nonexistent\"]}}",
+        );
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }
+            ))
+        ));
     }
 
     #[test]

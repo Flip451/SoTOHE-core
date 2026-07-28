@@ -1,0 +1,650 @@
+{
+  "track_id": "pr-signal-pure-di-2026-07-26",
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "PrBaseOverride",
+        "item_identifier": "invariant:non_empty_pr_base_override",
+        "obligation_kind": "boundary"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_base_override_with_empty_value_returns_none"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_command_interactor_ensure_with_spaced_base_preserves_exact_value"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "PrCommandInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_command_interactor_push_with_valid_track_delegates_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_command_interactor_push_preserves_port_output_and_track_payload"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_command_interactor_all_variants_preserve_port_output_through_typed_port"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "PrIdentifier",
+        "item_identifier": "invariant:non_empty_pr_identifier",
+        "obligation_kind": "boundary"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_command_interactor_status_with_empty_identifier_returns_failure"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "PrCommandPort",
+        "item_identifier": "trait_method:execute",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_command_interactor_push_with_valid_track_delegates_command"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_command_interactor_push_preserves_port_output_and_track_payload"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "item_identifier": "trait_impl:usecase::pr::PrCommandPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::pr::tests",
+          "test_name": "test_pr_composition_root_push_executes_system_adapter_and_persists_remote_ref"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::pr::tests",
+          "test_name": "test_pr_composition_root_wires_driver_through_interactor_to_typed_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::pr::tests",
+          "test_name": "test_system_pr_command_adapter_as_typed_port_pushes_branch_to_remote_ref"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::pr::tests",
+          "test_name": "test_pr_composition_root_push_executes_system_adapter_and_persists_remote_ref"
+        },
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::pr::tests",
+          "test_name": "test_pr_composition_root_wires_driver_through_interactor_to_typed_port"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::pr::tests",
+          "test_name": "test_system_pr_command_adapter_as_typed_port_pushes_branch_to_remote_ref"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_each_command_delegates_typed_variant"},
+        {"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_all_variants_preserve_port_output_through_typed_port"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {"layer": "cli_composition", "module_path": "cli_composition::pr::tests", "test_name": "test_pr_composition_root_all_commands_follow_single_path_and_preserve_outcomes"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "PrCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "reason": "The driver-to-interactor-to-port path is mechanically enforced: bin/sotp catalogue-lint check-active-track applies CompositionRootPureDi (0 violations across 6 layers); PrCompositionRoot exposes only new and pr_driver, while private pr_driver_with_port constructs PrCommandInteractor::new(port) and passes it to PrDriver::new; and PrDriver accepts only Arc<dyn PrCommandService>. Therefore no public composition route can inject a direct port or compatibility facade, while black-box port tests cannot independently prove the intermediate interactor."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {"layer": "cli_composition", "module_path": "cli_composition::pr::tests", "test_name": "test_pr_composition_root_all_commands_follow_single_path_and_preserve_outcomes"},
+        {"layer": "cli_composition", "module_path": "cli_composition::pr::tests", "test_name": "test_pr_composition_root_push_executes_system_adapter_and_persists_remote_ref"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrPollIntervalSeconds",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_each_command_delegates_typed_variant"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrPollIntervalSeconds",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_each_command_delegates_typed_variant"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrPollTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_each_command_delegates_typed_variant"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrPollTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_each_command_delegates_typed_variant"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrReviewCycleMode",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_each_command_delegates_typed_variant"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrReviewCycleMode",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [{"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_each_command_delegates_typed_variant"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [{"layer": "cli_composition", "module_path": "cli_composition::pr::tests", "test_name": "test_pr_composition_root_push_executes_system_adapter_and_persists_remote_ref"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "PrCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "reason": "The absence of command logic, outcome construction, direct I/O, and reverse delegation is a structural Pure DI property mechanically enforced by bin/sotp catalogue-lint check-active-track; a runtime unit test cannot independently prove this absence without duplicating that static analysis."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [{"layer": "cli_composition", "module_path": "cli_composition::pr::tests", "test_name": "test_pr_composition_root_push_executes_system_adapter_and_persists_remote_ref"}]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "PrCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "reason": "pr_driver_with_port is a private construction helper, not a declared or public compatibility facade. The public surface is pr_driver, and the no-facade structural property is mechanically enforced by bin/sotp catalogue-lint check-active-track."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrTrackIdOverride",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::pr::tests",
+          "test_name": "test_pr_command_interactor_invalid_track_ids_preserve_compatibility_overrides"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "PrTrackIdOverride",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::pr::tests", "test_name": "test_pr_command_interactor_invalid_track_ids_preserve_compatibility_overrides"},
+        {"layer": "infrastructure", "module_path": "infrastructure::pr::tests", "test_name": "test_system_pr_command_adapter_as_typed_port_pushes_branch_to_remote_ref"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "SignalCommandInteractor", "item_identifier": "entry", "obligation_kind": "result"},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_check_adr_user_resolves_gate_then_delegates"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_force_strict_bypasses_matrix_resolution"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_all_operations_delegate_resolved_payloads"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_error_categories_preserve_actionable_diagnostics"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_check_gate_with_failing_chain_fails_closed"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_check_gate_with_failing_spec_chain_fails_closed"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_check_gate_loads_mode_once_then_dispatches_all_chains"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_gate_preflight_uses_supplied_workspace_and_short_circuits"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_gate_missing_spec_path_precedes_active_track_preflight"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_composition_root_signal_driver_dispatches_adr_user_to_system_port"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_driver_calc_and_check_spec_adr_preserve_command_and_persistence_parity"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_composition_root_all_commands_follow_single_path_and_preserve_outcomes"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_execution_sources_do_not_reference_legacy_service_or_shim"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_system_signal_command_adapter_with_live_execution_sources_has_only_driver_interactor_port_route"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalFailureReason", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "CN-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_failure_reason_with_text_preserves_value"}]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "SignalActiveTrackResolverPort", "item_identifier": "trait_method:resolve_active_track", "obligation_kind": "contract"},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_gate_preflight_uses_supplied_workspace_and_short_circuits"},
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_resolves_active_track_from_supplied_workspace"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_execution_sources_do_not_reference_legacy_service_or_shim"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "SignalSpecPathResolverPort", "item_identifier": "trait_method:resolve_spec_path", "obligation_kind": "contract"},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_gate_missing_spec_path_precedes_active_track_preflight"},
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_external_spec_override_skips_root_resolution"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_execution_sources_do_not_reference_legacy_service_or_shim"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "SignalCommandPort", "item_identifier": "trait_method:execute", "obligation_kind": "contract"},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_check_adr_user_resolves_gate_then_delegates"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_all_operations_delegate_resolved_payloads"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_error_categories_preserve_actionable_diagnostics"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_check_gate_with_failing_spec_chain_fails_closed"},
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_calc_then_check_preserves_persisted_spec_document"},
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_adr_user_calc_and_check_preserve_adr_documents"},
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_catalog_spec_calc_then_check_preserves_signals"},
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_impl_catalog_check_preserves_persisted_signals"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_driver_calc_impl_catalog_persists_each_signal_document"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_execution_sources_do_not_reference_legacy_service_or_shim"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "SignalGateConfigPort", "item_identifier": "trait_method:load", "obligation_kind": "contract"},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_check_adr_user_resolves_gate_then_delegates"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_all_operations_delegate_resolved_payloads"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_error_categories_preserve_actionable_diagnostics"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_check_gate_loads_mode_once_then_dispatches_all_chains"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "SystemSignalCommandAdapter", "item_identifier": "trait_impl:usecase::signal_service::SignalCommandPort", "obligation_kind": "contract_conformance"},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_implements_typed_port"},
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_calc_then_check_preserves_persisted_spec_document"},
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_adr_user_calc_and_check_preserve_adr_documents"},
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_catalog_spec_calc_then_check_preserves_signals"},
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_impl_catalog_check_preserves_persisted_signals"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_driver_calc_impl_catalog_persists_each_signal_document"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "SystemSignalCommandAdapter", "item_identifier": "trait_impl:usecase::signal_service::SignalActiveTrackResolverPort", "obligation_kind": "contract_conformance"},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_implements_typed_port"}]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "SystemSignalCommandAdapter", "item_identifier": "trait_impl:usecase::signal_service::SignalSpecPathResolverPort", "obligation_kind": "contract_conformance"},
+      "tests": [{"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_implements_typed_port"}]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "SystemSignalGateConfigAdapter", "item_identifier": "trait_impl:usecase::signal_service::SignalGateConfigPort", "obligation_kind": "contract_conformance"},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_gate_config_adapter_implements_typed_port"},
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_gate_config_adapter_loads_repository_matrix"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ResolvedSignalChainCommand", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "AC-10"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_all_operations_delegate_resolved_payloads"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "ResolvedSignalChainCommand", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "CN-04"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_all_operations_delegate_resolved_payloads"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalChainExecutionReport", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "CN-01"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_all_operations_delegate_resolved_payloads"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalCommand", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "IN-02"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_closed_variants_preserve_every_payload"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_composition_root_signal_driver_dispatches_adr_user_to_system_port"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalCommand", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "AC-07"}},
+      "reason": "The driver-to-interactor-to-port route is a structural property of the declared production wiring. `bin/sotp catalogue-lint check-active-track` applies `CompositionRootPureDi`, which rejects CompositionRoot public methods that are neither wiring constructors nor PrimaryAdapter-returning accessors and rejects prohibited roles in their public surface. The SignalCompositionRoot catalogue declares only `new` and `signal_driver`; `signal_driver` builds SignalCommandInteractor from the two infrastructure ports and SignalDriver accepts only `Arc<dyn SignalService>`. The measured active-track check reports 0 violations across 6 layers, while a black-box payload test cannot independently prove the absence of an alternate composition or facade route."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalCommand", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "CN-04"}},
+      "reason": "The no-facade single-path guarantee is structural. `bin/sotp catalogue-lint check-active-track` applies `CompositionRootPureDi`, which rejects CompositionRoot public methods that are neither wiring constructors nor PrimaryAdapter-returning accessors and rejects prohibited roles in their public surface. The SignalCompositionRoot catalogue declares only `new` and `signal_driver`; its production wiring constructs SignalCommandInteractor from the two infrastructure ports and passes it to SignalDriver, whose only dependency is `Arc<dyn SignalService>`. The measured active-track check reports 0 violations across 6 layers, while a black-box payload test cannot independently prove that no alternate compatibility facade exists."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalGateConfigError", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "AC-08"}},
+      "tests": [{"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_error_categories_preserve_actionable_diagnostics"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalStrictOverride", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "AC-10"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_check_adr_user_resolves_gate_then_delegates"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_force_strict_bypasses_matrix_resolution"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalStrictOverride", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "CN-01"}},
+      "tests": [
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_check_adr_user_resolves_gate_then_delegates"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_force_strict_bypasses_matrix_resolution"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalCompositionRoot", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "IN-02"}},
+      "tests": [
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_composition_root_signal_driver_dispatches_adr_user_to_system_port"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SignalCompositionRoot", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "AC-02"}},
+      "reason": "The absence of command logic, CommandOutcome construction, direct I/O, and reverse delegation is a structural Pure DI property. The measured active-track check `bin/sotp catalogue-lint check-active-track` reports 0 violations across 6 layers; a runtime unit test cannot independently prove this absence without duplicating that static analysis."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalCompositionRoot", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "AC-04"}},
+      "tests": [{"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_execution_sources_do_not_reference_legacy_service_or_shim"}]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalCompositionRoot", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "AC-07"}},
+      "tests": [
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_composition_root_constructs_wired_driver"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_composition_root_signal_driver_dispatches_adr_user_to_system_port"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_composition_root_all_commands_follow_single_path_and_preserve_outcomes"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_execution_sources_do_not_reference_legacy_service_or_shim"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_composition_root_public_api_exposes_only_driver_factory"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SignalCompositionRoot", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "CN-04"}},
+      "tests": [
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_composition_root_constructs_wired_driver"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_composition_root_signal_driver_dispatches_adr_user_to_system_port"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_composition_root_all_commands_follow_single_path_and_preserve_outcomes"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_execution_sources_do_not_reference_legacy_service_or_shim"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_composition_root_public_api_exposes_only_driver_factory"}
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SystemSignalCommandAdapter", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "AC-02"}},
+      "reason": "SystemSignalCommandAdapter is an infrastructure secondary adapter. SignalCompositionRoot only constructs it and passes it into SignalCommandInteractor; the measured active-track catalogue-lint check reports 0 violations across 6 layers. Adapter tests cannot prove the separate absence of composition-root execution logic."
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {"entry_key": "SystemSignalCommandAdapter", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "AC-04"}},
+      "reason": "SystemSignalCommandAdapter implements SignalCommandPort directly. Its source imports usecase signal boundary types and infrastructure verifiers only; it contains no SignalServiceImpl or signal-shim reference, and the infrastructure crate does not depend on cli_composition. SignalCompositionRoot constructs this adapter and passes it to SignalCommandInteractor. The absence of a call or reverse delegation to retained legacy code is consequently a source and crate-dependency property, not behavior an adapter invocation can prove exhaustively."
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SystemSignalCommandAdapter", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "AC-09"}},
+      "tests": [
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_calc_then_check_preserves_persisted_spec_document"},
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_adr_user_calc_and_check_preserve_adr_documents"},
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_catalog_spec_calc_then_check_preserves_signals"},
+        {"layer": "infrastructure", "module_path": "infrastructure::signal::tests", "test_name": "test_system_signal_command_adapter_impl_catalog_check_preserves_persisted_signals"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_driver_calc_impl_catalog_persists_each_signal_document"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {"entry_key": "SystemSignalCommandAdapter", "anchor_id": {"file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json", "element_id": "CN-04"}},
+      "tests": [
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_system_signal_command_adapter_with_live_execution_sources_has_only_driver_interactor_port_route"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "cli::commands::signal::calc_adr_user::run", "item_identifier": "entry", "obligation_kind": "logic"},
+      "tests": [
+        {"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_calc_adr_user_run_with_driver_dispatches_command_and_preserves_outcome"},
+        {"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_calc_adr_user_run_with_real_interactor_reaches_port_once_and_preserves_outcome"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "cli::commands::signal::calc_catalog_spec::run", "item_identifier": "entry", "obligation_kind": "logic"},
+      "tests": [
+        {"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_calc_catalog_spec_run_with_driver_dispatches_command_and_preserves_outcome"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_execution_sources_do_not_reference_legacy_service_or_shim"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_composition_root_public_api_exposes_only_driver_factory"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "cli::commands::signal::calc_impl_catalog::run", "item_identifier": "entry", "obligation_kind": "logic"},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_calc_impl_catalog_run_with_driver_dispatches_command_and_preserves_outcome"}]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "cli::commands::signal::calc_spec_adr::run", "item_identifier": "entry", "obligation_kind": "logic"},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_calc_spec_adr_run_with_driver_dispatches_command_and_preserves_outcome"}]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "cli::commands::signal::check_adr_user::run", "item_identifier": "entry", "obligation_kind": "logic"},
+      "tests": [
+        {"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_check_adr_user_run_with_driver_dispatches_command_and_preserves_outcome"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_execution_sources_do_not_reference_legacy_service_or_shim"},
+        {"layer": "cli_composition", "module_path": "cli_composition::signal::tests", "test_name": "test_signal_composition_root_public_api_exposes_only_driver_factory"}
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "cli::commands::signal::check_catalog_spec::run", "item_identifier": "entry", "obligation_kind": "logic"},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_check_catalog_spec_run_with_driver_dispatches_command_and_preserves_outcome"}]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "cli::commands::signal::check_impl_catalog::run", "item_identifier": "entry", "obligation_kind": "logic"},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_check_impl_catalog_run_with_driver_dispatches_command_and_preserves_outcome"}]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "cli::commands::signal::check_spec_adr::run", "item_identifier": "entry", "obligation_kind": "logic"},
+      "tests": [{"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_check_spec_adr_run_with_driver_dispatches_command_and_preserves_outcome"}]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {"entry_key": "cli::commands::signal::run_aggregate_check", "item_identifier": "entry", "obligation_kind": "logic"},
+      "tests": [
+        {"layer": "cli", "module_path": "cli::commands::signal::tests", "test_name": "test_run_aggregate_check_with_driver_dispatches_gate_and_preserves_outcome"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_check_gate_loads_mode_once_then_dispatches_all_chains"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_check_gate_with_failing_chain_fails_closed"},
+        {"layer": "usecase", "module_path": "usecase::signal_service::tests", "test_name": "test_signal_command_interactor_check_gate_with_failing_spec_chain_fails_closed"}
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "SignalCommandPortError",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_service::tests",
+          "test_name": "test_signal_command_interactor_error_categories_preserve_actionable_diagnostics"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "SignalRootSelection",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_service::tests",
+          "test_name": "test_signal_command_interactor_check_adr_user_resolves_gate_then_delegates"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::signal_service::tests",
+      "test_name": "test_signal_command_interactor_gate_preflight_uses_supplied_workspace_and_short_circuits"
+        }
+      ]
+    }
+  ]
+}

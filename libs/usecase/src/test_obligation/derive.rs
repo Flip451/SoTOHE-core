@@ -172,6 +172,7 @@ struct TraitRoleEntry {
     name: String,
     role: ContractRole,
     anchors: Vec<TestObligationAnchorId>,
+    declaration_text: String,
 }
 
 /// Indexes every catalogue `TraitEntry` name to its `ContractRole` and anchors
@@ -187,6 +188,7 @@ fn index_trait_roles(
                 name: name.as_str().to_owned(),
                 role: entry.role().clone(),
                 anchors: anchors_from_spec_refs(entry.spec_refs())?,
+                declaration_text: format!("{entry:?}"),
             });
         }
     }
@@ -376,8 +378,9 @@ fn derive_trait_impl_obligations(
             entry_key.clone(),
         );
         let role_kind = TargetEntryRoleKind::TraitImpl(role);
-        let decl_hash =
-            DeclarationHash::new(sha256_content_hash(format!("{impl_decl:?}").as_bytes()));
+        let declaration =
+            super::trait_impl_pair_declaration_text(impl_decl, &trait_entry.declaration_text);
+        let decl_hash = DeclarationHash::new(sha256_content_hash(declaration.as_bytes()));
         for rule in role_rules.obligations() {
             let Some(item_ids) = projector.trait_impl_items(impl_decl.trait_ref(), rule.per_axis())
             else {

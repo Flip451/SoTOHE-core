@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-28T01:46:55Z",
-  "declaration_hash": "c507c4263ca0d0967aa9c6b650da09eaa20ff1b0208cf435e026cdd36e139b2b",
-  "implementation_input_hash": "a67daefd219bde09309b808e4b4feb70d2e1b1fbb3940cf5e3916deed9ff7090",
+  "generated_at": "2026-07-28T04:10:26Z",
+  "declaration_hash": "fceaf10d4b621c56d10e5371c47e493dd91efe7737374c6c57b7057f2d5f6be5",
+  "implementation_input_hash": "5f1e34baf022b314681dff28877fcfe3c554a2eabc0b24dabb4cfab028143dd8",
   "signals": [
     {
       "type_name": "FsTdddFeatureDeclarationAdapter",
@@ -13,8 +13,8 @@
         "Clone",
         "Debug",
         "Default",
-        "TdddActualFeatureDeclarationPort",
-        "TdddBaselineFeatureDeclarationPort"
+        "usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPort",
+        "usecase::tddd_feature_declaration::TdddBaselineFeatureDeclarationPort"
       ]
     },
     {
@@ -23,7 +23,7 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "RustdocBaselineCapturePort"
+        "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocBaselineCapturePort"
       ]
     },
     {
@@ -32,7 +32,7 @@
       "signal": "blue",
       "found_type": true,
       "found_items": [
-        "RustdocCratePort"
+        "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort"
       ]
     },
     {

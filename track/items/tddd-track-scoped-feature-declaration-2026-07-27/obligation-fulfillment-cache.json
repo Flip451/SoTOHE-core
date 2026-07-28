@@ -23,7 +23,14 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n        observed.lock().unwrap().as_slice(),\n        [\n            (\"domain\".to_owned(), vec![]),\n            (\"infrastructure\".to_owned(), vec![\"semantic-dup\".to_owned()]),\n        ]\n    );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_feature_declaration_forwards_layer_features_to_capture"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -47,7 +54,14 @@
         "kind": "fulfilled",
         "citation": "    assert!(matches!(error, BaselineCaptureError::FeatureDeclaration(_)));\n    assert_eq!(captures.load(Ordering::SeqCst), 0, \"rustdoc capture must not start\");"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_missing_feature_declaration_returns_error_before_capture"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -71,7 +85,14 @@
         "kind": "fulfilled",
         "citation": "assert!(matches!(error, BaselineCaptureError::FeatureDeclaration(_))); assert_eq!(captures.load(Ordering::SeqCst), 0, \"rustdoc capture must not start\");"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_missing_feature_declaration_returns_error_before_capture"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -87,15 +108,37 @@
         "item_identifier": "voluntary:IN-03"
       },
       "key": {
-        "bound_tests_set_hash": "eec59082be283c0fc4e587361f3e421cccd705d0b5e75bbfbb62212f309511f2",
+        "bound_tests_set_hash": "4e5e36ed737c09d80ed1b64bc0f24e71b10b8a55108d2ba9a5d15a711724d42a",
         "declaration_hash": "349111d9c8ed8dd54080b2138c87cfaad7038d8ac6e06fc606ffd904bca89528",
         "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "let args = build_rustdoc_args(\"catalogue_package\", &[\"--lib\"], &features);\n\n        assert_eq!(\n            args,\n            vec![\n                \"+nightly\",\n                \"rustdoc\",\n                \"-p\",\n                \"catalogue_package\",\n                \"--lib\",\n                \"--features\",\n                \"semantic-dup experimental\","
+        "citation": "assert_eq!(features.first().unwrap().as_str(), \"semantic-dup\"); ... assert_eq!( declaration.features_for(&layer).unwrap().first().unwrap().as_str(), \"semantic-dup\" );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_valid_declaration_creates_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_with_matching_baseline_snapshot_returns_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_baseline_snapshot_mismatch_returns_feature_declaration_error_before_rustdoc_capture"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_with_declared_features_forwards_them_to_rustdoc"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -119,7 +162,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n        observed.lock().unwrap().as_slice(),\n        [\n            (\"domain\".to_owned(), vec![]),\n            (\"infrastructure\".to_owned(), vec![\"semantic-dup\".to_owned()]),\n        ]\n    );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_feature_declaration_forwards_layer_features_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_missing_feature_declaration_returns_error_before_capture"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -143,7 +198,19 @@
         "kind": "fulfilled",
         "citation": "TdddFeatureDeclaration::try_new(\n                BTreeMap::from([(domain.clone(), vec![]), (infrastructure.clone(), vec![feature])]),\n                &[domain, infrastructure],\n            )\n\nassert_eq!(\n        observed.lock().unwrap().as_slice(),\n        [\n            (\"domain\".to_owned(), vec![]),\n            (\"infrastructure\".to_owned(), vec![\"semantic-dup\".to_owned()]),\n        ]\n    )\n\nassert!(matches!(error, BaselineCaptureError::FeatureDeclaration(_)));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_feature_declaration_forwards_layer_features_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_missing_feature_declaration_returns_error_before_capture"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -167,7 +234,14 @@
         "kind": "fulfilled",
         "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -184,14 +258,21 @@
       },
       "key": {
         "bound_tests_set_hash": "80734ddb70ee6060c7f867439e56f0090b7edbcbada1d7bb74e4fccdd86828e3",
-        "declaration_hash": "dc3ed4d8f34c811418cb1013397434c04475bddd81d88d6056ae09d2b29c9e79",
+        "declaration_hash": "c126550d7e85863f2fd9bc63b6130eecf637188335bec8a40b744b7688ed3b4a",
         "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
       },
       "verdict": {
         "kind": "fulfilled",
         "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -215,7 +296,14 @@
         "kind": "fulfilled",
         "citation": "assert!(matches!(\n            result,\n            Err(TdddActualFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_without_declaration_returns_missing_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -232,14 +320,21 @@
       },
       "key": {
         "bound_tests_set_hash": "238ae4beddde8656339af30316a2d0251efd10ffb83f5ba6c0e7a133775d5ea6",
-        "declaration_hash": "6e008f40c9654a80437de309a1c22aef52b8638f05fe805381b2482de0cf3b27",
+        "declaration_hash": "a0b94d4ce7ae854320d956267c1b110aae89893ff684f2e78d84355f7060cba5",
         "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            result,\n            Err(TdddActualFeatureDeclarationPortError::Read(\n                TdddActualFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddActualFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_without_declaration_returns_missing_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -252,18 +347,25 @@
       "obligation_id": {
         "entry_key": "RustdocBaselineCaptureAdapter",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::RustdocBaselineCapturePort"
+        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocBaselineCapturePort"
       },
       "key": {
-        "bound_tests_set_hash": "0f7a0ea2e244e88121b33efc71faed4e73f7cc54008a1aadd8292f0bd32be7e4",
-        "declaration_hash": "8f9eb97cd916d092c96ef574dea80c060120b6a737b8b1ffe773d3778c62210f",
+        "bound_tests_set_hash": "7bfab41eb1dbc58e9564a2c87674ff56c72b6477b93cded3a282ae8578f9e568",
+        "declaration_hash": "59a339d46b0fc1b9efadda514d7f19e702efdbf58de1181fcda37a0896decec2",
         "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "if [ \"$*\" != \"+nightly rustdoc -p infrastructure --lib --features semantic-dup -- -Z unstable-options --output-format json --document-hidden-items\" ]; then\n    exit 1\nfi\n...\nassert!(\n    baseline.contains(\"CodeFragmentExtractorAdapter\"),\n    \"the feature-gated public adapter must be present in the captured baseline\"\n);"
+        "citation": "assert_eq!(\n            std::fs::read_to_string(state.path().join(\"commands/rustdoc-args\")).unwrap().trim(),\n            \"+nightly rustdoc -p infrastructure --lib --no-default-features --features semantic-dup -- -Z unstable-options --output-format json --document-hidden-items\"\n        );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_baseline_capture_adapter::tests",
+          "test_name": "test_capture_adapter_with_declared_features_writes_feature_gated_baseline"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -287,7 +389,24 @@
         "kind": "fulfilled",
         "citation": "CargoFeatureName::try_new(\"not/a-feature\".to_owned()),\n            Err(CargoFeatureNameError::InvalidFeatureName(_))\n\nCargoFeatureName::try_new(\"-foo\".to_owned()),\n            Err(CargoFeatureNameError::InvalidFeatureName(_))\n\nCargoFeatureName::try_new(String::new()),\n            Err(CargoFeatureNameError::InvalidFeatureName(reason))"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_invalid_token_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_leading_hyphen_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_empty_value_returns_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -311,7 +430,24 @@
         "kind": "fulfilled",
         "citation": "CargoFeatureName::try_new(\"not/a-feature\".to_owned()),\n            Err(CargoFeatureNameError::InvalidFeatureName(_))\n\nCargoFeatureName::try_new(\"-foo\".to_owned()),\n            Err(CargoFeatureNameError::InvalidFeatureName(_))\n\nCargoFeatureName::try_new(String::new()),\n            Err(CargoFeatureNameError::InvalidFeatureName(reason))\n                if reason.as_str() == \"feature name must not be empty\""
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_invalid_token_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_leading_hyphen_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_empty_value_returns_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -335,7 +471,14 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n            declaration.features_for(&layer(\"infrastructure\")).unwrap(),\n            &[feature(\"semantic-dup\")]\n        );\n        assert!(declaration.layers().contains_key(&layer(\"domain\")));\n        assert!(declaration.layers().get(&layer(\"domain\")).is_some_and(Vec::is_empty));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_total_layers_succeeds"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -359,7 +502,14 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n            declaration.features_for(&layer(\"infrastructure\")).unwrap(),\n            &[feature(\"semantic-dup\")]\n        );\n        assert!(declaration.layers().contains_key(&layer(\"domain\")));\n        assert!(declaration.layers().get(&layer(\"domain\")).is_some_and(Vec::is_empty));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_total_layers_succeeds"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -383,7 +533,14 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n            declaration.features_for(&layer(\"infrastructure\")).unwrap(),\n            &[feature(\"semantic-dup\")]\n        );\n        assert!(declaration.layers().contains_key(&layer(\"domain\")));\n        assert!(declaration.layers().get(&layer(\"domain\")).is_some_and(Vec::is_empty));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_total_layers_succeeds"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -407,7 +564,24 @@
         "kind": "fulfilled",
         "citation": "matches!(result, Err(TdddFeatureDeclarationError::MissingLayer(missing)) if missing == layer(\"usecase\"))"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_missing_layer_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_unexpected_layer_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_duplicate_feature_returns_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -431,7 +605,14 @@
         "kind": "fulfilled",
         "citation": "matches!(declaration.features_for(&layer(\"usecase\")), Err(TdddFeatureLookupError::MissingLayer(missing)) if missing == layer(\"usecase\"))"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_lookup_for_missing_layer_returns_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -455,7 +636,14 @@
         "kind": "fulfilled",
         "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -479,7 +667,14 @@
         "kind": "fulfilled",
         "citation": "assert!(matches!(\n            result,\n            Err(TdddActualFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_without_declaration_returns_missing_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -503,7 +698,14 @@
         "kind": "fulfilled",
         "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -527,7 +729,14 @@
         "kind": "fulfilled",
         "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }\n            ))\n        ))"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_unknown_cargo_feature_returns_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -551,7 +760,14 @@
         "kind": "fulfilled",
         "citation": "\"{\\\"schema_version\\\":1,\\\"layers\\\":{\\\"cli\\\":[],\\\"domain\\\":[\\\"semantic-dup\\\"]}}\" ... declaration.features_for(&domain) ... [\"semantic-dup\"] ... declaration.features_for(&cli).unwrap().is_empty()"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_featureless_layer_preserves_empty_feature_list"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -575,7 +791,14 @@
         "kind": "fulfilled",
         "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }\n            ))\n        ));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_unknown_cargo_feature_returns_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -599,7 +822,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n        observed_baseline_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n        \"baseline rustdoc acquisition must receive the frozen declaration's feature content\"\n    );\n    assert_eq!(\n        observed_actual_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n        \"actual rustdoc acquisition must receive the same frozen declaration content\"\n    );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_nonexistent_file_returns_not_found"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -623,7 +858,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n        observed_baseline_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n        \"baseline rustdoc acquisition must receive the frozen declaration's feature content\"\n    );\n    assert_eq!(\n        observed_actual_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n        \"actual rustdoc acquisition must receive the same frozen declaration content\"\n    );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_with_exporter_forwards_declared_features"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -647,7 +894,29 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n        observed_baseline_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n        \"baseline rustdoc acquisition must receive the frozen declaration's feature content\"\n    );\n    assert_eq!(\n        observed_actual_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n        \"actual rustdoc acquisition must receive the same frozen declaration content\"\n    );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_missing_frozen_declaration_stops_before_rustdoc_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_undeclared_gated_catalogue_item_returns_non_blue_chain_three_signal"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -671,7 +940,29 @@
         "kind": "fulfilled",
         "citation": "\"the declared feature-gated item must be present in both baseline and actual surfaces\""
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_missing_frozen_declaration_stops_before_rustdoc_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_undeclared_gated_catalogue_item_returns_non_blue_chain_three_signal"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -695,7 +986,29 @@
         "kind": "fulfilled",
         "citation": "assert!(report.any_red, \"a non-Blue chain ③ signal must fail closed\");\nassert!(report.text.contains(\"🔴 Red\"),"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_missing_frozen_declaration_stops_before_rustdoc_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_undeclared_gated_catalogue_item_returns_non_blue_chain_three_signal"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -719,7 +1032,29 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n        observed_baseline_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n    );\n    assert_eq!(\n        observed_actual_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n    );\n    assert_eq!(\n        observed_surfaces.lock().unwrap().as_slice(),\n        [(true, true)],\n    );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_missing_frozen_declaration_stops_before_rustdoc_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_undeclared_gated_catalogue_item_returns_non_blue_chain_three_signal"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -743,7 +1078,29 @@
         "kind": "fulfilled",
         "citation": "\"the undeclared feature must omit the catalogue item from both extracted surfaces\"; assert!(report.any_red, \"a non-Blue chain ③ signal must fail closed\");"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_missing_frozen_declaration_stops_before_rustdoc_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_undeclared_gated_catalogue_item_returns_non_blue_chain_three_signal"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -756,18 +1113,25 @@
       "obligation_id": {
         "entry_key": "RustdocCrateAdapter",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::RustdocCratePort"
+        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort"
       },
       "key": {
         "bound_tests_set_hash": "d85bdba35d94b250131b8ccd8d1efd36d858eaec9c6255637fdd583da785e7b8",
-        "declaration_hash": "1bc4b32a8f7d0056887e2831c9b5865ce64cc8b7fe3ff2fd4ea77e2664ba1383",
+        "declaration_hash": "14a662ed8e4e9f19817862fe821f8496e4c181f921e4eb72477c7ced5c6fd2b4",
         "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
       },
       "verdict": {
         "kind": "fulfilled",
         "citation": "assert_eq!(*observed_features.lock().unwrap(), vec![\"semantic-dup\"]);"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_with_exporter_forwards_declared_features"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -791,7 +1155,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n        seen_features.lock().unwrap().as_slice(),\n        [vec![CargoFeatureName::try_new(\"semantic-dup\".to_owned()).unwrap()]],\n        \"the canonical executor must receive the layer's frozen feature declaration\"\n    );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_forwards_declared_layer_features_to_executor"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -815,7 +1191,19 @@
         "kind": "fulfilled",
         "citation": "assert_ne!(outcome.exit_code, 0, \"an absent declaration must fail the canonical path\");\n    assert_eq!(observer.launches(), 0, \"the declaration failure must occur before rustdoc launch\");"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_forwards_declared_layer_features_to_executor"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -839,7 +1227,19 @@
         "kind": "fulfilled",
         "citation": "assert_ne!(outcome.exit_code, 0, \"an absent declaration must fail the canonical path\");\n    assert_eq!(observer.launches(), 0, \"the declaration failure must occur before rustdoc launch\");"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_forwards_declared_layer_features_to_executor"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -863,7 +1263,14 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n        seen_features.lock().unwrap().as_slice(),\n        [vec![CargoFeatureName::try_new(\"semantic-dup\".to_owned()).unwrap()]],\n        \"the canonical executor must receive the layer's frozen feature declaration\"\n    );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_forwards_declared_layer_features_to_executor"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -887,7 +1294,14 @@
         "kind": "fulfilled",
         "citation": "assert_ne!(outcome.exit_code, 0, \"an absent declaration must fail the canonical path\");\n    assert_eq!(observer.launches(), 0, \"the declaration failure must occur before rustdoc launch\");"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -911,7 +1325,14 @@
         "kind": "fulfilled",
         "citation": "assert_ne!(outcome.exit_code, 0, \"an absent declaration must fail the canonical path\");\n    assert_eq!(observer.launches(), 0, \"the declaration failure must occur before rustdoc launch\");"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -935,7 +1356,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n            observer.feature_selections_for(\"infrastructure\"),\n            vec![vec![\"semantic-dup\".to_owned()], Vec::new()],\n            \"each measured rustdoc extraction must observe its declared feature selection\"\n        );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_composition_freshness_skip_and_conservative_reextract_use_real_adapter"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_feature_selection_change_reextracts_and_reaches_rustdoc"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -952,14 +1385,26 @@
       },
       "key": {
         "bound_tests_set_hash": "0f7b312aa09e12111a9acb85efcc243183dccbb01582fb8ffc97b1027250b139",
-        "declaration_hash": "c848bf66048376ba4352b30ae1c41ca78a67bf9be91d23da06fe404ee09dc663",
+        "declaration_hash": "d7238671b4ec530ea096152c34ac7da8e10d3d02f7928eccfaaba4c54ca0f6a0",
         "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
       },
       "verdict": {
         "kind": "fulfilled",
         "citation": "assert_eq!(\n            observer.feature_selections_for(\"infrastructure\"),\n            vec![vec![\"semantic-dup\".to_owned()]],\n            \"the executor adapter must pass the declaration-derived feature selection to rustdoc\"\n        );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_absent_catalogue_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_with_declared_features_forwards_them_to_rustdoc"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -983,7 +1428,19 @@
         "kind": "fulfilled",
         "citation": "assert_eq!(\n        observed_baseline_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n        \"baseline rustdoc acquisition must receive the frozen declaration's feature content\"\n    );\n    assert_eq!(\n        observed_actual_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n        \"actual rustdoc acquisition must receive the same frozen declaration content\"\n    );"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_baseline_snapshot_mismatch_returns_feature_declaration_error_before_rustdoc_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1007,7 +1464,14 @@
         "kind": "fulfilled",
         "citation": "assert!(matches!(\n        error,\n        CatalogueImplSignalsError::FeatureDeclaration(TdddActualFeatureDeclarationPortError::Read(\n            crate::tddd_feature_declaration::TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }\n        ))\n    ));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1031,7 +1495,14 @@
         "kind": "fulfilled",
         "citation": "assert!(matches!(\n        error,\n        CatalogueImplSignalsError::FeatureDeclaration(\n            TdddActualFeatureDeclarationPortError::MissingBaselineSnapshot { .. }\n        )\n    ));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_missing_frozen_declaration_stops_before_rustdoc_capture"
+        }
+      ]
     },
     {
       "edge_id": {
@@ -1055,7 +1526,14 @@
         "kind": "fulfilled",
         "citation": "assert!(matches!(\n        error,\n        CatalogueImplSignalsError::FeatureDeclaration(TdddActualFeatureDeclarationPortError::Read(\n            crate::tddd_feature_declaration::TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }\n        ))\n    ));"
       },
-      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        }
+      ]
     }
   ]
 }

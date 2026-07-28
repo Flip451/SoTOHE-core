@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-28T01:21:36Z",
+  "generated_at": "2026-07-28T04:10:16Z",
   "declaration_hash": "55641f5c2cee166ecbf1a8c5f621b3a59d921d83b84e25e87e8f5791ee54051a",
-  "implementation_input_hash": "d204e82c6b7b9e930a86acecffd8958161da77f796eed1495706bec436d96d21",
+  "implementation_input_hash": "3ec39700f4d6fca127703d46b8b0ec16b114d2700398322eef8963952b28b9f6",
   "signals": [
     {
       "type_name": "CargoFeatureName",

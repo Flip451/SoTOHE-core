@@ -862,6 +862,7 @@ dependencies = [
  "clap",
  "cli_composition",
  "cli_driver",
+ "domain",
  "infrastructure",
  "libc",
  "rstest",

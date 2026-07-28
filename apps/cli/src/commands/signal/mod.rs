@@ -42,7 +42,8 @@ use std::path::PathBuf;
 use std::process::ExitCode;
 
 use clap::{Args, Subcommand, ValueEnum};
-use cli_composition::{CompositionError, SignalCompositionRoot, SignalGateName};
+use cli_composition::{CompositionError, SignalCompositionRoot};
+use cli_driver::signal::SignalGateName;
 
 use super::outcome_to_exit;
 
@@ -188,40 +189,455 @@ pub enum SignalCommand {
 
 /// Dispatch a [`SignalCommand`] and return an [`ExitCode`].
 pub fn execute(cmd: SignalCommand) -> ExitCode {
-    let app = SignalCompositionRoot::new();
+    let driver = SignalCompositionRoot::new().signal_driver();
     match cmd {
-        SignalCommand::CalcAdrUser(args) => outcome_to_exit(calc_adr_user::run(&app, args)),
-        SignalCommand::CheckAdrUser(args) => outcome_to_exit(check_adr_user::run(&app, args)),
-        SignalCommand::CalcSpecAdr(args) => outcome_to_exit(calc_spec_adr::run(&app, args)),
-        SignalCommand::CheckSpecAdr(args) => outcome_to_exit(check_spec_adr::run(&app, args)),
-        SignalCommand::CalcCatalogSpec(args) => outcome_to_exit(calc_catalog_spec::run(&app, args)),
+        SignalCommand::CalcAdrUser(args) => outcome_to_exit(calc_adr_user::run(&driver, args)),
+        SignalCommand::CheckAdrUser(args) => outcome_to_exit(check_adr_user::run(&driver, args)),
+        SignalCommand::CalcSpecAdr(args) => outcome_to_exit(calc_spec_adr::run(&driver, args)),
+        SignalCommand::CheckSpecAdr(args) => outcome_to_exit(check_spec_adr::run(&driver, args)),
+        SignalCommand::CalcCatalogSpec(args) => {
+            outcome_to_exit(calc_catalog_spec::run(&driver, args))
+        }
         SignalCommand::CheckCatalogSpec(args) => {
-            outcome_to_exit(check_catalog_spec::run(&app, args))
+            outcome_to_exit(check_catalog_spec::run(&driver, args))
         }
-        SignalCommand::CalcImplCatalog(args) => outcome_to_exit(calc_impl_catalog::run(&app, args)),
+        SignalCommand::CalcImplCatalog(args) => {
+            outcome_to_exit(calc_impl_catalog::run(&driver, args))
+        }
         SignalCommand::CheckImplCatalog(args) => {
-            outcome_to_exit(check_impl_catalog::run(&app, args))
+            outcome_to_exit(check_impl_catalog::run(&driver, args))
         }
-        SignalCommand::Check(args) => outcome_to_exit(run_aggregate_check(&app, args)),
+        SignalCommand::Check(args) => outcome_to_exit(run_aggregate_check(&driver, args)),
     }
 }
 
 fn run_aggregate_check(
-    app: &SignalCompositionRoot,
+    driver: &cli_driver::signal::SignalDriver,
     args: SignalCheckArgs,
 ) -> Result<cli_composition::CommandOutcome, CompositionError> {
-    let gate: SignalGateName = args.gate.into();
-    app.signal_check_gate(args.project_root, args.spec_json, gate, args.workspace_root)
+    let gate = match args.gate {
+        GateArg::Commit => cli_driver::signal::SignalGateName::Commit,
+        GateArg::Merge => cli_driver::signal::SignalGateName::Merge,
+    };
+    Ok(driver.handle(cli_driver::signal::SignalInput::CheckGate {
+        project_root: args.project_root,
+        spec_json_path: args.spec_json,
+        gate,
+        workspace_root: args.workspace_root,
+    }))
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
 #[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic)]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 mod tests {
+    use std::path::PathBuf;
+    use std::sync::{Arc, Mutex};
+
     use clap::Parser;
+    use cli_driver::signal::SignalDriver;
+    use infrastructure::{signal::SystemSignalGateConfigAdapter, verify::VerifyOutcome};
+    use usecase::signal_service::{
+        ResolvedSignalChainCommand, SignalChainExecutionReport,
+        SignalCommand as ServiceSignalCommand, SignalCommandInteractor, SignalCommandOutput,
+        SignalCommandPort, SignalCommandPortError, SignalGateName as ServiceSignalGateName,
+        SignalService,
+    };
 
     use super::*;
+
+    const RECORDED_STDOUT: &str = "recorded stdout";
+    const RECORDED_STDERR: &str = "recorded stderr";
+    const RECORDED_EXIT_CODE: u8 = 23;
+
+    struct RecordingSignalService(Mutex<Vec<ServiceSignalCommand>>);
+
+    impl RecordingSignalService {
+        fn calls(&self) -> Vec<ServiceSignalCommand> {
+            self.0.lock().unwrap().clone()
+        }
+
+        fn record(&self, command: ServiceSignalCommand) -> SignalCommandOutput {
+            self.0.lock().unwrap().push(command);
+            SignalCommandOutput {
+                stdout: Some(RECORDED_STDOUT.to_owned()),
+                stderr: Some(RECORDED_STDERR.to_owned()),
+                exit_code: RECORDED_EXIT_CODE,
+            }
+        }
+    }
+
+    impl SignalService for RecordingSignalService {
+        fn calc_adr_user(&self, project_root: PathBuf) -> SignalCommandOutput {
+            self.record(ServiceSignalCommand::CalcAdrUser { project_root })
+        }
+
+        fn check_adr_user(
+            &self,
+            project_root: PathBuf,
+            strict_override: bool,
+            gate: Option<ServiceSignalGateName>,
+            workspace_root: Option<PathBuf>,
+        ) -> SignalCommandOutput {
+            self.record(ServiceSignalCommand::CheckAdrUser {
+                project_root,
+                strict_override: if strict_override {
+                    usecase::signal_service::SignalStrictOverride::ForceStrict
+                } else {
+                    usecase::signal_service::SignalStrictOverride::UseGateMatrix
+                },
+                gate,
+                workspace_root,
+            })
+        }
+
+        fn calc_spec_adr(
+            &self,
+            spec_json_path: Option<PathBuf>,
+            workspace_root: Option<PathBuf>,
+        ) -> SignalCommandOutput {
+            self.record(ServiceSignalCommand::CalcSpecAdr { spec_json_path, workspace_root })
+        }
+
+        fn check_spec_adr(
+            &self,
+            spec_json_path: Option<PathBuf>,
+            strict_override: bool,
+            gate: Option<ServiceSignalGateName>,
+            workspace_root: Option<PathBuf>,
+        ) -> SignalCommandOutput {
+            self.record(ServiceSignalCommand::CheckSpecAdr {
+                spec_json_path,
+                strict_override: if strict_override {
+                    usecase::signal_service::SignalStrictOverride::ForceStrict
+                } else {
+                    usecase::signal_service::SignalStrictOverride::UseGateMatrix
+                },
+                gate,
+                workspace_root,
+            })
+        }
+
+        fn calc_catalog_spec(&self) -> SignalCommandOutput {
+            self.record(ServiceSignalCommand::CalcCatalogSpec)
+        }
+
+        fn check_catalog_spec(
+            &self,
+            strict_override: bool,
+            gate: Option<ServiceSignalGateName>,
+            workspace_root: Option<PathBuf>,
+        ) -> SignalCommandOutput {
+            self.record(ServiceSignalCommand::CheckCatalogSpec {
+                strict_override: if strict_override {
+                    usecase::signal_service::SignalStrictOverride::ForceStrict
+                } else {
+                    usecase::signal_service::SignalStrictOverride::UseGateMatrix
+                },
+                gate,
+                workspace_root,
+            })
+        }
+
+        fn calc_impl_catalog(&self) -> SignalCommandOutput {
+            self.record(ServiceSignalCommand::CalcImplCatalog)
+        }
+
+        fn check_impl_catalog(
+            &self,
+            strict_override: bool,
+            gate: Option<ServiceSignalGateName>,
+            workspace_root: Option<PathBuf>,
+        ) -> SignalCommandOutput {
+            self.record(ServiceSignalCommand::CheckImplCatalog {
+                strict_override: if strict_override {
+                    usecase::signal_service::SignalStrictOverride::ForceStrict
+                } else {
+                    usecase::signal_service::SignalStrictOverride::UseGateMatrix
+                },
+                gate,
+                workspace_root,
+            })
+        }
+
+        fn check_gate(
+            &self,
+            project_root: Option<PathBuf>,
+            spec_json_path: Option<PathBuf>,
+            gate: ServiceSignalGateName,
+            workspace_root: Option<PathBuf>,
+        ) -> SignalCommandOutput {
+            self.record(ServiceSignalCommand::CheckGate {
+                project_root,
+                spec_json_path,
+                gate,
+                workspace_root,
+            })
+        }
+    }
+
+    fn recording_driver() -> (SignalDriver, Arc<RecordingSignalService>) {
+        let service = Arc::new(RecordingSignalService(Mutex::new(Vec::new())));
+        (SignalDriver::new(service.clone()), service)
+    }
+
+    fn assert_recorded_outcome(outcome: &cli_composition::CommandOutcome) {
+        assert_eq!(outcome.stdout.as_deref(), Some(RECORDED_STDOUT));
+        assert_eq!(outcome.stderr.as_deref(), Some(RECORDED_STDERR));
+        assert_eq!(outcome.exit_code, RECORDED_EXIT_CODE);
+    }
+
+    struct RecordingSignalPort(Mutex<Vec<ResolvedSignalChainCommand>>);
+
+    impl RecordingSignalPort {
+        fn calls(&self) -> Vec<ResolvedSignalChainCommand> {
+            self.0.lock().unwrap().clone()
+        }
+    }
+
+    impl SignalCommandPort for RecordingSignalPort {
+        fn execute(
+            &self,
+            command: ResolvedSignalChainCommand,
+        ) -> Result<SignalChainExecutionReport, SignalCommandPortError> {
+            self.0.lock().unwrap().push(command);
+            Ok(SignalChainExecutionReport {
+                outcome: VerifyOutcome::pass(),
+                stdout: Some(RECORDED_STDOUT.to_owned()),
+                stderr: Some(RECORDED_STDERR.to_owned()),
+            })
+        }
+    }
+
+    #[test]
+    fn test_calc_adr_user_run_with_driver_dispatches_command_and_preserves_outcome() {
+        let (driver, service) = recording_driver();
+        let project_root = PathBuf::from("project");
+
+        let outcome =
+            calc_adr_user::run(&driver, CalcAdrUserArgs { project_root: project_root.clone() })
+                .unwrap();
+
+        assert_recorded_outcome(&outcome);
+        assert_eq!(service.calls(), vec![ServiceSignalCommand::CalcAdrUser { project_root }]);
+    }
+
+    #[test]
+    fn test_calc_adr_user_run_with_real_interactor_reaches_port_once_and_preserves_outcome() {
+        let port = Arc::new(RecordingSignalPort(Mutex::new(Vec::new())));
+        let adapter = Arc::new(infrastructure::signal::SystemSignalCommandAdapter::new());
+        let interactor = Arc::new(SignalCommandInteractor::new(
+            port.clone(),
+            adapter.clone(),
+            adapter,
+            Arc::new(SystemSignalGateConfigAdapter::new()),
+        ));
+        let driver = SignalDriver::new(interactor);
+        let project_root = PathBuf::from("project");
+
+        let outcome =
+            calc_adr_user::run(&driver, CalcAdrUserArgs { project_root: project_root.clone() })
+                .unwrap();
+
+        assert_eq!(outcome.stdout.as_deref(), Some(RECORDED_STDOUT));
+        assert_eq!(outcome.stderr.as_deref(), Some(RECORDED_STDERR));
+        assert_eq!(outcome.exit_code, 0);
+        assert_eq!(port.calls(), vec![ResolvedSignalChainCommand::CalcAdrUser { project_root }]);
+    }
+
+    #[test]
+    fn test_calc_catalog_spec_run_with_driver_dispatches_command_and_preserves_outcome() {
+        let (driver, service) = recording_driver();
+
+        let outcome = calc_catalog_spec::run(&driver, CalcCatalogSpecArgs {}).unwrap();
+
+        assert_recorded_outcome(&outcome);
+        assert_eq!(service.calls(), vec![ServiceSignalCommand::CalcCatalogSpec]);
+    }
+
+    #[test]
+    fn test_calc_impl_catalog_run_with_driver_dispatches_command_and_preserves_outcome() {
+        let (driver, service) = recording_driver();
+
+        let outcome = calc_impl_catalog::run(&driver, CalcImplCatalogArgs {}).unwrap();
+
+        assert_recorded_outcome(&outcome);
+        assert_eq!(service.calls(), vec![ServiceSignalCommand::CalcImplCatalog]);
+    }
+
+    #[test]
+    fn test_calc_spec_adr_run_with_driver_dispatches_command_and_preserves_outcome() {
+        let (driver, service) = recording_driver();
+        let spec_json_path = PathBuf::from("project/spec.json");
+        let workspace_root = PathBuf::from("workspace");
+
+        let outcome = calc_spec_adr::run(
+            &driver,
+            CalcSpecAdrArgs {
+                spec_json: Some(spec_json_path.clone()),
+                workspace_root: Some(workspace_root.clone()),
+            },
+        )
+        .unwrap();
+
+        assert_recorded_outcome(&outcome);
+        assert_eq!(
+            service.calls(),
+            vec![ServiceSignalCommand::CalcSpecAdr {
+                spec_json_path: Some(spec_json_path),
+                workspace_root: Some(workspace_root),
+            }]
+        );
+    }
+
+    #[test]
+    fn test_check_adr_user_run_with_driver_dispatches_command_and_preserves_outcome() {
+        let (driver, service) = recording_driver();
+        let project_root = PathBuf::from("project");
+        let workspace_root = PathBuf::from("workspace");
+
+        let outcome = check_adr_user::run(
+            &driver,
+            CheckAdrUserArgs {
+                project_root: project_root.clone(),
+                flags: CheckFlags {
+                    strict: false,
+                    gate: Some(GateArg::Merge),
+                    workspace_root: Some(workspace_root.clone()),
+                },
+            },
+        )
+        .unwrap();
+
+        assert_recorded_outcome(&outcome);
+        assert_eq!(
+            service.calls(),
+            vec![ServiceSignalCommand::CheckAdrUser {
+                project_root,
+                strict_override: usecase::signal_service::SignalStrictOverride::UseGateMatrix,
+                gate: Some(ServiceSignalGateName::Merge),
+                workspace_root: Some(workspace_root),
+            }]
+        );
+    }
+
+    #[test]
+    fn test_check_catalog_spec_run_with_driver_dispatches_command_and_preserves_outcome() {
+        let (driver, service) = recording_driver();
+        let workspace_root = PathBuf::from("workspace");
+
+        let outcome = check_catalog_spec::run(
+            &driver,
+            CheckCatalogSpecArgs {
+                flags: CheckFlags {
+                    strict: true,
+                    gate: None,
+                    workspace_root: Some(workspace_root.clone()),
+                },
+            },
+        )
+        .unwrap();
+
+        assert_recorded_outcome(&outcome);
+        assert_eq!(
+            service.calls(),
+            vec![ServiceSignalCommand::CheckCatalogSpec {
+                strict_override: usecase::signal_service::SignalStrictOverride::ForceStrict,
+                gate: None,
+                workspace_root: Some(workspace_root),
+            }]
+        );
+    }
+
+    #[test]
+    fn test_check_impl_catalog_run_with_driver_dispatches_command_and_preserves_outcome() {
+        let (driver, service) = recording_driver();
+        let workspace_root = PathBuf::from("workspace");
+
+        let outcome = check_impl_catalog::run(
+            &driver,
+            CheckImplCatalogArgs {
+                flags: CheckFlags {
+                    strict: false,
+                    gate: Some(GateArg::Commit),
+                    workspace_root: Some(workspace_root.clone()),
+                },
+            },
+        )
+        .unwrap();
+
+        assert_recorded_outcome(&outcome);
+        assert_eq!(
+            service.calls(),
+            vec![ServiceSignalCommand::CheckImplCatalog {
+                strict_override: usecase::signal_service::SignalStrictOverride::UseGateMatrix,
+                gate: Some(ServiceSignalGateName::Commit),
+                workspace_root: Some(workspace_root),
+            }]
+        );
+    }
+
+    #[test]
+    fn test_check_spec_adr_run_with_driver_dispatches_command_and_preserves_outcome() {
+        let (driver, service) = recording_driver();
+        let spec_json_path = PathBuf::from("project/spec.json");
+        let workspace_root = PathBuf::from("workspace");
+
+        let outcome = check_spec_adr::run(
+            &driver,
+            CheckSpecAdrArgs {
+                spec_json: Some(spec_json_path.clone()),
+                flags: CheckFlags {
+                    strict: false,
+                    gate: Some(GateArg::Merge),
+                    workspace_root: Some(workspace_root.clone()),
+                },
+            },
+        )
+        .unwrap();
+
+        assert_recorded_outcome(&outcome);
+        assert_eq!(
+            service.calls(),
+            vec![ServiceSignalCommand::CheckSpecAdr {
+                spec_json_path: Some(spec_json_path),
+                strict_override: usecase::signal_service::SignalStrictOverride::UseGateMatrix,
+                gate: Some(ServiceSignalGateName::Merge),
+                workspace_root: Some(workspace_root),
+            }]
+        );
+    }
+
+    #[test]
+    fn test_run_aggregate_check_with_driver_dispatches_gate_and_preserves_outcome() {
+        let (driver, service) = recording_driver();
+        let project_root = PathBuf::from("project");
+        let spec_json_path = PathBuf::from("project/spec.json");
+        let workspace_root = PathBuf::from("workspace");
+
+        let outcome = run_aggregate_check(
+            &driver,
+            SignalCheckArgs {
+                gate: GateArg::Merge,
+                project_root: Some(project_root.clone()),
+                spec_json: Some(spec_json_path.clone()),
+                workspace_root: Some(workspace_root.clone()),
+            },
+        )
+        .unwrap();
+
+        assert_recorded_outcome(&outcome);
+        assert_eq!(
+            service.calls(),
+            vec![ServiceSignalCommand::CheckGate {
+                project_root: Some(project_root),
+                spec_json_path: Some(spec_json_path),
+                gate: ServiceSignalGateName::Merge,
+                workspace_root: Some(workspace_root),
+            }]
+        );
+    }
 
     // ── Parser wrapper ────────────────────────────────────────────────────────
 

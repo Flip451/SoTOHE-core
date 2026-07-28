@@ -323,7 +323,7 @@ if [ "$1" = "metadata" ]; then
     exit 0
 fi
 printf '%s\n' "$*" > "$(dirname "$0")/rustdoc-args"
-if [ "$*" != "+nightly rustdoc -p infrastructure --lib --features semantic-dup -- -Z unstable-options --output-format json --document-hidden-items" ]; then
+if [ "$*" != "+nightly rustdoc -p infrastructure --lib --no-default-features --features semantic-dup -- -Z unstable-options --output-format json --document-hidden-items" ]; then
     exit 1
 fi
 mkdir -p "$CARGO_TARGET_DIR/doc"
@@ -365,7 +365,7 @@ printf '{{"root":0,"crate_version":null,"includes_private":false,"index":{{}},"p
         );
         assert_eq!(
             std::fs::read_to_string(state.path().join("commands/rustdoc-args")).unwrap().trim(),
-            "+nightly rustdoc -p infrastructure --lib --features semantic-dup -- -Z unstable-options --output-format json --document-hidden-items"
+            "+nightly rustdoc -p infrastructure --lib --no-default-features --features semantic-dup -- -Z unstable-options --output-format json --document-hidden-items"
         );
     }
 

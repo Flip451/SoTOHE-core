@@ -741,7 +741,7 @@ mod tests {
     }
 
     #[test]
-    fn test_execute_results_explicit_track_returns_lane_summary_without_branch_read() {
+    fn test_execute_results_explicit_track_loads_historical_cache_without_branch_read() {
         let temp = fixture_workspace(&[
             "obligations.json",
             "test-bindings.json",
@@ -771,8 +771,14 @@ mod tests {
             |root, input| {
                 let outcome = root.results_handler().handle(input);
                 let stdout = outcome.stdout.as_deref().unwrap();
-                assert!(stdout.contains("Fulfillment:"), "expected lane summary: {stdout}");
-                assert!(stdout.contains("records="));
+                assert!(
+                    stdout.contains("Waiver:workspace"),
+                    "expected normal results output: {stdout}"
+                );
+                assert!(
+                    !stdout.contains("informational; read error"),
+                    "historical diagnostics must not make results unreadable: {stdout}"
+                );
                 driver_outcome_to_exit(outcome)
             },
         );

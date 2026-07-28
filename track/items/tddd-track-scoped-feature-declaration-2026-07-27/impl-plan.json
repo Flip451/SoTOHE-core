@@ -23,7 +23,7 @@
     },
     {
       "id": "T006",
-      "description": "Modify `TypeSignalsInteractor`, `TypeSignalsError`, and `TypeSignalsExecutorPort` in `libs/usecase/src/type_signals/{interactor.rs,service.rs,ports.rs}`, `TypeSignalsExecutorAdapter` in `libs/infrastructure/src/tddd/type_signals_executor_adapter.rs`, and `execute_type_signals_for_layer` in `libs/infrastructure/src/tddd/type_signals_evaluator.rs`; inject `TdddActualFeatureDeclarationPort` through `FsTdddFeatureDeclarationAdapter` at `apps/cli-composition/src/{signal/mod.rs,track/tddd.rs}`; and add canonical signal-calculation tests (IN-03, CN-01, AC-03, AC-04).",
+      "description": "Modify `TypeSignalsInteractor`, `TypeSignalsError`, and `TypeSignalsExecutorPort` in `libs/usecase/src/type_signals/{interactor.rs,service.rs,ports.rs}`, `TypeSignalsExecutorAdapter` in `libs/infrastructure/src/tddd/type_signals_executor_adapter.rs`, and `execute_type_signals_for_layer` in `libs/infrastructure/src/tddd/type_signals_evaluator.rs`; inject `TdddActualFeatureDeclarationPort` through `FsTdddFeatureDeclarationAdapter` at `libs/infrastructure/src/signal.rs::SystemSignalCommandAdapter::calc_impl` and `apps/cli-composition/src/track/tddd.rs`; and add canonical signal-calculation tests (IN-03, CN-01, AC-03, AC-04).",
       "status": "done"
     },
     {

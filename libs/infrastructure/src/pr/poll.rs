@@ -1,4 +1,4 @@
-//! Private polling and review helpers for the `pr` command family.
+//! Private polling and review helpers for the system PR command adapter.
 //!
 //! All items in this module are `pub(super)` — they are implementation details
 //! of `apps/cli-composition/src/pr.rs` and must not appear on the public facade.
@@ -7,9 +7,9 @@
 //! Production polling is delegated to the D4 `PrReviewPollingInteractor`.
 
 use std::fs;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
-use crate::error::CompositionError;
+use super::CompositionError;
 
 // ---------------------------------------------------------------------------
 // Outcome of a poll-review cycle
@@ -34,14 +34,67 @@ pub(super) struct TriggerState {
     pub(super) track_id: String,
 }
 
-pub(super) fn trigger_state_path(track_id: &str) -> PathBuf {
+fn trigger_state_location(track_id: &str) -> Result<(PathBuf, PathBuf), CompositionError> {
     use infrastructure::git_cli::SystemGitRepo;
-    let root = SystemGitRepo::discover().map(|r| r.root().to_path_buf()).unwrap_or_default();
-    root.join("tmp/pr-review-state").join(format!("{track_id}.json"))
+    let root = SystemGitRepo::discover()
+        .map_err(|e| CompositionError::AdapterInit(e.to_string()))?
+        .root()
+        .to_path_buf();
+    let path = trigger_state_path_under_root(&root, track_id)?;
+    Ok((root, path))
+}
+
+/// Construct the trigger-state path only from a validated track identifier.
+fn trigger_state_path_under_root(root: &Path, track_id: &str) -> Result<PathBuf, CompositionError> {
+    use infrastructure::track::symlink_guard::reject_symlinks_up_to_root;
+
+    let track_id = domain::TrackId::try_new(track_id.to_owned()).map_err(|e| {
+        CompositionError::WiringFailed(format!("invalid trigger-state track ID '{track_id}': {e}"))
+    })?;
+    reject_symlinks_up_to_root(root).map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "refusing trigger-state I/O below untrusted repo root {}: {e}",
+            root.display()
+        ))
+    })?;
+    let root = root.canonicalize().map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "failed to normalize trigger-state repo root {}: {e}",
+            root.display()
+        ))
+    })?;
+    let track_id: &str = track_id.as_ref();
+    let path = root.join("tmp/pr-review-state").join(format!("{track_id}.json"));
+    if path.strip_prefix(&root).is_err() {
+        return Err(CompositionError::Infrastructure(format!(
+            "refusing trigger-state path outside repo root: {}",
+            path.display()
+        )));
+    }
+    Ok(path)
+}
+
+/// Reject state paths whose root, parent, or leaf is a symlink before I/O.
+fn guard_trigger_state_path(path: &Path, root: &Path) -> Result<bool, CompositionError> {
+    use infrastructure::track::symlink_guard::{reject_symlinks_below, reject_symlinks_up_to_root};
+
+    reject_symlinks_up_to_root(root).map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "refusing trigger-state I/O below untrusted repo root {}: {e}",
+            root.display()
+        ))
+    })?;
+    reject_symlinks_below(path, root).map_err(|e| {
+        CompositionError::Infrastructure(format!(
+            "refusing trigger-state I/O at {}: {e}",
+            path.display()
+        ))
+    })
 }
 
 pub(super) fn save_trigger_state(state: &TriggerState) -> Result<(), CompositionError> {
-    let path = trigger_state_path(&state.track_id);
+    let (root, path) = trigger_state_location(&state.track_id)?;
+    guard_trigger_state_path(&path, &root)?;
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).map_err(|e| {
             CompositionError::Infrastructure(format!(
@@ -50,6 +103,7 @@ pub(super) fn save_trigger_state(state: &TriggerState) -> Result<(), Composition
             ))
         })?;
     }
+    guard_trigger_state_path(&path, &root)?;
     let json = serde_json::to_string_pretty(state).map_err(|e| {
         CompositionError::Infrastructure(format!("failed to serialize trigger state: {e}"))
     })?;
@@ -61,8 +115,8 @@ pub(super) fn save_trigger_state(state: &TriggerState) -> Result<(), Composition
 }
 
 pub(super) fn load_trigger_state(track_id: &str) -> Result<Option<TriggerState>, CompositionError> {
-    let path = trigger_state_path(track_id);
-    if !path.exists() {
+    let (root, path) = trigger_state_location(track_id)?;
+    if !guard_trigger_state_path(&path, &root)? {
         return Ok(None);
     }
     let json = fs::read_to_string(&path).map_err(|e| {
@@ -74,9 +128,13 @@ pub(super) fn load_trigger_state(track_id: &str) -> Result<Option<TriggerState>,
     Ok(Some(state))
 }
 
-pub(super) fn cleanup_trigger_state(track_id: &str) {
-    let path = trigger_state_path(track_id);
-    let _ = fs::remove_file(path);
+pub(super) fn cleanup_trigger_state(track_id: &str) -> Result<(), CompositionError> {
+    let (root, path) = trigger_state_location(track_id)?;
+    guard_trigger_state_path(&path, &root)?;
+    fs::remove_file(&path).map_err(|e| {
+        CompositionError::Infrastructure(format!("failed to remove {}: {e}", path.display()))
+    })?;
+    Ok(())
 }
 
 // ---------------------------------------------------------------------------
@@ -603,6 +661,20 @@ pub(super) fn format_review_summary(
 // resume_trigger_state
 // ---------------------------------------------------------------------------
 
+fn resolve_head_hash() -> Result<String, CompositionError> {
+    use infrastructure::FsGitWorkflowAdapter;
+    use std::sync::Arc;
+    use usecase::git_workflow::{GitPrimitivePort, PrGitInteractor};
+
+    let port: Arc<dyn GitPrimitivePort> = Arc::new(FsGitWorkflowAdapter::new());
+    let interactor = PrGitInteractor::new(port);
+    interactor
+        .resolve_head()
+        .map_err(|e| CompositionError::Infrastructure(format!("failed to resolve HEAD: {e}")))?
+        .map(|head| head.as_ref().to_owned())
+        .ok_or_else(|| CompositionError::WiringFailed("could not determine HEAD".to_owned()))
+}
+
 pub(super) fn resume_trigger_state(
     track_id: &str,
 ) -> Result<(String, String, Option<String>), CompositionError> {
@@ -620,23 +692,20 @@ pub(super) fn resume_trigger_state(
     // fail-closed "no git repo" contract of the surrounding function.
     let _repo =
         SystemGitRepo::discover().map_err(|e| CompositionError::AdapterInit(e.to_string()))?;
-    let current_head = {
-        use infrastructure::FsGitWorkflowAdapter;
-        use std::sync::Arc;
-        use usecase::git_workflow::{GitPrimitivePort, PrGitInteractor};
-        let port: Arc<dyn GitPrimitivePort> = Arc::new(FsGitWorkflowAdapter::new());
-        let interactor = PrGitInteractor::new(port);
-        interactor.resolve_head().ok().flatten().map(|h| h.as_ref().to_owned())
-    };
-    if let (Some(saved), Some(current)) = (&state.head_hash, &current_head) {
-        if saved != current {
-            cleanup_trigger_state(track_id);
-            return Err(CompositionError::WiringFailed(format!(
-                "HEAD has changed since trigger was posted \
-                 (saved={saved}, current={current}). \
-                 Run without --resume to start a new review cycle."
-            )));
-        }
+    let current_head = resolve_head_hash()?;
+    let saved_head = state.head_hash.as_deref().ok_or_else(|| {
+        CompositionError::WiringFailed(
+            "saved trigger state has no HEAD; run without --resume to start a new review cycle."
+                .to_owned(),
+        )
+    })?;
+    if saved_head != current_head {
+        cleanup_trigger_state(track_id)?;
+        return Err(CompositionError::WiringFailed(format!(
+            "HEAD has changed since trigger was posted \
+             (saved={saved_head}, current={current_head}). \
+             Run without --resume to start a new review cycle."
+        )));
     }
 
     println!("[OK] Resumed trigger state for PR #{}", state.pr_number);
@@ -661,6 +730,11 @@ pub(super) fn trigger_new_review(
     println!("Pushing {} to origin...", ctx.branch);
     repo.push_branch(&ctx.branch).map_err(|e| CompositionError::Infrastructure(e.to_string()))?;
     println!("[OK] Pushed {}", ctx.branch);
+
+    // The cycle has pushed its branch, so require a HEAD before making any
+    // external review request. Otherwise a failed resolution would leave a
+    // posted comment with no resumable state and retries would duplicate it.
+    let head_hash = resolve_head_hash()?;
 
     let base = super::branch_strategy_port_for_track(&ctx.track_id).map(|port| {
         use usecase::branch_strategy::BranchStrategyPort as _;
@@ -687,24 +761,14 @@ pub(super) fn trigger_new_review(
         ));
     }
 
-    // Route HEAD resolution through the usecase PrGitInteractor (T007).
-    let head_hash = {
-        use infrastructure::FsGitWorkflowAdapter;
-        use std::sync::Arc;
-        use usecase::git_workflow::{GitPrimitivePort, PrGitInteractor};
-        let port: Arc<dyn GitPrimitivePort> = Arc::new(FsGitWorkflowAdapter::new());
-        let interactor = PrGitInteractor::new(port);
-        interactor.resolve_head().ok().flatten().map(|h| h.as_ref().to_owned())
-    };
-
     save_trigger_state(&TriggerState {
         pr_number: pr_number.clone(),
         trigger_timestamp: trigger_timestamp.clone(),
-        head_hash: head_hash.clone(),
+        head_hash: Some(head_hash.clone()),
         track_id: track_id.to_owned(),
     })?;
 
-    Ok(Some((pr_number, trigger_timestamp, head_hash)))
+    Ok(Some((pr_number, trigger_timestamp, Some(head_hash))))
 }
 
 // ---------------------------------------------------------------------------
@@ -720,8 +784,8 @@ mod tests {
 
     use infrastructure::gh_cli::{GhClient, GhError, PrCheckRecord};
 
-    use super::PollReviewResult;
     use super::test_support::poll_review_for_cycle;
+    use super::{PollReviewResult, guard_trigger_state_path, trigger_state_path_under_root};
 
     // ------------------------------------------------------------------
     // Minimal fake GhClient for poll tests
@@ -804,6 +868,45 @@ mod tests {
         format!(
             r#"[{{"id":1,"user":{{"login":"{bot_login}"}},"state":"{state}","commit_id":"{commit_id}","submitted_at":"{submitted_at}","body":""}}]"#
         )
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_guard_trigger_state_path_rejects_symlinked_parent() {
+        let sandbox = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let tmp = sandbox.path().join("tmp");
+        std::fs::create_dir_all(&tmp).unwrap();
+        std::os::unix::fs::symlink(outside.path(), tmp.join("pr-review-state")).unwrap();
+
+        let path = tmp.join("pr-review-state/track.json");
+        let error = guard_trigger_state_path(&path, sandbox.path()).unwrap_err();
+
+        assert!(error.to_string().contains("refusing trigger-state I/O"));
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn test_guard_trigger_state_path_rejects_symlinked_leaf() {
+        let sandbox = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let state_dir = sandbox.path().join("tmp/pr-review-state");
+        std::fs::create_dir_all(&state_dir).unwrap();
+        let leaf = state_dir.join("track.json");
+        std::os::unix::fs::symlink(outside.path().join("state.json"), &leaf).unwrap();
+
+        let error = guard_trigger_state_path(&leaf, sandbox.path()).unwrap_err();
+
+        assert!(error.to_string().contains("refusing trigger-state I/O"));
+    }
+
+    #[test]
+    fn test_trigger_state_path_rejects_track_id_escape_before_construction() {
+        let sandbox = tempfile::tempdir().unwrap();
+
+        let error = trigger_state_path_under_root(sandbox.path(), "../outside").unwrap_err();
+
+        assert!(error.to_string().contains("invalid trigger-state track ID"));
     }
 
     // ------------------------------------------------------------------

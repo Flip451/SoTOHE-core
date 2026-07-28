@@ -13,10 +13,11 @@ use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
     CatalogueDocumentLoaderError, CatalogueDocumentLoaderPort,
 };
-use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole};
+use domain::tddd::catalogue_v2::roles::{ContractRole, DataRole, ItemAction};
 use domain::tddd::catalogue_v2::{
-    CatalogueDocument, CrateName, ModulePath, StructKind, StructShape, TraitImplDeclV2, TypeEntry,
-    TypeKindV2, TypeName, TypeRef,
+    CatalogueDocument, CrateName, MethodDeclaration, MethodName, ModulePath, SelfReceiver,
+    StructKind, StructShape, TraitEntry, TraitImplDeclV2, TraitName, TypeEntry, TypeKindV2,
+    TypeName, TypeRef,
 };
 use domain::tddd::semantic_verify::{
     CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, ModelTier,
@@ -24,6 +25,7 @@ use domain::tddd::semantic_verify::{
 use domain::tddd::test_obligation::binding::{
     NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument, TestLocation,
 };
+use domain::tddd::test_obligation::drift::{EdgeResolutionOutcome, EdgeVerdictRecord};
 use domain::tddd::test_obligation::errors::{
     ArtifactCodecError, ObligationEvaluateError, SemanticVerifierError, TestSourceScanError,
     VerifyCacheError,
@@ -39,19 +41,20 @@ use domain::tddd::test_obligation::ids::{
 };
 use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
 use domain::tddd::test_obligation::ports::{
-    ObligationFulfillmentCachePort, ObligationsArtifactPort, TestBindingsArtifactPort,
-    TestSourceScannerPort, WaiverCachePort,
+    ObligationsArtifactPort, TestBindingsArtifactPort, TestSourceScannerPort, WaiverCachePort,
 };
 
 use crate::semantic_verdict_core::driver::{
     SemanticEscalationDriverPort, SemanticEscalationFuture,
 };
 use crate::test_obligation::hasher::ContentHasherPort;
+use crate::test_obligation::ports::ObligationFulfillmentCachePort;
 use domain::tddd::test_obligation::pair::{ObligationFulfillmentPair, WaiverPair};
 use domain::tddd::test_obligation::verdict::{
     ObligationFulfillmentCacheDocument, ObligationFulfillmentCacheEntry,
-    ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict, WaiverCacheDocument,
-    WaiverCacheEntry, WaiverCacheKey, WaiverVerdict,
+    ObligationFulfillmentCacheEntryState, ObligationFulfillmentCacheKey,
+    ObligationFulfillmentVerdict, WaiverCacheDocument, WaiverCacheEntry, WaiverCacheKey,
+    WaiverVerdict,
 };
 use domain::tddd::test_obligation::vocab::{
     FulfillmentFailCategory, TargetEntryRoleKind, TestObligationKind,
@@ -369,7 +372,31 @@ impl SemanticEscalationDriverPort<WaiverPair, WaiverCacheKey, WaiverVerdict, Sem
 struct CapFulfillmentCache {
     loaded: Mutex<Option<ObligationFulfillmentCacheDocument>>,
     saved: Mutex<Option<ObligationFulfillmentCacheDocument>>,
+    save_error: Mutex<Option<DiagnosticMessage>>,
 }
+
+fn cache_entry(
+    edge_id: TestObligationEdgeId,
+    obligation_id: TestObligationId,
+    key: ObligationFulfillmentCacheKey,
+    verdict: ObligationFulfillmentVerdict,
+    verifier_fingerprint: Option<VerifierPromptFingerprint>,
+) -> ObligationFulfillmentCacheEntry {
+    let location = TestLocation::new(
+        LayerId::try_new("usecase".to_owned()).unwrap(),
+        TestModulePath::try_new("fixture".to_owned()).unwrap(),
+        TestFunctionName::try_new("entry".to_owned()).unwrap(),
+    );
+    let state = match verifier_fingerprint {
+        Some(verifier_fingerprint) => ObligationFulfillmentCacheEntryState::Identified {
+            verifier_fingerprint,
+            bound_tests: Some(NonEmptyTestLocations::new(location, Vec::new())),
+        },
+        None => ObligationFulfillmentCacheEntryState::Legacy,
+    };
+    ObligationFulfillmentCacheEntry::new(edge_id, obligation_id, key, verdict, state)
+}
+
 impl ObligationFulfillmentCachePort for CapFulfillmentCache {
     fn load(
         &self,
@@ -378,6 +405,9 @@ impl ObligationFulfillmentCachePort for CapFulfillmentCache {
         Ok(self.loaded.lock().unwrap().clone())
     }
     fn save(&self, d: &ObligationFulfillmentCacheDocument) -> Result<(), DiagnosticMessage> {
+        if let Some(error) = self.save_error.lock().unwrap().clone() {
+            return Err(error);
+        }
         *self.saved.lock().unwrap() = Some(d.clone());
         Ok(())
     }
@@ -689,6 +719,40 @@ fn money_catalogue() -> CatalogueDocument {
             vec![],
         ),
     );
+    doc.insert_trait(
+        TraitName::new("MyPort").unwrap(),
+        TraitEntry::new(
+            ItemAction::Add,
+            ContractRole::SecondaryPort,
+            vec![
+                MethodDeclaration::new(
+                    MethodName::new("load").unwrap(),
+                    Some(SelfReceiver::SharedRef),
+                    vec![],
+                    TypeRef::new("Result<CacheDocument, VerifyCacheError>").unwrap(),
+                    false,
+                    None,
+                ),
+                MethodDeclaration::new(
+                    MethodName::new("save").unwrap(),
+                    Some(SelfReceiver::SharedRef),
+                    vec![],
+                    TypeRef::new("Result<(), DiagnosticMessage>").unwrap(),
+                    false,
+                    None,
+                ),
+            ],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            vec![],
+            ModulePath::root(),
+            None,
+            vec![],
+            vec![],
+        ),
+    );
     doc.push_trait_impl(TraitImplDeclV2::new(
         TypeRef::new("MyPort").unwrap(),
         TypeRef::new("Money").unwrap(),
@@ -813,7 +877,7 @@ fn harness_with_scanner_and_caches(
         fast,
         last,
         waiver,
-        scanner,
+        Arc::clone(&scanner),
         existing_fulfillment,
         existing_waiver,
         spec_doc(),
@@ -840,7 +904,7 @@ fn harness_with_read_models(
         fast,
         last,
         waiver,
-        scanner,
+        Arc::clone(&scanner),
         existing_fulfillment,
         existing_waiver,
         spec,
@@ -851,6 +915,35 @@ fn harness_with_read_models(
 
 #[allow(clippy::too_many_arguments)]
 fn harness_with_read_models_and_config(
+    obligations: Option<ObligationsDocument>,
+    bindings: Option<TestBindingsDocument>,
+    fast: ObligationFulfillmentVerdict,
+    last: ObligationFulfillmentVerdict,
+    waiver: WaiverVerdict,
+    scanner: Arc<dyn TestSourceScannerPort + Send + Sync>,
+    existing_fulfillment: Option<ObligationFulfillmentCacheDocument>,
+    existing_waiver: Option<WaiverCacheDocument>,
+    spec: SpecDocument,
+    catalogue: CatalogueDocument,
+    cfg: TestObligationEvaluateConfig,
+) -> Harness {
+    harness_with_read_models_and_config_impl(
+        obligations,
+        bindings,
+        fast,
+        last,
+        waiver,
+        scanner,
+        existing_fulfillment,
+        existing_waiver,
+        spec,
+        catalogue,
+        cfg,
+    )
+}
+
+#[allow(clippy::too_many_arguments)]
+fn harness_with_read_models_and_config_impl(
     obligations: Option<ObligationsDocument>,
     bindings: Option<TestBindingsDocument>,
     fast: ObligationFulfillmentVerdict,
@@ -885,6 +978,7 @@ fn harness_with_read_models_and_config(
     let fulfillment_cache = Arc::new(CapFulfillmentCache {
         loaded: Mutex::new(existing_fulfillment),
         saved: Mutex::new(None),
+        save_error: Mutex::new(None),
     });
     let waiver_cache = Arc::new(CapWaiverCache {
         loaded: Mutex::new(existing_waiver),
@@ -894,7 +988,7 @@ fn harness_with_read_models_and_config(
     let interactor = EvaluateTestObligationsInteractor::new(
         Arc::new(StubObligations(obligations)),
         Arc::new(StubBindings(bindings)),
-        scanner,
+        Arc::clone(&scanner),
         Arc::clone(&fulfillment_driver)
             as Arc<
                 dyn SemanticEscalationDriverPort<
@@ -1020,13 +1114,7 @@ fn cached_fulfillment_doc_with_fingerprint(
     );
     ObligationFulfillmentCacheDocument::new(
         track(),
-        vec![ObligationFulfillmentCacheEntry::new(
-            edge(),
-            obligation.id().clone(),
-            key,
-            verdict,
-            verifier_fingerprint,
-        )],
+        vec![cache_entry(edge(), obligation.id().clone(), key, verdict, verifier_fingerprint)],
     )
 }
 
@@ -1216,12 +1304,9 @@ fn test_new_accepts_and_wires_declared_dependencies() {
     assert_eq!(fulfillment_cache.saved.lock().unwrap().as_ref().unwrap().entries().len(), 1);
 }
 
-/// A voluntary binding on an edge owned by SEVERAL obligations must be
-/// adjudicated once per owner: the check gate resolves each
-/// (edge × obligation) pair independently, so a single-owner adjudication
-/// leaves the other owners' verdicts absent.
+/// A voluntary binding may not target an edge already owned by derived obligations.
 #[test]
-fn test_voluntary_binding_adjudicates_every_obligation_owning_the_edge() {
+fn test_voluntary_binding_with_derived_owners_returns_consistency_error() {
     let fulfillment_driver = Arc::new(ScriptedFulfillment {
         fast: fulfilled(),
         last: fulfillment_fail(),
@@ -1285,14 +1370,15 @@ fn test_voluntary_binding_adjudicates_every_obligation_owning_the_edge() {
         Arc::new(SumHasher),
     );
 
-    let outcome = run(interactor.execute(&command())).unwrap();
+    let result = run(interactor.execute(&command()));
 
-    assert_eq!(outcome.pass_count(), 2, "each owning obligation must be adjudicated");
-    assert_eq!(
-        fulfillment_cache.saved.lock().unwrap().as_ref().unwrap().entries().len(),
-        2,
-        "one frozen verdict per (edge × obligation) pair"
-    );
+    assert!(matches!(
+        result,
+        Err(ObligationEvaluateError::BindingConsistency(
+            domain::tddd::test_obligation::errors::TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id }
+        )) if edge_id == edge()
+    ));
+    assert!(fulfillment_cache.saved.lock().unwrap().is_none());
 }
 
 /// A waiver on an edge owned by SEVERAL obligations must be adjudicated once
@@ -1326,11 +1412,10 @@ fn test_waiver_adjudicates_every_obligation_owning_the_edge() {
     assert!(declarations.iter().any(|declaration| declaration.contains("trait_ref")));
 }
 
-/// A voluntary binding on an edge that also carries a waiver record must not
-/// plan any fulfillment adjudication: the waiver owns the edge at the check
-/// gate, mirroring the fulfillment-record precedence.
+/// Ownership validation runs before waiver precedence, so an invalid voluntary
+/// binding cannot be hidden by a waiver for the same derived edge.
 #[test]
-fn test_waiver_edge_suppresses_voluntary_binding_adjudication() {
+fn test_waiver_does_not_hide_invalid_voluntary_binding() {
     let probe_tracker = DispatchTracker::new();
     let real_fulfillment_tracker = DispatchTracker::new();
     let waiver_tracker = DispatchTracker::new();
@@ -1354,20 +1439,25 @@ fn test_waiver_edge_suppresses_voluntary_binding_adjudication() {
         Arc::new(BoundedWaiverDriver { tracker: waiver_tracker.clone() }),
     );
 
-    let outcome = run(interactor.execute(&command())).unwrap();
+    let result = run(interactor.execute(&command()));
 
-    assert_eq!(outcome.pass_count(), 1, "only the waiver lane adjudicates the edge");
+    assert!(matches!(
+        result,
+        Err(ObligationEvaluateError::BindingConsistency(
+            domain::tddd::test_obligation::errors::TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id }
+        )) if edge_id == edge()
+    ));
     assert_eq!(
         real_fulfillment_tracker.peak(),
         0,
-        "a waived edge's voluntary binding must not be adjudicated"
+        "ownership validation must run before fulfillment dispatch"
     );
 }
 
-/// The calibration budget counts a voluntary binding once per owning
-/// obligation, matching the per-owner adjudication fan-out.
+/// Valid voluntary bindings always target catalogue-only edges and consume one
+/// calibration pair; waivers continue to scale with derived ownership.
 #[test]
-fn test_production_pair_count_scales_voluntary_bindings_by_owner_count() {
+fn test_production_pair_count_counts_valid_voluntary_binding_once() {
     let obligations =
         ObligationsDocument::new(track(), vec![obligation(), trait_impl_obligation()]);
     let bindings = TestBindingsDocument::new(
@@ -1377,7 +1467,7 @@ fn test_production_pair_count_scales_voluntary_bindings_by_owner_count() {
             tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
         }],
     );
-    assert_eq!(super::production_pair_count(&obligations, &bindings), 2);
+    assert_eq!(super::production_pair_count(&obligations, &bindings), 1);
 
     let waiver = TestBindingsDocument::new(
         track(),
@@ -1453,6 +1543,47 @@ fn test_stand_in_verifier_port_error_fails_closed_without_pass_verdict() {
             if message.as_str() == "provider unavailable"
     ));
     assert!(h.fulfillment_cache.saved.lock().unwrap().is_none());
+}
+
+#[test]
+fn test_absent_fulfillment_cache_is_rebuilt_with_resolved_bound_tests() {
+    let h = harness(
+        Some(obligations_doc()),
+        Some(fulfillment_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Pending,
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1);
+    assert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);
+    let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();
+    assert_eq!(saved.entries().len(), 1);
+    assert!(saved.entries()[0].bound_tests().is_some_and(|tests| !tests.as_slice().is_empty()));
+    assert_eq!(
+        saved.entries()[0].key().bound_tests_set_hash(),
+        &BoundTestsSetHash::new(sum_hash("assert!(money.is_positive());\n".as_bytes()))
+    );
+}
+
+#[test]
+fn test_evaluation_persists_the_exact_resolved_bound_test_locations() {
+    let h = harness(
+        Some(obligations_doc()),
+        Some(fulfillment_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Pending,
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1);
+    let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();
+    assert_eq!(saved.entries().len(), 1);
+    assert_eq!(saved.entries()[0].bound_tests().unwrap().as_slice(), &[location()]);
 }
 
 #[test]
@@ -1627,6 +1758,155 @@ fn test_matching_fulfillment_cache_reuses_frozen_verdict() {
 }
 
 #[test]
+fn test_evaluation_reuses_cache_when_bound_test_diagnostics_differ() {
+    let current = cached_fulfillment_doc(fulfilled()).entries()[0].clone();
+    let diagnostic_only_location = TestLocation::new(
+        LayerId::try_new("usecase".to_owned()).unwrap(),
+        TestModulePath::try_new("fixture".to_owned()).unwrap(),
+        TestFunctionName::try_new("diagnostic_only_location".to_owned()).unwrap(),
+    );
+    let cached_with_different_diagnostics = ObligationFulfillmentCacheEntry::new(
+        edge(),
+        obligation().id().clone(),
+        current.key().clone(),
+        current.verdict().clone(),
+        ObligationFulfillmentCacheEntryState::Identified {
+            verifier_fingerprint: current.verifier_fingerprint().cloned().unwrap(),
+            bound_tests: Some(NonEmptyTestLocations::new(
+                diagnostic_only_location.clone(),
+                Vec::new(),
+            )),
+        },
+    );
+    let h = harness_with_existing_caches(
+        Some(obligations_doc()),
+        Some(fulfillment_bindings()),
+        fulfillment_fail(),
+        fulfillment_fail(),
+        WaiverVerdict::Pending,
+        Some(ObligationFulfillmentCacheDocument::new(
+            track(),
+            vec![cached_with_different_diagnostics],
+        )),
+        None,
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1);
+    assert!(h.fulfillment_driver.tiers.lock().unwrap().is_empty());
+}
+
+#[test]
+fn test_duplicate_current_fulfillment_entries_reverify_and_replace_cache() {
+    let current = cached_fulfillment_doc(fulfilled()).entries()[0].clone();
+    let duplicate = cache_entry(
+        edge(),
+        obligation().id().clone(),
+        current.key().clone(),
+        ObligationFulfillmentVerdict::Pending,
+        Some(fulfillment_verifier_fingerprint()),
+    );
+    let h = harness_with_existing_caches(
+        Some(obligations_doc()),
+        Some(fulfillment_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Pending,
+        Some(ObligationFulfillmentCacheDocument::new(track(), vec![current, duplicate])),
+        None,
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1);
+    assert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);
+    let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();
+    assert_eq!(saved.entries().len(), 1);
+    assert!(matches!(saved.entries()[0].verdict(), ObligationFulfillmentVerdict::Fulfilled { .. }));
+}
+
+#[test]
+fn test_evaluate_reuses_current_entry_after_all_cache_identity_mismatches() {
+    let current = cached_fulfillment_doc(fulfilled()).entries()[0].clone();
+    let historical_entries = vec![
+        cache_entry(
+            edge(),
+            obligation().id().clone(),
+            ObligationFulfillmentCacheKey::new(
+                BoundTestsSetHash::new(sum_hash(b"historical bound-test source")),
+                current.key().declaration_hash().clone(),
+                current.key().anchor_text_hash().clone(),
+            ),
+            fulfillment_fail(),
+            Some(fulfillment_verifier_fingerprint()),
+        ),
+        cache_entry(
+            edge(),
+            obligation().id().clone(),
+            ObligationFulfillmentCacheKey::new(
+                current.key().bound_tests_set_hash().clone(),
+                DeclarationHash::new(sum_hash(b"historical entry declaration")),
+                current.key().anchor_text_hash().clone(),
+            ),
+            fulfillment_fail(),
+            Some(fulfillment_verifier_fingerprint()),
+        ),
+        cache_entry(
+            edge(),
+            obligation().id().clone(),
+            ObligationFulfillmentCacheKey::new(
+                current.key().bound_tests_set_hash().clone(),
+                current.key().declaration_hash().clone(),
+                AnchorTextHash::new(sum_hash(b"historical anchor text")),
+            ),
+            fulfillment_fail(),
+            Some(fulfillment_verifier_fingerprint()),
+        ),
+        cache_entry(
+            edge(),
+            obligation().id().clone(),
+            current.key().clone(),
+            fulfillment_fail(),
+            Some(VerifierPromptFingerprint::new(sum_hash(b"historical verifier prompt"))),
+        ),
+    ];
+    let [bound_tests_mismatch, declaration_mismatch, anchor_mismatch, fingerprint_mismatch] =
+        historical_entries.as_slice()
+    else {
+        panic!("fixture must include one row for every cache identity mismatch");
+    };
+    assert_ne!(
+        bound_tests_mismatch.key().bound_tests_set_hash(),
+        current.key().bound_tests_set_hash()
+    );
+    assert_ne!(declaration_mismatch.key().declaration_hash(), current.key().declaration_hash());
+    assert_ne!(anchor_mismatch.key().anchor_text_hash(), current.key().anchor_text_hash());
+    assert_ne!(fingerprint_mismatch.verifier_fingerprint(), current.verifier_fingerprint());
+    let mut entries = historical_entries;
+    entries.push(current.clone());
+    let h = harness_with_existing_caches(
+        Some(obligations_doc()),
+        Some(fulfillment_bindings()),
+        fulfillment_fail(),
+        fulfillment_fail(),
+        WaiverVerdict::Pending,
+        Some(ObligationFulfillmentCacheDocument::new(track(), entries)),
+        None,
+    );
+
+    let outcome = run(h.interactor.execute(&command())).unwrap();
+
+    assert_eq!(outcome.pass_count(), 1);
+    assert!(h.fulfillment_driver.tiers.lock().unwrap().is_empty());
+    let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();
+    assert_eq!(saved.entries().len(), 1);
+    assert_eq!(saved.entries()[0].key(), current.key());
+    assert_eq!(saved.entries()[0].verifier_fingerprint(), current.verifier_fingerprint());
+    assert!(saved.entries()[0].bound_tests().is_some_and(|tests| tests.is_non_empty()));
+}
+
+#[test]
 fn test_mismatched_fulfillment_fingerprint_reverifies_and_overwrites_entry() {
     let h = harness_with_existing_caches(
         Some(obligations_doc()),
@@ -1677,7 +1957,7 @@ fn test_absent_fulfillment_fingerprint_reverifies_and_overwrites_entry() {
 }
 
 #[test]
-fn test_voluntary_binding_for_derived_edge_uses_real_obligation_id() {
+fn test_voluntary_binding_for_derived_edge_returns_consistency_error() {
     let h = harness(
         Some(obligations_doc()),
         Some(voluntary_bindings()),
@@ -1686,13 +1966,39 @@ fn test_voluntary_binding_for_derived_edge_uses_real_obligation_id() {
         WaiverVerdict::Pending,
     );
 
+    let result = run(h.interactor.execute(&command()));
+
+    assert!(matches!(
+        result,
+        Err(ObligationEvaluateError::BindingConsistency(
+            domain::tddd::test_obligation::errors::TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id }
+        )) if edge_id == edge()
+    ));
+    assert!(h.fulfillment_cache.saved.lock().unwrap().is_none());
+}
+
+#[test]
+fn test_ownerless_voluntary_binding_is_evaluated() {
+    let bindings = TestBindingsDocument::new(
+        track(),
+        vec![TestBindingRecord::VoluntaryBinding {
+            edge_id: edge(),
+            tests: NonEmptyTestLocations::try_new(vec![location()]).unwrap(),
+        }],
+    );
+    let h = harness(
+        Some(ObligationsDocument::new(track(), vec![])),
+        Some(bindings),
+        fulfilled(),
+        fulfillment_fail(),
+        WaiverVerdict::Pending,
+    );
+
     let outcome = run(h.interactor.execute(&command())).unwrap();
 
     assert_eq!(outcome.pass_count(), 1);
-    let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();
-    let expected_obligation_id = obligation().id().clone();
-    assert_eq!(saved.entries()[0].edge_id(), &edge());
-    assert_eq!(saved.entries()[0].obligation_id(), &expected_obligation_id);
+    assert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);
+    assert_eq!(h.fulfillment_cache.saved.lock().unwrap().as_ref().unwrap().entries().len(), 1);
 }
 
 #[test]
@@ -1802,6 +2108,9 @@ fn test_trait_impl_obligation_verifies_against_impl_declaration() {
     assert!(declarations[0].contains("MyPort"));
     assert!(declarations[0].contains("for_type"));
     assert!(declarations[0].contains("Money"));
+    assert!(declarations[0].contains("trait_declaration"));
+    assert!(declarations[0].contains("load"));
+    assert!(declarations[0].contains("save"));
 }
 
 #[test]
@@ -1832,10 +2141,18 @@ fn test_final_fail_returns_semantic_failures_after_cache_save() {
         WaiverVerdict::Pending,
     );
     let result = run(h.interactor.execute(&command()));
+    let expected_record = EdgeVerdictRecord::new(
+        None,
+        edge(),
+        None,
+        None,
+        EdgeResolutionOutcome::Fulfillment(fulfillment_fail()),
+        None,
+    );
     assert!(matches!(
         result,
         Err(ObligationEvaluateError::SemanticFailuresConfirmed { records })
-            if records.as_slice().len() == 1
+            if records.as_slice() == [expected_record]
     ));
     let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();
     assert!(matches!(saved.entries()[0].verdict(), ObligationFulfillmentVerdict::Fail { .. }));
@@ -1856,7 +2173,15 @@ fn test_pending_verdict_requires_human_escalation_after_cache_save() {
     assert!(matches!(
         result,
         Err(ObligationEvaluateError::HumanEscalationRequired { records })
-            if records.as_slice().len() == 1
+            if records.as_slice()
+                == [EdgeVerdictRecord::new(
+                    None,
+                    edge(),
+                    None,
+                    None,
+                    EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Pending),
+                    None,
+                )]
     ));
     assert_eq!(
         h.fulfillment_driver.tiers.lock().unwrap().as_slice(),
@@ -1907,7 +2232,15 @@ fn test_missing_declaration_requires_human_escalation_after_cache_save() {
     assert!(matches!(
         result,
         Err(ObligationEvaluateError::HumanEscalationRequired { records })
-            if records.as_slice().len() == 1
+            if records.as_slice()
+                == [EdgeVerdictRecord::new(
+                    None,
+                    edge(),
+                    None,
+                    None,
+                    EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Pending),
+                    None,
+                )]
     ));
     assert!(h.fulfillment_driver.tiers.lock().unwrap().is_empty());
     assert!(h.fulfillment_cache.saved.lock().unwrap().clone().unwrap().entries().is_empty());
@@ -1978,6 +2311,9 @@ fn test_trait_impl_waiver_verifies_against_impl_declaration() {
     assert!(declarations[0].contains("MyPort"));
     assert!(declarations[0].contains("for_type"));
     assert!(declarations[0].contains("Money"));
+    assert!(declarations[0].contains("trait_declaration"));
+    assert!(declarations[0].contains("load"));
+    assert!(declarations[0].contains("save"));
 }
 
 #[test]
@@ -2052,16 +2388,13 @@ fn test_absent_waiver_fingerprint_reverifies_and_overwrites_entry() {
 }
 
 #[test]
-fn test_waiver_cache_save_failure_rolls_back_fulfillment_cache() {
-    let previous = cached_fulfillment_doc(ObligationFulfillmentVerdict::Pending);
-    let h = harness_with_existing_caches(
+fn test_waiver_cache_save_failure_preserves_fulfillment_reevaluation_state() {
+    let h = harness(
         Some(obligations_doc()),
         Some(fulfillment_bindings()),
         fulfilled(),
         fulfilled(),
         WaiverVerdict::Pending,
-        Some(previous.clone()),
-        None,
     );
     *h.waiver_cache.save_error.lock().unwrap() =
         Some(DiagnosticMessage::try_new("waiver write failed".to_owned()).unwrap());
@@ -2072,8 +2405,39 @@ fn test_waiver_cache_save_failure_rolls_back_fulfillment_cache() {
         result,
         Err(ObligationEvaluateError::CachePersistence(VerifyCacheError::Io(_)))
     ));
-    assert_eq!(*h.fulfillment_cache.saved.lock().unwrap(), Some(previous));
+    assert!(h.fulfillment_cache.saved.lock().unwrap().is_none());
     assert!(h.waiver_cache.saved.lock().unwrap().is_none());
+}
+
+#[test]
+fn test_fulfillment_cache_save_failure_restores_prior_waiver_document() {
+    let previous_waiver = cached_waiver_doc(WaiverVerdict::Waived {
+        citation: EvidenceCitation::try_new("previous waiver citation".to_owned()).unwrap(),
+    });
+    let h = harness_with_existing_caches(
+        Some(obligations_doc()),
+        Some(fulfillment_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Pending,
+        None,
+        Some(previous_waiver.clone()),
+    );
+    *h.fulfillment_cache.save_error.lock().unwrap() =
+        Some(DiagnosticMessage::try_new("fulfillment write failed".to_owned()).unwrap());
+
+    let result = run(h.interactor.execute(&command()));
+
+    assert!(matches!(
+        result,
+        Err(ObligationEvaluateError::CachePersistence(VerifyCacheError::Io(_)))
+    ));
+    assert_eq!(
+        h.waiver_cache.saved.lock().unwrap().clone(),
+        Some(previous_waiver),
+        "a failed final fulfillment save must not leave a newer waiver document behind"
+    );
+    assert!(h.fulfillment_cache.saved.lock().unwrap().is_none());
 }
 
 #[test]
@@ -2162,6 +2526,42 @@ fn test_source_scan_error_is_propagated() {
     assert!(matches!(
         result,
         Err(ObligationEvaluateError::TestSourceScan(TestSourceScanError::Io(_)))
+    ));
+}
+
+#[test]
+fn test_interactor_uses_its_injected_scanner_for_resolved_bound_tests() {
+    struct FailingScanner;
+    impl TestSourceScannerPort for FailingScanner {
+        fn scan_test_body(&self, _l: &TestLocation) -> Result<Option<String>, TestSourceScanError> {
+            Err(TestSourceScanError::Io(
+                DiagnosticMessage::try_new("injected scanner failed".to_owned()).unwrap(),
+            ))
+        }
+
+        fn hash_test_body(&self, _s: &str) -> TestBodySpanHash {
+            TestBodySpanHash::new(ContentHash::from_bytes([0u8; 32]))
+        }
+    }
+
+    let h = harness_with_read_models_and_config(
+        Some(obligations_doc()),
+        Some(fulfillment_bindings()),
+        fulfilled(),
+        fulfilled(),
+        WaiverVerdict::Pending,
+        Arc::new(FailingScanner),
+        None,
+        None,
+        spec_doc(),
+        money_catalogue(),
+        config(),
+    );
+
+    assert!(matches!(
+        run(h.interactor.execute(&command())),
+        Err(ObligationEvaluateError::TestSourceScan(TestSourceScanError::Io(message)))
+            if message.as_str() == "injected scanner failed"
     ));
 }
 

@@ -257,6 +257,7 @@ fn build_rustdoc_args(
 ) -> Vec<String> {
     let mut args = vec!["+nightly".into(), "rustdoc".into(), "-p".into(), crate_name.into()];
     args.extend(target.iter().map(|argument| (*argument).into()));
+    args.push("--no-default-features".into());
     if !features.is_empty() {
         args.push("--features".into());
         args.push(features.iter().map(CargoFeatureName::as_str).collect::<Vec<_>>().join(" "));
@@ -414,20 +415,8 @@ mod tests {
     }
 
     #[test]
-    fn test_build_rustdoc_args_includes_document_hidden_items_flag() {
+    fn test_build_rustdoc_args_without_features_disables_default_features() {
         let args = build_rustdoc_args("catalogue_package", &["--lib"], &[]);
-
-        assert!(args.iter().any(|argument| argument == "--document-hidden-items"));
-    }
-
-    #[test]
-    fn test_build_rustdoc_args_with_features_passes_space_separated_feature_list() {
-        let features = [
-            CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap(),
-            CargoFeatureName::try_new("experimental".to_owned()).unwrap(),
-        ];
-
-        let args = build_rustdoc_args("catalogue_package", &["--lib"], &features);
 
         assert_eq!(
             args,
@@ -437,6 +426,36 @@ mod tests {
                 "-p",
                 "catalogue_package",
                 "--lib",
+                "--no-default-features",
+                "--",
+                "-Z",
+                "unstable-options",
+                "--output-format",
+                "json",
+                "--document-hidden-items",
+            ]
+        );
+    }
+
+    #[test]
+    fn test_build_rustdoc_args_with_features_passes_space_separated_feature_list() {
+        let features = [
+            CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap(),
+            CargoFeatureName::try_new("experimental".to_owned()).unwrap(),
+        ];
+
+        let args = build_rustdoc_args("catalogue_package", &["--bin", "catalogue-bin"], &features);
+
+        assert_eq!(
+            args,
+            vec![
+                "+nightly",
+                "rustdoc",
+                "-p",
+                "catalogue_package",
+                "--bin",
+                "catalogue-bin",
+                "--no-default-features",
                 "--features",
                 "semantic-dup experimental",
                 "--",
