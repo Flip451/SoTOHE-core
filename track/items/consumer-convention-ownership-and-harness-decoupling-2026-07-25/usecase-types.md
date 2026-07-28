@@ -4,7 +4,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| ConventionShippingVerdict | enum | add | Conforming, UnsuppliedDocumentsShipped | 🟡 | 🔵 |
+| ConventionShippingVerdict | enum | add | Conforming, UnsuppliedDocumentsShipped | 🔵 | 🔵 |
 
 ## Value Objects
 
@@ -27,7 +27,7 @@
 | ConventionCapabilityIdError | error_type | add | Blank | 🔵 | 🔵 |
 | ConventionDocumentPathError | error_type | add | OutsideConventionRoot, NotRenderableAsRecord | 🔵 | 🔵 |
 | ConventionResolveError | error_type | add | FrontMatterUnparseable, RequiredForNotStringArray, EmptyCapabilityId, DocumentPathRejected, DocumentUnreadable, ConventionRootUnlistable | 🔵 | 🔵 |
-| ConventionShippingCheckError | error_type | add | ConventionRootMissing, TreeUnreadable, DocumentPathRejected | 🟡 | 🔵 |
+| ConventionShippingCheckError | error_type | add | ConventionRootMissing, TreeUnreadable, DocumentPathRejected | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -55,7 +55,7 @@
 
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
-| CheckConventionShippingQuery | query | add | — | 🟡 | 🔵 |
+| CheckConventionShippingQuery | query | add | — | 🔵 | 🔵 |
 | ResolveConventionsQuery | query | add | — | 🔵 | 🔵 |
 
 ## Free Functions

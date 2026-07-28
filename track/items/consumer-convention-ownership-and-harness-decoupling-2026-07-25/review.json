@@ -1,21 +1,36 @@
 {
   "schema_version": 2,
   "scopes": {
-    "domain": {
+    "spec": {
       "rounds": [
         {
-          "type": "fast",
+          "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:680373f24a76df5eda2a46afdd890ff3c768d0544915f6353f1d877d9ec9b9e2",
-          "at": "2026-07-28T09:32:18Z"
+          "hash": "rvw1:sha256:66c1bb19af42ec729b5ad27871aeb1ed88e7cda4c298be7b1ddaa6ad4a33b2e8",
+          "at": "2026-07-26T07:22:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "AC-17 requires old-path references in every existing ADR/research note to remain unchanged, but D10 and OUT-05 exempt only historical notes that are not referenced as current procedure. As written, a live ADR/research note cannot satisfy both IN-10/AC-16's live-reference cleanup and AC-17's blanket no-change requirement. Restore the missing 「現行手順として参照されていない」 qualifier.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+              "line": 496,
+              "category": "scope / acceptance_criteria contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:bf8fbae415eb769cdd14232b51233fd2cc8e98e6227480bd3a10e14cf9e4c3ee",
+          "at": "2026-07-26T16:44:06Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:680373f24a76df5eda2a46afdd890ff3c768d0544915f6353f1d877d9ec9b9e2",
-          "at": "2026-07-28T09:33:55Z"
+          "hash": "rvw1:sha256:71b827d604181d81b802fdeadb7dd19b2a2b56e5b384e474afa7bfdc62b4d516",
+          "at": "2026-07-26T16:56:56Z"
         }
       ]
     },
@@ -130,39 +145,6 @@
         }
       ]
     },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8ede22607d940e1a2f66c248a24a56540d651827bb41ea8bb841b3d04ecb3afa",
-          "at": "2026-07-26T14:50:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ConventionDocumentPath` accepts arbitrary paths beneath the convention root, including filenames containing newlines and, on Unix, non-UTF-8 bytes. Converting each path with `Display` and joining on `\\n` is therefore not a lossless one-record-per-line encoding: one matched file can produce multiple apparent records, while distinct non-UTF-8 paths can collapse to the same replacement-character text. This breaks the canonical machine-readable result promised by IN-05/AC-06. Enforce a render-safe path invariant or use an unambiguous encoding, with boundary-value coverage.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/conventions_resolve/mod.rs",
-              "line": 143,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b534b63f570047017f66cd20dd7f7616732afe5d0a6aabeca2824fa8c8b6f330",
-          "at": "2026-07-26T15:41:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:871e08e8b18707636fb57ed4b73704b74196b7622153e6eeb479dceae835e91e",
-          "at": "2026-07-26T16:06:47Z"
-        }
-      ]
-    },
     "cli": {
       "rounds": [
         {
@@ -221,82 +203,6 @@
           "findings": [],
           "hash": "rvw1:sha256:ef511a6e7b89f821c07686887c649ebb3447f7cb18e6a37e7aeb87b5fc52d88f",
           "at": "2026-07-28T06:11:36Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ebd270faf24694f2e4d43c74c69a52d65d64977f3b9544e05896fb6068d18cf",
-          "at": "2026-07-26T14:50:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The IN-05/AC-06 binding for this test attributes exact-match selection and stable ordering to `ConventionsCompositionRoot`: the fixture excludes the nonmatching document and the exact stdout assertion fixes the returned order. This root only establishes the adapter → interactor → driver graph; matching is established downstream and deduplication/order are inherited from `ConventionResolution`. Keep the composition binding limited to evidence of the selected object graph and bind those behavioral guarantees to their owning entries.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/conventions.rs",
-              "line": 128,
-              "category": "test_contract_attribution"
-            }
-          ],
-          "hash": "rvw1:sha256:5ebd270faf24694f2e4d43c74c69a52d65d64977f3b9544e05896fb6068d18cf",
-          "at": "2026-07-26T15:00:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7cad3c4376c80f4d6243885bef12aeca2948a6d41621557b2f3769e9204a469f",
-          "at": "2026-07-26T15:53:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CapabilityExecInteractor::new` still has a second construction site in the infrastructure test, but it supplies only three arguments and omits the newly required convention resolver and project root. This causes test compilation to fail and leaves construction outside the composition root inconsistent with the new wiring contract.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/capability_exec/agent_profiles.rs",
-              "line": 175,
-              "category": "wiring correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:03be39cb9b994e2e62248341aa4600ad5b4936fe904feac19bce6c1b4767d977",
-          "at": "2026-07-27T10:43:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:03be39cb9b994e2e62248341aa4600ad5b4936fe904feac19bce6c1b4767d977",
-          "at": "2026-07-27T10:47:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:03be39cb9b994e2e62248341aa4600ad5b4936fe904feac19bce6c1b4767d977",
-          "at": "2026-07-27T10:51:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e81de1d70deaab83dd066a681147249f32931a05a7670da457f6b490fb6a9c9",
-          "at": "2026-07-28T06:08:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e81de1d70deaab83dd066a681147249f32931a05a7670da457f6b490fb6a9c9",
-          "at": "2026-07-28T06:10:16Z"
         }
       ]
     },
@@ -1341,1124 +1247,13 @@
           "findings": [],
           "hash": "rvw1:sha256:c7b9c2484a37c32910d5530535ab2c35228f042032c94baad56c7100254b76f3",
           "at": "2026-07-28T11:55:07Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eb7bf0dc230b9dc29f7b7693e381b5b94e69030e49697713b72a3bd98ecbdf74",
-          "at": "2026-07-26T03:17:52Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:eb7bf0dc230b9dc29f7b7693e381b5b94e69030e49697713b72a3bd98ecbdf74",
-          "at": "2026-07-26T03:28:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:07eeb94d7cee9fda1026616a3b6b64b15713a9a08eddbec49acaf18c24be30ce",
-          "at": "2026-07-26T08:41:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ef43c487a62b52b64b5cf0e0e0da08137a9aae00a3e0aba4e036bbb7a50e9927",
-          "at": "2026-07-26T08:56:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`requires()` compares `CapabilityName` values, but `CapabilityName::try_new` stores a trimmed `NonEmptyString`. Consequently, `required_for: [\" reviewer \"]` matches a query for `reviewer`, violating IN-06/AC-06’s non-empty, exact-string matching contract. Preserve non-blank identifiers without normalization (and cover whitespace near-misses).",
-              "severity": "P0",
-              "file": "libs/usecase/src/conventions_resolve/mod.rs",
-              "line": 187,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:cd626c6438308172164c24c9581e1875a15348dd90fbe01e2f353b18790c47dd",
-          "at": "2026-07-26T09:23:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce6b0aa92f9f525dda1e08236d756f573ebfdb557b6c3fee410e4b838087a67c",
-          "at": "2026-07-26T10:12:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ae1c4e91f8c841867350940cf111eb84d0c589929ac2cc92fca2dfa87aede890",
-          "at": "2026-07-26T11:06:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dbd7cf8e063c764244ef7fec15d993d3a794dce630e874865599bc27af35e48d",
-          "at": "2026-07-26T11:37:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b71a03321dcd7672332d38be7c38cf5a38b4bbc6c178cc762c3a47487599083a",
-          "at": "2026-07-26T12:14:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`with_conventions` unconditionally adds the `## Project conventions` section heading, contrary to CN-06's requirement that rendered convention obligations contain no section heading. This makes both dispatch routes carry non-conforming discipline text.",
-              "severity": "P1",
-              "file": "libs/usecase/src/capability_exec/values.rs",
-              "line": 305,
-              "category": "contract violation"
-            }
-          ],
-          "hash": "rvw1:sha256:56b4d9b0fd41f5c31b9c8912f92d8404d7d2b08b2cd3b0aed112ef4d45011c23",
-          "at": "2026-07-26T14:49:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4bc29a94b9c32e380854c0dee261ea391deca5279be816b5321a7aca0425e245",
-          "at": "2026-07-26T14:56:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4bc29a94b9c32e380854c0dee261ea391deca5279be816b5321a7aca0425e245",
-          "at": "2026-07-26T15:02:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`try_new` now rejects paths that remain inside `knowledge/conventions/` when they contain CR/LF or non-UTF-8 bytes. This adds a fail-closed case beyond AC-07/D4, which explicitly limits resolver failure to five conditions and only rejects a path for escaping the convention root. Either preserve such paths losslessly in output or obtain an upstream contract change before rejecting them.",
-              "severity": "P1",
-              "file": "libs/usecase/src/conventions_resolve/mod.rs",
-              "line": 65,
-              "category": "contract_conformance"
-            }
-          ],
-          "hash": "rvw1:sha256:129cc0ec7a1e64f72b96b6fb5fbe9bdc772498b8aa7b1ac2a170ca2f601cb750",
-          "at": "2026-07-26T16:22:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:129cc0ec7a1e64f72b96b6fb5fbe9bdc772498b8aa7b1ac2a170ca2f601cb750",
-          "at": "2026-07-26T16:40:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:78cc06ac7ac9ff781e580891a4ae577fae6e64bbecadad4ac3365064f4c71787",
-          "at": "2026-07-27T01:42:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25bb5a922d0df1eb015f08c1a2d776f02d8b52996fa157668431784200264157",
-          "at": "2026-07-27T10:42:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25bb5a922d0df1eb015f08c1a2d776f02d8b52996fa157668431784200264157",
-          "at": "2026-07-27T10:47:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aaac2eaf124ee75243fccb48429e81b6a292787ef50543b69312f8862ab573ad",
-          "at": "2026-07-27T11:06:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aaac2eaf124ee75243fccb48429e81b6a292787ef50543b69312f8862ab573ad",
-          "at": "2026-07-27T11:08:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4c4e0e7eea050e2967ad44a246ed9dbf0864acb35ae47519570583cb9e15f3c5",
-          "at": "2026-07-27T13:39:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The cross-dispatch test does not fully pin the per-dispatch contract. It always returns the same document, never inspects `dispatches`, and changes capability on the second call. Thus a per-capability cache could skip resolution on a repeated same-capability dispatch, or the interactor could resolve the second capability but reuse the first composed discipline, while every assertion still passes. Add a same-capability repeat plus capability-specific resolver results, and assert the second dispatched discipline uses only its own resolution.",
-              "severity": "P1",
-              "file": "libs/usecase/src/capability_exec.rs",
-              "line": 1649,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:4c4e0e7eea050e2967ad44a246ed9dbf0864acb35ae47519570583cb9e15f3c5",
-          "at": "2026-07-27T13:45:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16e9db1e726c6323df9d61d9db67212251771ef39922f0c14aa41b254573df5a",
-          "at": "2026-07-27T13:56:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16e9db1e726c6323df9d61d9db67212251771ef39922f0c14aa41b254573df5a",
-          "at": "2026-07-27T14:05:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16e9db1e726c6323df9d61d9db67212251771ef39922f0c14aa41b254573df5a",
-          "at": "2026-07-27T14:07:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca77826ab0220f02171de0e979d3746191639dbbc3af21ce5b7279c95c4d81db",
-          "at": "2026-07-28T01:20:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca77826ab0220f02171de0e979d3746191639dbbc3af21ce5b7279c95c4d81db",
-          "at": "2026-07-28T01:23:59Z"
-        }
-      ]
-    },
-    "types": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`cli::ConventionsCommand.docs` repeats IN-06/AC-09’s whitespace rejection and no-registration behavior in prose. Per `no-upstream-restatement.md`, retain only the changed symbol/operation and rely on `spec_refs` for that contract.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli-types.json",
-              "line": 69,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`cli::ConventionsCommand::Resolve` orders its mirror fields as `capability, project_root`, while `cli_driver::ConventionResolveInput` and `usecase::ResolveConventionsQuery` use `project_root, capability`. No language-level constraint documents the divergence; align this command/input mirror chain.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli-types.json",
-              "line": 131,
-              "category": "mirror chain divergence"
-            },
-            {
-              "message": "The docs for `cli_driver::CapabilityNameArg`, `cli_driver::ConventionResolveDriver`, `cli_driver::ConventionResolveInput`, and `cli_driver::ConventionShippingCheckDriver` reproduce upstream validation, empty-result, fail-closed, rendering, and shipping-check behavior. Replace those paraphrases with concise symbol/operation descriptions plus the existing anchors, retaining only local adapter-design rationale.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli_driver-types.json",
-              "line": 106,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The docs for `infrastructure::conventions_resolve::parse_convention_front_matter`, `infrastructure::conventions_resolve::scan_convention_requirements`, `infrastructure::template_conventions::list_convention_documents`, `infrastructure::CapabilityIdField`, and `infrastructure::ConventionFrontMatterDto` restate AC-07/AC-08/AC-18 failure and empty-state contracts. Reference those anchors instead of duplicating their behavior in catalogue prose.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The docs for `usecase::conventions_resolve::select_required_conventions`, `usecase::template_conventions::select_unsupplied_conventions`, `usecase::ConventionInventoryPort`, `usecase::ConventionRequirementPort`, and `usecase::ConventionResolveService` reproduce exact-match, ordering, empty-result, one-way comparison, failure, and no-write behavior from the spec. Reduce them to downstream type/operation descriptions and anchor references.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 6,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`usecase::ConventionInventoryPort::list_conventions` and `usecase::ConventionRequirementPort::scan_requirements` are synchronous contracts for filesystem tree walking and file reads, but neither entry acknowledges why blocking I/O is intentional. Declare the appropriate async color or document the deliberate synchronous CLI boundary.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 468,
-              "category": "sync/async color mismatch"
-            },
-            {
-              "message": "The docs for `usecase::CapabilityExecError`, `usecase::CapabilityExecInteractor`, `usecase::CapabilityName`, and `usecase::DisciplineText` reproduce IN-06/IN-07, AC-09–AC-12, and CN-05 behavior such as execution ordering, both dispatch routes, and prohibition of re-resolution. Replace the duplicated contract with anchor citations while retaining type-local rationale.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 621,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "The docs for `usecase::ConventionRequirement`, `usecase::ConventionResolution`, `usecase::ConventionResolveError`, `usecase::ConventionResolveInteractor`, `usecase::ConventionShippingCheckError`, `usecase::ConventionShippingVerdict`, and `usecase::ResolveConventionsQuery` restate AC-06–AC-09/AC-18 behavior, including complete failure lists and normal-empty states. Keep the structural/type rationale, but refer to the existing anchors for behavioral details.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 1044,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "`usecase::ConventionShippingCheckError::DocumentPathRejected.source` accepts the entire `ConventionResolveError`, admitting impossible states such as `FrontMatterUnparseable` or `DocumentUnreadable` even though the shipping inventory reads no contents and can only fail path validation here. Use a path-specific error or payload so those states are unrepresentable.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 1275,
-              "category": "state-shape smell"
-            }
-          ],
-          "hash": "rvw1:sha256:989eba9bb04151e45ec82494b45bbb41b0d65dfeaae3c880114b811264696f5c",
-          "at": "2026-07-26T07:32:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8786fbceffe0cb5ca416c19092206868ae4deef11ba7fb121e73a0f4588a00e3",
-          "at": "2026-07-26T07:58:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::conventions_resolve::ConventionCapabilityId` と `ConventionCapabilityIdError` の docs は、D4／IN-06／AC-07 の許容・拒否契約（padded 値の許容、empty／whitespace-only だけの拒否、fail-closed リストが exhaustive であるため条件を追加できない理由）を散文で再記述しています。`no-upstream-restatement.md` に従い、newtype・bridge・配置・error shape のローカルな型設計根拠だけを残し、上流の挙動と理由は既存の anchor 参照に委ねてください。",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 1085,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:72e361584f80c8f824dcb48ec30a3c31067d4ba396933d75ec59aa864c081590",
-          "at": "2026-07-26T10:14:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::conventions_resolve::ConventionCapabilityId` declares its constructor the single enforcement owner for AC-07’s blank-identifier condition, while `infrastructure::conventions_resolve::ConventionFrontMatterDto` also calls `into_requirement` the single enforcing site. The DTO only invokes the constructor and maps `ConventionCapabilityIdError` to the document-aware resolver error; describe it as the single mapping/conversion site so validation has exactly one declared owner.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
-              "line": 234,
-              "category": "enforcement-owner contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:a38106d3b8495f3562658e7973a542dd5a7c89828cf5d0c51b321ea024f4f20c",
-          "at": "2026-07-26T10:31:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::conventions_resolve::ConventionCapabilityId` は `try_new` を AC-07 の blank-identifier 条件の「single enforcing site」としていますが、`infrastructure::conventions_resolve::ConventionFrontMatterDto` も `into_requirement` を同じ条件の「single enforcing site」としています。単一の fail-closed rule に二つの owner が宣言されています。`try_new` を検証 owner、`into_requirement` を `ConventionResolveError::EmptyCapabilityId` への mapping／文書情報付加 site とするなど、責務を一意にしてください。",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
-              "line": 234,
-              "category": "enforcement-owner contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:a38106d3b8495f3562658e7973a542dd5a7c89828cf5d0c51b321ea024f4f20c",
-          "at": "2026-07-26T10:31:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ba478df54f9527318e8e31482f5875bf6710d6e54ed157c01d28d6753920a7e8",
-          "at": "2026-07-26T10:44:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:58f0271df756d05a74febfb1892e2c4d3edad23910ded53943276dfb5104763e",
-          "at": "2026-07-26T13:12:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::ConventionDocumentPathError` restates the AC-06/AC-07 behavioral contract at length—canonical record shape, exact UTF-8/line-terminator rejection conditions, and their behavioral rationale—rather than referencing the upstream anchors. Keep the type-local variant, payload, ordering, and ownership rationale, but replace the upstream behavior explanation with anchor cites as required by `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 1180,
-              "category": "SoT integrity — upstream restatement"
-            },
-            {
-              "message": "`usecase::ConventionResolveError` restates AC-07's structural-anomaly category and its non-exhaustive semantics in the opening sentences. Because AC-07 owns that behavior contract, the catalogue should cite the anchor and retain only type-local information such as variant wiring and construction ownership.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 1289,
-              "category": "SoT integrity — upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:dc39951cc8e1cce429390c07141e1dda428920c9b5ca93ffa7e6ee4cb5ff4b97",
-          "at": "2026-07-26T16:49:48Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::ConventionResolveError` claims “one variant per condition,” but AC-07 defines a non-exhaustive anomaly category, and the two current path-rejection conditions are intentionally composed under the single `DocumentPathRejected` variant. This both closes the upstream category and misstates the enum’s present shape. Replace it with an AC-07 anchor reference and retain only the type-local composition/ownership details, per `knowledge/conventions/no-upstream-restatement.md`.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 1293,
-              "category": "SoT integrity — upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:59a813d8fa5252fbb1045d08d11bc1575ea27f1d29eb6638b6722ac0b2344933",
-          "at": "2026-07-26T17:12:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d2946ade596f643e4d462a900034447fb2a7d63bbd97e816118fe463a0ff4545",
-          "at": "2026-07-26T22:44:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::ConventionResolveError` now declares `ConventionRootUnlistable`, but its docs still classify only “the remaining three variants” and never name this variant's enforcement owner. The infrastructure directory scan both decides and constructs this failure; update the catalogue docs to record that single owner and remove the stale count.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 1293,
-              "category": "enforcement-owner contradiction"
-            },
-            {
-              "message": "`usecase::ConventionShippingCheckError` describes the structural fail-closed category as “one variant each” and later “all three variants,” turning the current enum membership into a closed behavioral enumeration. This is the downstream closed-set restatement prohibited by `knowledge/conventions/no-upstream-restatement.md`; retain category-level wording and anchor references without asserting an exhaustive count.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 1434,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:91c5b77bcec064682cab73feb0b686e097609fb84e807dae1b397affbca44490",
-          "at": "2026-07-27T01:42:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::ConventionShippingCheckError` still frames the structural fail-closed category as a closed one-to-one enumeration: “a variant apiece” is semantically identical to the previously rejected “one variant each.” This downstream completeness claim does not survive category growth and remains contrary to `knowledge/conventions/no-upstream-restatement.md`; use category-level wording and anchor references without asserting an exhaustive mapping.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 1434,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:45fbc72882d240e5eda16ee66ce60d7133f93863249e07a2c4b1b7c44a4de274",
-          "at": "2026-07-27T01:48:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2c7fe737485b161698d5749def157f01d0e728a2a52d12adcfc714eab6646a3b",
-          "at": "2026-07-27T02:01:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::CapabilityExecInteractor` `docs` substantially restates upstream rationale and behavior (subdirectory scanning, AC-08 empty results, `CapabilityExecRequest` placement, `PathBuf` versus newtype, and mirror-chain consequences) instead of referring to upstream anchors. Keep the catalogue documentation to type-level intent plus citations, per the no-upstream-restatement policy.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 856,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:0956996be249e5bc8c32038ea39936c8d6fee86f0f214093b91e118c25ea084b",
-          "at": "2026-07-27T10:43:01Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ed73edf0975098af4f870eac5997c097e849d38c6188a0936d4696aef40098e0",
-          "at": "2026-07-27T10:51:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`usecase::CapabilityExecInteractor` still restates the upstream dispatch contract in prose: the sentence beginning “Resolution sits at this seam…” re-explains D6/IN-07/AC-10/AC-11’s pre-branch resolution and shared two-outcome representation. This violates `no-upstream-restatement.md`; remove that sentence while retaining the separate R9 `PathBuf` justification and anchor citations.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
-              "line": 852,
-              "category": "SoT integrity: upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:792ded7123d8dd7c7b173aa19b54f4d95a097a88baeebc286a655d187c5ddd05",
-          "at": "2026-07-27T10:55:53Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b4ea18cb316ec10bfca34d523466b423f883741d6a92d37c2aff4f8c4579a930",
-          "at": "2026-07-27T11:12:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b4ea18cb316ec10bfca34d523466b423f883741d6a92d37c2aff4f8c4579a930",
-          "at": "2026-07-27T12:59:17Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dbe367c68bed86e7fea58223a20538f9eeb9771e93bb54ed6179796b9d9aa0e4",
-          "at": "2026-07-26T03:17:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dbe367c68bed86e7fea58223a20538f9eeb9771e93bb54ed6179796b9d9aa0e4",
-          "at": "2026-07-26T03:28:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9bebd6728c8c48f44bf2be0ee0b6047909aaf054834d8b751a500af6f8128853",
-          "at": "2026-07-26T03:36:04Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`serde_yaml::from_value` can fail before examining `required_for`. For example, valid YAML containing only `true: metadata` produces a boolean map key; deserializing that key as a struct field identifier fails, and this branch incorrectly reports `RequiredForNotStringArray`. This violates the promised unknown-key tolerance and AC-08’s requirement that an absent `required_for` succeed with the default value. Ensure unknown YAML keys are ignored regardless of their YAML scalar type, and reserve this error variant for failures in `required_for` itself.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 142,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:dd11ab90a8c0470c92069f6c9ccf21d62066cc097fb29235177672b36ce9c566",
-          "at": "2026-07-26T12:16:38Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`required_for` is deserialized directly into `Vec<CapabilityIdField>`, but `serde_yaml` coerces a YAML null/empty scalar to an empty sequence for `Vec`. Consequently, `required_for: null` or a bare `required_for:` succeeds as an empty declaration instead of returning `RequiredForNotStringArray`, violating AC-07’s fail-closed requirement for every non-string-array shape. Use a strict field deserializer that accepts only an actual YAML sequence and add null coverage.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 102,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e28fbdc82e14c7c2d3e96606a52d08811e5ca89890f27565958770ae648ccb81",
-          "at": "2026-07-26T12:30:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:55acdf6feb2b900331e2d8942b3de4ec7c689ce9683bed8b92b4313147495d52",
-          "at": "2026-07-26T13:05:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The scan follows `*.md` file symlinks via `std::fs::read_to_string(entry.path())`, allowing a convention document path inside `knowledge/conventions` to load bytes from outside the trusted project tree. Reject symlinks with `symlink_metadata` before reading (and add an escape test).",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 369,
-              "category": "symlink not rejected at boundary"
-            }
-          ],
-          "hash": "rvw1:sha256:14fd6a44ab6e8cb690a47344eef36e46629ac2e3ed7b27043cf3672e0f68e7aa",
-          "at": "2026-07-26T14:49:19Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d735c05805f98aa0cad8645859046d495262b0e84bbba8d3665a3795d1bbef59",
-          "at": "2026-07-26T14:56:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`read_dir` follows symlinks in the convention-root path before any `DirEntry::file_type` check runs. If `knowledge` or `knowledge/conventions` is a directory symlink, out-of-tree files are scanned and reported under validated in-tree paths. Guard every component below `project_root` with no-follow metadata checks before listing it, and test root/ancestor symlinks.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 340,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "After excluding directories and symlinks, every other `*.md` filesystem node is passed to `read_to_string`. A FIFO such as `blocked.md` can therefore block the resolver indefinitely. Require a regular file before reading, and fail closed or skip unsupported node types consistently.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 379,
-              "category": "unbounded I/O"
-            },
-            {
-              "message": "`read_to_string` buffers an externally controlled convention document without a size limit. A sufficiently large or sparse file can exhaust process memory instead of producing a typed adapter error. Read through an explicit byte bound and fail closed when it is exceeded.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 380,
-              "category": "unbounded I/O"
-            },
-            {
-              "message": "`sorted_entries` eagerly collects and sorts every directory entry. This both allocates without a bound—even for millions of non-Markdown entries—and establishes an observable infrastructure scan order that the briefing assigns to `ConventionResolution`; the order-sensitive scan tests entrench that ownership leak. Stream entries without imposing raw-result order, leaving canonical ordering to the usecase layer.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 389,
-              "category": "architecture violation"
-            }
-          ],
-          "hash": "rvw1:sha256:d735c05805f98aa0cad8645859046d495262b0e84bbba8d3665a3795d1bbef59",
-          "at": "2026-07-26T15:05:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The directory symlink checks are TOCTOU snapshots. After the root guard or `entry.file_type()` accepts a directory, `read_dir` reopens its path and follows any symlink substituted in between, allowing an out-of-tree directory to be scanned under in-tree document identities. Traverse through atomic no-follow directory handles (or an equivalent fail-closed mechanism) rather than reopening checked paths.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 424,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "The regular-file check is also separated from `File::open`. A concurrent replacement can turn the checked leaf into a symlink, FIFO, or device; `File::open` then follows it or blocks before the byte limit can help. Use an atomic no-follow/nonblocking open and validate the opened handle's file type, following the existing waiver-cache/output-collector pattern.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 477,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "The new limits are only per file and per directory. Recursive traversal still has no aggregate document, byte, entry, or depth budget, while `requirements` retains every decoded requirement. A tree with up to 10,000 children at each level can therefore drive unbounded I/O and memory growth without violating either local limit. Carry a total scan budget through recursion and fail closed when exhausted.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 410,
-              "category": "unbounded I/O"
-            },
-            {
-              "message": "`sorted_entries` still imposes an observable deterministic order on the raw adapter result, and the scan tests assert that order. This keeps ordering policy in infrastructure even though the briefing assigns ordering and deduplication exclusively to `ConventionResolution::from_matches`. Iterate without defining raw-result order and leave canonical ordering to the usecase-owned constructor.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 464,
-              "category": "architecture violation"
-            }
-          ],
-          "hash": "rvw1:sha256:58a1d0ffbfa8202a2cf0f1649c3be51699c9f63d8fb607bbec66edda6e65d738",
-          "at": "2026-07-26T15:41:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`sorted_entries` sorts every directory before scanning, so the infrastructure adapter establishes a deterministic traversal/output order. The briefing assigns ordering exclusively to `ConventionResolution::from_matches`, while the scan tests further expose this adapter order as contractual through exact vector assertions. Remove the adapter-side sort and make scan assertions order-independent so ordering remains owned by the use-case layer.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 486,
-              "category": "architecture violation"
-            }
-          ],
-          "hash": "rvw1:sha256:98f3c958045b8d1ba33537cfe8c0649af6d16abf10424479f9c07e3a1d4f320c",
-          "at": "2026-07-26T15:52:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`scan_entries` constructs a `ConventionDocumentPath` before checking an entry's type or `.md` extension. On Unix, an otherwise ignored neighbor such as `knowledge/conventions/notes\\n.txt` is a valid directory entry but is rejected as `NotRenderableAsRecord`, so it aborts the entire scan with `DocumentPathRejected` instead of being ignored. A similarly named `.md` file also disproves the comments and tests claiming no real tree can reach this lift, leaving that error path uncovered. Filter non-document entries before path validation and add real-tree coverage for both cases.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 434,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4868f49f29fee413678cda2c183ad0fce6e409f6011c79e66a281b88bcedbc48",
-          "at": "2026-07-26T16:27:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`front_matter.is_null()` treats explicit YAML null documents (`null`, `~`, or `Null`) the same as a genuinely empty front-matter block. Those values are non-mapping front matter, but the codec returns the default DTO instead of failing closed as `FrontMatterUnparseable`, silently treating malformed metadata as no declarations. Detect an actually empty block before parsing, reject explicit null values, and add coverage for the null spellings.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 241,
-              "category": "adapter correctness"
-            },
-            {
-              "message": "The prior path-validation fix remains incomplete for directories: `document_path(candidate)?` runs before determining whether a directory contains any Markdown documents. A tree containing only `knowledge/conventions/two\\nlines/README.txt` therefore fails with `DocumentPathRejected` even though the subtree has no `**/*.md` candidate and should be ignored. Carry the raw relative directory path during traversal and validate the complete path only when an actual Markdown document is found; an `.md` below such a directory will still fail closed correctly.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 475,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:3462e42b218a361764bffbf023caadbbdbdc9c96d4dc902865299f24e145a952",
-          "at": "2026-07-26T16:44:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`declares_nothing` applies Rust's Unicode `trim()` before deciding whether a line is a YAML comment. For example, a front-matter line beginning with U+00A0 followed by `#not-a-comment` is a non-mapping YAML scalar because NBSP is not YAML separation whitespace, but `trim()` removes it and this helper treats the line as comment-only, returning an empty DTO without parsing. This leaves a fail-open path for invalid/non-mapping front matter. Use YAML's lexical rules (or parser tokens) for the empty/comment-only distinction and add coverage for non-YAML Unicode whitespace.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 282,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:e566a904b10567d71ce8a3f684513aa138dae972c16256a86ad1f9febee202fd",
-          "at": "2026-07-26T17:02:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`parse_convention_front_matter` delegates block detection to a reader that recognizes only an exact `---\\n` opener. A valid document using CRLF starts with `---\\r\\n`, so the reader returns `None` and this function silently returns the default DTO, discarding every `required_for` declaration. This is a fail-open codec path for ordinary Windows-style files. Accept CRLF delimiters and add an end-to-end test whose entire front-matter block uses CRLF.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 233,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:51cdc376a954db6b2a96d1519056bd7b9e4bc4bb7734202f02c2886806a5c310",
-          "at": "2026-07-26T17:13:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`declares_nothing` uses `str::lines()`, which does not split on a bare carriage return even though YAML treats `\\r` as a line break. Consequently, `---\\n# note\\rrequired_for: [implementer]\\n---\\n` is valid mapping front matter, but the entire first Rust line starts with `#`, so the function returns `true` and silently discards the declaration. Split on every YAML line-break form or use parser-level token information when distinguishing an empty/comment-only block.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 295,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:baef5b161a0b941ab2b40424632948e46b5bbb603b5674e1755cf478e8c2f9db",
-          "at": "2026-07-26T23:09:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The shared delimiter reader still recognizes only LF/CRLF and requires `---` at byte zero, although the YAML reader accepts a leading UTF-8 BOM and additional line breaks such as a lone CR. Consequently, both `\\u{FEFF}---\\nrequired_for: [implementer]\\n---\\n` and `---\\rrequired_for: [implementer]\\r---\\r` are classified as having no block, so the convention codec silently returns its default and drops the declaration. Normalize an optional BOM and use the parser-compatible line-break set consistently for opening, scanning, closing, and trimming delimiters.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/capability_exec/front_matter.rs",
-              "line": 80,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:4d4341e3a5b5613ac86c173567e14247624c7c48058e02a0e689823941261a57",
-          "at": "2026-07-26T23:33:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `declares_nothing` fast path returns before YAML validation, so malformed front matter can silently become an empty requirement. For example, a block containing `\\t# comment` or a comment containing U+0001 satisfies this predicate, although libyaml rejects tab indentation/control characters. The document then loses its `required_for` enforcement instead of producing `FrontMatterUnparseable`. Validate even lexically empty/comment-only blocks before returning the default DTO.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 247,
-              "category": "non-fail-closed config"
-            }
-          ],
-          "hash": "rvw1:sha256:520b1decd751562231e6d2c304f4275bfdb12602bb387d15462a76bf46ad69f3",
-          "at": "2026-07-27T00:12:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3b65b02bf1cf3a987730d53fb961034d9319144227d70fe13437db7d1a649c4f",
-          "at": "2026-07-27T00:21:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5b9e0a92e577478d17df020eee54459ecccecc44b70d049f52966807ef20fd3a",
-          "at": "2026-07-27T00:32:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f11f33c2d57db512041ad774ca96bbd25538b74ec1f81a923a5de123991f2177",
-          "at": "2026-07-27T00:49:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`let Ok(true) = ... else` treats every symlink-guard error as an empty convention tree. For example, if `knowledge` is a regular file or cannot be traversed, the guard returns `NotADirectory` or `PermissionDenied`, and this function returns `Ok(Vec::new())` without reaching `ConventionRootUnlistable`. This silently converts an unreadable/malformed tree into “no requirements,” violating AC-07’s fail-closed contract. Distinguish an absent or deliberately skipped symlinked root from inspection errors, and add regression coverage for the latter.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 319,
-              "category": "non-fail-closed filesystem scan"
-            }
-          ],
-          "hash": "rvw1:sha256:2e5bb9d2097168e77eb49197b15451f6599b0da3e2f8ddfacf642c1a7982f0cc",
-          "at": "2026-07-27T01:51:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`InvalidInput` is not a symlink-specific signal: the guard also forwards filesystem inspection errors with their original kind, and filesystem operations return `InvalidInput` for malformed paths such as an interior-NUL `project_root`. This arm therefore converts some invalid roots into `Ok(Vec::new())` instead of failing closed with `ConventionRootUnlistable`. Distinguish explicit symlink rejection structurally and propagate other `InvalidInput` failures.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 328,
-              "category": "non-fail-closed filesystem scan"
-            },
-            {
-              "message": "The added regression test does not exercise the new guard-error arm: making `knowledge/conventions` a file causes the guard to return `Ok(true)`, with `bounded_entries` producing the error afterward. Add a case where `knowledge` itself is a file (or otherwise untraversable), which makes the guard return `Err(NotADirectory)`, and assert `ConventionRootUnlistable`; otherwise the originally affected branch can regress without failing this test.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/scan_tests.rs",
-              "line": 921,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:3eb2d3245056a95bee58409f63bc2f1de921bab6b4c7b7d50087ef69bd27bfe3",
-          "at": "2026-07-27T02:06:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`is_symlink_rejection` identifies the error’s origin by searching its rendered message. Inspection failures generated above include the inspected path in that message, so a non-symlink `InvalidInput` path containing this marker—for example a programmatic `project_root` containing `\"refusing to follow symlink\\0\"`—is misclassified as a refused link. The scanner then returns an ordinary empty result instead of `ConventionRootUnlistable`, violating fail-closed behavior. Use a typed inner error/sentinel that can be downcast rather than message matching, and test a non-symlink `InvalidInput` error carrying marker-like text.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/symlink_guard.rs",
-              "line": 126,
-              "category": "non-fail-closed filesystem scan"
-            }
-          ],
-          "hash": "rvw1:sha256:7fbec0feb288061425b96f9c2947e93de941001158195b6510b7f9053bd72a0d",
-          "at": "2026-07-27T02:18:46Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new typed discriminator is the only protection against treating a non-symlink `InvalidInput` inspection failure as an empty tree, but no test exercises that distinction. Existing guard tests only assert that symlinks return some error, while the scanner’s non-symlink case produces `NotADirectory`, not the same-kind failure that caused the bug. Add true/false tests for `is_symlink_rejection`, including a plain `InvalidInput` error whose message resembles the old marker, or an equivalent public scanner regression.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/track/symlink_guard.rs",
-              "line": 145,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:7a74b12559cfd0cbaabc0a559777b71f0925b91ae5a3b3e31c86089d6ec4f722",
-          "at": "2026-07-27T02:23:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30739fb5296197d379cd5d2857c5a37cfd9e2664f93452fd144ba6efb55f420e",
-          "at": "2026-07-27T02:26:19Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`rustix::fs::DirEntry::file_type()` can return `FileType::Unknown` when the filesystem supplies `DT_UNKNOWN`. This sets all three classification flags to false, so `scan_entries` silently skips valid Markdown files and entire subdirectories as non-regular nodes. The adapter can consequently return a successful empty/incomplete resolution instead of the AC-06 contents or an AC-07 fail-closed error. Resolve unknown types with a handle-relative, no-follow metadata lookup (or return an error) before classifying the entry.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/directory_walk.rs",
-              "line": 47,
-              "category": "adapter correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:2bb98c13ca36802f385a51163a5f30c8768d4029cbb07dc936850c068d61cf64",
-          "at": "2026-07-27T03:13:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:930f5b121270af372d7c82a2f02aad5523dedec5be9afabd8ed8477f7d00aea8",
-          "at": "2026-07-27T03:17:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c2f548bd32e8df4eaee94df1a9d415196a9e348583a64f0c2f858935159c50fa",
-          "at": "2026-07-27T03:22:48Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f441fcb31b40bb87cbb5cd71f082b76c0d2f9e11ca4bb223502ba2503c579edc",
-          "at": "2026-07-27T03:47:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The initial convention-root open remains vulnerable to an ancestor-symlink TOCTOU. After `reject_symlinks_below` checks `knowledge`, that directory can be replaced by a symlink before `open_directory(&convention_root)`. `O_NOFOLLOW` protects only the trailing `conventions` component, so the open can follow the substituted `knowledge` into another tree; if that link is dangling, `ENOENT` is incorrectly converted to an empty result. Open `project_root` as the trusted anchor and descend through both components with handle-relative `openat(..., O_NOFOLLOW)`, failing closed on any link. The handle-relative traversal below the root does not protect this first pathname open.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 356,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:f441fcb31b40bb87cbb5cd71f082b76c0d2f9e11ca4bb223502ba2503c579edc",
-          "at": "2026-07-27T03:55:49Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`open_convention_root` erases which open produced `NotFound`, so a nonexistent or dangling caller-supplied `project_root` is returned as a successful empty convention set. No repository was opened in that case; it is not the legitimate “repository exists but has no convention directory” state. Since `--project-root` is accepted directly, a typo can silently bypass the AC-07 fail-closed path. Open the trusted anchor separately and map its failures to `ConventionRootUnlistable`; only `NotFound` while descending to `knowledge` or `conventions` should return empty.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 348,
-              "category": "non-fail-closed config"
-            },
-            {
-              "message": "After `open_convention_root` has returned a directory handle, `NotFound` from `bounded_entries` means listing that opened root failed (for example, `getdents` can report `ENOENT` after concurrent removal); it is no longer evidence that the convention root was absent. Returning an empty result here again conflates “not inspected” with “contains no documents.” Map every `bounded_entries` error to `ConventionRootUnlistable`.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 378,
-              "category": "non-fail-closed I/O"
-            }
-          ],
-          "hash": "rvw1:sha256:76f22d8a509cf89be9353a1c1d4294f1dc1b3765e9ad59f4d0ddfdcbeb87fa1b",
-          "at": "2026-07-27T04:31:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1825ea86217759ab1697d21fadf285c5846853c08060fb5cf8003f1b34c0f9cc",
-          "at": "2026-07-27T04:43:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5cc2028a719c1822308a4223ba57d9fe224e60e8865fbd19f508d70362e0d934",
-          "at": "2026-07-27T06:23:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The whole-scan budget is charged too late. `bounded_entries` fully reads, classifies, and stores a child directory before recursive `scan_entries` decrements `remaining_entries`. A depth-64 chain with roughly 10,000 entries per level can therefore enumerate and retain about 640,000 entries while spending only one budget unit per descended directory, bypassing the advertised 20,000-entry traversal bound. Charge the shared budget as entries are produced, including the root listing.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 586,
-              "category": "resource_bounds"
-            },
-            {
-              "message": "This change grows the production module to 756 counted lines, exceeding the repository's 700-line maximum; `bin/sotp verify module-size` fails on this file. Move part of the new traversal/budget logic or its supporting code into a sibling module.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 218,
-              "category": "architecture"
-            },
-            {
-              "message": "The comment still documents the withdrawn behavior: it says a node changed into a link between listing and open is skipped, while the current branch returns `DocumentUnreadable` for every open failure. This contradicts the fail-closed security seam and should be rewritten; related test comments also still refer to the removed `read_dir`/joining/symlink-guard implementation.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
-              "line": 459,
-              "category": "documentation_correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:5cc2028a719c1822308a4223ba57d9fe224e60e8865fbd19f508d70362e0d934",
-          "at": "2026-07-27T06:30:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5f38a340053f2860f1e05ca6cdad5b8773f6fb43c4f3d7cbef5288ff87752b0b",
-          "at": "2026-07-27T06:53:09Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5f38a340053f2860f1e05ca6cdad5b8773f6fb43c4f3d7cbef5288ff87752b0b",
-          "at": "2026-07-27T06:57:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:624f2e042c2af45b25d8d1d71307899d8edd785a4d83a31375753d6be65bde07",
-          "at": "2026-07-27T13:41:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:624f2e042c2af45b25d8d1d71307899d8edd785a4d83a31375753d6be65bde07",
-          "at": "2026-07-27T13:42:31Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "テストが reviewer の fast-round 値を `ReasoningEffort::Medium` に固定しており、設定上の tunable な値を変更するたびにテスト修正が必要になります。ここでは具体値ではなく、ProviderCli が明示的な effort を解決できることだけを検証してください。",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles/tests.rs",
-              "line": 233,
-              "category": "test-coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:e46b0cd486bfe0ad542d95b46dbfa3909253e72c7930decf6afe7f8f84a385a9",
-          "at": "2026-07-27T14:44:29Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:942cac2cd5ab67f4ca23c0c6fe2fde274c77a32325644ce30fd37a1c20d73bc6",
-          "at": "2026-07-27T14:46:26Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The new `ProviderCli { .. }` assertion no longer verifies the successful fast-round selection path: `test_resolve_execution_missing_fast_effort_returns_error` proves only that an absent fast effort is rejected. An implementation that still requires `fast_reasoning_effort` but mistakenly returns the final `reasoning_effort` would now pass every reviewer assertion. Keep the committed profile tunable, but add a fixture-based happy-path test with distinct fast/final efforts and assert that `RoundType::Fast` returns the fixture's fast value.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/agent_profiles/tests.rs",
-              "line": 237,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:942cac2cd5ab67f4ca23c0c6fe2fde274c77a32325644ce30fd37a1c20d73bc6",
-          "at": "2026-07-27T14:48:40Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:90cf842217f1990cd390b7b3a0961cc4158359eb300e175a2dcdce35046a9f52",
-          "at": "2026-07-27T14:51:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:90cf842217f1990cd390b7b3a0961cc4158359eb300e175a2dcdce35046a9f52",
-          "at": "2026-07-27T14:51:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cfd0c835c65b78d432e02290a0a7f58e17b5a4c78a086deb672598940810e017",
-          "at": "2026-07-28T09:33:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:cfd0c835c65b78d432e02290a0a7f58e17b5a4c78a086deb672598940810e017",
-          "at": "2026-07-28T09:38:47Z"
-        }
-      ]
-    },
-    "spec": {
-      "rounds": [
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:66c1bb19af42ec729b5ad27871aeb1ed88e7cda4c298be7b1ddaa6ad4a33b2e8",
-          "at": "2026-07-26T07:22:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "AC-17 requires old-path references in every existing ADR/research note to remain unchanged, but D10 and OUT-05 exempt only historical notes that are not referenced as current procedure. As written, a live ADR/research note cannot satisfy both IN-10/AC-16's live-reference cleanup and AC-17's blanket no-change requirement. Restore the missing 「現行手順として参照されていない」 qualifier.",
-              "severity": "P1",
-              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
-              "line": 496,
-              "category": "scope / acceptance_criteria contradiction"
-            }
-          ],
-          "hash": "rvw1:sha256:bf8fbae415eb769cdd14232b51233fd2cc8e98e6227480bd3a10e14cf9e4c3ee",
-          "at": "2026-07-26T16:44:06Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:71b827d604181d81b802fdeadb7dd19b2a2b56e5b384e474afa7bfdc62b4d516",
-          "at": "2026-07-26T16:56:56Z"
+          "hash": "rvw1:sha256:693f8d1491c061d73c9d6e67585806e493710d766826f22a96027e84fbb03440",
+          "at": "2026-07-28T12:56:31Z"
         }
       ]
     },
@@ -3390,6 +2185,1247 @@
           "findings": [],
           "hash": "rvw1:sha256:442894d199d0ce2c63d26296a7c5b75ab934052a0d91388a23dc7657d6880c7a",
           "at": "2026-07-28T12:12:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6dac5ba90e4cf81756cb464af8cb009883e77e012aa52d4f43d8f4916d278d6c",
+          "at": "2026-07-28T12:57:38Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`cli::ConventionsCommand.docs` repeats IN-06/AC-09’s whitespace rejection and no-registration behavior in prose. Per `no-upstream-restatement.md`, retain only the changed symbol/operation and rely on `spec_refs` for that contract.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli-types.json",
+              "line": 69,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`cli::ConventionsCommand::Resolve` orders its mirror fields as `capability, project_root`, while `cli_driver::ConventionResolveInput` and `usecase::ResolveConventionsQuery` use `project_root, capability`. No language-level constraint documents the divergence; align this command/input mirror chain.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli-types.json",
+              "line": 131,
+              "category": "mirror chain divergence"
+            },
+            {
+              "message": "The docs for `cli_driver::CapabilityNameArg`, `cli_driver::ConventionResolveDriver`, `cli_driver::ConventionResolveInput`, and `cli_driver::ConventionShippingCheckDriver` reproduce upstream validation, empty-result, fail-closed, rendering, and shipping-check behavior. Replace those paraphrases with concise symbol/operation descriptions plus the existing anchors, retaining only local adapter-design rationale.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/cli_driver-types.json",
+              "line": 106,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `infrastructure::conventions_resolve::parse_convention_front_matter`, `infrastructure::conventions_resolve::scan_convention_requirements`, `infrastructure::template_conventions::list_convention_documents`, `infrastructure::CapabilityIdField`, and `infrastructure::ConventionFrontMatterDto` restate AC-07/AC-08/AC-18 failure and empty-state contracts. Reference those anchors instead of duplicating their behavior in catalogue prose.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `usecase::conventions_resolve::select_required_conventions`, `usecase::template_conventions::select_unsupplied_conventions`, `usecase::ConventionInventoryPort`, `usecase::ConventionRequirementPort`, and `usecase::ConventionResolveService` reproduce exact-match, ordering, empty-result, one-way comparison, failure, and no-write behavior from the spec. Reduce them to downstream type/operation descriptions and anchor references.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 6,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::ConventionInventoryPort::list_conventions` and `usecase::ConventionRequirementPort::scan_requirements` are synchronous contracts for filesystem tree walking and file reads, but neither entry acknowledges why blocking I/O is intentional. Declare the appropriate async color or document the deliberate synchronous CLI boundary.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 468,
+              "category": "sync/async color mismatch"
+            },
+            {
+              "message": "The docs for `usecase::CapabilityExecError`, `usecase::CapabilityExecInteractor`, `usecase::CapabilityName`, and `usecase::DisciplineText` reproduce IN-06/IN-07, AC-09–AC-12, and CN-05 behavior such as execution ordering, both dispatch routes, and prohibition of re-resolution. Replace the duplicated contract with anchor citations while retaining type-local rationale.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 621,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "The docs for `usecase::ConventionRequirement`, `usecase::ConventionResolution`, `usecase::ConventionResolveError`, `usecase::ConventionResolveInteractor`, `usecase::ConventionShippingCheckError`, `usecase::ConventionShippingVerdict`, and `usecase::ResolveConventionsQuery` restate AC-06–AC-09/AC-18 behavior, including complete failure lists and normal-empty states. Keep the structural/type rationale, but refer to the existing anchors for behavioral details.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 1044,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "`usecase::ConventionShippingCheckError::DocumentPathRejected.source` accepts the entire `ConventionResolveError`, admitting impossible states such as `FrontMatterUnparseable` or `DocumentUnreadable` even though the shipping inventory reads no contents and can only fail path validation here. Use a path-specific error or payload so those states are unrepresentable.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 1275,
+              "category": "state-shape smell"
+            }
+          ],
+          "hash": "rvw1:sha256:989eba9bb04151e45ec82494b45bbb41b0d65dfeaae3c880114b811264696f5c",
+          "at": "2026-07-26T07:32:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8786fbceffe0cb5ca416c19092206868ae4deef11ba7fb121e73a0f4588a00e3",
+          "at": "2026-07-26T07:58:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::conventions_resolve::ConventionCapabilityId` と `ConventionCapabilityIdError` の docs は、D4／IN-06／AC-07 の許容・拒否契約（padded 値の許容、empty／whitespace-only だけの拒否、fail-closed リストが exhaustive であるため条件を追加できない理由）を散文で再記述しています。`no-upstream-restatement.md` に従い、newtype・bridge・配置・error shape のローカルな型設計根拠だけを残し、上流の挙動と理由は既存の anchor 参照に委ねてください。",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 1085,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:72e361584f80c8f824dcb48ec30a3c31067d4ba396933d75ec59aa864c081590",
+          "at": "2026-07-26T10:14:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::conventions_resolve::ConventionCapabilityId` declares its constructor the single enforcement owner for AC-07’s blank-identifier condition, while `infrastructure::conventions_resolve::ConventionFrontMatterDto` also calls `into_requirement` the single enforcing site. The DTO only invokes the constructor and maps `ConventionCapabilityIdError` to the document-aware resolver error; describe it as the single mapping/conversion site so validation has exactly one declared owner.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+              "line": 234,
+              "category": "enforcement-owner contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a38106d3b8495f3562658e7973a542dd5a7c89828cf5d0c51b321ea024f4f20c",
+          "at": "2026-07-26T10:31:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::conventions_resolve::ConventionCapabilityId` は `try_new` を AC-07 の blank-identifier 条件の「single enforcing site」としていますが、`infrastructure::conventions_resolve::ConventionFrontMatterDto` も `into_requirement` を同じ条件の「single enforcing site」としています。単一の fail-closed rule に二つの owner が宣言されています。`try_new` を検証 owner、`into_requirement` を `ConventionResolveError::EmptyCapabilityId` への mapping／文書情報付加 site とするなど、責務を一意にしてください。",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+              "line": 234,
+              "category": "enforcement-owner contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:a38106d3b8495f3562658e7973a542dd5a7c89828cf5d0c51b321ea024f4f20c",
+          "at": "2026-07-26T10:31:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ba478df54f9527318e8e31482f5875bf6710d6e54ed157c01d28d6753920a7e8",
+          "at": "2026-07-26T10:44:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:58f0271df756d05a74febfb1892e2c4d3edad23910ded53943276dfb5104763e",
+          "at": "2026-07-26T13:12:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::ConventionDocumentPathError` restates the AC-06/AC-07 behavioral contract at length—canonical record shape, exact UTF-8/line-terminator rejection conditions, and their behavioral rationale—rather than referencing the upstream anchors. Keep the type-local variant, payload, ordering, and ownership rationale, but replace the upstream behavior explanation with anchor cites as required by `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 1180,
+              "category": "SoT integrity — upstream restatement"
+            },
+            {
+              "message": "`usecase::ConventionResolveError` restates AC-07's structural-anomaly category and its non-exhaustive semantics in the opening sentences. Because AC-07 owns that behavior contract, the catalogue should cite the anchor and retain only type-local information such as variant wiring and construction ownership.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 1289,
+              "category": "SoT integrity — upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:dc39951cc8e1cce429390c07141e1dda428920c9b5ca93ffa7e6ee4cb5ff4b97",
+          "at": "2026-07-26T16:49:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::ConventionResolveError` claims “one variant per condition,” but AC-07 defines a non-exhaustive anomaly category, and the two current path-rejection conditions are intentionally composed under the single `DocumentPathRejected` variant. This both closes the upstream category and misstates the enum’s present shape. Replace it with an AC-07 anchor reference and retain only the type-local composition/ownership details, per `knowledge/conventions/no-upstream-restatement.md`.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 1293,
+              "category": "SoT integrity — upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:59a813d8fa5252fbb1045d08d11bc1575ea27f1d29eb6638b6722ac0b2344933",
+          "at": "2026-07-26T17:12:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2946ade596f643e4d462a900034447fb2a7d63bbd97e816118fe463a0ff4545",
+          "at": "2026-07-26T22:44:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::ConventionResolveError` now declares `ConventionRootUnlistable`, but its docs still classify only “the remaining three variants” and never name this variant's enforcement owner. The infrastructure directory scan both decides and constructs this failure; update the catalogue docs to record that single owner and remove the stale count.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 1293,
+              "category": "enforcement-owner contradiction"
+            },
+            {
+              "message": "`usecase::ConventionShippingCheckError` describes the structural fail-closed category as “one variant each” and later “all three variants,” turning the current enum membership into a closed behavioral enumeration. This is the downstream closed-set restatement prohibited by `knowledge/conventions/no-upstream-restatement.md`; retain category-level wording and anchor references without asserting an exhaustive count.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 1434,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:91c5b77bcec064682cab73feb0b686e097609fb84e807dae1b397affbca44490",
+          "at": "2026-07-27T01:42:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::ConventionShippingCheckError` still frames the structural fail-closed category as a closed one-to-one enumeration: “a variant apiece” is semantically identical to the previously rejected “one variant each.” This downstream completeness claim does not survive category growth and remains contrary to `knowledge/conventions/no-upstream-restatement.md`; use category-level wording and anchor references without asserting an exhaustive mapping.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 1434,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:45fbc72882d240e5eda16ee66ce60d7133f93863249e07a2c4b1b7c44a4de274",
+          "at": "2026-07-27T01:48:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c7fe737485b161698d5749def157f01d0e728a2a52d12adcfc714eab6646a3b",
+          "at": "2026-07-27T02:01:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::CapabilityExecInteractor` `docs` substantially restates upstream rationale and behavior (subdirectory scanning, AC-08 empty results, `CapabilityExecRequest` placement, `PathBuf` versus newtype, and mirror-chain consequences) instead of referring to upstream anchors. Keep the catalogue documentation to type-level intent plus citations, per the no-upstream-restatement policy.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 856,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:0956996be249e5bc8c32038ea39936c8d6fee86f0f214093b91e118c25ea084b",
+          "at": "2026-07-27T10:43:01Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ed73edf0975098af4f870eac5997c097e849d38c6188a0936d4696aef40098e0",
+          "at": "2026-07-27T10:51:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`usecase::CapabilityExecInteractor` still restates the upstream dispatch contract in prose: the sentence beginning “Resolution sits at this seam…” re-explains D6/IN-07/AC-10/AC-11’s pre-branch resolution and shared two-outcome representation. This violates `no-upstream-restatement.md`; remove that sentence while retaining the separate R9 `PathBuf` justification and anchor citations.",
+              "severity": "P1",
+              "file": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+              "line": 852,
+              "category": "SoT integrity: upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:792ded7123d8dd7c7b173aa19b54f4d95a097a88baeebc286a655d187c5ddd05",
+          "at": "2026-07-27T10:55:53Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4ea18cb316ec10bfca34d523466b423f883741d6a92d37c2aff4f8c4579a930",
+          "at": "2026-07-27T11:12:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b4ea18cb316ec10bfca34d523466b423f883741d6a92d37c2aff4f8c4579a930",
+          "at": "2026-07-27T12:59:17Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ede22607d940e1a2f66c248a24a56540d651827bb41ea8bb841b3d04ecb3afa",
+          "at": "2026-07-26T14:50:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ConventionDocumentPath` accepts arbitrary paths beneath the convention root, including filenames containing newlines and, on Unix, non-UTF-8 bytes. Converting each path with `Display` and joining on `\\n` is therefore not a lossless one-record-per-line encoding: one matched file can produce multiple apparent records, while distinct non-UTF-8 paths can collapse to the same replacement-character text. This breaks the canonical machine-readable result promised by IN-05/AC-06. Enforce a render-safe path invariant or use an unambiguous encoding, with boundary-value coverage.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/conventions_resolve/mod.rs",
+              "line": 143,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b534b63f570047017f66cd20dd7f7616732afe5d0a6aabeca2824fa8c8b6f330",
+          "at": "2026-07-26T15:41:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:871e08e8b18707636fb57ed4b73704b74196b7622153e6eeb479dceae835e91e",
+          "at": "2026-07-26T16:06:47Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ebd270faf24694f2e4d43c74c69a52d65d64977f3b9544e05896fb6068d18cf",
+          "at": "2026-07-26T14:50:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The IN-05/AC-06 binding for this test attributes exact-match selection and stable ordering to `ConventionsCompositionRoot`: the fixture excludes the nonmatching document and the exact stdout assertion fixes the returned order. This root only establishes the adapter → interactor → driver graph; matching is established downstream and deduplication/order are inherited from `ConventionResolution`. Keep the composition binding limited to evidence of the selected object graph and bind those behavioral guarantees to their owning entries.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/conventions.rs",
+              "line": 128,
+              "category": "test_contract_attribution"
+            }
+          ],
+          "hash": "rvw1:sha256:5ebd270faf24694f2e4d43c74c69a52d65d64977f3b9544e05896fb6068d18cf",
+          "at": "2026-07-26T15:00:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7cad3c4376c80f4d6243885bef12aeca2948a6d41621557b2f3769e9204a469f",
+          "at": "2026-07-26T15:53:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityExecInteractor::new` still has a second construction site in the infrastructure test, but it supplies only three arguments and omits the newly required convention resolver and project root. This causes test compilation to fail and leaves construction outside the composition root inconsistent with the new wiring contract.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/agent_profiles.rs",
+              "line": 175,
+              "category": "wiring correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:03be39cb9b994e2e62248341aa4600ad5b4936fe904feac19bce6c1b4767d977",
+          "at": "2026-07-27T10:43:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03be39cb9b994e2e62248341aa4600ad5b4936fe904feac19bce6c1b4767d977",
+          "at": "2026-07-27T10:47:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03be39cb9b994e2e62248341aa4600ad5b4936fe904feac19bce6c1b4767d977",
+          "at": "2026-07-27T10:51:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e81de1d70deaab83dd066a681147249f32931a05a7670da457f6b490fb6a9c9",
+          "at": "2026-07-28T06:08:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e81de1d70deaab83dd066a681147249f32931a05a7670da457f6b490fb6a9c9",
+          "at": "2026-07-28T06:10:16Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbe367c68bed86e7fea58223a20538f9eeb9771e93bb54ed6179796b9d9aa0e4",
+          "at": "2026-07-26T03:17:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbe367c68bed86e7fea58223a20538f9eeb9771e93bb54ed6179796b9d9aa0e4",
+          "at": "2026-07-26T03:28:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9bebd6728c8c48f44bf2be0ee0b6047909aaf054834d8b751a500af6f8128853",
+          "at": "2026-07-26T03:36:04Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`serde_yaml::from_value` can fail before examining `required_for`. For example, valid YAML containing only `true: metadata` produces a boolean map key; deserializing that key as a struct field identifier fails, and this branch incorrectly reports `RequiredForNotStringArray`. This violates the promised unknown-key tolerance and AC-08’s requirement that an absent `required_for` succeed with the default value. Ensure unknown YAML keys are ignored regardless of their YAML scalar type, and reserve this error variant for failures in `required_for` itself.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 142,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:dd11ab90a8c0470c92069f6c9ccf21d62066cc097fb29235177672b36ce9c566",
+          "at": "2026-07-26T12:16:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`required_for` is deserialized directly into `Vec<CapabilityIdField>`, but `serde_yaml` coerces a YAML null/empty scalar to an empty sequence for `Vec`. Consequently, `required_for: null` or a bare `required_for:` succeeds as an empty declaration instead of returning `RequiredForNotStringArray`, violating AC-07’s fail-closed requirement for every non-string-array shape. Use a strict field deserializer that accepts only an actual YAML sequence and add null coverage.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 102,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e28fbdc82e14c7c2d3e96606a52d08811e5ca89890f27565958770ae648ccb81",
+          "at": "2026-07-26T12:30:58Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:55acdf6feb2b900331e2d8942b3de4ec7c689ce9683bed8b92b4313147495d52",
+          "at": "2026-07-26T13:05:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The scan follows `*.md` file symlinks via `std::fs::read_to_string(entry.path())`, allowing a convention document path inside `knowledge/conventions` to load bytes from outside the trusted project tree. Reject symlinks with `symlink_metadata` before reading (and add an escape test).",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 369,
+              "category": "symlink not rejected at boundary"
+            }
+          ],
+          "hash": "rvw1:sha256:14fd6a44ab6e8cb690a47344eef36e46629ac2e3ed7b27043cf3672e0f68e7aa",
+          "at": "2026-07-26T14:49:19Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d735c05805f98aa0cad8645859046d495262b0e84bbba8d3665a3795d1bbef59",
+          "at": "2026-07-26T14:56:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`read_dir` follows symlinks in the convention-root path before any `DirEntry::file_type` check runs. If `knowledge` or `knowledge/conventions` is a directory symlink, out-of-tree files are scanned and reported under validated in-tree paths. Guard every component below `project_root` with no-follow metadata checks before listing it, and test root/ancestor symlinks.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 340,
+              "category": "trusted-root violation"
+            },
+            {
+              "message": "After excluding directories and symlinks, every other `*.md` filesystem node is passed to `read_to_string`. A FIFO such as `blocked.md` can therefore block the resolver indefinitely. Require a regular file before reading, and fail closed or skip unsupported node types consistently.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 379,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "`read_to_string` buffers an externally controlled convention document without a size limit. A sufficiently large or sparse file can exhaust process memory instead of producing a typed adapter error. Read through an explicit byte bound and fail closed when it is exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 380,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "`sorted_entries` eagerly collects and sorts every directory entry. This both allocates without a bound—even for millions of non-Markdown entries—and establishes an observable infrastructure scan order that the briefing assigns to `ConventionResolution`; the order-sensitive scan tests entrench that ownership leak. Stream entries without imposing raw-result order, leaving canonical ordering to the usecase layer.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 389,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:d735c05805f98aa0cad8645859046d495262b0e84bbba8d3665a3795d1bbef59",
+          "at": "2026-07-26T15:05:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The directory symlink checks are TOCTOU snapshots. After the root guard or `entry.file_type()` accepts a directory, `read_dir` reopens its path and follows any symlink substituted in between, allowing an out-of-tree directory to be scanned under in-tree document identities. Traverse through atomic no-follow directory handles (or an equivalent fail-closed mechanism) rather than reopening checked paths.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 424,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The regular-file check is also separated from `File::open`. A concurrent replacement can turn the checked leaf into a symlink, FIFO, or device; `File::open` then follows it or blocks before the byte limit can help. Use an atomic no-follow/nonblocking open and validate the opened handle's file type, following the existing waiver-cache/output-collector pattern.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 477,
+              "category": "symlink not rejected at boundary"
+            },
+            {
+              "message": "The new limits are only per file and per directory. Recursive traversal still has no aggregate document, byte, entry, or depth budget, while `requirements` retains every decoded requirement. A tree with up to 10,000 children at each level can therefore drive unbounded I/O and memory growth without violating either local limit. Carry a total scan budget through recursion and fail closed when exhausted.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 410,
+              "category": "unbounded I/O"
+            },
+            {
+              "message": "`sorted_entries` still imposes an observable deterministic order on the raw adapter result, and the scan tests assert that order. This keeps ordering policy in infrastructure even though the briefing assigns ordering and deduplication exclusively to `ConventionResolution::from_matches`. Iterate without defining raw-result order and leave canonical ordering to the usecase-owned constructor.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 464,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:58a1d0ffbfa8202a2cf0f1649c3be51699c9f63d8fb607bbec66edda6e65d738",
+          "at": "2026-07-26T15:41:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`sorted_entries` sorts every directory before scanning, so the infrastructure adapter establishes a deterministic traversal/output order. The briefing assigns ordering exclusively to `ConventionResolution::from_matches`, while the scan tests further expose this adapter order as contractual through exact vector assertions. Remove the adapter-side sort and make scan assertions order-independent so ordering remains owned by the use-case layer.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 486,
+              "category": "architecture violation"
+            }
+          ],
+          "hash": "rvw1:sha256:98f3c958045b8d1ba33537cfe8c0649af6d16abf10424479f9c07e3a1d4f320c",
+          "at": "2026-07-26T15:52:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`scan_entries` constructs a `ConventionDocumentPath` before checking an entry's type or `.md` extension. On Unix, an otherwise ignored neighbor such as `knowledge/conventions/notes\\n.txt` is a valid directory entry but is rejected as `NotRenderableAsRecord`, so it aborts the entire scan with `DocumentPathRejected` instead of being ignored. A similarly named `.md` file also disproves the comments and tests claiming no real tree can reach this lift, leaving that error path uncovered. Filter non-document entries before path validation and add real-tree coverage for both cases.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 434,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4868f49f29fee413678cda2c183ad0fce6e409f6011c79e66a281b88bcedbc48",
+          "at": "2026-07-26T16:27:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`front_matter.is_null()` treats explicit YAML null documents (`null`, `~`, or `Null`) the same as a genuinely empty front-matter block. Those values are non-mapping front matter, but the codec returns the default DTO instead of failing closed as `FrontMatterUnparseable`, silently treating malformed metadata as no declarations. Detect an actually empty block before parsing, reject explicit null values, and add coverage for the null spellings.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 241,
+              "category": "adapter correctness"
+            },
+            {
+              "message": "The prior path-validation fix remains incomplete for directories: `document_path(candidate)?` runs before determining whether a directory contains any Markdown documents. A tree containing only `knowledge/conventions/two\\nlines/README.txt` therefore fails with `DocumentPathRejected` even though the subtree has no `**/*.md` candidate and should be ignored. Carry the raw relative directory path during traversal and validate the complete path only when an actual Markdown document is found; an `.md` below such a directory will still fail closed correctly.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 475,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:3462e42b218a361764bffbf023caadbbdbdc9c96d4dc902865299f24e145a952",
+          "at": "2026-07-26T16:44:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`declares_nothing` applies Rust's Unicode `trim()` before deciding whether a line is a YAML comment. For example, a front-matter line beginning with U+00A0 followed by `#not-a-comment` is a non-mapping YAML scalar because NBSP is not YAML separation whitespace, but `trim()` removes it and this helper treats the line as comment-only, returning an empty DTO without parsing. This leaves a fail-open path for invalid/non-mapping front matter. Use YAML's lexical rules (or parser tokens) for the empty/comment-only distinction and add coverage for non-YAML Unicode whitespace.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 282,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:e566a904b10567d71ce8a3f684513aa138dae972c16256a86ad1f9febee202fd",
+          "at": "2026-07-26T17:02:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`parse_convention_front_matter` delegates block detection to a reader that recognizes only an exact `---\\n` opener. A valid document using CRLF starts with `---\\r\\n`, so the reader returns `None` and this function silently returns the default DTO, discarding every `required_for` declaration. This is a fail-open codec path for ordinary Windows-style files. Accept CRLF delimiters and add an end-to-end test whose entire front-matter block uses CRLF.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 233,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:51cdc376a954db6b2a96d1519056bd7b9e4bc4bb7734202f02c2886806a5c310",
+          "at": "2026-07-26T17:13:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`declares_nothing` uses `str::lines()`, which does not split on a bare carriage return even though YAML treats `\\r` as a line break. Consequently, `---\\n# note\\rrequired_for: [implementer]\\n---\\n` is valid mapping front matter, but the entire first Rust line starts with `#`, so the function returns `true` and silently discards the declaration. Split on every YAML line-break form or use parser-level token information when distinguishing an empty/comment-only block.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 295,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:baef5b161a0b941ab2b40424632948e46b5bbb603b5674e1755cf478e8c2f9db",
+          "at": "2026-07-26T23:09:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The shared delimiter reader still recognizes only LF/CRLF and requires `---` at byte zero, although the YAML reader accepts a leading UTF-8 BOM and additional line breaks such as a lone CR. Consequently, both `\\u{FEFF}---\\nrequired_for: [implementer]\\n---\\n` and `---\\rrequired_for: [implementer]\\r---\\r` are classified as having no block, so the convention codec silently returns its default and drops the declaration. Normalize an optional BOM and use the parser-compatible line-break set consistently for opening, scanning, closing, and trimming delimiters.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/front_matter.rs",
+              "line": 80,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:4d4341e3a5b5613ac86c173567e14247624c7c48058e02a0e689823941261a57",
+          "at": "2026-07-26T23:33:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `declares_nothing` fast path returns before YAML validation, so malformed front matter can silently become an empty requirement. For example, a block containing `\\t# comment` or a comment containing U+0001 satisfies this predicate, although libyaml rejects tab indentation/control characters. The document then loses its `required_for` enforcement instead of producing `FrontMatterUnparseable`. Validate even lexically empty/comment-only blocks before returning the default DTO.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 247,
+              "category": "non-fail-closed config"
+            }
+          ],
+          "hash": "rvw1:sha256:520b1decd751562231e6d2c304f4275bfdb12602bb387d15462a76bf46ad69f3",
+          "at": "2026-07-27T00:12:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3b65b02bf1cf3a987730d53fb961034d9319144227d70fe13437db7d1a649c4f",
+          "at": "2026-07-27T00:21:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5b9e0a92e577478d17df020eee54459ecccecc44b70d049f52966807ef20fd3a",
+          "at": "2026-07-27T00:32:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f11f33c2d57db512041ad774ca96bbd25538b74ec1f81a923a5de123991f2177",
+          "at": "2026-07-27T00:49:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`let Ok(true) = ... else` treats every symlink-guard error as an empty convention tree. For example, if `knowledge` is a regular file or cannot be traversed, the guard returns `NotADirectory` or `PermissionDenied`, and this function returns `Ok(Vec::new())` without reaching `ConventionRootUnlistable`. This silently converts an unreadable/malformed tree into “no requirements,” violating AC-07’s fail-closed contract. Distinguish an absent or deliberately skipped symlinked root from inspection errors, and add regression coverage for the latter.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 319,
+              "category": "non-fail-closed filesystem scan"
+            }
+          ],
+          "hash": "rvw1:sha256:2e5bb9d2097168e77eb49197b15451f6599b0da3e2f8ddfacf642c1a7982f0cc",
+          "at": "2026-07-27T01:51:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`InvalidInput` is not a symlink-specific signal: the guard also forwards filesystem inspection errors with their original kind, and filesystem operations return `InvalidInput` for malformed paths such as an interior-NUL `project_root`. This arm therefore converts some invalid roots into `Ok(Vec::new())` instead of failing closed with `ConventionRootUnlistable`. Distinguish explicit symlink rejection structurally and propagate other `InvalidInput` failures.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 328,
+              "category": "non-fail-closed filesystem scan"
+            },
+            {
+              "message": "The added regression test does not exercise the new guard-error arm: making `knowledge/conventions` a file causes the guard to return `Ok(true)`, with `bounded_entries` producing the error afterward. Add a case where `knowledge` itself is a file (or otherwise untraversable), which makes the guard return `Err(NotADirectory)`, and assert `ConventionRootUnlistable`; otherwise the originally affected branch can regress without failing this test.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/scan_tests.rs",
+              "line": 921,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:3eb2d3245056a95bee58409f63bc2f1de921bab6b4c7b7d50087ef69bd27bfe3",
+          "at": "2026-07-27T02:06:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`is_symlink_rejection` identifies the error’s origin by searching its rendered message. Inspection failures generated above include the inspected path in that message, so a non-symlink `InvalidInput` path containing this marker—for example a programmatic `project_root` containing `\"refusing to follow symlink\\0\"`—is misclassified as a refused link. The scanner then returns an ordinary empty result instead of `ConventionRootUnlistable`, violating fail-closed behavior. Use a typed inner error/sentinel that can be downcast rather than message matching, and test a non-symlink `InvalidInput` error carrying marker-like text.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/symlink_guard.rs",
+              "line": 126,
+              "category": "non-fail-closed filesystem scan"
+            }
+          ],
+          "hash": "rvw1:sha256:7fbec0feb288061425b96f9c2947e93de941001158195b6510b7f9053bd72a0d",
+          "at": "2026-07-27T02:18:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new typed discriminator is the only protection against treating a non-symlink `InvalidInput` inspection failure as an empty tree, but no test exercises that distinction. Existing guard tests only assert that symlinks return some error, while the scanner’s non-symlink case produces `NotADirectory`, not the same-kind failure that caused the bug. Add true/false tests for `is_symlink_rejection`, including a plain `InvalidInput` error whose message resembles the old marker, or an equivalent public scanner regression.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/track/symlink_guard.rs",
+              "line": 145,
+              "category": "test coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:7a74b12559cfd0cbaabc0a559777b71f0925b91ae5a3b3e31c86089d6ec4f722",
+          "at": "2026-07-27T02:23:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30739fb5296197d379cd5d2857c5a37cfd9e2664f93452fd144ba6efb55f420e",
+          "at": "2026-07-27T02:26:19Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`rustix::fs::DirEntry::file_type()` can return `FileType::Unknown` when the filesystem supplies `DT_UNKNOWN`. This sets all three classification flags to false, so `scan_entries` silently skips valid Markdown files and entire subdirectories as non-regular nodes. The adapter can consequently return a successful empty/incomplete resolution instead of the AC-06 contents or an AC-07 fail-closed error. Resolve unknown types with a handle-relative, no-follow metadata lookup (or return an error) before classifying the entry.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/directory_walk.rs",
+              "line": 47,
+              "category": "adapter correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:2bb98c13ca36802f385a51163a5f30c8768d4029cbb07dc936850c068d61cf64",
+          "at": "2026-07-27T03:13:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:930f5b121270af372d7c82a2f02aad5523dedec5be9afabd8ed8477f7d00aea8",
+          "at": "2026-07-27T03:17:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2f548bd32e8df4eaee94df1a9d415196a9e348583a64f0c2f858935159c50fa",
+          "at": "2026-07-27T03:22:48Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:f441fcb31b40bb87cbb5cd71f082b76c0d2f9e11ca4bb223502ba2503c579edc",
+          "at": "2026-07-27T03:47:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The initial convention-root open remains vulnerable to an ancestor-symlink TOCTOU. After `reject_symlinks_below` checks `knowledge`, that directory can be replaced by a symlink before `open_directory(&convention_root)`. `O_NOFOLLOW` protects only the trailing `conventions` component, so the open can follow the substituted `knowledge` into another tree; if that link is dangling, `ENOENT` is incorrectly converted to an empty result. Open `project_root` as the trusted anchor and descend through both components with handle-relative `openat(..., O_NOFOLLOW)`, failing closed on any link. The handle-relative traversal below the root does not protect this first pathname open.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 356,
+              "category": "trusted-root violation"
+            }
+          ],
+          "hash": "rvw1:sha256:f441fcb31b40bb87cbb5cd71f082b76c0d2f9e11ca4bb223502ba2503c579edc",
+          "at": "2026-07-27T03:55:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`open_convention_root` erases which open produced `NotFound`, so a nonexistent or dangling caller-supplied `project_root` is returned as a successful empty convention set. No repository was opened in that case; it is not the legitimate “repository exists but has no convention directory” state. Since `--project-root` is accepted directly, a typo can silently bypass the AC-07 fail-closed path. Open the trusted anchor separately and map its failures to `ConventionRootUnlistable`; only `NotFound` while descending to `knowledge` or `conventions` should return empty.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 348,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "After `open_convention_root` has returned a directory handle, `NotFound` from `bounded_entries` means listing that opened root failed (for example, `getdents` can report `ENOENT` after concurrent removal); it is no longer evidence that the convention root was absent. Returning an empty result here again conflates “not inspected” with “contains no documents.” Map every `bounded_entries` error to `ConventionRootUnlistable`.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 378,
+              "category": "non-fail-closed I/O"
+            }
+          ],
+          "hash": "rvw1:sha256:76f22d8a509cf89be9353a1c1d4294f1dc1b3765e9ad59f4d0ddfdcbeb87fa1b",
+          "at": "2026-07-27T04:31:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1825ea86217759ab1697d21fadf285c5846853c08060fb5cf8003f1b34c0f9cc",
+          "at": "2026-07-27T04:43:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5cc2028a719c1822308a4223ba57d9fe224e60e8865fbd19f508d70362e0d934",
+          "at": "2026-07-27T06:23:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The whole-scan budget is charged too late. `bounded_entries` fully reads, classifies, and stores a child directory before recursive `scan_entries` decrements `remaining_entries`. A depth-64 chain with roughly 10,000 entries per level can therefore enumerate and retain about 640,000 entries while spending only one budget unit per descended directory, bypassing the advertised 20,000-entry traversal bound. Charge the shared budget as entries are produced, including the root listing.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 586,
+              "category": "resource_bounds"
+            },
+            {
+              "message": "This change grows the production module to 756 counted lines, exceeding the repository's 700-line maximum; `bin/sotp verify module-size` fails on this file. Move part of the new traversal/budget logic or its supporting code into a sibling module.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 218,
+              "category": "architecture"
+            },
+            {
+              "message": "The comment still documents the withdrawn behavior: it says a node changed into a link between listing and open is skipped, while the current branch returns `DocumentUnreadable` for every open failure. This contradicts the fail-closed security seam and should be rewritten; related test comments also still refer to the removed `read_dir`/joining/symlink-guard implementation.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/conventions_resolve/mod.rs",
+              "line": 459,
+              "category": "documentation_correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:5cc2028a719c1822308a4223ba57d9fe224e60e8865fbd19f508d70362e0d934",
+          "at": "2026-07-27T06:30:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f38a340053f2860f1e05ca6cdad5b8773f6fb43c4f3d7cbef5288ff87752b0b",
+          "at": "2026-07-27T06:53:09Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f38a340053f2860f1e05ca6cdad5b8773f6fb43c4f3d7cbef5288ff87752b0b",
+          "at": "2026-07-27T06:57:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:624f2e042c2af45b25d8d1d71307899d8edd785a4d83a31375753d6be65bde07",
+          "at": "2026-07-27T13:41:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:624f2e042c2af45b25d8d1d71307899d8edd785a4d83a31375753d6be65bde07",
+          "at": "2026-07-27T13:42:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "テストが reviewer の fast-round 値を `ReasoningEffort::Medium` に固定しており、設定上の tunable な値を変更するたびにテスト修正が必要になります。ここでは具体値ではなく、ProviderCli が明示的な effort を解決できることだけを検証してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles/tests.rs",
+              "line": 233,
+              "category": "test-coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:e46b0cd486bfe0ad542d95b46dbfa3909253e72c7930decf6afe7f8f84a385a9",
+          "at": "2026-07-27T14:44:29Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:942cac2cd5ab67f4ca23c0c6fe2fde274c77a32325644ce30fd37a1c20d73bc6",
+          "at": "2026-07-27T14:46:26Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new `ProviderCli { .. }` assertion no longer verifies the successful fast-round selection path: `test_resolve_execution_missing_fast_effort_returns_error` proves only that an absent fast effort is rejected. An implementation that still requires `fast_reasoning_effort` but mistakenly returns the final `reasoning_effort` would now pass every reviewer assertion. Keep the committed profile tunable, but add a fixture-based happy-path test with distinct fast/final efforts and assert that `RoundType::Fast` returns the fixture's fast value.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/agent_profiles/tests.rs",
+              "line": 237,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:942cac2cd5ab67f4ca23c0c6fe2fde274c77a32325644ce30fd37a1c20d73bc6",
+          "at": "2026-07-27T14:48:40Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:90cf842217f1990cd390b7b3a0961cc4158359eb300e175a2dcdce35046a9f52",
+          "at": "2026-07-27T14:51:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:90cf842217f1990cd390b7b3a0961cc4158359eb300e175a2dcdce35046a9f52",
+          "at": "2026-07-27T14:51:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfd0c835c65b78d432e02290a0a7f58e17b5a4c78a086deb672598940810e017",
+          "at": "2026-07-28T09:33:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cfd0c835c65b78d432e02290a0a7f58e17b5a4c78a086deb672598940810e017",
+          "at": "2026-07-28T09:38:47Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:680373f24a76df5eda2a46afdd890ff3c768d0544915f6353f1d877d9ec9b9e2",
+          "at": "2026-07-28T09:32:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:680373f24a76df5eda2a46afdd890ff3c768d0544915f6353f1d877d9ec9b9e2",
+          "at": "2026-07-28T09:33:55Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb7bf0dc230b9dc29f7b7693e381b5b94e69030e49697713b72a3bd98ecbdf74",
+          "at": "2026-07-26T03:17:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb7bf0dc230b9dc29f7b7693e381b5b94e69030e49697713b72a3bd98ecbdf74",
+          "at": "2026-07-26T03:28:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:07eeb94d7cee9fda1026616a3b6b64b15713a9a08eddbec49acaf18c24be30ce",
+          "at": "2026-07-26T08:41:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ef43c487a62b52b64b5cf0e0e0da08137a9aae00a3e0aba4e036bbb7a50e9927",
+          "at": "2026-07-26T08:56:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`requires()` compares `CapabilityName` values, but `CapabilityName::try_new` stores a trimmed `NonEmptyString`. Consequently, `required_for: [\" reviewer \"]` matches a query for `reviewer`, violating IN-06/AC-06’s non-empty, exact-string matching contract. Preserve non-blank identifiers without normalization (and cover whitespace near-misses).",
+              "severity": "P0",
+              "file": "libs/usecase/src/conventions_resolve/mod.rs",
+              "line": 187,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cd626c6438308172164c24c9581e1875a15348dd90fbe01e2f353b18790c47dd",
+          "at": "2026-07-26T09:23:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce6b0aa92f9f525dda1e08236d756f573ebfdb557b6c3fee410e4b838087a67c",
+          "at": "2026-07-26T10:12:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae1c4e91f8c841867350940cf111eb84d0c589929ac2cc92fca2dfa87aede890",
+          "at": "2026-07-26T11:06:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbd7cf8e063c764244ef7fec15d993d3a794dce630e874865599bc27af35e48d",
+          "at": "2026-07-26T11:37:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b71a03321dcd7672332d38be7c38cf5a38b4bbc6c178cc762c3a47487599083a",
+          "at": "2026-07-26T12:14:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`with_conventions` unconditionally adds the `## Project conventions` section heading, contrary to CN-06's requirement that rendered convention obligations contain no section heading. This makes both dispatch routes carry non-conforming discipline text.",
+              "severity": "P1",
+              "file": "libs/usecase/src/capability_exec/values.rs",
+              "line": 305,
+              "category": "contract violation"
+            }
+          ],
+          "hash": "rvw1:sha256:56b4d9b0fd41f5c31b9c8912f92d8404d7d2b08b2cd3b0aed112ef4d45011c23",
+          "at": "2026-07-26T14:49:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4bc29a94b9c32e380854c0dee261ea391deca5279be816b5321a7aca0425e245",
+          "at": "2026-07-26T14:56:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4bc29a94b9c32e380854c0dee261ea391deca5279be816b5321a7aca0425e245",
+          "at": "2026-07-26T15:02:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`try_new` now rejects paths that remain inside `knowledge/conventions/` when they contain CR/LF or non-UTF-8 bytes. This adds a fail-closed case beyond AC-07/D4, which explicitly limits resolver failure to five conditions and only rejects a path for escaping the convention root. Either preserve such paths losslessly in output or obtain an upstream contract change before rejecting them.",
+              "severity": "P1",
+              "file": "libs/usecase/src/conventions_resolve/mod.rs",
+              "line": 65,
+              "category": "contract_conformance"
+            }
+          ],
+          "hash": "rvw1:sha256:129cc0ec7a1e64f72b96b6fb5fbe9bdc772498b8aa7b1ac2a170ca2f601cb750",
+          "at": "2026-07-26T16:22:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:129cc0ec7a1e64f72b96b6fb5fbe9bdc772498b8aa7b1ac2a170ca2f601cb750",
+          "at": "2026-07-26T16:40:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78cc06ac7ac9ff781e580891a4ae577fae6e64bbecadad4ac3365064f4c71787",
+          "at": "2026-07-27T01:42:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25bb5a922d0df1eb015f08c1a2d776f02d8b52996fa157668431784200264157",
+          "at": "2026-07-27T10:42:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25bb5a922d0df1eb015f08c1a2d776f02d8b52996fa157668431784200264157",
+          "at": "2026-07-27T10:47:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aaac2eaf124ee75243fccb48429e81b6a292787ef50543b69312f8862ab573ad",
+          "at": "2026-07-27T11:06:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aaac2eaf124ee75243fccb48429e81b6a292787ef50543b69312f8862ab573ad",
+          "at": "2026-07-27T11:08:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c4e0e7eea050e2967ad44a246ed9dbf0864acb35ae47519570583cb9e15f3c5",
+          "at": "2026-07-27T13:39:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The cross-dispatch test does not fully pin the per-dispatch contract. It always returns the same document, never inspects `dispatches`, and changes capability on the second call. Thus a per-capability cache could skip resolution on a repeated same-capability dispatch, or the interactor could resolve the second capability but reuse the first composed discipline, while every assertion still passes. Add a same-capability repeat plus capability-specific resolver results, and assert the second dispatched discipline uses only its own resolution.",
+              "severity": "P1",
+              "file": "libs/usecase/src/capability_exec.rs",
+              "line": 1649,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:4c4e0e7eea050e2967ad44a246ed9dbf0864acb35ae47519570583cb9e15f3c5",
+          "at": "2026-07-27T13:45:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16e9db1e726c6323df9d61d9db67212251771ef39922f0c14aa41b254573df5a",
+          "at": "2026-07-27T13:56:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16e9db1e726c6323df9d61d9db67212251771ef39922f0c14aa41b254573df5a",
+          "at": "2026-07-27T14:05:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16e9db1e726c6323df9d61d9db67212251771ef39922f0c14aa41b254573df5a",
+          "at": "2026-07-27T14:07:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca77826ab0220f02171de0e979d3746191639dbbc3af21ce5b7279c95c4d81db",
+          "at": "2026-07-28T01:20:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca77826ab0220f02171de0e979d3746191639dbbc3af21ce5b7279c95c4d81db",
+          "at": "2026-07-28T01:23:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `CheckConventionShippingQuery × AC-18` obligation is unsoundly fulfilled by this test and the companion root-carrying test: they only construct a query and echo its `PathBuf` fields. AC-18 requires an exported-tree smoke check to run successfully and the repository to contain no prose-based dead-reference check; neither condition is observed. Waive this type-level edge or bind it to the future smoke integration test that actually executes the check.",
+              "severity": "P1",
+              "file": "libs/usecase/src/template_conventions/shipping_contract_tests.rs",
+              "line": 39,
+              "category": "test_coverage_gap"
+            }
+          ],
+          "hash": "rvw1:sha256:6ca3a506156fa7b2b7768ddbd47bafbb86069ced92bc8973960839b68617af21",
+          "at": "2026-07-28T12:54:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:6ca3a506156fa7b2b7768ddbd47bafbb86069ced92bc8973960839b68617af21",
+          "at": "2026-07-28T13:01:37Z"
         }
       ]
     },
@@ -3737,6 +3773,20 @@
           "findings": [],
           "hash": "rvw1:sha256:29226467efe9e5a33189df2164b95daf0cf95bb17ec210b17ee8b35ca95d7117",
           "at": "2026-07-28T12:17:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:60a1fcc12b22675585c6934f5fa57935aa67f1eb006e6452eca6338af03e52ea",
+          "at": "2026-07-28T12:56:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:64b569f040d3211eb34a31486c9c0eafba611a4736bda56fee76872c7f5052e0",
+          "at": "2026-07-28T13:04:36Z"
         }
       ]
     }

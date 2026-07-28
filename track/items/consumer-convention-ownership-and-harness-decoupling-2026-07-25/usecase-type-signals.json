@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-28T01:12:56Z",
+  "generated_at": "2026-07-28T12:26:39Z",
   "declaration_hash": "894afddc4dc648cad1639fd5b44e91d94ed436dfa0a3f6b1270a7596c5827d19",
-  "implementation_input_hash": "9ab8cbc487bb05414f04791011a28a3cdf4a1aa70ba5889db25406da68d3d4e5",
+  "implementation_input_hash": "66d0c87235dac8152f8cbec52749a068d14db075e846139aec5bcfb560ccc0fb",
   "signals": [
     {
       "type_name": "CapabilityExecError",
@@ -27,9 +27,9 @@
     {
       "type_name": "CheckConventionShippingQuery",
       "kind_tag": "query",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",
@@ -153,9 +153,9 @@
     {
       "type_name": "ConventionShippingCheckError",
       "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Debug",
         "Display",
         "Error"
@@ -179,9 +179,9 @@
     {
       "type_name": "ConventionShippingVerdict",
       "kind_tag": "enum",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
         "Clone",
         "Debug",
         "Eq",

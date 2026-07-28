@@ -139,12 +139,12 @@
     {
       "id": "T024",
       "description": "`.harness/config/template-boundary.json` の `knowledge/conventions/` 配下に残るファイル単位 entry 群を削除し、`knowledge/conventions` のディレクトリ単位 `overlay` entry 一件へ置き換える。overlay 供給 (T021-T023) と文書移動 (T012-T017, T032) の完了後に置く。Size estimate — harness-policy: ~40 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-01`, `#IN-03`, `#IN-10`, `#CN-01`, `#AC-01`, `#AC-02`, `#AC-04`, `#AC-05`, `#AC-16`.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T025",
       "description": "`libs/usecase/src/template_conventions/` を新設し、`CheckConventionShippingQuery`、`ConventionShippingVerdict`、`ConventionShippingCheckError` を実装する。`ConventionDocumentPath` と `ConventionDocumentPathError` を共有するため T001 に依存する。`libs/usecase/src/template_conventions/` は新設のため既存行の移動を伴わない。Size estimate — usecase: ~130 prod + ~160 test lines (計 ~290)。実測比 ~1.4x を織り込んだ数字である。`track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-11`, `#AC-18`.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T026",

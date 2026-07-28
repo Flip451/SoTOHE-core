@@ -1512,6 +1512,54 @@
         "citation": "assert_eq!(listed_documents(dispatched), vec![RESOLVED_DOCUMENT]);\n        for trap in [TRAP_TRACK_DOCUMENT, TRAP_BRIEFING_DOCUMENT, TRAP_ON_DISK_DOCUMENT] {\n            assert!(\n                !dispatched.as_str().contains(trap),"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckConventionShippingQuery",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckConventionShippingQuery",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "d6f01a5d7c13283bb79723ec3eaa8e17cbcabfa65ae4610c7c7016070ed956f0",
+        "declaration_hash": "06df90f7df69b65c8d4524d3508c846fbfc2691c340242d226298a174dc029a5",
+        "anchor_text_hash": "0d8bcb7b6139fbd92056795f9ccd8bb834d9efea32f8501529a2b539795d9e75"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(query.exported_root, PathBuf::from(\"/var/tmp/export-42\"));\n    assert_eq!(query.overlay_dir, PathBuf::from(\"overlay\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionShippingVerdict",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionShippingVerdict",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "bound_tests_set_hash": "0352b7063ec28fc0e54ebcd3a4b719c0020d172d4ee409723d1edbc1111a88e9",
+        "declaration_hash": "138d6dd0e4fb8eb1d4e748af7adb0cc4d75191c72b7a33a032e6b10cfb504ba7",
+        "anchor_text_hash": "0d8bcb7b6139fbd92056795f9ccd8bb834d9efea32f8501529a2b539795d9e75"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let ConventionShippingVerdict::UnsuppliedDocumentsShipped { documents } = verdict else {\n        panic!(\"expected the violating verdict\");\n    };\n    let named: Vec<String> = documents.as_slice().iter().map(ToString::to_string).collect();\n    assert_eq!(\n        named,\n        [\n            \"knowledge/conventions/language-policy.md\",\n            \"knowledge/conventions/typed-deserialization.md\",\n        ],"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     }
   ]
 }

@@ -67,6 +67,7 @@ pub mod spec_adr_signal;
 pub mod task_completion;
 pub mod task_ops;
 pub mod telemetry;
+pub mod template_conventions;
 pub mod template_export;
 pub mod test_obligation;
 pub mod track_phase;
