@@ -472,7 +472,7 @@
       },
       "key": {
         "bound_tests_set_hash": "238ae4beddde8656339af30316a2d0251efd10ffb83f5ba6c0e7a133775d5ea6",
-        "declaration_hash": "6fe33aabfc0906ddee530ca34b743f154a2465d805a1ca6845a054b4ded68c69",
+        "declaration_hash": "1c14f7cd66da0fb4e1b687ee8610468c2087f30a22e52512dc891dbcd44cd7ba",
         "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
       },
       "verdict": {
@@ -766,6 +766,198 @@
       "verdict": {
         "kind": "fulfilled",
         "citation": "assert_eq!(*observed_features.lock().unwrap(), vec![\"semantic-dup\"]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "eef67a9755217216576e187743c0db3ff6c8b81d2023ea43fb88ca111c1dd365",
+        "declaration_hash": "73f50f1055ccdb7b0113f72d353259bb60ec98ae648e6e3939a85c706a4d13cb",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        seen_features.lock().unwrap().as_slice(),\n        [vec![CargoFeatureName::try_new(\"semantic-dup\".to_owned()).unwrap()]],\n        \"the canonical executor must receive the layer's frozen feature declaration\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "eef67a9755217216576e187743c0db3ff6c8b81d2023ea43fb88ca111c1dd365",
+        "declaration_hash": "73f50f1055ccdb7b0113f72d353259bb60ec98ae648e6e3939a85c706a4d13cb",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(outcome.exit_code, 0, \"an absent declaration must fail the canonical path\");\n    assert_eq!(observer.launches(), 0, \"the declaration failure must occur before rustdoc launch\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "eef67a9755217216576e187743c0db3ff6c8b81d2023ea43fb88ca111c1dd365",
+        "declaration_hash": "73f50f1055ccdb7b0113f72d353259bb60ec98ae648e6e3939a85c706a4d13cb",
+        "anchor_text_hash": "a6f03d4d496a6520dfecd164f5d335765406389e2967c5dff57ef31c57d08b19"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(outcome.exit_code, 0, \"an absent declaration must fail the canonical path\");\n    assert_eq!(observer.launches(), 0, \"the declaration failure must occur before rustdoc launch\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:evaluate_layer"
+      },
+      "key": {
+        "bound_tests_set_hash": "ec22e586e6f29355bce6264736a0498bfd6952f8979632e9b936496ab3aac4e7",
+        "declaration_hash": "aab4647e8f0e12891491f8b8f1a879b31eb36a71be2bcbf0b6d6a8d3046b1177",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        seen_features.lock().unwrap().as_slice(),\n        [vec![CargoFeatureName::try_new(\"semantic-dup\".to_owned()).unwrap()]],\n        \"the canonical executor must receive the layer's frozen feature declaration\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "1ad4d720b63db968ff5ce8f7913605abc381a6a81d907223d60e44c05b8fc210",
+        "declaration_hash": "b92b7afdcdd0a86d1227e9ba7e22da6f726b4947634e3895b87ac1eb5581cf34",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(outcome.exit_code, 0, \"an absent declaration must fail the canonical path\");\n    assert_eq!(observer.launches(), 0, \"the declaration failure must occur before rustdoc launch\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "1ad4d720b63db968ff5ce8f7913605abc381a6a81d907223d60e44c05b8fc210",
+        "declaration_hash": "b92b7afdcdd0a86d1227e9ba7e22da6f726b4947634e3895b87ac1eb5581cf34",
+        "anchor_text_hash": "a6f03d4d496a6520dfecd164f5d335765406389e2967c5dff57ef31c57d08b19"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(outcome.exit_code, 0, \"an absent declaration must fail the canonical path\");\n    assert_eq!(observer.launches(), 0, \"the declaration failure must occur before rustdoc launch\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "35661455a7b37ed674c5cb4559c5cb64ba889711eb15cff322d293f42739d8e9",
+        "declaration_hash": "e84cf5c7e59c414c044a192a519a6a0889fdf33e2b53652e088229891e824dda",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            observer.feature_selections_for(\"infrastructure\"),\n            vec![vec![\"semantic-dup\".to_owned()], Vec::new()],\n            \"each measured rustdoc extraction must observe its declared feature selection\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "0f7b312aa09e12111a9acb85efcc243183dccbb01582fb8ffc97b1027250b139",
+        "declaration_hash": "c848bf66048376ba4352b30ae1c41ca78a67bf9be91d23da06fe404ee09dc663",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            observer.feature_selections_for(\"infrastructure\"),\n            vec![vec![\"semantic-dup\".to_owned()]],\n            \"the executor adapter must pass the declaration-derived feature selection to rustdoc\"\n        );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
     },

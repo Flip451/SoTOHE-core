@@ -22,15 +22,20 @@
       "status": "done"
     },
     {
+      "id": "T006",
+      "description": "Modify `TypeSignalsInteractor`, `TypeSignalsError`, and `TypeSignalsExecutorPort` in `libs/usecase/src/type_signals/{interactor.rs,service.rs,ports.rs}`, `TypeSignalsExecutorAdapter` in `libs/infrastructure/src/tddd/type_signals_executor_adapter.rs`, and `execute_type_signals_for_layer` in `libs/infrastructure/src/tddd/type_signals_evaluator.rs`; inject `TdddActualFeatureDeclarationPort` through `FsTdddFeatureDeclarationAdapter` at `apps/cli-composition/src/{signal/mod.rs,track/tddd.rs}`; and add canonical signal-calculation tests (IN-03, CN-01, AC-03, AC-04).",
+      "status": "done"
+    },
+    {
       "id": "T005",
       "description": "Complete the catalogue-declared `semantic-dup` public items in `libs/infrastructure/src/semantic_dup/{extractor.rs,fragment_extractor_adapter.rs,embedding.rs,index.rs,noop_adapter.rs,null_insert_proxy.rs}` and their corresponding usecase ports/errors; add feature-enabled rustdoc and signal regression coverage (CN-04, CN-05, AC-07, AC-08).",
-      "status": "todo"
+      "status": "done"
     }
   ],
   "plan": {
     "summary": [
       "GO-01: T001, T002, T003.",
-      "GO-02: T003, T004."
+      "GO-02: T003, T004, T006."
     ],
     "sections": [
       {
@@ -52,7 +57,8 @@
         ],
         "task_ids": [
           "T003",
-          "T004"
+          "T004",
+          "T006"
         ]
       },
       {

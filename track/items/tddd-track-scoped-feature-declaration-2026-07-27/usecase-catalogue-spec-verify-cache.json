@@ -459,11 +459,11 @@
       }
     },
     {
-      "claim_hash": "6e2ac3827c34ca4508ce549d62876546985940fc02f6cf474fd059d1abbe3e1f",
+      "claim_hash": "02feb91ab1fb66f7bbe9f325210b9f24ecd380c2dca1dca72282108f2409595e",
       "evidence_hash": "1a47ffbd85e3395733a74240f580498f5fd9b77e568bfef9702964fd21c5e359",
       "verdict": {
         "kind": "pass",
-        "citation": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+        "citation": "feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -555,7 +555,127 @@
       }
     },
     {
-      "claim_hash": "3d2893030d47040aaee3fef876e9fe6fa79b57f74b9dac88cad4589f75724962",
+      "claim_hash": "33605673823d854bae1dae3c7a0e0dbf18d672bd6db4d292097e2160b0723d7d",
+      "evidence_hash": "1a47ffbd85e3395733a74240f580498f5fd9b77e568bfef9702964fd21c5e359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+        }
+      }
+    },
+    {
+      "claim_hash": "33605673823d854bae1dae3c7a0e0dbf18d672bd6db4d292097e2160b0723d7d",
+      "evidence_hash": "a6481a45e2bb141d792a1a8d08880fe0b6f5ad4f40a9df6524e4cdf9cc45315a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 宣言を欠く track で baseline 取得または実測取得を実行すると、rustdoc を呼び出さず fail-closed の失敗として終了する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "feature 宣言を欠く track で baseline 取得または実測取得を実行すると、rustdoc を呼び出さず fail-closed の失敗として終了する"
+        }
+      }
+    },
+    {
+      "claim_hash": "64a342ea1caf4ae7b019446b3d156635609d689b3ab4c41e6c103d037d8a179c",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "64a342ea1caf4ae7b019446b3d156635609d689b3ab4c41e6c103d037d8a179c",
+      "evidence_hash": "1a47ffbd85e3395733a74240f580498f5fd9b77e568bfef9702964fd21c5e359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+        }
+      }
+    },
+    {
+      "claim_hash": "64a342ea1caf4ae7b019446b3d156635609d689b3ab4c41e6c103d037d8a179c",
+      "evidence_hash": "a6481a45e2bb141d792a1a8d08880fe0b6f5ad4f40a9df6524e4cdf9cc45315a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature 宣言を欠く track で baseline 取得または実測取得を実行すると、rustdoc を呼び出さず fail-closed の失敗として終了する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "feature 宣言を欠く track で baseline 取得または実測取得を実行すると、rustdoc を呼び出さず fail-closed の失敗として終了する"
+        }
+      }
+    },
+    {
+      "claim_hash": "4e0dac63eef4bcd440bbeb49c1c01a82b3b478dc8212614651c5657e18daaffe",
       "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
       "verdict": {
         "kind": "pass",
@@ -579,7 +699,7 @@
       }
     },
     {
-      "claim_hash": "3d2893030d47040aaee3fef876e9fe6fa79b57f74b9dac88cad4589f75724962",
+      "claim_hash": "4e0dac63eef4bcd440bbeb49c1c01a82b3b478dc8212614651c5657e18daaffe",
       "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
       "verdict": {
         "kind": "pass",
@@ -699,7 +819,7 @@
       }
     },
     {
-      "claim_hash": "1c6ceb2374300205fc8c5e9a2c2fe7e28dff9d05197a329bb7fe2ef3b2c12d6d",
+      "claim_hash": "ce951eec108712fad8516f32d4c547a5d923e66500569948060bb41232e7818b",
       "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
       "verdict": {
         "kind": "pass",
@@ -723,7 +843,7 @@
       }
     },
     {
-      "claim_hash": "1c6ceb2374300205fc8c5e9a2c2fe7e28dff9d05197a329bb7fe2ef3b2c12d6d",
+      "claim_hash": "ce951eec108712fad8516f32d4c547a5d923e66500569948060bb41232e7818b",
       "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
       "verdict": {
         "kind": "pass",
@@ -791,6 +911,30 @@
           "section": "constraint",
           "element_id": "CN-01",
           "text_label": "rustdoc を呼び出す baseline 取得または実測取得で feature 宣言が不在なら fail-closed で停止し、不在を暗黙の空宣言として扱わない"
+        }
+      }
+    },
+    {
+      "claim_hash": "edba391baca99cc0e50467cb751bc754111470d3414a10194282df5d632c3644",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TypeSignalsExecutorPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
         }
       }
     }

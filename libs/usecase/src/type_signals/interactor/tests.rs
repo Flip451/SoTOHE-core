@@ -5,7 +5,12 @@
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 
+use crate::tddd_feature_declaration::{
+    TdddActualFeatureDeclarationPort, TdddActualFeatureDeclarationPortError,
+    TdddFeatureDeclarationReadError,
+};
 use domain::tddd::catalogue_v2::{TdddLayerBinding, TdddLayerBindingsError, TdddLayerBindingsPort};
+use domain::tddd::{CargoFeatureName, LayerId, TdddFeatureDeclaration};
 use domain::{TrackBranch, TrackId};
 
 use super::super::{
@@ -61,6 +66,7 @@ impl TypeSignalsExecutorPort for SuccessExecutor {
         _track_id: &TrackId,
         _workspace_root: &Path,
         _binding: &TdddLayerBinding,
+        _features: &[domain::tddd::CargoFeatureName],
     ) -> Result<(), TypeSignalsExecutionError> {
         Ok(())
     }
@@ -75,6 +81,7 @@ impl TypeSignalsExecutorPort for FailingExecutor {
         _track_id: &TrackId,
         _workspace_root: &Path,
         _binding: &TdddLayerBinding,
+        _features: &[domain::tddd::CargoFeatureName],
     ) -> Result<(), TypeSignalsExecutionError> {
         Err(TypeSignalsExecutionError("evaluation failed: nightly not installed".to_owned()))
     }
@@ -91,9 +98,84 @@ impl TypeSignalsExecutorPort for TrackIdSpyExecutor {
         track_id: &TrackId,
         _workspace_root: &Path,
         _binding: &TdddLayerBinding,
+        _features: &[domain::tddd::CargoFeatureName],
     ) -> Result<(), TypeSignalsExecutionError> {
         self.seen_track_ids.lock().unwrap().push(track_id.clone());
         Ok(())
+    }
+}
+
+struct EmptyFeatureDeclaration;
+
+impl TdddActualFeatureDeclarationPort for EmptyFeatureDeclaration {
+    fn load_for_actual(
+        &self,
+        _track_dir: &Path,
+        _workspace_root: &Path,
+        layers: &[TdddLayerBinding],
+    ) -> Result<TdddFeatureDeclaration, TdddActualFeatureDeclarationPortError> {
+        let required_layers = layers
+            .iter()
+            .map(|binding| LayerId::try_new(binding.layer_id.clone()))
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|_| TdddActualFeatureDeclarationPortError::BaselineSnapshotMismatch)?;
+        TdddFeatureDeclaration::try_new(
+            required_layers.iter().cloned().map(|layer| (layer, Vec::new())).collect(),
+            &required_layers,
+        )
+        .map_err(|_| TdddActualFeatureDeclarationPortError::BaselineSnapshotMismatch)
+    }
+}
+
+struct MissingFeatureDeclaration;
+
+impl TdddActualFeatureDeclarationPort for MissingFeatureDeclaration {
+    fn load_for_actual(
+        &self,
+        track_dir: &Path,
+        _workspace_root: &Path,
+        _layers: &[TdddLayerBinding],
+    ) -> Result<TdddFeatureDeclaration, TdddActualFeatureDeclarationPortError> {
+        Err(TdddActualFeatureDeclarationPortError::Read(
+            TdddFeatureDeclarationReadError::MissingDeclaration {
+                path: track_dir.join("tddd-features.json"),
+            },
+        ))
+    }
+}
+
+struct SemanticDupFeatureDeclaration;
+
+impl TdddActualFeatureDeclarationPort for SemanticDupFeatureDeclaration {
+    fn load_for_actual(
+        &self,
+        _track_dir: &Path,
+        _workspace_root: &Path,
+        layers: &[TdddLayerBinding],
+    ) -> Result<TdddFeatureDeclaration, TdddActualFeatureDeclarationPortError> {
+        let required_layers = layers
+            .iter()
+            .map(|binding| LayerId::try_new(binding.layer_id.clone()))
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|_| TdddActualFeatureDeclarationPortError::BaselineSnapshotMismatch)?;
+        let semantic_dup = CargoFeatureName::try_new("semantic-dup".to_owned())
+            .map_err(|_| TdddActualFeatureDeclarationPortError::BaselineSnapshotMismatch)?;
+        TdddFeatureDeclaration::try_new(
+            required_layers
+                .iter()
+                .cloned()
+                .map(|layer| {
+                    let features = if layer.as_ref() == "infrastructure" {
+                        vec![semantic_dup.clone()]
+                    } else {
+                        Vec::new()
+                    };
+                    (layer, features)
+                })
+                .collect(),
+            &required_layers,
+        )
+        .map_err(|_| TdddActualFeatureDeclarationPortError::BaselineSnapshotMismatch)
     }
 }
 
@@ -110,7 +192,7 @@ fn build_interactor(
     layer_bindings: Arc<dyn TdddLayerBindingsPort>,
     executor: Arc<dyn TypeSignalsExecutorPort>,
 ) -> TypeSignalsInteractor {
-    TypeSignalsInteractor::new(layer_bindings, executor)
+    TypeSignalsInteractor::new(layer_bindings, executor, Arc::new(EmptyFeatureDeclaration))
 }
 
 fn valid_request(tmp: &std::path::Path) -> TypeSignalsRequest {
@@ -132,12 +214,88 @@ fn test_new_with_injected_ports_runs_the_requested_layer() {
     let interactor = TypeSignalsInteractor::new(
         Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
         Arc::new(SuccessExecutor),
+        Arc::new(EmptyFeatureDeclaration),
     );
     let tmp = tempfile::tempdir().unwrap();
 
     let result = interactor.run(valid_request(tmp.path()));
 
     assert!(result.is_ok(), "injected ports must be used by the constructed interactor");
+}
+
+#[test]
+fn test_run_with_absent_feature_declaration_stops_before_executor() {
+    use std::sync::atomic::{AtomicUsize, Ordering};
+
+    struct CountingExecutor(Arc<AtomicUsize>);
+
+    impl TypeSignalsExecutorPort for CountingExecutor {
+        fn evaluate_layer(
+            &self,
+            _items_dir: &Path,
+            _track_id: &TrackId,
+            _workspace_root: &Path,
+            _binding: &TdddLayerBinding,
+            _features: &[domain::tddd::CargoFeatureName],
+        ) -> Result<(), TypeSignalsExecutionError> {
+            self.0.fetch_add(1, Ordering::SeqCst);
+            Ok(())
+        }
+    }
+
+    let executions = Arc::new(AtomicUsize::new(0));
+    let interactor = TypeSignalsInteractor::new(
+        Arc::new(StubLayerBindings { bindings: vec![stub_binding("domain")] }),
+        Arc::new(CountingExecutor(Arc::clone(&executions))),
+        Arc::new(MissingFeatureDeclaration),
+    );
+    let tmp = tempfile::tempdir().unwrap();
+
+    let error = interactor.run(valid_request(tmp.path())).unwrap_err();
+
+    assert!(matches!(error, TypeSignalsError::FeatureDeclaration(_)));
+    assert_eq!(
+        executions.load(Ordering::SeqCst),
+        0,
+        "missing declarations must stop the canonical path before an executor can launch rustdoc"
+    );
+}
+
+#[test]
+fn test_run_forwards_declared_layer_features_to_executor() {
+    struct FeatureSpyExecutor {
+        seen_features: Arc<Mutex<Vec<Vec<CargoFeatureName>>>>,
+    }
+
+    impl TypeSignalsExecutorPort for FeatureSpyExecutor {
+        fn evaluate_layer(
+            &self,
+            _items_dir: &Path,
+            _track_id: &TrackId,
+            _workspace_root: &Path,
+            _binding: &TdddLayerBinding,
+            features: &[CargoFeatureName],
+        ) -> Result<(), TypeSignalsExecutionError> {
+            self.seen_features.lock().unwrap().push(features.to_vec());
+            Ok(())
+        }
+    }
+
+    let seen_features = Arc::new(Mutex::new(Vec::new()));
+    let interactor = TypeSignalsInteractor::new(
+        Arc::new(StubLayerBindings { bindings: vec![stub_binding("infrastructure")] }),
+        Arc::new(FeatureSpyExecutor { seen_features: Arc::clone(&seen_features) }),
+        Arc::new(SemanticDupFeatureDeclaration),
+    );
+    let tmp = tempfile::tempdir().unwrap();
+
+    interactor.run(valid_request(tmp.path())).unwrap();
+
+    assert_eq!(
+        seen_features.lock().unwrap().as_slice(),
+        [vec![CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap()]],
+        "the canonical executor must receive the layer's frozen feature declaration"
+    );
 }
 
 /// The interactor derives `items_dir` from `workspace_root` internally, so
@@ -334,6 +492,7 @@ fn test_run_with_multiple_layers_processes_all() {
             _track_id: &TrackId,
             _workspace_root: &Path,
             _binding: &TdddLayerBinding,
+            _features: &[domain::tddd::CargoFeatureName],
         ) -> Result<(), TypeSignalsExecutionError> {
             self.0.fetch_add(1, Ordering::SeqCst);
             Ok(())

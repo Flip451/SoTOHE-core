@@ -84,6 +84,11 @@
   "trait_impls": [
     {
       "action": "modify",
+      "for_type": "TypeSignalsInteractor",
+      "trait_ref": "TypeSignalsService"
+    },
+    {
+      "action": "modify",
       "for_type": "BaselineCaptureInteractor",
       "trait_ref": "BaselineCaptureService"
     },
@@ -202,12 +207,27 @@
     {
       "for_type": "TdddActualFeatureDeclarationPortError",
       "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsError",
+      "trait_ref": "core::error::Error"
     }
   ],
   "traits": {
     "CodeFragmentExtractorPort": {
       "action": "reference",
-      "docs": "Extracts semantic-duplication code fragments behind the existing infrastructure boundary.",
+      "docs": "Extracts semantic-duplication code fragments behind the existing infrastructure boundary. The synchronous boundary is intentional: the port fronts a synchronous filesystem scanner and is consumed by the synchronous DRY pipeline under a CLI gate with no ambient async runtime.",
       "informal_grounds": [],
       "methods": [
         {
@@ -334,7 +354,7 @@
     },
     "SemanticIndexPort": {
       "action": "reference",
-      "docs": "Indexes and searches semantic-duplication fragments behind the existing infrastructure boundary.",
+      "docs": "Indexes and searches semantic-duplication fragments behind the existing infrastructure boundary. The synchronous boundary is intentional: the infrastructure adapter owns the async-to-sync bridge by driving LanceDB on its single-worker Tokio runtime from dedicated OS threads, which keeps the usecase layer independent of any async runtime. SemanticIndexError remains shared across the port, but OpenFailed belongs exclusively to adapter construction and is not produced by any port method.",
       "informal_grounds": [],
       "methods": [
         {
@@ -352,7 +372,8 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<(), SemanticIndexError>"
+          "returns": "Result<(), SemanticIndexError>",
+          "docs": "Produces only SemanticIndexError::InsertFailed; SemanticIndexError::OpenFailed is reserved for adapter construction and cannot be produced by this port method."
         },
         {
           "has_default_impl": false,
@@ -365,7 +386,8 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<(), SemanticIndexError>"
+          "returns": "Result<(), SemanticIndexError>",
+          "docs": "Produces only SemanticIndexError::InsertFailed; SemanticIndexError::OpenFailed is reserved for adapter construction and cannot be produced by this port method."
         },
         {
           "has_default_impl": false,
@@ -378,7 +400,8 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<(), SemanticIndexError>"
+          "returns": "Result<(), SemanticIndexError>",
+          "docs": "Produces only SemanticIndexError::DeleteFailed; SemanticIndexError::OpenFailed is reserved for adapter construction and cannot be produced by this port method."
         },
         {
           "has_default_impl": false,
@@ -395,7 +418,8 @@
             }
           ],
           "receiver": "&self",
-          "returns": "Result<Vec<domain::semantic_dup::SimilarFragment>, SemanticIndexError>"
+          "returns": "Result<Vec<domain::semantic_dup::SimilarFragment>, SemanticIndexError>",
+          "docs": "Produces only SemanticIndexError::SearchFailed; SemanticIndexError::OpenFailed is reserved for adapter construction and cannot be produced by this port method."
         }
       ],
       "module_path": "semantic_dup::ports",
@@ -493,6 +517,56 @@
       "spec_refs": [
         {
           "anchor": "CN-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "TypeSignalsExecutorPort": {
+      "action": "modify",
+      "docs": "Synchronous secondary port for per-layer implementation-signal execution; blocking is deliberate because it drives cargo rustdoc subprocesses and filesystem reads from a CLI gate with no async runtime.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "evaluate_layer",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "binding",
+              "ty": "&domain::tddd::catalogue_v2::TdddLayerBinding"
+            },
+            {
+              "name": "features",
+              "ty": "&[domain::tddd::CargoFeatureName]"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), TypeSignalsExecutionError>"
+        }
+      ],
+      "module_path": "type_signals::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
           "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
         }
       ],
@@ -951,7 +1025,7 @@
     },
     "TdddActualFeatureDeclarationPortError": {
       "action": "add",
-      "docs": "Actual-capture-only failures for declaration loading, frozen-byte verification, and undeclared feature-gated catalogue items.",
+      "docs": "Actual-capture-only failures for declaration loading and frozen-byte verification.",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -981,26 +1055,6 @@
             "name": "BaselineSnapshotMismatch",
             "payload": {
               "kind": "unit"
-            }
-          },
-          {
-            "name": "CatalogueUsesUndeclaredFeature",
-            "payload": {
-              "fields": [
-                {
-                  "name": "layer",
-                  "ty": "domain::tddd::LayerId"
-                },
-                {
-                  "name": "feature",
-                  "ty": "domain::tddd::CargoFeatureName"
-                },
-                {
-                  "name": "item",
-                  "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
-                }
-              ],
-              "kind": "struct"
             }
           }
         ]
@@ -1150,6 +1204,155 @@
         },
         {
           "anchor": "AC-05",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsError": {
+      "action": "modify",
+      "docs": "Error boundary for the canonical per-layer implementation-signal application service.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "BranchTrackMismatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "branch",
+                  "ty": "domain::TrackBranch"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "domain::TrackId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "LayerBindingsLoad",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoLayers",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "FeatureDeclaration",
+            "payload": {
+              "fields": [
+                "TdddActualFeatureDeclarationPortError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "EvaluationFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "layer_id",
+                  "ty": "domain::tddd::LayerId"
+                },
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InconsistentRequest",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "type_signals::service",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsInteractor": {
+      "action": "modify",
+      "docs": "Interactor for the canonical per-layer implementation-signal application service.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "layer_bindings",
+              "ty": "Arc<dyn domain::tddd::catalogue_v2::TdddLayerBindingsPort>"
+            },
+            {
+              "name": "executor",
+              "ty": "Arc<dyn TypeSignalsExecutorPort>"
+            },
+            {
+              "name": "feature_declaration",
+              "ty": "Arc<dyn TdddActualFeatureDeclarationPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "type_signals::interactor",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "AC-03",
           "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
         }
       ]

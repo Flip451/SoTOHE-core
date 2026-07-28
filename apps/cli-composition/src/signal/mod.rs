@@ -471,6 +471,7 @@ impl SignalCompositionRoot {
         executor: std::sync::Arc<dyn usecase::type_signals::TypeSignalsExecutorPort>,
     ) -> Result<CommandOutcome, CompositionError> {
         use infrastructure::signal_layer_reader::LocalSignalLayerReaderAdapter;
+        use infrastructure::tddd::feature_declaration_adapter::FsTdddFeatureDeclarationAdapter;
         use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
         use usecase::type_signals::{
             TypeSignalsInteractor, TypeSignalsRequest, TypeSignalsService,
@@ -478,7 +479,8 @@ impl SignalCompositionRoot {
 
         let items_dir = workspace_root.join("track").join("items");
         let layer_bindings = std::sync::Arc::new(FsTdddLayerBindingsAdapter::new());
-        let interactor = TypeSignalsInteractor::new(layer_bindings, executor);
+        let feature_declaration = std::sync::Arc::new(FsTdddFeatureDeclarationAdapter::new());
+        let interactor = TypeSignalsInteractor::new(layer_bindings, executor, feature_declaration);
 
         let reader = LocalSignalLayerReaderAdapter::new(workspace_root.clone());
 

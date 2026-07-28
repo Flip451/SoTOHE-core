@@ -2,7 +2,7 @@
   "crate_name": "infrastructure",
   "functions": {
     "infrastructure::semantic_dup::extractor::extract_code_fragments": {
-      "action": "add",
+      "action": "reference",
       "docs": "Extracts source fragments for semantic-duplication analysis when that Cargo feature is declared.",
       "informal_grounds": [],
       "is_async": false,
@@ -26,7 +26,7 @@
       ]
     },
     "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock": {
-      "action": "add",
+      "action": "reference",
       "docs": "Acquires the process-persistent semantic-index file lock.",
       "informal_grounds": [],
       "is_async": false,
@@ -50,7 +50,7 @@
       ]
     },
     "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path": {
-      "action": "add",
+      "action": "reference",
       "docs": "Derives the lock-file path for a semantic-index database path.",
       "informal_grounds": [],
       "is_async": false,
@@ -69,6 +69,42 @@
         },
         {
           "anchor": "AC-07",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer": {
+      "action": "modify",
+      "docs": "Free-function entrypoint for one layer's implementation-signal evaluation.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "items_dir",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "&domain::TrackId"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "binding",
+          "ty": "&TdddLayerBinding"
+        },
+        {
+          "name": "features",
+          "ty": "&[domain::tddd::CargoFeatureName]"
+        }
+      ],
+      "returns": "Result<std::process::ExitCode, EvaluateSignalsError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
           "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
         }
       ]
@@ -353,90 +389,105 @@
       "trait_ref": "usecase::export_schema::SchemaExporterPort"
     },
     {
-      "action": "add",
+      "action": "reference",
       "for_type": "ExtractError",
       "trait_ref": "core::fmt::Debug"
     },
     {
-      "action": "add",
+      "action": "reference",
       "for_type": "ExtractError",
       "trait_ref": "core::fmt::Display"
     },
     {
-      "action": "add",
+      "action": "reference",
       "for_type": "ExtractError",
       "trait_ref": "core::error::Error"
     },
     {
-      "action": "add",
+      "action": "reference",
       "for_type": "FastEmbedAdapter",
       "trait_ref": "usecase::semantic_dup::EmbeddingPort"
     },
     {
-      "action": "add",
+      "action": "reference",
       "for_type": "FastEmbedAdapter",
       "trait_ref": "core::fmt::Debug"
     },
     {
-      "action": "add",
+      "action": "reference",
       "for_type": "LanceDbSemanticIndexAdapter",
       "trait_ref": "usecase::semantic_dup::SemanticIndexPort"
     },
     {
-      "action": "add",
+      "action": "reference",
       "for_type": "LanceDbSemanticIndexAdapter",
       "trait_ref": "core::fmt::Debug"
     },
     {
-      "action": "add",
+      "action": "reference",
       "for_type": "LanceDbSemanticIndexAdapter",
       "trait_ref": "core::ops::drop::Drop"
     },
     {
-      "action": "add",
+      "action": "reference",
       "for_type": "NoopSemanticIndexPort",
       "trait_ref": "usecase::semantic_dup::SemanticIndexPort"
     },
     {
-      "action": "add",
+      "action": "reference",
       "for_type": "CodeFragmentExtractorAdapter",
       "trait_ref": "usecase::dry_check::fragment_pipeline::CodeFragmentExtractorPort"
     },
     {
-      "action": "add",
+      "action": "reference",
       "for_type": "CodeFragmentExtractorAdapter",
       "trait_ref": "core::fmt::Debug"
     },
     {
-      "action": "add",
+      "action": "reference",
       "for_type": "CodeFragmentExtractorAdapter",
       "trait_ref": "core::default::Default"
     },
     {
-      "action": "add",
+      "action": "reference",
       "for_type": "PersistentIndexLockError",
       "trait_ref": "core::fmt::Debug"
     },
     {
-      "action": "add",
+      "action": "reference",
       "for_type": "PersistentIndexLockError",
       "trait_ref": "core::fmt::Display"
     },
     {
-      "action": "add",
+      "action": "reference",
       "for_type": "PersistentIndexLockError",
       "trait_ref": "core::error::Error"
     },
     {
-      "action": "add",
+      "action": "reference",
       "for_type": "NullInsertIndexProxy",
       "trait_ref": "usecase::semantic_dup::SemanticIndexPort"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "usecase::type_signals::ports::TypeSignalsExecutorPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "core::default::Default"
     }
   ],
   "traits": {},
   "types": {
     "CodeFragmentExtractorAdapter": {
-      "action": "add",
+      "action": "reference",
       "docs": "Adapts semantic-duplication fragment extraction to the use-case port.",
       "informal_grounds": [],
       "kind": {
@@ -462,7 +513,7 @@
       ]
     },
     "ExtractError": {
-      "action": "add",
+      "action": "reference",
       "docs": "Reports semantic fragment extraction I/O failures with a validated diagnostic message.",
       "informal_grounds": [],
       "kind": {
@@ -499,7 +550,7 @@
       ]
     },
     "FastEmbedAdapter": {
-      "action": "add",
+      "action": "reference",
       "docs": "Adapts the feature-gated embedding model to the semantic embedding port.",
       "informal_grounds": [],
       "kind": {
@@ -553,7 +604,7 @@
       ]
     },
     "LanceDbSemanticIndexAdapter": {
-      "action": "add",
+      "action": "reference",
       "docs": "Adapts the feature-gated LanceDB store to the semantic index port.",
       "informal_grounds": [],
       "kind": {
@@ -581,7 +632,7 @@
       ]
     },
     "NoopSemanticIndexPort": {
-      "action": "add",
+      "action": "reference",
       "docs": "Provides the feature-gated no-op semantic index adapter.",
       "informal_grounds": [],
       "kind": {
@@ -607,7 +658,7 @@
       ]
     },
     "NullInsertIndexProxy": {
-      "action": "add",
+      "action": "reference",
       "docs": "Wraps the semantic index while retaining its process-persistent lock.",
       "informal_grounds": [],
       "kind": {
@@ -635,7 +686,7 @@
       ]
     },
     "PersistentIndexLock": {
-      "action": "add",
+      "action": "reference",
       "docs": "Owns the operating-system file resource that keeps a semantic-index lock held.",
       "informal_grounds": [],
       "kind": {
@@ -663,7 +714,7 @@
       ]
     },
     "PersistentIndexLockError": {
-      "action": "add",
+      "action": "reference",
       "docs": "Reports persistent index-lock failures with a validated diagnostic message; contains accepts unconstrained free-text search input for diagnostic inspection.",
       "informal_grounds": [],
       "kind": {
@@ -756,6 +807,38 @@
       },
       "methods": [],
       "module_path": "schema_export",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsExecutorAdapter": {
+      "action": "modify",
+      "docs": "Secondary adapter for the canonical implementation-signal executor port.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::type_signals_executor_adapter",
       "role": {
         "SecondaryAdapter": {}
       },

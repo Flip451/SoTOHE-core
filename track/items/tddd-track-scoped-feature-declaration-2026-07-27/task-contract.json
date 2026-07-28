@@ -33,6 +33,28 @@
       {"layer": "infrastructure", "entry_key": "RustdocCrateAdapter"},
       {"layer": "infrastructure", "entry_key": "RustdocSchemaExporter"}
     ],
+    "T006": [
+      {
+        "layer": "usecase",
+        "entry_key": "TypeSignalsInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "TypeSignalsError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "TypeSignalsExecutorPort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "TypeSignalsExecutorAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      }
+    ],
     "T005": [
       {"layer": "usecase", "entry_key": "CodeFragmentExtractorError"},
       {"layer": "usecase", "entry_key": "EmbeddingError"},

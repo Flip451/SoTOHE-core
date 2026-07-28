@@ -29,6 +29,7 @@ impl TrackCompositionRoot {
     ) -> Result<CommandOutcome, CompositionError> {
         use domain::TrackBranch;
         use infrastructure::git_cli::SystemGitRepo;
+        use infrastructure::tddd::feature_declaration_adapter::FsTdddFeatureDeclarationAdapter;
         use infrastructure::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
         use infrastructure::tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter;
         use usecase::type_signals::{
@@ -65,7 +66,8 @@ impl TrackCompositionRoot {
 
         let layer_bindings = Arc::new(FsTdddLayerBindingsAdapter::new());
         let executor = Arc::new(TypeSignalsExecutorAdapter::new());
-        let interactor = TypeSignalsInteractor::new(layer_bindings, executor);
+        let feature_declaration = Arc::new(FsTdddFeatureDeclarationAdapter::new());
+        let interactor = TypeSignalsInteractor::new(layer_bindings, executor, feature_declaration);
 
         interactor
             .run(TypeSignalsRequest {

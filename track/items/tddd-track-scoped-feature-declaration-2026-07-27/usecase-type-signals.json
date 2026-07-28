@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-27T15:31:30Z",
-  "declaration_hash": "703d4188331c9a35969c65a758dc77c2d5d6389577165c53a0235bd817ddc409",
-  "implementation_input_hash": "051a7fa8cddc561f817d7427788372ce7a73f5037b865fbb3adc0d964d251e5e",
+  "generated_at": "2026-07-28T02:31:10Z",
+  "declaration_hash": "b92f1c279195b9fee4d5660a9904954139c95dfa7be7324bfb6ad2f3c02f7c35",
+  "implementation_input_hash": "7fcf2047ede0385eebede342adc74fee269d844214c4c6bc5439b31c8f1ea4e1",
   "signals": [
     {
       "type_name": "BaselineCaptureError",
@@ -87,6 +87,32 @@
         "Debug",
         "Display",
         "Error"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsExecutorPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TypeSignalsService"
       ]
     },
     {

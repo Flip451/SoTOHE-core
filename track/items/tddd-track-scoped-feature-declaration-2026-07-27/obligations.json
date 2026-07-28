@@ -143,6 +143,38 @@
     },
     {
       "id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "TypeSignalsInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of TypeSignalsInteractor",
+      "declaration_hash": "73f50f1055ccdb7b0113f72d353259bb60ec98ae648e6e3939a85c706a4d13cb",
+      "spec_refs": [
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
         "entry_key": "TdddActualFeatureDeclarationPort",
         "obligation_kind": "contract",
         "item_identifier": "trait_method:load_for_actual"
@@ -191,85 +223,49 @@
     },
     {
       "id": {
-        "entry_key": "infrastructure::semantic_dup::extractor::extract_code_fragments",
-        "obligation_kind": "logic",
-        "item_identifier": "entry"
+        "entry_key": "TypeSignalsExecutorPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:evaluate_layer"
       },
       "target_entry": {
-        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-        "section_key": "functions",
-        "entry_key": "infrastructure::semantic_dup::extractor::extract_code_fragments"
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "TypeSignalsExecutorPort"
       },
       "target_role": {
-        "kind": "function_role",
-        "role": "FreeFunction"
+        "kind": "contract_role",
+        "role": "SecondaryPort"
       },
-      "brief": "Author a logic test covering 'entry' of infrastructure::semantic_dup::extractor::extract_code_fragments",
-      "declaration_hash": "9080c90ce28d77375bb8d208504be2f7568e395a092d47325529bd0a7a9c2515",
+      "brief": "Author a contract test covering 'trait_method:evaluate_layer' of TypeSignalsExecutorPort",
+      "declaration_hash": "aab4647e8f0e12891491f8b8f1a879b31eb36a71be2bcbf0b6d6a8d3046b1177",
       "spec_refs": [
         {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "CN-04"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-07"
+          "element_id": "IN-03"
         }
       ]
     },
     {
       "id": {
-        "entry_key": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
         "obligation_kind": "logic",
         "item_identifier": "entry"
       },
       "target_entry": {
         "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
         "section_key": "functions",
-        "entry_key": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock"
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
       },
       "target_role": {
         "kind": "function_role",
         "role": "FreeFunction"
       },
-      "brief": "Author a logic test covering 'entry' of infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock",
-      "declaration_hash": "453ea834d8d99f32a49757ccf615103b5f1baad44e28a9316178e4fa804afe5c",
+      "brief": "Author a logic test covering 'entry' of infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+      "declaration_hash": "e84cf5c7e59c414c044a192a519a6a0889fdf33e2b53652e088229891e824dda",
       "spec_refs": [
         {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "CN-04"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-07"
-        }
-      ]
-    },
-    {
-      "id": {
-        "entry_key": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path",
-        "obligation_kind": "logic",
-        "item_identifier": "entry"
-      },
-      "target_entry": {
-        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-        "section_key": "functions",
-        "entry_key": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path"
-      },
-      "target_role": {
-        "kind": "function_role",
-        "role": "FreeFunction"
-      },
-      "brief": "Author a logic test covering 'entry' of infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path",
-      "declaration_hash": "268730261b79f1274ff45af5de5150ffc7782fd35e951746c5323f3ee855d505",
-      "spec_refs": [
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "CN-04"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-07"
+          "element_id": "IN-03"
         }
       ]
     },
@@ -371,141 +367,25 @@
     },
     {
       "id": {
-        "entry_key": "FastEmbedAdapter",
+        "entry_key": "TypeSignalsExecutorAdapter",
         "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::semantic_dup::EmbeddingPort"
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort"
       },
       "target_entry": {
         "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
         "section_key": "traits",
-        "entry_key": "FastEmbedAdapter"
+        "entry_key": "TypeSignalsExecutorAdapter"
       },
       "target_role": {
         "kind": "trait_impl",
         "role": "SecondaryPort"
       },
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::semantic_dup::EmbeddingPort' of FastEmbedAdapter",
-      "declaration_hash": "09f443bbfea60b142ace2c5f951b8771083d16ea8a86187f0871633ce64f45e5",
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort' of TypeSignalsExecutorAdapter",
+      "declaration_hash": "c848bf66048376ba4352b30ae1c41ca78a67bf9be91d23da06fe404ee09dc663",
       "spec_refs": [
         {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "CN-04"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-07"
-        }
-      ]
-    },
-    {
-      "id": {
-        "entry_key": "LanceDbSemanticIndexAdapter",
-        "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::semantic_dup::SemanticIndexPort"
-      },
-      "target_entry": {
-        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-        "section_key": "traits",
-        "entry_key": "LanceDbSemanticIndexAdapter"
-      },
-      "target_role": {
-        "kind": "trait_impl",
-        "role": "SecondaryPort"
-      },
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::semantic_dup::SemanticIndexPort' of LanceDbSemanticIndexAdapter",
-      "declaration_hash": "14551c617ba4816fbb95291de8e997f4fa65c020fd4cf6704c1d2e1bd030433d",
-      "spec_refs": [
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "CN-04"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-07"
-        }
-      ]
-    },
-    {
-      "id": {
-        "entry_key": "NoopSemanticIndexPort",
-        "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::semantic_dup::SemanticIndexPort"
-      },
-      "target_entry": {
-        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-        "section_key": "traits",
-        "entry_key": "NoopSemanticIndexPort"
-      },
-      "target_role": {
-        "kind": "trait_impl",
-        "role": "SecondaryPort"
-      },
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::semantic_dup::SemanticIndexPort' of NoopSemanticIndexPort",
-      "declaration_hash": "c53ccb54771797bf144e7119a65b08dcd66424476f8c5ae45262db477fab026f",
-      "spec_refs": [
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "CN-04"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-07"
-        }
-      ]
-    },
-    {
-      "id": {
-        "entry_key": "CodeFragmentExtractorAdapter",
-        "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::dry_check::fragment_pipeline::CodeFragmentExtractorPort"
-      },
-      "target_entry": {
-        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-        "section_key": "traits",
-        "entry_key": "CodeFragmentExtractorAdapter"
-      },
-      "target_role": {
-        "kind": "trait_impl",
-        "role": "SecondaryPort"
-      },
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::dry_check::fragment_pipeline::CodeFragmentExtractorPort' of CodeFragmentExtractorAdapter",
-      "declaration_hash": "e3fa40b4de41d35d029318fa43fbb31f11f42859bcb9f58523a352315ec9a5b7",
-      "spec_refs": [
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "CN-04"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-07"
-        }
-      ]
-    },
-    {
-      "id": {
-        "entry_key": "NullInsertIndexProxy",
-        "obligation_kind": "contract_conformance",
-        "item_identifier": "trait_impl:usecase::semantic_dup::SemanticIndexPort"
-      },
-      "target_entry": {
-        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-        "section_key": "traits",
-        "entry_key": "NullInsertIndexProxy"
-      },
-      "target_role": {
-        "kind": "trait_impl",
-        "role": "SecondaryPort"
-      },
-      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::semantic_dup::SemanticIndexPort' of NullInsertIndexProxy",
-      "declaration_hash": "308675f7fae327903dbfde5d87d015ae0512ec817dba30a54675155da50cce03",
-      "spec_refs": [
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "CN-04"
-        },
-        {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
-          "element_id": "AC-07"
+          "element_id": "IN-03"
         }
       ]
     }

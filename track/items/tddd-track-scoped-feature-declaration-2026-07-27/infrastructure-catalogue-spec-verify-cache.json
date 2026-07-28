@@ -3,7 +3,7 @@
   "layer": "infrastructure",
   "entries": [
     {
-      "claim_hash": "238598f309dd49514eb9a3700114ced40d86808045110fe1017b54f090e9cd4f",
+      "claim_hash": "df96a7bdca07ec41bd6b69124c1a8742cd1698dd559853d3fd2c6b3effb9cbd4",
       "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
       "verdict": {
         "kind": "pass",
@@ -27,7 +27,7 @@
       }
     },
     {
-      "claim_hash": "238598f309dd49514eb9a3700114ced40d86808045110fe1017b54f090e9cd4f",
+      "claim_hash": "df96a7bdca07ec41bd6b69124c1a8742cd1698dd559853d3fd2c6b3effb9cbd4",
       "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
       "verdict": {
         "kind": "pass",
@@ -51,7 +51,7 @@
       }
     },
     {
-      "claim_hash": "000d1a62646140f16a974534abfd894440a1e2dd0c0b30789c39ab6d4701e027",
+      "claim_hash": "45f75936a3c2bf8f69222513e8e290b7da5a9824c99f2dc496c3ab5a7824c35b",
       "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
       "verdict": {
         "kind": "pass",
@@ -75,11 +75,11 @@
       }
     },
     {
-      "claim_hash": "000d1a62646140f16a974534abfd894440a1e2dd0c0b30789c39ab6d4701e027",
+      "claim_hash": "45f75936a3c2bf8f69222513e8e290b7da5a9824c99f2dc496c3ab5a7824c35b",
       "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
       "verdict": {
         "kind": "pass",
-        "citation": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        "citation": "その feature により可視化された既存 public item が catalogue に整備され"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -99,7 +99,7 @@
       }
     },
     {
-      "claim_hash": "d4e7ca2c04aed40d83f14789464b60095bf1ad37eda001b88f493739475e2ced",
+      "claim_hash": "d1144d3b40c0e7c84776bb1056c425e29de51fb1cec86288b03653645bc17bef",
       "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
       "verdict": {
         "kind": "pass",
@@ -123,7 +123,7 @@
       }
     },
     {
-      "claim_hash": "d4e7ca2c04aed40d83f14789464b60095bf1ad37eda001b88f493739475e2ced",
+      "claim_hash": "d1144d3b40c0e7c84776bb1056c425e29de51fb1cec86288b03653645bc17bef",
       "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
       "verdict": {
         "kind": "pass",
@@ -195,7 +195,7 @@
       }
     },
     {
-      "claim_hash": "90ecae55c1b57cb53acbc138aa571d84d4a4041521fb5fee2cffa2e2d8b799c1",
+      "claim_hash": "fe05cdec5cf7cbfb81be8be38bfb7d40beca85e06a6ec393f66c91633beb02c4",
       "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
       "verdict": {
         "kind": "pass",
@@ -219,7 +219,7 @@
       }
     },
     {
-      "claim_hash": "90ecae55c1b57cb53acbc138aa571d84d4a4041521fb5fee2cffa2e2d8b799c1",
+      "claim_hash": "fe05cdec5cf7cbfb81be8be38bfb7d40beca85e06a6ec393f66c91633beb02c4",
       "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
       "verdict": {
         "kind": "pass",
@@ -243,7 +243,7 @@
       }
     },
     {
-      "claim_hash": "8dac88e1090e78cb2a1d3e32aee949d514f09038dfffdb871a1b8b788616d447",
+      "claim_hash": "1b5736da35ab045fdd8f71b189d3e9005ca8ccd54c9f4f992759c33f971d45f4",
       "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
       "verdict": {
         "kind": "pass",
@@ -267,7 +267,7 @@
       }
     },
     {
-      "claim_hash": "8dac88e1090e78cb2a1d3e32aee949d514f09038dfffdb871a1b8b788616d447",
+      "claim_hash": "1b5736da35ab045fdd8f71b189d3e9005ca8ccd54c9f4f992759c33f971d45f4",
       "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
       "verdict": {
         "kind": "pass",
@@ -291,7 +291,7 @@
       }
     },
     {
-      "claim_hash": "ed64bedc2ee3fb29c0059ba24019bb94690f11ffe57d76f58fe3708b476553ba",
+      "claim_hash": "0574cad17d77f5b8646245e0f23f5a30b360b505a620ac5ddf29892ecee63b53",
       "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
       "verdict": {
         "kind": "pass",
@@ -315,7 +315,7 @@
       }
     },
     {
-      "claim_hash": "ed64bedc2ee3fb29c0059ba24019bb94690f11ffe57d76f58fe3708b476553ba",
+      "claim_hash": "0574cad17d77f5b8646245e0f23f5a30b360b505a620ac5ddf29892ecee63b53",
       "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
       "verdict": {
         "kind": "pass",
@@ -339,7 +339,7 @@
       }
     },
     {
-      "claim_hash": "1c9a5027b862a6448d6d660965bf381b6c1aabe244f58fdb6926b5e70a14ad0f",
+      "claim_hash": "737d8600be9978eea590f7900b732442cee80d4d7958dd5714498ac289daab53",
       "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
       "verdict": {
         "kind": "pass",
@@ -363,7 +363,7 @@
       }
     },
     {
-      "claim_hash": "1c9a5027b862a6448d6d660965bf381b6c1aabe244f58fdb6926b5e70a14ad0f",
+      "claim_hash": "737d8600be9978eea590f7900b732442cee80d4d7958dd5714498ac289daab53",
       "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
       "verdict": {
         "kind": "pass",
@@ -387,7 +387,7 @@
       }
     },
     {
-      "claim_hash": "b28e76725a5589076c4acc61f9c3bcc001bc6ff2747a4cc91d5003361ff95b08",
+      "claim_hash": "caea12ee187d73ad64570719523e7d20d660e33679fba7cab0d9eae60070a925",
       "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
       "verdict": {
         "kind": "pass",
@@ -411,11 +411,11 @@
       }
     },
     {
-      "claim_hash": "b28e76725a5589076c4acc61f9c3bcc001bc6ff2747a4cc91d5003361ff95b08",
+      "claim_hash": "caea12ee187d73ad64570719523e7d20d660e33679fba7cab0d9eae60070a925",
       "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
       "verdict": {
         "kind": "pass",
-        "citation": "その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        "citation": "その feature により可視化された既存 public item が catalogue に整備され"
       },
       "claim_origin": {
         "kind": "catalogue_entry",
@@ -507,7 +507,31 @@
       }
     },
     {
-      "claim_hash": "a0b469f36a09c996e741ae40b4645317fac43e86e25d300edeb2f4136135c4c1",
+      "claim_hash": "93ea1f4963d515901332bc3ff9fcea78128e5940a048ab7353bd0192d69c0595",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "types",
+          "entry_key": "TypeSignalsExecutorAdapter"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+        }
+      }
+    },
+    {
+      "claim_hash": "fcc0ae68c7fb30e4223b6f490c733cd18c8f85078db9380191f8a10b6b1756a1",
       "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
       "verdict": {
         "kind": "pass",
@@ -531,7 +555,7 @@
       }
     },
     {
-      "claim_hash": "a0b469f36a09c996e741ae40b4645317fac43e86e25d300edeb2f4136135c4c1",
+      "claim_hash": "fcc0ae68c7fb30e4223b6f490c733cd18c8f85078db9380191f8a10b6b1756a1",
       "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
       "verdict": {
         "kind": "pass",
@@ -555,7 +579,7 @@
       }
     },
     {
-      "claim_hash": "a91af6cf3744a9b0207bf561427e5b474cf64973890f38e041ea4f959a5d5ef5",
+      "claim_hash": "f6267b12bc7362bc58eb0c2b8d62bfd58355fa47fc4feb64f90aa34753c521ad",
       "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
       "verdict": {
         "kind": "pass",
@@ -579,55 +603,7 @@
       }
     },
     {
-      "claim_hash": "a91af6cf3744a9b0207bf561427e5b474cf64973890f38e041ea4f959a5d5ef5",
-      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
-      "verdict": {
-        "kind": "pass",
-        "citation": "その feature により可視化された既存 public item が catalogue に整備され"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-          "section_key": "functions",
-          "entry_key": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "acceptance_criteria",
-          "element_id": "AC-07",
-          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
-        }
-      }
-    },
-    {
-      "claim_hash": "c634c752e84f7062ee3bde2e30cd53ab394ec387715de9199952e71631966f85",
-      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
-      "verdict": {
-        "kind": "pass",
-        "citation": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
-      },
-      "claim_origin": {
-        "kind": "catalogue_entry",
-        "data": {
-          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
-          "section_key": "functions",
-          "entry_key": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path"
-        }
-      },
-      "evidence_origin": {
-        "kind": "spec_element",
-        "data": {
-          "section": "constraint",
-          "element_id": "CN-04",
-          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
-        }
-      }
-    },
-    {
-      "claim_hash": "c634c752e84f7062ee3bde2e30cd53ab394ec387715de9199952e71631966f85",
+      "claim_hash": "f6267b12bc7362bc58eb0c2b8d62bfd58355fa47fc4feb64f90aa34753c521ad",
       "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
       "verdict": {
         "kind": "pass",
@@ -638,6 +614,54 @@
         "data": {
           "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
           "section_key": "functions",
+          "entry_key": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "4dd4076355699f49ee855ddb0b6fa285e72140c2f8aae89b168a34697ff1584a",
+      "evidence_hash": "2f3e3e1efb25741a7fd8b81143e296477fbf42b48e588835d564a9572f1cf612",
+      "verdict": {
+        "kind": "pass",
+        "citation": "その feature により新たに可視化される既存 public item を catalogue に整備する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "feature を最初に宣言する track は、その feature により新たに可視化される既存 public item を catalogue に整備する"
+        }
+      }
+    },
+    {
+      "claim_hash": "4dd4076355699f49ee855ddb0b6fa285e72140c2f8aae89b168a34697ff1584a",
+      "evidence_hash": "473a90fba33b896fd1902f5712bbd40bca2a71aa2fd02aa7aa01b18580c96359",
+      "verdict": {
+        "kind": "pass",
+        "citation": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "functions",
           "entry_key": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path"
         }
       },
@@ -647,6 +671,30 @@
           "section": "acceptance_criteria",
           "element_id": "AC-07",
           "text_label": "feature を最初に宣言する track では、その feature により可視化された既存 public item が catalogue に整備され、implementation-to-catalogue signal を blue と評価できる"
+        }
+      }
+    },
+    {
+      "claim_hash": "81b3834d9af7b584bf75dc58ed45ded29dbcb2463d6c468f47b47ecd96ddec4c",
+      "evidence_hash": "ae977edae3406629e7a060eb649980ac330ce59cf6ca2169ce513ea98018d215",
+      "verdict": {
+        "kind": "pass",
+        "citation": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+          "section_key": "functions",
+          "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "rustdoc を実際に呼び出す baseline 取得と実測取得は feature 宣言を入力として読み、同一の宣言内容を観測する"
         }
       }
     }

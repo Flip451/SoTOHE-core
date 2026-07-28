@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "703d4188331c9a35969c65a758dc77c2d5d6389577165c53a0235bd817ddc409",
+  "catalogue_declaration_hash": "b92f1c279195b9fee4d5660a9904954139c95dfa7be7324bfb6ad2f3c02f7c35",
   "signals": [
     {
       "type_name": "BaselineCaptureError",
@@ -40,7 +40,7 @@
     {
       "type_name": "TdddActualFeatureDeclarationPortError",
       "signal": "blue",
-      "entry_hash": "6e2ac3827c34ca4508ce549d62876546985940fc02f6cf474fd059d1abbe3e1f"
+      "entry_hash": "02feb91ab1fb66f7bbe9f325210b9f24ecd380c2dca1dca72282108f2409595e"
     },
     {
       "type_name": "TdddBaselineFeatureDeclarationPortError",
@@ -53,9 +53,19 @@
       "entry_hash": "0fbeddc9e61b6bc4772ae6d243b009573609828d9fcd93a0b14c5b070749aff4"
     },
     {
+      "type_name": "TypeSignalsError",
+      "signal": "blue",
+      "entry_hash": "33605673823d854bae1dae3c7a0e0dbf18d672bd6db4d292097e2160b0723d7d"
+    },
+    {
+      "type_name": "TypeSignalsInteractor",
+      "signal": "blue",
+      "entry_hash": "64a342ea1caf4ae7b019446b3d156635609d689b3ab4c41e6c103d037d8a179c"
+    },
+    {
       "type_name": "CodeFragmentExtractorPort",
       "signal": "blue",
-      "entry_hash": "3d2893030d47040aaee3fef876e9fe6fa79b57f74b9dac88cad4589f75724962"
+      "entry_hash": "4e0dac63eef4bcd440bbeb49c1c01a82b3b478dc8212614651c5657e18daaffe"
     },
     {
       "type_name": "EmbeddingPort",
@@ -70,7 +80,7 @@
     {
       "type_name": "SemanticIndexPort",
       "signal": "blue",
-      "entry_hash": "1c6ceb2374300205fc8c5e9a2c2fe7e28dff9d05197a329bb7fe2ef3b2c12d6d"
+      "entry_hash": "ce951eec108712fad8516f32d4c547a5d923e66500569948060bb41232e7818b"
     },
     {
       "type_name": "TdddActualFeatureDeclarationPort",
@@ -81,6 +91,11 @@
       "type_name": "TdddBaselineFeatureDeclarationPort",
       "signal": "blue",
       "entry_hash": "d3384df3587c5eace37b28c5160c9dd2c654b3f7d8f475e30cc8416144c8eb35"
+    },
+    {
+      "type_name": "TypeSignalsExecutorPort",
+      "signal": "blue",
+      "entry_hash": "edba391baca99cc0e50467cb751bc754111470d3414a10194282df5d632c3644"
     }
   ]
 }

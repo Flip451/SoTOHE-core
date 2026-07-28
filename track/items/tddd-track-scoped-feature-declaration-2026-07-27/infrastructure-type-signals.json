@@ -1,41 +1,9 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-27T12:22:40Z",
-  "declaration_hash": "4b6906ae2bb783ed276b46e0cdd808fa0accafe5fd4a0b769e8c465892ad449e",
-  "implementation_input_hash": "7983dc1aa06a51dcc0e78716288d26136968dd492a4d213b4d0e8a57ada7c674",
+  "generated_at": "2026-07-28T01:46:55Z",
+  "declaration_hash": "c507c4263ca0d0967aa9c6b650da09eaa20ff1b0208cf435e026cdd36e139b2b",
+  "implementation_input_hash": "a67daefd219bde09309b808e4b4feb70d2e1b1fbb3940cf5e3916deed9ff7090",
   "signals": [
-    {
-      "type_name": "CodeFragmentExtractorAdapter",
-      "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "CodeFragmentExtractorPort",
-        "Debug",
-        "Default"
-      ]
-    },
-    {
-      "type_name": "ExtractError",
-      "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "Debug",
-        "Display",
-        "Error"
-      ]
-    },
-    {
-      "type_name": "FastEmbedAdapter",
-      "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "Debug",
-        "EmbeddingPort"
-      ]
-    },
     {
       "type_name": "FsTdddFeatureDeclarationAdapter",
       "kind_tag": "secondary_adapter",
@@ -47,52 +15,6 @@
         "Default",
         "TdddActualFeatureDeclarationPort",
         "TdddBaselineFeatureDeclarationPort"
-      ]
-    },
-    {
-      "type_name": "LanceDbSemanticIndexAdapter",
-      "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "Debug",
-        "Drop",
-        "SemanticIndexPort"
-      ]
-    },
-    {
-      "type_name": "NoopSemanticIndexPort",
-      "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "SemanticIndexPort"
-      ]
-    },
-    {
-      "type_name": "NullInsertIndexProxy",
-      "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "SemanticIndexPort"
-      ]
-    },
-    {
-      "type_name": "PersistentIndexLock",
-      "kind_tag": "secondary_adapter",
-      "signal": "yellow",
-      "found_type": false
-    },
-    {
-      "type_name": "PersistentIndexLockError",
-      "kind_tag": "error_type",
-      "signal": "yellow",
-      "found_type": false,
-      "missing_items": [
-        "Debug",
-        "Display",
-        "Error"
       ]
     },
     {
@@ -120,22 +42,85 @@
       "found_type": true
     },
     {
+      "type_name": "TypeSignalsExecutorAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "usecase::type_signals::ports::TypeSignalsExecutorPort"
+      ]
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+      "kind_tag": "free_function",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "CodeFragmentExtractorAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ExtractError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "FastEmbedAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "LanceDbSemanticIndexAdapter",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "NoopSemanticIndexPort",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "NullInsertIndexProxy",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PersistentIndexLock",
+      "kind_tag": "secondary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "PersistentIndexLockError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
       "type_name": "infrastructure::semantic_dup::extractor::extract_code_fragments",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::semantic_dup::null_insert_proxy::acquire_persistent_index_lock",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "infrastructure::semantic_dup::null_insert_proxy::persistent_index_lock_path",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

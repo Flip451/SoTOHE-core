@@ -499,6 +499,115 @@
       ]
     },
     {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_forwards_declared_layer_features_to_executor"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "item_identifier": "trait_method:evaluate_layer",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_forwards_declared_layer_features_to_executor"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_composition_freshness_skip_and_conservative_reextract_use_real_adapter"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_feature_selection_change_reextracts_and_reaches_rustdoc"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_absent_catalogue_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_with_declared_features_forwards_them_to_rustdoc"
+        }
+      ]
+    },
+    {
       "kind": "voluntary_binding",
       "edge_id": {
         "entry_key": "CatalogueImplSignalsError",

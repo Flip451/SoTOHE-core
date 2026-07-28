@@ -79,12 +79,6 @@ pub enum TdddActualFeatureDeclarationPortError {
     MissingBaselineSnapshot { path: PathBuf },
     /// Existing baseline bytes differ from the current declaration bytes.
     BaselineSnapshotMismatch,
-    /// A catalogue item is gated by a feature omitted from the declaration.
-    CatalogueUsesUndeclaredFeature {
-        layer: LayerId,
-        feature: CargoFeatureName,
-        item: DiagnosticMessage,
-    },
 }
 
 impl fmt::Display for TdddActualFeatureDeclarationPortError {
@@ -99,12 +93,6 @@ impl fmt::Display for TdddActualFeatureDeclarationPortError {
             Self::BaselineSnapshotMismatch => {
                 formatter.write_str("feature declaration differs from its baseline snapshot")
             }
-            Self::CatalogueUsesUndeclaredFeature { layer, feature, item } => write!(
-                formatter,
-                "catalogue item '{}' uses undeclared feature '{}' for layer '{layer}'",
-                item.as_str(),
-                feature.as_str()
-            ),
         }
     }
 }

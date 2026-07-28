@@ -9,9 +9,10 @@
 | CodeFragmentExtractorError | error_type | reference | ExtractionFailed | 🔵 | 🔵 |
 | EmbeddingError | error_type | reference | ModelLoadFailed, InferenceFailed | 🔵 | 🔵 |
 | SemanticIndexError | error_type | reference | OpenFailed, InsertFailed, DeleteFailed, SearchFailed | 🔵 | 🔵 |
-| TdddActualFeatureDeclarationPortError | error_type | add | Read, MissingBaselineSnapshot, BaselineSnapshotMismatch, CatalogueUsesUndeclaredFeature | 🔵 | 🔵 |
+| TdddActualFeatureDeclarationPortError | error_type | add | Read, MissingBaselineSnapshot, BaselineSnapshotMismatch | 🔵 | 🔵 |
 | TdddBaselineFeatureDeclarationPortError | error_type | add | Read, SnapshotWrite, BaselineSnapshotMismatch | 🔵 | 🔵 |
 | TdddFeatureDeclarationReadError | error_type | add | MissingDeclaration, ReadDeclaration, DecodeDeclaration, UnknownCargoFeature | 🔵 | 🔵 |
+| TypeSignalsError | error_type | modify | BranchTrackMismatch, LayerBindingsLoad, NoLayers, FeatureDeclaration, EvaluationFailed, InconsistentRequest | 🔵 | 🔵 |
 
 ## Secondary Ports
 
@@ -23,6 +24,7 @@
 | SemanticIndexPort | secondary_port | reference | fn insert(&self, fragment: &domain::semantic_dup::CodeFragment, embedding: &[f32]) -> Result<(), SemanticIndexError>, fn insert_batch(&self, items: &[(domain::semantic_dup::CodeFragment, Vec<f32>)]) -> Result<(), SemanticIndexError>, fn delete_by_source_path(&self, source_path: &std::path::Path) -> Result<(), SemanticIndexError>, fn search(&self, embedding: &[f32], top_k: domain::semantic_dup::TopK) -> Result<Vec<domain::semantic_dup::SimilarFragment>, SemanticIndexError> | 🔵 | 🔵 |
 | TdddActualFeatureDeclarationPort | secondary_port | add | fn load_for_actual(&self, track_dir: &std::path::Path, workspace_root: &std::path::Path, layers: &[domain::tddd::catalogue_v2::TdddLayerBinding]) -> Result<domain::tddd::TdddFeatureDeclaration, TdddActualFeatureDeclarationPortError> | 🔵 | 🔵 |
 | TdddBaselineFeatureDeclarationPort | secondary_port | add | fn load_for_baseline(&self, track_dir: &std::path::Path, workspace_root: &std::path::Path, layers: &[domain::tddd::catalogue_v2::TdddLayerBinding]) -> Result<domain::tddd::TdddFeatureDeclaration, TdddBaselineFeatureDeclarationPortError> | 🔵 | 🔵 |
+| TypeSignalsExecutorPort | secondary_port | modify | fn evaluate_layer(&self, items_dir: &std::path::Path, track_id: &domain::TrackId, workspace_root: &std::path::Path, binding: &domain::tddd::catalogue_v2::TdddLayerBinding, features: &[domain::tddd::CargoFeatureName]) -> Result<(), TypeSignalsExecutionError> | 🔵 | 🔵 |
 
 ## Interactors
 
@@ -30,4 +32,5 @@
 |------|------|--------|---------|--------|----------|
 | BaselineCaptureInteractor | interactor | modify | — | 🔵 | 🔵 |
 | CatalogueImplSignalsInteractor | interactor | modify | — | 🔵 | 🔵 |
+| TypeSignalsInteractor | interactor | modify | — | 🔵 | 🔵 |
 

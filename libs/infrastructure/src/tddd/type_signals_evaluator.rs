@@ -15,6 +15,8 @@ mod signal_builder;
 #[path = "type_signals_evaluator/signal_tags.rs"]
 pub(crate) mod signal_tags;
 
+use domain::tddd::CargoFeatureName;
+use domain::tddd::catalogue_v2::CrateName;
 use domain::tddd::type_signals_doc::{TypeSignalsDocument, TypeSignalsReuseDecision};
 use domain::{Timestamp, TrackId};
 use freshness::{
@@ -75,9 +77,10 @@ pub fn execute_type_signals_for_layer(
     track_id: &TrackId,
     workspace_root: &Path,
     binding: &TdddLayerBinding,
+    features: &[CargoFeatureName],
 ) -> Result<ExitCode, EvaluateSignalsError> {
     let exporter = RustdocSchemaExporter::new(workspace_root.to_path_buf());
-    execute_with_dependencies(items_dir, track_id, workspace_root, binding, &exporter)
+    execute_with_dependencies(items_dir, track_id, workspace_root, binding, features, &exporter)
 }
 
 #[cfg(feature = "test-helpers")]
@@ -86,9 +89,10 @@ pub fn execute_type_signals_for_layer_with_launch_observer(
     track_id: &TrackId,
     workspace_root: &Path,
     binding: &TdddLayerBinding,
+    features: &[CargoFeatureName],
     observer: &RustdocLaunchObserver,
 ) -> Result<ExitCode, EvaluateSignalsError> {
-    execute_with_dependencies(items_dir, track_id, workspace_root, binding, observer)
+    execute_with_dependencies(items_dir, track_id, workspace_root, binding, features, observer)
 }
 
 fn execute_with_dependencies(
@@ -96,6 +100,7 @@ fn execute_with_dependencies(
     track_id: &TrackId,
     workspace_root: &Path,
     binding: &TdddLayerBinding,
+    features: &[CargoFeatureName],
     rustdoc: &impl RustdocJsonPathProvider,
 ) -> Result<ExitCode, EvaluateSignalsError> {
     reject_symlinked_type_signals_anchor(workspace_root, "workspace_root")
@@ -145,7 +150,7 @@ fn execute_with_dependencies(
         }
     };
     let declaration_hash = type_signals_codec::declaration_hash(&catalogue_bytes);
-    let implementation_hash = hash_workspace_inputs(&canonical_workspace, target_crate);
+    let implementation_hash = hash_workspace_inputs(&canonical_workspace, target_crate, features);
     let recorded = read_utf8_file_limited(&signal_path, MAX_TYPE_SIGNALS_BYTES)
         .ok()
         .and_then(|text| type_signals_codec::decode(&text).ok());
@@ -165,6 +170,7 @@ fn execute_with_dependencies(
                     &canonical_items,
                     target_crate,
                     binding,
+                    features,
                     content,
                     declaration_hash,
                     implementation_hash,
@@ -173,9 +179,13 @@ fn execute_with_dependencies(
         }
         TypeSignalsReuseDecision::ReextractAndEvaluate => {}
     }
-    let json_path = rustdoc.export_rustdoc_json_path(target_crate).map_err(|error| {
-        EvaluateSignalsError(format!("rustdoc export failed for '{target_crate}': {error}"))
+    let target_crate_name = CrateName::new(target_crate).map_err(|error| {
+        EvaluateSignalsError(format!("invalid rustdoc target crate '{target_crate}': {error}"))
     })?;
+    let json_path =
+        rustdoc.export_rustdoc_json_path(&target_crate_name, features).map_err(|error| {
+            EvaluateSignalsError(format!("rustdoc export failed for '{target_crate}': {error}"))
+        })?;
     let content = read_utf8_file_limited(&json_path, MAX_RUSTDOC_JSON_BYTES).map_err(|error| {
         EvaluateSignalsError(format!("cannot read rustdoc JSON '{}': {error}", json_path.display()))
     })?;
@@ -187,7 +197,7 @@ fn execute_with_dependencies(
     // extraction, so a repaired input can be recorded with the fresh artifact.
     let implementation_hash = match implementation_hash {
         Ok(initial) => {
-            let current = hash_workspace_inputs(&canonical_workspace, target_crate)?;
+            let current = hash_workspace_inputs(&canonical_workspace, target_crate, features)?;
             if current != initial {
                 return Err(EvaluateSignalsError(format!(
                     "implementation inputs for '{target_crate}' changed during rustdoc \
@@ -196,7 +206,7 @@ fn execute_with_dependencies(
             }
             Ok(current)
         }
-        Err(_) => hash_workspace_inputs(&canonical_workspace, target_crate),
+        Err(_) => hash_workspace_inputs(&canonical_workspace, target_crate, features),
     };
     evaluate_and_write(
         &catalogue_bytes,
@@ -206,6 +216,7 @@ fn execute_with_dependencies(
         &canonical_items,
         target_crate,
         binding,
+        features,
         content,
         declaration_hash,
         implementation_hash,
@@ -221,6 +232,7 @@ fn evaluate_and_write(
     trusted_items_root: &Path,
     target_crate: &str,
     binding: &TdddLayerBinding,
+    features: &[CargoFeatureName],
     rustdoc_json: String,
     declaration_hash: domain::CatalogueDeclarationHash,
     implementation_hash: Result<domain::ImplementationInputHash, EvaluateSignalsError>,
@@ -275,6 +287,7 @@ fn evaluate_and_write(
     verify_evaluation_inputs_unchanged(
         workspace_root,
         target_crate,
+        features,
         catalogue_path,
         &declaration_hash,
         &implementation_hash,
@@ -308,4 +321,125 @@ fn reject_type_signals_path(
         ))
     })?;
     Ok(())
+}
+
+#[cfg(all(test, feature = "test-helpers"))]
+#[allow(clippy::unwrap_used)]
+mod tests {
+    use super::*;
+    use crate::verify::tddd_layers::parse_tddd_layers;
+
+    fn rustdoc_json() -> String {
+        format!(
+            r#"{{"root":0,"crate_version":null,"includes_private":false,"index":{{}},"paths":{{}},"external_crates":{{}},"format_version":{},"target":{{"triple":"","target_features":[]}}}}"#,
+            rustdoc_types::FORMAT_VERSION
+        )
+    }
+
+    fn setup_workspace() -> (tempfile::TempDir, PathBuf, TrackId, TdddLayerBinding, PathBuf) {
+        let workspace = tempfile::tempdir().unwrap();
+        let root = workspace.path();
+        let track_id = TrackId::try_new("feature-input-track").unwrap();
+        let items_dir = root.join("track/items");
+        let track_dir = items_dir.join(track_id.as_ref());
+        std::fs::create_dir_all(root.join("libs/infrastructure/src")).unwrap();
+        std::fs::create_dir_all(&track_dir).unwrap();
+        std::fs::write(
+            root.join("Cargo.toml"),
+            "[workspace]\nmembers = [\"libs/infrastructure\"]\nresolver = \"2\"\n",
+        )
+        .unwrap();
+        std::fs::write(
+            root.join("Cargo.lock"),
+            "version = 4\n\n[[package]]\nname = \"infrastructure\"\nversion = \"0.1.0\"\n",
+        )
+        .unwrap();
+        std::fs::write(
+            root.join("libs/infrastructure/Cargo.toml"),
+            "[package]\nname = \"infrastructure\"\nversion = \"0.1.0\"\nedition = \"2024\"\n\n[features]\nsemantic-dup = []\n",
+        )
+        .unwrap();
+        std::fs::write(root.join("libs/infrastructure/src/lib.rs"), "pub struct Fixture;\n")
+            .unwrap();
+        std::fs::write(
+            track_dir.join("infrastructure-types.json"),
+            "{\n  \"schema_version\": 5,\n  \"crate_name\": \"infrastructure\",\n  \"layer\": \"infrastructure\",\n  \"types\": {},\n  \"traits\": {},\n  \"functions\": {}\n}\n",
+        )
+        .unwrap();
+        let rustdoc_path = root.join("infrastructure-rustdoc.json");
+        let json = rustdoc_json();
+        std::fs::write(&rustdoc_path, &json).unwrap();
+        std::fs::write(track_dir.join("infrastructure-types-baseline.json"), json).unwrap();
+        let rules = r#"{
+            "layers": [{
+                "crate": "infrastructure",
+                "tddd": {
+                    "enabled": true,
+                    "catalogue_file": "infrastructure-types.json",
+                    "schema_export": { "method": "rustdoc", "targets": ["infrastructure"] }
+                }
+            }]
+        }"#;
+        let binding = parse_tddd_layers(rules).unwrap().pop().unwrap();
+
+        (workspace, items_dir, track_id, binding, rustdoc_path)
+    }
+
+    fn nightly_toolchain_available() -> bool {
+        std::process::Command::new("rustup")
+            .args(["run", "nightly", "rustc", "-Vv"])
+            .status()
+            .is_ok_and(|status| status.success())
+    }
+
+    #[test]
+    fn test_execute_type_signals_feature_selection_change_reextracts_and_reaches_rustdoc() {
+        if !nightly_toolchain_available() {
+            eprintln!(
+                "skipping feature-selection evaluator test: nightly toolchain is unavailable"
+            );
+            return;
+        }
+        let (workspace, items_dir, track_id, binding, rustdoc_path) = setup_workspace();
+        let declared_feature = CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap();
+        let observer = RustdocLaunchObserver::using_json_path(rustdoc_path);
+
+        execute_type_signals_for_layer_with_launch_observer(
+            &items_dir,
+            &track_id,
+            workspace.path(),
+            &binding,
+            std::slice::from_ref(&declared_feature),
+            &observer,
+        )
+        .unwrap();
+        let signal_path =
+            items_dir.join(track_id.as_ref()).join("infrastructure-type-signals.json");
+        let first =
+            type_signals_codec::decode(&std::fs::read_to_string(&signal_path).unwrap()).unwrap();
+
+        execute_type_signals_for_layer_with_launch_observer(
+            &items_dir,
+            &track_id,
+            workspace.path(),
+            &binding,
+            &[],
+            &observer,
+        )
+        .unwrap();
+        let second =
+            type_signals_codec::decode(&std::fs::read_to_string(signal_path).unwrap()).unwrap();
+
+        assert_eq!(
+            observer.feature_selections_for("infrastructure"),
+            vec![vec!["semantic-dup".to_owned()], Vec::new()],
+            "each measured rustdoc extraction must observe its declared feature selection"
+        );
+        assert_eq!(observer.launches_for("infrastructure"), 2);
+        assert_ne!(
+            first.implementation_input_hash(),
+            second.implementation_input_hash(),
+            "changing the declaration-derived feature selection must not reuse a stale artifact"
+        );
+    }
 }
