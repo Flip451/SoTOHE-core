@@ -1,8 +1,8 @@
-# SoT 再入の順次処理規律
+# Policy: SoT 再入の順次処理
 
 ## Purpose
 
-SoT Chain の back-and-forth において、どの SoT へ回帰するかのルーティングは `rollback-diagnoser` の責務である (`.harness/capabilities/rollback-diagnoser.md`)。本規約はその後段 — ルーティングされた上流フェーズから下流へ降りる際の順次処理 — を規律として固定する。各下流フェーズは直上流フェーズの再収束を待ってからのみ再開し、上流編集の必要性が判明した下流作業は即時に中断して上流へ戻す。意味論検証の判定は当該上流 chain に関係する指摘に限定し、列挙不能時は列挙可能になり次第、検証する。prompt-level の規律であり、gate / CI / signal 設定の変更は伴わない。
+SoT Chain の back-and-forth において、どの SoT へ回帰するかのルーティングは `rollback-diagnoser` の責務である (`.harness/capabilities/rollback-diagnoser.md`)。本書はその後段 — ルーティングされた上流フェーズから下流へ降りる際の順次処理 — を規律として固定する。各下流フェーズは直上流フェーズの再収束を待ってからのみ再開し、上流編集の必要性が判明した下流作業は即時に中断して上流へ戻す。意味論検証の判定は当該上流 chain に関係する指摘に限定し、列挙不能時は列挙可能になり次第、検証する。prompt-level の規律であり、gate / CI / signal 設定の変更は伴わない。
 
 ## Scope
 
@@ -13,8 +13,8 @@ SoT Chain の back-and-forth において、どの SoT へ回帰するかのル�
 
 フェーズ X が**収束している**とは、次のすべてが成立していること:
 
-1. **参照信号**: X の成果物を引用側 (下流) とする chain の参照信号 — 参照の存在を機械評価した 🔵 / 🟡 / 🔴 — が、`.harness/config/signal-gates.json` の当該 chain × gate 指定 (interim / strict) を満たす。許容水準の SSoT は同設定ファイルであり、本規約は値を再記述しない。
-2. **意味論検証**: 当該上流 chain に関係する `bin/sotp ref-verify` の指摘が全て解消されている。参照先の内容と引用側の記述の意味的整合を確認する、参照信号とは独立の検証である。scope と chain の対応は ref-verify 側の定義に従い、本規約は対応表を再記述しない。`adr_user` chain (ADR の収束) には意味論検証を要求しない。**他 chain の指摘、および直後の下流 writer 再走で再生成予定の stale 下流成果物に起因する列挙失敗は、上流収束の判定に関与しない。** 既知の当該 chain 指摘は chain 限定の読み出し (例: `bin/sotp ref-verify results --chain 1`) で確認する。列挙失敗中は fresh な検証を生成できないが、それは条件の未充足ではない — 検証は列挙可能になり次第 (通常は即時、abort 時は下流再生成直後の full run で) 実行し、そこで当該 chain の指摘が出れば即時突き返し規則に従う。
+1. **参照信号**: X の成果物を引用側 (下流) とする chain の参照信号 — 参照の存在を機械評価した 🔵 / 🟡 / 🔴 — が、`.harness/config/signal-gates.json` の当該 chain × gate 指定 (interim / strict) を満たす。許容水準の SSoT は同設定ファイルであり、本書は値を再記述しない。
+2. **意味論検証**: 当該上流 chain に関係する `bin/sotp ref-verify` の指摘が全て解消されている。参照先の内容と引用側の記述の意味的整合を確認する、参照信号とは独立の検証である。scope と chain の対応は ref-verify 側の定義に従い、本書は対応表を再記述しない。`adr_user` chain (ADR の収束) には意味論検証を要求しない。**他 chain の指摘、および直後の下流 writer 再走で再生成予定の stale 下流成果物に起因する列挙失敗は、上流収束の判定に関与しない。** 既知の当該 chain 指摘は chain 限定の読み出し (例: `bin/sotp ref-verify results --chain 1`) で確認する。列挙失敗中は fresh な検証を生成できないが、それは条件の未充足ではない — 検証は列挙可能になり次第 (通常は即時、abort 時は下流再生成直後の full run で) 実行し、そこで当該 chain の指摘が出れば即時突き返し規則に従う。
 3. **レビュー**: 該当 SoT スコープの review が `zero_findings` で完了している。
 
 ## 再開 Prerequisite (直上流 1 層のみ)
@@ -60,11 +60,10 @@ SoT Chain の back-and-forth において、どの SoT へ回帰するかのル�
 - [ ] 再開 Prerequisite の検査を直上流 1 層に限定しているか (上位層の再検査を重複させない)
 - [ ] 上流編集の必要性の発見時に下流作業を即時中断したか
 - [ ] 収束失効時の再開例外を impl-plan の task ステータス遷移以外に拡張していないか。意味論検証の判定を当該 chain の指摘に限定し、他 chain の指摘・列挙失敗を混入させていないか
-- [ ] 信号の許容値や ref-verify の対応表を本規約や下流文書に複製していないか
+- [ ] 信号の許容値や ref-verify の対応表を本書や下流文書に複製していないか
 
 ## Decision Reference
 
-- [knowledge/adr/README.md](../adr/README.md) — ADR 索引。本規約の原典 ADR はこの索引の「トラック・ワークフロー」節から辿る
-- [knowledge/conventions/pre-track-adr-authoring.md](./pre-track-adr-authoring.md) — ADR 側の編集裁定権 (二箱分離)
-- [knowledge/conventions/enforce-by-mechanism.md](./enforce-by-mechanism.md) — 将来の mechanism 昇格の判断基準
-- [knowledge/conventions/workflow-ceremony-minimization.md](./workflow-ceremony-minimization.md) — 人工的状態フィールドを作らない原則
+- [knowledge/adr/README.md](../../knowledge/adr/README.md) — ADR 索引。本書の原典 ADR はこの索引の「トラック・ワークフロー」節から辿る
+- [knowledge/conventions/pre-track-adr-authoring.md](../../knowledge/conventions/pre-track-adr-authoring.md) — ADR 側の編集裁定権 (二箱分離)
+- [.harness/capabilities/rollback-diagnoser.md](../capabilities/rollback-diagnoser.md) — 回帰先の判定 (本書の適用外)

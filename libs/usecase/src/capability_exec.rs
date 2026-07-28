@@ -1500,7 +1500,14 @@ mod tests {
     /// The two exist as separate values so that a discipline composed from the
     /// wrong dispatch's resolution is visible in the text rather than hidden
     /// behind an answer that happens to be the same either way.
-    const REVIEWER_DOCUMENT: &str = "knowledge/conventions/review-protocol.md";
+    ///
+    /// Any consumer convention distinct from `RESOLVED_DOCUMENT` serves; what
+    /// this value may not be is a harness-owned document, because
+    /// [`ConventionDocumentPath::try_new`] admits only paths under
+    /// `knowledge/conventions/`. A capability's reading obligation and the
+    /// resolver's answer are therefore different sets, and a fixture naming a
+    /// path outside that root would not survive construction.
+    const REVIEWER_DOCUMENT: &str = "knowledge/conventions/security.md";
 
     /// Convention resolver that answers according to the capability it was
     /// asked about, and keeps every query.

@@ -23,7 +23,7 @@
 
 状態遷移は `bin/sotp track` サブコマンド（Rust CLI）を経由する:
 
-- `bin/sotp track transition`: タスクの状態遷移（todo → in_progress → done / skipped）。orchestrator の専管。done 遷移は 2 段階: (1) DFP 通過後・review 前に hash 無しで `done`（DonePending）へ、(2) batch commit 後に `--commit-hash <hash>` で埋め戻して DoneTraced にする。詳細は `task-completion-flow.md`。
+- `bin/sotp track transition`: タスクの状態遷移（todo → in_progress → done / skipped）。orchestrator の専管。done 遷移は 2 段階: (1) DFP 通過後・review 前に hash 無しで `done`（DonePending）へ、(2) batch commit 後に `--commit-hash <hash>` で埋め戻して DoneTraced にする。2 段階の実行順序と埋め戻し手順は `.harness/workflows/track/full-cycle.md`、遷移の実行主体と merge ガードの前提は `.harness/policies/task-completion.md` が所有する。
 - `bin/sotp track add-task`: 新タスクの追加。
 - `bin/sotp track set-override` / `clear-override`: トラック全体のブロック/キャンセル。
 - `bin/sotp track next-task`: 次の作業対象タスクの取得（JSON 出力）。
@@ -56,7 +56,7 @@
 
 ### observations.md（optional）
 
-各トラックは `observations.md` を **必要に応じて** 作成する。AC 充足判定は `spec.json` の signals + `review.json` の zero_findings + `impl-plan.json` の task done / commit_hash で機械的に行うため、`observations.md` は「機械検証不能な手動観測ログ」専用とする。
+各トラックは `observations.md` を **必要に応じて** 作成する。`observations.md` はどのゲートの入力でもない — AC が満たされたかを判定するゲートは存在しないからである。機械が検査するのは別のもので、参照信号の grounding（`.harness/config/signal-gates.json` の chain × gate 指定）、commit 時の review / ref-verify / test-obligation / DRY / ADR-baseline の各承認、merge 時のタスク解決状態、といったものに限られる。AC が実際に満たされたかどうかの判断は reviewer と user が行う。したがって `observations.md` は「機械検証不能な手動観測ログ」専用であり、その有無がゲートの結果を変えることはない。
 
 作成条件（いずれかに該当する場合のみ）:
 

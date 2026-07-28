@@ -63,7 +63,7 @@ Derived read-only views — never hand-edit, regenerate via `bin/sotp track view
 - Public UI is `/track:*`; never use legacy aliases.
 - No direct `git add` / `commit` / `merge` / `rebase` / `switch` — use `/track:*` or the guarded `bin/sotp git`, `bin/sotp track branch`, and `bin/sotp pr` workflow commands (`.claude/rules/guardrails.md`).
 - The orchestrator never edits SoT files directly (1 file = 1 writer): ADR → `adr-editor`, `spec.json` → `spec-designer`, catalogues → `type-designer`, `impl-plan.json` → `impl-planner`. Task state transitions go through `bin/sotp track transition`.
-- Every commit (plan artifacts included) is preceded by a reviewer-capability cycle to `zero_findings`; inline self-review is never a substitute (`knowledge/conventions/review-protocol.md`).
+- No change reaches merge without a reviewer-capability verdict; the default is a local cycle to `zero_findings` before every commit (plan artifacts included), and the PR-review lane defers that verdict rather than waiving it. Inline self-review is never a substitute (`.harness/policies/review-protocol.md`).
 - Do not manually copy, edit, or remove ADR baseline records. A missing init snapshot blocks review and commit; a byte mismatch blocks commit and track-aware CI (not review — a Phase 0 draft divergence is normal). Use the sanctioned snapshot, restore, and diagnoser routes.
 - Enforce rules by mechanism (type system > CI gate > hook > lint > docs), and prefer type-safe abstractions over lint/doc rules (`knowledge/conventions/{enforce-by-mechanism,prefer-type-safe-abstractions}.md`).
 - Read `.claude/rules/orchestration.md` and `.claude/rules/guardrails.md` before making changes.
@@ -71,8 +71,8 @@ Derived read-only views — never hand-edit, regenerate via `bin/sotp track view
 ## Rules and conventions
 
 - `.claude/rules/` — Claude Code-specific operating rules: `language.md` (language guidance), `dev-environment.md` (toolchain, cargo-make, `bin/sotp` build), `orchestration.md` (delegation), and `guardrails.md` (guards, hooks, permissions).
-- `.harness/policies/` — harness-owned track-operation policies the consumer does not own: `branch-strategy.md`, `track-lifecycle.md`, `git-notes.md`.
-- `knowledge/conventions/` — ~30 engineering conventions; the index in its `README.md` is auto-generated (`bin/sotp conventions update-index`) and lists them in reading order. Load-bearing for daily work: `task-completion-flow.md`, `pre-track-adr-authoring.md`, `review-protocol.md`, `coding-principles.md`, `type-designer-kind-selection.md`, `no-upstream-restatement.md`.
+- `.harness/policies/` — harness-owned track-operation policies the consumer does not own: `branch-strategy.md`, `track-lifecycle.md`, `git-notes.md`, `review-protocol.md`, `task-completion.md`, `sot-reentry-sequencing.md`.
+- `knowledge/conventions/` — ~30 engineering conventions; the index in its `README.md` is auto-generated (`bin/sotp conventions update-index`) and lists them in reading order. Load-bearing for daily work: `pre-track-adr-authoring.md`, `coding-principles.md`, `type-designer-kind-selection.md`, `no-upstream-restatement.md`.
 
 ## Workspace shape
 
