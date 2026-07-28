@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "621045cc782dfdce6fc8d497ee29a11c47ff70159f12661a6d63c26cb45d4583",
+  "catalogue_declaration_hash": "53a6c25244e65fd0ddb7e98d30649f61a301b2c5c81377b1a4deea890f9d5784",
   "signals": [
     {
       "type_name": "CheckTestObligationsInteractor",
@@ -10,7 +10,7 @@
     {
       "type_name": "EvaluateTestObligationsInteractor",
       "signal": "blue",
-      "entry_hash": "668da9543aaad4ae518eb045e13a3ec97c59977224adfa6a682d174304d2e763"
+      "entry_hash": "2a360a88e5988744419f53d74e6f3c1e6d75db4901654994687873971c475c2c"
     },
     {
       "type_name": "ResolvedBoundTests",

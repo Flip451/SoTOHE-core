@@ -97,7 +97,7 @@
         "role": "Interactor"
       },
       "brief": "Author a result test covering 'entry' of EvaluateTestObligationsInteractor",
-      "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+      "declaration_hash": "57718c9badd5c550f7c65dee8837fe23e0cacc2bd4a7cf4cbd13ba4143b48340",
       "spec_refs": [
         {
           "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json",

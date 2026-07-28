@@ -47,7 +47,6 @@ use domain::tddd::test_obligation::ports::{
 use crate::semantic_verdict_core::driver::{
     SemanticEscalationDriverPort, SemanticEscalationFuture,
 };
-use crate::test_obligation::bound_tests::ResolvedBoundTestsResolver;
 use crate::test_obligation::hasher::ContentHasherPort;
 use crate::test_obligation::ports::ObligationFulfillmentCachePort;
 use domain::tddd::test_obligation::pair::{ObligationFulfillmentPair, WaiverPair};
@@ -928,13 +927,12 @@ fn harness_with_read_models_and_config(
     catalogue: CatalogueDocument,
     cfg: TestObligationEvaluateConfig,
 ) -> Harness {
-    harness_with_read_models_config_and_resolver_scanner(
+    harness_with_read_models_and_config_impl(
         obligations,
         bindings,
         fast,
         last,
         waiver,
-        Arc::clone(&scanner),
         scanner,
         existing_fulfillment,
         existing_waiver,
@@ -945,14 +943,13 @@ fn harness_with_read_models_and_config(
 }
 
 #[allow(clippy::too_many_arguments)]
-fn harness_with_read_models_config_and_resolver_scanner(
+fn harness_with_read_models_and_config_impl(
     obligations: Option<ObligationsDocument>,
     bindings: Option<TestBindingsDocument>,
     fast: ObligationFulfillmentVerdict,
     last: ObligationFulfillmentVerdict,
     waiver: WaiverVerdict,
     scanner: Arc<dyn TestSourceScannerPort + Send + Sync>,
-    resolver_scanner: Arc<dyn TestSourceScannerPort + Send + Sync>,
     existing_fulfillment: Option<ObligationFulfillmentCacheDocument>,
     existing_waiver: Option<WaiverCacheDocument>,
     spec: SpecDocument,
@@ -1018,7 +1015,6 @@ fn harness_with_read_models_config_and_resolver_scanner(
         Arc::new(StubSpec(spec)),
         Arc::new(StubCatalogue(catalogue)),
         Arc::new(SumHasher),
-        Arc::new(ResolvedBoundTestsResolver::new(resolver_scanner, Arc::new(SumHasher))),
     );
     Harness { fulfillment_driver, waiver_driver, fulfillment_cache, waiver_cache, interactor }
 }
@@ -1061,7 +1057,6 @@ fn interactor_with_bounded_drivers(
         Arc::new(StubSpec(spec_doc())),
         Arc::new(StubCatalogue(money_catalogue())),
         Arc::new(SumHasher),
-        Arc::new(ResolvedBoundTestsResolver::new(Arc::new(StubScanner), Arc::new(SumHasher))),
     )
 }
 
@@ -1300,7 +1295,6 @@ fn test_new_accepts_and_wires_declared_dependencies() {
         Arc::new(StubSpec(spec_doc())),
         Arc::new(StubCatalogue(money_catalogue())),
         Arc::new(SumHasher),
-        Arc::new(ResolvedBoundTestsResolver::new(Arc::new(StubScanner), Arc::new(SumHasher))),
     );
 
     let outcome = run(interactor.execute(&command())).unwrap();
@@ -1374,7 +1368,6 @@ fn test_voluntary_binding_with_derived_owners_returns_consistency_error() {
         Arc::new(StubSpec(spec_doc())),
         Arc::new(StubCatalogue(money_catalogue())),
         Arc::new(SumHasher),
-        Arc::new(ResolvedBoundTestsResolver::new(Arc::new(StubScanner), Arc::new(SumHasher))),
     );
 
     let result = run(interactor.execute(&command()));
@@ -1569,6 +1562,10 @@ fn test_absent_fulfillment_cache_is_rebuilt_with_resolved_bound_tests() {
     let saved = h.fulfillment_cache.saved.lock().unwrap().clone().unwrap();
     assert_eq!(saved.entries().len(), 1);
     assert!(saved.entries()[0].bound_tests().is_some_and(|tests| !tests.as_slice().is_empty()));
+    assert_eq!(
+        saved.entries()[0].key().bound_tests_set_hash(),
+        &BoundTestsSetHash::new(sum_hash("assert!(money.is_positive());\n".as_bytes()))
+    );
 }
 
 #[test]
@@ -2533,7 +2530,7 @@ fn test_source_scan_error_is_propagated() {
 }
 
 #[test]
-fn test_interactor_uses_its_injected_scanner_when_resolver_has_a_different_scanner() {
+fn test_interactor_uses_its_injected_scanner_for_resolved_bound_tests() {
     struct FailingScanner;
     impl TestSourceScannerPort for FailingScanner {
         fn scan_test_body(&self, _l: &TestLocation) -> Result<Option<String>, TestSourceScanError> {
@@ -2547,14 +2544,13 @@ fn test_interactor_uses_its_injected_scanner_when_resolver_has_a_different_scann
         }
     }
 
-    let h = harness_with_read_models_config_and_resolver_scanner(
+    let h = harness_with_read_models_and_config(
         Some(obligations_doc()),
         Some(fulfillment_bindings()),
         fulfilled(),
         fulfilled(),
         WaiverVerdict::Pending,
         Arc::new(FailingScanner),
-        Arc::new(StubScanner),
         None,
         None,
         spec_doc(),

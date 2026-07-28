@@ -78,7 +78,6 @@ use super::{
 use crate::semantic_verdict_core::driver::{
     SemanticEscalationDriverPort, SemanticEscalationFuture,
 };
-use crate::test_obligation::bound_tests::ResolvedBoundTestsResolver;
 use crate::test_obligation::derive::derive_obligations_document;
 use crate::test_obligation::evaluate::{
     EvaluateTestObligationsApplicationService, EvaluateTestObligationsCommand,
@@ -2701,7 +2700,6 @@ fn test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutati
         Arc::new(StubSpec(spec_doc())),
         Arc::new(StubCatalogue(money_catalogue())),
         Arc::new(Sha256Hasher),
-        Arc::new(ResolvedBoundTestsResolver::new(Arc::new(StubScanner), Arc::new(Sha256Hasher))),
     );
     let evaluation = run(evaluator.execute(&EvaluateTestObligationsCommand::new(
         track(),

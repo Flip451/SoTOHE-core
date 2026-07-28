@@ -37,13 +37,11 @@ use usecase::pre_review_gate::{ImplPlanReaderPort, TaskContractReaderPort};
 use usecase::semantic_verdict_core::driver::SemanticEscalationDriverPort;
 use usecase::semantic_verdict_core::probe::SemanticCalibrationProbeConfig;
 use usecase::test_obligation::bindings_skeleton::TestBindingsSkeletonInteractor;
-use usecase::test_obligation::bound_tests::ResolvedBoundTestsResolver;
 use usecase::test_obligation::check::CheckTestObligationsInteractor;
 use usecase::test_obligation::derive::DeriveTestObligationsInteractor;
 use usecase::test_obligation::evaluate::{
     EvaluateTestObligationsInteractor, TestObligationEvaluateConfig,
 };
-use usecase::test_obligation::hasher::ContentHasherPort;
 use usecase::test_obligation::ports::ObligationFulfillmentCachePort;
 use usecase::test_obligation::results::TestObligationResultsInteractor;
 
@@ -172,7 +170,6 @@ impl TestObligationCompositionRoot {
             self.spec_loader(),
             self.catalogue_loader(),
             Arc::new(Sha256ContentHasher::new()),
-            self.resolved_bound_tests_resolver(),
         ));
         cli_driver::test_obligation::evaluate::TestObligationEvaluateHandler::new(
             service,
@@ -254,11 +251,6 @@ impl TestObligationCompositionRoot {
         &self,
     ) -> Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort + Send + Sync> {
         Arc::new(SynTestSourceScanner::new(self.workspace_root.clone()))
-    }
-
-    fn resolved_bound_tests_resolver(&self) -> Arc<ResolvedBoundTestsResolver> {
-        let hasher: Arc<dyn ContentHasherPort + Send + Sync> = Arc::new(Sha256ContentHasher::new());
-        Arc::new(ResolvedBoundTestsResolver::new(self.source_scanner(), hasher))
     }
 
     fn spec_loader(&self) -> Arc<dyn domain::SpecDocumentLoaderPort + Send + Sync> {

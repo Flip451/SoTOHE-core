@@ -56,15 +56,6 @@ impl ResolvedBoundTestsResolver {
         Self { source_scanner, hasher }
     }
 
-    /// Rebinds this resolver to the scanner selected by the application service.
-    #[must_use]
-    pub(super) fn with_source_scanner(
-        &self,
-        source_scanner: Arc<dyn TestSourceScannerPort + Send + Sync>,
-    ) -> Self {
-        Self { source_scanner, hasher: Arc::clone(&self.hasher) }
-    }
-
     /// Scans every location and derives evidence from exactly that source.
     ///
     /// # Errors

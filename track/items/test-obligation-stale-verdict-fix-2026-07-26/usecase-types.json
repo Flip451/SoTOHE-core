@@ -355,7 +355,7 @@
     },
     "EvaluateTestObligationsInteractor": {
       "action": "modify",
-      "docs": "Evaluate interactor propagating domain validation and verifier-port failures.",
+      "docs": "Evaluate interactor propagating domain validation and verifier-port failures. Its resolved-bound-tests resolver is constructed internally from the same source scanner and ContentHasherPort supplied to new, making mixed hashing strategies unrepresentable for fulfillment cache keys.",
       "informal_grounds": [],
       "kind": {
         "kind": "struct",
@@ -419,14 +419,10 @@
               "name": "catalogue_reader",
               "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort + Send + Sync>"
             },
-            {
-              "name": "hasher",
-              "ty": "std::sync::Arc<dyn ContentHasherPort + Send + Sync>"
-            },
-            {
-              "name": "resolved_bound_tests_resolver",
-              "ty": "std::sync::Arc<ResolvedBoundTestsResolver>"
-            }
+        {
+          "name": "hasher",
+          "ty": "std::sync::Arc<dyn ContentHasherPort + Send + Sync>"
+        }
           ],
           "returns": "Self"
         }

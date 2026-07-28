@@ -328,13 +328,11 @@ impl EvaluateTestObligationsInteractor {
         spec_reader: Arc<dyn SpecDocumentLoaderPort + Send + Sync>,
         catalogue_reader: Arc<dyn CatalogueDocumentLoaderPort + Send + Sync>,
         hasher: Arc<dyn ContentHasherPort + Send + Sync>,
-        resolved_bound_tests_resolver: Arc<ResolvedBoundTestsResolver>,
     ) -> Self {
-        // The application service owns the scanner dependency. Rebind the
-        // resolver so its evidence reads and scan errors always come from that
-        // same injected port.
+        // Keep every fulfillment-cache hash on the one injected strategy:
+        // callers cannot supply a resolver built with a different hasher.
         let resolved_bound_tests_resolver =
-            Arc::new(resolved_bound_tests_resolver.with_source_scanner(source_scanner));
+            Arc::new(ResolvedBoundTestsResolver::new(source_scanner, Arc::clone(&hasher)));
         Self {
             obligations_port,
             bindings_port,

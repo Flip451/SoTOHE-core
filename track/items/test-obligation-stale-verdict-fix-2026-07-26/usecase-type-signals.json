@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-27T16:58:53Z",
-  "declaration_hash": "621045cc782dfdce6fc8d497ee29a11c47ff70159f12661a6d63c26cb45d4583",
-  "implementation_input_hash": "5a67732a2acb1c4d7188be0c6b68960c0c1bf14211401e9a5d918b2d128aa31c",
+  "generated_at": "2026-07-28T00:01:38Z",
+  "declaration_hash": "53a6c25244e65fd0ddb7e98d30649f61a301b2c5c81377b1a4deea890f9d5784",
+  "implementation_input_hash": "3801da3eb0b47b6294e6df428f30a4da3e826cad5b12561c01fda3b469b63c7b",
   "signals": [
     {
       "type_name": "CheckTestObligationsInteractor",

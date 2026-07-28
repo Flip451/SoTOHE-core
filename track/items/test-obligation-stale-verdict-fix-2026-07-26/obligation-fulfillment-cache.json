@@ -697,7 +697,7 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "dd163efb1f05b7f7e3aa55001da8226bba4e127b3e1acfe67f2a573431d8022a",
+        "bound_tests_set_hash": "60b3475b023ad178e82af12094db5e6d2077268124e26f80dacf73a7a56a76c0",
         "declaration_hash": "0b85f8cae2921b0e4080fc072b60684e00b3e14a942779cd523137c75241d4a3",
         "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
       },
@@ -763,13 +763,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "dd163efb1f05b7f7e3aa55001da8226bba4e127b3e1acfe67f2a573431d8022a",
+        "bound_tests_set_hash": "60b3475b023ad178e82af12094db5e6d2077268124e26f80dacf73a7a56a76c0",
         "declaration_hash": "0b85f8cae2921b0e4080fc072b60684e00b3e14a942779cd523137c75241d4a3",
         "anchor_text_hash": "91071973616ad036c5a1ad322545d6c20047098290137122fb69172f7cbe9118"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(selected.key(), &current_key);\n    assert_eq!(selected.bound_tests(), expected_bound_tests.as_ref());"
+        "citation": "assert_eq!(selected.bound_tests(), expected_bound_tests.as_ref());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -829,13 +829,13 @@
         "item_identifier": "trait_method:load"
       },
       "key": {
-        "bound_tests_set_hash": "dd163efb1f05b7f7e3aa55001da8226bba4e127b3e1acfe67f2a573431d8022a",
+        "bound_tests_set_hash": "60b3475b023ad178e82af12094db5e6d2077268124e26f80dacf73a7a56a76c0",
         "declaration_hash": "0b85f8cae2921b0e4080fc072b60684e00b3e14a942779cd523137c75241d4a3",
         "anchor_text_hash": "9398e6445efcd3a8a4b50484bb4eea078e8e190c70c12ff370ba0965ba35c104"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(initial_check, Err(ObligationCheckError::StaleVerdicts { .. }))); ... let evaluation = run(evaluator.execute(&EvaluateTestObligationsCommand::new(...))).unwrap(); ... assert!( cache.saved.lock().unwrap().is_some(), \"evaluate must persist a replacement fulfillment cache for the next check\" ); ... let recovered_check = interactor_with_recoverable_fulfillment_cache(cache).execute(&command()).unwrap();"
+        "citation": "assert!(matches!(initial_check, Err(ObligationCheckError::StaleVerdicts { .. }))); ... let evaluation = run(evaluator.execute(&EvaluateTestObligationsCommand::new( ... ))).unwrap(); ... assert!(\n        cache.saved.lock().unwrap().is_some(),\n        \"evaluate must persist a replacement fulfillment cache for the next check\"\n    ); ... let recovered_check =\n        interactor_with_recoverable_fulfillment_cache(cache).execute(&command()).unwrap();\n    assert_eq!(recovered_check.resolved_edges(), &[edge()]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -895,7 +895,7 @@
         "item_identifier": "trait_method:save"
       },
       "key": {
-        "bound_tests_set_hash": "de97b54055bbc4f76fa518f72abbf71ec031636d5eda74d9926eb45dee0cb253",
+        "bound_tests_set_hash": "1d18dd8c6c9c2bbfd4ff9e12da601a6e3edd33014125cdc59d3823b20ee3c763",
         "declaration_hash": "0b85f8cae2921b0e4080fc072b60684e00b3e14a942779cd523137c75241d4a3",
         "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
       },
@@ -941,7 +941,7 @@
         "item_identifier": "trait_method:save"
       },
       "key": {
-        "bound_tests_set_hash": "de97b54055bbc4f76fa518f72abbf71ec031636d5eda74d9926eb45dee0cb253",
+        "bound_tests_set_hash": "1d18dd8c6c9c2bbfd4ff9e12da601a6e3edd33014125cdc59d3823b20ee3c763",
         "declaration_hash": "0b85f8cae2921b0e4080fc072b60684e00b3e14a942779cd523137c75241d4a3",
         "anchor_text_hash": "91071973616ad036c5a1ad322545d6c20047098290137122fb69172f7cbe9118"
       },
@@ -987,7 +987,7 @@
         "item_identifier": "trait_method:save"
       },
       "key": {
-        "bound_tests_set_hash": "de97b54055bbc4f76fa518f72abbf71ec031636d5eda74d9926eb45dee0cb253",
+        "bound_tests_set_hash": "1d18dd8c6c9c2bbfd4ff9e12da601a6e3edd33014125cdc59d3823b20ee3c763",
         "declaration_hash": "0b85f8cae2921b0e4080fc072b60684e00b3e14a942779cd523137c75241d4a3",
         "anchor_text_hash": "9398e6445efcd3a8a4b50484bb4eea078e8e190c70c12ff370ba0965ba35c104"
       },
@@ -1033,13 +1033,13 @@
         "item_identifier": "trait_impl:usecase::test_obligation::ports::ObligationFulfillmentCachePort"
       },
       "key": {
-        "bound_tests_set_hash": "0684bc905ac758a0bf672bc5825f4b8983d3d8abb7d0e82dca7c033a34f0780f",
+        "bound_tests_set_hash": "55951fd43a8547ae462647357c48ca1318a3f0db86fd3d55869a02fdd8b4ad0e",
         "declaration_hash": "52b322f9174745d83e0b2a6eeb59da6264dea26980f213da818f544ba27c173b",
         "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "\"lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint())\" ... \"assert_eq!(selected.key(), &current_key);\" ... \"assert!(loaded.lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint()).is_err())\""
+        "citation": "let selected = loaded\n        .lookup_current(&edge_id(), &obligation_id(), &current_key, &verifier_fingerprint())\n        .unwrap()\n        .unwrap();\n    assert_eq!(selected.key(), &current_key);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1084,13 +1084,13 @@
         "item_identifier": "trait_impl:usecase::test_obligation::ports::ObligationFulfillmentCachePort"
       },
       "key": {
-        "bound_tests_set_hash": "0684bc905ac758a0bf672bc5825f4b8983d3d8abb7d0e82dca7c033a34f0780f",
+        "bound_tests_set_hash": "55951fd43a8547ae462647357c48ca1318a3f0db86fd3d55869a02fdd8b4ad0e",
         "declaration_hash": "52b322f9174745d83e0b2a6eeb59da6264dea26980f213da818f544ba27c173b",
         "anchor_text_hash": "91071973616ad036c5a1ad322545d6c20047098290137122fb69172f7cbe9118"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(selected.bound_tests(), expected_bound_tests.as_ref());\n\nassert_eq!(selected.key(), &current_key);"
+        "citation": "assert_eq!(selected.bound_tests(), expected_bound_tests.as_ref()); ... assert_eq!(selected.key(), &current_key);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1135,13 +1135,13 @@
         "item_identifier": "trait_impl:usecase::test_obligation::ports::ObligationFulfillmentCachePort"
       },
       "key": {
-        "bound_tests_set_hash": "0684bc905ac758a0bf672bc5825f4b8983d3d8abb7d0e82dca7c033a34f0780f",
+        "bound_tests_set_hash": "55951fd43a8547ae462647357c48ca1318a3f0db86fd3d55869a02fdd8b4ad0e",
         "declaration_hash": "52b322f9174745d83e0b2a6eeb59da6264dea26980f213da818f544ba27c173b",
         "anchor_text_hash": "9398e6445efcd3a8a4b50484bb4eea078e8e190c70c12ff370ba0965ba35c104"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(initial_check, Err(ObligationCheckError::StaleVerdicts { .. }))); ... let evaluation = run(evaluator.execute(&EvaluateTestObligationsCommand::new(...))).unwrap(); ... let recovered_check = interactor_with_recoverable_fulfillment_cache(cache).execute(&command()).unwrap(); assert_eq!(recovered_check.resolved_edges(), &[edge()]);"
+        "citation": "assert!(matches!(initial_check, Err(ObligationCheckError::StaleVerdicts { .. }))); ... let evaluation = run(evaluator.execute(&EvaluateTestObligationsCommand::new(...))).unwrap(); ... let recovered_check = interactor_with_recoverable_fulfillment_cache(cache).execute(&command()).unwrap();"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1232,13 +1232,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "bound_tests_set_hash": "e73a3be8f5ca09199ce21ee8b12810b4b2ca3ea741195dac33e44e0026a6219a",
         "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
         "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(result, Err(ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(message))) if message.as_str() == \"provider unavailable\")); assert!(h.fulfillment_cache.saved.lock().unwrap().is_none());"
+        "citation": "assert_eq!(outcome.resolved_edges(), &[edge()]);\n\nassert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));\n\nassert!(matches!(\n        result,\n        Err(ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(message)))\n            if message.as_str() == \"provider unavailable\"\n    ));\n    assert!(h.fulfillment_cache.saved.lock().unwrap().is_none());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1328,7 +1328,7 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "bound_tests_set_hash": "e73a3be8f5ca09199ce21ee8b12810b4b2ca3ea741195dac33e44e0026a6219a",
         "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
         "anchor_text_hash": "ea73875ea10c4047021f7c664d5047480ad2e6ea9d2beffc4bb775bc46243305"
       },
@@ -1424,13 +1424,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "bound_tests_set_hash": "e73a3be8f5ca09199ce21ee8b12810b4b2ca3ea741195dac33e44e0026a6219a",
         "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
         "anchor_text_hash": "a2eb3fe459adc5b0543bffa5b597ad1b34a47bffc837a6947d203ae3d1a57036"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(result, Err(ObligationCheckError::FulfillmentCacheRequiresEvaluation))); ... assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. }))); ... assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. }))); ... Err(ObligationCheckError::FulfillmentCacheLookup(\n                FulfillmentCacheLookupError::AmbiguousCurrentEntries {"
+        "citation": "assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. }))); ... assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. }))); ... Err(ObligationCheckError::FulfillmentCacheLookup(\n                FulfillmentCacheLookupError::AmbiguousCurrentEntries {"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1520,7 +1520,7 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "bound_tests_set_hash": "e73a3be8f5ca09199ce21ee8b12810b4b2ca3ea741195dac33e44e0026a6219a",
         "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
         "anchor_text_hash": "2bcaa6bd097998bdf743836b92e2a3a65485dfae2a0695a964ce4be6854c0d09"
       },
@@ -1616,13 +1616,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "bound_tests_set_hash": "e73a3be8f5ca09199ce21ee8b12810b4b2ca3ea741195dac33e44e0026a6219a",
         "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
         "anchor_text_hash": "f420577c5989e261f5142fcbcf8ebd99c73420803493c622d16ce7ad84c25684"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(result, Err(ObligationCheckError::FulfillmentCacheRequiresEvaluation))); ... assert!(matches!(result, Err(ObligationCheckError::BindingConsistency( domain::tddd::test_obligation::errors::TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id } )) if edge_id == edge())); ... assert!(matches!(result, Err(ObligationCheckError::FulfillmentCacheLookup( FulfillmentCacheLookupError::AmbiguousCurrentEntries { ... } ))); ... assert_ne!(outcome.exit_code, 0);"
+        "citation": "assert!(matches!(result, Err(ObligationCheckError::BindingConsistency(domain::tddd::test_obligation::errors::TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id })) if edge_id == edge());\n\nassert!(matches!(result, Err(ObligationCheckError::FulfillmentCacheLookup(FulfillmentCacheLookupError::AmbiguousCurrentEntries { edge_id: actual_edge_id, obligation_id: actual_obligation_id, key: actual_key, })));\n\nassert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));\n\nassert_ne!(outcome.exit_code, 0);\n\nassert!(matches!(initial_check, Err(ObligationCheckError::StaleVerdicts { .. })));\nassert!(cache.saved.lock().unwrap().is_some(), \"evaluate must persist a replacement fulfillment cache for the next check\");"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -1712,7 +1712,7 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "bound_tests_set_hash": "e73a3be8f5ca09199ce21ee8b12810b4b2ca3ea741195dac33e44e0026a6219a",
         "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
         "anchor_text_hash": "3ff88b6d083f5c2a33bf137a869a58c6c9cfcc44129391db5dd737a156ed323a"
       },
@@ -1808,7 +1808,7 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "bound_tests_set_hash": "e73a3be8f5ca09199ce21ee8b12810b4b2ca3ea741195dac33e44e0026a6219a",
         "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
         "anchor_text_hash": "2bf538e0a37daa40874f6818500b2bbe4b2d766a646f9a788122afbeb06d4de1"
       },
@@ -1904,13 +1904,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "bound_tests_set_hash": "e73a3be8f5ca09199ce21ee8b12810b4b2ca3ea741195dac33e44e0026a6219a",
         "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
         "anchor_text_hash": "0637af9c7e989dc3b6ba0ec7df9f8045089d7140aba3f404335d24a691f4e184"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n        result,\n        Err(ObligationCheckError::BindingConsistency(\n            domain::tddd::test_obligation::errors::TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id }\n        )) if edge_id == edge()\n    ));"
+        "citation": "assert!(matches!(\n        result,\n        Err(ObligationCheckError::BindingConsistency(\n            domain::tddd::test_obligation::errors::TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id }\n        )) if edge_id == edge()\n    ));\n\nassert_eq!(outcome.pass_count(), 1);\nassert_eq!(h.fulfillment_driver.tiers.lock().unwrap().as_slice(), &[ModelTier::Fast]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2000,13 +2000,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "0e535c46ee9254e3ba295b8a36434b5d210d03c9b5ef3ce6abf9743e7d2d9b7a",
+        "bound_tests_set_hash": "e73a3be8f5ca09199ce21ee8b12810b4b2ca3ea741195dac33e44e0026a6219a",
         "declaration_hash": "7107c5672849f20fd19d74f550df96baa0b67cf1748de490c21218462b4229f7",
         "anchor_text_hash": "9398e6445efcd3a8a4b50484bb4eea078e8e190c70c12ff370ba0965ba35c104"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(initial_check, Err(ObligationCheckError::StaleVerdicts { .. }))); ... assert!(cache.saved.lock().unwrap().is_some(), \"evaluate must persist a replacement fulfillment cache for the next check\"); ... assert_eq!(recovered_check.resolved_edges(), &[edge()]);"
+        "citation": "assert!(matches!(initial_check, Err(ObligationCheckError::StaleVerdicts { .. }))); ... assert!(cache.saved.lock().unwrap().is_some(), \"evaluate must persist a replacement fulfillment cache for the next check\"); ... let recovered_check =\n        interactor_with_recoverable_fulfillment_cache(cache).execute(&command()).unwrap();\n    assert_eq!(recovered_check.resolved_edges(), &[edge()]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2132,13 +2132,13 @@
         "item_identifier": "voluntary:AC-05"
       },
       "key": {
-        "bound_tests_set_hash": "a6d4bf74965b306b79b7682f46f166d7f72cac788d22df5fb8f5438e40432c98",
+        "bound_tests_set_hash": "46f4f6789d6dcf2f719479266fcf6a1bf1ffecb106f0bfdc5f95513d82338fc2",
         "declaration_hash": "ea42487eb2a531f0a4747e45898cdc1a19ce4d3b83a39cfeb3963c6df369bfbe",
         "anchor_text_hash": "5321f9c4d0e2404bba4bdd4465f7e89aca3761a23f1bef7f505e4bb2eee894aa"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(saved.entries()[0].bound_tests().is_some_and(|tests| !tests.as_slice().is_empty()));\n\nassert_eq!(selected.bound_tests().unwrap().as_slice()[0].test_name().as_str(), \"diagnostic_only_location\");"
+        "citation": "assert!(saved.entries()[0].bound_tests().is_some_and(|tests| !tests.as_slice().is_empty()));\n    assert_eq!(\n        saved.entries()[0].key().bound_tests_set_hash(),\n        &BoundTestsSetHash::new(sum_hash(\"assert!(money.is_positive());\\n\".as_bytes()))\n    );"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -2939,13 +2939,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "5077b3864f6d11c028bde7a93de8f562a7cae7a76c77d2a58574ceec2c00d2cb",
-        "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+        "bound_tests_set_hash": "0864a58f5b54fe24eb89efdf20f81c30783f997c9dd0a4e094a906b68996b653",
+        "declaration_hash": "57718c9badd5c550f7c65dee8837fe23e0cacc2bd4a7cf4cbd13ba4143b48340",
         "anchor_text_hash": "aca68ba2ba62c3b09e43f01fdc003f90275bc866b2b99653d605559b3069dcb8"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_ne!(bound_tests_mismatch.key().bound_tests_set_hash(), current.key().bound_tests_set_hash());\nassert_ne!(declaration_mismatch.key().declaration_hash(), current.key().declaration_hash());\nassert_ne!(anchor_mismatch.key().anchor_text_hash(), current.key().anchor_text_hash());\nassert_ne!(fingerprint_mismatch.verifier_fingerprint(), current.verifier_fingerprint());\n...\nassert_eq!(saved.entries()[0].key(), current.key());\nassert_eq!(saved.entries()[0].verifier_fingerprint(), current.verifier_fingerprint());\n...\nassert!(matches!(\n    result,\n    Err(ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(message)))\n        if message.as_str() == \"provider unavailable\"\n));\nassert!(h.fulfillment_cache.saved.lock().unwrap().is_none());"
+        "citation": "assert_eq!(saved.entries()[0].key(), current.key());\nassert_eq!(saved.entries()[0].verifier_fingerprint(), current.verifier_fingerprint());\nassert!(h.fulfillment_driver.tiers.lock().unwrap().is_empty());\nassert!(matches!(\n        result,\n        Err(ObligationEvaluateError::VerifierPort(SemanticVerifierError::VerifierPort(message)))\n            if message.as_str() == \"provider unavailable\"\n    ));\nassert!(h.fulfillment_cache.saved.lock().unwrap().is_none());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -3015,8 +3015,8 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "5077b3864f6d11c028bde7a93de8f562a7cae7a76c77d2a58574ceec2c00d2cb",
-        "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+        "bound_tests_set_hash": "0864a58f5b54fe24eb89efdf20f81c30783f997c9dd0a4e094a906b68996b653",
+        "declaration_hash": "57718c9badd5c550f7c65dee8837fe23e0cacc2bd4a7cf4cbd13ba4143b48340",
         "anchor_text_hash": "ea73875ea10c4047021f7c664d5047480ad2e6ea9d2beffc4bb775bc46243305"
       },
       "verdict": {
@@ -3091,13 +3091,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "5077b3864f6d11c028bde7a93de8f562a7cae7a76c77d2a58574ceec2c00d2cb",
-        "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+        "bound_tests_set_hash": "0864a58f5b54fe24eb89efdf20f81c30783f997c9dd0a4e094a906b68996b653",
+        "declaration_hash": "57718c9badd5c550f7c65dee8837fe23e0cacc2bd4a7cf4cbd13ba4143b48340",
         "anchor_text_hash": "91071973616ad036c5a1ad322545d6c20047098290137122fb69172f7cbe9118"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(saved.entries()[0].bound_tests().unwrap().as_slice(), &[location()]); ... assert!(h.fulfillment_driver.tiers.lock().unwrap().is_empty()); ... assert_eq!(saved.entries()[0].key(), current.key());"
+        "citation": "assert!(saved.entries()[0].bound_tests().is_some_and(|tests| !tests.as_slice().is_empty()));\nassert_eq!(saved.entries()[0].key().bound_tests_set_hash(), &BoundTestsSetHash::new(sum_hash(\"assert!(money.is_positive());\\n\".as_bytes())));\nassert_eq!(saved.entries()[0].bound_tests().unwrap().as_slice(), &[location()]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -3167,8 +3167,8 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "5077b3864f6d11c028bde7a93de8f562a7cae7a76c77d2a58574ceec2c00d2cb",
-        "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+        "bound_tests_set_hash": "0864a58f5b54fe24eb89efdf20f81c30783f997c9dd0a4e094a906b68996b653",
+        "declaration_hash": "57718c9badd5c550f7c65dee8837fe23e0cacc2bd4a7cf4cbd13ba4143b48340",
         "anchor_text_hash": "f420577c5989e261f5142fcbcf8ebd99c73420803493c622d16ce7ad84c25684"
       },
       "verdict": {
@@ -3243,8 +3243,8 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "5077b3864f6d11c028bde7a93de8f562a7cae7a76c77d2a58574ceec2c00d2cb",
-        "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+        "bound_tests_set_hash": "0864a58f5b54fe24eb89efdf20f81c30783f997c9dd0a4e094a906b68996b653",
+        "declaration_hash": "57718c9badd5c550f7c65dee8837fe23e0cacc2bd4a7cf4cbd13ba4143b48340",
         "anchor_text_hash": "0637af9c7e989dc3b6ba0ec7df9f8045089d7140aba3f404335d24a691f4e184"
       },
       "verdict": {
@@ -3319,13 +3319,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "5077b3864f6d11c028bde7a93de8f562a7cae7a76c77d2a58574ceec2c00d2cb",
-        "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+        "bound_tests_set_hash": "0864a58f5b54fe24eb89efdf20f81c30783f997c9dd0a4e094a906b68996b653",
+        "declaration_hash": "57718c9badd5c550f7c65dee8837fe23e0cacc2bd4a7cf4cbd13ba4143b48340",
         "anchor_text_hash": "5321f9c4d0e2404bba4bdd4465f7e89aca3761a23f1bef7f505e4bb2eee894aa"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert_eq!(saved.entries()[0].bound_tests().unwrap().as_slice(), &[location()]); ... assert!(h.fulfillment_driver.tiers.lock().unwrap().is_empty()); ... assert_ne!(bound_tests_mismatch.key().bound_tests_set_hash(), current.key().bound_tests_set_hash()); assert_ne!(declaration_mismatch.key().declaration_hash(), current.key().declaration_hash()); assert_ne!(anchor_mismatch.key().anchor_text_hash(), current.key().anchor_text_hash()); assert_ne!(fingerprint_mismatch.verifier_fingerprint(), current.verifier_fingerprint());"
+        "citation": "assert!(saved.entries()[0].bound_tests().is_some_and(|tests| !tests.as_slice().is_empty()));\nassert_eq!(saved.entries()[0].key().bound_tests_set_hash(), &BoundTestsSetHash::new(sum_hash(\"assert!(money.is_positive());\\n\".as_bytes())));\nassert_eq!(saved.entries()[0].bound_tests().unwrap().as_slice(), &[location()]);\nassert!(h.fulfillment_driver.tiers.lock().unwrap().is_empty());"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -3395,13 +3395,13 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "5077b3864f6d11c028bde7a93de8f562a7cae7a76c77d2a58574ceec2c00d2cb",
-        "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+        "bound_tests_set_hash": "0864a58f5b54fe24eb89efdf20f81c30783f997c9dd0a4e094a906b68996b653",
+        "declaration_hash": "57718c9badd5c550f7c65dee8837fe23e0cacc2bd4a7cf4cbd13ba4143b48340",
         "anchor_text_hash": "9398e6445efcd3a8a4b50484bb4eea078e8e190c70c12ff370ba0965ba35c104"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(initial_check, Err(ObligationCheckError::StaleVerdicts { .. }))); ... assert_eq!(evaluation.pass_count(), 1); ... \"evaluate must persist a replacement fulfillment cache for the next check\" ... assert_eq!(recovered_check.resolved_edges(), &[edge()]);"
+        "citation": "assert!(matches!(initial_check, Err(ObligationCheckError::StaleVerdicts { .. }))); ... assert_eq!(evaluation.pass_count(), 1); ... \"evaluate must persist a replacement fulfillment cache for the next check\" ... let recovered_check = interactor_with_recoverable_fulfillment_cache(cache).execute(&command()).unwrap(); assert_eq!(recovered_check.resolved_edges(), &[edge()]);"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -3471,8 +3471,8 @@
         "item_identifier": "entry"
       },
       "key": {
-        "bound_tests_set_hash": "5077b3864f6d11c028bde7a93de8f562a7cae7a76c77d2a58574ceec2c00d2cb",
-        "declaration_hash": "bd297a1b879572dafe4521d4737a9893fad94aae9e937ea04765db08952d1d2e",
+        "bound_tests_set_hash": "0864a58f5b54fe24eb89efdf20f81c30783f997c9dd0a4e094a906b68996b653",
+        "declaration_hash": "57718c9badd5c550f7c65dee8837fe23e0cacc2bd4a7cf4cbd13ba4143b48340",
         "anchor_text_hash": "753b9eb475bf1c9bd7805922ce379a8289a44e27cf1b3345979352f438bde285"
       },
       "verdict": {
