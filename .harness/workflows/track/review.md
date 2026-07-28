@@ -109,7 +109,7 @@ finding — with the same sentence stating that the severity constraints themsel
 unchanged.
 
 For an ADR scope, every briefing must reference
-`knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`. This standing
+`.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権`. This standing
 methodology is not a consumer-owned severity preference and cannot be relaxed by a scope policy.
 
 The CLI auto-injects the scope file list and severity policy. Do NOT hand-author the
@@ -163,7 +163,7 @@ capability directly.
 
 **ADR-scope repair lane (before re-launching the affected review).** The orchestrator, rather
 than `review-fix-lead`, owns any ADR change requested by an ADR-scoped finding, per
-`knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`. The lane forks
+`.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権`. The lane forks
 on the Phase 0 adjudication boundary:
 
 - **Before the boundary (Phase 0 baseline-review loop)**: when the recorded reviewer finding

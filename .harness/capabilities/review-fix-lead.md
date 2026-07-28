@@ -58,7 +58,7 @@ in `.harness/config/review-scope.json`.
 ## ADR baseline semantic freeze
 
 When a finding requires *any* edit to an ADR, never make that edit yourself. Under the two-box
-model (`knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権), the
+model (`.harness/policies/pre-track-adr-authoring.md` §In-track 意味変更の裁定権), the
 orchestrator routes every ADR change through adr-editor and adr-diagnoser: Phase 0 uses the
 in-place convergence or user-present hearing lane; after the Phase 0 adjudication boundary,
 semantic changes use the delta lane and proposed non-semantic changes use the

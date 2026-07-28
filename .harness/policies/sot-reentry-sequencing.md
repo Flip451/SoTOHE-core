@@ -65,5 +65,5 @@ SoT Chain の back-and-forth において、どの SoT へ回帰するかのル�
 ## Decision Reference
 
 - [knowledge/adr/README.md](../../knowledge/adr/README.md) — ADR 索引。本書の原典 ADR はこの索引の「トラック・ワークフロー」節から辿る
-- [knowledge/conventions/pre-track-adr-authoring.md](../../knowledge/conventions/pre-track-adr-authoring.md) — ADR 側の編集裁定権 (二箱分離)
+- [.harness/policies/pre-track-adr-authoring.md](./pre-track-adr-authoring.md) — ADR 側の編集裁定権 (二箱分離)
 - [.harness/capabilities/rollback-diagnoser.md](../capabilities/rollback-diagnoser.md) — 回帰先の判定 (本書の適用外)

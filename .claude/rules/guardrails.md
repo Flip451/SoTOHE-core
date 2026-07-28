@@ -17,7 +17,7 @@ Core guardrails:
 ## Permission Guardrails
 
 `permissions.allow` in `.claude/settings.json` is the template consumer's responsibility
-(`knowledge/conventions/responsibility-boundary.md`): SoTOHE ships a recommended default allowlist
+(`.harness/policies/consumer-ownership.md`): SoTOHE ships a recommended default allowlist
 and documents which commands are safe vs dangerous to allow, but does **not** CI-enforce it. The
 lists below are guidance, not a gate — the consumer owns their permission posture.
 

@@ -1,4 +1,4 @@
-# Responsibility Boundary: Framework Enforcement vs Consumer Configuration
+# Policy: Consumer Ownership
 
 ## Purpose
 
@@ -30,16 +30,16 @@ SoTOHE はテンプレート（framework）であり、その CI ゲート / ver
 
 ## Examples
 
-- Good: `verify-view-freshness`（生成ビューが JSON SSoT と一致するか）、`adr-signals`（decision が grounding されているか）、`check-layers`（層依存方向）、`cargo make ci` の fmt/clippy/test。いずれも SoTOHE 自身の整合性。
+- Good: `cargo make ci` が回す view freshness 検査（生成ビューが JSON SSoT と一致するか）、`cargo make verify-adr-signals`（decision が grounding されているか）、`cargo make check-layers`（層依存方向）、`cargo make ci` の fmt/clippy/test。いずれも SoTOHE 自身の整合性。
 - Good: `.codex/config.toml` や `.claude/settings.json` を**デフォルトとして同梱**し、`.claude/rules/guardrails.md` 等で意図・危険例を説明する（提供 + docs）。
-- Good: `.harness/config/signal-gates.json` を**推奨デフォルトとして同梱**し、`responsibility-boundary.md` で `interim` の理由（TDDD 構造的必然 vs ワークフロー選択）を説明する（提供 + docs）。
-- Bad: `verify-orchestra` のように `.claude/settings.json` の allow/deny エントリや `.codex/*` の設定値・ファイル存在・rules の allow リストを「期待リスト」と照合して CI で hard-fail させる（利用者設定の enforcement ＝越権である）。
+- Good: `.harness/config/signal-gates.json` を**推奨デフォルトとして同梱**し、本書で `interim` の理由（TDDD 構造的必然 vs ワークフロー選択）を説明する（提供 + docs）。
+- Bad: `.claude/settings.json` の allow/deny エントリや `.codex/*` の設定値・ファイル存在・rules の allow リストを「期待リスト」と照合して CI で hard-fail させる（利用者設定の enforcement ＝越権である）。本書の provide-not-enforce 原則に基づいて撤去された `verify-orchestra` ゲートがこの形だった。
 - Bad: 人間向け doc に特定の散文スニペットが在る/無いを CI で照合する（言い換えで壊れ、偽安心）。
 
 ## Exceptions
 
 - テンプレート開発中、SoTOHE 自身が dogfooding で使う設定（このリポジトリ自身の `.claude` / `.codex`）について、**maintainer の任意の自己規律**として lint したい場合は、CI の hard-fail ゲートではなく非ブロッキングな補助チェック（警告のみ）に留める。利用者の fork に強制が伝播しない形であること。
-- 例外を採るときは ADR に記録し、本 convention を参照する。
+- 例外を採るときは ADR に記録し、本書を参照する。
 
 ## Review Checklist
 
@@ -49,7 +49,6 @@ SoTOHE はテンプレート（framework）であり、その CI ゲート / ver
 
 ## Related Documents
 
-- `knowledge/conventions/enforce-by-mechanism.md` — 機構で強制する原則（その「機構」が enforce してよい対象が本 convention の前段）。
-- `knowledge/conventions/workflow-ceremony-minimization.md` — 形骸化する人工状態フィールドを作らない原則。
-- `knowledge/adr/README.md` — 設計判断の索引（履歴を確認する必要がある場合）。
+- [knowledge/adr/README.md](../../knowledge/adr/README.md) — 設計判断の索引（履歴を確認する必要がある場合）。
+- [.harness/reference/guard-semantics.md](../reference/guard-semantics.md) — Bash 書き込みガードの残存範囲と、`permissions.deny` を利用者所有として扱う根拠。
 - `.claude/rules/guardrails.md` — 危険な permission の**説明**（警告であって CI 強制ではない）。

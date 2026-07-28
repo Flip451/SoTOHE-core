@@ -332,7 +332,7 @@ type-designer 自身および reviewer は draft 段階で以下を確認する:
 ## Related Documents
 
 - `knowledge/conventions/prefer-type-safe-abstractions.md` — enum-first / typestate / newtype の design principle (本 convention は role 選定への適用)
-- `knowledge/conventions/pre-track-adr-authoring.md` — ADR 配置規則 (catalogue の上流 SSoT)
+- `.harness/policies/pre-track-adr-authoring.md` — ADR 配置規則 (catalogue の上流 SSoT)
 - `architecture-rules.json` — TDDD 対応層の SSoT (R1 layer 列挙の根拠)
 - `libs/domain/src/tddd/catalogue_v2/roles.rs` — `DataRole` / `ContractRole` / `FunctionRole` enum 定義 (現行 schema の role 正本; v2 の `TypeDefinitionKind` に相当)
 - `libs/domain/src/tddd/catalogue_v2/entries.rs` — `TypeEntry` / `TraitEntry` / `FunctionEntry` + `TypeKindV2` / `CompositePattern` 定義 (現行 schema の型正本)

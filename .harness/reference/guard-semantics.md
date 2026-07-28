@@ -15,7 +15,7 @@ This reference now documents the remaining Bash write guardrails and the accepte
 ### Layer 1: `permissions.deny` (fastest — Claude Code blocks before hook execution)
 
 Which commands are denied is stated in `.claude/settings.json` and nowhere else. That file is
-the consumer's own (`responsibility-boundary.md`): SoTOHE ships a recommended default posture
+the consumer's own (`.harness/policies/consumer-ownership.md`): SoTOHE ships a recommended default posture
 and no CI gate enforces it, so a list repeated here would describe one repository's choices as
 if they were the guard's contract, and would go stale the first time either side moved.
 Read the file.

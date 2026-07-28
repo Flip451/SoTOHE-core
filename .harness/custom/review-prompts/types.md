@@ -59,7 +59,7 @@ spec_refs/role/action mismatch.
   prose. Flag the restatement itself regardless of whether an anchor cite
   (`AC-NN` / `IN-NN` / `CN-NN` / spec element id) accompanies it — the field
   must reference upstream behaviour by anchor cite, not reproduce it. Cite
-  `knowledge/conventions/no-upstream-restatement.md`.
+  `.harness/policies/no-upstream-restatement.md`.
 - **unsupported semantic placement**: a `ValueObject` placed in domain, usecase,
   or infrastructure whose `docs` or reviewable track record does not establish
   the semantic grounds for that placement: ubiquitous language, invariant

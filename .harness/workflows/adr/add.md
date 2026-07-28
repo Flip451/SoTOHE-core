@@ -16,7 +16,7 @@ The resulting ADR is a pre-track artifact that a later track-planning workflow m
 
 ## Preconditions
 
-Before starting the hearing, read `.harness/reference/adr-schema.md`, `knowledge/conventions/pre-track-adr-authoring.md`, and `knowledge/adr/README.md`.
+Before starting the hearing, read `.harness/reference/adr-schema.md`, `.harness/policies/pre-track-adr-authoring.md`, and `knowledge/adr/README.md`.
 The conventions take precedence if an older template or index example conflicts with them.
 Confirm that a target ADR is eligible for direct amendment under the ADR lifecycle rules before using Focused or Quick mode.
 
@@ -62,7 +62,7 @@ Create a new file only at `knowledge/adr/$(date -u +"%Y-%m-%d-%H%M")-<slug>.md`.
 Obtain the UTC timestamp with `date -u +"%Y-%m-%d-%H%M"` rather than manual input.
 Use the Nygard-style body format required by the ADR convention, with `Context`, `Decision`, `Rejected Alternatives`, `Consequences`, and `Reassess When` sections when the user did not skip them.
 Use a Japanese body, with English limited to code identifiers, the ASCII slug, and repository-standard headings.
-Do not add a `Status` section because ADR file existence is the operational approval.
+Do not add a `Status` section: `.harness/policies/pre-track-adr-authoring.md` forbids file-level `Status` / `approved` state fields. File existence satisfies the `/track:plan` startup precondition only — it is not the Phase 0 user approval, which the adjudication boundary in that policy owns.
 Omit skipped sections rather than creating empty headings.
 
 Start every new ADR with conformant YAML front matter.

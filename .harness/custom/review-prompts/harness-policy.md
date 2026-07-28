@@ -28,7 +28,7 @@ Violations of the role statement above are always reportable. The following prio
 - **responsibility-boundary cross**: harness code / docs that move a
   framework-owned concern into a consumer-owned slot (or vice-versa)
   in a way that conflicts with
-  `knowledge/conventions/responsibility-boundary.md`. Specifically:
+  `.harness/policies/consumer-ownership.md`. Specifically:
   framework methodology (review process, gate enforcement) must not
   live under `.harness/custom/`; consumer-customizable policies
   (severity preferences) must not live under `.harness/briefings/`
@@ -65,7 +65,7 @@ Violations of the role statement above are always reportable. The following prio
   `track/items/<a-specific-track>/spec.md`; a `.harness/custom/**`
   briefing that mentions `tmp/reviewer-runtime/...` as if it were a
   durable reference; a `knowledge/conventions/**` rule that points at a
-  removed file. Cite `knowledge/conventions/responsibility-boundary.md`
+  removed file. Cite `.harness/policies/consumer-ownership.md`
   for the distribution surface boundary.
 - **adapter-SSoT 同期 check**: `harness-policy` review scope が trigger されたとき、
   adapter と workflow SSoT の整合について以下の 3 要件を adapter / SSoT 両方について検査する。

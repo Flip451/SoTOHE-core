@@ -25,7 +25,7 @@ or failure-recovery procedures here.
 
 - Phase 0 is delegated to `$track-init`, then `$track-review`, then `$track-commit`; their
   transition rules and inputs are owned by the plan workflow SSoT. Phase 0 follows
-  `knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権 as its sole
+  `.harness/policies/pre-track-adr-authoring.md` §In-track 意味変更の裁定権 as its sole
   normative source; this skill states no procedure of its own for that phase.
 - Phase 1 is delegated to `$track-spec-design` (which dispatches the `spec-designer`
   capability through `bin/sotp capability exec`, provider resolved from

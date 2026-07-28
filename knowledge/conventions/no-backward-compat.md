@@ -69,5 +69,5 @@ workspace の lifecycle 整合性を保ち、暫定 compatibility layer の長�
 - [knowledge/adr/README.md](../adr/README.md) — ADR 索引
 - [workflow-ceremony-minimization.md](./workflow-ceremony-minimization.md) — 形式手順の最小化原則
   (本 convention と対になる、暫定 toggle の排除と方向性が一致)
-- [pre-track-adr-authoring.md](./pre-track-adr-authoring.md) — ADR lifecycle (遡及 amendment は
-  adr-editor back-and-forth で明示的に扱う)
+- [.harness/policies/pre-track-adr-authoring.md](../../.harness/policies/pre-track-adr-authoring.md) — ADR lifecycle
+  (遡及 amendment は adr-editor back-and-forth で明示的に扱う)

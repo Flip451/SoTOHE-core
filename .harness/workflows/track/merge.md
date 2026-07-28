@@ -38,7 +38,7 @@ caller’s current branch as a substitute for the PR head.
 **Step 1: Terminal audit**
 
 Before every merge attempt, present the merge-stage terminal audit required by
-`knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権` to the user. Audit
+`.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権` to the user. Audit
 every protected source (every source with a ledger record), from its protection-start record to
 its current terminal bytes, with per-record provenance and the adjacent diff for every
 `non-semantic-fix` record. This audit is required even when every terminal diff is empty.
@@ -101,7 +101,7 @@ bin/sotp pr wait-and-merge <pr_number> --method <method>    # explicit caller ov
 7. On timeout: stops and reports the pending checks.
 
 This workflow also hosts the merge-stage user adjudication of the two-box model
-(`knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`): admitted
+(`.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権`): admitted
 delta drafts and the terminal audit are decided here, with the user present at invocation.
 
 **Step 3: Post-merge**
@@ -158,7 +158,7 @@ re-invoke this workflow from Step 1 for a fresh terminal audit.
   content or infer whether the candidate was admitted. For each candidate that passes all three
   checks, dispatch `adr-diagnoser` with the bytes from that same PR-head checkout to re-judge the current text (the byte-bound
   interim admission procedure of
-  `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`); only a
+  `.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権`); only a
   verdict confirming the admitted, judged text routes that block into the adjudication
   recovery below. Every other blocking signal (🔴, a 🟡 outside a track-born draft, or a
   candidate the guardian does not confirm) is an ordinary gate failure: resolve it upstream
@@ -172,7 +172,7 @@ re-invoke this workflow from Step 1 for a fresh terminal audit.
   the PR-head checkout, so every recovery edit, stamp, and commit lands in the PR's own track
   context. Then follow
   the merge-stage procedures of
-  `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`:
+  `.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権`:
   - **Adoption**: dispatch `adr-editor` to promote the draft's grounds to
     `user_decision_ref` (an edit that voids the admission — re-judge and re-admit via
     `adr-diagnoser`), pass the adoption-conformance re-audit, then run

@@ -48,7 +48,7 @@ Before executing the state machine, register the following items as a task list 
 stays visible across phases and back-and-forth loops:
 
 1. Phase 0 — invoke `init`, ADR-baseline `review`, and ADR-baseline `commit` in that order,
-   following `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`
+   following `.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権`
 2. Phase 1 loop — invoke `spec-design` workflow, evaluate spec → ADR signal, escalate on 🔴
    (delta-candidate lane — the input box is frozen after the boundary)
 3. Phase 2 loop — invoke `type-design` workflow, evaluate type → spec signal per layer, escalate on 🔴
@@ -96,7 +96,7 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
    `--kind init` snapshot step; that ledger record becomes the primary designation. On ERROR,
    stop and report.
 2. Invoke the `review` workflow for the ADR baseline, then follow
-   `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権` for Phase 0
+   `.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権` for Phase 0
    convergence, user adjudication, and boundary-stamp preparation — up to but excluding the
    ADR-baseline commit, which step 3 performs. That convention is the sole normative source
    for this phase; do not restate or alter its procedure here.
@@ -121,7 +121,7 @@ Reverse references and layer skipping are forbidden: `spec → type catalogue`,
      b. Dispatch `adr-editor` to author (or revise) a delta candidate under
         `knowledge/adr/` with non-user grounds, declaring any supersedes / refines targets
         in the draft body per
-        `knowledge/conventions/pre-track-adr-authoring.md#In-track 意味変更の裁定権`.
+        `.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権`.
         Briefing must include the 🔴 element(s), the originating signal verbatim, and the
         constraint "edit working tree only; do not commit, do not snapshot".
      c. Dispatch `adr-diagnoser` for the delta admission judgment (three-way). On admit
@@ -199,7 +199,7 @@ capability's domain expert judgment. Each capability is the domain expert for it
 
 | Gate style | Phases | Signals |
 |------------|--------|---------|
-| ADR-baseline review + user adjudication + commit | Phase 0 after `init` | `knowledge/conventions/pre-track-adr-authoring.md` の手順に従い → commit |
+| ADR-baseline review + user adjudication + commit | Phase 0 after `init` | `.harness/policies/pre-track-adr-authoring.md` の手順に従い → commit |
 | SoT Chain signal (🔵🟡🔴) | Phase 1, Phase 2 | Blue = pass, Yellow = warn + proceed, Red = escalate |
 | Binary check (OK / ERROR) | Phase 0 `init`, Phase 3 | OK = pass, ERROR = re-invoke or stop |
 

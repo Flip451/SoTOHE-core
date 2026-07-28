@@ -1,4 +1,4 @@
-# No Upstream Restatement Convention
+# Policy: No Upstream Restatement
 
 ## Purpose
 
@@ -17,9 +17,10 @@ artifact 間矛盾の発生源が増える。挙動契約の本文は上流だ�
   - `<layer>-types.json` entry の `docs` / `intent` フィールド
 - 適用外:
   - `spec.json` — ADR を細粒度の挙動契約に書き下すのが spec の本務であり、再記述禁止は適用しない
-  - 本 convention 導入前に完了した track の artifact — 歴史的記録として原型を保ち、
+  - 本書の規律が導入される前に完了した track の artifact — 歴史的記録として原型を保ち、
     遡及的に書き直さない
-  - workflow ドキュメント (`.claude/commands/` / `.claude/skills/` 等) — provider 非依存 logic の
+  - workflow / capability ドキュメント (`.harness/workflows/` / `.harness/capabilities/` と、
+    `.claude/commands/` / `.agents/skills/` 等のその provider adapter) — provider 非依存 logic の
     重複禁止 (adapter-SSoT 規則) が同種の懸念を既にカバーしている
 
 ## Rules
@@ -48,7 +49,7 @@ artifact 間矛盾の発生源が増える。挙動契約の本文は上流だ�
 
 ## Related Documents
 
-- `knowledge/adr/README.md` — 設計判断の索引（履歴を確認する必要がある場合）
-- [enforce-by-mechanism.md](./enforce-by-mechanism.md) — 本 convention は reviewer severity policy
-  (`.harness/custom/review-prompts/impl-plan.md` / `types.md`) の finding class とセットで
-  review gate から強制される
+- [knowledge/adr/README.md](../../knowledge/adr/README.md) — 設計判断の索引（履歴を確認する必要がある場合）
+- [.harness/custom/review-prompts/impl-plan.md](../custom/review-prompts/impl-plan.md) /
+  [types.md](../custom/review-prompts/types.md) — 本書はこの 2 つの reviewer severity policy が
+  持つ finding class とセットで review gate から強制される

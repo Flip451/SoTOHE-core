@@ -8,7 +8,7 @@
 ## Mission
 
 Perform every in-track write to `knowledge/adr/*.md` under the two-box model
-(`knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権). The edit is
+(`.harness/policies/pre-track-adr-authoring.md` §In-track 意味変更の裁定権). The edit is
 always triggered by a concrete recorded input relayed through the orchestrator — never by
 style preferences or proactive restructuring. Every applied edit is subsequently judged or
 classified by `adr-diagnoser`; this capability edits, it never adjudicates.

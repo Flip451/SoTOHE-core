@@ -17,7 +17,7 @@ description: |
 **Operational SSoT:** read and follow `.harness/capabilities/adr-diagnoser.md` — the
 provider-agnostic contract for this capability (the four judgment modes, their invocation
 contracts, the verdict tables, and the output contract). The surrounding lane contract lives in
-`knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権. Do not duplicate
+`.harness/policies/pre-track-adr-authoring.md` §In-track 意味変更の裁定権. Do not duplicate
 either here.
 
 ## Claude-subagent notes

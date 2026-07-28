@@ -11,7 +11,7 @@ init-stamped ADRs, frozen after the Phase 0 adjudication boundary; delta box = a
 track-born drafts). The capability returns read-only verdicts in four modes. It never becomes
 part of a binary gate's decision path and never writes a baseline, restores an ADR, or edits
 an ADR. The surrounding lane contract lives in
-`knowledge/conventions/pre-track-adr-authoring.md` §In-track 意味変更の裁定権.
+`.harness/policies/pre-track-adr-authoring.md` §In-track 意味変更の裁定権.
 
 1. **Edit judgment (Phase 0 収束ループ)** — for every in-place edit applied to an input-box
    ADR during the Phase 0 baseline-review loop, judge the applied edit (concrete diff)
