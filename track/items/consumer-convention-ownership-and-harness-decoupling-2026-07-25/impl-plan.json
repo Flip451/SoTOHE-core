@@ -69,7 +69,7 @@
     {
       "id": "T013",
       "description": "`.harness/config/template-boundary.json` に `.harness/policies` の分類 entry を新設したうえで、track 運用 policy 3 件 (`branch-strategy.md`, `git-notes.md`, `track-lifecycle.md`) を `.harness/policies/` へ移す。分類 entry の新設を文書移動群の先頭に置く。相互参照する 3 文書を同一 task に置くことで、中間状態で片方だけが旧 path を指す状態を作らない(移動対象どうしの相互参照 6 箇所を含む)。移動 3 件の旧 path への参照が surviving live surface に残らないよう、同一変更集合で更新する。既知の参照点は次のとおりで、この列挙は下限であって上限ではない — ここに挙がっていない surviving live surface に本 task の移動対象の旧 path への参照が残っていれば、それも同じ変更集合で解消する (他 task が移動する文書の旧 path 参照は本 task の所有領域ではない): `CLAUDE.md`、`.claude/rules/orchestration.md`、`.claude/rules/maintainer-checklist.md`、`.claude/rules/guardrails.md`、`.claude/commands/track/setup.md`、`.claude/commands/architecture-customizer.md`、`.codex/instructions.md`、`.codex/agents/orchestrator.toml`、`.harness/capabilities/spec-designer.md`。移動 3 件のファイル単位 entry を `.harness/config/template-boundary.json` から除き、source 索引を再生成する。移動する本文の outbound 参照 — `track-lifecycle.md` 本文 1 箇所の `workflow-ceremony-minimization.md` 参照 — を同一変更集合で解消する。`branch-strategy.md` と `git-notes.md` に該当参照はない。T012 の後に置く。Size estimate — harness-policy: ~381 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-02`, `#IN-03`, `#IN-09`, `#IN-10`, `#AC-03`, `#AC-04`, `#AC-15`, `#AC-16`, `#AC-17`.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T014",

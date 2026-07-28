@@ -1,4 +1,4 @@
-# Track Lifecycle Convention
+# Policy: Track Lifecycle
 
 ## Purpose
 
@@ -6,14 +6,14 @@
 
 ## Scope
 
-- 適用対象: `track/items/<id>/metadata.json`（schema_version 5、identity-only）、`track/items/<id>/impl-plan.json`（実装計画・タスク進捗 SSoT）、`track/items/<id>/plan.md`（生成ビュー）、`track/registry.md`（生成ビュー、`.gitignore` 済み）、`track/items/<id>/observations.md`（任意手動観測ログ）、`bin/sotp track` 系状態遷移サブコマンド、`/track:plan` / `/track:commit` / `/track:archive` の registry 更新タイミング、タイムスタンプ取り扱い。
-- 適用外: ブランチ作成・PR ワークフロー（`knowledge/conventions/branch-strategy.md`）、git note 付与（`knowledge/conventions/git-notes.md`）、`spec.json` / `<layer>-types.json` / `impl-plan.json` の生成パイプライン（各 phase コマンドと spec-designer / type-designer / impl-planner の責務）。
+- 適用対象: `track/items/<id>/metadata.json`（identity-only）、`track/items/<id>/impl-plan.json`（実装計画・タスク進捗 SSoT）、`track/items/<id>/plan.md`（生成ビュー）、`track/registry.md`（生成ビュー）、`track/items/<id>/observations.md`（任意手動観測ログ）、`bin/sotp track` 系状態遷移サブコマンド、`track/registry.md` の再生成タイミング、タイムスタンプ取り扱い。
+- 適用外: ブランチ作成・PR ワークフロー（`.harness/policies/branch-strategy.md`）、git note 付与（`.harness/policies/git-notes.md`）、`spec.json` / `<layer>-types.json` / `impl-plan.json` の生成パイプライン（各 phase コマンドと spec-designer / type-designer / impl-planner の責務）。
 
 ## Rules
 
 ### plan.md と metadata.json SSoT
 
-- `metadata.json`（`schema_version: 5`）が identity 情報の唯一の SSoT。`plan.md` は `bin/sotp track views sync` で `metadata.json` + `impl-plan.json` から生成される **読み取り専用ビュー**。直接編集してはならない（`<!-- Generated from ... — DO NOT EDIT DIRECTLY -->` マーカー付き）。
+- `metadata.json` が identity 情報の唯一の SSoT（受理される `schema_version` は `bin/sotp` 側の実装が単独で決め、本書はその値を複製しない）。`plan.md` は `bin/sotp track views sync` で `metadata.json` + `impl-plan.json` から生成される **読み取り専用ビュー**。直接編集してはならない（`<!-- Generated from ... — DO NOT EDIT DIRECTLY -->` マーカー付き）。
 - 二段階ライフサイクル:
   1. **初回作成**（Phase 0 の `/track:init` または `/track:plan` 承認後）: `metadata.json` を作成し、`plan.md` は `bin/sotp track views sync` で生成する。初回から SSoT モデルに従う。
   2. **以降の更新**: タスク状態の変更は `bin/sotp track` サブコマンド経由で `impl-plan.json` の対応 task を更新し、`plan.md` は自動再生成される。直接編集は禁止。
@@ -75,15 +75,9 @@
 
 タイムスタンプ（`created_at`, `updated_at` 等）は必ず `date -u +%Y-%m-%dT%H:%M:%SZ` コマンドの出力を使用する。手入力や推測は禁止（`created_at > updated_at` 等の不整合を防止するため）。
 
-### track/registry.md 更新ルール
+### track/registry.md 再生成ルール
 
-`track/registry.md` は以下のタイミングで `metadata.json` から自動再生成される（生成ロジックは `bin/sotp track views sync`）。
-
-| Trigger | 更新内容 |
-| ------- | ------- |
-| `/track:plan <feature>` 承認時 | アクティブトラック行を追加・更新、`Current Focus` を設定、`Next recommended command` を `/track:full-cycle <task>` または `/track:implement` に設定（`planned` 状態は自動レンダラーの既定）、`Last updated` 更新 |
-| `/track:commit <message>` | 現在のトラックの status/result を更新、完了したものは適切なタイミングで `Completed Tracks` へ移動、`Last updated` 更新 |
-| `/track:archive <id>` | トラック status を `archived` に設定、`Completed` から `Archived Tracks` へ移動、`Last updated` 更新。解決済みトラック（全タスクが `done` または `skipped`）のみアーカイブ可能 |
+`track/registry.md` の内容は renderer が単独で決める。トラック初期化時と、トラックの状態を書き換える `bin/sotp track` サブコマンド（`transition` / `add-task` / `set-override` / `clear-override`）の実行時に自動再生成され、任意のタイミングで `bin/sotp track views sync` を直接呼んでも再生成できる。どの trigger でどの行がどう変わるかは renderer の出力であって本書の規定ではないため、再生成結果の形をここに複製しない。
 
 ## Examples
 
@@ -103,13 +97,11 @@
 - [ ] タスク状態遷移が `bin/sotp track transition` 経由になっているか
 - [ ] `observations.md` の追記が AC の「機械検証不能観測」に該当するか
 - [ ] タイムスタンプが `date -u +%Y-%m-%dT%H:%M:%SZ` 由来か（手入力 / 推測がないか）
-- [ ] `track/registry.md` の更新タイミングが上表 3 行のいずれかに対応しているか
 - [ ] primary ADR の init snapshot が workflow 経由で作られ、review / commit / ci-track の
   freeze checks が維持されているか
 
 ## Decision Reference
 
-- [knowledge/adr/README.md](../adr/README.md) — ADR 索引。本 convention の原典となる ADR はこの索引から辿る
-- [knowledge/conventions/branch-strategy.md](./branch-strategy.md) — `track/<id>` ブランチの作成・切替・PR 操作
-- [knowledge/conventions/git-notes.md](./git-notes.md) — コミットへの構造化メモ
-- [knowledge/conventions/workflow-ceremony-minimization.md](./workflow-ceremony-minimization.md) — 人工状態フィールド・事前承認の最小化
+- [knowledge/adr/README.md](../../knowledge/adr/README.md) — ADR 索引。本書の原典となる ADR はこの索引から辿る
+- [.harness/policies/branch-strategy.md](./branch-strategy.md) — `track/<id>` ブランチの作成・切替・PR 操作
+- [.harness/policies/git-notes.md](./git-notes.md) — コミットへの構造化メモ

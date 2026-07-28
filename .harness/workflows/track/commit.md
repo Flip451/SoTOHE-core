@@ -98,7 +98,7 @@ skip note generation and mention this in the summary.
 ## Task Summary: <brief description>
 
 **Track:** <track-id or "no-track">
-**Task:** <task description from metadata.json done task, or commit subject>
+**Task:** <task description from impl-plan.json done task, or commit subject>
 **Date:** <YYYY-MM-DD>
 
 ### Changes

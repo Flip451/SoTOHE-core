@@ -7,9 +7,9 @@ Always consider:
 - user-facing docs:
   - `README.md`
 - track docs:
-  - `knowledge/conventions/branch-strategy.md`
-  - `knowledge/conventions/track-lifecycle.md`
-  - `knowledge/conventions/git-notes.md`
+  - `.harness/policies/branch-strategy.md`
+  - `.harness/policies/track-lifecycle.md`
+  - `.harness/policies/git-notes.md`
   - `track/registry.md`
 - enforcement:
   - `Makefile.toml`

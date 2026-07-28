@@ -23,7 +23,7 @@ Each downstream artifact must cite its direct upstream (no layer skipping, no re
 - pre-review task-contract gate (`bin/sotp task-contract check`, binary) — reads `impl_catalog` signals per task status via `task-contract.json`: entries attributed to done / in_progress tasks must be 🔵, todo-task entries may remain 🟡, 🔴 always blocks. Its precondition — every catalogue entry attributed to an existing task — is enforced separately by `bin/sotp task-contract coverage` (in `cargo make ci`). The gate asserts structural conformance only; body semantics remain the reviewer's lane.
 - ADR-baseline freeze gate (`bin/sotp adr-baseline`) — at Phase 0, the orchestrator designates primary ADR source(s) exclusively by creating `init` snapshots; those ledger records are the designation, with no separate metadata or external primary pointer. The review workflow requires the orchestrator to run `check-review` before dispatching reviewer wrappers; its CLI requires a nonempty init-record designation set and verifies every recorded ledger copy. A current ADR that differs from its latest baseline is a normal Phase 0 draft state and does not block review dispatch. `--primary-source <file>` is only a direct-CLI override. Byte matching fires at the commit gate and track-aware CI: `cargo make ci-track` and guarded commits run `check-commit` for all recorded ADRs and separately enforce coverage for non-draft ADRs cited by `spec.json`. This is a separate byte-comparison gate; it does not change `adr_user` evaluation or `.harness/config/signal-gates.json`.
 
-The unit of work is a **track** (one feature / fix / refactor) living on branch `track/<id>` with its artifacts under `track/items/<id>/`. The active track id is resolved from the current git branch name (branch-bound); on the base branch resolution fail-closes as `NotTrackBranch`, and only read commands with an explicit `--track-id` work there (`knowledge/conventions/branch-strategy.md`).
+The unit of work is a **track** (one feature / fix / refactor) living on branch `track/<id>` with its artifacts under `track/items/<id>/`. The active track id is resolved from the current git branch name (branch-bound); on the base branch resolution fail-closes as `NotTrackBranch`, and only read commands with an explicit `--track-id` work there (`.harness/policies/branch-strategy.md`).
 
 ## Primary pipeline
 
@@ -71,7 +71,8 @@ Derived read-only views — never hand-edit, regenerate via `bin/sotp track view
 ## Rules and conventions
 
 - `.claude/rules/` — Claude Code-specific operating rules: `language.md` (language guidance), `dev-environment.md` (toolchain, cargo-make, `bin/sotp` build), `orchestration.md` (delegation), and `guardrails.md` (guards, hooks, permissions).
-- `knowledge/conventions/` — ~30 engineering conventions; the index in its `README.md` is auto-generated (`bin/sotp conventions update-index`) and lists them in reading order. Load-bearing for daily work: `track-lifecycle.md`, `branch-strategy.md`, `git-notes.md`, `task-completion-flow.md`, `pre-track-adr-authoring.md`, `review-protocol.md`, `coding-principles.md`, `type-designer-kind-selection.md`, `no-upstream-restatement.md`.
+- `.harness/policies/` — harness-owned track-operation policies the consumer does not own: `branch-strategy.md`, `track-lifecycle.md`, `git-notes.md`.
+- `knowledge/conventions/` — ~30 engineering conventions; the index in its `README.md` is auto-generated (`bin/sotp conventions update-index`) and lists them in reading order. Load-bearing for daily work: `task-completion-flow.md`, `pre-track-adr-authoring.md`, `review-protocol.md`, `coding-principles.md`, `type-designer-kind-selection.md`, `no-upstream-restatement.md`.
 
 ## Workspace shape
 

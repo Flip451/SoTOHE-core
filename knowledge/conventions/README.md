@@ -56,13 +56,11 @@
 
 <!-- convention-docs:start -->
 - `testing.md`: Testing Convention
-- `branch-strategy.md`: Branch Strategy Convention
 - `catalogue-schema-reference.md`: Catalogue Schema Reference (v5)
 - `coding-principles.md`: Coding Principles Convention
 - `dry-check-workflow.md`: DRY Check Workflow Convention
 - `enforce-by-mechanism.md`: Enforce by Mechanism Convention
 - `filesystem-persistence-guard.md`: Filesystem Persistence Guard Convention
-- `git-notes.md`: Git Notes Convention
 - `impl-delegation-arch-guard.md`: Implementation Delegation Architecture Guard
 - `language-policy.md`: Language Policy Convention
 - `nightly-dev-tool.md`: Nightly Toolchain Dev-Tool Convention
@@ -78,7 +76,6 @@
 - `source-attribution.md`: Source Attribution Convention
 - `task-completion-flow.md`: Task Completion Flow
 - `tddd-product-correctness.md`: TDDD Product Correctness Convention
-- `track-lifecycle.md`: Track Lifecycle Convention
 - `type-designer-kind-selection.md`: Type-Designer Kind Selection Convention
 - `typed-deserialization.md`: Typed Deserialization Convention
 - `workflow-ceremony-minimization.md`: Workflow Ceremony Minimization Convention

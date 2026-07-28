@@ -12,9 +12,9 @@ assigned to Codex, act only within that specialist boundary.
 Read these first:
 
 - `AGENTS.md`
-- `knowledge/conventions/branch-strategy.md`
-- `knowledge/conventions/track-lifecycle.md`
-- `knowledge/conventions/git-notes.md`
+- `.harness/policies/branch-strategy.md`
+- `.harness/policies/track-lifecycle.md`
+- `.harness/policies/git-notes.md`
 - `knowledge/adr/README.md` (pre-track ADR index — tech stack / product-policy decisions)
 - `track/registry.md`
 - `knowledge/conventions/README.md`

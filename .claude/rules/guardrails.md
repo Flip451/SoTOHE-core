@@ -141,9 +141,9 @@ Inline review within Claude Code's main context (self-review) is not a substitut
 
 Operational details live in:
 
-- `knowledge/conventions/branch-strategy.md`
-- `knowledge/conventions/track-lifecycle.md`
-- `knowledge/conventions/git-notes.md`
+- `.harness/policies/branch-strategy.md`
+- `.harness/policies/track-lifecycle.md`
+- `.harness/policies/git-notes.md`
 - `README.md`
 - `.claude/settings.json`
 - `.claude/hooks/`

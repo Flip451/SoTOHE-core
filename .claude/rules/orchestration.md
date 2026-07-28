@@ -28,9 +28,9 @@ Terms:
 Read these first before planning or implementation:
 
 - `knowledge/adr/README.md` (pre-track ADR index — tech stack / product-policy decisions)
-- `knowledge/conventions/branch-strategy.md`
-- `knowledge/conventions/track-lifecycle.md`
-- `knowledge/conventions/git-notes.md`
+- `.harness/policies/branch-strategy.md`
+- `.harness/policies/track-lifecycle.md`
+- `.harness/policies/git-notes.md`
 - `track/registry.md`
 - `knowledge/conventions/README.md`
 - `track/items/<id>/metadata.json`

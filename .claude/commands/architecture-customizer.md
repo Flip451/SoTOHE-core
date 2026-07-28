@@ -22,7 +22,7 @@ Required workflow:
 4. Update crates and dependency edges.
 5. Update architecture-facing documents:
    - a pre-track ADR under `knowledge/adr/` recording the architecture decision
-   - `knowledge/conventions/branch-strategy.md` / `knowledge/conventions/track-lifecycle.md` / `knowledge/conventions/git-notes.md` if the day-to-day workflow shape changes
+   - `.harness/policies/branch-strategy.md` / `.harness/policies/track-lifecycle.md` / `.harness/policies/git-notes.md` if the day-to-day workflow shape changes
    - `CLAUDE.md` when the file tree changes
 6. Run:
    - `cargo fmt --all -- --check`
