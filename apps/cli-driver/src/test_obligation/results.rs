@@ -122,6 +122,7 @@ impl TestObligationResultsHandler {
 mod tests {
     use std::sync::Mutex;
 
+    use domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict;
     use usecase::DiagnosticMessage;
     use usecase::LayerId;
     use usecase::test_obligation::errors::ObligationResultsError;
@@ -349,8 +350,7 @@ mod tests {
                         edge,
                         None,
                         None,
-                        EdgeResolutionOutcome::Pending,
-                        None,
+                        EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Pending),
                         None,
                     )],
                     Vec::new(),
@@ -443,8 +443,10 @@ mod tests {
                         edge,
                         None,
                         None,
-                        EdgeResolutionOutcome::Fail(FulfillmentFailCategory::Contradiction),
-                        None,
+                        EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Fail {
+                            category: FulfillmentFailCategory::Contradiction,
+                            reason: DiagnosticMessage::try_new("contradiction".to_owned()).unwrap(),
+                        }),
                         Some(drift),
                     )],
                     Vec::new(),
@@ -466,7 +468,7 @@ mod tests {
         assert!(stdout.contains("record=EdgeVerdictRecord"));
         assert!(stdout.contains("domain::Money"));
         assert!(stdout.contains("AC-09"));
-        assert!(stdout.contains("Fail(Contradiction)"));
+        assert!(stdout.contains("Fulfillment(Fail { category: Contradiction"));
         assert!(stdout.contains("ReasonChanged"));
         assert!(stdout.contains("changed waiver reason"));
     }
@@ -517,13 +519,13 @@ mod tests {
                             )
                             .unwrap(),
                         ),
-                        EdgeResolutionOutcome::Fail(FulfillmentFailCategory::CentralUnverified),
-                        Some(
-                            DiagnosticMessage::try_new(
+                        EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Fail {
+                            category: FulfillmentFailCategory::CentralUnverified,
+                            reason: DiagnosticMessage::try_new(
                                 "entry-relevant proof is missing".to_owned(),
                             )
                             .unwrap(),
-                        ),
+                        }),
                         Some(drift),
                     )],
                     Vec::new(),
@@ -550,10 +552,8 @@ mod tests {
         assert!(stdout.contains(
             "evidence_source: Some(DiagnosticMessage(\"cli_driver::test_obligation::results::tests::test_results_handler_renders_record_claim_evidence_verdict_and_reason\"))"
         ));
-        assert!(stdout.contains("outcome: Fail(CentralUnverified)"));
-        assert!(stdout.contains(
-            "verdict_reason: Some(DiagnosticMessage(\"entry-relevant proof is missing\"))"
-        ));
+        assert!(stdout.contains("outcome: Fulfillment(Fail { category: CentralUnverified"));
+        assert!(stdout.contains("reason: DiagnosticMessage(\"entry-relevant proof is missing\")"));
         assert!(
             stdout.contains("detail: DiagnosticMessage(\"evidence no longer matches the claim\")")
         );

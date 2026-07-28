@@ -1,0 +1,619 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "source_scanner",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort + Send + Sync>"
+            },
+            {
+              "name": "hasher",
+              "ty": "std::sync::Arc<dyn ContentHasherPort + Send + Sync>"
+            }
+          ],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve",
+          "params": [
+            {
+              "name": "locations",
+              "ty": "domain::tddd::test_obligation::binding::NonEmptyTestLocations"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ResolvedBoundTests, domain::tddd::test_obligation::errors::TestSourceScanError>"
+        }
+      ],
+      "type_name": "ResolvedBoundTestsResolver"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "set_hash",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::tddd::test_obligation::hashes::BoundTestsSetHash"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "locations",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&domain::tddd::test_obligation::binding::NonEmptyTestLocations"
+        }
+      ],
+      "type_name": "ResolvedBoundTests"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "CheckTestObligationsInteractor",
+      "trait_ref": "CheckTestObligationsApplicationService"
+    },
+    {
+      "action": "modify",
+      "for_type": "EvaluateTestObligationsInteractor",
+      "trait_ref": "EvaluateTestObligationsApplicationService"
+    },
+    {
+      "action": "modify",
+      "for_type": "TestObligationResultsInteractor",
+      "trait_ref": "TestObligationResultsApplicationService"
+    },
+    {
+      "for_type": "ResolvedBoundTestsResolver",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ResolvedBoundTestsResolver",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "ResolvedBoundTestsResolver",
+      "trait_ref": "ResolvedBoundTestsResolverPort"
+    },
+    {
+      "for_type": "ResolvedBoundTests",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "ResolvedBoundTests",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "ResolvedBoundTests",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "ResolvedBoundTests",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {
+    "ContentHasherPort": {
+      "action": "reference",
+      "docs": "Content-hashing secondary port; bytes are an unconstrained opaque input payload, so &[u8] is intentional.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "sha256",
+          "params": [
+            {
+              "name": "bytes",
+              "ty": "&[u8]"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "domain::ContentHash"
+        }
+      ],
+      "module_path": "test_obligation::hasher",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ObligationFulfillmentCachePort": {
+      "action": "add",
+      "docs": "Synchronous CLI-local fulfillment-cache persistence port.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load",
+          "params": [
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<Option<domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheDocument>, domain::tddd::test_obligation::errors::VerifyCacheError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "save",
+          "params": [
+            {
+              "name": "doc",
+              "ty": "&domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheDocument"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), domain::tddd::test_obligation::ids::DiagnosticMessage>"
+        }
+      ],
+      "module_path": "test_obligation::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "ResolvedBoundTestsResolverPort": {
+      "action": "add",
+      "docs": "Synchronous CLI-local bound-test source resolver matching the blocking execution boundary.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "resolve",
+          "params": [
+            {
+              "name": "locations",
+              "ty": "domain::tddd::test_obligation::binding::NonEmptyTestLocations"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<ResolvedBoundTests, domain::tddd::test_obligation::errors::TestSourceScanError>"
+        }
+      ],
+      "module_path": "test_obligation::ports",
+      "role": {
+        "ApplicationService": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "CheckTestObligationsInteractor": {
+      "action": "modify",
+      "docs": "Check interactor invoking domain-owned consistency validation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "rules_loader",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestObligationRulesLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "obligations_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "bindings_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "source_scanner",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_cache",
+              "ty": "std::sync::Arc<dyn ObligationFulfillmentCachePort + Send + Sync>"
+            },
+            {
+              "name": "waiver_cache",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "waiver_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "std::sync::Arc<dyn domain::SpecDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "task_contract_reader",
+              "ty": "std::sync::Arc<dyn TaskContractReaderPort>"
+            },
+            {
+              "name": "impl_plan_reader",
+              "ty": "std::sync::Arc<dyn ImplPlanReaderPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::check",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-02",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "EvaluateTestObligationsInteractor": {
+      "action": "modify",
+      "docs": "Evaluate interactor propagating domain validation and verifier-port failures. Its resolved-bound-tests resolver is constructed internally from the same source scanner and ContentHasherPort supplied to new, making mixed hashing strategies unrepresentable for fulfillment cache keys.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "obligations_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "bindings_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "source_scanner",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_driver",
+              "ty": "std::sync::Arc<dyn SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::ObligationFulfillmentPair, domain::tddd::test_obligation::verdict::ObligationFulfillmentCacheKey, domain::tddd::test_obligation::verdict::ObligationFulfillmentVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> + Send + Sync>"
+            },
+            {
+              "name": "waiver_driver",
+              "ty": "std::sync::Arc<dyn SemanticEscalationDriverPort<domain::tddd::test_obligation::pair::WaiverPair, domain::tddd::test_obligation::verdict::WaiverCacheKey, domain::tddd::test_obligation::verdict::WaiverVerdict, domain::tddd::test_obligation::errors::SemanticVerifierError> + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_cache",
+              "ty": "std::sync::Arc<dyn ObligationFulfillmentCachePort + Send + Sync>"
+            },
+            {
+              "name": "waiver_cache",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "waiver_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "config",
+              "ty": "TestObligationEvaluateConfig"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "std::sync::Arc<dyn domain::SpecDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort + Send + Sync>"
+            },
+        {
+          "name": "hasher",
+          "ty": "std::sync::Arc<dyn ContentHasherPort + Send + Sync>"
+        }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::evaluate",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "IN-03",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "ResolvedBoundTests": {
+      "action": "add",
+      "docs": "Application-boundary evidence constructed only by ResolvedBoundTestsResolver from one source scan; private fields prevent independent hash/location pairing.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation::bound_tests",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "ResolvedBoundTestsResolver": {
+      "action": "add",
+      "docs": "Bound-test evidence resolution interactor that exclusively scans locations, hashes the resulting source, and constructs ResolvedBoundTests.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "test_obligation::bound_tests",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "CN-04",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        }
+      ]
+    },
+    "TestObligationResultsInteractor": {
+      "action": "modify",
+      "docs": "Results interactor projecting typed edge outcomes.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "obligations_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::ObligationsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "bindings_port",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestBindingsArtifactPort + Send + Sync>"
+            },
+            {
+              "name": "source_scanner",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::TestSourceScannerPort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_cache",
+              "ty": "std::sync::Arc<dyn ObligationFulfillmentCachePort + Send + Sync>"
+            },
+            {
+              "name": "waiver_cache",
+              "ty": "std::sync::Arc<dyn domain::tddd::test_obligation::ports::WaiverCachePort + Send + Sync>"
+            },
+            {
+              "name": "fulfillment_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "waiver_verifier_fingerprint",
+              "ty": "domain::tddd::test_obligation::hashes::VerifierPromptFingerprint"
+            },
+            {
+              "name": "spec_reader",
+              "ty": "std::sync::Arc<dyn domain::SpecDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "catalogue_reader",
+              "ty": "std::sync::Arc<dyn domain::tddd::catalogue_v2::catalogue_impl_signals_ports::CatalogueDocumentLoaderPort + Send + Sync>"
+            },
+            {
+              "name": "task_contract_reader",
+              "ty": "std::sync::Arc<dyn TaskContractReaderPort>"
+            },
+            {
+              "name": "impl_plan_reader",
+              "ty": "std::sync::Arc<dyn ImplPlanReaderPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "test_obligation::results",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-04",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/test-obligation-stale-verdict-fix-2026-07-26/spec.json"
+        }
+      ]
+    }
+  }
+}

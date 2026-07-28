@@ -89,7 +89,7 @@ impl DiagnosticMessage {
 /// Returns a non-empty fallback detail for error paths that cannot retain their
 /// original diagnostic text.
 #[must_use]
-pub(crate) fn unavailable_diagnostic_message() -> DiagnosticMessage {
+pub fn unavailable_diagnostic_message() -> DiagnosticMessage {
     DiagnosticMessage("diagnostic detail unavailable".to_owned())
 }
 
@@ -438,6 +438,11 @@ mod tests {
     fn test_diagnostic_message_accepts_non_empty() {
         let msg = DiagnosticMessage::try_new("boom".to_owned()).unwrap();
         assert_eq!(msg.as_str(), "boom");
+    }
+
+    #[test]
+    fn test_unavailable_diagnostic_message_returns_bound_test_source_message() {
+        assert_eq!(unavailable_diagnostic_message().as_str(), "diagnostic detail unavailable");
     }
 
     #[test]

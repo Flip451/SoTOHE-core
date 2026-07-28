@@ -1,0 +1,1230 @@
+{
+  "schema_version": 1,
+  "layer": "domain",
+  "entries": [
+    {
+      "claim_hash": "cdaf09913587f6a19ca31258e557dbe9d3127c70196821de8aa431d74973cb0a",
+      "evidence_hash": "8820bdec45a833bed09879c2a38ef4cfe3fb09a6fbeaa37b8905908752888c97",
+      "verdict": {
+        "kind": "pass",
+        "citation": "失敗理由の正本を `entries[].verdict.reason` に限定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "EdgeResolutionOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`evaluate` の結果 entry から非正本の `entries[].verdict_reason` を削除し、失敗理由の正本を `entries[].verdict.reason` に限定する。失敗 verdict ではこの nested field を必須かつ非空とし、null placeholder、alias、または mirror を設けない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cdaf09913587f6a19ca31258e557dbe9d3127c70196821de8aa431d74973cb0a",
+      "evidence_hash": "96433e2c2a52bfca7e707c69812b7a5252377f7cf36fde556472753916c928f8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`evaluate` の失敗 verdict fixture で、出力 schema、domain model、および encoder が `entries[].verdict_reason` を表現または出力せず、対応する `entries[].verdict.reason` が唯一の理由として必須かつ非空であることを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "EdgeResolutionOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`evaluate` の失敗 verdict fixture で、出力 schema、domain model、および encoder が `entries[].verdict_reason` を表現または出力せず、対応する `entries[].verdict.reason` が唯一の理由として必須かつ非空であることを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cdaf09913587f6a19ca31258e557dbe9d3127c70196821de8aa431d74973cb0a",
+      "evidence_hash": "15da3dc7bd290beaba756f25c9587eeb7410ec6b89d5bbc86a5e8635a8837cf2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "診断情報は、fulfillment cache 行の resolved `bound_tests` と、失敗 `evaluate` entry の唯一かつ非空の `entries[].verdict.reason` に限定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "EdgeResolutionOutcome"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "診断情報は、fulfillment cache 行の resolved `bound_tests` と、失敗 `evaluate` entry の唯一かつ非空の `entries[].verdict.reason` に限定する。これらは観測用であり、current verdict の選択は D6 の hash 三つ組と D16 の verifier-prompt fingerprint だけで決まり、診断情報による別の cache key または採用経路を作らない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "38f8802de17502e55654e26af1e7792f083f6a333136ef745773ade4662889df",
+      "evidence_hash": "8820bdec45a833bed09879c2a38ef4cfe3fb09a6fbeaa37b8905908752888c97",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`evaluate` の結果 entry から非正本の `entries[].verdict_reason` を削除し、失敗理由の正本を `entries[].verdict.reason` に限定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "EdgeVerdictRecord"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "`evaluate` の結果 entry から非正本の `entries[].verdict_reason` を削除し、失敗理由の正本を `entries[].verdict.reason` に限定する。失敗 verdict ではこの nested field を必須かつ非空とし、null placeholder、alias、または mirror を設けない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "38f8802de17502e55654e26af1e7792f083f6a333136ef745773ade4662889df",
+      "evidence_hash": "96433e2c2a52bfca7e707c69812b7a5252377f7cf36fde556472753916c928f8",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`evaluate` の失敗 verdict fixture で、出力 schema、domain model、および encoder が `entries[].verdict_reason` を表現または出力せず、対応する `entries[].verdict.reason` が唯一の理由として必須かつ非空であることを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "EdgeVerdictRecord"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "`evaluate` の失敗 verdict fixture で、出力 schema、domain model、および encoder が `entries[].verdict_reason` を表現または出力せず、対応する `entries[].verdict.reason` が唯一の理由として必須かつ非空であることを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6a2127e8fe2a2496fe653989869bb3f83f2b1a516eca7611e55678f3c32816ed",
+      "evidence_hash": "cdb1c6d815f443c22bad57710477afecb34dcd258ff2af510b39857d5450adf3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同じ完全な key を持つ複数行は曖昧な cache として明示的に検出し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FulfillmentCacheLookupError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "fulfillment cache 行の同一性を完全な cache key により定める。同じ完全な key を持つ複数行は曖昧な cache として明示的に検出し、edge id と obligation id だけによる first-match 選択で verdict を採用しない。異なる hash 三つ組を持つ同一 edge・obligation の過去行は、現行 key に一致しない限り current verdict として扱わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6a2127e8fe2a2496fe653989869bb3f83f2b1a516eca7611e55678f3c32816ed",
+      "evidence_hash": "526572dc91b7d545045c0fdb4af15228e53180216df2cf54b3adba9d048097c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "曖昧な同一 key 行を現行 fulfilled verdict として採用してはならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FulfillmentCacheLookupError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "`check` は pure-read の fail-closed gate のままとし、現行 key に一致しない行、fingerprint が不一致または不在の行、または曖昧な同一 key 行を現行 fulfilled verdict として採用してはならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6a2127e8fe2a2496fe653989869bb3f83f2b1a516eca7611e55678f3c32816ed",
+      "evidence_hash": "e36862cace69cb3d984eaca3898181b9dee2b8fdbf5d33b1df7cdf9bd6d889c4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "キャッシュの過去行が残る場合でも、現行 binding と現行の hash / fingerprint に対応する fulfilled verdict がある限り、行の格納順序によって `check` が StaleVerdicts を報告してはならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FulfillmentCacheLookupError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "キャッシュの過去行が残る場合でも、現行 binding と現行の hash / fingerprint に対応する fulfilled verdict がある限り、行の格納順序によって `check` が StaleVerdicts を報告してはならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6a2127e8fe2a2496fe653989869bb3f83f2b1a516eca7611e55678f3c32816ed",
+      "evidence_hash": "998c3c369200c8e4826b7474cf917991ba9af7788ede968f3e7ecc1fcf0cad93",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`evaluate` の cache lookup と `check` の freshness verification はいずれも現行の三つ組と fingerprint に一致する行を選び"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FulfillmentCacheLookupError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "同じ edge・obligation に対して、過去の bound tests 集合 hash の fulfilled 行と、現行 binding の hash の fulfilled 行が共存する fixture で検証する。`evaluate` の cache lookup と `check` の freshness verification はいずれも現行の三つ組と fingerprint に一致する行を選び、行の順序にかかわらず `check` は StaleVerdicts を報告せず成功する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6a2127e8fe2a2496fe653989869bb3f83f2b1a516eca7611e55678f3c32816ed",
+      "evidence_hash": "b3c5c6483537b8a70fe12f5208b7128f7959fecc39e4a443c1f350baf554ddf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同じ完全な cache key に複数の fulfillment cache 行があり verdict 内容が矛盾する fixture で、`check` が first-match で一方を採用せず、cache の曖昧性を finding として表示して非零 exit することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "FulfillmentCacheLookupError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "同じ完全な cache key に複数の fulfillment cache 行があり verdict 内容が矛盾する fixture で、`check` が first-match で一方を採用せず、cache の曖昧性を finding として表示して非零 exit することを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5e8129265b3a78bd0da536e7a6695bf4aef31c88bc60682409ba50e6d309573",
+      "evidence_hash": "8f357df9e87bcd0a91ceb9251222d39577b550300882bac29037c9b1afb2375d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`evaluate` が verifier provider の解決不能を受けた場合は VerifierPort error を呼出元へ伝播し、成功した評価または current fulfilled verdict として扱わない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationCheckError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "fulfillment verdict の cache reader は、bound tests 集合 hash・entry 宣言 hash・anchor hash の三つ組と現在の verifier-prompt fingerprint を一貫して照合する。`evaluate` の再利用判定と `check` の freshness 判定は、同一 edge に複数の過去行があっても同じ現行 entry を認識する。`evaluate` が verifier provider の解決不能を受けた場合は VerifierPort error を呼出元へ伝播し、成功した評価または current fulfilled verdict として扱わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5e8129265b3a78bd0da536e7a6695bf4aef31c88bc60682409ba50e6d309573",
+      "evidence_hash": "cdb1c6d815f443c22bad57710477afecb34dcd258ff2af510b39857d5450adf3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fulfillment cache 行の同一性を完全な cache key により定める。同じ完全な key を持つ複数行は曖昧な cache として明示的に検出し、edge id と obligation id だけによる first-match 選択で verdict を採用しない。異なる hash 三つ組を持つ同一 edge・obligation の過去行は、現行 key に一致しない限り current verdict として扱わない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationCheckError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "fulfillment cache 行の同一性を完全な cache key により定める。同じ完全な key を持つ複数行は曖昧な cache として明示的に検出し、edge id と obligation id だけによる first-match 選択で verdict を採用しない。異なる hash 三つ組を持つ同一 edge・obligation の過去行は、現行 key に一致しない限り current verdict として扱わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5e8129265b3a78bd0da536e7a6695bf4aef31c88bc60682409ba50e6d309573",
+      "evidence_hash": "04e84dc6d6143f81626a2c62ac002b3e8802db2d475e635ef65578a9aa556866",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実在する導出義務を所有する edge に `voluntary_binding` を直接記録した状態を、binding の不整合として機械的に検出する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationCheckError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "実在する導出義務を所有する edge に `voluntary_binding` を直接記録した状態を、binding の不整合として機械的に検出する。義務なし edge のためだけに許された自発的 binding を、義務あり edge の fulfillment 解決として黙って無視または受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5e8129265b3a78bd0da536e7a6695bf4aef31c88bc60682409ba50e6d309573",
+      "evidence_hash": "526572dc91b7d545045c0fdb4af15228e53180216df2cf54b3adba9d048097c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check` は pure-read の fail-closed gate のままとし、現行 key に一致しない行、fingerprint が不一致または不在の行、または曖昧な同一 key 行を現行 fulfilled verdict として採用してはならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationCheckError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "`check` は pure-read の fail-closed gate のままとし、現行 key に一致しない行、fingerprint が不一致または不在の行、または曖昧な同一 key 行を現行 fulfilled verdict として採用してはならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5e8129265b3a78bd0da536e7a6695bf4aef31c88bc60682409ba50e6d309573",
+      "evidence_hash": "e36862cace69cb3d984eaca3898181b9dee2b8fdbf5d33b1df7cdf9bd6d889c4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "キャッシュの過去行が残る場合でも、現行 binding と現行の hash / fingerprint に対応する fulfilled verdict がある限り、行の格納順序によって `check` が StaleVerdicts を報告してはならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationCheckError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "キャッシュの過去行が残る場合でも、現行 binding と現行の hash / fingerprint に対応する fulfilled verdict がある限り、行の格納順序によって `check` が StaleVerdicts を報告してはならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5e8129265b3a78bd0da536e7a6695bf4aef31c88bc60682409ba50e6d309573",
+      "evidence_hash": "c521e89668f66408d535ef59bde919136aeaf2083e7d8c0503a278fb6c8ed81b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "義務あり edge の `voluntary_binding`、同一 key の矛盾行、または解決不能な cache / binding 不整合は、warning だけで通過させず finding と非零 exit で失敗させる。治療は binding または `evaluate` による正規の再評価で行う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationCheckError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "義務あり edge の `voluntary_binding`、同一 key の矛盾行、または解決不能な cache / binding 不整合は、warning だけで通過させず finding と非零 exit で失敗させる。治療は binding または `evaluate` による正規の再評価で行う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5e8129265b3a78bd0da536e7a6695bf4aef31c88bc60682409ba50e6d309573",
+      "evidence_hash": "998c3c369200c8e4826b7474cf917991ba9af7788ede968f3e7ecc1fcf0cad93",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`check` の freshness verification はいずれも現行の三つ組と fingerprint に一致する行を選び、行の順序にかかわらず `check` は StaleVerdicts を報告せず成功する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationCheckError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "同じ edge・obligation に対して、過去の bound tests 集合 hash の fulfilled 行と、現行 binding の hash の fulfilled 行が共存する fixture で検証する。`evaluate` の cache lookup と `check` の freshness verification はいずれも現行の三つ組と fingerprint に一致する行を選び、行の順序にかかわらず `check` は StaleVerdicts を報告せず成功する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5e8129265b3a78bd0da536e7a6695bf4aef31c88bc60682409ba50e6d309573",
+      "evidence_hash": "b3c5c6483537b8a70fe12f5208b7128f7959fecc39e4a443c1f350baf554ddf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同じ完全な cache key に複数の fulfillment cache 行があり verdict 内容が矛盾する fixture で、`check` が first-match で一方を採用せず、cache の曖昧性を finding として表示して非零 exit することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationCheckError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "同じ完全な cache key に複数の fulfillment cache 行があり verdict 内容が矛盾する fixture で、`check` が first-match で一方を採用せず、cache の曖昧性を finding として表示して非零 exit することを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5e8129265b3a78bd0da536e7a6695bf4aef31c88bc60682409ba50e6d309573",
+      "evidence_hash": "da4486afe94a5403060d017d49d559d579f0898b1e84f41b606090aad019272f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "導出済み義務を所有する edge へ `voluntary_binding` を置いた fixture で、`check` が当該 binding を黙殺せず、義務あり edge には voluntary binding を使えないことを示す finding と非零 exit を返すことを検証する。義務なし edge の自発的 binding は引き続き fulfillment 評価へ進めることも検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationCheckError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "導出済み義務を所有する edge へ `voluntary_binding` を置いた fixture で、`check` が当該 binding を黙殺せず、義務あり edge には voluntary binding を使えないことを示す finding と非零 exit を返すことを検証する。義務なし edge の自発的 binding は引き続き fulfillment 評価へ進めることも検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d5e8129265b3a78bd0da536e7a6695bf4aef31c88bc60682409ba50e6d309573",
+      "evidence_hash": "d708aa8a0ff480f7d50ee6f60f1cfb4fbd6dea4f979bfc4155f07287730fbb33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "初回の `check` が必要な finding を fail-closed に返し、`evaluate` による現行 verdict の正規再評価後の `check` が、手動 cache 編集・削除または force / lenient flag なしに成功することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationCheckError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "旧形式または stale な fulfillment cache 行を含む active track fixture で、初回の `check` が必要な finding を fail-closed に返し、`evaluate` による現行 verdict の正規再評価後の `check` が、手動 cache 編集・削除または force / lenient flag なしに成功することを検証する。これにより、この gate 自身を通る実装 batch の回復経路を維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f22b8a8a5f8b42a7adb4b9fee2b2b1d4ce30f3e06c652003556177db6132ee9a",
+      "evidence_hash": "8f357df9e87bcd0a91ceb9251222d39577b550300882bac29037c9b1afb2375d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`evaluate` が verifier provider の解決不能を受けた場合は VerifierPort error を呼出元へ伝播し、成功した評価または current fulfilled verdict として扱わない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationEvaluateError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "fulfillment verdict の cache reader は、bound tests 集合 hash・entry 宣言 hash・anchor hash の三つ組と現在の verifier-prompt fingerprint を一貫して照合する。`evaluate` の再利用判定と `check` の freshness 判定は、同一 edge に複数の過去行があっても同じ現行 entry を認識する。`evaluate` が verifier provider の解決不能を受けた場合は VerifierPort error を呼出元へ伝播し、成功した評価または current fulfilled verdict として扱わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f22b8a8a5f8b42a7adb4b9fee2b2b1d4ce30f3e06c652003556177db6132ee9a",
+      "evidence_hash": "cdb1c6d815f443c22bad57710477afecb34dcd258ff2af510b39857d5450adf3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fulfillment cache 行の同一性を完全な cache key により定める。同じ完全な key を持つ複数行は曖昧な cache として明示的に検出し、edge id と obligation id だけによる first-match 選択で verdict を採用しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationEvaluateError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "fulfillment cache 行の同一性を完全な cache key により定める。同じ完全な key を持つ複数行は曖昧な cache として明示的に検出し、edge id と obligation id だけによる first-match 選択で verdict を採用しない。異なる hash 三つ組を持つ同一 edge・obligation の過去行は、現行 key に一致しない限り current verdict として扱わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f22b8a8a5f8b42a7adb4b9fee2b2b1d4ce30f3e06c652003556177db6132ee9a",
+      "evidence_hash": "04e84dc6d6143f81626a2c62ac002b3e8802db2d475e635ef65578a9aa556866",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実在する導出義務を所有する edge に `voluntary_binding` を直接記録した状態を、binding の不整合として機械的に検出する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationEvaluateError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "実在する導出義務を所有する edge に `voluntary_binding` を直接記録した状態を、binding の不整合として機械的に検出する。義務なし edge のためだけに許された自発的 binding を、義務あり edge の fulfillment 解決として黙って無視または受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f22b8a8a5f8b42a7adb4b9fee2b2b1d4ce30f3e06c652003556177db6132ee9a",
+      "evidence_hash": "c521e89668f66408d535ef59bde919136aeaf2083e7d8c0503a278fb6c8ed81b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "義務あり edge の `voluntary_binding`、同一 key の矛盾行、または解決不能な cache / binding 不整合は、warning だけで通過させず finding と非零 exit で失敗させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationEvaluateError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "義務あり edge の `voluntary_binding`、同一 key の矛盾行、または解決不能な cache / binding 不整合は、warning だけで通過させず finding と非零 exit で失敗させる。治療は binding または `evaluate` による正規の再評価で行う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f22b8a8a5f8b42a7adb4b9fee2b2b1d4ce30f3e06c652003556177db6132ee9a",
+      "evidence_hash": "998c3c369200c8e4826b7474cf917991ba9af7788ede968f3e7ecc1fcf0cad93",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`evaluate` の cache lookup と `check` の freshness verification はいずれも現行の三つ組と fingerprint に一致する行を選び、行の順序にかかわらず `check` は StaleVerdicts を報告せず成功する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationEvaluateError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "同じ edge・obligation に対して、過去の bound tests 集合 hash の fulfilled 行と、現行 binding の hash の fulfilled 行が共存する fixture で検証する。`evaluate` の cache lookup と `check` の freshness verification はいずれも現行の三つ組と fingerprint に一致する行を選び、行の順序にかかわらず `check` は StaleVerdicts を報告せず成功する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f22b8a8a5f8b42a7adb4b9fee2b2b1d4ce30f3e06c652003556177db6132ee9a",
+      "evidence_hash": "da4486afe94a5403060d017d49d559d579f0898b1e84f41b606090aad019272f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "義務あり edge には voluntary binding を使えないことを示す finding と非零 exit を返すことを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationEvaluateError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "導出済み義務を所有する edge へ `voluntary_binding` を置いた fixture で、`check` が当該 binding を黙殺せず、義務あり edge には voluntary binding を使えないことを示す finding と非零 exit を返すことを検証する。義務なし edge の自発的 binding は引き続き fulfillment 評価へ進めることも検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f22b8a8a5f8b42a7adb4b9fee2b2b1d4ce30f3e06c652003556177db6132ee9a",
+      "evidence_hash": "d708aa8a0ff480f7d50ee6f60f1cfb4fbd6dea4f979bfc4155f07287730fbb33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧形式または stale な fulfillment cache 行を含む active track fixture で、初回の `check` が必要な finding を fail-closed に返し、`evaluate` による現行 verdict の正規再評価後の `check` が、手動 cache 編集・削除または force / lenient flag なしに成功することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationEvaluateError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "旧形式または stale な fulfillment cache 行を含む active track fixture で、初回の `check` が必要な finding を fail-closed に返し、`evaluate` による現行 verdict の正規再評価後の `check` が、手動 cache 編集・削除または force / lenient flag なしに成功することを検証する。これにより、この gate 自身を通る実装 batch の回復経路を維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f22b8a8a5f8b42a7adb4b9fee2b2b1d4ce30f3e06c652003556177db6132ee9a",
+      "evidence_hash": "3e447f562ec7be4611a9bf53416405b7ae6e44a346bc46d30f2d14104da35e6f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`evaluate` が VerifierPort error を呼出元へ返すことを検証する。この失敗を成功した評価または current fulfilled verdict として扱わないことも検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationEvaluateError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "verifier provider が解決不能となる fixture で、`evaluate` が VerifierPort error を呼出元へ返すことを検証する。この失敗を成功した評価または current fulfilled verdict として扱わないことも検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5fbc5250e969260a041359bf0f36b4d54d5cf35427879977c1a2ed5c2b2e5455",
+      "evidence_hash": "8f357df9e87bcd0a91ceb9251222d39577b550300882bac29037c9b1afb2375d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fulfillment verdict の cache reader は、bound tests 集合 hash・entry 宣言 hash・anchor hash の三つ組と現在の verifier-prompt fingerprint を一貫して照合する。`evaluate` の再利用判定と `check` の freshness 判定は、同一 edge に複数の過去行があっても同じ現行 entry を認識する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationFulfillmentCacheDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "fulfillment verdict の cache reader は、bound tests 集合 hash・entry 宣言 hash・anchor hash の三つ組と現在の verifier-prompt fingerprint を一貫して照合する。`evaluate` の再利用判定と `check` の freshness 判定は、同一 edge に複数の過去行があっても同じ現行 entry を認識する。`evaluate` が verifier provider の解決不能を受けた場合は VerifierPort error を呼出元へ伝播し、成功した評価または current fulfilled verdict として扱わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5fbc5250e969260a041359bf0f36b4d54d5cf35427879977c1a2ed5c2b2e5455",
+      "evidence_hash": "cdb1c6d815f443c22bad57710477afecb34dcd258ff2af510b39857d5450adf3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fulfillment cache 行の同一性を完全な cache key により定める。同じ完全な key を持つ複数行は曖昧な cache として明示的に検出し、edge id と obligation id だけによる first-match 選択で verdict を採用しない。異なる hash 三つ組を持つ同一 edge・obligation の過去行は、現行 key に一致しない限り current verdict として扱わない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationFulfillmentCacheDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "fulfillment cache 行の同一性を完全な cache key により定める。同じ完全な key を持つ複数行は曖昧な cache として明示的に検出し、edge id と obligation id だけによる first-match 選択で verdict を採用しない。異なる hash 三つ組を持つ同一 edge・obligation の過去行は、現行 key に一致しない限り current verdict として扱わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5fbc5250e969260a041359bf0f36b4d54d5cf35427879977c1a2ed5c2b2e5455",
+      "evidence_hash": "526572dc91b7d545045c0fdb4af15228e53180216df2cf54b3adba9d048097c0",
+      "verdict": {
+        "kind": "pass",
+        "citation": "現行 key に一致しない行、fingerprint が不一致または不在の行、または曖昧な同一 key 行を現行 fulfilled verdict として採用してはならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationFulfillmentCacheDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "`check` は pure-read の fail-closed gate のままとし、現行 key に一致しない行、fingerprint が不一致または不在の行、または曖昧な同一 key 行を現行 fulfilled verdict として採用してはならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5fbc5250e969260a041359bf0f36b4d54d5cf35427879977c1a2ed5c2b2e5455",
+      "evidence_hash": "e36862cace69cb3d984eaca3898181b9dee2b8fdbf5d33b1df7cdf9bd6d889c4",
+      "verdict": {
+        "kind": "pass",
+        "citation": "キャッシュの過去行が残る場合でも、現行 binding と現行の hash / fingerprint に対応する fulfilled verdict がある限り、行の格納順序によって `check` が StaleVerdicts を報告してはならない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationFulfillmentCacheDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "キャッシュの過去行が残る場合でも、現行 binding と現行の hash / fingerprint に対応する fulfilled verdict がある限り、行の格納順序によって `check` が StaleVerdicts を報告してはならない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5fbc5250e969260a041359bf0f36b4d54d5cf35427879977c1a2ed5c2b2e5455",
+      "evidence_hash": "998c3c369200c8e4826b7474cf917991ba9af7788ede968f3e7ecc1fcf0cad93",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`evaluate` の cache lookup と `check` の freshness verification はいずれも現行の三つ組と fingerprint に一致する行を選び、行の順序にかかわらず `check` は StaleVerdicts を報告せず成功する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationFulfillmentCacheDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "同じ edge・obligation に対して、過去の bound tests 集合 hash の fulfilled 行と、現行 binding の hash の fulfilled 行が共存する fixture で検証する。`evaluate` の cache lookup と `check` の freshness verification はいずれも現行の三つ組と fingerprint に一致する行を選び、行の順序にかかわらず `check` は StaleVerdicts を報告せず成功する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5fbc5250e969260a041359bf0f36b4d54d5cf35427879977c1a2ed5c2b2e5455",
+      "evidence_hash": "b3c5c6483537b8a70fe12f5208b7128f7959fecc39e4a443c1f350baf554ddf6",
+      "verdict": {
+        "kind": "pass",
+        "citation": "同じ完全な cache key に複数の fulfillment cache 行があり verdict 内容が矛盾する fixture で、`check` が first-match で一方を採用せず、cache の曖昧性を finding として表示して非零 exit することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationFulfillmentCacheDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "同じ完全な cache key に複数の fulfillment cache 行があり verdict 内容が矛盾する fixture で、`check` が first-match で一方を採用せず、cache の曖昧性を finding として表示して非零 exit することを検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c023142ce2ad4cf8ecbb5c056294d7763f7d8801285c1906bc935abf3d232c46",
+      "evidence_hash": "cdb1c6d815f443c22bad57710477afecb34dcd258ff2af510b39857d5450adf3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fulfillment cache 行の同一性を完全な cache key により定める。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationFulfillmentCacheEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "fulfillment cache 行の同一性を完全な cache key により定める。同じ完全な key を持つ複数行は曖昧な cache として明示的に検出し、edge id と obligation id だけによる first-match 選択で verdict を採用しない。異なる hash 三つ組を持つ同一 edge・obligation の過去行は、現行 key に一致しない限り current verdict として扱わない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c023142ce2ad4cf8ecbb5c056294d7763f7d8801285c1906bc935abf3d232c46",
+      "evidence_hash": "043f03d951675c1a78b81b1568590afec369f97d569ffa4776f9e35b6c6e1dc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fulfillment cache 行に、hash の根拠となった resolved `bound_tests` を診断専用情報として記録する。この情報は調査可能性を高めるが、cache key の同一性軸を増やさず、bound tests 集合 hash を含む既存の三つ組規律を変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationFulfillmentCacheEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "fulfillment cache 行に、hash の根拠となった resolved `bound_tests` を診断専用情報として記録する。この情報は調査可能性を高めるが、cache key の同一性軸を増やさず、bound tests 集合 hash を含む既存の三つ組規律を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c023142ce2ad4cf8ecbb5c056294d7763f7d8801285c1906bc935abf3d232c46",
+      "evidence_hash": "15da3dc7bd290beaba756f25c9587eeb7410ec6b89d5bbc86a5e8635a8837cf2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "診断情報は、fulfillment cache 行の resolved `bound_tests` と、失敗 `evaluate` entry の唯一かつ非空の `entries[].verdict.reason` に限定する。これらは観測用であり、current verdict の選択は D6 の hash 三つ組と D16 の verifier-prompt fingerprint だけで決まり、診断情報による別の cache key または採用経路を作らない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationFulfillmentCacheEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "診断情報は、fulfillment cache 行の resolved `bound_tests` と、失敗 `evaluate` entry の唯一かつ非空の `entries[].verdict.reason` に限定する。これらは観測用であり、current verdict の選択は D6 の hash 三つ組と D16 の verifier-prompt fingerprint だけで決まり、診断情報による別の cache key または採用経路を作らない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c023142ce2ad4cf8ecbb5c056294d7763f7d8801285c1906bc935abf3d232c46",
+      "evidence_hash": "fa9ecf10c47417e61f8d654063d5e12fd655906e131523b2779fd6dfc19fe5b9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`evaluate` が書く fulfillment cache 行に resolved `bound_tests` が診断情報として記録されることを検証する。cache key の一致判定は `bound_tests` 表現ではなく、bound tests 集合 hash・entry 宣言 hash・anchor hash と fingerprint により決まり、診断情報を key の軸に含めないことも検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationFulfillmentCacheEntry"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`evaluate` が書く fulfillment cache 行に resolved `bound_tests` が診断情報として記録されることを検証する。cache key の一致判定は `bound_tests` 表現ではなく、bound tests 集合 hash・entry 宣言 hash・anchor hash と fingerprint により決まり、診断情報を key の軸に含めないことも検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "811c915805fb5f8216b83a98d65b33d51a8e7abe1ae67cbba232519b11400c1f",
+      "evidence_hash": "043f03d951675c1a78b81b1568590afec369f97d569ffa4776f9e35b6c6e1dc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fulfillment cache 行に、hash の根拠となった resolved `bound_tests` を診断専用情報として記録する。この情報は調査可能性を高めるが、cache key の同一性軸を増やさず、bound tests 集合 hash を含む既存の三つ組規律を変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationFulfillmentCacheEntryState"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "fulfillment cache 行に、hash の根拠となった resolved `bound_tests` を診断専用情報として記録する。この情報は調査可能性を高めるが、cache key の同一性軸を増やさず、bound tests 集合 hash を含む既存の三つ組規律を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "811c915805fb5f8216b83a98d65b33d51a8e7abe1ae67cbba232519b11400c1f",
+      "evidence_hash": "15da3dc7bd290beaba756f25c9587eeb7410ec6b89d5bbc86a5e8635a8837cf2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "診断情報は、fulfillment cache 行の resolved `bound_tests` と、失敗 `evaluate` entry の唯一かつ非空の `entries[].verdict.reason` に限定する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationFulfillmentCacheEntryState"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "診断情報は、fulfillment cache 行の resolved `bound_tests` と、失敗 `evaluate` entry の唯一かつ非空の `entries[].verdict.reason` に限定する。これらは観測用であり、current verdict の選択は D6 の hash 三つ組と D16 の verifier-prompt fingerprint だけで決まり、診断情報による別の cache key または採用経路を作らない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "811c915805fb5f8216b83a98d65b33d51a8e7abe1ae67cbba232519b11400c1f",
+      "evidence_hash": "fa9ecf10c47417e61f8d654063d5e12fd655906e131523b2779fd6dfc19fe5b9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`evaluate` が書く fulfillment cache 行に resolved `bound_tests` が診断情報として記録されることを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationFulfillmentCacheEntryState"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "`evaluate` が書く fulfillment cache 行に resolved `bound_tests` が診断情報として記録されることを検証する。cache key の一致判定は `bound_tests` 表現ではなく、bound tests 集合 hash・entry 宣言 hash・anchor hash と fingerprint により決まり、診断情報を key の軸に含めないことも検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "99bad8409d3d91c6f187bc1de4fd098735b3802412a118675f77ad9778c46cd8",
+      "evidence_hash": "04e84dc6d6143f81626a2c62ac002b3e8802db2d475e635ef65578a9aa556866",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実在する導出義務を所有する edge に `voluntary_binding` を直接記録した状態を、binding の不整合として機械的に検出する。義務なし edge のためだけに許された自発的 binding を、義務あり edge の fulfillment 解決として黙って無視または受理しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "実在する導出義務を所有する edge に `voluntary_binding` を直接記録した状態を、binding の不整合として機械的に検出する。義務なし edge のためだけに許された自発的 binding を、義務あり edge の fulfillment 解決として黙って無視または受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "99bad8409d3d91c6f187bc1de4fd098735b3802412a118675f77ad9778c46cd8",
+      "evidence_hash": "c521e89668f66408d535ef59bde919136aeaf2083e7d8c0503a278fb6c8ed81b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "義務あり edge の `voluntary_binding`、同一 key の矛盾行、または解決不能な cache / binding 不整合は、warning だけで通過させず finding と非零 exit で失敗させる。治療は binding または `evaluate` による正規の再評価で行う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "義務あり edge の `voluntary_binding`、同一 key の矛盾行、または解決不能な cache / binding 不整合は、warning だけで通過させず finding と非零 exit で失敗させる。治療は binding または `evaluate` による正規の再評価で行う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "99bad8409d3d91c6f187bc1de4fd098735b3802412a118675f77ad9778c46cd8",
+      "evidence_hash": "da4486afe94a5403060d017d49d559d579f0898b1e84f41b606090aad019272f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "導出済み義務を所有する edge へ `voluntary_binding` を置いた fixture で、`check` が当該 binding を黙殺せず、義務あり edge には voluntary binding を使えないことを示す finding と非零 exit を返すことを検証する。義務なし edge の自発的 binding は引き続き fulfillment 評価へ進めることも検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "ObligationsDocument"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "導出済み義務を所有する edge へ `voluntary_binding` を置いた fixture で、`check` が当該 binding を黙殺せず、義務あり edge には voluntary binding を使えないことを示す finding と非零 exit を返すことを検証する。義務なし edge の自発的 binding は引き続き fulfillment 評価へ進めることも検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4ab9dca98753ba7553a2636e8905d57494dcbf9a40b2fbeb1e4ccdc322ea5e30",
+      "evidence_hash": "04e84dc6d6143f81626a2c62ac002b3e8802db2d475e635ef65578a9aa556866",
+      "verdict": {
+        "kind": "pass",
+        "citation": "実在する導出義務を所有する edge に `voluntary_binding` を直接記録した状態を、binding の不整合として機械的に検出する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TestBindingConsistencyError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "実在する導出義務を所有する edge に `voluntary_binding` を直接記録した状態を、binding の不整合として機械的に検出する。義務なし edge のためだけに許された自発的 binding を、義務あり edge の fulfillment 解決として黙って無視または受理しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4ab9dca98753ba7553a2636e8905d57494dcbf9a40b2fbeb1e4ccdc322ea5e30",
+      "evidence_hash": "c521e89668f66408d535ef59bde919136aeaf2083e7d8c0503a278fb6c8ed81b",
+      "verdict": {
+        "kind": "pass",
+        "citation": "義務あり edge の `voluntary_binding`、同一 key の矛盾行、または解決不能な cache / binding 不整合は、warning だけで通過させず finding と非零 exit で失敗させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TestBindingConsistencyError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "義務あり edge の `voluntary_binding`、同一 key の矛盾行、または解決不能な cache / binding 不整合は、warning だけで通過させず finding と非零 exit で失敗させる。治療は binding または `evaluate` による正規の再評価で行う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4ab9dca98753ba7553a2636e8905d57494dcbf9a40b2fbeb1e4ccdc322ea5e30",
+      "evidence_hash": "da4486afe94a5403060d017d49d559d579f0898b1e84f41b606090aad019272f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "導出済み義務を所有する edge へ `voluntary_binding` を置いた fixture で、`check` が当該 binding を黙殺せず、義務あり edge には voluntary binding を使えないことを示す finding と非零 exit を返すことを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "TestBindingConsistencyError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "導出済み義務を所有する edge へ `voluntary_binding` を置いた fixture で、`check` が当該 binding を黙殺せず、義務あり edge には voluntary binding を使えないことを示す finding と非零 exit を返すことを検証する。義務なし edge の自発的 binding は引き続き fulfillment 評価へ進めることも検証する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c3f60e087dd3a4f9ce07513b1c1bd980811012ce9697dd6d279bcc05693c52be",
+      "evidence_hash": "d708aa8a0ff480f7d50ee6f60f1cfb4fbd6dea4f979bfc4155f07287730fbb33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "旧形式または stale な fulfillment cache 行を含む active track fixture で、初回の `check` が必要な finding を fail-closed に返し、`evaluate` による現行 verdict の正規再評価後の `check` が、手動 cache 編集・削除または force / lenient flag なしに成功することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "types",
+          "entry_key": "VerifyCacheError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "旧形式または stale な fulfillment cache 行を含む active track fixture で、初回の `check` が必要な finding を fail-closed に返し、`evaluate` による現行 verdict の正規再評価後の `check` が、手動 cache 編集・削除または force / lenient flag なしに成功することを検証する。これにより、この gate 自身を通る実装 batch の回復経路を維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "895ad26ca4b1f1054ed7a42d7e156be182ed51e1df9a7f56a56861e8d3a2aaff",
+      "evidence_hash": "80b1abec52e69d1c2edf2f32f959b682169eb559d77ffc26e9b3dc35dc16c6b2",
+      "verdict": {
+        "kind": "pass",
+        "citation": "評価エラーを黙殺せず、既存の fail-closed gate を自己ホスト可能な回復経路のまま維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "functions",
+          "entry_key": "domain::tddd::test_obligation::ids::unavailable_diagnostic_message"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "cache の不整合、義務を持つ edge への不正な自発的 binding、および評価エラーを黙殺せず、既存の fail-closed gate を自己ホスト可能な回復経路のまま維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "35be383be784b0b622fce27228f5560ab03c495277bd0787a35cfab9f2576ca7",
+      "evidence_hash": "043f03d951675c1a78b81b1568590afec369f97d569ffa4776f9e35b6c6e1dc1",
+      "verdict": {
+        "kind": "pass",
+        "citation": "fulfillment cache 行に、hash の根拠となった resolved `bound_tests` を診断専用情報として記録する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "ObligationFulfillmentCachePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "fulfillment cache 行に、hash の根拠となった resolved `bound_tests` を診断専用情報として記録する。この情報は調査可能性を高めるが、cache key の同一性軸を増やさず、bound tests 集合 hash を含む既存の三つ組規律を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "35be383be784b0b622fce27228f5560ab03c495277bd0787a35cfab9f2576ca7",
+      "evidence_hash": "d708aa8a0ff480f7d50ee6f60f1cfb4fbd6dea4f979bfc4155f07287730fbb33",
+      "verdict": {
+        "kind": "pass",
+        "citation": "初回の `check` が必要な finding を fail-closed に返し、`evaluate` による現行 verdict の正規再評価後の `check` が、手動 cache 編集・削除または force / lenient flag なしに成功することを検証する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/test-obligation-stale-verdict-fix-2026-07-26/domain-types.json",
+          "section_key": "traits",
+          "entry_key": "ObligationFulfillmentCachePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-06",
+          "text_label": "旧形式または stale な fulfillment cache 行を含む active track fixture で、初回の `check` が必要な finding を fail-closed に返し、`evaluate` による現行 verdict の正規再評価後の `check` が、手動 cache 編集・削除または force / lenient flag なしに成功することを検証する。これにより、この gate 自身を通る実装 batch の回復経路を維持する。"
+        }
+      }
+    }
+  ]
+}

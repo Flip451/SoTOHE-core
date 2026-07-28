@@ -22,10 +22,12 @@ mod results_status;
 mod status_lanes;
 
 pub mod bindings_skeleton;
+pub mod bound_tests;
 pub mod check;
 pub mod derive;
 pub mod evaluate;
 pub mod hasher;
+pub mod ports;
 pub mod results;
 
 pub use domain::tddd::test_obligation::errors;
@@ -34,7 +36,7 @@ use std::path::{Component, Path, PathBuf};
 
 use domain::ContentHash;
 use domain::TrackId;
-use domain::tddd::catalogue_v2::CatalogueDocument;
+use domain::tddd::catalogue_v2::{CatalogueDocument, TraitImplDeclV2, TraitRefScope};
 use domain::tddd::semantic_verify::{CatalogueEntryRef, CatalogueSectionKey};
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::test_obligation::obligations::TestObligation;
@@ -228,9 +230,9 @@ pub(crate) fn find_declaration_text_from_loaded(
 /// Resolves the declaration text for a derived obligation.
 ///
 /// Trait-impl obligations use the implementer type as their entry key but freeze
-/// the actual `TraitImplDeclV2`; use the item identifier (`trait_impl:<trait>`)
-/// to re-resolve that same impl declaration instead of falling back to a type
-/// declaration with the same key.
+/// the implementation together with its resolved trait declaration. Use the item
+/// identifier (`trait_impl:<trait>`) to re-resolve that same pair instead of
+/// falling back to a type declaration with the same key.
 #[cfg(test)]
 #[must_use]
 pub(crate) fn obligation_declaration_text(
@@ -255,7 +257,8 @@ pub(crate) fn obligation_declaration_text_from_loaded(
         .filter(|catalogue| catalogue.matches_file_path(&obligation.target_entry().file_path))
         .map(LoadedCatalogueDocument::document);
     if matches!(obligation.target_role(), TargetEntryRoleKind::TraitImpl(_)) {
-        return trait_impl_declaration_text_in(matching, obligation);
+        let all = catalogues.iter().map(LoadedCatalogueDocument::document).collect::<Vec<_>>();
+        return trait_impl_declaration_text_in(matching, &all, obligation);
     }
     target_entry_declaration_text_in(matching, obligation.target_entry())
 }
@@ -287,11 +290,13 @@ fn trait_impl_declaration_text(
     catalogues: &[CatalogueDocument],
     obligation: &TestObligation,
 ) -> Option<String> {
-    trait_impl_declaration_text_in(catalogues.iter(), obligation)
+    let all = catalogues.iter().collect::<Vec<_>>();
+    trait_impl_declaration_text_in(catalogues.iter(), &all, obligation)
 }
 
 fn trait_impl_declaration_text_in<'a>(
     catalogues: impl IntoIterator<Item = &'a CatalogueDocument>,
+    all_catalogues: &[&CatalogueDocument],
     obligation: &TestObligation,
 ) -> Option<String> {
     let trait_ref = obligation.id().item_identifier().as_str().strip_prefix("trait_impl:")?;
@@ -301,11 +306,62 @@ fn trait_impl_declaration_text_in<'a>(
             if impl_decl.for_type().as_str() == for_type
                 && impl_decl.trait_ref().as_str() == trait_ref
             {
-                return Some(format!("{impl_decl:?}"));
+                let trait_declaration =
+                    trait_declaration_text_for_impl(all_catalogues, catalogue, impl_decl)?;
+                return Some(trait_impl_pair_declaration_text(impl_decl, &trait_declaration));
             }
         }
     }
     None
+}
+
+/// Canonical declaration text for a trait implementation and the contract it
+/// implements. Both derivation and verification use this exact composition so
+/// an implementation's cache key changes with either side of the pair.
+#[must_use]
+pub(crate) fn trait_impl_pair_declaration_text(
+    impl_declaration: &TraitImplDeclV2,
+    trait_declaration: &str,
+) -> String {
+    format!("trait_impl: {impl_declaration:?}\ntrait_declaration: {trait_declaration}")
+}
+
+fn trait_declaration_text_for_impl(
+    catalogues: &[&CatalogueDocument],
+    impl_catalogue: &CatalogueDocument,
+    impl_declaration: &TraitImplDeclV2,
+) -> Option<String> {
+    let scope = impl_declaration.trait_ref_scope();
+    let (crate_name, trait_name) = match scope {
+        TraitRefScope::SelfCrate { bare_name } => {
+            return trait_entry_declaration_text(impl_catalogue, bare_name.as_str());
+        }
+        TraitRefScope::Workspace { crate_name, bare_name } => (crate_name, bare_name),
+        TraitRefScope::External => return None,
+    };
+
+    let mut found = None;
+    for catalogue in catalogues {
+        if catalogue.crate_name() != &crate_name {
+            continue;
+        }
+        let Some(declaration) = trait_entry_declaration_text(catalogue, trait_name.as_str()) else {
+            continue;
+        };
+        if found.is_some() {
+            return None;
+        }
+        found = Some(declaration);
+    }
+    found
+}
+
+fn trait_entry_declaration_text(catalogue: &CatalogueDocument, name: &str) -> Option<String> {
+    catalogue
+        .traits()
+        .iter()
+        .find(|(trait_name, _)| trait_name.as_str() == name)
+        .map(|(_, entry)| format!("{entry:?}"))
 }
 
 /// Returns the artifact identity for a catalogue path.

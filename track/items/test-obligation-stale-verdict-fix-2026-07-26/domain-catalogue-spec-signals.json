@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "da7c98a742168af1de0282184c5a3c8149859e417d254dca39fcfa984f8c86a8",
+  "signals": [
+    {
+      "type_name": "EdgeResolutionOutcome",
+      "signal": "blue",
+      "entry_hash": "cdaf09913587f6a19ca31258e557dbe9d3127c70196821de8aa431d74973cb0a"
+    },
+    {
+      "type_name": "EdgeVerdictRecord",
+      "signal": "blue",
+      "entry_hash": "38f8802de17502e55654e26af1e7792f083f6a333136ef745773ade4662889df"
+    },
+    {
+      "type_name": "FulfillmentCacheLookupError",
+      "signal": "blue",
+      "entry_hash": "6a2127e8fe2a2496fe653989869bb3f83f2b1a516eca7611e55678f3c32816ed"
+    },
+    {
+      "type_name": "ObligationCheckError",
+      "signal": "blue",
+      "entry_hash": "d5e8129265b3a78bd0da536e7a6695bf4aef31c88bc60682409ba50e6d309573"
+    },
+    {
+      "type_name": "ObligationEvaluateError",
+      "signal": "blue",
+      "entry_hash": "f22b8a8a5f8b42a7adb4b9fee2b2b1d4ce30f3e06c652003556177db6132ee9a"
+    },
+    {
+      "type_name": "ObligationFulfillmentCacheDocument",
+      "signal": "blue",
+      "entry_hash": "5fbc5250e969260a041359bf0f36b4d54d5cf35427879977c1a2ed5c2b2e5455"
+    },
+    {
+      "type_name": "ObligationFulfillmentCacheEntry",
+      "signal": "blue",
+      "entry_hash": "c023142ce2ad4cf8ecbb5c056294d7763f7d8801285c1906bc935abf3d232c46"
+    },
+    {
+      "type_name": "ObligationFulfillmentCacheEntryState",
+      "signal": "blue",
+      "entry_hash": "811c915805fb5f8216b83a98d65b33d51a8e7abe1ae67cbba232519b11400c1f"
+    },
+    {
+      "type_name": "ObligationsDocument",
+      "signal": "blue",
+      "entry_hash": "99bad8409d3d91c6f187bc1de4fd098735b3802412a118675f77ad9778c46cd8"
+    },
+    {
+      "type_name": "TestBindingConsistencyError",
+      "signal": "blue",
+      "entry_hash": "4ab9dca98753ba7553a2636e8905d57494dcbf9a40b2fbeb1e4ccdc322ea5e30"
+    },
+    {
+      "type_name": "VerifyCacheError",
+      "signal": "blue",
+      "entry_hash": "c3f60e087dd3a4f9ce07513b1c1bd980811012ce9697dd6d279bcc05693c52be"
+    },
+    {
+      "type_name": "domain::tddd::test_obligation::ids::unavailable_diagnostic_message",
+      "signal": "blue",
+      "entry_hash": "895ad26ca4b1f1054ed7a42d7e156be182ed51e1df9a7f56a56861e8d3a2aaff"
+    },
+    {
+      "type_name": "ObligationFulfillmentCachePort",
+      "signal": "blue",
+      "entry_hash": "35be383be784b0b622fce27228f5560ab03c495277bd0787a35cfab9f2576ca7"
+    }
+  ]
+}

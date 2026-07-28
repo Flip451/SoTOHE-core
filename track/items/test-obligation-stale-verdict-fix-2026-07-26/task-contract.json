@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "track_id": "test-obligation-stale-verdict-fix-2026-07-26",
+  "entries": {
+    "T001":[{"layer":"domain","entry_key":"FulfillmentCacheLookupError"},{"layer":"domain","entry_key":"TestBindingConsistencyError"},{"layer":"domain","entry_key":"ObligationFulfillmentCacheDocument"}],
+    "T002":[{"layer":"domain","entry_key":"domain::tddd::test_obligation::ids::unavailable_diagnostic_message"},{"layer":"domain","entry_key":"ObligationFulfillmentCacheEntry"},{"layer":"domain","entry_key":"ObligationFulfillmentCacheEntryState"},{"layer":"domain","entry_key":"ObligationFulfillmentCachePort"},{"layer":"domain","entry_key":"VerifyCacheError"},{"layer":"usecase","entry_key":"ContentHasherPort"},{"layer":"usecase","entry_key":"CheckTestObligationsInteractor"},{"layer":"usecase","entry_key":"ObligationFulfillmentCachePort"},{"layer":"usecase","entry_key":"ResolvedBoundTests"},{"layer":"usecase","entry_key":"ResolvedBoundTestsResolver"},{"layer":"usecase","entry_key":"ResolvedBoundTestsResolverPort"},{"layer":"usecase","entry_key":"TestObligationResultsInteractor"},{"layer":"infrastructure","entry_key":"Sha256ContentHasher"},{"layer":"infrastructure","entry_key":"JsonObligationFulfillmentCacheCodec"}],
+    "T003":[{"layer":"domain","entry_key":"ObligationsDocument"},{"layer":"domain","entry_key":"ObligationCheckError"},{"layer":"usecase","entry_key":"CheckTestObligationsInteractor"}],
+    "T004":[{"layer":"domain","entry_key":"EdgeVerdictRecord"},{"layer":"domain","entry_key":"EdgeResolutionOutcome"},{"layer":"usecase","entry_key":"TestObligationResultsInteractor"},{"layer":"usecase","entry_key":"EvaluateTestObligationsInteractor"}],
+    "T005":[{"layer":"domain","entry_key":"ObligationEvaluateError"},{"layer":"usecase","entry_key":"EvaluateTestObligationsInteractor"}],
+    "T006":[{"layer":"infrastructure","entry_key":"ObligationFulfillmentCacheEntryDto"},{"layer":"infrastructure","entry_key":"JsonObligationFulfillmentCacheCodec"}],
+    "T007":[{"layer":"infrastructure","entry_key":"JsonObligationFulfillmentCacheCodec"}],
+    "T008":[{"layer":"infrastructure","entry_key":"JsonObligationFulfillmentCacheCodec"}],
+    "T009":[{"layer":"usecase","entry_key":"EvaluateTestObligationsInteractor"}]
+  }
+}

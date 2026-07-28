@@ -1055,6 +1055,135 @@ fn crate_with_external_trait_impl(
     }
 }
 
+/// The domain baseline and usecase catalogue can each expose a trait with the
+/// same short name. Build both impls in one rustdoc fixture so identity-map
+/// construction must preserve their workspace crate paths.
+#[test]
+fn test_impl_identity_map_when_workspace_traits_share_short_name_retains_both_crate_paths() {
+    use super::build_impl_identity_map;
+    use rustdoc_types::{ExternalCrate, Impl, Path as RdPath};
+
+    let crate_name = "infrastructure";
+    let root_id = Id(0);
+    let codec_id = Id(1);
+    let domain_impl_id = Id(2);
+    let usecase_impl_id = Id(3);
+    let domain_trait_id = Id(4);
+    let usecase_trait_id = Id(5);
+    let domain_crate_id = 1u32;
+    let usecase_crate_id = 2u32;
+    let trait_short_name = "ObligationFulfillmentCachePort";
+    let domain_trait_path = "domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort";
+    let usecase_trait_path = "usecase::test_obligation::ports::ObligationFulfillmentCachePort";
+
+    let mut index = HashMap::new();
+    let mut paths = HashMap::new();
+    let mut external_crates = HashMap::new();
+
+    index.insert(
+        root_id,
+        root_module_item(root_id, crate_name, vec![codec_id, domain_impl_id, usecase_impl_id]),
+    );
+    index.insert(codec_id, struct_item(codec_id, "JsonObligationFulfillmentCacheCodec"));
+    paths.insert(
+        codec_id,
+        ItemSummary {
+            crate_id: 0,
+            path: vec![crate_name.to_string(), "JsonObligationFulfillmentCacheCodec".to_string()],
+            kind: ItemKind::Struct,
+        },
+    );
+    paths.insert(
+        domain_trait_id,
+        ItemSummary {
+            crate_id: domain_crate_id,
+            path: domain_trait_path.split("::").map(str::to_string).collect(),
+            kind: ItemKind::Trait,
+        },
+    );
+    paths.insert(
+        usecase_trait_id,
+        ItemSummary {
+            crate_id: usecase_crate_id,
+            path: usecase_trait_path.split("::").map(str::to_string).collect(),
+            kind: ItemKind::Trait,
+        },
+    );
+    external_crates.insert(
+        domain_crate_id,
+        ExternalCrate {
+            name: "domain".to_string(),
+            html_root_url: None,
+            path: std::path::PathBuf::new(),
+        },
+    );
+    external_crates.insert(
+        usecase_crate_id,
+        ExternalCrate {
+            name: "usecase".to_string(),
+            html_root_url: None,
+            path: std::path::PathBuf::new(),
+        },
+    );
+
+    for (impl_id, trait_id, trait_path) in [
+        (domain_impl_id, domain_trait_id, domain_trait_path),
+        (usecase_impl_id, usecase_trait_id, usecase_trait_path),
+    ] {
+        index.insert(
+            impl_id,
+            make_item(
+                impl_id,
+                None,
+                ItemEnum::Impl(Impl {
+                    is_unsafe: false,
+                    generics: empty_generics(),
+                    provided_trait_methods: vec![],
+                    trait_: Some(RdPath { path: trait_path.to_string(), id: trait_id, args: None }),
+                    for_: Type::ResolvedPath(RdPath {
+                        path: "JsonObligationFulfillmentCacheCodec".to_string(),
+                        id: codec_id,
+                        args: None,
+                    }),
+                    items: vec![],
+                    is_synthetic: false,
+                    is_negative: false,
+                    blanket_impl: None,
+                }),
+            ),
+        );
+    }
+
+    let krate = Crate {
+        root: root_id,
+        crate_version: None,
+        includes_private: false,
+        index,
+        paths,
+        external_crates,
+        format_version: FORMAT_VERSION,
+        target: Target { triple: String::new(), target_features: vec![] },
+    };
+
+    let map = build_impl_identity_map(&krate, crate_name);
+
+    assert_eq!(map.len(), 2, "the two workspace traits must not collide by short name");
+    assert!(
+        map.contains_key(&format!("JsonObligationFulfillmentCacheCodec: {domain_trait_path}")),
+        "the baseline domain trait identity must retain its canonical path; keys: {:?}",
+        map.keys().collect::<Vec<_>>()
+    );
+    assert!(
+        map.contains_key(&format!("JsonObligationFulfillmentCacheCodec: {usecase_trait_path}")),
+        "the catalogue usecase add identity must retain its canonical path; keys: {:?}",
+        map.keys().collect::<Vec<_>>()
+    );
+    assert!(
+        !map.contains_key(&format!("JsonObligationFulfillmentCacheCodec: {trait_short_name}")),
+        "a collapsed short-name identity must not be produced"
+    );
+}
+
 /// T039 (AC-14, case b): compiler-internal trait Impls present
 /// only in C must NOT trigger `CMinusSUnionD`.  These are compiler-internal
 /// phantom traits that cannot be declared in any workspace catalogue.
