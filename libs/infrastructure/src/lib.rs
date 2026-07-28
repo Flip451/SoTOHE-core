@@ -46,6 +46,7 @@ pub mod task_contract_reader;
 pub mod task_coverage_codec;
 pub mod tddd;
 pub mod telemetry;
+pub mod template_conventions;
 pub mod template_export;
 pub mod test_obligation;
 pub mod track;

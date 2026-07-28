@@ -1691,6 +1691,122 @@
         }
       },
       "reason": "ConventionShippingCheckInteractor implements ConventionShippingCheckService by asking its injected ConventionInventoryPort to list the exported tree and overlay, then selecting the unsupplied documents. AC-18 promises three different repository-level facts: that template smoke runs this non-shipping check against an exported tree, that the run succeeds on the changed repository, and that no dead-reference check extracting convention paths from prose was added. Every bound interactor test uses ScriptedInventory and synthetic roots, so its Conforming result demonstrates only the comparison of listings arranged by that test. It cannot establish that template smoke invokes the interactor, that any invocation ran on this repository's exported tree and succeeded, or that an unrelated prose-path check is absent. The interactor does establish the narrower implementation property that both listings are obtained through the one injected inventory and the resulting selection is returned as the service verdict; those are not any of AC-18's three promises."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::template_conventions::list_convention_documents",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_names_every_document_an_exported_tree_ships"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_yields_identities_two_trees_can_be_compared_by"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_inventories_the_tree_it_was_named_and_no_ambient_location"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_inventories_only_markdown_documents"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_inventories_a_document_it_could_not_have_parsed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_leaves_the_tree_untouched"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_without_a_convention_root_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_does_not_report_a_linked_convention_root_as_missing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_does_not_read_a_dangling_ancestor_link_as_a_missing_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_with_a_tree_root_that_does_not_exist_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_refuses_a_linked_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_refuses_a_linked_subdirectory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_passes_over_a_node_that_is_not_a_regular_file"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_beyond_the_entry_ceiling_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_with_an_oversized_directory_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_below_the_depth_bound_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_within_the_depth_bound_inventories_the_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_attributes_a_rejected_document_path_to_its_own_tree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_ignores_an_unrenderable_name_that_is_not_a_document"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "infrastructure::template_conventions::list_convention_documents",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "list_convention_documents is declared as a synchronous free function — list_convention_documents(tree_root: &std::path::Path) -> Result<Vec<ConventionDocumentPath>, ConventionShippingCheckError> — that walks the convention directory of the tree named by tree_root and hands back one tree-relative identity per document that tree ships, reading no file contents. Unlike a declaration whose tests can only drive a stand-in, a test at this one drives the real operation against real directory trees, so what it reads back is what the walk found on disk rather than what the test arranged. AC-18 promises three things: that template smoke checks, against an exported tree, that source conventions beyond the overlay are not shipped; that this succeeds on the changed repository; and that no dead-reference check extracting convention paths from prose has been added. None of the three is within reach at this declaration, and the reason is not that the trees under test are synthetic. The first clause asserts that a check was put and answered. This function's entire result is one tree's documents, and a list of documents is neither a comparison of two trees nor a finding about either, so inventorying a tree — however genuinely, and however closely the tree resembles an export — establishes at most that the tree was inventoried. The declaration admits one tree root and cannot name a second, so the non-shipping question cannot be stated in its vocabulary at all, let alone answered in it. The second clause asserts that a particular run succeeded on the changed repository. Success here is an Ok carrying a listing rather than a verdict, and the tree read is whichever location the caller names, so nothing this function returns distinguishes the changed repository from any other directory tree, and the value it returns is not the outcome whose success is being asserted. Whether template smoke acquires such an item, and whether that item's run succeeds, are settled by whatever wires this walk into a smoke run, and no wiring is representable in a function signature. The third clause is an absence in a repository. This function takes a tree root and returns that tree's own document paths; that vocabulary cannot spell which checks a repository contains. That it opens no document and parses no front matter, and so extracts nothing from any prose, is a statement about what this walk does rather than evidence that no such extraction was added elsewhere. What this declaration does establish is narrower than any of the three and belongs to the inventory step rather than to a run: that the tree inventoried is the one the caller named and never an ambient location; that documents are identified relative to that tree, without which two inventories could not be compared at all; that a tree holding no convention root is a failure rather than an inventory of nothing, so an export cannot answer by being empty; and that a document whose contents are malformed is inventoried like any other, because nothing here opens one. None of that is any part of what AC-18 promises."
     }
   ]
 }

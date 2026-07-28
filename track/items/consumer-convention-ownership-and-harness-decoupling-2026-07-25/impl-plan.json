@@ -159,7 +159,7 @@
     {
       "id": "T028",
       "description": "`libs/infrastructure/src/template_conventions/` を新設し、走査関数 `list_convention_documents` のみを実装する。AC-18 の構造的 fail-closed 条件 3 件はこの走査が所有する。front matter 解析を挟まないため既存の `scan_convention_requirements` は再利用せず別走査として実装する (既存行の移動は伴わない)。走査の logic obligation を tempdir fixture で果たし、symlink・非通常 node・読み取り量上限の防御もこの task で持つ: 同型の T006 では review round でこれらが後付けになり見積りを外した。`FsConventionInventoryAdapter` は T033 に分けた — 同型の T006 (走査 + adapter を 1 task) の実測 infrastructure diff が 767 行と ceiling 500 を大きく超えたため、同じ形を繰り返さない。Size estimate — infrastructure: ~90 prod + ~330 test lines (計 ~420)。infrastructure の実測比 ~2.2x を織り込んだ数字である。`track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-11`, `#AC-18`, `#OUT-04`.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T033",

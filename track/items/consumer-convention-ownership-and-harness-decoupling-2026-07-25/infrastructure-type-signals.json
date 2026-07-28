@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-28T13:31:58Z",
+  "generated_at": "2026-07-28T15:34:10Z",
   "declaration_hash": "6dfa8a2c4f24ee92e46c159e3176f838a8c46e264778dcf3bff0ab6aca715eb7",
-  "implementation_input_hash": "bb9d5902d346dd37825dc9f857023b665ce97f7b1ebf87458bd921c6d7005f76",
+  "implementation_input_hash": "7d53b42f5c1ce44e7b3a4651992d817c3363a9aa475e09a7abd35b1370c3f352",
   "signals": [
     {
       "type_name": "CapabilityIdField",
@@ -63,8 +63,8 @@
     {
       "type_name": "infrastructure::template_conventions::list_convention_documents",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     }
   ]
 }

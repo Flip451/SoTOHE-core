@@ -1,7 +1,14 @@
-//! Handle-relative directory traversal for the convention scan.
+//! Handle-relative directory traversal for the walks over a convention tree.
 //!
 //! Kept in a sibling module so the codec, the scan, and the adapter stay inside
-//! the parent module's length limit. Only the anchor the walk starts from is
+//! the parent module's length limit, and visible to the crate because the
+//! shipping inventory in [`crate::template_conventions`] walks the same kind of
+//! tree under the same refusals. The two walks differ in what they do with a
+//! document — one decodes its front matter, the other never opens it — and not
+//! in how a directory is reached, so sharing these primitives is what keeps a
+//! second traversal from arriving at its own answer about links, about entries
+//! a listing declined to classify, and about how much of a tree to enumerate.
+//! Only the anchor the walk starts from is
 //! opened by pathname; every open below it is `NOFOLLOW` and relative to the
 //! handle above it — the one whose listing produced the name, once the walk is
 //! inside the tree. A name resolved again from the top can have become a link
@@ -29,7 +36,7 @@ use std::os::unix::ffi::OsStringExt;
 /// the root. A directory of fifteen thousand entries would otherwise be
 /// reported as an oversized repository rather than as the one oversized
 /// directory it is.
-pub(super) const MAX_DIRECTORY_ENTRIES: usize = 10_000;
+pub(crate) const MAX_DIRECTORY_ENTRIES: usize = 10_000;
 
 /// Most directory entries this walk will examine, across the whole scan.
 ///
@@ -53,7 +60,7 @@ pub(super) const MAX_DIRECTORY_ENTRIES: usize = 10_000;
 /// repository at all. That case is an accident far more often than an attack,
 /// and either way the answer is the same, which is why the walk stops at a
 /// stated number rather than at exhaustion.
-pub(super) const MAX_SCAN_ENTRIES: usize = 20_000;
+pub(crate) const MAX_SCAN_ENTRIES: usize = 20_000;
 
 /// Why a listing produced no entries.
 ///
@@ -62,7 +69,7 @@ pub(super) const MAX_SCAN_ENTRIES: usize = 20_000;
 /// root, while a failed listing is about the directory being listed and is
 /// reported against that directory. Folding both into one [`std::io::Error`]
 /// would leave the caller matching on a message to tell them apart.
-pub(super) enum ListingError {
+pub(crate) enum ListingError {
     /// The whole-scan entry budget ran out while this listing was produced.
     BudgetExhausted,
     /// The listing failed, or the directory holds more entries than
@@ -86,7 +93,7 @@ pub(super) enum ListingError {
 /// of it, so a chain of large directories would materialise every one of them
 /// while costing a single unit each. What the budget is for is the total the
 /// walk enumerates, so the total is what it counts.
-pub(super) fn bounded_entries(
+pub(crate) fn bounded_entries(
     directory: &std::fs::File,
     remaining_entries: &mut usize,
 ) -> Result<Vec<DirectoryEntry>, ListingError> {
@@ -164,11 +171,11 @@ fn classify_at(
 ///
 /// The classification is kept beside the name rather than re-asked of the path,
 /// because asking again would ask about whatever the name refers to by then.
-pub(super) struct DirectoryEntry {
-    pub(super) name: PathBuf,
-    pub(super) is_dir: bool,
-    pub(super) is_file: bool,
-    pub(super) is_symlink: bool,
+pub(crate) struct DirectoryEntry {
+    pub(crate) name: PathBuf,
+    pub(crate) is_dir: bool,
+    pub(crate) is_file: bool,
+    pub(crate) is_symlink: bool,
 }
 
 /// Opens the root the walk descends from.
@@ -182,7 +189,7 @@ pub(super) struct DirectoryEntry {
 /// this anchor, and each of those is opened through [`open_directory_at`],
 /// relative to the handle above it, so none of them can be swapped for a link
 /// between one open and the next.
-pub(super) fn open_trusted_root(path: &Path) -> std::io::Result<std::fs::File> {
+pub(crate) fn open_trusted_root(path: &Path) -> std::io::Result<std::fs::File> {
     rustix::fs::open(
         path,
         rustix::fs::OFlags::RDONLY | rustix::fs::OFlags::DIRECTORY | rustix::fs::OFlags::CLOEXEC,
@@ -198,7 +205,7 @@ pub(super) fn open_trusted_root(path: &Path) -> std::io::Result<std::fs::File> {
 /// the top can have become a link since the listing classified it, and the
 /// listing that followed would then walk a tree outside the convention root
 /// while every path this scan builds still reads as repository-relative.
-pub(super) fn open_directory_at(
+pub(crate) fn open_directory_at(
     parent: &std::fs::File,
     name: &Path,
 ) -> std::io::Result<std::fs::File> {

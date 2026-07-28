@@ -3310,6 +3310,127 @@
           "test_name": "test_interactor_carries_nothing_from_one_check_into_the_next"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::template_conventions::list_convention_documents",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::template_conventions::list_convention_documents",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "cf169fabb5f3031af791fef6d38e5f07dccae14510ed66b31d4b0d8de68bee81",
+        "declaration_hash": "b66942a4da413425ff78d4901f91aba3f0b30ad53bc3ba04c417bd79c9537a70",
+        "anchor_text_hash": "0d8bcb7b6139fbd92056795f9ccd8bb834d9efea32f8501529a2b539795d9e75"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        unsupplied.iter().map(ToString::to_string).collect::<Vec<_>>(),\n        [\"knowledge/conventions/leaked-source.md\"],"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_names_every_document_an_exported_tree_ships"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_yields_identities_two_trees_can_be_compared_by"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_inventories_the_tree_it_was_named_and_no_ambient_location"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_inventories_only_markdown_documents"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_inventories_a_document_it_could_not_have_parsed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_leaves_the_tree_untouched"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_without_a_convention_root_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_does_not_report_a_linked_convention_root_as_missing"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_does_not_read_a_dangling_ancestor_link_as_a_missing_root"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_with_a_tree_root_that_does_not_exist_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_refuses_a_linked_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_refuses_a_linked_subdirectory"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_passes_over_a_node_that_is_not_a_regular_file"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_beyond_the_entry_ceiling_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_with_an_oversized_directory_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_below_the_depth_bound_fails_closed"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_within_the_depth_bound_inventories_the_document"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_attributes_a_rejected_document_path_to_its_own_tree"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::template_conventions::inventory_tests",
+          "test_name": "test_list_convention_documents_ignores_an_unrenderable_name_that_is_not_a_document"
+        }
+      ]
     }
   ]
 }

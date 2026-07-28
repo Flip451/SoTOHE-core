@@ -31,7 +31,7 @@ use usecase::conventions_resolve::{
 };
 
 use crate::capability_exec::{YAML_LINE_BREAKS, read_front_matter};
-mod directory_walk;
+pub(crate) mod directory_walk;
 mod document_read;
 mod front_matter_dto;
 
