@@ -172,4 +172,6 @@ println!("saved");
 
 - `prefer-type-safe-abstractions.md` — 型安全パターン (Newtype / Enum-first / Typestate)
 - `type-designer-kind-selection.md` — role × layer 配置の方針
+- `security.md` — シークレット管理、入力検証、SQL インジェクション対策
+- `testing.md` — TDD サイクルとテスト構造 (本規約のテスト例外の適用先)
 - `architecture-rules.json` — 層 id、層 path、`module_limits`、層ごとの verify フラグの SSoT

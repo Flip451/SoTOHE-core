@@ -14,7 +14,7 @@ ceiling に対する現況: batch E で実測された scope diff は usecase 94
 未着手 task に対しては 2 点を確認した。(i) 既存 production code の移動を要する task は残っていない — module ごとの現行 production 行数で確認済みで、T010/T011 の `libs/usecase/src/capability_exec.rs` は T009 の切り出し後 288 行、T030 の `apps/cli/src/commands/template/mod.rs` は 78 行・`apps/cli-composition/src/template_export/mod.rs` は 71 行、T025-T029 と T033 は新設 module であり、いずれも追加後も `module_limits.max_lines` に届かない。(ii) 実測比を織り込んだ見積りが ceiling を超えた T028 を T028 (走査関数) + T033 (adapter) に分割した。この修正後、ceiling を超える見積りを持つ未着手 task は残っていない — 唯一の超過として残していた T016 は、その根拠が誤った前提に立っていたため取り下げた (次項)。
 T016 (`catalogue-schema-reference.md` の移動) は本文 745 行の単一ファイル移動で分割余地がない。当初はこれを「本文無改変が rename 検出の成立条件であり、ceiling 内に収められない task」として残していたが、この前提は誤りだった — T012 (`5f8c3fb1`) は 145 行の文書を 6 行編集したうえで similarity index 86% の rename として記録されており、既定の 50% 閾値に対し本文編集は十分な余裕を持つ。745 行の本文に対する数行の編集で検出が失われることはないため、本文の参照修正 (T016 description の (a)-(d)) を含めても rename 検出下の実質 diff は ~25 行にとどまり、capability 側の参照更新を T018 へ寄せる分割と合わせて ceiling 内に収まる。
 
-## Tasks (25/35 resolved)
+## Tasks (26/35 resolved)
 
 ### resolver-usecase-core — Convention resolver: usecase core
 
@@ -84,7 +84,7 @@ T016 (`catalogue-schema-reference.md` の移動) は本文 745 行の単一フ�
 
 - [x] **T021**: `overlay/knowledge/conventions/type-designer-kind-selection.md` を新規供給し、role × layer マトリクス本体をここに置く。`required_for: [type-designer, rollback-diagnoser]` の frontmatter を付与する。T035 の後に実施する。Size estimate — other: ~360 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-04`, `#IN-08`, `#IN-09`, `#IN-10`, `#CN-04`, `#CN-08`, `#AC-05`, `#AC-13`, `#AC-14`, `#AC-15`.
 - [x] **T022**: `overlay/knowledge/conventions/coding-principles.md` に `required_for: [spec-designer, impl-planner]`、`overlay/knowledge/conventions/prefer-type-safe-abstractions.md` に `required_for: [type-designer, spec-designer, impl-planner, rollback-diagnoser]` の frontmatter を付与して新規供給する。T034 と T035 の後に実施する。Size estimate — other: ~350 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-04`, `#IN-09`, `#IN-10`, `#CN-04`, `#AC-05`, `#AC-13`, `#AC-15`.
-- [ ] **T023**: `overlay/knowledge/conventions/` に `testing.md`、`security.md`、`README.md` を新規供給する。`README.md` は `bin/sotp conventions update-index` が再生成できる形式に揃える。T021 と T022 と合わせて overlay 供給を完結させる。Size estimate — other: ~380 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-04`, `#CN-04`, `#AC-05`.
+- [x] **T023**: `overlay/knowledge/conventions/` に `testing.md`、`security.md`、`README.md` を新規供給し、`overlay/knowledge/conventions/coding-principles.md` の関連文書一覧へ `security.md` と `testing.md` の cross-reference を追加する。`README.md` は `bin/sotp conventions update-index` が再生成できる形式に揃える。T021 と T022 と合わせて overlay 供給を完結させる。Size estimate — other: ~380 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-04`, `#CN-04`, `#AC-05`.
 
 ### non-shipping-check — Non-shipping check subcommand
 
