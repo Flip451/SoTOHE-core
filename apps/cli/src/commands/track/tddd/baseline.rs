@@ -64,6 +64,12 @@ mod tests {
         .unwrap();
     }
 
+    /// Reuse the declaration bytes exactly as the baseline adapter snapshots them.
+    fn write_feature_declaration_snapshot(track_dir: &std::path::Path) {
+        let declaration = std::fs::read(track_dir.join("tddd-features.json")).unwrap();
+        std::fs::write(track_dir.join("tddd-features-baseline.json"), declaration).unwrap();
+    }
+
     fn write_workspace_manifests(workspace_root: &std::path::Path, include_usecase: bool) {
         let members = if include_usecase {
             "[\"libs/domain\", \"libs/usecase\"]"
@@ -192,6 +198,7 @@ mod tests {
         std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
         write_workspace_manifests(dir.path(), false);
         write_feature_declaration(&track_dir, r#"{"domain":[]}"#);
+        write_feature_declaration_snapshot(&track_dir);
 
         // Write a minimal valid rustdoc baseline so the interactor finds it and skips.
         // Idempotency now validates `format_version`, so an empty `{}` would be rejected.
@@ -230,6 +237,7 @@ mod tests {
         std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
         write_workspace_manifests(dir.path(), true);
         write_feature_declaration(&track_dir, r#"{"domain":[],"usecase":[]}"#);
+        write_feature_declaration_snapshot(&track_dir);
 
         std::fs::write(track_dir.join("usecase-types-baseline.json"), minimal_rustdoc_json())
             .unwrap();
@@ -248,6 +256,36 @@ mod tests {
         assert!(
             result.is_ok(),
             "dispatch to usecase binding must find existing baseline and skip, got: {result:?}"
+        );
+    }
+
+    #[test]
+    fn test_baseline_capture_existing_layer_baseline_without_declaration_snapshot_returns_error() {
+        let dir = tempfile::tempdir().unwrap();
+        let track_dir = dir.path().join("track/items/test-track");
+        std::fs::create_dir_all(&track_dir).unwrap();
+
+        let rules_json = r#"{
+          "layers": [
+            { "crate": "domain", "tddd": { "enabled": true, "catalogue_file": "domain-types.json" } }
+          ]
+        }"#;
+        std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
+        write_workspace_manifests(dir.path(), false);
+        write_feature_declaration(&track_dir, r#"{"domain":[]}"#);
+        std::fs::write(track_dir.join("domain-types-baseline.json"), minimal_rustdoc_json())
+            .unwrap();
+        init_git_repo_on_track_branch(dir.path(), "test-track");
+
+        let result =
+            execute_baseline_capture("test-track".to_owned(), dir.path().into(), None, None);
+
+        let error = result.expect_err("missing declaration snapshot must reject existing baseline");
+        assert!(
+            error.to_string().contains(
+                "cannot create a feature declaration snapshot while layer baselines already exist"
+            ),
+            "must surface the fail-closed declaration snapshot guard, got: {error}"
         );
     }
 
@@ -274,18 +312,22 @@ mod tests {
         std::fs::write(dir.path().join("architecture-rules.json"), rules_json).unwrap();
         write_workspace_manifests(dir.path(), true);
         write_feature_declaration(&track_dir, r#"{"domain":[],"usecase":[]}"#);
+        write_feature_declaration_snapshot(&track_dir);
 
         // domain baseline exists → skip; usecase baseline absent → proceeds to export → fails.
         std::fs::write(track_dir.join("domain-types-baseline.json"), minimal_rustdoc_json())
             .unwrap();
+        init_git_repo_on_track_branch(dir.path(), "test-track");
 
         let result =
             execute_baseline_capture("test-track".to_owned(), dir.path().into(), None, None);
 
+        let error = result.expect_err("usecase export must fail after domain baseline is skipped");
         assert!(
-            result.is_err(),
-            "loop must continue past domain skip to usecase and fail at export; \
-             Ok(SUCCESS) would mean the loop stopped after the first binding"
+            error.to_string().contains(
+                "baseline capture failed for layer 'usecase': failed to export rustdoc JSON"
+            ),
+            "loop must continue past domain skip to usecase export, got: {error}"
         );
     }
 }

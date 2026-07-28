@@ -3,7 +3,7 @@
 use std::fmt;
 use std::path::{Path, PathBuf};
 
-use domain::tddd::catalogue_v2::TdddLayerBinding;
+use domain::tddd::catalogue_v2::{NonEmptyVec, TdddLayerBinding};
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::{CargoFeatureName, LayerId, TdddFeatureDeclaration};
 
@@ -50,6 +50,8 @@ pub enum TdddBaselineFeatureDeclarationPortError {
     Read(TdddFeatureDeclarationReadError),
     /// The initial declaration snapshot could not be persisted.
     SnapshotWrite { path: PathBuf, reason: DiagnosticMessage },
+    /// Layer baselines exist but no declaration snapshot binds them to the declaration.
+    MissingDeclarationSnapshotWithExistingBaselines { baseline_paths: NonEmptyVec<PathBuf> },
     /// Existing baseline bytes differ from the current declaration bytes.
     BaselineSnapshotMismatch,
 }
@@ -60,6 +62,18 @@ impl fmt::Display for TdddBaselineFeatureDeclarationPortError {
             Self::Read(error) => error.fmt(formatter),
             Self::SnapshotWrite { path, reason } => {
                 write!(formatter, "failed to write '{}': {}", path.display(), reason.as_str())
+            }
+            Self::MissingDeclarationSnapshotWithExistingBaselines { baseline_paths } => {
+                let paths = baseline_paths
+                    .as_slice()
+                    .iter()
+                    .map(|path| path.display().to_string())
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                write!(
+                    formatter,
+                    "cannot create a feature declaration snapshot while layer baselines already exist ({paths}); delete those baselines and re-capture"
+                )
             }
             Self::BaselineSnapshotMismatch => {
                 formatter.write_str("feature declaration differs from its baseline snapshot")
@@ -107,7 +121,7 @@ pub trait TdddBaselineFeatureDeclarationPort: Send + Sync {
     ///
     /// Returns [`TdddBaselineFeatureDeclarationPortError`] when the declaration is
     /// unavailable, invalid, has unknown features, cannot be snapshotted, or differs
-    /// from its existing snapshot.
+    /// from its existing snapshot, or has layer baselines without a declaration snapshot.
     fn load_for_baseline(
         &self,
         track_dir: &Path,

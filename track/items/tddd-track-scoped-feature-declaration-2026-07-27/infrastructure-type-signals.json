@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-28T04:10:26Z",
+  "generated_at": "2026-07-28T08:09:03Z",
   "declaration_hash": "fceaf10d4b621c56d10e5371c47e493dd91efe7737374c6c57b7057f2d5f6be5",
-  "implementation_input_hash": "5f1e34baf022b314681dff28877fcfe3c554a2eabc0b24dabb4cfab028143dd8",
+  "implementation_input_hash": "f0e2fbd70f56f153a78b9e669ac06458711e998db372e9d93546ef9a7b37711d",
   "signals": [
     {
       "type_name": "FsTdddFeatureDeclarationAdapter",

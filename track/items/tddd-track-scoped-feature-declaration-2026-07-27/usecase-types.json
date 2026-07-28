@@ -1073,7 +1073,7 @@
     },
     "TdddBaselineFeatureDeclarationPortError": {
       "action": "add",
-      "docs": "Baseline-capture-only failures for declaration loading and first-write-wins snapshot binding.",
+      "docs": "Baseline-capture failure vocabulary for the declaration-snapshot path (CN-01, AC-03, IN-03).",
       "informal_grounds": [],
       "kind": {
         "kind": "enum",
@@ -1100,12 +1100,24 @@
                   "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
                 }
               ],
-              "kind": "struct"
+          "kind": "struct"
+        }
+      },
+      {
+        "name": "MissingDeclarationSnapshotWithExistingBaselines",
+        "payload": {
+          "fields": [
+            {
+              "name": "baseline_paths",
+              "ty": "domain::tddd::catalogue_v2::NonEmptyVec<std::path::PathBuf>"
             }
-          },
-          {
-            "name": "BaselineSnapshotMismatch",
-            "payload": {
+          ],
+          "kind": "struct"
+        }
+      },
+      {
+        "name": "BaselineSnapshotMismatch",
+        "payload": {
               "kind": "unit"
             }
           }
@@ -1117,12 +1129,20 @@
         "ErrorType": {}
       },
       "spec_refs": [
-        {
-          "anchor": "CN-01",
-          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
-        }
-      ]
-    },
+      {
+        "anchor": "CN-01",
+        "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+      },
+      {
+        "anchor": "AC-03",
+        "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+      },
+      {
+        "anchor": "IN-03",
+        "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+      }
+    ]
+  },
     "TdddFeatureDeclarationReadError": {
       "action": "add",
       "docs": "Shared declaration read and Cargo-manifest validation failures that either client-specific port can wrap.",

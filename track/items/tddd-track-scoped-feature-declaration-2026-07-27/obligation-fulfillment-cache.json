@@ -629,12 +629,12 @@
       },
       "key": {
         "bound_tests_set_hash": "80734ddb70ee6060c7f867439e56f0090b7edbcbada1d7bb74e4fccdd86828e3",
-        "declaration_hash": "768d06945ea013fae2b342f354beb310c08b928cf0c042c8927469fc987cebae",
+        "declaration_hash": "157e138e93c85dedb0ceff6f9a4a36c5ea55400e03038f3f105ddd3568451882",
         "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
       },
       "verdict": {
         "kind": "fulfilled",
-        "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ))"
       },
       "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
       "bound_tests": [
@@ -642,6 +642,78 @@
           "layer": "infrastructure",
           "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
           "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPortError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPortError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "af46828146a0f9bf6bd0bab073c36308211113a41f051196167af71a50a49707",
+        "declaration_hash": "157e138e93c85dedb0ceff6f9a4a36c5ea55400e03038f3f105ddd3568451882",
+        "anchor_text_hash": "a6f03d4d496a6520dfecd164f5d335765406389e2967c5dff57ef31c57d08b19"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            &result,\n            Err(\n                TdddBaselineFeatureDeclarationPortError::MissingDeclarationSnapshotWithExistingBaselines { .. }\n            )\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_existing_layer_baselines_and_no_snapshot_returns_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPortError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPortError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "a4654d8c6d2d0dfaf3c8a7c12c05e44630742c5be4da88691bed40fdc35f0dfb",
+        "declaration_hash": "157e138e93c85dedb0ceff6f9a4a36c5ea55400e03038f3f105ddd3568451882",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            declaration.features_for(&layer).unwrap().first().unwrap().as_str(),\n            \"semantic-dup\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_valid_declaration_creates_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_with_matching_baseline_snapshot_returns_declaration"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_with_changed_declaration_returns_snapshot_mismatch"
         }
       ]
     },

@@ -10,7 +10,7 @@
 | EmbeddingError | error_type | reference | ModelLoadFailed, InferenceFailed | 🔵 | 🔵 |
 | SemanticIndexError | error_type | reference | OpenFailed, InsertFailed, DeleteFailed, SearchFailed | 🔵 | 🔵 |
 | TdddActualFeatureDeclarationPortError | error_type | add | Read, MissingBaselineSnapshot, BaselineSnapshotMismatch | 🔵 | 🔵 |
-| TdddBaselineFeatureDeclarationPortError | error_type | add | Read, SnapshotWrite, BaselineSnapshotMismatch | 🔵 | 🔵 |
+| TdddBaselineFeatureDeclarationPortError | error_type | add | Read, SnapshotWrite, MissingDeclarationSnapshotWithExistingBaselines, BaselineSnapshotMismatch | 🔵 | 🔵 |
 | TdddFeatureDeclarationReadError | error_type | add | MissingDeclaration, ReadDeclaration, DecodeDeclaration, UnknownCargoFeature | 🔵 | 🔵 |
 | TypeSignalsError | error_type | modify | BranchTrackMismatch, LayerBindingsLoad, NoLayers, FeatureDeclaration, EvaluationFailed, InconsistentRequest | 🔵 | 🔵 |
 

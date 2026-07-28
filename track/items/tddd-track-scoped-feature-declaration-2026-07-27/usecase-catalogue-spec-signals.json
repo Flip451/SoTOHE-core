@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "catalogue_declaration_hash": "b92f1c279195b9fee4d5660a9904954139c95dfa7be7324bfb6ad2f3c02f7c35",
+  "catalogue_declaration_hash": "d8e6be0fec66952086f83784c00ff5afc0fd3e40514585677a80c9b1b20d68fb",
   "signals": [
     {
       "type_name": "BaselineCaptureError",
@@ -45,7 +45,7 @@
     {
       "type_name": "TdddBaselineFeatureDeclarationPortError",
       "signal": "blue",
-      "entry_hash": "63ce3514396cdf21fc6eb6a7b50a13797889d25e3f500e086d88ee1f9ff8885b"
+      "entry_hash": "517f084c6b4030b0d73839e2b0cdf9859e8a40369a90da3e43db55ea74bfde41"
     },
     {
       "type_name": "TdddFeatureDeclarationReadError",

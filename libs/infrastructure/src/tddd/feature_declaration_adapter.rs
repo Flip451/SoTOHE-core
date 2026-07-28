@@ -1,12 +1,11 @@
 //! Filesystem implementation of the client-specific TDDD feature declaration ports.
 
 use std::collections::{BTreeMap, BTreeSet};
-use std::fs::{File, OpenOptions};
-use std::io::{Read as _, Write as _};
+use std::fs::File;
+use std::io::Read as _;
 use std::path::{Component, Path, PathBuf};
-use std::sync::atomic::{AtomicU64, Ordering};
 
-use domain::tddd::catalogue_v2::TdddLayerBinding;
+use domain::tddd::catalogue_v2::{NonEmptyVec, TdddLayerBinding};
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
 use domain::tddd::{CargoFeatureName, LayerId, TdddFeatureDeclaration};
 use serde::de::{MapAccess, Visitor};
@@ -19,10 +18,16 @@ use usecase::tddd_feature_declaration::{
 
 use crate::track::symlink_guard::{reject_symlinks_below, reject_symlinks_up_to_root};
 
+#[path = "feature_declaration_adapter/snapshot.rs"]
+mod snapshot;
+
+#[cfg(test)]
+use snapshot::write_first_snapshot_after_temporary_write;
+use snapshot::{SnapshotPublicationError, write_first_snapshot};
+
 const DECLARATION_FILE: &str = "tddd-features.json";
 const SNAPSHOT_FILE: &str = "tddd-features-baseline.json";
 const MAX_READ_BYTES: usize = 1024 * 1024;
-static SNAPSHOT_TEMP_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 /// Filesystem adapter shared by baseline and actual feature-declaration clients.
 #[derive(Debug, Clone, Default)]
@@ -51,24 +56,35 @@ impl TdddBaselineFeatureDeclarationPort for FsTdddFeatureDeclarationAdapter {
         match read_bytes(&snapshot_path, track_dir) {
             Ok(Some(snapshot)) if snapshot == bytes => Ok(declaration),
             Ok(Some(_)) => Err(TdddBaselineFeatureDeclarationPortError::BaselineSnapshotMismatch),
-            Ok(None) => match write_first_snapshot(&snapshot_path, track_dir, &bytes) {
-                Ok(()) => Ok(declaration),
-                Err(SnapshotPublicationError::Mismatch) => {
-                    Err(TdddBaselineFeatureDeclarationPortError::BaselineSnapshotMismatch)
+            Ok(None) => {
+                if let Some(baseline_paths) = existing_layer_baseline_paths(track_dir, layers)
+                    .map_err(TdddBaselineFeatureDeclarationPortError::Read)?
+                {
+                    return Err(
+                        TdddBaselineFeatureDeclarationPortError::MissingDeclarationSnapshotWithExistingBaselines {
+                            baseline_paths,
+                        },
+                    );
                 }
-                Err(SnapshotPublicationError::Read(reason)) => {
-                    Err(TdddBaselineFeatureDeclarationPortError::Read(read_error(
-                        &snapshot_path,
-                        reason.as_str().to_owned(),
-                    )))
+                match write_first_snapshot(&snapshot_path, track_dir, &bytes) {
+                    Ok(()) => Ok(declaration),
+                    Err(SnapshotPublicationError::Mismatch) => {
+                        Err(TdddBaselineFeatureDeclarationPortError::BaselineSnapshotMismatch)
+                    }
+                    Err(SnapshotPublicationError::Read(reason)) => {
+                        Err(TdddBaselineFeatureDeclarationPortError::Read(read_error(
+                            &snapshot_path,
+                            reason.as_str().to_owned(),
+                        )))
+                    }
+                    Err(SnapshotPublicationError::Write(reason)) => {
+                        Err(TdddBaselineFeatureDeclarationPortError::SnapshotWrite {
+                            path: snapshot_path,
+                            reason,
+                        })
+                    }
                 }
-                Err(SnapshotPublicationError::Write(reason)) => {
-                    Err(TdddBaselineFeatureDeclarationPortError::SnapshotWrite {
-                        path: snapshot_path,
-                        reason,
-                    })
-                }
-            },
+            }
             Err(reason) => Err(TdddBaselineFeatureDeclarationPortError::Read(read_error(
                 &snapshot_path,
                 reason.as_str().to_owned(),
@@ -227,6 +243,66 @@ fn load_declaration(
         })?;
     validate_cargo_features(&declaration, workspace_root, bindings)?;
     Ok((declaration, bytes))
+}
+
+fn existing_layer_baseline_paths(
+    track_dir: &Path,
+    layers: &[TdddLayerBinding],
+) -> Result<Option<NonEmptyVec<PathBuf>>, TdddFeatureDeclarationReadError> {
+    let mut paths = Vec::new();
+    for binding in layers {
+        let baseline_path = validated_baseline_path(track_dir, binding)?;
+        if reject_symlinks_below(&baseline_path, track_dir)
+            .map_err(|error| read_error(&baseline_path, error.to_string()))?
+        {
+            paths.push(baseline_path);
+        }
+    }
+    let mut paths = paths.into_iter();
+    let Some(first) = paths.next() else {
+        return Ok(None);
+    };
+    Ok(Some(NonEmptyVec::new(first, paths.collect())))
+}
+
+/// Resolves a layer baseline filename beneath its trusted track directory.
+///
+/// `TdddLayerBinding::baseline_file` is a filename, not a relative path. Rejecting every
+/// separator makes that contract explicit and prevents a hostile binding from redirecting the
+/// existence probe outside the track before the symlink guard runs.
+fn validated_baseline_path(
+    track_dir: &Path,
+    binding: &TdddLayerBinding,
+) -> Result<PathBuf, TdddFeatureDeclarationReadError> {
+    let baseline_file = Path::new(&binding.baseline_file);
+    if binding.baseline_file.contains('/') || binding.baseline_file.contains('\\') {
+        return Err(invalid_baseline_filename(track_dir, binding));
+    }
+    let mut components = baseline_file.components();
+    let Some(Component::Normal(filename)) = components.next() else {
+        return Err(invalid_baseline_filename(track_dir, binding));
+    };
+    if components.next().is_some() {
+        return Err(invalid_baseline_filename(track_dir, binding));
+    }
+    let path = track_dir.join(filename);
+    if !path.starts_with(track_dir) {
+        return Err(invalid_baseline_filename(track_dir, binding));
+    }
+    Ok(path)
+}
+
+fn invalid_baseline_filename(
+    track_dir: &Path,
+    binding: &TdddLayerBinding,
+) -> TdddFeatureDeclarationReadError {
+    read_error(
+        track_dir,
+        format!(
+            "layer '{}' baseline file '{}' must be a safe bare filename",
+            binding.layer_id, binding.baseline_file
+        ),
+    )
 }
 
 fn parse_layer(value: &str, path: &Path) -> Result<LayerId, TdddFeatureDeclarationReadError> {
@@ -504,155 +580,6 @@ fn read_error(path: &Path, reason: String) -> TdddFeatureDeclarationReadError {
     }
 }
 
-#[derive(Debug)]
-enum SnapshotPublicationError {
-    Mismatch,
-    Read(DiagnosticMessage),
-    Write(DiagnosticMessage),
-}
-
-fn write_first_snapshot(
-    path: &Path,
-    trusted_root: &Path,
-    bytes: &[u8],
-) -> Result<(), SnapshotPublicationError> {
-    write_first_snapshot_after_temporary_write(path, trusted_root, bytes, |_| {})
-}
-
-/// Creates the immutable baseline snapshot without ever publishing partial bytes.
-///
-/// The temporary file is created below the trusted root, fully synced, then published with a
-/// hard link. `hard_link` has no replacement behavior, so a concurrent writer cannot replace
-/// the snapshot selected by the first successful publisher.
-fn write_first_snapshot_after_temporary_write(
-    path: &Path,
-    trusted_root: &Path,
-    bytes: &[u8],
-    after_temporary_write: impl FnOnce(&Path),
-) -> Result<(), SnapshotPublicationError> {
-    match reject_symlinks_below(path, trusted_root) {
-        Ok(true) => return compare_snapshot(path, trusted_root, bytes),
-        Ok(false) => {}
-        Err(error) => return Err(SnapshotPublicationError::Write(diagnostic(error.to_string()))),
-    }
-    let (mut file, temporary) = create_snapshot_temporary_file(path, trusted_root)?;
-    if let Err(error) = file.write_all(bytes) {
-        drop(file);
-        return Err(clean_up_temporary(
-            &temporary,
-            SnapshotPublicationError::Write(diagnostic(error.to_string())),
-        ));
-    }
-    if let Err(error) = file.sync_all() {
-        drop(file);
-        return Err(clean_up_temporary(
-            &temporary,
-            SnapshotPublicationError::Write(diagnostic(error.to_string())),
-        ));
-    }
-    drop(file);
-
-    after_temporary_write(&temporary);
-
-    let publication = match reject_symlinks_below(path, trusted_root) {
-        Ok(false) => match std::fs::hard_link(&temporary, path) {
-            Ok(()) => Ok(()),
-            Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => {
-                compare_snapshot(path, trusted_root, bytes)
-            }
-            Err(error) => Err(SnapshotPublicationError::Write(diagnostic(error.to_string()))),
-        },
-        Ok(true) => compare_snapshot(path, trusted_root, bytes),
-        Err(error) => Err(SnapshotPublicationError::Write(diagnostic(error.to_string()))),
-    };
-    if let Err(error) = publication {
-        return Err(clean_up_temporary(&temporary, error));
-    }
-    if let Err(error) = std::fs::remove_file(&temporary) {
-        return Err(clean_up_temporary(
-            &temporary,
-            SnapshotPublicationError::Write(diagnostic(error.to_string())),
-        ));
-    }
-    let parent = path.parent().ok_or_else(|| {
-        SnapshotPublicationError::Write(diagnostic("baseline snapshot has no parent".to_owned()))
-    })?;
-    File::open(parent)
-        .and_then(|directory| directory.sync_all())
-        .map_err(|error| SnapshotPublicationError::Write(diagnostic(error.to_string())))
-}
-
-fn create_snapshot_temporary_file(
-    path: &Path,
-    trusted_root: &Path,
-) -> Result<(File, PathBuf), SnapshotPublicationError> {
-    let parent = path.parent().ok_or_else(|| {
-        SnapshotPublicationError::Write(diagnostic("baseline snapshot has no parent".to_owned()))
-    })?;
-    for _ in 0..1024 {
-        let sequence = SNAPSHOT_TEMP_SEQUENCE.fetch_add(1, Ordering::Relaxed);
-        let temporary =
-            parent.join(format!(".{SNAPSHOT_FILE}.{}.{sequence}.tmp", std::process::id()));
-        match reject_symlinks_below(&temporary, trusted_root) {
-            Ok(false) => {}
-            Ok(true) => continue,
-            Err(error) => {
-                return Err(SnapshotPublicationError::Write(diagnostic(error.to_string())));
-            }
-        }
-        match OpenOptions::new().write(true).create_new(true).open(&temporary) {
-            Ok(file) => return Ok((file, temporary)),
-            Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => continue,
-            Err(error) => {
-                return Err(SnapshotPublicationError::Write(diagnostic(error.to_string())));
-            }
-        }
-    }
-    Err(SnapshotPublicationError::Write(diagnostic(
-        "unable to allocate baseline snapshot temporary file".to_owned(),
-    )))
-}
-
-fn clean_up_temporary(
-    temporary: &Path,
-    error: SnapshotPublicationError,
-) -> SnapshotPublicationError {
-    if let Err(cleanup_error) = std::fs::remove_file(temporary)
-        && cleanup_error.kind() != std::io::ErrorKind::NotFound
-    {
-        return SnapshotPublicationError::Write(diagnostic(format!(
-            "{}; additionally unable to remove temporary baseline snapshot: {cleanup_error}",
-            snapshot_publication_error_description(&error)
-        )));
-    }
-    error
-}
-
-fn snapshot_publication_error_description(error: &SnapshotPublicationError) -> String {
-    match error {
-        SnapshotPublicationError::Mismatch => {
-            "baseline snapshot contains different declaration bytes".to_owned()
-        }
-        SnapshotPublicationError::Read(reason) | SnapshotPublicationError::Write(reason) => {
-            reason.as_str().to_owned()
-        }
-    }
-}
-
-fn compare_snapshot(
-    path: &Path,
-    trusted_root: &Path,
-    bytes: &[u8],
-) -> Result<(), SnapshotPublicationError> {
-    let Some(snapshot) = read_bytes(path, trusted_root).map_err(SnapshotPublicationError::Read)?
-    else {
-        return Err(SnapshotPublicationError::Read(diagnostic(
-            "baseline snapshot disappeared during write".to_owned(),
-        )));
-    };
-    if snapshot == bytes { Ok(()) } else { Err(SnapshotPublicationError::Mismatch) }
-}
-
 fn diagnostic(message: String) -> DiagnosticMessage {
     let mut text = if message.trim().is_empty() {
         "feature declaration operation failed".to_owned()
@@ -673,10 +600,18 @@ mod tests {
     use super::*;
 
     fn binding(layer_id: &str, target: &str) -> TdddLayerBinding {
+        binding_with_baseline(layer_id, target, &format!("{layer_id}-types-baseline.json"))
+    }
+
+    fn binding_with_baseline(
+        layer_id: &str,
+        target: &str,
+        baseline_file: &str,
+    ) -> TdddLayerBinding {
         TdddLayerBinding {
             layer_id: layer_id.to_owned(),
             catalogue_file: format!("{layer_id}-types.json"),
-            baseline_file: format!("{layer_id}-types-baseline.json"),
+            baseline_file: baseline_file.to_owned(),
             targets: vec![target.to_owned()],
         }
     }
@@ -719,6 +654,184 @@ mod tests {
         let features = declaration.features_for(&LayerId::try_new("domain").unwrap()).unwrap();
         assert_eq!(features.first().unwrap().as_str(), "semantic-dup");
         assert!(track.path().join(SNAPSHOT_FILE).exists());
+    }
+
+    #[test]
+    fn test_baseline_port_with_existing_layer_baselines_and_no_snapshot_returns_error() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(
+            track.path(),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[],\"usecase\":[]}}",
+        );
+        let domain_baseline = track.path().join("domain-types-baseline.json");
+        let usecase_baseline = track.path().join("usecase-types-baseline.json");
+        std::fs::write(&domain_baseline, "domain baseline").unwrap();
+        std::fs::write(&usecase_baseline, "usecase baseline").unwrap();
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain"), binding("usecase", "domain")],
+        );
+
+        assert!(matches!(
+            &result,
+            Err(
+                TdddBaselineFeatureDeclarationPortError::MissingDeclarationSnapshotWithExistingBaselines { .. }
+            )
+        ));
+        let message = match &result {
+            Err(error) => error.to_string(),
+            Ok(_) => return,
+        };
+        let Err(
+            TdddBaselineFeatureDeclarationPortError::MissingDeclarationSnapshotWithExistingBaselines {
+                baseline_paths,
+            },
+        ) = result
+        else {
+            return;
+        };
+        assert!(message.contains(&domain_baseline.display().to_string()));
+        assert!(message.contains(&usecase_baseline.display().to_string()));
+        assert!(message.contains("delete those baselines and re-capture"));
+        assert_eq!(baseline_paths.as_slice(), &[domain_baseline, usecase_baseline]);
+        assert!(!track.path().join(SNAPSHOT_FILE).exists());
+    }
+
+    #[test]
+    fn test_baseline_port_with_absolute_baseline_filename_returns_error_without_snapshot() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        let outside = tempfile::tempdir().unwrap();
+        let outside_baseline = outside.path().join("domain-types-baseline.json");
+        std::fs::write(&outside_baseline, "outside baseline").unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding_with_baseline("domain", "domain", &outside_baseline.display().to_string())],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration { .. }
+            ))
+        ));
+        assert!(!track.path().join(SNAPSHOT_FILE).exists());
+    }
+
+    #[test]
+    fn test_baseline_port_with_parent_traversal_baseline_filename_returns_error_without_snapshot() {
+        let workspace = setup_workspace();
+        let container = tempfile::tempdir().unwrap();
+        let track_path = container.path().join("track");
+        std::fs::create_dir(&track_path).unwrap();
+        std::fs::write(container.path().join("domain-types-baseline.json"), "outside baseline")
+            .unwrap();
+        write_declaration(&track_path, "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            &track_path,
+            workspace.path(),
+            &[binding_with_baseline("domain", "domain", "../domain-types-baseline.json")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration { .. }
+            ))
+        ));
+        assert!(!track_path.join(SNAPSHOT_FILE).exists());
+    }
+
+    #[test]
+    fn test_baseline_port_with_separator_in_baseline_filename_returns_error_without_snapshot() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        std::fs::create_dir(track.path().join("nested")).unwrap();
+        std::fs::write(track.path().join("nested/domain-types-baseline.json"), "baseline").unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding_with_baseline("domain", "domain", "nested/domain-types-baseline.json")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration { .. }
+            ))
+        ));
+        assert!(!track.path().join(SNAPSHOT_FILE).exists());
+    }
+
+    #[test]
+    fn test_baseline_port_with_backslash_in_baseline_filename_returns_error_without_snapshot() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding_with_baseline("domain", "domain", "nested\\\\domain-types-baseline.json")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::Read(
+                TdddFeatureDeclarationReadError::ReadDeclaration { .. }
+            ))
+        ));
+        assert!(!track.path().join(SNAPSHOT_FILE).exists());
+    }
+
+    #[test]
+    fn test_baseline_port_with_existing_snapshot_and_layer_baseline_returns_declaration() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        let declaration = "{\"schema_version\":1,\"layers\":{\"domain\":[]}}";
+        write_declaration(track.path(), declaration);
+        std::fs::write(track.path().join(SNAPSHOT_FILE), declaration).unwrap();
+        std::fs::write(track.path().join("domain-types-baseline.json"), "domain baseline").unwrap();
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_baseline_port_with_mismatched_snapshot_returns_snapshot_mismatch() {
+        let workspace = setup_workspace();
+        let track = tempfile::tempdir().unwrap();
+        write_declaration(track.path(), "{\"schema_version\":1,\"layers\":{\"domain\":[]}}");
+        std::fs::write(
+            track.path().join(SNAPSHOT_FILE),
+            "{\"schema_version\":1,\"layers\":{\"domain\":[\"semantic-dup\"]}}",
+        )
+        .unwrap();
+
+        let result = FsTdddFeatureDeclarationAdapter::new().load_for_baseline(
+            track.path(),
+            workspace.path(),
+            &[binding("domain", "domain")],
+        );
+
+        assert!(matches!(
+            result,
+            Err(TdddBaselineFeatureDeclarationPortError::BaselineSnapshotMismatch)
+        ));
     }
 
     #[test]
