@@ -3,8 +3,9 @@
 //! This module owns the request naming the two trees the shipping check
 //! compares, the verdict that check produces, the fail-closed conditions under
 //! which it cannot produce one at all, the port that inventories a tree's
-//! convention documents, and the pure comparison between two such inventories
-//! (spec `IN-11`, `AC-18`).
+//! convention documents, the pure comparison between two such inventories, and
+//! the primary port the check is driven through together with the interactor
+//! that realises it (spec `IN-11`, `AC-18`).
 //!
 //! The document identity both trees are inventoried as is
 //! [`ConventionDocumentPath`], owned by [`crate::conventions_resolve`] and
@@ -12,6 +13,7 @@
 //! found under the overlay or inside an export.
 
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
 
 use domain::tddd::catalogue_linter::FreeText;
 use domain::tddd::catalogue_v2::NonEmptyVec;
@@ -20,6 +22,8 @@ use crate::conventions_resolve::{ConventionDocumentPath, ConventionDocumentPathE
 
 #[cfg(test)]
 mod inventory_port_tests;
+#[cfg(test)]
+mod shipping_check_tests;
 #[cfg(test)]
 mod shipping_contract_tests;
 #[cfg(test)]
@@ -203,4 +207,83 @@ pub fn select_unsupplied_conventions(
         return ConventionShippingVerdict::Conforming;
     };
     ConventionShippingVerdict::UnsuppliedDocumentsShipped { documents }
+}
+
+/// Primary port of the read-only convention non-shipping check (`IN-11`,
+/// `AC-18`).
+///
+/// A port of its own rather than a second method on `TemplateExportService`,
+/// because the two operations are asymmetric on every axis that would justify
+/// sharing one: this one writes nothing, collaborates with a single read-only
+/// inventory port rather than the manifest / export / transplant ports, and
+/// answers a verdict over an already-produced tree rather than an export
+/// report. The check also runs *after* an export, against its output, so
+/// folding it in would put a consumer of the export inside the export's own
+/// consistency boundary.
+///
+/// The declared result is what fixes the shape of the answer: a violation is a
+/// [`ConventionShippingVerdict`] and therefore an `Ok`, while
+/// [`ConventionShippingCheckError`] is reached only when the question could not
+/// be answered at all. No implementor can report a shipping violation as a
+/// failure, and no caller holding a verdict has to ask whether the check ran.
+pub trait ConventionShippingCheckService: Send + Sync {
+    /// Checks whether the tree `query` names ships convention documents its
+    /// overlay does not supply.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`ConventionShippingCheckError`] when either tree could not be
+    /// inventoried. Finding unsupplied documents is not among those conditions:
+    /// it is the check's normal finding and arrives as
+    /// [`ConventionShippingVerdict::UnsuppliedDocumentsShipped`].
+    fn check(
+        &self,
+        query: CheckConventionShippingQuery,
+    ) -> Result<ConventionShippingVerdict, ConventionShippingCheckError>;
+}
+
+/// [`ConventionShippingCheckService`] realised by inventorying both trees
+/// through one injected [`ConventionInventoryPort`] (`IN-11`, `AC-18`).
+///
+/// Holding a single port instance rather than one per side is the load-bearing
+/// choice, and it is not symmetry or economy: one instance makes it impossible
+/// for the two sides of the comparison to be walked by different rules, which
+/// would produce a difference that is an artefact of the walk rather than of
+/// what ships. Accepting two ports, or constructing a second walker internally,
+/// would satisfy the same signature and lose that.
+///
+/// The type exists rather than a free function only to carry that injected
+/// dependency — R2's stated exception, the same one
+/// [`ConventionResolveInteractor`](crate::conventions_resolve::ConventionResolveInteractor)
+/// stands on — and it holds nothing else, so two checks through the same value
+/// are as independent as two calls to a function would be.
+///
+/// Its own contribution is the wiring, and nothing besides: both inventories
+/// reach [`select_unsupplied_conventions`] as the port produced them, and what
+/// that comparison returns is what the caller receives. Deduplication, ordering
+/// and the one-directional reading stay the comparison's, and the conditions
+/// that prevent an inventory stay the port's to raise.
+pub struct ConventionShippingCheckInteractor {
+    inventory: Arc<dyn ConventionInventoryPort>,
+}
+
+impl ConventionShippingCheckInteractor {
+    /// Wires the interactor to the one inventory both trees are walked by.
+    #[must_use]
+    pub fn new(inventory: Arc<dyn ConventionInventoryPort>) -> Self {
+        Self { inventory }
+    }
+}
+
+impl ConventionShippingCheckService for ConventionShippingCheckInteractor {
+    fn check(
+        &self,
+        query: CheckConventionShippingQuery,
+    ) -> Result<ConventionShippingVerdict, ConventionShippingCheckError> {
+        // Both listings come from `self.inventory`: the one port the caller
+        // injected, asked twice, rather than two walkers that could disagree.
+        let shipped = self.inventory.list_conventions(&query.exported_root)?;
+        let supplied = self.inventory.list_conventions(&query.overlay_dir)?;
+        Ok(select_unsupplied_conventions(&shipped, &supplied))
+    }
 }

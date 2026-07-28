@@ -154,7 +154,7 @@
     {
       "id": "T027",
       "description": "primary port `ConventionShippingCheckService` と `ConventionShippingCheckInteractor` を実装する。注入する `ConventionInventoryPort` は 1 つとし、export 済み tree と overlay tree の双方をその同一 instance で列挙して `select_unsupplied_conventions` へ委譲する配線にする。両者の result obligation を fake port で果たす。新設 module 内の追加であり既存行の移動を伴わない。Size estimate — usecase: ~70 prod + ~280 test lines (計 ~350)。実測比 ~1.4x を織り込んだ数字である。`track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-11`, `#AC-18`.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T028",

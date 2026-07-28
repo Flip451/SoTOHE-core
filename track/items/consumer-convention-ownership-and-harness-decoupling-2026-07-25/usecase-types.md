@@ -41,7 +41,7 @@
 | Name | Kind | Action | Details | Signal | Cat-Spec |
 |------|------|--------|---------|--------|----------|
 | ConventionResolveService | application_service | add | fn resolve(&self, query: ResolveConventionsQuery) -> Result<ConventionResolution, ConventionResolveError> | 🔵 | 🔵 |
-| ConventionShippingCheckService | application_service | add | fn check(&self, query: CheckConventionShippingQuery) -> Result<ConventionShippingVerdict, ConventionShippingCheckError> | 🟡 | 🔵 |
+| ConventionShippingCheckService | application_service | add | fn check(&self, query: CheckConventionShippingQuery) -> Result<ConventionShippingVerdict, ConventionShippingCheckError> | 🔵 | 🔵 |
 
 ## Interactors
 
@@ -49,7 +49,7 @@
 |------|------|--------|---------|--------|----------|
 | CapabilityExecInteractor | interactor | modify | — | 🔵 | 🔵 |
 | ConventionResolveInteractor | interactor | add | — | 🔵 | 🔵 |
-| ConventionShippingCheckInteractor | interactor | add | — | 🟡 | 🔵 |
+| ConventionShippingCheckInteractor | interactor | add | — | 🔵 | 🔵 |
 
 ## Queries
 

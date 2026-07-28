@@ -3218,6 +3218,98 @@
           "test_name": "test_select_unsupplied_conventions_ignores_documents_the_overlay_supplies_but_the_export_lacks"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckService",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionShippingCheckService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check"
+      },
+      "key": {
+        "bound_tests_set_hash": "f8f786f6401cd12eb9c835c498435ab6d8f1e592739a3ab771a021d63e055232",
+        "declaration_hash": "61076364ee93b426a6cc6346c00cb9b94f9677f8ad39b87cf944c73be7f1298a",
+        "anchor_text_hash": "0d8bcb7b6139fbd92056795f9ccd8bb834d9efea32f8501529a2b539795d9e75"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"the exported tree ships a source convention the overlay never supplied\" ... assert_eq!( named(documents.as_slice()), [\"knowledge/conventions/workflow-ceremony-minimization.md\"]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_check_tests",
+          "test_name": "test_check_hands_a_shipping_violation_back_as_a_verdict_and_not_as_a_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_check_tests",
+          "test_name": "test_check_reports_a_tree_it_could_not_inventory_as_a_failure_and_not_as_a_verdict"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_check_tests",
+          "test_name": "test_check_is_reachable_from_more_than_one_holder_of_one_shared_port"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckInteractor",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionShippingCheckInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "7241650bb94ae60d27ac9855ec50cd4565e5099fd777f28632f5052da7db2789",
+        "declaration_hash": "05245ad436dc34b983abf71ea6e86eab1cfb3ee3d94f89a5893e909bf8b88a33",
+        "anchor_text_hash": "0d8bcb7b6139fbd92056795f9ccd8bb834d9efea32f8501529a2b539795d9e75"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        verdict,\n        ConventionShippingVerdict::Conforming,\n        \"the whole check ran over an exported tree that ships nothing beyond the overlay's supply \\\n         and reported no finding, whatever order either walk produced\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_check_tests",
+          "test_name": "test_interactor_inventories_both_trees_through_the_one_port_it_was_given"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_check_tests",
+          "test_name": "test_interactor_answers_with_what_the_comparison_selects_over_the_two_inventories"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_check_tests",
+          "test_name": "test_interactor_reports_conforming_when_the_exported_tree_ships_only_supplied_documents"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_check_tests",
+          "test_name": "test_interactor_surfaces_a_tree_it_could_not_inventory_as_that_failure"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::shipping_check_tests",
+          "test_name": "test_interactor_carries_nothing_from_one_check_into_the_next"
+        }
+      ]
     }
   ]
 }
