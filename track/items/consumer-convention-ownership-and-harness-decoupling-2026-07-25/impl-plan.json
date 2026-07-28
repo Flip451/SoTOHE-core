@@ -129,7 +129,7 @@
     {
       "id": "T022",
       "description": "`overlay/knowledge/conventions/coding-principles.md` に `required_for: [spec-designer, impl-planner]`、`overlay/knowledge/conventions/prefer-type-safe-abstractions.md` に `required_for: [type-designer, spec-designer, impl-planner, rollback-diagnoser]` の frontmatter を付与して新規供給する。T034 と T035 の後に実施する。Size estimate — other: ~350 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-04`, `#IN-09`, `#IN-10`, `#CN-04`, `#AC-05`, `#AC-13`, `#AC-15`.",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T023",

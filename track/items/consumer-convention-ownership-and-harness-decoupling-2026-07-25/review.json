@@ -1,6 +1,39 @@
 {
   "schema_version": 2,
   "scopes": {
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8ede22607d940e1a2f66c248a24a56540d651827bb41ea8bb841b3d04ecb3afa",
+          "at": "2026-07-26T14:50:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`ConventionDocumentPath` accepts arbitrary paths beneath the convention root, including filenames containing newlines and, on Unix, non-UTF-8 bytes. Converting each path with `Display` and joining on `\\n` is therefore not a lossless one-record-per-line encoding: one matched file can produce multiple apparent records, while distinct non-UTF-8 paths can collapse to the same replacement-character text. This breaks the canonical machine-readable result promised by IN-05/AC-06. Enforce a render-safe path invariant or use an unambiguous encoding, with boundary-value coverage.",
+              "severity": "P1",
+              "file": "apps/cli-driver/src/conventions_resolve/mod.rs",
+              "line": 143,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:b534b63f570047017f66cd20dd7f7616732afe5d0a6aabeca2824fa8c8b6f330",
+          "at": "2026-07-26T15:41:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:871e08e8b18707636fb57ed4b73704b74196b7622153e6eeb479dceae835e91e",
+          "at": "2026-07-26T16:06:47Z"
+        }
+      ]
+    },
     "adr": {
       "rounds": [
         {
@@ -109,6 +142,100 @@
           "findings": [],
           "hash": "rvw1:sha256:7d979015324a16df45f9a0f6ae8f71db386c0a9463aaaf1ba00afd88f97aba3b",
           "at": "2026-07-26T05:14:57Z"
+        }
+      ]
+    },
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ebd270faf24694f2e4d43c74c69a52d65d64977f3b9544e05896fb6068d18cf",
+          "at": "2026-07-26T14:50:08Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The IN-05/AC-06 binding for this test attributes exact-match selection and stable ordering to `ConventionsCompositionRoot`: the fixture excludes the nonmatching document and the exact stdout assertion fixes the returned order. This root only establishes the adapter → interactor → driver graph; matching is established downstream and deduplication/order are inherited from `ConventionResolution`. Keep the composition binding limited to evidence of the selected object graph and bind those behavioral guarantees to their owning entries.",
+              "severity": "P1",
+              "file": "apps/cli-composition/src/conventions.rs",
+              "line": 128,
+              "category": "test_contract_attribution"
+            }
+          ],
+          "hash": "rvw1:sha256:5ebd270faf24694f2e4d43c74c69a52d65d64977f3b9544e05896fb6068d18cf",
+          "at": "2026-07-26T15:00:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7cad3c4376c80f4d6243885bef12aeca2948a6d41621557b2f3769e9204a469f",
+          "at": "2026-07-26T15:53:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`CapabilityExecInteractor::new` still has a second construction site in the infrastructure test, but it supplies only three arguments and omits the newly required convention resolver and project root. This causes test compilation to fail and leaves construction outside the composition root inconsistent with the new wiring contract.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/capability_exec/agent_profiles.rs",
+              "line": 175,
+              "category": "wiring correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:03be39cb9b994e2e62248341aa4600ad5b4936fe904feac19bce6c1b4767d977",
+          "at": "2026-07-27T10:43:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03be39cb9b994e2e62248341aa4600ad5b4936fe904feac19bce6c1b4767d977",
+          "at": "2026-07-27T10:47:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:03be39cb9b994e2e62248341aa4600ad5b4936fe904feac19bce6c1b4767d977",
+          "at": "2026-07-27T10:51:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e81de1d70deaab83dd066a681147249f32931a05a7670da457f6b490fb6a9c9",
+          "at": "2026-07-28T06:08:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e81de1d70deaab83dd066a681147249f32931a05a7670da457f6b490fb6a9c9",
+          "at": "2026-07-28T06:10:16Z"
+        }
+      ]
+    },
+    "domain": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:680373f24a76df5eda2a46afdd890ff3c768d0544915f6353f1d877d9ec9b9e2",
+          "at": "2026-07-28T09:32:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:680373f24a76df5eda2a46afdd890ff3c768d0544915f6353f1d877d9ec9b9e2",
+          "at": "2026-07-28T09:33:55Z"
         }
       ]
     },
@@ -699,39 +826,6 @@
         }
       ]
     },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8ede22607d940e1a2f66c248a24a56540d651827bb41ea8bb841b3d04ecb3afa",
-          "at": "2026-07-26T14:50:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`ConventionDocumentPath` accepts arbitrary paths beneath the convention root, including filenames containing newlines and, on Unix, non-UTF-8 bytes. Converting each path with `Display` and joining on `\\n` is therefore not a lossless one-record-per-line encoding: one matched file can produce multiple apparent records, while distinct non-UTF-8 paths can collapse to the same replacement-character text. This breaks the canonical machine-readable result promised by IN-05/AC-06. Enforce a render-safe path invariant or use an unambiguous encoding, with boundary-value coverage.",
-              "severity": "P1",
-              "file": "apps/cli-driver/src/conventions_resolve/mod.rs",
-              "line": 143,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:b534b63f570047017f66cd20dd7f7616732afe5d0a6aabeca2824fa8c8b6f330",
-          "at": "2026-07-26T15:41:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:871e08e8b18707636fb57ed4b73704b74196b7622153e6eeb479dceae835e91e",
-          "at": "2026-07-26T16:06:47Z"
-        }
-      ]
-    },
     "other": {
       "rounds": [
         {
@@ -988,24 +1082,72 @@
           "findings": [],
           "hash": "rvw1:sha256:f358d0c9090a45b32626e7be9d51a54a80e8d777d460bca90d2a5b51a15f9608",
           "at": "2026-07-28T10:12:07Z"
-        }
-      ]
-    },
-    "domain": {
-      "rounds": [
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This file references `security.md`, which is intentionally supplied by the separate T023 batch and is absent from the current overlay. Remove this Related Documents link or defer it until the document is present.",
+              "severity": "P1",
+              "file": "overlay/knowledge/conventions/coding-principles.md",
+              "line": 172,
+              "category": "dead reference"
+            }
+          ],
+          "hash": "rvw1:sha256:747b4e58ca828c8b88137c2b8e09783a786c4a17c57a15fe91129ac7a44a661a",
+          "at": "2026-07-28T11:28:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The convention requires an exact `reviewer` capability review before using `unsafe`. This is SoTOHE-core harness operational practice, not a consumer-neutral engineering rule, and can become invalid when a consumer changes its capabilities. State the project-owned review requirement generically instead of naming the harness capability.",
+              "severity": "P1",
+              "file": "overlay/knowledge/conventions/coding-principles.md",
+              "line": 69,
+              "category": "CN-04 leakage"
+            }
+          ],
+          "hash": "rvw1:sha256:2cf01585dff1823845259e44c27f814ac0283e4c1120b0e821c5600ad2cb7b58",
+          "at": "2026-07-28T11:30:08Z"
+        },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:680373f24a76df5eda2a46afdd890ff3c768d0544915f6353f1d877d9ec9b9e2",
-          "at": "2026-07-28T09:32:18Z"
+          "hash": "rvw1:sha256:5ca9a706f17e086d7b3c94672ef1c71e347e381f2770977117075ad08f2482a9",
+          "at": "2026-07-28T11:31:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The rename/delete safety claim is false in the current tree: `.harness/reference/catalogue-schema.md:469` still hard-codes both `knowledge/conventions/prefer-type-safe-abstractions.md` and its `Enum-first`/`Typestate` headings. Renaming, restructuring, or deleting this consumer-owned convention therefore leaves a stale harness-owned dependency.",
+              "severity": "P1",
+              "file": "overlay/knowledge/conventions/prefer-type-safe-abstractions.md",
+              "line": 15,
+              "category": "architecture"
+            },
+            {
+              "message": "The example labeled `Good: Result` still panics for `i32::MIN / -1`, because signed division overflow reaches `a / b` despite the zero-divisor check. Use `checked_div` and map division-by-zero and overflow to explicit errors.",
+              "severity": "P1",
+              "file": "overlay/knowledge/conventions/coding-principles.md",
+              "line": 127,
+              "category": "error_handling"
+            }
+          ],
+          "hash": "rvw1:sha256:5ca9a706f17e086d7b3c94672ef1c71e347e381f2770977117075ad08f2482a9",
+          "at": "2026-07-28T11:36:40Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:680373f24a76df5eda2a46afdd890ff3c768d0544915f6353f1d877d9ec9b9e2",
-          "at": "2026-07-28T09:33:55Z"
+          "hash": "rvw1:sha256:96a16972b51588e27a626c794557a4735dcc516f5f1103559bd7d1db29ac1627",
+          "at": "2026-07-28T11:46:23Z"
         }
       ]
     },
@@ -1286,6 +1428,285 @@
           "findings": [],
           "hash": "rvw1:sha256:b4ea18cb316ec10bfca34d523466b423f883741d6a92d37c2aff4f8c4579a930",
           "at": "2026-07-27T12:59:17Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb7bf0dc230b9dc29f7b7693e381b5b94e69030e49697713b72a3bd98ecbdf74",
+          "at": "2026-07-26T03:17:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eb7bf0dc230b9dc29f7b7693e381b5b94e69030e49697713b72a3bd98ecbdf74",
+          "at": "2026-07-26T03:28:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:07eeb94d7cee9fda1026616a3b6b64b15713a9a08eddbec49acaf18c24be30ce",
+          "at": "2026-07-26T08:41:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ef43c487a62b52b64b5cf0e0e0da08137a9aae00a3e0aba4e036bbb7a50e9927",
+          "at": "2026-07-26T08:56:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`requires()` compares `CapabilityName` values, but `CapabilityName::try_new` stores a trimmed `NonEmptyString`. Consequently, `required_for: [\" reviewer \"]` matches a query for `reviewer`, violating IN-06/AC-06’s non-empty, exact-string matching contract. Preserve non-blank identifiers without normalization (and cover whitespace near-misses).",
+              "severity": "P0",
+              "file": "libs/usecase/src/conventions_resolve/mod.rs",
+              "line": 187,
+              "category": "correctness"
+            }
+          ],
+          "hash": "rvw1:sha256:cd626c6438308172164c24c9581e1875a15348dd90fbe01e2f353b18790c47dd",
+          "at": "2026-07-26T09:23:07Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ce6b0aa92f9f525dda1e08236d756f573ebfdb557b6c3fee410e4b838087a67c",
+          "at": "2026-07-26T10:12:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ae1c4e91f8c841867350940cf111eb84d0c589929ac2cc92fca2dfa87aede890",
+          "at": "2026-07-26T11:06:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:dbd7cf8e063c764244ef7fec15d993d3a794dce630e874865599bc27af35e48d",
+          "at": "2026-07-26T11:37:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b71a03321dcd7672332d38be7c38cf5a38b4bbc6c178cc762c3a47487599083a",
+          "at": "2026-07-26T12:14:47Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`with_conventions` unconditionally adds the `## Project conventions` section heading, contrary to CN-06's requirement that rendered convention obligations contain no section heading. This makes both dispatch routes carry non-conforming discipline text.",
+              "severity": "P1",
+              "file": "libs/usecase/src/capability_exec/values.rs",
+              "line": 305,
+              "category": "contract violation"
+            }
+          ],
+          "hash": "rvw1:sha256:56b4d9b0fd41f5c31b9c8912f92d8404d7d2b08b2cd3b0aed112ef4d45011c23",
+          "at": "2026-07-26T14:49:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4bc29a94b9c32e380854c0dee261ea391deca5279be816b5321a7aca0425e245",
+          "at": "2026-07-26T14:56:29Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4bc29a94b9c32e380854c0dee261ea391deca5279be816b5321a7aca0425e245",
+          "at": "2026-07-26T15:02:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`try_new` now rejects paths that remain inside `knowledge/conventions/` when they contain CR/LF or non-UTF-8 bytes. This adds a fail-closed case beyond AC-07/D4, which explicitly limits resolver failure to five conditions and only rejects a path for escaping the convention root. Either preserve such paths losslessly in output or obtain an upstream contract change before rejecting them.",
+              "severity": "P1",
+              "file": "libs/usecase/src/conventions_resolve/mod.rs",
+              "line": 65,
+              "category": "contract_conformance"
+            }
+          ],
+          "hash": "rvw1:sha256:129cc0ec7a1e64f72b96b6fb5fbe9bdc772498b8aa7b1ac2a170ca2f601cb750",
+          "at": "2026-07-26T16:22:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:129cc0ec7a1e64f72b96b6fb5fbe9bdc772498b8aa7b1ac2a170ca2f601cb750",
+          "at": "2026-07-26T16:40:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:78cc06ac7ac9ff781e580891a4ae577fae6e64bbecadad4ac3365064f4c71787",
+          "at": "2026-07-27T01:42:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25bb5a922d0df1eb015f08c1a2d776f02d8b52996fa157668431784200264157",
+          "at": "2026-07-27T10:42:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:25bb5a922d0df1eb015f08c1a2d776f02d8b52996fa157668431784200264157",
+          "at": "2026-07-27T10:47:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aaac2eaf124ee75243fccb48429e81b6a292787ef50543b69312f8862ab573ad",
+          "at": "2026-07-27T11:06:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aaac2eaf124ee75243fccb48429e81b6a292787ef50543b69312f8862ab573ad",
+          "at": "2026-07-27T11:08:26Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c4e0e7eea050e2967ad44a246ed9dbf0864acb35ae47519570583cb9e15f3c5",
+          "at": "2026-07-27T13:39:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The cross-dispatch test does not fully pin the per-dispatch contract. It always returns the same document, never inspects `dispatches`, and changes capability on the second call. Thus a per-capability cache could skip resolution on a repeated same-capability dispatch, or the interactor could resolve the second capability but reuse the first composed discipline, while every assertion still passes. Add a same-capability repeat plus capability-specific resolver results, and assert the second dispatched discipline uses only its own resolution.",
+              "severity": "P1",
+              "file": "libs/usecase/src/capability_exec.rs",
+              "line": 1649,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:4c4e0e7eea050e2967ad44a246ed9dbf0864acb35ae47519570583cb9e15f3c5",
+          "at": "2026-07-27T13:45:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16e9db1e726c6323df9d61d9db67212251771ef39922f0c14aa41b254573df5a",
+          "at": "2026-07-27T13:56:02Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16e9db1e726c6323df9d61d9db67212251771ef39922f0c14aa41b254573df5a",
+          "at": "2026-07-27T14:05:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:16e9db1e726c6323df9d61d9db67212251771ef39922f0c14aa41b254573df5a",
+          "at": "2026-07-27T14:07:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca77826ab0220f02171de0e979d3746191639dbbc3af21ce5b7279c95c4d81db",
+          "at": "2026-07-28T01:20:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ca77826ab0220f02171de0e979d3746191639dbbc3af21ce5b7279c95c4d81db",
+          "at": "2026-07-28T01:23:59Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0fd0cd9d80d342188b4ca77e27549a1bbfb4a6290d5f7a824bbd8b6e07f7cab2",
+          "at": "2026-07-26T14:49:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "A zero-match resolution produces `stdout: Some(\"\")`, but this path passes it to `driver_outcome_to_exit`, whose `println!` emits a spurious blank line. Thus the normal empty result contains one empty stdout line instead of zero path lines, violating AC-06/AC-08. Represent empty stdout as absent before emission and add a dispatch-level empty-result assertion.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/conventions.rs",
+              "line": 82,
+              "category": "correctness"
+            },
+            {
+              "message": "The new public `Resolve` dispatch has no error-path test. All dispatch tests use readable convention trees, so resolver failures are not verified to return `ExitCode::FAILURE` without partial stdout, despite the required public-API error coverage and the briefing's error-propagation check.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/conventions.rs",
+              "line": 499,
+              "category": "test_coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:0fd0cd9d80d342188b4ca77e27549a1bbfb4a6290d5f7a824bbd8b6e07f7cab2",
+          "at": "2026-07-26T15:28:38Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ddff316446453f4ebb1711edd54d16d8bb418d79b10f13fb227c0859e5cc69b6",
+          "at": "2026-07-26T15:40:59Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:89467259504740d2418d3bb1b9c8e17c2302e581bc12c033058e2b508d5be889",
+          "at": "2026-07-27T01:43:44Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ef511a6e7b89f821c07686887c649ebb3447f7cb18e6a37e7aeb87b5fc52d88f",
+          "at": "2026-07-28T06:07:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:ef511a6e7b89f821c07686887c649ebb3447f7cb18e6a37e7aeb87b5fc52d88f",
+          "at": "2026-07-28T06:11:36Z"
         }
       ]
     },
@@ -2308,143 +2729,28 @@
           "findings": [],
           "hash": "rvw1:sha256:6a113f17bd2cb16653f3079d2759edf488b22c7603f26123e247966339903414",
           "at": "2026-07-28T09:52:45Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0fd0cd9d80d342188b4ca77e27549a1bbfb4a6290d5f7a824bbd8b6e07f7cab2",
-          "at": "2026-07-26T14:49:45Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "A zero-match resolution produces `stdout: Some(\"\")`, but this path passes it to `driver_outcome_to_exit`, whose `println!` emits a spurious blank line. Thus the normal empty result contains one empty stdout line instead of zero path lines, violating AC-06/AC-08. Represent empty stdout as absent before emission and add a dispatch-level empty-result assertion.",
+              "message": "resolver が 0 件を返す正当な状態が、この新しい所有権説明から欠落しています。`.harness/capabilities/type-designer.md` は、規約が 0 件なら capability 自身の汎用 decision tree と機械制約が完全なルールセットになると明記していますが、ここ（同趣旨の 315・741 行目も同様）は role/kind・配置の拘束ルールが常に project-owned convention にあり、実 path が必ず渡されるように読めます。consumer が規約を削除できる CN-04/D8 の契約と矛盾するため、「project 固有の追加規則」に限定し、空解決時の capability + machine-constraint fallback を明記してください。",
               "severity": "P1",
-              "file": "apps/cli/src/commands/conventions.rs",
-              "line": 82,
-              "category": "correctness"
-            },
-            {
-              "message": "The new public `Resolve` dispatch has no error-path test. All dispatch tests use readable convention trees, so resolver failures are not verified to return `ExitCode::FAILURE` without partial stdout, despite the required public-API error coverage and the briefing's error-propagation check.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/conventions.rs",
-              "line": 499,
-              "category": "test_coverage"
+              "file": ".harness/reference/catalogue-schema.md",
+              "line": 19,
+              "category": "convention contradiction"
             }
           ],
-          "hash": "rvw1:sha256:0fd0cd9d80d342188b4ca77e27549a1bbfb4a6290d5f7a824bbd8b6e07f7cab2",
-          "at": "2026-07-26T15:28:38Z"
+          "hash": "rvw1:sha256:f6f51c3dcae9b43fa60785a5d2adf3cd2e191b3fb97f8c2b07afcec5bd7310cb",
+          "at": "2026-07-28T11:51:25Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:ddff316446453f4ebb1711edd54d16d8bb418d79b10f13fb227c0859e5cc69b6",
-          "at": "2026-07-26T15:40:59Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:89467259504740d2418d3bb1b9c8e17c2302e581bc12c033058e2b508d5be889",
-          "at": "2026-07-27T01:43:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ef511a6e7b89f821c07686887c649ebb3447f7cb18e6a37e7aeb87b5fc52d88f",
-          "at": "2026-07-28T06:07:57Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ef511a6e7b89f821c07686887c649ebb3447f7cb18e6a37e7aeb87b5fc52d88f",
-          "at": "2026-07-28T06:11:36Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5ebd270faf24694f2e4d43c74c69a52d65d64977f3b9544e05896fb6068d18cf",
-          "at": "2026-07-26T14:50:08Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The IN-05/AC-06 binding for this test attributes exact-match selection and stable ordering to `ConventionsCompositionRoot`: the fixture excludes the nonmatching document and the exact stdout assertion fixes the returned order. This root only establishes the adapter → interactor → driver graph; matching is established downstream and deduplication/order are inherited from `ConventionResolution`. Keep the composition binding limited to evidence of the selected object graph and bind those behavioral guarantees to their owning entries.",
-              "severity": "P1",
-              "file": "apps/cli-composition/src/conventions.rs",
-              "line": 128,
-              "category": "test_contract_attribution"
-            }
-          ],
-          "hash": "rvw1:sha256:5ebd270faf24694f2e4d43c74c69a52d65d64977f3b9544e05896fb6068d18cf",
-          "at": "2026-07-26T15:00:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7cad3c4376c80f4d6243885bef12aeca2948a6d41621557b2f3769e9204a469f",
-          "at": "2026-07-26T15:53:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`CapabilityExecInteractor::new` still has a second construction site in the infrastructure test, but it supplies only three arguments and omits the newly required convention resolver and project root. This causes test compilation to fail and leaves construction outside the composition root inconsistent with the new wiring contract.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/capability_exec/agent_profiles.rs",
-              "line": 175,
-              "category": "wiring correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:03be39cb9b994e2e62248341aa4600ad5b4936fe904feac19bce6c1b4767d977",
-          "at": "2026-07-27T10:43:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:03be39cb9b994e2e62248341aa4600ad5b4936fe904feac19bce6c1b4767d977",
-          "at": "2026-07-27T10:47:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:03be39cb9b994e2e62248341aa4600ad5b4936fe904feac19bce6c1b4767d977",
-          "at": "2026-07-27T10:51:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e81de1d70deaab83dd066a681147249f32931a05a7670da457f6b490fb6a9c9",
-          "at": "2026-07-28T06:08:16Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4e81de1d70deaab83dd066a681147249f32931a05a7670da457f6b490fb6a9c9",
-          "at": "2026-07-28T06:10:16Z"
+          "hash": "rvw1:sha256:c7b9c2484a37c32910d5530535ab2c35228f042032c94baad56c7100254b76f3",
+          "at": "2026-07-28T11:55:07Z"
         }
       ]
     },
@@ -3340,6 +3646,20 @@
           "findings": [],
           "hash": "rvw1:sha256:9306a340cb8f64b7fbeecf695176b55da8f62644f758e0dd8e810a4e68bae5d8",
           "at": "2026-07-28T10:14:05Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a86ce946d20ec75c2ed81931993378b94470125e6a9a7f7bcbb2716167285a3",
+          "at": "2026-07-28T11:28:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1a86ce946d20ec75c2ed81931993378b94470125e6a9a7f7bcbb2716167285a3",
+          "at": "2026-07-28T11:33:26Z"
         }
       ]
     },
@@ -3373,224 +3693,6 @@
           "findings": [],
           "hash": "rvw1:sha256:71b827d604181d81b802fdeadb7dd19b2a2b56e5b384e474afa7bfdc62b4d516",
           "at": "2026-07-26T16:56:56Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eb7bf0dc230b9dc29f7b7693e381b5b94e69030e49697713b72a3bd98ecbdf74",
-          "at": "2026-07-26T03:17:52Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eb7bf0dc230b9dc29f7b7693e381b5b94e69030e49697713b72a3bd98ecbdf74",
-          "at": "2026-07-26T03:28:47Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:07eeb94d7cee9fda1026616a3b6b64b15713a9a08eddbec49acaf18c24be30ce",
-          "at": "2026-07-26T08:41:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ef43c487a62b52b64b5cf0e0e0da08137a9aae00a3e0aba4e036bbb7a50e9927",
-          "at": "2026-07-26T08:56:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`requires()` compares `CapabilityName` values, but `CapabilityName::try_new` stores a trimmed `NonEmptyString`. Consequently, `required_for: [\" reviewer \"]` matches a query for `reviewer`, violating IN-06/AC-06’s non-empty, exact-string matching contract. Preserve non-blank identifiers without normalization (and cover whitespace near-misses).",
-              "severity": "P0",
-              "file": "libs/usecase/src/conventions_resolve/mod.rs",
-              "line": 187,
-              "category": "correctness"
-            }
-          ],
-          "hash": "rvw1:sha256:cd626c6438308172164c24c9581e1875a15348dd90fbe01e2f353b18790c47dd",
-          "at": "2026-07-26T09:23:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ce6b0aa92f9f525dda1e08236d756f573ebfdb557b6c3fee410e4b838087a67c",
-          "at": "2026-07-26T10:12:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ae1c4e91f8c841867350940cf111eb84d0c589929ac2cc92fca2dfa87aede890",
-          "at": "2026-07-26T11:06:01Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:dbd7cf8e063c764244ef7fec15d993d3a794dce630e874865599bc27af35e48d",
-          "at": "2026-07-26T11:37:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b71a03321dcd7672332d38be7c38cf5a38b4bbc6c178cc762c3a47487599083a",
-          "at": "2026-07-26T12:14:47Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`with_conventions` unconditionally adds the `## Project conventions` section heading, contrary to CN-06's requirement that rendered convention obligations contain no section heading. This makes both dispatch routes carry non-conforming discipline text.",
-              "severity": "P1",
-              "file": "libs/usecase/src/capability_exec/values.rs",
-              "line": 305,
-              "category": "contract violation"
-            }
-          ],
-          "hash": "rvw1:sha256:56b4d9b0fd41f5c31b9c8912f92d8404d7d2b08b2cd3b0aed112ef4d45011c23",
-          "at": "2026-07-26T14:49:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4bc29a94b9c32e380854c0dee261ea391deca5279be816b5321a7aca0425e245",
-          "at": "2026-07-26T14:56:29Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4bc29a94b9c32e380854c0dee261ea391deca5279be816b5321a7aca0425e245",
-          "at": "2026-07-26T15:02:51Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`try_new` now rejects paths that remain inside `knowledge/conventions/` when they contain CR/LF or non-UTF-8 bytes. This adds a fail-closed case beyond AC-07/D4, which explicitly limits resolver failure to five conditions and only rejects a path for escaping the convention root. Either preserve such paths losslessly in output or obtain an upstream contract change before rejecting them.",
-              "severity": "P1",
-              "file": "libs/usecase/src/conventions_resolve/mod.rs",
-              "line": 65,
-              "category": "contract_conformance"
-            }
-          ],
-          "hash": "rvw1:sha256:129cc0ec7a1e64f72b96b6fb5fbe9bdc772498b8aa7b1ac2a170ca2f601cb750",
-          "at": "2026-07-26T16:22:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:129cc0ec7a1e64f72b96b6fb5fbe9bdc772498b8aa7b1ac2a170ca2f601cb750",
-          "at": "2026-07-26T16:40:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:78cc06ac7ac9ff781e580891a4ae577fae6e64bbecadad4ac3365064f4c71787",
-          "at": "2026-07-27T01:42:44Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25bb5a922d0df1eb015f08c1a2d776f02d8b52996fa157668431784200264157",
-          "at": "2026-07-27T10:42:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:25bb5a922d0df1eb015f08c1a2d776f02d8b52996fa157668431784200264157",
-          "at": "2026-07-27T10:47:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aaac2eaf124ee75243fccb48429e81b6a292787ef50543b69312f8862ab573ad",
-          "at": "2026-07-27T11:06:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aaac2eaf124ee75243fccb48429e81b6a292787ef50543b69312f8862ab573ad",
-          "at": "2026-07-27T11:08:26Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:4c4e0e7eea050e2967ad44a246ed9dbf0864acb35ae47519570583cb9e15f3c5",
-          "at": "2026-07-27T13:39:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The cross-dispatch test does not fully pin the per-dispatch contract. It always returns the same document, never inspects `dispatches`, and changes capability on the second call. Thus a per-capability cache could skip resolution on a repeated same-capability dispatch, or the interactor could resolve the second capability but reuse the first composed discipline, while every assertion still passes. Add a same-capability repeat plus capability-specific resolver results, and assert the second dispatched discipline uses only its own resolution.",
-              "severity": "P1",
-              "file": "libs/usecase/src/capability_exec.rs",
-              "line": 1649,
-              "category": "test_coverage"
-            }
-          ],
-          "hash": "rvw1:sha256:4c4e0e7eea050e2967ad44a246ed9dbf0864acb35ae47519570583cb9e15f3c5",
-          "at": "2026-07-27T13:45:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16e9db1e726c6323df9d61d9db67212251771ef39922f0c14aa41b254573df5a",
-          "at": "2026-07-27T13:56:02Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16e9db1e726c6323df9d61d9db67212251771ef39922f0c14aa41b254573df5a",
-          "at": "2026-07-27T14:05:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:16e9db1e726c6323df9d61d9db67212251771ef39922f0c14aa41b254573df5a",
-          "at": "2026-07-27T14:07:18Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca77826ab0220f02171de0e979d3746191639dbbc3af21ce5b7279c95c4d81db",
-          "at": "2026-07-28T01:20:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:ca77826ab0220f02171de0e979d3746191639dbbc3af21ce5b7279c95c4d81db",
-          "at": "2026-07-28T01:23:59Z"
         }
       ]
     }

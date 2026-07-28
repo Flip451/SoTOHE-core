@@ -16,7 +16,7 @@ TDDD 型カタログ v5 の schema 詳細リファレンス。wire format / role
 ## Scope
 
 - Applies to: `track/items/<id>/<layer>-types.json` (schema_version 5) を読む・注釈する・手直しする・レビューするすべての場面。type-designer capability / reviewer / orchestrator / 人間の開発者。
-- Does not apply to: workflow 手順そのもの (生成 + 注釈の実行手順は `.harness/capabilities/type-designer.md` が SSoT)。role / kind の**選定判断** (`knowledge/conventions/type-designer-kind-selection.md` が SSoT)。
+- Does not apply to: workflow 手順そのもの (生成 + 注釈の実行手順は `.harness/capabilities/type-designer.md` が SSoT)。role / kind の**選定判断**と層配置 — プロジェクト固有の追加拘束があれば、それはプロジェクトが所有する convention 群が持つ。capability への dispatch では resolver がその実際の path を渡すが、0 件の解決も有効である。その場合は capability 定義と機械制約が完全なルールセットとなる。本書は文書名も節構成も前提にしない。
 
 ## Document structure
 
@@ -312,7 +312,7 @@ Concrete catalogue shapes. In the generate + annotate workflow the skeletons are
 
 > **Schema Reference takes precedence.** The cookbook examples below are written in the normative **v5 wire format**: `role` uses the discriminated-object form for type-section and trait-section entries (e.g. `"role": { "ValueObject": {} }`, `"role": { "SecondaryPort": {} }`), while function-section entries keep the plain-string form (`"role": "UseCaseFunction"` — `FunctionRole` is a fieldless enum, wired as `role: String` in the codec DTO). If a cookbook literal ever diverges from the schema reference sections above, the schema reference sections win.
 
-> **Layer-name disclaimer.** The cookbook examples below use the layer / crate name placeholders `<core-crate>` (a layer that may host roles like `"ValueObject"` / `"SecondaryPort"`) and `<adapter-crate>` (a layer that may host roles like `"SecondaryAdapter"`). For *this* workspace, the actual names are listed in `architecture-rules.json` and the legal role × layer combinations are specified in `knowledge/conventions/type-designer-kind-selection.md` § R1. Substitute the placeholders for the real names — do not copy the placeholders verbatim into the JSON. The catalogue file name follows the pattern `<layer>-types.json` (e.g. `<core-crate>-types.json`); locate the legal layer names from the SSoT pair.
+> **Layer-name disclaimer.** The cookbook examples below use the layer / crate name placeholders `<core-crate>` (a layer that may host roles like `"ValueObject"` / `"SecondaryPort"`) and `<adapter-crate>` (a layer that may host roles like `"SecondaryAdapter"`). For *this* workspace, the actual layer ids are listed in `architecture-rules.json`, and the layers each role may occupy are enumerated per role by the `KindLayerConstraint` rows of the shipped catalogue-lint configuration (`.harness/catalogue-lint/config.json`). Those two settle **which** layer names are legal for a given role; **which** of the permitted layers to pick is the project's own additional placement policy when resolver-delivered project-owned conventions declare one — the lint does not adjudicate that choice. A zero-document resolution is valid; then the capability definition together with these machine constraints is the complete rule set. Substitute the placeholders for the real names — do not copy the placeholders verbatim into the JSON. The catalogue file name follows the pattern `<layer>-types.json` (e.g. `<core-crate>-types.json`); locate the legal layer names from `architecture-rules.json` and the matching `permitted_layers` rows.
 
 Patterns 1 and 3 show complete documents with `"schema_version": 5`. Patterns 2, 4–8 show partial BTreeMap sections (e.g. `"types": { ... }`) extracted from a full document for conciseness; they use `jsonc` fences because some contain `//` annotation comments. The codec accepts only `"schema_version": 5` — versions 1–4 are rejected fail-closed (v4 with a migration prompt).
 
@@ -466,7 +466,7 @@ ADR decision lifecycle `Proposed → Accepted → Implemented → Superseded | D
 }
 ```
 
-Anti-pattern: a flat `Enum` `DecisionStatus { Proposed, Accepted, ... }` plus a plain-shape struct `{ status: DecisionStatus, implemented_in: Option<String>, superseded_by: Option<String> }`. That shape permits `Proposed { superseded_by: Some(...) }` — runtime invariants only. Per `knowledge/conventions/prefer-type-safe-abstractions.md` § Enum-first / § Typestate, use a typestate cluster instead.
+Anti-pattern: a flat `Enum` `DecisionStatus { Proposed, Accepted, ... }` plus a plain-shape struct `{ status: DecisionStatus, implemented_in: Option<String>, superseded_by: Option<String> }`. That shape permits `Proposed { superseded_by: Some(...) }` — runtime invariants only. Use a typestate cluster instead.
 
 ### Pattern 2: Pure enum with variant payloads (finite values, no transitions)
 
@@ -698,7 +698,7 @@ A `type_alias` entry is for a genuine Rust `pub type` declaration — a named al
 
 A `reference` entry is for a **pre-existing workspace type already in baseline** that this track does not modify. It is included only so that edges that reference it (`trait_impls`, `params[].ty`, etc.) appear in the contract-map / baseline-graph rendering.
 
-A `reference` entry's methods / fields do not drive Phase 2 structural equality: Phase 2 compares the baseline item (B) against the current source (C), not the catalogue declaration (A). They are still required for the authoring contract. `sotp catalog import --action reference` carries the rustdoc shape unchanged; keep that baseline shape intact, including the full baseline method list for referenced ports. Do not shrink a reference trait to `methods: []` unless the baseline trait actually has no methods: R7 requires baseline port methods to be enumerated, and capability step 12c requires every reference entry to be confirmed baseline-identical.
+A `reference` entry's methods / fields do not drive Phase 2 structural equality: Phase 2 compares the baseline item (B) against the current source (C), not the catalogue declaration (A). They are still required for the authoring contract. `sotp catalog import --action reference` carries the rustdoc shape unchanged; keep that baseline shape intact, including the full baseline method list for referenced ports. Do not shrink a reference trait to `methods: []` unless the baseline trait actually has no methods: capability step 12c requires every `reference` entry to be confirmed baseline-identical.
 
 ```jsonc
 "traits": {
@@ -738,6 +738,7 @@ A `reference` entry's methods / fields do not drive Phase 2 structural equality:
 ## Related Documents
 
 - `.harness/capabilities/type-designer.md` — 生成 + 注釈 workflow の手順書 (capability operational SSoT)
-- `knowledge/conventions/type-designer-kind-selection.md` — role / kind 選定の拘束ルール (R1-R10)
+- プロジェクト所有の convention 群 — resolver が返す場合の role / kind 選定と層配置のプロジェクト固有の追加拘束。0 件の解決も有効であり、その場合は capability 定義と機械制約が完全なルールセットとなる (本書は文書名を持たない)
+- `architecture-rules.json` + `.harness/catalogue-lint/config.json` の `KindLayerConstraint` — 層 id と、role ごとに許可される層の機械制約
 - `knowledge/adr/README.md` — 設計判断の索引（履歴を確認する必要がある場合）
 - `bin/sotp catalog check` — catalogue の consumer-available validation
