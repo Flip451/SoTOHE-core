@@ -1,414 +1,105 @@
 {
   "schema_version": 2,
   "scopes": {
-    "adr": {
+    "spec": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5ce2edadf548aa73c048b12a92127764347b1ca881c4f4923ce48b037d80b303",
-          "at": "2026-07-27T00:54:53Z"
+          "hash": "rvw1:sha256:5f5e2a1a1841aa488e15957c378800cb46653cdc33f01aea7b121ed3df8a1589",
+          "at": "2026-07-27T02:49:31Z"
         },
         {
           "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "D3 は「baseline と実測が同一の宣言を読む」だけで feature 集合の乖離が構造的に不可能になるとしていますが、この commit 対象成果物は両取得の間に変更できます。baseline 後に宣言が更新されれば、同じパスを読んでも異なる feature 集合で抽出され、Context の中核要件と矛盾します。両取得を同一内容へ拘束する決定が必要です（具体的な形式は下流へ委ねられます）。",
-              "severity": "P1",
-              "file": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
-              "line": 68,
-              "category": "inconsistent decisions within the same ADR"
-            }
-          ],
-          "hash": "rvw1:sha256:5ce2edadf548aa73c048b12a92127764347b1ca881c4f4923ce48b037d80b303",
-          "at": "2026-07-27T00:57:45Z"
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5f5e2a1a1841aa488e15957c378800cb46653cdc33f01aea7b121ed3df8a1589",
+          "at": "2026-07-27T02:52:36Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:312e3823bde4aa58374a77d63bdc6933c9f5d99fa5d28d38eb7de6c8becf6fbb",
-          "at": "2026-07-27T01:03:52Z"
+          "hash": "rvw1:sha256:e0456a03b249c72e6a0c0cae09c98f427a9b35da50879872fa6847304997ce68",
+          "at": "2026-07-27T06:50:35Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:312e3823bde4aa58374a77d63bdc6933c9f5d99fa5d28d38eb7de6c8becf6fbb",
-          "at": "2026-07-27T01:06:45Z"
+          "hash": "rvw1:sha256:e0456a03b249c72e6a0c0cae09c98f427a9b35da50879872fa6847304997ce68",
+          "at": "2026-07-27T06:52:51Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3c59bec9944232a1bc692cf2bf9e75f686164690f3d82e579126fc4d6b731950",
-          "at": "2026-07-27T01:49:10Z"
+          "hash": "rvw1:sha256:8577685935d7500d73a4dcdfd4c2a9f7e208589baab7e506395ca4af1db87050",
+          "at": "2026-07-27T07:25:33Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:3c59bec9944232a1bc692cf2bf9e75f686164690f3d82e579126fc4d6b731950",
-          "at": "2026-07-27T01:51:58Z"
+          "hash": "rvw1:sha256:8577685935d7500d73a4dcdfd4c2a9f7e208589baab7e506395ca4af1db87050",
+          "at": "2026-07-27T07:26:18Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8577685935d7500d73a4dcdfd4c2a9f7e208589baab7e506395ca4af1db87050",
+          "at": "2026-07-27T07:29:35Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:49556c547d8af9785760ba33527a7ab7addb7f7aaaeea37c4d1c57a62160fd0d",
-          "at": "2026-07-28T06:35:46Z"
+          "hash": "rvw1:sha256:d376df4f3f3c24af0aa965d2b97faef0dfaf2edcfce9c2241ec915d08788f0a5",
+          "at": "2026-07-27T11:21:36Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:49556c547d8af9785760ba33527a7ab7addb7f7aaaeea37c4d1c57a62160fd0d",
-          "at": "2026-07-28T06:38:18Z"
-        }
-      ]
-    },
-    "cli": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d791f2cf8850d22f1bee4f4b5c7285453aeec7347762d0cd5587967fb4ee839e",
-          "at": "2026-07-27T10:25:06Z"
+          "hash": "rvw1:sha256:d376df4f3f3c24af0aa965d2b97faef0dfaf2edcfce9c2241ec915d08788f0a5",
+          "at": "2026-07-27T11:23:07Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:d791f2cf8850d22f1bee4f4b5c7285453aeec7347762d0cd5587967fb4ee839e",
-          "at": "2026-07-27T10:27:31Z"
+          "hash": "rvw1:sha256:d376df4f3f3c24af0aa965d2b97faef0dfaf2edcfce9c2241ec915d08788f0a5",
+          "at": "2026-07-27T11:23:55Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d376df4f3f3c24af0aa965d2b97faef0dfaf2edcfce9c2241ec915d08788f0a5",
+          "at": "2026-07-27T11:25:23Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bcddb3d532da6900baf152166e2b66d8f0163ce38b55d6a9e31e9c30804b3a3f",
-          "at": "2026-07-28T06:36:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bcddb3d532da6900baf152166e2b66d8f0163ce38b55d6a9e31e9c30804b3a3f",
-          "at": "2026-07-28T06:37:00Z"
+          "hash": "rvw1:sha256:af784686fa71d7a881e6e8c279afad295575186a68e63272ed969a9eaac70c68",
+          "at": "2026-07-27T14:25:12Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:bcddb3d532da6900baf152166e2b66d8f0163ce38b55d6a9e31e9c30804b3a3f",
-          "at": "2026-07-28T06:50:06Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:593dbefa0f8261e9cf6f9fda7a9fe2fc93a105661a44ce34ca7c24d4f04932c5",
-          "at": "2026-07-28T07:42:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`test_baseline_capture_no_layer_filter_iterates_all_enabled_bindings` still creates an existing domain baseline without `tddd-features-baseline.json`. The new fail-closed guard therefore rejects this fixture before it can skip domain and attempt usecase export, while the broad `is_err()` assertion still passes for the wrong reason. Add `write_feature_declaration_snapshot(&track_dir)` (and initialize the track Git repository if needed), then assert the expected usecase-export failure so the test continues to cover iteration across all bindings.",
-              "severity": "P1",
-              "file": "apps/cli/src/commands/track/tddd/baseline.rs",
-              "line": 314,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:593dbefa0f8261e9cf6f9fda7a9fe2fc93a105661a44ce34ca7c24d4f04932c5",
-          "at": "2026-07-28T07:45:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:15d2428c449d8087fcf68fe8148bc75e414dace5e9868bf086d2a8b8fbb89f60",
-          "at": "2026-07-28T08:15:11Z"
+          "hash": "rvw1:sha256:af784686fa71d7a881e6e8c279afad295575186a68e63272ed969a9eaac70c68",
+          "at": "2026-07-27T15:10:17Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:15d2428c449d8087fcf68fe8148bc75e414dace5e9868bf086d2a8b8fbb89f60",
-          "at": "2026-07-28T08:16:04Z"
-        }
-      ]
-    },
-    "cli_composition": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:56d2f01b02cab38ff9d67f1dede68862dac0a18987b1bfa8f6e4bcb83eec1672",
-          "at": "2026-07-27T10:25:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:56d2f01b02cab38ff9d67f1dede68862dac0a18987b1bfa8f6e4bcb83eec1672",
-          "at": "2026-07-27T10:27:55Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:751ddc66bbe90599dc39bb90a2f4ad618425f9295c1acf340a291b3bc7a6da27",
-          "at": "2026-07-27T12:43:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:751ddc66bbe90599dc39bb90a2f4ad618425f9295c1acf340a291b3bc7a6da27",
-          "at": "2026-07-27T12:46:12Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9e9d944e80acfa1487f327a1a482641e0613512fff1c794e258ff4761553536c",
-          "at": "2026-07-28T01:56:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:9e9d944e80acfa1487f327a1a482641e0613512fff1c794e258ff4761553536c",
-          "at": "2026-07-28T01:59:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:384ba9911a73b3d01d1dbff87d3ada76aa7a598243b96b42604cb41983ff2acb",
-          "at": "2026-07-28T06:35:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:384ba9911a73b3d01d1dbff87d3ada76aa7a598243b96b42604cb41983ff2acb",
-          "at": "2026-07-28T06:40:42Z"
-        }
-      ]
-    },
-    "usecase": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2ddfb49ad9453179908790a08d22757ac1fb30c12e7ae16b2166e157665ab70b",
-          "at": "2026-07-27T04:08:30Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:2ddfb49ad9453179908790a08d22757ac1fb30c12e7ae16b2166e157665ab70b",
-          "at": "2026-07-27T04:12:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3fa86ec72806c86de50ed11bb6deb01433d3a2149b2c14e25a47f25493f0ce16",
-          "at": "2026-07-27T10:25:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:3fa86ec72806c86de50ed11bb6deb01433d3a2149b2c14e25a47f25493f0ce16",
-          "at": "2026-07-27T10:30:17Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fbaf14e1d10b7ac1c82eaff07d00b31bccb73e52981d8ebecd65c172c16d7bc2",
-          "at": "2026-07-27T12:43:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`SymlinkRejected(PathBuf)` is populated with the formatted `SymlinkGuardError`, not a path. For example, a symlink error produces a payload like `\"symlink detected at path: /x\"`, so callers receive a fabricated relative path instead of `/x`; the same pattern recurs for the other guard calls and in `helpers.rs`. Match the guard error and preserve its actual path (and model any I/O reason separately).",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_impl_signals/interactor.rs",
-              "line": 141,
-              "category": "architecture"
-            },
-            {
-              "message": "The AC-04 regression only records the features passed to actual capture; both rustdoc methods return empty crates and the evaluator inspects neither surface. It therefore passes if the baseline omitted the feature-gated item or if actual extraction ignored the feature. Add coverage asserting that the declared gated public item appears in both baseline and current extracted surfaces.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_impl_signals/interactor_tests.rs",
-              "line": 657,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:fbaf14e1d10b7ac1c82eaff07d00b31bccb73e52981d8ebecd65c172c16d7bc2",
-          "at": "2026-07-27T12:48:00Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "This does not exercise AC-06: the mock port directly fabricates `CatalogueUsesUndeclaredFeature`, while `minimal_catalogue_doc` contains no feature-gated entry and no declaration omitting `semantic-dup` is supplied. The test therefore passes even if production never detects a catalogue/declaration mismatch. Construct the gated catalogue plus omitted-feature declaration and assert the resulting fail-closed refusal through the actual validation path.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_impl_signals/interactor_tests.rs",
-              "line": 857,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:3507ba565364a1942a2cbc416f9ef86e8255c62922af3d76fdadee855805eafa",
-          "at": "2026-07-27T13:33:32Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The AC-06 test still implements the behavior entirely inside its fake port. The inserted `TypeEntry` has no association with `gated_feature`; that relationship exists only in separate test fields, and the test-only `if !declared_features.contains(...)` manufactures the expected rejection. It therefore passes even if production never derives a catalogue item's feature gate or rejects the mismatch. Exercise the production validation that establishes this association; if the current declared model cannot represent it, stop for the Phase 2 re-dispatch required by the briefing.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_impl_signals/interactor_tests.rs",
-              "line": 872,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:736fb528ec542f16e704b7004c066ecc49297cedc7084b10240a852e48f21533",
-          "at": "2026-07-27T13:40:23Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The AC-06 scenario violates the frozen-declaration invariant: `EmptyFeatureDeclaration` supplies no features, yet the baseline loader returns the gated item while actual capture omits it. The fake evaluator then emits Red only for `(catalogue, baseline, actual) = (true, true, false)`, so the test proves artificial baseline/actual drift rather than an undeclared feature omitting the item from both captures. Model both extracted surfaces without the item and assert the resulting real chain-③ non-Blue outcome.",
-              "severity": "P1",
-              "file": "libs/usecase/src/catalogue_impl_signals/interactor_tests.rs",
-              "line": 527,
-              "category": "testing"
-            }
-          ],
-          "hash": "rvw1:sha256:fc0c3410104adfe806701dd63409d1ff89c8c2cb94d77a0b5020d61119ffbe79",
-          "at": "2026-07-27T14:36:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:690d1c3e52ee372a5677547565ae8913ece7f6a6a7439f78cebb9f233cc7ccbf",
-          "at": "2026-07-27T14:41:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:539853e14614bf71e42f6a9e33e6fdd507f3fe591d9943e2e31c3cb58e31c805",
-          "at": "2026-07-27T15:00:50Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8e9c7be0efa1aa1d04286554bd0a82fb2d634e72daed953871a1b232326fa49a",
-          "at": "2026-07-27T15:29:22Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8e9c7be0efa1aa1d04286554bd0a82fb2d634e72daed953871a1b232326fa49a",
-          "at": "2026-07-27T15:31:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:276fa66252e39a5d2f58aa8afaf032f2c9766d8e9ba5768822342ed7c2812843",
-          "at": "2026-07-28T01:56:15Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:276fa66252e39a5d2f58aa8afaf032f2c9766d8e9ba5768822342ed7c2812843",
-          "at": "2026-07-28T02:00:38Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:818cfc6a90e01b3949d901081c354b5608fa65519c2501b84ef6ca6cf580ea95",
-          "at": "2026-07-28T02:43:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:818cfc6a90e01b3949d901081c354b5608fa65519c2501b84ef6ca6cf580ea95",
-          "at": "2026-07-28T02:44:57Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c2e94e036d1d16f13c45d24b2766959a23804883fec92e8ff2e3b4c450d54929",
-          "at": "2026-07-28T06:35:50Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c2e94e036d1d16f13c45d24b2766959a23804883fec92e8ff2e3b4c450d54929",
-          "at": "2026-07-28T06:37:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fdfd36e40e0dee205e61b5f90f1e9a06facf7163bbb255e944fcccade1830fca",
-          "at": "2026-07-28T07:43:05Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:fdfd36e40e0dee205e61b5f90f1e9a06facf7163bbb255e944fcccade1830fca",
-          "at": "2026-07-28T07:45:57Z"
-        }
-      ]
-    },
-    "cli_driver": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30b7c5a5b8d557d24ebb2bda9515d57951161bd86b762b4ce09171f6a4e8fde7",
-          "at": "2026-07-28T06:35:45Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:30b7c5a5b8d557d24ebb2bda9515d57951161bd86b762b4ce09171f6a4e8fde7",
-          "at": "2026-07-28T06:39:13Z"
+          "hash": "rvw1:sha256:af784686fa71d7a881e6e8c279afad295575186a68e63272ed969a9eaac70c68",
+          "at": "2026-07-27T15:13:24Z"
         }
       ]
     },
@@ -540,6 +231,448 @@
         }
       ]
     },
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T001 restates the upstream behavior contract (validated names, deterministic lists, and rejected declaration shapes) instead of limiting the description to target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
+              "line": 12,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T002 restates fail-closed behavior and detailed rejection cases from the upstream contract.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
+              "line": 19,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T003 restates upstream capture semantics, including argument propagation and absence-before-rustdoc behavior.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
+              "line": 26,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T004 restates upstream actual-capture behavior, including exact-list use, declaration requirements, and persisted-JSON exceptions.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
+              "line": 33,
+              "category": "upstream restatement"
+            },
+            {
+              "message": "T005 restates upstream behavioral requirements for signal evaluation and CLI compatibility rather than using only target + operation + anchor cite.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
+              "line": 40,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:b60c60cb6fca92d796e97b077956ad0b42e27c20604804485c3dfa78b1ff6434",
+          "at": "2026-07-27T02:49:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `plan.summary` restates upstream design rationale and behavior: self-hosting commit order, preservation of the command interface, and proving the semantic-dup surface is blue. Per policy, plan sections must use target + operation + anchor cite only.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
+              "line": 47,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:77e6af43897fe2b51201f1498d1e606c6582fbb759610ebdda8a25487b4edbad",
+          "at": "2026-07-27T02:52:03Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:be1b637499ad0b4fef0e4af7a821f0d3722057b8ac41355add87e7027a09884a",
+          "at": "2026-07-27T02:53:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 maps IN-02/AC-02 to runtime capture changes, but no task updates the type-designer workflow to author `tddd-features.json` before baseline capture. The current capability still runs baseline capture first, so once T003 makes missing declarations fail closed, future tracks cannot reach the authoring step. Add an executable workflow task and map IN-02/IN-04/AC-01/AC-02 to it.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/task-coverage.json",
+              "line": 5,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "`plan.summary` is empty even though the spec defines GO-01 and GO-02. The impl-plan policy requires explicit goal-to-task traceability in this field; task-coverage intentionally cannot provide it.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
+              "line": 36,
+              "category": "task-coverage gap"
+            },
+            {
+              "message": "T003 targets `libs/infrastructure/src/schema_export/mod.rs` for `RustdocSchemaExporter`, but that file does not exist; the symbol is defined in `libs/infrastructure/src/schema_export.rs`. Creating both paths would also make the Rust module ambiguous. Correct the task's target path.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
+              "line": 18,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:04247cd3c93adf9fa16f3f1bceae8be43b7beb025fbc9263ab6d3eac9a036047",
+          "at": "2026-07-27T02:59:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 の「author `tddd-features.json` for every track before its first `baseline-capture`」は IN-02/IN-04/AC-02 の挙動契約を散文で再記述している。`knowledge/conventions/no-upstream-restatement.md` に従い、対象・操作と anchor cite だけに置き換えること。",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
+              "line": 18,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:4cec89498add70e559c52b9840019685e26b5a01d124c87613e30ec4eb25fb5c",
+          "at": "2026-07-27T03:04:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa836713cd7f8d90e7dacf739f467571b61903adee63f11e697b7c1e5e1b3ad6",
+          "at": "2026-07-27T03:06:52Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eba43a0dc4a005c08f9f7bf3ad3ef87f281a0ed8e275032ab00e6e6e23cb7b45",
+          "at": "2026-07-27T03:22:25Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:eba43a0dc4a005c08f9f7bf3ad3ef87f281a0ed8e275032ab00e6e6e23cb7b45",
+          "at": "2026-07-27T03:24:27Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:018a1879885f7ba04e73ea40437ab410571c5e0cc15ac605e63b5ed7895227b3",
+          "at": "2026-07-27T04:08:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:018a1879885f7ba04e73ea40437ab410571c5e0cc15ac605e63b5ed7895227b3",
+          "at": "2026-07-27T04:10:09Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b5756b08a45e176c9af1d0c34dfbe4b391cf64d841dd5d41d0f8c262b9afede9",
+          "at": "2026-07-27T06:50:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b5756b08a45e176c9af1d0c34dfbe4b391cf64d841dd5d41d0f8c262b9afede9",
+          "at": "2026-07-27T06:51:25Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e82d1fa72afbf286833e0eb34c1a4a5e9da725f4f88ac275346ef70564b1c9b",
+          "at": "2026-07-27T07:08:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e82d1fa72afbf286833e0eb34c1a4a5e9da725f4f88ac275346ef70564b1c9b",
+          "at": "2026-07-27T07:10:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e82d1fa72afbf286833e0eb34c1a4a5e9da725f4f88ac275346ef70564b1c9b",
+          "at": "2026-07-27T07:10:54Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e82d1fa72afbf286833e0eb34c1a4a5e9da725f4f88ac275346ef70564b1c9b",
+          "at": "2026-07-27T07:11:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7e82d1fa72afbf286833e0eb34c1a4a5e9da725f4f88ac275346ef70564b1c9b",
+          "at": "2026-07-27T07:18:23Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:364cd80e04f66bad973cb92cc865a4568e2b203456d054687725a253ddd3f374",
+          "at": "2026-07-27T10:25:13Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:364cd80e04f66bad973cb92cc865a4568e2b203456d054687725a253ddd3f374",
+          "at": "2026-07-27T10:26:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d2ca4514806ef27c7c6b736e4f59bb00ef039bbd41661e0f30d95caa6572e0e",
+          "at": "2026-07-27T12:01:34Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d2ca4514806ef27c7c6b736e4f59bb00ef039bbd41661e0f30d95caa6572e0e",
+          "at": "2026-07-27T12:02:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5d2ca4514806ef27c7c6b736e4f59bb00ef039bbd41661e0f30d95caa6572e0e",
+          "at": "2026-07-27T12:03:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05ab9054d475b365b3e699fc30ed600e2280f948cb76e1971cdb3a49288c4612",
+          "at": "2026-07-27T12:43:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:05ab9054d475b365b3e699fc30ed600e2280f948cb76e1971cdb3a49288c4612",
+          "at": "2026-07-27T12:47:22Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:371e02128e86301c95c330aede36eef6c692d8148c81798a676e1a46a6a5c22b",
+          "at": "2026-07-27T15:14:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 is the task that authors `tddd-features.json`, but it does not cite the newly added `CN-06`, and no other task carries that constraint; the current coverage map also lacks a `constraints[\"CN-06\"]` mapping. This leaves the feature-selection constraint uncovered despite the stated 26-element coverage. Add `CN-06` to T003's anchors and map it to T003.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
+              "line": 16,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:371e02128e86301c95c330aede36eef6c692d8148c81798a676e1a46a6a5c22b",
+          "at": "2026-07-27T15:17:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:706e56af261f0981052e65c42ce1273e0fdac43e6b885253f5a047223bdbd83a",
+          "at": "2026-07-27T15:29:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:706e56af261f0981052e65c42ce1273e0fdac43e6b885253f5a047223bdbd83a",
+          "at": "2026-07-27T15:32:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8827c6abb1b79cdecf01c9bf7aa6082f1077ec00123fbfd0d3ac686aef08fa41",
+          "at": "2026-07-28T01:56:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8827c6abb1b79cdecf01c9bf7aa6082f1077ec00123fbfd0d3ac686aef08fa41",
+          "at": "2026-07-28T02:00:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db36939470d18050fedc351b1436687875405e3a64d967e42b9fea17feafd44e",
+          "at": "2026-07-28T02:46:57Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:db36939470d18050fedc351b1436687875405e3a64d967e42b9fea17feafd44e",
+          "at": "2026-07-28T02:49:51Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5834b9e64a68b057acce9c1d4c5ea49d15e32d877e2e1c0d4bf8e6d6be48af51",
+          "at": "2026-07-28T06:35:49Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T006 still names `apps/cli-composition/src/signal/mod.rs` as the canonical signal-wiring target, but the merge moved that execution path to `libs/infrastructure/src/signal.rs::SystemSignalCommandAdapter::calc_impl`, where this track now performs the feature-declaration injection. Update the task target so the plan covers the actual merge-resolved edit; otherwise an executor following T006 would miss the active call site.",
+              "severity": "P1",
+              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
+              "line": 26,
+              "category": "task description non-executable"
+            }
+          ],
+          "hash": "rvw1:sha256:5834b9e64a68b057acce9c1d4c5ea49d15e32d877e2e1c0d4bf8e6d6be48af51",
+          "at": "2026-07-28T06:38:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1cc2fc8e7d09535a2264652d170377f417b92a5009c020ad50e3e630b34b1958",
+          "at": "2026-07-28T06:50:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1cc2fc8e7d09535a2264652d170377f417b92a5009c020ad50e3e630b34b1958",
+          "at": "2026-07-28T06:51:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c77acb2b3870e57a4c65e1279b8ac4da4bda958822ebb63923e9d19e2e25448",
+          "at": "2026-07-28T06:54:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:1c77acb2b3870e57a4c65e1279b8ac4da4bda958822ebb63923e9d19e2e25448",
+          "at": "2026-07-28T06:54:42Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:5ce2edadf548aa73c048b12a92127764347b1ca881c4f4923ce48b037d80b303",
+          "at": "2026-07-27T00:54:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 は「baseline と実測が同一の宣言を読む」だけで feature 集合の乖離が構造的に不可能になるとしていますが、この commit 対象成果物は両取得の間に変更できます。baseline 後に宣言が更新されれば、同じパスを読んでも異なる feature 集合で抽出され、Context の中核要件と矛盾します。両取得を同一内容へ拘束する決定が必要です（具体的な形式は下流へ委ねられます）。",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-27-0039-tddd-track-scoped-feature-declaration.md",
+              "line": 68,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:5ce2edadf548aa73c048b12a92127764347b1ca881c4f4923ce48b037d80b303",
+          "at": "2026-07-27T00:57:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:312e3823bde4aa58374a77d63bdc6933c9f5d99fa5d28d38eb7de6c8becf6fbb",
+          "at": "2026-07-27T01:03:52Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:312e3823bde4aa58374a77d63bdc6933c9f5d99fa5d28d38eb7de6c8becf6fbb",
+          "at": "2026-07-27T01:06:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c59bec9944232a1bc692cf2bf9e75f686164690f3d82e579126fc4d6b731950",
+          "at": "2026-07-27T01:49:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3c59bec9944232a1bc692cf2bf9e75f686164690f3d82e579126fc4d6b731950",
+          "at": "2026-07-27T01:51:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49556c547d8af9785760ba33527a7ab7addb7f7aaaeea37c4d1c57a62160fd0d",
+          "at": "2026-07-28T06:35:46Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:49556c547d8af9785760ba33527a7ab7addb7f7aaaeea37c4d1c57a62160fd0d",
+          "at": "2026-07-28T06:38:18Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c41d3a1681aa7f16ae35c94f5276a088f09e846eb89568853a73052affa15ed",
+          "at": "2026-07-28T08:41:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2c41d3a1681aa7f16ae35c94f5276a088f09e846eb89568853a73052affa15ed",
+          "at": "2026-07-28T08:44:30Z"
+        }
+      ]
+    },
     "domain": {
       "rounds": [
         {
@@ -626,253 +759,6 @@
           "findings": [],
           "hash": "rvw1:sha256:d2a63eb9fdcc8feb8b9074f1cbbeb40c0a6763cc40cb8188350309342be98532",
           "at": "2026-07-28T06:39:18Z"
-        }
-      ]
-    },
-    "infrastructure": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The versioned declaration DTO does not use `#[serde(deny_unknown_fields)]`. A future declaration containing extra fields is accepted and silently truncated, so schema-versioned input can be misinterpreted instead of failing closed.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 92,
-              "category": "serde codec break"
-            },
-            {
-              "message": "Snapshot creation writes directly to the newly created file. A concurrent baseline/actual capture can observe the snapshot after `create_new` but before `write_all`/`sync_all` completes, producing a transient mismatch or accepting an incomplete snapshot. Use an atomic temp-file write/rename or equivalent synchronization.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 287,
-              "category": "snapshot concurrency"
-            }
-          ],
-          "hash": "rvw1:sha256:ce651b026513f30c2745c70e20b850dc5c502dd5f1b76581664338173ac23966",
-          "at": "2026-07-27T04:08:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1879b90c723866ad4952affffcf5d4f36be9823fe27f16a2ab014d2e62e91712",
-          "at": "2026-07-27T04:38:37Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Workspace member paths are joined without containment validation. An absolute member or one containing `..` can escape `workspace_root`; `reject_symlinks_below` checks symlinks but does not prove containment, allowing an out-of-root Cargo.toml to be read and accepted. Reject absolute/parent components and verify the normalized path remains under the trusted root.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 232,
-              "category": "trusted-root violation"
-            },
-            {
-              "message": "`reject_symlinks_below` deliberately excludes `trusted_root`, but the adapter never verifies that `track_dir` and `workspace_root` themselves are real directories. A symlinked root redirects declaration, snapshot, and manifest I/O, including snapshot writes. Reject symlinked trusted roots before performing any path operations.",
-              "severity": "P0",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 273,
-              "category": "symlink not rejected at boundary"
-            },
-            {
-              "message": "Deserializing `layers` directly into a `BTreeMap` silently keeps the last duplicate JSON key. A declaration containing conflicting duplicate layer entries therefore passes instead of failing closed. Use a duplicate-rejecting map deserializer, as existing infrastructure codecs do.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 98,
-              "category": "non-fail-closed config"
-            },
-            {
-              "message": "All declaration, snapshot, and Cargo.toml reads use unbounded `std::fs::read`, so a large input can allocate until memory exhaustion before validation. Enforce an explicit byte limit using metadata plus a bounded reader and return a typed error when exceeded.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 274,
-              "category": "unbounded read"
-            },
-            {
-              "message": "The tests never exercise a successful `load_for_actual` call or concurrent baseline publishers, and omit the declared symlink, unsupported-schema, and malformed-TOML rejection paths. This leaves both a public API happy path and the snapshot concurrency/fail-closed contract unverified.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 456,
-              "category": "test coverage gap"
-            }
-          ],
-          "hash": "rvw1:sha256:c9f778378433d1e048297f63a403213421575323279608faaa794e656866019f",
-          "at": "2026-07-27T05:15:28Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "Concurrent publication of different declaration bytes is misclassified. If another writer creates the snapshot after the initial absence check, `compare_snapshot` returns a diagnostic for differing bytes, but this branch wraps it as `SnapshotWrite` instead of the declared `BaselineSnapshotMismatch`. Existing-snapshot read failures are likewise labeled as writes. Preserve mismatch versus I/O internally and map each to its correct public error; add a deterministic conflicting-publisher test.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 54,
-              "category": "error handling"
-            },
-            {
-              "message": "Cargo.toml structural validation still has silent fallbacks: non-string workspace members are skipped here, and a present but non-table `features` value is treated as an absent feature table via `unwrap_or_default` below. The adapter can therefore accept a semantically invalid manifest instead of failing closed. Reject malformed member entries and malformed `features` values with `ReadDeclaration`, while retaining an actually absent `[features]` table as the valid empty case.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 291,
-              "category": "non-fail-closed config"
-            }
-          ],
-          "hash": "rvw1:sha256:d14462b48e61c066a88aa5514efc539c4035ce8bde7239221ccd3c5c5c51f4e6",
-          "at": "2026-07-27T05:33:42Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The target manifest's `[features]` table is validated only by collecting its keys. Values such as `semantic-dup = 1` or arrays containing non-string entries therefore count as valid declared features even though Cargo rejects that manifest. Validate each feature value as an array of strings (or resolve features through Cargo metadata) and return `ReadDeclaration` for malformed entries.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 338,
-              "category": "non-fail-closed config"
-            },
-            {
-              "message": "`clean_up_temporary` reports cleanup failures only when the original error was `Write`. If publication ends with `Mismatch` or `Read` and removal of the temporary file also fails, that I/O failure is silently discarded and a stale file is left behind. Preserve both causes or promote the cleanup failure to a typed write error instead of swallowing it.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 554,
-              "category": "error handling"
-            }
-          ],
-          "hash": "rvw1:sha256:64adcde8087d3b3cc824b80b83ad6d13671d2d8f710e772b099ffc893cc26425",
-          "at": "2026-07-27T05:44:11Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:bce2cb365db65c781736c0b56b778a145117e91bcf31b0f6f97d63f04349418e",
-          "at": "2026-07-27T05:49:40Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c184c19e7b310fbd26ce647a25d739008b118ee3efec3012c44e75aa6a2ff187",
-          "at": "2026-07-27T06:06:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:f990e4aff6344a01b8daaa7833c6fd33165de9bfa72caa36215a710868c0bf29",
-          "at": "2026-07-27T06:42:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8db0bd1249f2c306fd21ef6ba904be1323b0fd0baa328b2d49366d542a213a36",
-          "at": "2026-07-27T10:25:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8db0bd1249f2c306fd21ef6ba904be1323b0fd0baa328b2d49366d542a213a36",
-          "at": "2026-07-27T10:29:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7fea5ff16508cac0cb5895953f3e0909bb6fccb262f94a258e51cbf64cb50bbe",
-          "at": "2026-07-27T11:04:46Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:760e83b90c10a7626c8c360d6683a0b9d166425b9c4a4d1f84248aacf7392f95",
-          "at": "2026-07-27T12:43:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:760e83b90c10a7626c8c360d6683a0b9d166425b9c4a4d1f84248aacf7392f95",
-          "at": "2026-07-27T12:46:28Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c451fdb4a346ea662a5063c874bcc335eb299a55d1c0976ab4ad49152da60a0a",
-          "at": "2026-07-28T01:56:27Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:c451fdb4a346ea662a5063c874bcc335eb299a55d1c0976ab4ad49152da60a0a",
-          "at": "2026-07-28T02:03:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aee14ca7e11b9c26c9bb4497bcc1a1a0d3aeaf0bff30bc232e58ec7a59dbf181",
-          "at": "2026-07-28T06:35:53Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aee14ca7e11b9c26c9bb4497bcc1a1a0d3aeaf0bff30bc232e58ec7a59dbf181",
-          "at": "2026-07-28T06:46:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aee14ca7e11b9c26c9bb4497bcc1a1a0d3aeaf0bff30bc232e58ec7a59dbf181",
-          "at": "2026-07-28T06:49:56Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:0272f2285a5371e9de14685a792aa98b58fcda6f15888afc18e29a20771d869a",
-          "at": "2026-07-28T07:42:58Z"
-        },
-        {
-          "type": "final",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "`baseline_file` is a public raw string, but this new path probe joins it without validating that the result remains under `track_dir`. `reject_symlinks_below` rejects symlinks but does not enforce containment, so an absolute path or `../` component can probe outside the trusted root and falsely trigger the integrity guard. Validate it as a safe relative filename before calling `symlink_metadata`, following the fail-closed trusted-root pattern.",
-              "severity": "P1",
-              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
-              "line": 249,
-              "category": "trusted-root violation"
-            }
-          ],
-          "hash": "rvw1:sha256:0272f2285a5371e9de14685a792aa98b58fcda6f15888afc18e29a20771d869a",
-          "at": "2026-07-28T07:48:03Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19ea63c8ad530f25d63d4583b49115c182b866e31e3fd8c7ae34353d65f0700f",
-          "at": "2026-07-28T08:15:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:19ea63c8ad530f25d63d4583b49115c182b866e31e3fd8c7ae34353d65f0700f",
-          "at": "2026-07-28T08:18:12Z"
         }
       ]
     },
@@ -1542,108 +1428,6 @@
         }
       ]
     },
-    "spec": {
-      "rounds": [
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5f5e2a1a1841aa488e15957c378800cb46653cdc33f01aea7b121ed3df8a1589",
-          "at": "2026-07-27T02:49:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5f5e2a1a1841aa488e15957c378800cb46653cdc33f01aea7b121ed3df8a1589",
-          "at": "2026-07-27T02:52:36Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e0456a03b249c72e6a0c0cae09c98f427a9b35da50879872fa6847304997ce68",
-          "at": "2026-07-27T06:50:35Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:e0456a03b249c72e6a0c0cae09c98f427a9b35da50879872fa6847304997ce68",
-          "at": "2026-07-27T06:52:51Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8577685935d7500d73a4dcdfd4c2a9f7e208589baab7e506395ca4af1db87050",
-          "at": "2026-07-27T07:25:33Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8577685935d7500d73a4dcdfd4c2a9f7e208589baab7e506395ca4af1db87050",
-          "at": "2026-07-27T07:26:18Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8577685935d7500d73a4dcdfd4c2a9f7e208589baab7e506395ca4af1db87050",
-          "at": "2026-07-27T07:29:35Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d376df4f3f3c24af0aa965d2b97faef0dfaf2edcfce9c2241ec915d08788f0a5",
-          "at": "2026-07-27T11:21:36Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d376df4f3f3c24af0aa965d2b97faef0dfaf2edcfce9c2241ec915d08788f0a5",
-          "at": "2026-07-27T11:23:07Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d376df4f3f3c24af0aa965d2b97faef0dfaf2edcfce9c2241ec915d08788f0a5",
-          "at": "2026-07-27T11:23:55Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:d376df4f3f3c24af0aa965d2b97faef0dfaf2edcfce9c2241ec915d08788f0a5",
-          "at": "2026-07-27T11:25:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af784686fa71d7a881e6e8c279afad295575186a68e63272ed969a9eaac70c68",
-          "at": "2026-07-27T14:25:12Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af784686fa71d7a881e6e8c279afad295575186a68e63272ed969a9eaac70c68",
-          "at": "2026-07-27T15:10:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:af784686fa71d7a881e6e8c279afad295575186a68e63272ed969a9eaac70c68",
-          "at": "2026-07-27T15:13:24Z"
-        }
-      ]
-    },
     "types": {
       "rounds": [
         {
@@ -2136,363 +1920,593 @@
         }
       ]
     },
-    "impl-plan": {
+    "cli_composition": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56d2f01b02cab38ff9d67f1dede68862dac0a18987b1bfa8f6e4bcb83eec1672",
+          "at": "2026-07-27T10:25:14Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:56d2f01b02cab38ff9d67f1dede68862dac0a18987b1bfa8f6e4bcb83eec1672",
+          "at": "2026-07-27T10:27:55Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:751ddc66bbe90599dc39bb90a2f4ad618425f9295c1acf340a291b3bc7a6da27",
+          "at": "2026-07-27T12:43:40Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:751ddc66bbe90599dc39bb90a2f4ad618425f9295c1acf340a291b3bc7a6da27",
+          "at": "2026-07-27T12:46:12Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e9d944e80acfa1487f327a1a482641e0613512fff1c794e258ff4761553536c",
+          "at": "2026-07-28T01:56:12Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9e9d944e80acfa1487f327a1a482641e0613512fff1c794e258ff4761553536c",
+          "at": "2026-07-28T01:59:34Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:384ba9911a73b3d01d1dbff87d3ada76aa7a598243b96b42604cb41983ff2acb",
+          "at": "2026-07-28T06:35:56Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:384ba9911a73b3d01d1dbff87d3ada76aa7a598243b96b42604cb41983ff2acb",
+          "at": "2026-07-28T06:40:42Z"
+        }
+      ]
+    },
+    "usecase": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ddfb49ad9453179908790a08d22757ac1fb30c12e7ae16b2166e157665ab70b",
+          "at": "2026-07-27T04:08:30Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:2ddfb49ad9453179908790a08d22757ac1fb30c12e7ae16b2166e157665ab70b",
+          "at": "2026-07-27T04:12:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3fa86ec72806c86de50ed11bb6deb01433d3a2149b2c14e25a47f25493f0ce16",
+          "at": "2026-07-27T10:25:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:3fa86ec72806c86de50ed11bb6deb01433d3a2149b2c14e25a47f25493f0ce16",
+          "at": "2026-07-27T10:30:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fbaf14e1d10b7ac1c82eaff07d00b31bccb73e52981d8ebecd65c172c16d7bc2",
+          "at": "2026-07-27T12:43:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`SymlinkRejected(PathBuf)` is populated with the formatted `SymlinkGuardError`, not a path. For example, a symlink error produces a payload like `\"symlink detected at path: /x\"`, so callers receive a fabricated relative path instead of `/x`; the same pattern recurs for the other guard calls and in `helpers.rs`. Match the guard error and preserve its actual path (and model any I/O reason separately).",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor.rs",
+              "line": 141,
+              "category": "architecture"
+            },
+            {
+              "message": "The AC-04 regression only records the features passed to actual capture; both rustdoc methods return empty crates and the evaluator inspects neither surface. It therefore passes if the baseline omitted the feature-gated item or if actual extraction ignored the feature. Add coverage asserting that the declared gated public item appears in both baseline and current extracted surfaces.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor_tests.rs",
+              "line": 657,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:fbaf14e1d10b7ac1c82eaff07d00b31bccb73e52981d8ebecd65c172c16d7bc2",
+          "at": "2026-07-27T12:48:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "This does not exercise AC-06: the mock port directly fabricates `CatalogueUsesUndeclaredFeature`, while `minimal_catalogue_doc` contains no feature-gated entry and no declaration omitting `semantic-dup` is supplied. The test therefore passes even if production never detects a catalogue/declaration mismatch. Construct the gated catalogue plus omitted-feature declaration and assert the resulting fail-closed refusal through the actual validation path.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor_tests.rs",
+              "line": 857,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:3507ba565364a1942a2cbc416f9ef86e8255c62922af3d76fdadee855805eafa",
+          "at": "2026-07-27T13:33:32Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The AC-06 test still implements the behavior entirely inside its fake port. The inserted `TypeEntry` has no association with `gated_feature`; that relationship exists only in separate test fields, and the test-only `if !declared_features.contains(...)` manufactures the expected rejection. It therefore passes even if production never derives a catalogue item's feature gate or rejects the mismatch. Exercise the production validation that establishes this association; if the current declared model cannot represent it, stop for the Phase 2 re-dispatch required by the briefing.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor_tests.rs",
+              "line": 872,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:736fb528ec542f16e704b7004c066ecc49297cedc7084b10240a852e48f21533",
+          "at": "2026-07-27T13:40:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The AC-06 scenario violates the frozen-declaration invariant: `EmptyFeatureDeclaration` supplies no features, yet the baseline loader returns the gated item while actual capture omits it. The fake evaluator then emits Red only for `(catalogue, baseline, actual) = (true, true, false)`, so the test proves artificial baseline/actual drift rather than an undeclared feature omitting the item from both captures. Model both extracted surfaces without the item and assert the resulting real chain-③ non-Blue outcome.",
+              "severity": "P1",
+              "file": "libs/usecase/src/catalogue_impl_signals/interactor_tests.rs",
+              "line": 527,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:fc0c3410104adfe806701dd63409d1ff89c8c2cb94d77a0b5020d61119ffbe79",
+          "at": "2026-07-27T14:36:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:690d1c3e52ee372a5677547565ae8913ece7f6a6a7439f78cebb9f233cc7ccbf",
+          "at": "2026-07-27T14:41:35Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:539853e14614bf71e42f6a9e33e6fdd507f3fe591d9943e2e31c3cb58e31c805",
+          "at": "2026-07-27T15:00:50Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e9c7be0efa1aa1d04286554bd0a82fb2d634e72daed953871a1b232326fa49a",
+          "at": "2026-07-27T15:29:22Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8e9c7be0efa1aa1d04286554bd0a82fb2d634e72daed953871a1b232326fa49a",
+          "at": "2026-07-27T15:31:21Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:276fa66252e39a5d2f58aa8afaf032f2c9766d8e9ba5768822342ed7c2812843",
+          "at": "2026-07-28T01:56:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:276fa66252e39a5d2f58aa8afaf032f2c9766d8e9ba5768822342ed7c2812843",
+          "at": "2026-07-28T02:00:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:818cfc6a90e01b3949d901081c354b5608fa65519c2501b84ef6ca6cf580ea95",
+          "at": "2026-07-28T02:43:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:818cfc6a90e01b3949d901081c354b5608fa65519c2501b84ef6ca6cf580ea95",
+          "at": "2026-07-28T02:44:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2e94e036d1d16f13c45d24b2766959a23804883fec92e8ff2e3b4c450d54929",
+          "at": "2026-07-28T06:35:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c2e94e036d1d16f13c45d24b2766959a23804883fec92e8ff2e3b4c450d54929",
+          "at": "2026-07-28T06:37:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fdfd36e40e0dee205e61b5f90f1e9a06facf7163bbb255e944fcccade1830fca",
+          "at": "2026-07-28T07:43:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fdfd36e40e0dee205e61b5f90f1e9a06facf7163bbb255e944fcccade1830fca",
+          "at": "2026-07-28T07:45:57Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d791f2cf8850d22f1bee4f4b5c7285453aeec7347762d0cd5587967fb4ee839e",
+          "at": "2026-07-27T10:25:06Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d791f2cf8850d22f1bee4f4b5c7285453aeec7347762d0cd5587967fb4ee839e",
+          "at": "2026-07-27T10:27:31Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bcddb3d532da6900baf152166e2b66d8f0163ce38b55d6a9e31e9c30804b3a3f",
+          "at": "2026-07-28T06:36:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bcddb3d532da6900baf152166e2b66d8f0163ce38b55d6a9e31e9c30804b3a3f",
+          "at": "2026-07-28T06:37:00Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:bcddb3d532da6900baf152166e2b66d8f0163ce38b55d6a9e31e9c30804b3a3f",
+          "at": "2026-07-28T06:50:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:593dbefa0f8261e9cf6f9fda7a9fe2fc93a105661a44ce34ca7c24d4f04932c5",
+          "at": "2026-07-28T07:42:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`test_baseline_capture_no_layer_filter_iterates_all_enabled_bindings` still creates an existing domain baseline without `tddd-features-baseline.json`. The new fail-closed guard therefore rejects this fixture before it can skip domain and attempt usecase export, while the broad `is_err()` assertion still passes for the wrong reason. Add `write_feature_declaration_snapshot(&track_dir)` (and initialize the track Git repository if needed), then assert the expected usecase-export failure so the test continues to cover iteration across all bindings.",
+              "severity": "P1",
+              "file": "apps/cli/src/commands/track/tddd/baseline.rs",
+              "line": 314,
+              "category": "testing"
+            }
+          ],
+          "hash": "rvw1:sha256:593dbefa0f8261e9cf6f9fda7a9fe2fc93a105661a44ce34ca7c24d4f04932c5",
+          "at": "2026-07-28T07:45:38Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15d2428c449d8087fcf68fe8148bc75e414dace5e9868bf086d2a8b8fbb89f60",
+          "at": "2026-07-28T08:15:11Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:15d2428c449d8087fcf68fe8148bc75e414dace5e9868bf086d2a8b8fbb89f60",
+          "at": "2026-07-28T08:16:04Z"
+        }
+      ]
+    },
+    "cli_driver": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30b7c5a5b8d557d24ebb2bda9515d57951161bd86b762b4ce09171f6a4e8fde7",
+          "at": "2026-07-28T06:35:45Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:30b7c5a5b8d557d24ebb2bda9515d57951161bd86b762b4ce09171f6a4e8fde7",
+          "at": "2026-07-28T06:39:13Z"
+        }
+      ]
+    },
+    "infrastructure": {
       "rounds": [
         {
           "type": "fast",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "T001 restates the upstream behavior contract (validated names, deterministic lists, and rejected declaration shapes) instead of limiting the description to target + operation + anchor cite.",
+              "message": "The versioned declaration DTO does not use `#[serde(deny_unknown_fields)]`. A future declaration containing extra fields is accepted and silently truncated, so schema-versioned input can be misinterpreted instead of failing closed.",
               "severity": "P1",
-              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
-              "line": 12,
-              "category": "upstream restatement"
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 92,
+              "category": "serde codec break"
             },
             {
-              "message": "T002 restates fail-closed behavior and detailed rejection cases from the upstream contract.",
+              "message": "Snapshot creation writes directly to the newly created file. A concurrent baseline/actual capture can observe the snapshot after `create_new` but before `write_all`/`sync_all` completes, producing a transient mismatch or accepting an incomplete snapshot. Use an atomic temp-file write/rename or equivalent synchronization.",
               "severity": "P1",
-              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
-              "line": 19,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T003 restates upstream capture semantics, including argument propagation and absence-before-rustdoc behavior.",
-              "severity": "P1",
-              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
-              "line": 26,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T004 restates upstream actual-capture behavior, including exact-list use, declaration requirements, and persisted-JSON exceptions.",
-              "severity": "P1",
-              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
-              "line": 33,
-              "category": "upstream restatement"
-            },
-            {
-              "message": "T005 restates upstream behavioral requirements for signal evaluation and CLI compatibility rather than using only target + operation + anchor cite.",
-              "severity": "P1",
-              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
-              "line": 40,
-              "category": "upstream restatement"
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 287,
+              "category": "snapshot concurrency"
             }
           ],
-          "hash": "rvw1:sha256:b60c60cb6fca92d796e97b077956ad0b42e27c20604804485c3dfa78b1ff6434",
-          "at": "2026-07-27T02:49:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "findings_remain",
-          "findings": [
-            {
-              "message": "The `plan.summary` restates upstream design rationale and behavior: self-hosting commit order, preservation of the command interface, and proving the semantic-dup surface is blue. Per policy, plan sections must use target + operation + anchor cite only.",
-              "severity": "P1",
-              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
-              "line": 47,
-              "category": "upstream restatement"
-            }
-          ],
-          "hash": "rvw1:sha256:77e6af43897fe2b51201f1498d1e606c6582fbb759610ebdda8a25487b4edbad",
-          "at": "2026-07-27T02:52:03Z"
+          "hash": "rvw1:sha256:ce651b026513f30c2745c70e20b850dc5c502dd5f1b76581664338173ac23966",
+          "at": "2026-07-27T04:08:35Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:be1b637499ad0b4fef0e4af7a821f0d3722057b8ac41355add87e7027a09884a",
-          "at": "2026-07-27T02:53:32Z"
+          "hash": "rvw1:sha256:1879b90c723866ad4952affffcf5d4f36be9823fe27f16a2ab014d2e62e91712",
+          "at": "2026-07-27T04:38:37Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "T003 maps IN-02/AC-02 to runtime capture changes, but no task updates the type-designer workflow to author `tddd-features.json` before baseline capture. The current capability still runs baseline capture first, so once T003 makes missing declarations fail closed, future tracks cannot reach the authoring step. Add an executable workflow task and map IN-02/IN-04/AC-01/AC-02 to it.",
-              "severity": "P1",
-              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/task-coverage.json",
-              "line": 5,
-              "category": "task-coverage gap"
+              "message": "Workspace member paths are joined without containment validation. An absolute member or one containing `..` can escape `workspace_root`; `reject_symlinks_below` checks symlinks but does not prove containment, allowing an out-of-root Cargo.toml to be read and accepted. Reject absolute/parent components and verify the normalized path remains under the trusted root.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 232,
+              "category": "trusted-root violation"
             },
             {
-              "message": "`plan.summary` is empty even though the spec defines GO-01 and GO-02. The impl-plan policy requires explicit goal-to-task traceability in this field; task-coverage intentionally cannot provide it.",
-              "severity": "P1",
-              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
-              "line": 36,
-              "category": "task-coverage gap"
+              "message": "`reject_symlinks_below` deliberately excludes `trusted_root`, but the adapter never verifies that `track_dir` and `workspace_root` themselves are real directories. A symlinked root redirects declaration, snapshot, and manifest I/O, including snapshot writes. Reject symlinked trusted roots before performing any path operations.",
+              "severity": "P0",
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 273,
+              "category": "symlink not rejected at boundary"
             },
             {
-              "message": "T003 targets `libs/infrastructure/src/schema_export/mod.rs` for `RustdocSchemaExporter`, but that file does not exist; the symbol is defined in `libs/infrastructure/src/schema_export.rs`. Creating both paths would also make the Rust module ambiguous. Correct the task's target path.",
+              "message": "Deserializing `layers` directly into a `BTreeMap` silently keeps the last duplicate JSON key. A declaration containing conflicting duplicate layer entries therefore passes instead of failing closed. Use a duplicate-rejecting map deserializer, as existing infrastructure codecs do.",
               "severity": "P1",
-              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
-              "line": 18,
-              "category": "task description non-executable"
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 98,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "All declaration, snapshot, and Cargo.toml reads use unbounded `std::fs::read`, so a large input can allocate until memory exhaustion before validation. Enforce an explicit byte limit using metadata plus a bounded reader and return a typed error when exceeded.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 274,
+              "category": "unbounded read"
+            },
+            {
+              "message": "The tests never exercise a successful `load_for_actual` call or concurrent baseline publishers, and omit the declared symlink, unsupported-schema, and malformed-TOML rejection paths. This leaves both a public API happy path and the snapshot concurrency/fail-closed contract unverified.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 456,
+              "category": "test coverage gap"
             }
           ],
-          "hash": "rvw1:sha256:04247cd3c93adf9fa16f3f1bceae8be43b7beb025fbc9263ab6d3eac9a036047",
-          "at": "2026-07-27T02:59:49Z"
+          "hash": "rvw1:sha256:c9f778378433d1e048297f63a403213421575323279608faaa794e656866019f",
+          "at": "2026-07-27T05:15:28Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "T003 の「author `tddd-features.json` for every track before its first `baseline-capture`」は IN-02/IN-04/AC-02 の挙動契約を散文で再記述している。`knowledge/conventions/no-upstream-restatement.md` に従い、対象・操作と anchor cite だけに置き換えること。",
+              "message": "Concurrent publication of different declaration bytes is misclassified. If another writer creates the snapshot after the initial absence check, `compare_snapshot` returns a diagnostic for differing bytes, but this branch wraps it as `SnapshotWrite` instead of the declared `BaselineSnapshotMismatch`. Existing-snapshot read failures are likewise labeled as writes. Preserve mismatch versus I/O internally and map each to its correct public error; add a deterministic conflicting-publisher test.",
               "severity": "P1",
-              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
-              "line": 18,
-              "category": "upstream restatement"
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 54,
+              "category": "error handling"
+            },
+            {
+              "message": "Cargo.toml structural validation still has silent fallbacks: non-string workspace members are skipped here, and a present but non-table `features` value is treated as an absent feature table via `unwrap_or_default` below. The adapter can therefore accept a semantically invalid manifest instead of failing closed. Reject malformed member entries and malformed `features` values with `ReadDeclaration`, while retaining an actually absent `[features]` table as the valid empty case.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 291,
+              "category": "non-fail-closed config"
             }
           ],
-          "hash": "rvw1:sha256:4cec89498add70e559c52b9840019685e26b5a01d124c87613e30ec4eb25fb5c",
-          "at": "2026-07-27T03:04:03Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:aa836713cd7f8d90e7dacf739f467571b61903adee63f11e697b7c1e5e1b3ad6",
-          "at": "2026-07-27T03:06:52Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eba43a0dc4a005c08f9f7bf3ad3ef87f281a0ed8e275032ab00e6e6e23cb7b45",
-          "at": "2026-07-27T03:22:25Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:eba43a0dc4a005c08f9f7bf3ad3ef87f281a0ed8e275032ab00e6e6e23cb7b45",
-          "at": "2026-07-27T03:24:27Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:018a1879885f7ba04e73ea40437ab410571c5e0cc15ac605e63b5ed7895227b3",
-          "at": "2026-07-27T04:08:17Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:018a1879885f7ba04e73ea40437ab410571c5e0cc15ac605e63b5ed7895227b3",
-          "at": "2026-07-27T04:10:09Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b5756b08a45e176c9af1d0c34dfbe4b391cf64d841dd5d41d0f8c262b9afede9",
-          "at": "2026-07-27T06:50:20Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:b5756b08a45e176c9af1d0c34dfbe4b391cf64d841dd5d41d0f8c262b9afede9",
-          "at": "2026-07-27T06:51:25Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e82d1fa72afbf286833e0eb34c1a4a5e9da725f4f88ac275346ef70564b1c9b",
-          "at": "2026-07-27T07:08:56Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e82d1fa72afbf286833e0eb34c1a4a5e9da725f4f88ac275346ef70564b1c9b",
-          "at": "2026-07-27T07:10:41Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e82d1fa72afbf286833e0eb34c1a4a5e9da725f4f88ac275346ef70564b1c9b",
-          "at": "2026-07-27T07:10:54Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e82d1fa72afbf286833e0eb34c1a4a5e9da725f4f88ac275346ef70564b1c9b",
-          "at": "2026-07-27T07:11:10Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:7e82d1fa72afbf286833e0eb34c1a4a5e9da725f4f88ac275346ef70564b1c9b",
-          "at": "2026-07-27T07:18:23Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:364cd80e04f66bad973cb92cc865a4568e2b203456d054687725a253ddd3f374",
-          "at": "2026-07-27T10:25:13Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:364cd80e04f66bad973cb92cc865a4568e2b203456d054687725a253ddd3f374",
-          "at": "2026-07-27T10:26:45Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d2ca4514806ef27c7c6b736e4f59bb00ef039bbd41661e0f30d95caa6572e0e",
-          "at": "2026-07-27T12:01:34Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d2ca4514806ef27c7c6b736e4f59bb00ef039bbd41661e0f30d95caa6572e0e",
-          "at": "2026-07-27T12:02:39Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:5d2ca4514806ef27c7c6b736e4f59bb00ef039bbd41661e0f30d95caa6572e0e",
-          "at": "2026-07-27T12:03:21Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:05ab9054d475b365b3e699fc30ed600e2280f948cb76e1971cdb3a49288c4612",
-          "at": "2026-07-27T12:43:31Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:05ab9054d475b365b3e699fc30ed600e2280f948cb76e1971cdb3a49288c4612",
-          "at": "2026-07-27T12:47:22Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:371e02128e86301c95c330aede36eef6c692d8148c81798a676e1a46a6a5c22b",
-          "at": "2026-07-27T15:14:24Z"
+          "hash": "rvw1:sha256:d14462b48e61c066a88aa5514efc539c4035ce8bde7239221ccd3c5c5c51f4e6",
+          "at": "2026-07-27T05:33:42Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "T003 is the task that authors `tddd-features.json`, but it does not cite the newly added `CN-06`, and no other task carries that constraint; the current coverage map also lacks a `constraints[\"CN-06\"]` mapping. This leaves the feature-selection constraint uncovered despite the stated 26-element coverage. Add `CN-06` to T003's anchors and map it to T003.",
+              "message": "The target manifest's `[features]` table is validated only by collecting its keys. Values such as `semantic-dup = 1` or arrays containing non-string entries therefore count as valid declared features even though Cargo rejects that manifest. Validate each feature value as an array of strings (or resolve features through Cargo metadata) and return `ReadDeclaration` for malformed entries.",
               "severity": "P1",
-              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
-              "line": 16,
-              "category": "task-coverage gap"
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 338,
+              "category": "non-fail-closed config"
+            },
+            {
+              "message": "`clean_up_temporary` reports cleanup failures only when the original error was `Write`. If publication ends with `Mismatch` or `Read` and removal of the temporary file also fails, that I/O failure is silently discarded and a stale file is left behind. Preserve both causes or promote the cleanup failure to a typed write error instead of swallowing it.",
+              "severity": "P1",
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 554,
+              "category": "error handling"
             }
           ],
-          "hash": "rvw1:sha256:371e02128e86301c95c330aede36eef6c692d8148c81798a676e1a46a6a5c22b",
-          "at": "2026-07-27T15:17:58Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:706e56af261f0981052e65c42ce1273e0fdac43e6b885253f5a047223bdbd83a",
-          "at": "2026-07-27T15:29:31Z"
+          "hash": "rvw1:sha256:64adcde8087d3b3cc824b80b83ad6d13671d2d8f710e772b099ffc893cc26425",
+          "at": "2026-07-27T05:44:11Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:706e56af261f0981052e65c42ce1273e0fdac43e6b885253f5a047223bdbd83a",
-          "at": "2026-07-27T15:32:34Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:8827c6abb1b79cdecf01c9bf7aa6082f1077ec00123fbfd0d3ac686aef08fa41",
-          "at": "2026-07-28T01:56:14Z"
+          "hash": "rvw1:sha256:bce2cb365db65c781736c0b56b778a145117e91bcf31b0f6f97d63f04349418e",
+          "at": "2026-07-27T05:49:40Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:8827c6abb1b79cdecf01c9bf7aa6082f1077ec00123fbfd0d3ac686aef08fa41",
-          "at": "2026-07-28T02:00:30Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:db36939470d18050fedc351b1436687875405e3a64d967e42b9fea17feafd44e",
-          "at": "2026-07-28T02:46:57Z"
+          "hash": "rvw1:sha256:c184c19e7b310fbd26ce647a25d739008b118ee3efec3012c44e75aa6a2ff187",
+          "at": "2026-07-27T06:06:53Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:db36939470d18050fedc351b1436687875405e3a64d967e42b9fea17feafd44e",
-          "at": "2026-07-28T02:49:51Z"
+          "hash": "rvw1:sha256:f990e4aff6344a01b8daaa7833c6fd33165de9bfa72caa36215a710868c0bf29",
+          "at": "2026-07-27T06:42:46Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:5834b9e64a68b057acce9c1d4c5ea49d15e32d877e2e1c0d4bf8e6d6be48af51",
-          "at": "2026-07-28T06:35:49Z"
+          "hash": "rvw1:sha256:8db0bd1249f2c306fd21ef6ba904be1323b0fd0baa328b2d49366d542a213a36",
+          "at": "2026-07-27T10:25:33Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:8db0bd1249f2c306fd21ef6ba904be1323b0fd0baa328b2d49366d542a213a36",
+          "at": "2026-07-27T10:29:03Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7fea5ff16508cac0cb5895953f3e0909bb6fccb262f94a258e51cbf64cb50bbe",
+          "at": "2026-07-27T11:04:46Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:760e83b90c10a7626c8c360d6683a0b9d166425b9c4a4d1f84248aacf7392f95",
+          "at": "2026-07-27T12:43:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:760e83b90c10a7626c8c360d6683a0b9d166425b9c4a4d1f84248aacf7392f95",
+          "at": "2026-07-27T12:46:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c451fdb4a346ea662a5063c874bcc335eb299a55d1c0976ab4ad49152da60a0a",
+          "at": "2026-07-28T01:56:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c451fdb4a346ea662a5063c874bcc335eb299a55d1c0976ab4ad49152da60a0a",
+          "at": "2026-07-28T02:03:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aee14ca7e11b9c26c9bb4497bcc1a1a0d3aeaf0bff30bc232e58ec7a59dbf181",
+          "at": "2026-07-28T06:35:53Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aee14ca7e11b9c26c9bb4497bcc1a1a0d3aeaf0bff30bc232e58ec7a59dbf181",
+          "at": "2026-07-28T06:46:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aee14ca7e11b9c26c9bb4497bcc1a1a0d3aeaf0bff30bc232e58ec7a59dbf181",
+          "at": "2026-07-28T06:49:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:0272f2285a5371e9de14685a792aa98b58fcda6f15888afc18e29a20771d869a",
+          "at": "2026-07-28T07:42:58Z"
         },
         {
           "type": "final",
           "verdict": "findings_remain",
           "findings": [
             {
-              "message": "T006 still names `apps/cli-composition/src/signal/mod.rs` as the canonical signal-wiring target, but the merge moved that execution path to `libs/infrastructure/src/signal.rs::SystemSignalCommandAdapter::calc_impl`, where this track now performs the feature-declaration injection. Update the task target so the plan covers the actual merge-resolved edit; otherwise an executor following T006 would miss the active call site.",
+              "message": "`baseline_file` is a public raw string, but this new path probe joins it without validating that the result remains under `track_dir`. `reject_symlinks_below` rejects symlinks but does not enforce containment, so an absolute path or `../` component can probe outside the trusted root and falsely trigger the integrity guard. Validate it as a safe relative filename before calling `symlink_metadata`, following the fail-closed trusted-root pattern.",
               "severity": "P1",
-              "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/impl-plan.json",
-              "line": 26,
-              "category": "task description non-executable"
+              "file": "libs/infrastructure/src/tddd/feature_declaration_adapter.rs",
+              "line": 249,
+              "category": "trusted-root violation"
             }
           ],
-          "hash": "rvw1:sha256:5834b9e64a68b057acce9c1d4c5ea49d15e32d877e2e1c0d4bf8e6d6be48af51",
-          "at": "2026-07-28T06:38:50Z"
+          "hash": "rvw1:sha256:0272f2285a5371e9de14685a792aa98b58fcda6f15888afc18e29a20771d869a",
+          "at": "2026-07-28T07:48:03Z"
         },
         {
           "type": "fast",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1cc2fc8e7d09535a2264652d170377f417b92a5009c020ad50e3e630b34b1958",
-          "at": "2026-07-28T06:50:24Z"
+          "hash": "rvw1:sha256:19ea63c8ad530f25d63d4583b49115c182b866e31e3fd8c7ae34353d65f0700f",
+          "at": "2026-07-28T08:15:18Z"
         },
         {
           "type": "final",
           "verdict": "zero_findings",
           "findings": [],
-          "hash": "rvw1:sha256:1cc2fc8e7d09535a2264652d170377f417b92a5009c020ad50e3e630b34b1958",
-          "at": "2026-07-28T06:51:33Z"
-        },
-        {
-          "type": "fast",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1c77acb2b3870e57a4c65e1279b8ac4da4bda958822ebb63923e9d19e2e25448",
-          "at": "2026-07-28T06:54:14Z"
-        },
-        {
-          "type": "final",
-          "verdict": "zero_findings",
-          "findings": [],
-          "hash": "rvw1:sha256:1c77acb2b3870e57a4c65e1279b8ac4da4bda958822ebb63923e9d19e2e25448",
-          "at": "2026-07-28T06:54:42Z"
+          "hash": "rvw1:sha256:19ea63c8ad530f25d63d4583b49115c182b866e31e3fd8c7ae34353d65f0700f",
+          "at": "2026-07-28T08:18:12Z"
         }
       ]
     }
