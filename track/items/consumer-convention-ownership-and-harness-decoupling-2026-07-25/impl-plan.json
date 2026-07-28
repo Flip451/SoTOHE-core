@@ -1,0 +1,330 @@
+{
+  "schema_version": 1,
+  "tasks": [
+    {
+      "id": "T001",
+      "description": "`libs/usecase/src/conventions_resolve/` を新設し、`ConventionDocumentPath`、その構築失敗型 `ConventionDocumentPathError`、`ConventionResolveError` を実装する。`ConventionDocumentPathError` の発生元は `ConventionDocumentPath::try_new` に限定し、`ConventionResolveError::DocumentPathOutsideRoot` はそれを `source` として合成する。T025 の `ConventionShippingCheckError` も同じ失敗型を合成するため、この task は resolver slice と非出荷検査 slice の共通上流になる。Size estimate — usecase: ~120 prod + ~155 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#AC-06`, `#AC-07`.",
+      "status": "done",
+      "commit_hash": "c615cfcbd6c8847913a37af629f60851bff2c727"
+    },
+    {
+      "id": "T002",
+      "description": "`ConventionRequirement`、`ConventionResolution`、`ResolveConventionsQuery` に加えて、照合語としての capability 識別子 `ConventionCapabilityId` とその構築失敗型 `ConventionCapabilityIdError`(単一 unit variant `Blank`) を実装する。`ConventionRequirement::new` / `requires` と `ResolveConventionsQuery.capability` は照合の両辺を `ConventionCapabilityId` で受ける retype として行い、`CapabilityName` からの一方向 bridge `From<&CapabilityName>` を同 task で実装する(逆変換は作らない)。この 2 型と対応する test は `libs/usecase/src/conventions_resolve/capability_id.rs` に置き、`mod.rs` から `pub use` で再公開する: catalogue が宣言する module path `conventions_resolve` を保ったまま `mod.rs` を `architecture-rules.json` の `module_limits.max_lines` 内に収めるためで、既存行の移動は伴わない。Size estimate — usecase: ~160 prod + ~265 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#IN-06`, `#AC-06`, `#AC-07`, `#AC-08`, `#AC-09`.",
+      "status": "done",
+      "commit_hash": "5203752c11af8f5b258f3bcb107140201997324f"
+    },
+    {
+      "id": "T003",
+      "description": "driven port `ConventionRequirementPort` と、照合語 `&ConventionCapabilityId` を受け取る純関数 `select_required_conventions` を実装する。port の contract obligation と関数の logic obligation を同一 task で果たし、filesystem 入力を使わずにテストする。実装と test は `libs/usecase/src/conventions_resolve/` 配下の sibling module に置き、`mod.rs` から再公開して catalogue が宣言する module path `conventions_resolve` を保ったまま `module_limits.max_lines` 内に収める(T002 と同じ形)。Size estimate — usecase: ~60 prod + ~200 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#AC-06`, `#AC-08`.",
+      "status": "done",
+      "commit_hash": "cb8281dcb9d5ab090139eba91f842a0ca6900bd0"
+    },
+    {
+      "id": "T004",
+      "description": "primary port `ConventionResolveService` と `ConventionResolveInteractor` を実装し、注入された `ConventionRequirementPort` の結果を `select_required_conventions` へ委譲する形に配線する。両者の result obligation を fake port で果たす。実装と test は `libs/usecase/src/conventions_resolve/` 配下の sibling module に置き、`mod.rs` から再公開して module path `conventions_resolve` を保ったまま `module_limits.max_lines` 内に収める(T002・T003 と同じ形)。Size estimate — usecase: ~70 prod + ~210 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#AC-06`, `#AC-08`.",
+      "status": "done",
+      "commit_hash": "9be974c3095b0054be91d4d486e16c6d677815d4"
+    },
+    {
+      "id": "T005",
+      "description": "`libs/infrastructure/src/conventions_resolve/` に `CapabilityIdField`、`ConventionFrontMatterDto`、`parse_convention_front_matter` を実装し、既存の crate 内 front-matter block reader を再利用する。`CapabilityIdField` と `ConventionFrontMatterDto::into_requirement` で domain validation と `ConventionResolveError` への変換を実装する。Size estimate — infrastructure: ~140 prod + ~230 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#AC-06`, `#AC-07`, `#AC-08`.",
+      "status": "done",
+      "commit_hash": "9be974c3095b0054be91d4d486e16c6d677815d4"
+    },
+    {
+      "id": "T006",
+      "description": "`scan_convention_requirements` と、それへ委譲する `FsConventionRequirementAdapter` を実装する。AC-07 の 5 条件のうち読み取り不能文書の条件をこの走査が所有する。adapter の contract_conformance obligation と走査の logic obligation を tempdir fixture で果たす。Size estimate — infrastructure: ~110 prod + ~250 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#AC-06`, `#AC-07`.",
+      "status": "done"
+    },
+    {
+      "id": "T007",
+      "description": "`apps/cli-driver/src/conventions_resolve/` に `ConventionResolveInput` と `ConventionResolveDriver` を追加し、境界 mirror `ConventionCapabilityIdArg` を `capability::CapabilityNameArg` の sibling として同 module に新設する(共有 mirror である `CapabilityNameArg` は `capability exec` と共用のため retype しない)。`ConventionCapabilityIdArg` は `FromStr` で `ConventionCapabilityId` を構築して private field に保持し、非空不変条件を parse 時に一度だけ確立する。`ConventionResolveDriver` に機械可読出力と人間向け表示の 2 つの render 経路を実装する。Size estimate — cli_driver: ~130 prod + ~185 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#IN-06`, `#AC-06`, `#AC-08`, `#AC-09`.",
+      "status": "done"
+    },
+    {
+      "id": "T008",
+      "description": "`ConventionsCommand` に `Resolve` variant を追加して `bin/sotp conventions resolve --capability <id>` を公開する。`capability` field は `cli_driver::conventions_resolve::ConventionCapabilityIdArg` で受け(`capability exec` が使う `CapabilityNameArg` ではない)、空識別子の拒否を parse 時に済ませる。あわせて`ConventionsCompositionRoot` に `conventions_resolve_driver` accessor を追加して `FsConventionRequirementAdapter` → `ConventionResolveInteractor` → `ConventionResolveDriver` を配線する。Size estimate — cli: ~45 prod + ~60 test lines; cli_composition: ~20 prod + ~30 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-05`, `#IN-06`, `#AC-06`, `#AC-09`.",
+      "status": "done"
+    },
+    {
+      "id": "T009",
+      "description": "`DisciplineText::with_conventions` と `CapabilityExecError::ConventionResolutionFailed`(typed source error を保持) を追加する。dispatcher 本体の配線は T010 で行う。`libs/usecase/src/capability_exec.rs` は現状 production 624 行で、T009 と T010 の追加を同ファイルへ足すと `architecture-rules.json` の `module_limits.max_lines` を超える。この task で既存 production code を `capability_exec/` 配下の sibling module へ切り出し、catalogue が宣言する module path `capability_exec` を変えないまま上限内に収める。Size estimate — usecase: ~55 prod + ~130 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-07`, `#AC-10`, `#AC-11`, `#CN-05`.",
+      "status": "done"
+    },
+    {
+      "id": "T010",
+      "description": "`CapabilityExecInteractor` に `ConventionResolveService` を第 4 依存として注入し、`execute` の resolver 呼び出し位置と回数を AC-11 が要求する形に合わせて `DisciplineText` へ畳み込む。preflight query が名指す capability は `From<&CapabilityName>` で `ConventionCapabilityId` へ橋渡しする。`CapabilityExecInteractor::new` に第 5 引数 `project_root: PathBuf` を末尾に追加し、`apps/cli-composition/src/capability.rs` の配線も同 task で更新して `CapabilityCompositionRoot` が git 探索した `repo_root` を渡す。T009 の後に置く。既存の `#[cfg(test)] mod tests` 本体は移動させない: 新規 test を sibling file へ置く場合も既存行は現位置に残し、T009 型の relocation diff を再発させない。T009 の切り出し完了により `libs/usecase/src/capability_exec.rs` の production は 288 行で、この task の追加後も `module_limits.max_lines` に届かないため、追加の切り出しは不要である。Size estimate — usecase: ~70 prod + ~310 test lines (計 ~380); cli_composition: ~25 prod + ~0 test lines. `CapabilityExecInteractor::new` の引数追加が既存 test 内の構築点 10 箇所と fake resolver 定義を巻き込むこと、および batch A-E で実測された usecase の test 量超過 (見積り比 ~1.4x) を織り込んだ数字である。`track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-07`, `#AC-10`, `#AC-11`.",
+      "status": "done"
+    },
+    {
+      "id": "T011",
+      "description": "`libs/usecase/src/capability_exec.rs` の `#[cfg(test)] mod tests` に `CapabilityExecInteractor::execute` の適合テストを追加し、fake `ConventionResolveService` と両 dispatch route の fake port を用いる。T010 の後に置く。T010 と同じく既存 test module 本体は移動させない。Size estimate — usecase: ~25 prod + ~270 test lines (計 ~295)。実測比 ~1.4x を織り込んだ数字である。`track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-07`, `#AC-10`, `#AC-11`, `#AC-12`.",
+      "status": "done"
+    },
+    {
+      "id": "T012",
+      "description": "`.harness/config/template-boundary.json` に `.harness/reference` の分類 entry を新設し、`adr.md` を `.harness/reference/adr-schema.md` へ、`bash-write-guard.md` を `.harness/reference/guard-semantics.md` へ移す。各旧 path の既知の参照点を更新し、移動 entry を削除して `bin/sotp conventions update-index` で source 索引を再生成する。移動文書の既知の outbound reference を更新する。Size estimate — harness-policy: ~247 prod + ~0 test lines; usecase: ~2 prod + ~0 test lines; infrastructure: ~2 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-02`, `#IN-03`, `#IN-09`, `#IN-10`, `#AC-03`, `#AC-04`, `#AC-15`, `#AC-16`, `#AC-17`.",
+      "status": "done"
+    },
+    {
+      "id": "T013",
+      "description": "`.harness/config/template-boundary.json` に `.harness/policies` の分類 entry を新設し、`branch-strategy.md`、`git-notes.md`、`track-lifecycle.md` を `.harness/policies/` へ移す。各旧 path と移動文書の既知の outbound reference を更新し、移動 entry を削除して source 索引を再生成する。T012 の後に置く。Size estimate — harness-policy: ~381 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-02`, `#IN-03`, `#IN-09`, `#IN-10`, `#AC-03`, `#AC-04`, `#AC-15`, `#AC-16`, `#AC-17`.",
+      "status": "done"
+    },
+    {
+      "id": "T014",
+      "description": "`review-protocol.md`、`task-completion-flow.md` を `.harness/policies/task-completion.md` へ、`sot-reentry-sequencing.md` を `.harness/policies/` へ移す。各旧 path と移動文書の既知の outbound reference を更新し、移動 entry を削除して source 索引を再生成する。T013 の後に置く。Size estimate — harness-policy: ~297 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-02`, `#IN-09`, `#IN-10`, `#AC-03`, `#AC-15`, `#AC-16`, `#AC-17`.",
+      "status": "done"
+    },
+    {
+      "id": "T015",
+      "description": "`pre-track-adr-authoring.md` を `.harness/policies/` へ移し、既知の旧 path と outbound reference を更新する。移動 entry を削除して source 索引を再生成する。参照点が 4 workflow・5 capability・2 adapter 群にまたがるため T032 と分割した。T012 と T014 の後に置く。Size estimate — harness-policy: ~216 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-02`, `#IN-09`, `#IN-10`, `#AC-03`, `#AC-15`, `#AC-16`, `#AC-17`.",
+      "status": "done"
+    },
+    {
+      "id": "T032",
+      "description": "`no-upstream-restatement.md` を `.harness/policies/` へ、`responsibility-boundary.md` を `.harness/policies/consumer-ownership.md` へ移す。既知の旧 path と outbound reference を更新し、移動 entry を削除して source 索引を再生成する。T015 と同じ移動群だが参照集合が重ならないため独立 task にした。Size estimate — harness-policy: ~138 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-02`, `#IN-09`, `#IN-10`, `#AC-03`, `#AC-15`, `#AC-16`, `#AC-17`.",
+      "status": "done"
+    },
+    {
+      "id": "T016",
+      "description": "`catalogue-schema-reference.md` を `.harness/reference/catalogue-schema.md` へ移す。`.harness/capabilities/type-designer.md` 以外の既知の旧 path reference と移動文書の outbound reference を更新し、移動 entry を削除して source 索引を再生成する。`.harness/capabilities/type-designer.md` 内の catalogue-schema reference は T018 へ委譲する。単一ファイル移動なのでこれ以上の分割余地はない。Size estimate — harness-policy: ~25 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-02`, `#IN-09`, `#IN-10`, `#AC-03`, `#AC-16`, `#AC-17`.",
+      "status": "done"
+    },
+    {
+      "id": "T017",
+      "description": "`impl-delegation-arch-guard.md` を分割し、provider 非依存の委譲手順と architecture guard の実行責務を `.harness/policies/implementation-delegation.md` に置く。AC-03 に従って残余を配置し、既知の旧 path と移動本文の outbound reference を更新する。移動 entry を削除して source 索引を再生成する。Size estimate — harness-policy: ~225 prod + ~0 test lines; cli: ~2 prod + ~0 test lines; cli_composition: ~2 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-02`, `#IN-09`, `#IN-10`, `#CN-03`, `#AC-03`, `#AC-16`, `#AC-17`.",
+      "status": "done"
+    },
+    {
+      "id": "T018",
+      "description": "`.harness/capabilities/type-designer.md` の consumer 所有規約への固定 reference を resolver が返す convention 群を読む形へ更新する。T016 から委譲された catalogue schema old-path reference と、同じ責務記述を写す `.claude/agents/type-designer.md`、`.codex/agents/type-designer.toml`、`.harness/custom/review-prompts/types.md` を更新する。`.harness/catalogue-lint/config.json` と `.harness/catalogue-lint/presets/ddd-strict.json` の `permitted_layers` を確認する。T016 の後に置く。Size estimate — harness-policy: ~195 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-08`, `#IN-09`, `#IN-10`, `#CN-06`, `#CN-08`, `#AC-13`, `#AC-14`, `#AC-15`, `#AC-16`.",
+      "status": "done"
+    },
+    {
+      "id": "T035",
+      "description": "`knowledge/conventions/type-designer-kind-selection.md` に `required_for: [type-designer, rollback-diagnoser]`、`knowledge/conventions/prefer-type-safe-abstractions.md` に `required_for: [type-designer, spec-designer, impl-planner, rollback-diagnoser]` を付与する。T018 と同一変更集合に置く。Size estimate — harness-policy: ~12 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-08`, `#IN-09`, `#IN-10`, `#AC-13`, `#AC-14`, `#AC-15`.",
+      "status": "done"
+    },
+    {
+      "id": "T019",
+      "description": "T018 が扱う type-designer を除く D6 capability 記述と review prompt の consumer 所有規約への固定 path reference を更新する。対象は `.harness/capabilities/spec-designer.md`、`impl-planner.md`、`implementer.md`、`adr-editor.md`、`rollback-diagnoser.md`、`.harness/custom/review-prompts/domain.md`。IN-09 に従って capability 側は dispatcher 注入へ、review prompt 側は resolver 注入以外の方法へ更新する。Size estimate — harness-policy: ~130 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-09`, `#IN-10`, `#CN-05`, `#CN-06`, `#CN-07`, `#AC-13`, `#AC-15`, `#AC-16`.",
+      "status": "done"
+    },
+    {
+      "id": "T020",
+      "description": "`libs/domain/src/spec.rs`、`libs/infrastructure/src/spec/codec.rs`、`render.rs`、`tddd/semantic_verify_codec.rs`、`verify/latest_track.rs`、`latest_track_tests.rs` の source-only convention reference を更新する。`CLAUDE.md` と `.harness/config/template-boundary.json` の source-only 文書への言及も整理する。Size estimate — domain: ~4 prod + ~0 test lines; infrastructure: ~8 prod + ~4 test lines; harness-policy: ~12 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-02`, `#IN-09`, `#IN-10`, `#CN-07`, `#AC-03`, `#AC-15`, `#AC-16`.",
+      "status": "done"
+    },
+    {
+      "id": "T034",
+      "description": "source 側 `knowledge/conventions/coding-principles.md` に `required_for: [spec-designer, impl-planner]` を付与する。T019 と同一変更集合に置く。Size estimate — harness-policy: ~5 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-09`, `#IN-10`, `#AC-13`, `#AC-15`.",
+      "status": "done"
+    },
+    {
+      "id": "T021",
+      "description": "`overlay/knowledge/conventions/type-designer-kind-selection.md` を新規供給し、role × layer マトリクス本体をここに置く。`required_for: [type-designer, rollback-diagnoser]` の frontmatter を付与する。T035 の後に実施する。Size estimate — other: ~360 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-04`, `#IN-08`, `#IN-09`, `#IN-10`, `#CN-04`, `#CN-08`, `#AC-05`, `#AC-13`, `#AC-14`, `#AC-15`.",
+      "status": "done"
+    },
+    {
+      "id": "T022",
+      "description": "`overlay/knowledge/conventions/coding-principles.md` に `required_for: [spec-designer, impl-planner]`、`overlay/knowledge/conventions/prefer-type-safe-abstractions.md` に `required_for: [type-designer, spec-designer, impl-planner, rollback-diagnoser]` の frontmatter を付与して新規供給する。T034 と T035 の後に実施する。Size estimate — other: ~350 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-04`, `#IN-09`, `#IN-10`, `#CN-04`, `#AC-05`, `#AC-13`, `#AC-15`.",
+      "status": "done"
+    },
+    {
+      "id": "T023",
+      "description": "`overlay/knowledge/conventions/` に `testing.md`、`security.md`、`README.md` を新規供給し、`overlay/knowledge/conventions/coding-principles.md` の関連文書一覧へ `security.md` と `testing.md` の cross-reference を追加する。`README.md` は `bin/sotp conventions update-index` が再生成できる形式に揃える。T021 と T022 と合わせて overlay 供給を完結させる。Size estimate — other: ~380 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-04`, `#CN-04`, `#AC-05`.",
+      "status": "done"
+    },
+    {
+      "id": "T024",
+      "description": "`.harness/config/template-boundary.json` の `knowledge/conventions/` 配下に残るファイル単位 entry 群を削除し、`knowledge/conventions` のディレクトリ単位 `overlay` entry 一件へ置き換える。overlay 供給 (T021-T023) と文書移動 (T012-T017, T032) の完了後に置く。Size estimate — harness-policy: ~40 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-01`, `#IN-03`, `#IN-10`, `#CN-01`, `#AC-01`, `#AC-02`, `#AC-04`, `#AC-05`, `#AC-16`.",
+      "status": "done"
+    },
+    {
+      "id": "T025",
+      "description": "`libs/usecase/src/template_conventions/` を新設し、`CheckConventionShippingQuery`、`ConventionShippingVerdict`、`ConventionShippingCheckError` を実装する。`ConventionDocumentPath` と `ConventionDocumentPathError` を共有するため T001 に依存する。`libs/usecase/src/template_conventions/` は新設のため既存行の移動を伴わない。Size estimate — usecase: ~130 prod + ~160 test lines (計 ~290)。実測比 ~1.4x を織り込んだ数字である。`track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-11`, `#AC-18`.",
+      "status": "done"
+    },
+    {
+      "id": "T026",
+      "description": "driven port `ConventionInventoryPort` と純関数 `select_unsupplied_conventions` を実装する。port の contract obligation と関数の logic obligation を同一 task で果たし、filesystem 入力を使わずにテストする。新設 module 内の追加であり既存行の移動を伴わない。Size estimate — usecase: ~60 prod + ~300 test lines (計 ~360)。実測比 ~1.4x を織り込んだ数字である。`track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-11`, `#AC-18`, `#OUT-04`.",
+      "status": "done"
+    },
+    {
+      "id": "T027",
+      "description": "primary port `ConventionShippingCheckService` と `ConventionShippingCheckInteractor` を実装する。注入する `ConventionInventoryPort` は 1 つとし、export 済み tree と overlay tree の双方をその同一 instance で列挙して `select_unsupplied_conventions` へ委譲する配線にする。両者の result obligation を fake port で果たす。新設 module 内の追加であり既存行の移動を伴わない。Size estimate — usecase: ~70 prod + ~280 test lines (計 ~350)。実測比 ~1.4x を織り込んだ数字である。`track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-11`, `#AC-18`.",
+      "status": "done"
+    },
+    {
+      "id": "T028",
+      "description": "`libs/infrastructure/src/template_conventions/` を新設し、走査関数 `list_convention_documents` のみを実装する。AC-18 の構造的 fail-closed 条件 3 件はこの走査が所有する。front matter 解析を挟まないため既存の `scan_convention_requirements` は再利用せず別走査として実装する (既存行の移動は伴わない)。走査の logic obligation を tempdir fixture で果たし、symlink・非通常 node・読み取り量上限の防御もこの task で持つ: 同型の T006 では review round でこれらが後付けになり見積りを外した。`FsConventionInventoryAdapter` は T033 に分けた — 同型の T006 (走査 + adapter を 1 task) の実測 infrastructure diff が 767 行と ceiling 500 を大きく超えたため、同じ形を繰り返さない。Size estimate — infrastructure: ~90 prod + ~330 test lines (計 ~420)。infrastructure の実測比 ~2.2x を織り込んだ数字である。`track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-11`, `#AC-18`, `#OUT-04`.",
+      "status": "done"
+    },
+    {
+      "id": "T033",
+      "description": "`FsConventionInventoryAdapter` を実装し、T028 の `list_convention_documents` へ委譲する。adapter の contract_conformance obligation を tempdir fixture で果たす。T028 の後に置き、同一 batch には入れない (両者とも infrastructure scope)。Size estimate — infrastructure: ~45 prod + ~205 test lines (計 ~250)。`track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-11`, `#AC-18`, `#OUT-04`.",
+      "status": "done"
+    },
+    {
+      "id": "T029",
+      "description": "`apps/cli-driver/src/template_conventions/` に `ConventionShippingCheckInput` と `ConventionShippingCheckDriver` を追加する。`UnsuppliedDocumentsShipped` の render は違反文書の path を件数ではなく全件名指しする。新設 module 内の追加であり既存行の移動を伴わない。Size estimate — cli_driver: ~120 prod + ~190 test lines (計 ~310)。cli_driver の実測比 ~1.3x を織り込んだ数字である。`track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-11`, `#AC-18`.",
+      "status": "done"
+    },
+    {
+      "id": "T030",
+      "description": "`TemplateCommand` に `CheckConventionShipping` variant と専用 args 構造体 `TemplateConventionShippingArgs`(`--exported-root` / `--overlay-dir` を明示指定させ、どちらの位置も周辺状態から推測しない) を追加して `bin/sotp template check-convention-shipping` を公開し、`TemplateCompositionRoot` に `convention_shipping_check_driver` accessor を追加して `FsConventionInventoryAdapter` → `ConventionShippingCheckInteractor` → `ConventionShippingCheckDriver` を配線する。`apps/cli/src/commands/template/mod.rs` は production 78 行、`apps/cli-composition/src/template_export/mod.rs` は production 71 行で、いずれもこの task の追加後も `module_limits.max_lines` に届かないため既存行の切り出しは不要である。Size estimate — cli: ~60 prod + ~80 test lines (計 ~140); cli_composition: ~25 prod + ~40 test lines (計 ~65)。`track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-11`, `#AC-18`.",
+      "status": "done"
+    },
+    {
+      "id": "T031",
+      "description": "`Makefile.toml` の `template-export-smoke-local` に、export 済み tree を対象とした `bin/sotp template check-convention-shipping` の実行を追加する。この block は検査群の前に export 先へ `cd` するため、source repo 側にある overlay の path は `cd` より前に絶対 path へ解決してから渡す。分類切り替え (T024) と subcommand 実装 (T025-T030) の双方の完了後に置く。Size estimate — harness-policy: ~35 prod + ~0 test lines. `track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json#IN-11`, `#AC-02`, `#AC-18`, `#OUT-01`, `#OUT-04`.",
+      "status": "done"
+    }
+  ],
+  "plan": {
+    "summary": [
+      "Goal 対応 (task 番号の連続範囲ではなく `plan.sections[].task_ids` の所属で定義する。task が追加されたとき範囲表記は黙って古くなるため、section 単位で書く): GO-01 = harness-policy-relocation (T012, T013, T014, T015, T032, T016, T017) + ownership-reference-migration (T018, T035, T019, T020, T034) + consumer-overlay (T021, T022, T023) + non-shipping-check (T025, T026, T027, T028, T033, T029, T030) + boundary-flip-and-smoke (T024, T031)。非出荷検査の実装 (T025-T030 と、T028 から分割された adapter task T033) とその smoke 配線 (T031) はいずれも GO-01 に属する。GO-02 = resolver-usecase-core (T001-T004) + resolver-infrastructure (T005, T006) + resolver-delivery (T007, T008)。GO-03 = dispatch-injection (T009, T010, T011)。",
+      "Sizing basis: `.harness/config/review-scope.json` の `default_diff_ceiling_lines` を全 scope が継承する(per-group override なし)。scope は path 由来で、`libs/**` / `apps/**` は各 layer scope、`knowledge/conventions/**` と `.harness/**` と `CLAUDE.md` / `README.md` / `Makefile.toml` / `.claude/**` / `.codex/**` / `.agents/**` は harness-policy、`overlay/**` は other に落ちる。各 task の description に scope ごとの production + test 見積りを明示した。数え方は変更の種類で異なる: (a) 新規ファイルまたは新設 module への追加は追加行数をそのまま数える。(b) 既存 module 内の production code の切り出し (relocation) は、移動元の削除と移動先の追加の双方が diff に出るため移動行数を 2 回数える。(c) 文書の全体移動は移動本文を 1 回数える — reviewer の読解量に相当する数字であり、git の rename 検出が効く測定ではこれより小さく (変更行のみ)、効かない測定では (b) と同じく 2 倍になるため、下限と上限の中間である。いずれの見積りも review 指摘由来の追加実装を含まない下限である。",
+      "見積りの信頼度 (batch A-E の実測): 実測 diff は見積りを一貫して上回った — usecase ~1.4x、infrastructure ~2.2x、cli_driver ~1.3x。主因は 2 つある。第一に test obligation の量で、obligation edge を閉じる test 行数は production 行数を上回るのが常態である (batch E の infrastructure は production ~110 行に対し test 650+ 行)。第二に review 由来の hardening で、batch E の infrastructure では P1 4 件が symlink guard・node 種別検査・読み取り量上限を要求し、いずれも見積りに存在しなかった。未着手の Rust 実装 task (T010, T011, T025, T026, T027, T028, T033, T029, T030 — 番号順の T032 は harness-policy の文書移動であり実測比の対象外) の見積りはこの実測比を織り込み済みであり、hardening の余白として ceiling に対し最低 20% を残してある。",
+      "Batching: ceiling は per review scope に効き、1 batch に複数 task を入れると同一 scope 分の diff が合算される。したがって全 scope を通じた規則として、同一 review scope を共有する 2 task を同一 batch に入れない。この規則の下では各 scope の batch diff が単一 task の見積りに一致する。個別 batch を要する同一 scope group は次の通り: usecase の T001-T004、T009-T011、T025-T027; infrastructure の T005・T006・T028・T033; cli_driver の T007・T029; cli の T008・T030・T017; cli_composition の T008・T010・T030・T017; other の T021-T023 (T021+T022 だけで 710); harness-policy の T012-T020・T024・T031・T032・T034・T035。合算しても ceiling 未満に収まる組 (例: cli の T008+T030) も同じ規則で分ける。batch 編成のたびに合算値を計算し直す運用は誤りが混入しやすく、ceiling 逸脱は review が収束しない形でしか顕在化しないためである。この規則の例外は T034 と T035 の 2 件で、それぞれ T019 / T018 と同じ batch に置く (`spec.json#D10`)。いずれも ~12 行以下の harness-policy 見積りであり、合算しても相手 task 単独の見積りに対する余白の範囲に収まる。review scope が 1 つも重ならない task 同士 (例: cli_driver の T007 と cli + cli_composition の T008) は同一 batch に入れてよい。",
+      "Dependencies: T001 → T002 → T003 → T004 は usecase 内の依存順。T005/T006 は T001-T004 の型に依存。T007 は T004、T008 は T006-T007 に依存。T009 → T010 → T011 の順で dispatcher 注入を確定させる。T012 は `.harness/policies` / `.harness/reference` の分類 entry を最初に導入するため文書移動群の先頭に置く。T013 → T014 → T015 → T032 の順で移動を積み、後続 task が先行 task の移動先 path 上の参照を書き換える。T016 は T018 より前。T035 は T018 と、T034 は T019 と同一変更集合に置く (`spec.json#D9`, `#D10`)。T021 は T035 の後、T022 は T034 と T035 の後。T024 は overlay 供給 (T021-T023) と移動 (T012-T017, T032) の完了後。非出荷検査は T025 → T026 → T027(usecase) → T028 → T033(infrastructure) → T029(cli_driver) → T030(cli + cli_composition) の順で積み、`ConventionDocumentPath` と `ConventionDocumentPathError` を共有するため T001 に依存する。T031 は T024 と T030 の双方の完了後に置く。",
+      "移動と参照更新の結合: `bin/sotp verify doc-links` が検査するのは markdown link 形式の参照だけである。移動対象への link 形式参照は `.claude/rules/guardrails.md` の 1 箇所、移動対象どうしの相互 link 群、`no-backward-compat.md` と `workflow-ceremony-minimization.md` と `sot-reentry-sequencing.md` と `pre-track-adr-authoring.md` の Related Documents に限られる。そのため移動 task と参照更新 task を分けず、各移動 task が自分の移動対象への live reference を同一変更集合で更新する形にした。監査した参照面は `.harness/workflows/`、`.harness/capabilities/`、`.harness/custom/`、`.harness/briefings/`、`.harness/config/`、`.agents/`、`.claude/`、`.codex/`、top-level entry document、production source、test fixture、overlay、および source 側に残る convention 本文である。`track/items/**` / `track/archive/**` と既存 ADR / research note の旧 path は OUT-05 の対象として更新しない。",
+      "移動文書自身の outbound 参照: 移動対象 13 文書の本文が持つ参照先を全件監査し、`.harness/config/template-boundary.json` の分類と初期 overlay 供給集合 (T021-T023) に照らして、移動後に export 側で解決できなくなる参照を洗い出した。この監査は下限であって上限ではない。実装済みの move task 3 件で連続して過小と判明している — T012 は `adr.md` の `libs/infrastructure/src/adr_decision/parse.rs` 参照を、T013 は `branch-strategy.md` の `libs/usecase/src/track_resolution.rs` 参照を、いずれも宣言しないまま実装が解消しており、T014 は `task-completion-flow.md` に「該当参照なし」と書いたが実際には 4 件 (`.claude/skills/architecture-customizer/SKILL.md`、`.claude/rules/guardrails.md`、`libs/usecase/src/task_completion.rs`、`libs/domain/src/impl_plan.rs`) を解消している。原因は監査の判定基準が source 側に留まる convention 間参照 (`workflow-ceremony-minimization.md` / `enforce-by-mechanism.md`) に偏り、`libs/**` のような overlay 分類 path への参照と consumer 所有面への参照を拾わなかったことである。したがって未実行の move task (T015, T016, T017, T032) の description が挙げる outbound 参照は既知分にすぎず、実装時に移動本文の outbound 参照を全件列挙して出荷後に解決できないものをすべて解消する形に改めた。現時点で判明している該当は次のとおりで、実行済み task の分も含めていずれも下限である — `adr.md` (T012)、`track-lifecycle.md` (T013)、`sot-reentry-sequencing.md` 2 件と `task-completion-flow.md` 4 件 (T014)、`pre-track-adr-authoring.md` 1 件 (T015)、`no-upstream-restatement.md` 1 件と `responsibility-boundary.md` 2 件 (T032)、`catalogue-schema-reference.md` 4 件 (T016)。各件を移動元文書を運ぶ move task に割り当て、移動と同一変更集合で解消する形にした。実装を経て該当なしを確認できたのは `bash-write-guard.md` (T012)、`git-notes.md` (T013)、`review-protocol.md` (T014) である (`branch-strategy.md` は当初この列に入れていたが、実際には解消対象を持っていたため外した)。`catalogue-schema-reference.md` (T016) は計画時点で「該当なし」と判定していたが、実装時の全件列挙で 4 件 (2 種の `libs/**` path が各 3 箇所、`structural_eq.rs` の所在、`track/items/` を指す worked example の参照先) が判明し、この判定も同じ偏りによる過小と確認された。未実行の `impl-delegation-arch-guard.md` (T017) の「該当なし」は計画時点の判定にとどまり、実装時の全件列挙で確定させる。移動対象どうしの相互参照は各 move task の inbound 参照集合が既に所有しており、`knowledge/adr/README.md`・`track/registry.md`・`.claude/**`・`.harness/**` への参照先は出荷後も export 側に存在する。",
+      "ceiling に対する現況: batch E で実測された scope diff は usecase 943 行・infrastructure 767 行で、いずれも ceiling 500 を超えた。usecase の超過は T009 の見積りが必須の relocation を数えなかったことによる — `libs/usecase/src/capability_exec.rs` の production ~390 行を sibling module へ切り出す作業が見積りに入っておらず、~185 行の追加見積りに対し実測 943 行になった。infrastructure の超過は T006 の test 見積り不足による。T001-T009 は実装・review 済みのため事後分割はせず、超過はそのまま記録として残す。",
+      "未着手 task に対しては 2 点を確認した。(i) 既存 production code の移動を要する task は残っていない — module ごとの現行 production 行数で確認済みで、T010/T011 の `libs/usecase/src/capability_exec.rs` は T009 の切り出し後 288 行、T030 の `apps/cli/src/commands/template/mod.rs` は 78 行・`apps/cli-composition/src/template_export/mod.rs` は 71 行、T025-T029 と T033 は新設 module であり、いずれも追加後も `module_limits.max_lines` に届かない。(ii) 実測比を織り込んだ見積りが ceiling を超えた T028 を T028 (走査関数) + T033 (adapter) に分割した。この修正後、ceiling を超える見積りを持つ未着手 task は残っていない — 唯一の超過として残していた T016 は、その根拠が誤った前提に立っていたため取り下げた (次項)。",
+      "T016 (`catalogue-schema-reference.md` の移動) は本文 745 行の単一ファイル移動で分割余地がない。当初はこれを「本文無改変が rename 検出の成立条件であり、ceiling 内に収められない task」として残していたが、この前提は誤りだった — T012 (`5f8c3fb1`) は 145 行の文書を 6 行編集したうえで similarity index 86% の rename として記録されており、既定の 50% 閾値に対し本文編集は十分な余裕を持つ。745 行の本文に対する数行の編集で検出が失われることはないため、本文の参照修正 (T016 description の (a)-(d)) を含めても rename 検出下の実質 diff は ~25 行にとどまり、capability 側の参照更新を T018 へ寄せる分割と合わせて ceiling 内に収まる。"
+    ],
+    "sections": [
+      {
+        "id": "resolver-usecase-core",
+        "title": "Convention resolver: usecase core",
+        "description": [
+          "path 検証 newtype と error 型 (T001)、照合語識別子 `ConventionCapabilityId` とその失敗型・走査結果・解決結果・query の値型 (T002)、driven port と純粋な選択関数 (T003)、primary port と interactor (T004) を段階的に積む。usecase scope 単独で 4 分割したのは、この slice の obligation 4 件がこの層に集中し production + test 合算が単一 task では ceiling を超えるため。",
+          "照合語の識別子 `ConventionCapabilityId` とその失敗型は、依存する retype (`ConventionRequirement`・`ResolveConventionsQuery`) と同一変更集合にあるため新規 task を立てず T002 に吸収した。新規 2 型は `conventions_resolve/capability_id.rs` に置き、既存行を動かさない。",
+          "IN-05, IN-06, AC-06 から AC-09。"
+        ],
+        "task_ids": [
+          "T001",
+          "T002",
+          "T003",
+          "T004"
+        ]
+      },
+      {
+        "id": "resolver-infrastructure",
+        "title": "Convention resolver: filesystem and codec seams",
+        "description": [
+          "frontmatter codec (T005) と directory 走査 + adapter (T006) を分けて実装する。codec は front matter fixture だけで、走査は filesystem fixture だけでテストできる分離を保つ。infrastructure の 3 obligation はこの 2 task に分かれる。",
+          "IN-05, AC-06 から AC-08。"
+        ],
+        "task_ids": [
+          "T005",
+          "T006"
+        ]
+      },
+      {
+        "id": "resolver-delivery",
+        "title": "Convention resolver: CLI delivery surface",
+        "description": [
+          "primary adapter と境界 mirror `ConventionCapabilityIdArg` (T007)、subcommand 追加 + 合成根配線 (T008)。mirror は `capability exec` と共用の `CapabilityNameArg` を retype せず sibling として新設する — 照合契約を持たない command の受理値を変えないため。",
+          "IN-05, IN-06, AC-06, AC-08, AC-09。"
+        ],
+        "task_ids": [
+          "T007",
+          "T008"
+        ]
+      },
+      {
+        "id": "dispatch-injection",
+        "title": "Capability dispatch injection",
+        "description": [
+          "discipline 合成と error variant (T009)、dispatcher への resolver 注入と `cli-composition` 配線 (T010)、両 dispatch 経路の適合テスト (T011)。usecase scope の test 量が大きいため 3 分割した。",
+          "IN-07, CN-05, AC-10 から AC-12。"
+        ],
+        "task_ids": [
+          "T009",
+          "T010",
+          "T011"
+        ]
+      },
+      {
+        "id": "harness-policy-relocation",
+        "title": "Harness policy and reference relocation",
+        "description": [
+          "分類 entry 新設と reference 系 2 件 (T012)、track 運用 policy 3 件 (T013)、review / 完了フロー policy 3 件 (T014)、ADR 起草 policy 1 件 (T015)、所有境界 policy 2 件 (T032)、catalogue schema 単独移動 (T016)、委譲手順の分割 (T017)。すべて harness-policy scope に落ちるため、移動本文の行数と参照更新点の合計が ceiling を超えないように 7 分割した。",
+          "T015 と T032 は round-2 時点では 1 task だったが、参照監査の結果 `pre-track-adr-authoring.md` の inbound reference が 4 workflow・5 capability・2 adapter 群に広がることが分かったため分割した。両者の参照集合は重ならない。",
+          "IN-02, IN-03, IN-09, IN-10, CN-03, AC-03, AC-04, AC-16, AC-17。"
+        ],
+        "task_ids": [
+          "T012",
+          "T013",
+          "T014",
+          "T015",
+          "T032",
+          "T016",
+          "T017"
+        ]
+      },
+      {
+        "id": "ownership-reference-migration",
+        "title": "Ownership-based reference migration",
+        "description": [
+          "対象 task: T018, T035, T019, T020, T034。",
+          "契約アンカー: IN-08, IN-09, IN-10, CN-05 から CN-08, AC-13 から AC-16。"
+        ],
+        "task_ids": [
+          "T018",
+          "T035",
+          "T019",
+          "T020",
+          "T034"
+        ]
+      },
+      {
+        "id": "consumer-overlay",
+        "title": "Consumer-neutral initial overlay",
+        "description": [
+          "role × layer マトリクス本体を持つ規約 (T021)、設計原則 2 件 (T022)、テスト・セキュリティ・索引 (T023)。すべて other scope の新規ファイルで、1 task あたりの読解量を ~380 行以内に抑えるため 3 分割した。",
+          "IN-04, IN-08, IN-09, IN-10, CN-04, CN-08, AC-05, AC-13, AC-14, AC-15。"
+        ],
+        "task_ids": [
+          "T021",
+          "T022",
+          "T023"
+        ]
+      },
+      {
+        "id": "non-shipping-check",
+        "title": "Non-shipping check subcommand",
+        "description": [
+          "IN-11 / AC-18 の検査は shell block の拡張ではなく `bin/sotp template check-convention-shipping` として実装する。`Makefile.toml` の task は `bin/sotp` への薄い wrapper であり、導出と分岐は CLI 側に置くため。値型と error (T025)、driven port と純粋な比較関数 (T026)、primary port と interactor (T027)、filesystem 走査 (T028)、driven adapter (T033)、primary adapter (T029)、subcommand 公開と合成根配線 (T030) の順に積む。",
+          "usecase scope を 3 分割したのは、この slice が持つ 6 obligation のうち 4 件が usecase に集中し、production + test 合算が単一 task では ceiling を超えるため。resolver 側 (T001-T004) と同じ分割形にしてある。",
+          "infrastructure は走査 (T028) と adapter (T033) に分けた。resolver 側の同型 task T006 が両者を 1 task に持ち、実測 767 行で ceiling を超えたためである。",
+          "IN-11, AC-18, OUT-01, OUT-04。"
+        ],
+        "task_ids": [
+          "T025",
+          "T026",
+          "T027",
+          "T028",
+          "T033",
+          "T029",
+          "T030"
+        ]
+      },
+      {
+        "id": "boundary-flip-and-smoke",
+        "title": "Export boundary flip and non-shipping smoke",
+        "description": [
+          "ディレクトリ単位 overlay への切り替え (T024) と、smoke への非出荷検査の配線 (T031)。両者はこの track の最後に置き、overlay 供給欠落・未分類 path・検査対象 subcommand 不在のいずれの fail-closed も途中 commit で発生させない。T031 は T024 と T030 の後に来るため、section 内で task id は連続しない。",
+          "IN-01, IN-03, IN-10, IN-11, CN-01, AC-01, AC-02, AC-04, AC-05, AC-16, AC-18。"
+        ],
+        "task_ids": [
+          "T024",
+          "T031"
+        ]
+      }
+    ]
+  }
+}

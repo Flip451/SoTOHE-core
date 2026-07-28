@@ -14,20 +14,19 @@ Violations of the role statement above are always reportable. The following prio
 
 - **primitive obsession**: raw `String` / `u64` / `i32` used where a domain
   Newtype should encode invariants (`UserId`, `EmailAddress`, `SimilarityThreshold`).
-  Cite `knowledge/conventions/prefer-type-safe-abstractions.md` §Newtype.
+  Name the invariant the raw type leaves unenforced.
 - **enum-first violation**: boolean flags or string discriminants used where
-  an `enum` would make illegal states unrepresentable. Cite
-  `prefer-type-safe-abstractions.md` §Enum-first.
+  an `enum` would make illegal states unrepresentable. Name a combination the
+  current representation admits and the type should not.
 - **typestate / parse-don't-validate gap**: a function returning `Result<T, E>`
   whose `T` does not encode the validation it just performed (the caller can
-  still reach an invalid state). Cite §Parse-don't-validate.
+  still reach an invalid state). Name the reachable invalid state.
 - **panic-able production code**: `.unwrap()` / `.expect()` / `panic!()` /
   index-access (`slice[i]`) / `assert!()` / `unreachable!()` / `todo!()` in
-  any code path NOT under `#[cfg(test)]`. Cite `coding-principles.md`
-  §No Panics in Library Code.
+  any code path NOT under `#[cfg(test)]`.
 - **port misplaced**: a trait that abstracts an infrastructure capability
   (git hash, two-phase commit, HTTP client) placed in domain instead of
-  usecase. Cite `type-designer-kind-selection.md` R1.
+  usecase. Name the capability the trait abstracts.
 - **purity violation**: `std::fs::*`, `std::net::*`, `std::process::*`,
   `std::io::*`, `std::env::*`, `chrono::Utc::now()`, `std::time::SystemTime`,
   `std::time::Instant`, `println!` / `eprintln!` reaching domain (these are

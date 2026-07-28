@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "track_id": "composition-root-pure-di-support-workflows-2026-07-26",
+  "entries": {
+    "T001": [],
+    "T002": [
+      { "layer": "cli_composition", "entry_key": "cli_composition::verify::execute_catalogue_spec_refs" }
+    ]
+  }
+}

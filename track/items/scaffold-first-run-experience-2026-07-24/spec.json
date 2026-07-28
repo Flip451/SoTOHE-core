@@ -1,0 +1,280 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "scaffold の初期化列を単一タスクへ畳む",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "export 直後の scaffold 利用者が、明示的に選んだ一つのタスクで初期 git repository、lockfile、初期 commit、および bootstrap 済みの状態へ到達できるようにする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "出荷 scaffold の branch strategy 既定を新規 repository の実在 branch と一致させ、初回 workflow の不一致 prompt をなくす。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "GO-03",
+      "text": "出荷 command adapter が host 固有の進捗トラッキング機能に依存して workflow を停止しないようにする。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "anchor": "D3"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "export された overlay Makefile に、初期化列を実行する明示 opt-in の `cargo make init` task を提供する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "初期化 task の二回目以降の実行を、既に commit を持つ repository では利用者可読な明示エラーで fail-closed に停止させる。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": "出荷 branch-strategy 設定を overlay へ置き、出荷既定を base branch と merge target ともに main にする一方、maintainer 運用値は source repository 側に残す。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+            "anchor": "D2"
+          }
+        ]
+      },
+      {
+        "id": "IN-04",
+        "text": "出荷 plan / adr2pr command adapter の進捗トラッキングを、TaskCreate が利用可能な場合だけ使用し、不在時にはテキスト進捗報告へ代替する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+            "anchor": "D3"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "source repository 側の Makefile へ初期化 task を追加すること。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "初期化列を sotp の新しい subcommand として実装すること。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "placeholder Cargo.lock を overlay に同梱すること、または Cargo.lock を gitignore に入れること。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-04",
+        "text": "bootstrap 自体へ git repository 前提チェックを追加すること。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-05",
+        "text": "source repository の maintainer 向け develop-base branch strategy を変更すること。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+            "anchor": "D2"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "初期化 task は利用者が明示的に選ぶ opt-in command であり、hooks 設置前に許される素の git 操作は同一 command 内の初回初期化列に閉じる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "初期化列は git init -b main、lockfile 生成、初期 commit、bootstrap の順で実行され、bootstrap により生じる lockfile 差分を残さない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "出荷 Makefile の task 集合を検査する既存の smoke 検査は、初期化 task を出荷 task として検証する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-04",
+      "text": "出荷 branch strategy は新規 repository の main branch と一致し、maintainer の branch strategy は出荷面へ輸出しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "CN-05",
+      "text": "進捗トラッキングは host 提供機能の有無にかかわらず command adapter の完了を妨げない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "anchor": "D3"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "export 直後の未初期化 scaffold で cargo make init を実行すると、main branch の git repository、生成済み Cargo.lock を含む初期 commit、bootstrap 済みの hooks 設定に到達する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "commit を持つ repository で cargo make init を再実行すると、ref-update guard の原因不明な停止ではなく、二回目以降を拒否する明示エラーで失敗する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "出荷 overlay は init task を提供し source repository の Makefile は提供せず、出荷 Makefile task 集合を検査する smoke 検査は task の欠落を検出する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": "export 済み scaffold の branch-strategy.json は overlay から供給され、base branch と merge target は main である。source repository 側の maintainer 運用値は develop のまま保持される。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "anchor": "D2"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "出荷 plan / adr2pr command adapter は TaskCreate が利用可能なら進捗トラッキングに使い、不在ならテキスト進捗報告に代替して workflow を停止せず完了する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "anchor": "D3"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/responsibility-boundary.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/branch-strategy.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/bash-write-guard.md",
+      "anchor": "Design Decision"
+    },
+    {
+      "file": "knowledge/conventions/enforce-by-mechanism.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/no-upstream-restatement.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/testing.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/prefer-type-safe-abstractions.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/coding-principles.md",
+      "anchor": "Rules"
+    }
+  ],
+  "signals": {
+    "blue": 22,
+    "yellow": 0,
+    "red": 0
+  }
+}

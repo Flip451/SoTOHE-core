@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "pr-signal-pure-di-2026-07-26",
+  "title": "PR / Signal composition root を純 DI 化し、closure 注入と逆委譲 ServiceImpl を除去する",
+  "branch": "track/pr-signal-pure-di-2026-07-26",
+  "created_at": "2026-07-26T09:03:34Z",
+  "updated_at": "2026-07-26T09:03:34Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

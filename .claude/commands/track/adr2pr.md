@@ -17,7 +17,9 @@ filename is recorded as that track's init baseline.
 
 ## Claude Code invocation constraints
 
-- **Progress tracking**: use `TaskCreate` to register the workflow steps as tasks; mark each `in_progress` before starting and `completed` after its gate passes.
+- **Progress tracking**: when `TaskCreate` is available, use it to register the workflow steps
+  as tasks, marking each `in_progress` before starting and `completed` after its gate passes.
+  When it is unavailable, report those transitions in text and continue the workflow.
 - **Sub-command execution**: drive each sub-step by reading its `.claude/commands/track/<name>.md` definition and executing it. Do not re-state sub-command logic here.
 - **Phase 0 input forwarding**: when Step 1 invokes
   `/track:init <feature> --primary-adr <file>`, pass both resolved, user-confirmed inputs
@@ -34,6 +36,9 @@ filename is recorded as that track's init baseline.
   `--resume` only when continuing the same assignment (`.claude/rules/orchestration.md`).
 - **Interaction boundaries**: honor the workflow SSoT's user-interaction and terminal-state
   rules; this adapter does not restate them.
+- **Phase 0 governing convention**: apply
+  `.harness/policies/pre-track-adr-authoring.md#In-track 意味変更の裁定権` as the sole
+  normative source for Phase 0. This adapter states no procedure of its own for that phase.
 - **Staging**: `bin/sotp git add-all`
 - **Commit**: write to `tmp/track-commit/commit-message.txt`, then `cargo make track-commit-message`
 - **Terminal audit comment**: use only the workflow SSoT's approved wrapper; do not invoke

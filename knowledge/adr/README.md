@@ -75,7 +75,9 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [技術スタック・製品ガイドラインの grandfathered baseline](2026-07-08-1405-grandfathered-tech-and-product-baseline.md) | Proposed | 2026-07-08 |
 | [retention gate の verify サブコマンド化](2026-07-08-2306-retention-gate-verify-subcommand.md) | Proposed | 2026-07-08 |
 | [公開テンプレート配布前の阻害要因解消](2026-07-13-0818-public-template-blocker-cleanup.md) | Proposed | 2026-07-13 |
+| [scaffold の初期化列を単一タスクへ畳む](2026-07-23-0115-scaffold-first-run-experience.md) | Proposed | 2026-07-23 |
 | [出荷面を最小化し、workflow と出荷物の乖離クラスを閉じる](2026-07-23-0117-export-surface-minimization.md) | Proposed | 2026-07-23 |
+| [機械可読な契約を持たない出荷面 assert を削除する](2026-07-25-0045-drop-contractless-export-surface-assertions.md) | Proposed | 2026-07-25 |
 | [scripts/ Python ヘルパーの段階的 Rust 移行ロードマップ](2026-04-13-1200-scripts-python-helpers-rust-migration-roadmap.md) | Proposed | 2026-04-13 |
 | [external_guides 撤去 — Python migration roadmap Phase 3 supersede](2026-04-28-1258-remove-external-guides.md) | — | 2026-04-28 |
 | [Python 固有ロジックの Rust 完全移行と Python ランタイム依存の撤去](2026-06-03-1327-python-runtime-full-removal.md) | Proposed | 2026-06-03 |
@@ -124,13 +126,19 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [TDDD GAT trait サポート: パーサ QualifiedPath + 比較フォーマッター正規化 + カタログ関連アイテムスキーマ](2026-06-18-0822-typeref-parser-qualified-path-support.md) | Proposed | 2026-06-18 |
 | [cli 系 3 層への TDDD 適用と既存 linter によるロール配置制約の設定](2026-06-21-1420-cli-layers-tddd-and-role-placement-lint.md) | Proposed | 2026-06-21 |
 | [TDDD chain ③ の `cargo rustdoc` 呼び出しに `--document-hidden-items` を追加する](2026-06-27-0440-tddd-rustdoc-document-hidden-items.md) | Proposed | 2026-06-27 |
+| [TDDD chain ③ の rustdoc 抽出を track 単位の feature 宣言に基づかせる](2026-07-27-0039-tddd-track-scoped-feature-declaration.md) | Proposed | 2026-07-27 |
+| [catalogue の適用範囲を実装の追加・変更に一致させる](2026-07-28-1024-catalogue-scope-is-implementation-delta.md) | Proposed | 2026-07-28 |
 | [型カタログ作成の「生成 + 注釈」への移行 — 意図入力スキャフォールディング API](2026-07-02-1345-catalogue-generation-annotation.md) | — | 2026-07-02 |
 | [テスト義務ゲートと obligation-fulfillment 意味論検証 — SoT chain 第三リンクの意味論検証の完成](2026-07-02-0359-test-obligation-and-fulfillment-gate.md) | Proposed | 2026-07-02 |
 | [テスト義務ゲートにおける skipped task status レーン](2026-07-11-0802-test-obligation-skipped-status-lane.md) | Proposed | 2026-07-11 |
 | [テスト義務ゲートへの登録を機構化し、成果物不在による空振り合格を廃する](2026-07-23-0240-test-obligation-enrollment-mechanization.md) | Proposed | 2026-07-23 |
 | [contract-map renderer: `dyn Trait` return/param edge の解決](2026-07-13-0308-contract-map-dyn-trait-return-edge.md) | Proposed | 2026-07-13 |
 | [composition root 規範を純 DI に確定し、実践側の逸脱を解消する](2026-07-23-0111-composition-root-pure-di-realignment.md) | Proposed | 2026-07-23 |
+| [Composition root 純 DI 化を単一改善イニシアチブと複数独立 track で完遂する](2026-07-23-1318-composition-root-pure-di-migration-initiative.md) | Proposed | 2026-07-23 |
+| [DDD・Clean Architectureに整合する型配置と境界依存の再調整](2026-07-24-1001-architecture-pattern-placement-guard-realignment.md) | Proposed | 2026-07-24 |
+| [型配置是正における CLI 契約の維持](2026-07-25-0313-architecture-pattern-placement-cli-contract-preservation.md) | Proposed | 2026-07-25 |
 | [型契約パイプラインの規範と機構を実挙動に整合させる](2026-07-23-0113-type-contract-pipeline-consistency.md) | Proposed | 2026-07-23 |
+| [role × 層マトリクスを機構で強制し ValueObject の層勾配を是正する](2026-07-25-0538-role-layer-matrix-enforcement.md) | Proposed | 2026-07-25 |
 
 ### トラック・ワークフロー
 
@@ -171,6 +179,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [ADR-baseline の review 入口検査を init 刻印の存在確認のみに縮小する](2026-07-17-1203-adr-baseline-review-gate-init-existence-only.md) | Proposed | 2026-07-17 |
 | [adr2pr 終端に ADR baseline diff の PR コメント投稿フェーズを追加](2026-07-18-0340-adr2pr-baseline-diff-comment.md) | Proposed | 2026-07-18 |
 | [入力決定と pipeline 産決定の二箱分離](2026-07-19-0616-two-box-decision-separation.md) | Proposed | 2026-07-19 |
+| [Phase 0 承認後に修正が入った場合は承認前へ戻して再収束する](2026-07-25-0716-phase0-post-approval-reconvergence-lane.md) | Proposed | 2026-07-25 |
 
 ### ドキュメント運用
 
@@ -180,6 +189,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [運用ドキュメント再編（統合版）— ルート文書一本化・track/workflow.md 分散・工学規約の conventions 移管](2026-06-15-0025-operational-docs-restructure-unified.md) | — | 2026-06-15 |
 | [knowledge/strategy ディレクトリの整理方針](2026-06-17-1321-knowledge-strategy-cleanup.md) | — | 2026-06-17 |
 | [同梱運用ドキュメントのアーキテクチャ記述 SSoT 再編](2026-07-17-0247-docs-architecture-ssot-realignment.md) | Proposed | 2026-07-17 |
+| [consumer 規約の所有権分離と harness 固定依存の撤去](2026-07-24-0326-consumer-convention-ownership-and-harness-decoupling.md) | Proposed | 2026-07-24 |
 
 ### ドメインモデル・型設計 (DESIGN.md 由来)
 
@@ -264,3 +274,4 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [内容レビューの SoT 別スコープ化](2026-06-30-1549-per-sot-review-scope.md) | — | 2026-06-30 |
 | [レビュー負荷軽減 — findings 全件報告と下流 artifact の再記述禁止](2026-07-02-1600-review-load-batch-findings-no-restatement.md) | — | 2026-07-02 |
 | [レビュー指示書のカテゴリ閉列挙を半開形式へ改める](2026-07-23-0109-review-briefing-open-category-format.md) | Proposed | 2026-07-23 |
+| [機械導出される義務成果物を review 運用成果物として扱う](2026-07-25-0715-derived-obligation-artifact-review-scope.md) | Proposed | 2026-07-25 |

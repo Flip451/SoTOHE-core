@@ -13,14 +13,14 @@ Violations of the role statement above are always reportable. The following prio
 - **adapter performs DI**: a Driver constructor that calls `Arc::new(...)` /
   instantiates adapters / constructs use-case interactors itself, rather than
   receiving them via constructor injection. `cli_driver` is the _injected_ side;
-  object-graph construction belongs in `cli_composition`. Cite
-  `type-designer-kind-selection.md` R1 (`PrimaryAdapter`).
+  object-graph construction belongs in `cli_composition`. Name the collaborator the
+  constructor builds instead of receiving.
 - **business logic in adapter**: a `handle` method (or helper it calls) that
   contains validation rules, domain decisions, multi-step orchestration beyond
   `input → invoke → render`, or any calculation that belongs in `usecase` or
   `domain`. Orchestrating multiple use cases is a composition/usecase concern;
-  a Driver calls exactly one interactor per request. Cite
-  `coding-principles.md` §Usecase Layer Purity.
+  a Driver calls exactly one interactor per request. Name the rule or decision the
+  method carries and the layer that owns it.
 - **non-CommandOutcome return**: a public `handle` or equivalent method whose
   return type is anything other than `CommandOutcome`. Errors are part of the
   rendered output — map them to `CommandOutcome.stderr` with an appropriate
@@ -31,6 +31,16 @@ Violations of the role statement above are always reportable. The following prio
   a usecase application service, not inlined in the Driver. A Driver may call
   render-only helpers (formatters, table builders) freely — those are not
   interactor calls.
+- **boundary exposure violation**: a Driver may use usecase `Command`, `Query`,
+  boundary DTO, and usecase `ValueObject` types in its public signatures for
+  transport translation. Report direct domain `ValueObject` / `Entity` /
+  `AggregateRoot` exposure,
+  infrastructure type exposure, or transport-specific types leaking into the
+  usecase boundary. Whether a given `ValueObject` is a domain type or a
+  usecase-boundary type is a semantic judgment: state the evidence for the
+  classification you assert. The role-only catalogue lint intentionally cannot make
+  that distinction, so its silence is not a defence and its verdict is not the
+  ground for this finding.
 
 ## What NOT to report
 

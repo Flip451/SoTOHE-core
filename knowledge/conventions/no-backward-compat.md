@@ -8,7 +8,7 @@ workspace の lifecycle 整合性を保ち、暫定 compatibility layer の長�
 
 ## Scope
 
-- 適用対象: track 成果物 (metadata.json / spec.json / 型カタログ / impl-plan / task-coverage)、schema
+- 適用対象: track 成果物 (metadata.json / spec.json / 型カタログ / impl-plan / task-coverage / task-contract)、schema
   定義、CI gate の規則、codec フォーマット、CLI サブコマンドの interface
 - 適用外:
   - 純粋なバグ修正 (semantic 同値だが実装誤りの訂正)
@@ -69,5 +69,5 @@ workspace の lifecycle 整合性を保ち、暫定 compatibility layer の長�
 - [knowledge/adr/README.md](../adr/README.md) — ADR 索引
 - [workflow-ceremony-minimization.md](./workflow-ceremony-minimization.md) — 形式手順の最小化原則
   (本 convention と対になる、暫定 toggle の排除と方向性が一致)
-- [pre-track-adr-authoring.md](./pre-track-adr-authoring.md) — ADR lifecycle (遡及 amendment は
-  adr-editor back-and-forth で明示的に扱う)
+- [.harness/policies/pre-track-adr-authoring.md](../../.harness/policies/pre-track-adr-authoring.md) — ADR lifecycle
+  (遡及 amendment は adr-editor back-and-forth で明示的に扱う)

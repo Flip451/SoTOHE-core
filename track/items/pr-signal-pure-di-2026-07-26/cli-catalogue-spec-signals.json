@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "c7950fe4bce18908c1bdebd354c797f94bbefdcc206c655ef62f6a79a6652589",
+  "signals": [
+    {
+      "type_name": "cli::commands::signal::run_aggregate_check",
+      "signal": "blue",
+      "entry_hash": "75a0b4bda58a8c879cb68f450bf2fb823504fb6db53b68313c8c2eb86be7c399"
+    },
+    {
+      "type_name": "cli::commands::signal::calc_adr_user::run",
+      "signal": "blue",
+      "entry_hash": "bb00345074ddb77843a64cfa946e1692ffb714d82e62cd539ca667f9d8d5cc91"
+    },
+    {
+      "type_name": "cli::commands::signal::calc_catalog_spec::run",
+      "signal": "blue",
+      "entry_hash": "ff32389f08cf12027f4da8001c0f649c374e757554870cd9f633e8ef3ff9d137"
+    },
+    {
+      "type_name": "cli::commands::signal::calc_impl_catalog::run",
+      "signal": "blue",
+      "entry_hash": "7c39d850bad8f24edd97dd33d674fdd9030ae29c4228bd8d2ee0d22b4a3ca47c"
+    },
+    {
+      "type_name": "cli::commands::signal::calc_spec_adr::run",
+      "signal": "blue",
+      "entry_hash": "cd81ad4cef885485ca1e8b391ceb8e635bce241358755401f1f930693f19a63c"
+    },
+    {
+      "type_name": "cli::commands::signal::check_adr_user::run",
+      "signal": "blue",
+      "entry_hash": "7aea5ec3d00f3b82ce43c880f7caf1ab35293407c9d970e13dfafac0725012d8"
+    },
+    {
+      "type_name": "cli::commands::signal::check_catalog_spec::run",
+      "signal": "blue",
+      "entry_hash": "b0c4e708ad5138d92767dd855e78ea273634d02cf82bea3753a4af00d9c7088b"
+    },
+    {
+      "type_name": "cli::commands::signal::check_impl_catalog::run",
+      "signal": "blue",
+      "entry_hash": "16c5b7a603c039cfca1005182850586cff0a644dd16ae2d98c4be2121087f9bd"
+    },
+    {
+      "type_name": "cli::commands::signal::check_spec_adr::run",
+      "signal": "blue",
+      "entry_hash": "16b1da4d633fb2fff84de3d0d79d8fda26bc9f9f1a5b01b114da5a113f0b1188"
+    }
+  ]
+}

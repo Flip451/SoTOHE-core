@@ -1,12 +1,13 @@
 ---
 name: adr-editor
-model: claude-opus-4-7[1m]
-effort: max
+model: claude-opus-5
+effort: high
 tools:
   - Read
   - Grep
   - Glob
   - Edit
+  - Write
   - Bash
 description: |
   Single in-track writer for knowledge/adr/*.md under the two-box model. Applies Phase 0 convergence edits on input-box ADRs, authors / revises / deletes Phase 1+ delta candidates (track-born draft ADRs), applies non-semantic in-place fixes, and implements explicit user adjudications (grounds promotion, rejection deletion or revision, corrective restoration). Every applied edit is judged or re-audited afterwards by adr-diagnoser. Edits the working tree only — never commits or snapshots. Mirrors the `adr-editor` capability in `.harness/config/agent-profiles.json` and declares explicit Opus routing via frontmatter.

@@ -1,0 +1,512 @@
+{
+  "crate_name": "domain",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "value",
+              "ty": "String"
+            }
+          ],
+          "returns": "Result<Self, CargoFeatureNameError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "as_str",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&str"
+        }
+      ],
+      "type_name": "CargoFeatureName"
+    },
+    {
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "try_new",
+          "params": [
+            {
+              "name": "layers",
+              "ty": "std::collections::BTreeMap<LayerId, Vec<CargoFeatureName>>"
+            },
+            {
+              "name": "required_layers",
+              "ty": "&[LayerId]"
+            }
+          ],
+          "returns": "Result<Self, TdddFeatureDeclarationError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "features_for",
+          "params": [
+            {
+              "name": "layer",
+              "ty": "&LayerId"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<&[CargoFeatureName], TdddFeatureLookupError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "layers",
+          "params": [],
+          "receiver": "&self",
+          "returns": "&std::collections::BTreeMap<LayerId, Vec<CargoFeatureName>>"
+        }
+      ],
+      "type_name": "TdddFeatureDeclaration"
+    }
+  ],
+  "layer": "domain",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "for_type": "CargoFeatureName",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CargoFeatureName",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "CargoFeatureName",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "CargoFeatureName",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CargoFeatureName",
+      "trait_ref": "core::cmp::PartialOrd"
+    },
+    {
+      "for_type": "CargoFeatureName",
+      "trait_ref": "core::cmp::Ord"
+    },
+    {
+      "for_type": "CargoFeatureName",
+      "trait_ref": "core::hash::Hash"
+    },
+    {
+      "for_type": "TdddFeatureDeclaration",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TdddFeatureDeclaration",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "for_type": "TdddFeatureDeclaration",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "for_type": "TdddFeatureDeclaration",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TdddFeatureDeclarationError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TdddFeatureDeclarationError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "TdddFeatureDeclarationError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "TdddFeatureDeclarationError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TdddFeatureDeclarationError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TdddFeatureDeclarationError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "CargoFeatureNameError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "CargoFeatureNameError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "CargoFeatureNameError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "CargoFeatureNameError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "CargoFeatureNameError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "CargoFeatureNameError",
+      "trait_ref": "core::cmp::Eq"
+    },
+    {
+      "for_type": "TdddFeatureLookupError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TdddFeatureLookupError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "TdddFeatureLookupError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "add",
+      "for_type": "TdddFeatureLookupError",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "TdddFeatureLookupError",
+      "trait_ref": "core::cmp::PartialEq"
+    },
+    {
+      "action": "add",
+      "for_type": "TdddFeatureLookupError",
+      "trait_ref": "core::cmp::Eq"
+    }
+  ],
+  "traits": {
+    "RustdocBaselineCapturePort": {
+      "action": "modify",
+      "docs": "Secondary port whose capture operation receives the validated feature selection for its layer.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "capture",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&TrackId"
+            },
+            {
+              "name": "rustdoc_workspace",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "binding",
+              "ty": "&TdddLayerBinding"
+            },
+            {
+              "name": "features",
+              "ty": "&[CargoFeatureName]"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), BaselineCaptureIoError>"
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::catalogue_impl_signals_ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "RustdocCratePort": {
+      "action": "modify",
+      "docs": "Secondary port whose live rustdoc capture receives the validated feature selection for its layer.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load_from_path",
+          "params": [
+            {
+              "name": "path",
+              "ty": "&std::path::Path"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<rustdoc_types::Crate, RustdocCratePortError>"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "capture_current",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&CrateName"
+            },
+            {
+              "name": "features",
+              "ty": "&[CargoFeatureName]"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<rustdoc_types::Crate, RustdocCratePortError>"
+        }
+      ],
+      "module_path": "tddd::catalogue_v2::catalogue_impl_signals_ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "SchemaExporter": {
+      "action": "reference",
+      "docs": "Baseline schema-export port retained unchanged for the existing command surface; crate_name remains the baseline string boundary.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "export",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<SchemaExport, SchemaExportError>"
+        }
+      ],
+      "module_path": "schema",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-05",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    }
+  },
+  "types": {
+    "CargoFeatureName": {
+      "action": "add",
+      "docs": "Validated Cargo feature token that owns token syntax validation and is independent of delivery, persistence, and capture workflow.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "tuple"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::feature_declaration",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-09",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "CargoFeatureNameError": {
+      "action": "add",
+      "docs": "Narrow construction failure produced only when a Cargo feature token is invalid.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidFeatureName",
+            "payload": {
+              "fields": [
+                "DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::feature_declaration",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "AC-09",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "TdddFeatureDeclaration": {
+      "action": "add",
+      "docs": "Validated total layer-to-feature mapping; a TDDD extraction value independent of transport representation.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::feature_declaration",
+      "role": {
+        "ValueObject": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "GO-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "IN-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "TdddFeatureDeclarationError": {
+      "action": "add",
+      "docs": "Construction failures producible while validating a total per-layer feature declaration.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MissingLayer",
+            "payload": {
+              "fields": [
+                "LayerId"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "UnexpectedLayer",
+            "payload": {
+              "fields": [
+                "LayerId"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "DuplicateFeature",
+            "payload": {
+              "fields": [
+                {
+                  "name": "layer",
+                  "ty": "LayerId"
+                },
+                {
+                  "name": "feature",
+                  "ty": "CargoFeatureName"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::feature_declaration",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "TdddFeatureLookupError": {
+      "action": "add",
+      "docs": "Narrow lookup failure produced only when a requested layer is absent from the validated declaration.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MissingLayer",
+            "payload": {
+              "fields": [
+                "LayerId"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd::feature_declaration",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    }
+  }
+}

@@ -5,7 +5,7 @@
 //! `<items_dir>/<track_id>/<layer>-type-signals.json` and returns a
 //! `domain::TypeSignalsDocument`.
 //!
-//! Errors are mapped to [`usecase::pre_review_gate::PreReviewGateError::SignalReadFailed`]
+//! Errors are mapped to [`usecase::pre_review_gate::ImplCatalogSignalReadError::ReadFailed`]
 //! with the layer id and a diagnostic message.
 
 use std::path::PathBuf;
@@ -13,12 +13,20 @@ use std::path::PathBuf;
 use domain::TrackId;
 use domain::TypeSignalsDocument;
 use domain::tddd::LayerId;
-use usecase::pre_review_gate::{ImplCatalogSignalReaderPort, PreReviewGateError};
+use domain::tddd::catalogue_linter::FreeText;
+use usecase::pre_review_gate::{ImplCatalogSignalReadError, ImplCatalogSignalReaderPort};
 
 use crate::tddd::type_signals_codec;
 use crate::track::symlink_guard::reject_symlinks_below;
 
 const MAX_TYPE_SIGNALS_BYTES: u64 = 16 * 1024 * 1024;
+
+fn read_failed(layer: &LayerId, message: impl Into<String>) -> ImplCatalogSignalReadError {
+    ImplCatalogSignalReadError::ReadFailed {
+        layer: layer.clone(),
+        message: FreeText::new(message.into()),
+    }
+}
 
 /// Filesystem secondary adapter implementing
 /// [`usecase::pre_review_gate::ImplCatalogSignalReaderPort`].
@@ -26,7 +34,7 @@ const MAX_TYPE_SIGNALS_BYTES: u64 = 16 * 1024 * 1024;
 /// Reads `<items_dir>/<track_id>/<layer>-type-signals.json`, decodes it as a
 /// `domain::TypeSignalsDocument`, and returns it.
 ///
-/// - I/O and decode errors map to [`PreReviewGateError::SignalReadFailed`] with
+/// - I/O and decode errors map to [`ImplCatalogSignalReadError::ReadFailed`] with
 ///   the layer id and a diagnostic message.
 ///
 /// The `items_dir` is injected at construction time.
@@ -48,23 +56,19 @@ impl ImplCatalogSignalReaderPort for FsImplCatalogSignalReader {
         &self,
         track_id: &TrackId,
         layer: &LayerId,
-    ) -> Result<Option<TypeSignalsDocument>, PreReviewGateError> {
+    ) -> Result<Option<TypeSignalsDocument>, ImplCatalogSignalReadError> {
         let filename = format!("{}-type-signals.json", layer.as_ref());
         let items_dir =
             crate::resolve_items_dir_under_current_repo(&self.items_dir).map_err(|e| {
-                PreReviewGateError::SignalReadFailed {
-                    layer: layer.clone(),
-                    message: format!("items_dir rejected before reading type-signals: {e}"),
-                }
+                read_failed(layer, format!("items_dir rejected before reading type-signals: {e}"))
             })?;
         let path = items_dir.join(track_id.as_ref()).join(&filename);
         match reject_symlinks_below(&path, &items_dir) {
             Ok(true) => self.read_signals(track_id, layer).map(Some),
             Ok(false) => Ok(None),
-            Err(e) => Err(PreReviewGateError::SignalReadFailed {
-                layer: layer.clone(),
-                message: format!("symlink check failed for {}: {e}", path.display()),
-            }),
+            Err(e) => {
+                Err(read_failed(layer, format!("symlink check failed for {}: {e}", path.display())))
+            }
         }
     }
 
@@ -72,69 +76,58 @@ impl ImplCatalogSignalReaderPort for FsImplCatalogSignalReader {
         &self,
         track_id: &TrackId,
         layer: &LayerId,
-    ) -> Result<TypeSignalsDocument, PreReviewGateError> {
+    ) -> Result<TypeSignalsDocument, ImplCatalogSignalReadError> {
         let filename = format!("{}-type-signals.json", layer.as_ref());
         let items_dir =
             crate::resolve_items_dir_under_current_repo(&self.items_dir).map_err(|e| {
-                PreReviewGateError::SignalReadFailed {
-                    layer: layer.clone(),
-                    message: format!("items_dir rejected before reading type-signals: {e}"),
-                }
+                read_failed(layer, format!("items_dir rejected before reading type-signals: {e}"))
             })?;
         let path = items_dir.join(track_id.as_ref()).join(&filename);
 
         match reject_symlinks_below(&path, &items_dir) {
             Ok(true) => {}
             Ok(false) => {
-                return Err(PreReviewGateError::SignalReadFailed {
-                    layer: layer.clone(),
-                    message: format!("signal file not found: {}", path.display()),
-                });
+                return Err(read_failed(
+                    layer,
+                    format!("signal file not found: {}", path.display()),
+                ));
             }
             Err(e) => {
-                return Err(PreReviewGateError::SignalReadFailed {
-                    layer: layer.clone(),
-                    message: format!("symlink check failed for {}: {e}", path.display()),
-                });
+                return Err(read_failed(
+                    layer,
+                    format!("symlink check failed for {}: {e}", path.display()),
+                ));
             }
         }
 
-        let metadata =
-            std::fs::symlink_metadata(&path).map_err(|e| PreReviewGateError::SignalReadFailed {
-                layer: layer.clone(),
-                message: format!("metadata error reading {}: {e}", path.display()),
-            })?;
+        let metadata = std::fs::symlink_metadata(&path).map_err(|e| {
+            read_failed(layer, format!("metadata error reading {}: {e}", path.display()))
+        })?;
         if metadata.file_type().is_symlink() {
-            return Err(PreReviewGateError::SignalReadFailed {
-                layer: layer.clone(),
-                message: format!("symlink check failed for {}: refused symlink", path.display()),
-            });
+            return Err(read_failed(
+                layer,
+                format!("symlink check failed for {}: refused symlink", path.display()),
+            ));
         }
         if metadata.len() > MAX_TYPE_SIGNALS_BYTES {
-            return Err(PreReviewGateError::SignalReadFailed {
-                layer: layer.clone(),
-                message: format!(
+            return Err(read_failed(
+                layer,
+                format!(
                     "type-signals file exceeds maximum size of {MAX_TYPE_SIGNALS_BYTES} bytes: {} bytes",
                     metadata.len()
                 ),
-            });
+            ));
         }
 
-        let bytes = std::fs::read(&path).map_err(|e| PreReviewGateError::SignalReadFailed {
-            layer: layer.clone(),
-            message: format!("I/O error reading {}: {e}", path.display()),
+        let bytes = std::fs::read(&path).map_err(|e| {
+            read_failed(layer, format!("I/O error reading {}: {e}", path.display()))
         })?;
 
-        let json =
-            std::str::from_utf8(&bytes).map_err(|e| PreReviewGateError::SignalReadFailed {
-                layer: layer.clone(),
-                message: format!("UTF-8 error in {}: {e}", path.display()),
-            })?;
+        let json = std::str::from_utf8(&bytes)
+            .map_err(|e| read_failed(layer, format!("UTF-8 error in {}: {e}", path.display())))?;
 
-        type_signals_codec::decode(json).map_err(|e| PreReviewGateError::SignalReadFailed {
-            layer: layer.clone(),
-            message: format!("codec error reading {}: {e}", path.display()),
-        })
+        type_signals_codec::decode(json)
+            .map_err(|e| read_failed(layer, format!("codec error reading {}: {e}", path.display())))
     }
 }
 
@@ -149,9 +142,32 @@ mod tests {
 
     use domain::TrackId;
     use domain::tddd::LayerId;
-    use usecase::pre_review_gate::PreReviewGateError;
+    use usecase::pre_review_gate::ImplCatalogSignalReadError;
 
     use super::*;
+
+    #[test]
+    fn fs_impl_catalog_signal_reader_implements_port_without_compatibility_delegation() {
+        let source = include_str!("impl_catalog_signal_reader.rs");
+        let production_source = source.split("#[cfg(test)]").next().unwrap();
+
+        assert!(
+            production_source
+                .contains("impl ImplCatalogSignalReaderPort for FsImplCatalogSignalReader"),
+            "reader must implement its declared secondary port"
+        );
+        for required_method in ["fn read_optional_signals(", "fn read_signals("] {
+            assert!(production_source.contains(required_method));
+        }
+        for forbidden_runtime_path in
+            ["ServiceImpl", "CompositionRoot", "PreReviewGateInteractor", "TaskContractDriver"]
+        {
+            assert!(
+                !production_source.contains(forbidden_runtime_path),
+                "filesystem adapter must not reverse-delegate through {forbidden_runtime_path}"
+            );
+        }
+    }
 
     fn layer(s: &str) -> LayerId {
         LayerId::try_new(s.to_owned()).unwrap()
@@ -203,7 +219,7 @@ mod tests {
         let reader = FsImplCatalogSignalReader::new(dir.path().to_path_buf());
         let err = reader.read_signals(&track_id("my-track"), &layer("domain")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::SignalReadFailed { .. }),
+            matches!(err, ImplCatalogSignalReadError::ReadFailed { .. }),
             "expected SignalReadFailed, got: {err}"
         );
     }
@@ -217,6 +233,20 @@ mod tests {
     }
 
     #[test]
+    fn test_read_optional_signals_returns_some_for_existing_file() {
+        let dir = temp_items_dir();
+        let track_dir = dir.path().join("my-track");
+        fs::create_dir_all(&track_dir).unwrap();
+        fs::write(track_dir.join("domain-type-signals.json"), SAMPLE_SIGNALS_JSON).unwrap();
+
+        let reader = FsImplCatalogSignalReader::new(dir.path().to_path_buf());
+        let doc = reader.read_optional_signals(&track_id("my-track"), &layer("domain")).unwrap();
+        let document = doc.expect("existing signal document must be returned as Some");
+        assert_eq!(document.signals().len(), 1);
+        assert_eq!(document.signals()[0].type_name(), "MyType");
+    }
+
+    #[test]
     fn read_signals_returns_signal_read_failed_for_malformed_json() {
         let dir = temp_items_dir();
         let track_dir = dir.path().join("my-track");
@@ -226,7 +256,7 @@ mod tests {
         let reader = FsImplCatalogSignalReader::new(dir.path().to_path_buf());
         let err = reader.read_signals(&track_id("my-track"), &layer("domain")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::SignalReadFailed { .. }),
+            matches!(err, ImplCatalogSignalReadError::ReadFailed { .. }),
             "expected SignalReadFailed, got: {err}"
         );
     }
@@ -242,7 +272,7 @@ mod tests {
         let reader = FsImplCatalogSignalReader::new(dir.path().to_path_buf());
         let err = reader.read_signals(&track_id("my-track"), &layer("domain")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::SignalReadFailed { .. }),
+            matches!(err, ImplCatalogSignalReadError::ReadFailed { .. }),
             "expected SignalReadFailed, got: {err}"
         );
     }
@@ -260,7 +290,7 @@ mod tests {
         let reader = FsImplCatalogSignalReader::new(dir.path().to_path_buf());
         let err = reader.read_signals(&track_id("my-track"), &layer("domain")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::SignalReadFailed { .. }),
+            matches!(err, ImplCatalogSignalReadError::ReadFailed { .. }),
             "expected SignalReadFailed, got: {err}"
         );
     }
@@ -277,7 +307,7 @@ mod tests {
         let reader = FsImplCatalogSignalReader::new(dir.path().to_path_buf());
         let err = reader.read_signals(&track_id("my-track"), &layer("domain")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::SignalReadFailed { .. }),
+            matches!(err, ImplCatalogSignalReadError::ReadFailed { .. }),
             "expected SignalReadFailed, got: {err}"
         );
     }
@@ -294,7 +324,7 @@ mod tests {
         let err =
             reader.read_optional_signals(&track_id("my-track"), &layer("domain")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::SignalReadFailed { .. }),
+            matches!(err, ImplCatalogSignalReadError::ReadFailed { .. }),
             "expected SignalReadFailed, got: {err}"
         );
     }
@@ -313,7 +343,7 @@ mod tests {
         let reader = FsImplCatalogSignalReader::new(link_items_dir);
         let err = reader.read_signals(&track_id("my-track"), &layer("domain")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::SignalReadFailed { .. }),
+            matches!(err, ImplCatalogSignalReadError::ReadFailed { .. }),
             "expected SignalReadFailed, got: {err}"
         );
     }
@@ -324,7 +354,7 @@ mod tests {
         let reader = FsImplCatalogSignalReader::new(dir.path().to_path_buf());
         let err = reader.read_signals(&track_id("my-track"), &layer("domain")).unwrap_err();
         assert!(
-            matches!(err, PreReviewGateError::SignalReadFailed { .. }),
+            matches!(err, ImplCatalogSignalReadError::ReadFailed { .. }),
             "expected SignalReadFailed, got: {err}"
         );
     }

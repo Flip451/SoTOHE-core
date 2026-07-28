@@ -1,0 +1,69 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {},
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "traits": {},
+  "types": {
+    "AdrBaselineCompositionRoot": {
+      "action": "reference",
+      "docs": "Baseline-identical ADR-baseline composition root.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "adr_baseline_driver",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "cli_driver::adr_baseline::AdrBaselineDriver"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-05",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        },
+        {
+          "anchor": "AC-07",
+          "file": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json"
+        }
+      ]
+    }
+  },
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineCompositionRoot",
+      "trait_ref": "core::default::Default"
+    }
+  ]
+}

@@ -1,0 +1,773 @@
+{
+  "track_id": "architecture-pattern-placement-guard-realignment-2026-07-24",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "d2810d617c588c08dd466c6ce78f645a4a06e7c933c00a482fe0d4fc4e1a6ae7",
+        "declaration_hash": "7b9cb5ebeadbc10b12280a4208989181bf6662f8b413c4dad567fe9de62a4b7e",
+        "anchor_text_hash": "8bddc59f7182ec0f2600227915f583334425dbc6cb4920988adca52286739c37"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(kinds.len(), 15, \"must have exactly 15 variants\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "b68d635219139140f424074ede88208af38c4e2a412446492f6907401baacf08",
+        "declaration_hash": "7b9cb5ebeadbc10b12280a4208989181bf6662f8b413c4dad567fe9de62a4b7e",
+        "anchor_text_hash": "185240cccb157593ed987f45e81ce4bef1ff1b83e336ae53c665a3c926b64639"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            config_rules, preset_rules,\n            \"shipped config and preset must have identical rules\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "d7b35b09ab5f8208144536bed50e0e6a32aa12547c0cb37417c34a7e564b6c82",
+        "declaration_hash": "7b9cb5ebeadbc10b12280a4208989181bf6662f8b413c4dad567fe9de62a4b7e",
+        "anchor_text_hash": "28aad2e955458d9cfb0379a928c40a9d1c0c84e61c2ced4f652538377c3b922f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(violations.len(), 2, \"both prohibited domain roles must be rejected\");\n        assert!(violations.iter().all(|violation| violation.entry_name() == \"OrderDriver\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueLinterRuleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "4a900a07da8b3c6780e16a350b9eae2a8a7779f15c80456c47dfdef155c22064",
+        "declaration_hash": "7b9cb5ebeadbc10b12280a4208989181bf6662f8b413c4dad567fe9de62a4b7e",
+        "anchor_text_hash": "2b1f3f306348d4d3209cbb0a97c172b2456c22c7132ec49fc8781d871b9c3123"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(kinds.len(), 15, \"must have exactly 15 variants\");\n\nlet names: Vec<&str> = kinds.iter().map(|k| k.discriminant_name()).collect();\nlet expected = [\n    \"FieldEmpty\",\n    \"FieldNonEmpty\",\n    \"KindLayerConstraint\",\n    \"ReferencedRoleConstraint\",\n    \"TraitImplRequired\",\n    \"NoRoleInMethodSignature\",\n    \"NoLayerInMethodSignature\",\n    \"MethodReferenceSignature\",\n    \"AccessorSignatureRequired\",\n    \"FieldElementUniqueAcrossEntries\",\n    \"NoExternalReferenceInMethods\",\n    \"NoPublicField\",\n    \"ForbiddenMethodReceiver\",\n    \"ForbidPrimitiveInTypes\",\n    \"CompositionRootPureDi\",\n];\nassert_eq!(names, expected);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LintRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LintRuleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "9ce618462b7c7fec5f7c3c7415a0dff3f32da674338129e17d66b304e1dbcbfb",
+        "declaration_hash": "53f3d25168d85a0dc6d4bb2caf9d89a70d8e68f3338343914db6797089c4b802",
+        "anchor_text_hash": "8bddc59f7182ec0f2600227915f583334425dbc6cb4920988adca52286739c37"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n                rule.kind(),\n                &expected_kind,\n                \"conversion must preserve the typed rule variant and payload\"\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LintRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LintRuleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-06"
+      },
+      "key": {
+        "bound_tests_set_hash": "842a80eb855786fa39110a3196f09c8629459760fc9e1f8045013c33afa71907",
+        "declaration_hash": "53f3d25168d85a0dc6d4bb2caf9d89a70d8e68f3338343914db6797089c4b802",
+        "anchor_text_hash": "28aad2e955458d9cfb0379a928c40a9d1c0c84e61c2ced4f652538377c3b922f"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(specs.len(), 15, \"must cover all 15 LintRuleKind variants\");\n        for spec in specs { ... assert_eq!(rule.kind(), &expected_kind, \"conversion must preserve the typed rule variant and payload\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "LintRuleKind",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "LintRuleKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "21a86e10eb1ac584bdbc116077dc19eb00551a1a137287637212f24edb413bae",
+        "declaration_hash": "53f3d25168d85a0dc6d4bb2caf9d89a70d8e68f3338343914db6797089c4b802",
+        "anchor_text_hash": "2b1f3f306348d4d3209cbb0a97c172b2456c22c7132ec49fc8781d871b9c3123"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(rule.kind(),\n                    &expected_kind,\n                    \"conversion must preserve the typed rule variant and payload\"\n                );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineInteractor",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "4dbf27b466776da95d3b6fbcd593aaf15282bcf1db4c3669534e14cdc0603709",
+        "declaration_hash": "1a18fdf0da9b9218ab515fef1a44a74e425390591d3b75979d6c694cdc8485a5",
+        "anchor_text_hash": "62a62c158f31693a33324de251f8c0331b0f4a23ed31c6ff8bdff95f64971fb5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let interactor = AdrBaselineInteractor::new(\n            Arc::new(Store { entries: Mutex::new(Vec::new()) }),\n            Arc::new(Source {\n                working: b\"current\".to_vec(),\n                fork: b\"fork\".to_vec(),\n                cited: Vec::new(),\n                state: AdrBaselineSourceState::ExistingAtForkPoint,\n            }),\n            Arc::new(FixedClock { result: Ok(timestamp.clone()) }),\n        );\n\n        let result = interactor.execute(AdrBaselineCommand::Snapshot {\n            track_id: track(),\n            source: source(),\n            kind: AdrBaselineSnapshotKind::Init,\n        });\n        assert!(matches!(\n            result,\n            Ok(AdrBaselineOutput::SnapshotRecorded(AdrBaselineLedgerEntry::Init { timestamp: actual, .. }))\n                if actual == timestamp\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineInteractor",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "4dbf27b466776da95d3b6fbcd593aaf15282bcf1db4c3669534e14cdc0603709",
+        "declaration_hash": "1a18fdf0da9b9218ab515fef1a44a74e425390591d3b75979d6c694cdc8485a5",
+        "anchor_text_hash": "18e78f8fcb2b06dc59587651e89572a1ad5e68b7c8ee3b92b6a440104308fda2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Arc::new(FixedClock { result: Ok(timestamp.clone()) }),\n        );\n\n        let result = interactor.execute(AdrBaselineCommand::Snapshot {\n            track_id: track(),\n            source: source(),\n            kind: AdrBaselineSnapshotKind::Init,\n        });\n        assert!(matches!(\n            result,\n            Ok(AdrBaselineOutput::SnapshotRecorded(AdrBaselineLedgerEntry::Init { timestamp: actual, .. }))\n                if actual == timestamp\n        ));\n\n        let result = interactor.execute(AdrBaselineCommand::Snapshot {\n            track_id: track(),\n            source: source(),\n            kind: AdrBaselineSnapshotKind::Init,\n        });\n\n        assert_eq!(result, Err(AdrBaselineError::Clock(clock_error)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineInteractor",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "4dbf27b466776da95d3b6fbcd593aaf15282bcf1db4c3669534e14cdc0603709",
+        "declaration_hash": "1a18fdf0da9b9218ab515fef1a44a74e425390591d3b75979d6c694cdc8485a5",
+        "anchor_text_hash": "cb6007f6c69b801ca797e53100730e6430792a7e3b9ae068c28e77f9fbd17c36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = interactor.execute(AdrBaselineCommand::Snapshot {\n            track_id: track(),\n            source: source(),\n            kind: AdrBaselineSnapshotKind::Init,\n        });\n        assert!(matches!(\n            result,\n            Ok(AdrBaselineOutput::SnapshotRecorded(AdrBaselineLedgerEntry::Init { timestamp: actual, .. }))\n                if actual == timestamp\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineInteractor",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "4dbf27b466776da95d3b6fbcd593aaf15282bcf1db4c3669534e14cdc0603709",
+        "declaration_hash": "1a18fdf0da9b9218ab515fef1a44a74e425390591d3b75979d6c694cdc8485a5",
+        "anchor_text_hash": "2b1f3f306348d4d3209cbb0a97c172b2456c22c7132ec49fc8781d871b9c3123"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Arc::new(FixedClock { result: Ok(timestamp.clone()) })"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClockPort",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClockPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:now"
+      },
+      "key": {
+        "bound_tests_set_hash": "4dbf27b466776da95d3b6fbcd593aaf15282bcf1db4c3669534e14cdc0603709",
+        "declaration_hash": "231c54987eb5dfc9016e612dd30d4354c6088bbd8c7b77c6817daf2fa3bc6e00",
+        "anchor_text_hash": "62a62c158f31693a33324de251f8c0331b0f4a23ed31c6ff8bdff95f64971fb5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Arc::new(FixedClock { result: Ok(timestamp.clone()) }) ... assert!(matches!(\n            result,\n            Ok(AdrBaselineOutput::SnapshotRecorded(AdrBaselineLedgerEntry::Init { timestamp: actual, .. }))\n                if actual == timestamp\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClockPort",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClockPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:now"
+      },
+      "key": {
+        "bound_tests_set_hash": "4dbf27b466776da95d3b6fbcd593aaf15282bcf1db4c3669534e14cdc0603709",
+        "declaration_hash": "231c54987eb5dfc9016e612dd30d4354c6088bbd8c7b77c6817daf2fa3bc6e00",
+        "anchor_text_hash": "18e78f8fcb2b06dc59587651e89572a1ad5e68b7c8ee3b92b6a440104308fda2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Arc::new(FixedClock { result: Ok(timestamp.clone()) }) ... assert!(matches!(\n            result,\n            Ok(AdrBaselineOutput::SnapshotRecorded(AdrBaselineLedgerEntry::Init { timestamp: actual, .. }))\n                if actual == timestamp\n        ));\n\nArc::new(FixedClock { result: Err(clock_error.clone()) }) ... assert_eq!(result, Err(AdrBaselineError::Clock(clock_error)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClockPort",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClockPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:now"
+      },
+      "key": {
+        "bound_tests_set_hash": "4dbf27b466776da95d3b6fbcd593aaf15282bcf1db4c3669534e14cdc0603709",
+        "declaration_hash": "231c54987eb5dfc9016e612dd30d4354c6088bbd8c7b77c6817daf2fa3bc6e00",
+        "anchor_text_hash": "cb6007f6c69b801ca797e53100730e6430792a7e3b9ae068c28e77f9fbd17c36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Arc::new(FixedClock { result: Ok(timestamp.clone()) }),\n        );\n\n        let result = interactor.execute(AdrBaselineCommand::Snapshot {"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ClockPort",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ClockPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:now"
+      },
+      "key": {
+        "bound_tests_set_hash": "4dbf27b466776da95d3b6fbcd593aaf15282bcf1db4c3669534e14cdc0603709",
+        "declaration_hash": "231c54987eb5dfc9016e612dd30d4354c6088bbd8c7b77c6817daf2fa3bc6e00",
+        "anchor_text_hash": "2b1f3f306348d4d3209cbb0a97c172b2456c22c7132ec49fc8781d871b9c3123"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "Arc::new(FixedClock { result: Ok(timestamp.clone()) }), ... if actual == timestamp\n\nArc::new(FixedClock { result: Err(clock_error.clone()) }), ... assert_eq!(result, Err(AdrBaselineError::Clock(clock_error)))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemClockAdapter",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemClockAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::adr_baseline::ClockPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "f2e44525eacef06b9aface247b73ad91dec6733acfc5f049f653fe86be8e5eee",
+        "declaration_hash": "c1f3ae1f708419eeeb32a93cb28fd28dcabe84e78f904c7605a69f341b4b705a",
+        "anchor_text_hash": "62a62c158f31693a33324de251f8c0331b0f4a23ed31c6ff8bdff95f64971fb5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let timestamp = SystemClockAdapter.now().unwrap();\n    assert!(Timestamp::new(timestamp.as_str().to_owned()).is_ok());\n\n    let source = include_str!(\"../adr_baseline.rs\");\n    assert!(source.contains(\"impl ClockPort for SystemClockAdapter\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemClockAdapter",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemClockAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::adr_baseline::ClockPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "f2e44525eacef06b9aface247b73ad91dec6733acfc5f049f653fe86be8e5eee",
+        "declaration_hash": "c1f3ae1f708419eeeb32a93cb28fd28dcabe84e78f904c7605a69f341b4b705a",
+        "anchor_text_hash": "18e78f8fcb2b06dc59587651e89572a1ad5e68b7c8ee3b92b6a440104308fda2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let timestamp = SystemClockAdapter.now().unwrap();\n    assert!(Timestamp::new(timestamp.as_str().to_owned()).is_ok());\n\n    let source = include_str!(\"../adr_baseline.rs\");\n    assert!(source.contains(\"impl ClockPort for SystemClockAdapter\"));\n    assert!(\n        source.contains(\n            \"crate::timestamp_now().map_err(AdrBaselineTimestampError::InvalidTimestamp)\"\n        )\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemClockAdapter",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemClockAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::adr_baseline::ClockPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "f2e44525eacef06b9aface247b73ad91dec6733acfc5f049f653fe86be8e5eee",
+        "declaration_hash": "c1f3ae1f708419eeeb32a93cb28fd28dcabe84e78f904c7605a69f341b4b705a",
+        "anchor_text_hash": "cb6007f6c69b801ca797e53100730e6430792a7e3b9ae068c28e77f9fbd17c36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(source.contains(\"impl ClockPort for SystemClockAdapter\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemClockAdapter",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemClockAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::adr_baseline::ClockPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "f2e44525eacef06b9aface247b73ad91dec6733acfc5f049f653fe86be8e5eee",
+        "declaration_hash": "c1f3ae1f708419eeeb32a93cb28fd28dcabe84e78f904c7605a69f341b4b705a",
+        "anchor_text_hash": "2b1f3f306348d4d3209cbb0a97c172b2456c22c7132ec49fc8781d871b9c3123"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(source.contains(\"impl ClockPort for SystemClockAdapter\")); assert!(source.contains(\"crate::timestamp_now().map_err(AdrBaselineTimestampError::InvalidTimestamp)\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineCommand",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "b65ab42004feca67fab0452fbd0ddd54ba820f43b7fec8cbfb3beb26d4c01f2f",
+        "declaration_hash": "c3254ed9f4b3c37de0b15f26b415249edc09d09131f6ef277c6b208ec1b092ef",
+        "anchor_text_hash": "18e78f8fcb2b06dc59587651e89572a1ad5e68b7c8ee3b92b6a440104308fda2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "[AdrBaselineCommand::Snapshot { track_id, source, kind: AdrBaselineSnapshotKind::NewAdr(reason) }]\n                if track_id.as_ref() == \"test-track\"\n                    && source.as_str() == \"decision.md\"\n                    && reason.as_ref() == \"approved by user\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineCommand",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "967040b7705b950da4d8650c5bf43eb59e4fc3ac0b2368d425a4513d424da316",
+        "declaration_hash": "c3254ed9f4b3c37de0b15f26b415249edc09d09131f6ef277c6b208ec1b092ef",
+        "anchor_text_hash": "cb6007f6c69b801ca797e53100730e6430792a7e3b9ae068c28e77f9fbd17c36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let timestamp = Timestamp::new(\"2026-07-16T00:00:00Z\").unwrap();\n        let interactor = AdrBaselineInteractor::new(\n            Arc::new(Store { entries: Mutex::new(Vec::new()) }),\n            Arc::new(Source {\n                working: b\"current\".to_vec(),\n                fork: b\"fork\".to_vec(),\n                cited: Vec::new(),\n                state: AdrBaselineSourceState::ExistingAtForkPoint,\n            }),\n            Arc::new(FixedClock { result: Ok(timestamp.clone()) }),\n        );\n\n        let result = interactor.execute(AdrBaselineCommand::Snapshot {\n            track_id: track(),\n            source: source(),\n            kind: AdrBaselineSnapshotKind::Init,\n        });\n        assert!(matches!(\n            result,\n            Ok(AdrBaselineOutput::SnapshotRecorded(AdrBaselineLedgerEntry::Init { timestamp: actual, .. }))\n                if actual == timestamp\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineCommand",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "b65ab42004feca67fab0452fbd0ddd54ba820f43b7fec8cbfb3beb26d4c01f2f",
+        "declaration_hash": "c3254ed9f4b3c37de0b15f26b415249edc09d09131f6ef277c6b208ec1b092ef",
+        "anchor_text_hash": "2b1f3f306348d4d3209cbb0a97c172b2456c22c7132ec49fc8781d871b9c3123"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            recorded.as_slice(),\n            [AdrBaselineCommand::Snapshot { track_id, source, kind: AdrBaselineSnapshotKind::NewAdr(reason) }]\n                if track_id.as_ref() == \"test-track\"\n                    && source.as_str() == \"decision.md\"\n                    && reason.as_ref() == \"approved by user\"\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineError",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "872336978f2fea9f56b6c099a5058ff5df9328e8919655538007657584ebbcec",
+        "declaration_hash": "4d76902895858dd047c493cd4807ee280070234697fca613b239a950620afc5a",
+        "anchor_text_hash": "62a62c158f31693a33324de251f8c0331b0f4a23ed31c6ff8bdff95f64971fb5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = interactor.execute(AdrBaselineCommand::Snapshot {\n            track_id: track(),\n            source: source(),\n            kind: AdrBaselineSnapshotKind::Init,\n        });\n\n        assert_eq!(result, Err(AdrBaselineError::Clock(clock_error)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineError",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "872336978f2fea9f56b6c099a5058ff5df9328e8919655538007657584ebbcec",
+        "declaration_hash": "4d76902895858dd047c493cd4807ee280070234697fca613b239a950620afc5a",
+        "anchor_text_hash": "18e78f8fcb2b06dc59587651e89572a1ad5e68b7c8ee3b92b6a440104308fda2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let result = interactor.execute(AdrBaselineCommand::Snapshot {\n            track_id: track(),\n            source: source(),\n            kind: AdrBaselineSnapshotKind::Init,\n        });\n\n        assert_eq!(result, Err(AdrBaselineError::Clock(clock_error)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineError",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "872336978f2fea9f56b6c099a5058ff5df9328e8919655538007657584ebbcec",
+        "declaration_hash": "4d76902895858dd047c493cd4807ee280070234697fca613b239a950620afc5a",
+        "anchor_text_hash": "cb6007f6c69b801ca797e53100730e6430792a7e3b9ae068c28e77f9fbd17c36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(result, Err(AdrBaselineError::Clock(clock_error)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineError",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "872336978f2fea9f56b6c099a5058ff5df9328e8919655538007657584ebbcec",
+        "declaration_hash": "4d76902895858dd047c493cd4807ee280070234697fca613b239a950620afc5a",
+        "anchor_text_hash": "2b1f3f306348d4d3209cbb0a97c172b2456c22c7132ec49fc8781d871b9c3123"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(result, Err(AdrBaselineError::Clock(clock_error)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineDriver",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "8af2ee6c8ba22c4d2ef9bec27145a715da3ed2b1a8d2f70ddbe73d0596896792",
+        "declaration_hash": "98447a34d07d7404e7f0da78b296fbbae90f0d3357e97036b39de1a5b3a01db8",
+        "anchor_text_hash": "e69840331a73e8fa4e8c00e01bbd0a4ded015aa75158f4c5058a15ede49c04c5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let outcome = driver.handle(AdrBaselineInput::Snapshot { ... }); ... assert!(matches!( recorded.as_slice(), [AdrBaselineCommand::Snapshot { track_id, source, kind: AdrBaselineSnapshotKind::NewAdr(reason) }] ... )); ... let review_outcome = driver.handle(AdrBaselineInput::CheckReview { ... }); ... assert!(matches!( query_service.recorded.lock().unwrap().as_slice(), [ AdrBaselineQuery::CheckReview { ... }, AdrBaselineQuery::CheckCommit { ... }, ] ... ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineDriver",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "7c7792d5a0db01f98f9e0dae1b01d899d3d8044bf9c39195bbf26c331efaf282",
+        "declaration_hash": "98447a34d07d7404e7f0da78b296fbbae90f0d3357e97036b39de1a5b3a01db8",
+        "anchor_text_hash": "62a62c158f31693a33324de251f8c0331b0f4a23ed31c6ff8bdff95f64971fb5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            command_service.recorded.lock().unwrap().as_slice(),\n            [AdrBaselineCommand::Snapshot { .. }]\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineDriver",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "15ca2a728c5f234c8271a0b2a7cd4393061d7c09b0f4261965e2ea580b70c7fa",
+        "declaration_hash": "98447a34d07d7404e7f0da78b296fbbae90f0d3357e97036b39de1a5b3a01db8",
+        "anchor_text_hash": "18e78f8fcb2b06dc59587651e89572a1ad5e68b7c8ee3b92b6a440104308fda2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let driver = AdrBaselineDriver::new(command_service.clone(), Arc::new(PassingQueryService));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineDriver",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "5e36cefea1f6d351d07623335b4b6412ea8b34a18dd013c2b7f34e6a8b27b9a0",
+        "declaration_hash": "98447a34d07d7404e7f0da78b296fbbae90f0d3357e97036b39de1a5b3a01db8",
+        "anchor_text_hash": "95a09e50051e377125c32bc87676eb3df2a5a06c40ef5ca7c57bdaa57c69f809"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            recorded.as_slice(),\n            [AdrBaselineCommand::Snapshot { track_id, source, kind: AdrBaselineSnapshotKind::NewAdr(reason) }]\n                if track_id.as_ref() == \"test-track\"\n                    && source.as_str() == \"decision.md\"\n                    && reason.as_ref() == \"approved by user\"\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineDriver",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "15ca2a728c5f234c8271a0b2a7cd4393061d7c09b0f4261965e2ea580b70c7fa",
+        "declaration_hash": "98447a34d07d7404e7f0da78b296fbbae90f0d3357e97036b39de1a5b3a01db8",
+        "anchor_text_hash": "cb6007f6c69b801ca797e53100730e6430792a7e3b9ae068c28e77f9fbd17c36"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let driver = AdrBaselineDriver::new(command_service.clone(), Arc::new(PassingQueryService));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineDriver",
+        "anchor_id": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "41250e597726f16c2c4b634286312a3f16187f110702f091dbeff98f5e1e1ac5",
+        "declaration_hash": "98447a34d07d7404e7f0da78b296fbbae90f0d3357e97036b39de1a5b3a01db8",
+        "anchor_text_hash": "2b1f3f306348d4d3209cbb0a97c172b2456c22c7132ec49fc8781d871b9c3123"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let outcome = driver.handle(AdrBaselineInput::Snapshot {\n            track_id: \"test-track\".parse().unwrap(),\n            source: \"decision.md\".parse().unwrap(),\n            kind: AdrBaselineSnapshotInput::NewAdr(\n                NonEmptyString::try_new(\"approved by user\".to_owned()).unwrap(),\n            ),\n        });\n\n        assert_eq!(outcome.exit_code, 1);\n        let recorded = service.recorded.lock().unwrap();\n        assert!(matches!(\n            recorded.as_slice(),\n            [AdrBaselineCommand::Snapshot { track_id, source, kind: AdrBaselineSnapshotKind::NewAdr(reason) }]\n                if track_id.as_ref() == \"test-track\"\n                    && source.as_str() == \"decision.md\"\n                    && reason.as_ref() == \"approved by user\"\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ]
+}

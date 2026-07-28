@@ -1,0 +1,23 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {
+    "cli_composition::verify::execute_catalogue_spec_refs": {
+      "action": "delete",
+      "informal_grounds": [],
+      "spec_refs": [
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json"
+        }
+      ]
+    }
+  },
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "traits": {},
+  "types": {}
+}

@@ -53,9 +53,9 @@ pub fn verify(root: &Path) -> VerifyOutcome {
             // (pre-implementation). spec.json / spec.md / plan.md are not
             // yet required at these phases, so skip the existence checks.
             // impl-plan.json presence is the marker for Phase 3+ where
-            // artifact validation kicks in (per
-            // knowledge/conventions/workflow-ceremony-minimization.md Rules
-            // "file existence = phase status").
+            // artifact validation kicks in: file existence is the phase
+            // status, so the gate stays a check-if-present / skip-if-absent
+            // branch rather than a conditional check over optional fields.
             let impl_plan_path = track_dir.join("impl-plan.json");
             let impl_plan_present =
                 match guarded_file_present(&impl_plan_path, &track_dir, root, "impl-plan.json") {

@@ -1,0 +1,372 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {
+    "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer": {
+      "action": "modify",
+      "docs": "Free-function entrypoint for one layer's implementation-signal evaluation.",
+      "informal_grounds": [],
+      "is_async": false,
+      "params": [
+        {
+          "name": "items_dir",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "track_id",
+          "ty": "&domain::TrackId"
+        },
+        {
+          "name": "workspace_root",
+          "ty": "&std::path::Path"
+        },
+        {
+          "name": "binding",
+          "ty": "&TdddLayerBinding"
+        },
+        {
+          "name": "features",
+          "ty": "&[domain::tddd::CargoFeatureName]"
+        }
+      ],
+      "returns": "Result<std::process::ExitCode, EvaluateSignalsError>",
+      "role": "FreeFunction",
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    }
+  },
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "type_name": "FsTdddFeatureDeclarationAdapter"
+    },
+    {
+      "methods": [
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "type_name": "RustdocBaselineCaptureAdapter"
+    },
+    {
+      "methods": [
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "type_name": "RustdocCrateAdapter"
+    },
+    {
+      "methods": [
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "workspace_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        },
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "export_rustdoc_json_path",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<std::path::PathBuf, domain::schema::SchemaExportError>",
+          "where_predicates": []
+        },
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "export_rustdoc_json_path_with_features",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&domain::tddd::catalogue_v2::CrateName"
+            },
+            {
+              "name": "features",
+              "ty": "&[domain::tddd::CargoFeatureName]"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<std::path::PathBuf, domain::schema::SchemaExportError>",
+          "where_predicates": []
+        },
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "existing_rustdoc_json_path",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<std::path::PathBuf, domain::schema::SchemaExportError>",
+          "where_predicates": []
+        }
+      ],
+      "type_name": "RustdocSchemaExporter"
+    }
+  ],
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "add",
+      "for_type": "FsTdddFeatureDeclarationAdapter",
+      "trait_ref": "usecase::tddd_feature_declaration::TdddBaselineFeatureDeclarationPort"
+    },
+    {
+      "action": "add",
+      "for_type": "FsTdddFeatureDeclarationAdapter",
+      "trait_ref": "usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPort"
+    },
+    {
+      "action": "add",
+      "for_type": "FsTdddFeatureDeclarationAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "add",
+      "for_type": "FsTdddFeatureDeclarationAdapter",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "add",
+      "for_type": "FsTdddFeatureDeclarationAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "RustdocBaselineCaptureAdapter",
+      "trait_ref": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocBaselineCapturePort"
+    },
+    {
+      "action": "reference",
+      "for_type": "RustdocBaselineCaptureAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "RustdocBaselineCaptureAdapter",
+      "trait_ref": "core::clone::Clone"
+    },
+    {
+      "action": "reference",
+      "for_type": "RustdocBaselineCaptureAdapter",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "modify",
+      "for_type": "RustdocCrateAdapter",
+      "trait_ref": "domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort"
+    },
+    {
+      "action": "reference",
+      "for_type": "RustdocSchemaExporter",
+      "trait_ref": "domain::schema::SchemaExporter"
+    },
+    {
+      "action": "reference",
+      "for_type": "RustdocSchemaExporter",
+      "trait_ref": "usecase::export_schema::SchemaExporterPort"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "usecase::type_signals::ports::TypeSignalsExecutorPort"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TypeSignalsExecutorAdapter",
+      "trait_ref": "core::default::Default"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "FsTdddFeatureDeclarationAdapter": {
+      "action": "add",
+      "docs": "Implements both client-specific declaration ports over one shared reader and byte-binding mechanism.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::feature_declaration_adapter",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "RustdocBaselineCaptureAdapter": {
+      "action": "modify",
+      "docs": "Captures per-layer baseline rustdoc with the declaration-provided Cargo features.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::rustdoc_baseline_capture_adapter",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "RustdocCrateAdapter": {
+      "action": "modify",
+      "docs": "Captures actual rustdoc for a crate with the declaration-provided Cargo features.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "tddd::rustdoc_crate_adapter",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "RustdocSchemaExporter": {
+      "action": "modify",
+      "docs": "Exports rustdoc JSON normally or with an explicit validated Cargo-feature set.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "schema_export",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsExecutorAdapter": {
+      "action": "modify",
+      "docs": "Secondary adapter for the canonical implementation-signal executor port.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "tddd::type_signals_executor_adapter",
+      "role": {
+        "SecondaryAdapter": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    }
+  }
+}

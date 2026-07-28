@@ -19,19 +19,18 @@ Violations of the role statement above are always reportable. The following prio
   method (e.g., `.handle(...)` / `.run(...)`). This includes a `CompositionRoot`
   method and any public free function in `cli_composition`. A composition root may
   construct and inject those collaborators, but it must not accept a request and
-  return an application result itself. Cite `type-designer-kind-selection.md` R1
-  (`CompositionRoot` and `FreeFunction`).
+  return an application result itself. Name the entry point and the call through
+  which the application flow leaves it.
 - **public free-function composition entry point**: a public free function in
   `cli_composition`, including one that only returns a fully wired adapter.
   Composition wiring belongs on a `CompositionRoot` method; a free function is not
-  a permitted handoff surface. Cite `type-designer-kind-selection.md` R1
-  (`FreeFunction`).
+  a permitted handoff surface.
 - **prohibited public-surface exposure**: a `CompositionRoot` public field,
   generic bound, implemented application trait, or method signature that exposes
   a domain type, use-case type (including its error types), or an internal role
   type. Keep those details behind the composition boundary; a composition-local
-  typed wiring error remains permitted. Cite `type-designer-kind-selection.md`
-  R1 (`CompositionRoot`).
+  typed wiring error remains permitted. Name the exposed type and the layer it
+  belongs to.
 - **`PrimaryAdapter` wiring allowance**: do not report a composition method
   solely because it constructs the object graph and returns a fully wired
   `PrimaryAdapter`. That return value is the permitted pure-DI handoff to
@@ -53,17 +52,18 @@ Violations of the role statement above are always reportable. The following prio
   in `libs/infrastructure`; `cli_composition` only constructs and wires them.
 - **port-adapter pairing mistake**: a wiring function that constructs adapter `A`
   but binds it to a port that `A` does NOT implement (code may compile via a
-  separate impl block). Cite `type-designer-kind-selection.md` R1 and
-  `architecture-rules.json`.
+  separate impl block). Name the adapter, the port it was bound to, and the
+  impl block that makes the mismatch compile.
 - **panic in wiring**: `unwrap()` / `expect()` on a config-load or constructor
   call in production wiring. Wiring errors must propagate as `Result<_, CompositionError>`
-  to the CLI caller. Cite `coding-principles.md` §No Panics in Library Code.
+  to the CLI caller.
 - **double-instantiation of stateful adapter**: a builder that creates two
   instances of an adapter holding shared mutable state (file handle, DB pool, lock)
-  where one was intended. Cite `type-designer-kind-selection.md` R1.
+  where one was intended. Name the shared state the two instances would contend for.
 - **leaked test fixture in production wiring**: a `pub fn` reachable from real CLI
   commands that returns an adapter with a hard-coded test profile, fake path, or
-  in-memory store. Cite `coding-principles.md` test-code exclusions.
+  in-memory store. Show the production call path that reaches it; a fixture reachable
+  only from `#[cfg(test)]` is not this finding.
 
 ## What NOT to report
 

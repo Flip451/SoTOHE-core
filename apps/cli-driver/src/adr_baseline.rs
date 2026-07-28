@@ -1,15 +1,14 @@
 //! Primary adapter for ADR baseline snapshot, restore, and freeze-check commands.
 
-use std::path::PathBuf;
 use std::str::FromStr;
 use std::sync::Arc;
 
 use usecase::adr_baseline::{
-    AdrBaselineCheckOutcome, AdrBaselineCommand, AdrBaselineKind, AdrBaselineQuery,
-    AdrBaselineQueryOutput, AdrBaselineQueryService, AdrBaselineService,
+    AdrBaselineCheckOutcome, AdrBaselineCommand, AdrBaselineQuery, AdrBaselineQueryOutput,
+    AdrBaselineQueryService, AdrBaselineService, AdrBaselineSnapshotKind,
     AdrBaselineValidationError, AdrSourceFileName,
 };
-use usecase::{NonEmptyString, Timestamp, TrackId, ValidationError};
+use usecase::{NonEmptyString, TrackId, ValidationError};
 
 use crate::render::CommandOutcome;
 
@@ -93,18 +92,6 @@ pub enum AdrBaselineKindInput {
     Escalation,
 }
 
-impl AdrBaselineKindInput {
-    fn into_domain(self) -> AdrBaselineKind {
-        match self {
-            Self::Init => AdrBaselineKind::Init,
-            Self::Cite => AdrBaselineKind::Cite,
-            Self::NewAdr => AdrBaselineKind::NewAdr,
-            Self::NonSemanticFix => AdrBaselineKind::NonSemanticFix,
-            Self::Escalation => AdrBaselineKind::Escalation,
-        }
-    }
-}
-
 impl FromStr for AdrBaselineKindInput {
     type Err = String;
 
@@ -174,41 +161,46 @@ impl std::fmt::Display for AdrBaselineReasonInput {
     }
 }
 
-/// Unresolved ADR baseline requests accepted by the composition boundary.
+/// Validated reason-aware snapshot input accepted by the primary adapter.
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum AdrBaselineRequest {
-    Snapshot {
-        items_dir: PathBuf,
-        track_id: Option<TrackIdInput>,
-        source: AdrSourceFileNameInput,
-        kind: AdrBaselineKindInput,
-        reason: Option<AdrBaselineReasonInput>,
-    },
-    Restore {
-        items_dir: PathBuf,
-        track_id: Option<TrackIdInput>,
-        source: AdrSourceFileNameInput,
-    },
-    CheckReview {
-        items_dir: PathBuf,
-        track_id: Option<TrackIdInput>,
-        primary_source: Option<AdrSourceFileNameInput>,
-    },
-    CheckCommit {
-        items_dir: PathBuf,
-        track_id: Option<TrackIdInput>,
-    },
+pub enum AdrBaselineSnapshotInput {
+    /// Initial designation snapshot.
+    Init,
+    /// Snapshot of a cited ADR.
+    Cite,
+    /// New ADR snapshot with required rationale.
+    NewAdr(NonEmptyString),
+    /// Non-semantic correction snapshot.
+    NonSemanticFix,
+    /// Escalated snapshot with required rationale.
+    Escalation(NonEmptyString),
 }
 
-impl AdrBaselineRequest {
-    /// Returns the request's track-items directory without interpreting it.
-    #[must_use]
-    pub fn items_dir(&self) -> &std::path::Path {
-        match self {
-            Self::Snapshot { items_dir, .. }
-            | Self::Restore { items_dir, .. }
-            | Self::CheckReview { items_dir, .. }
-            | Self::CheckCommit { items_dir, .. } => items_dir,
+impl TryFrom<(AdrBaselineKindInput, Option<AdrBaselineReasonInput>)> for AdrBaselineSnapshotInput {
+    type Error = AdrBaselineValidationError;
+
+    fn try_from(
+        (kind, reason): (AdrBaselineKindInput, Option<AdrBaselineReasonInput>),
+    ) -> Result<Self, Self::Error> {
+        match (kind, reason) {
+            (AdrBaselineKindInput::Init, None) => Ok(Self::Init),
+            (AdrBaselineKindInput::Cite, None) => Ok(Self::Cite),
+            (AdrBaselineKindInput::NewAdr, Some(reason)) => Ok(Self::NewAdr(reason.value)),
+            (AdrBaselineKindInput::NonSemanticFix, None) => Ok(Self::NonSemanticFix),
+            (AdrBaselineKindInput::Escalation, Some(reason)) => Ok(Self::Escalation(reason.value)),
+            _ => Err(AdrBaselineValidationError::InvalidReason),
+        }
+    }
+}
+
+impl From<AdrBaselineSnapshotInput> for AdrBaselineSnapshotKind {
+    fn from(input: AdrBaselineSnapshotInput) -> Self {
+        match input {
+            AdrBaselineSnapshotInput::Init => Self::Init,
+            AdrBaselineSnapshotInput::Cite => Self::Cite,
+            AdrBaselineSnapshotInput::NewAdr(reason) => Self::NewAdr(reason),
+            AdrBaselineSnapshotInput::NonSemanticFix => Self::NonSemanticFix,
+            AdrBaselineSnapshotInput::Escalation(reason) => Self::Escalation(reason),
         }
     }
 }
@@ -219,9 +211,7 @@ pub enum AdrBaselineInput {
     Snapshot {
         track_id: TrackIdInput,
         source: AdrSourceFileNameInput,
-        kind: AdrBaselineKindInput,
-        reason: Option<AdrBaselineReasonInput>,
-        timestamp: Timestamp,
+        kind: AdrBaselineSnapshotInput,
     },
     Restore {
         track_id: TrackIdInput,
@@ -243,7 +233,7 @@ pub struct AdrBaselineDriver {
 }
 
 impl AdrBaselineDriver {
-    /// Creates an ADR baseline driver from the command and query services.
+    /// Creates an ADR baseline driver from its application services.
     #[must_use]
     pub fn new(
         command_service: Arc<dyn AdrBaselineService>,
@@ -256,14 +246,12 @@ impl AdrBaselineDriver {
     #[must_use]
     pub fn handle(&self, input: AdrBaselineInput) -> CommandOutcome {
         match input {
-            AdrBaselineInput::Snapshot { track_id, source, kind, reason, timestamp } => self
+            AdrBaselineInput::Snapshot { track_id, source, kind } => self
                 .command_service
                 .execute(AdrBaselineCommand::Snapshot {
                     track_id: track_id.value,
                     source: source.value,
-                    kind: kind.into_domain(),
-                    reason: reason.map(|reason| reason.value),
-                    timestamp,
+                    kind: kind.into(),
                 })
                 .map(|output| {
                     CommandOutcome::success(Some(format!("ADR baseline snapshot: {output:?}")))
@@ -312,7 +300,9 @@ fn render_query_outcome(output: AdrBaselineQueryOutput) -> CommandOutcome {
 mod tests {
     use std::sync::Mutex;
 
-    use usecase::adr_baseline::{AdrBaselineError, AdrBaselineOutput, AdrBaselineQueryError};
+    use usecase::adr_baseline::{
+        AdrBaselineError, AdrBaselineOutput, AdrBaselineQueryError, AdrBaselineSourceError,
+    };
 
     use super::*;
 
@@ -326,7 +316,9 @@ mod tests {
             command: AdrBaselineCommand,
         ) -> Result<AdrBaselineOutput, AdrBaselineError> {
             self.recorded.lock().unwrap().push(command);
-            Err(AdrBaselineError::Validation(AdrBaselineValidationError::InvalidReason))
+            Err(AdrBaselineError::Source(AdrBaselineSourceError::Read(
+                usecase::DiagnosticMessage::try_new("not used".to_owned()).unwrap(),
+            )))
         }
     }
 
@@ -340,6 +332,31 @@ mod tests {
             Err(AdrBaselineQueryError::SourceRead(
                 usecase::DiagnosticMessage::try_new("not used".to_owned()).unwrap(),
             ))
+        }
+    }
+
+    struct RecordingQueryService {
+        recorded: Mutex<Vec<AdrBaselineQuery>>,
+    }
+
+    impl AdrBaselineQueryService for RecordingQueryService {
+        fn execute(
+            &self,
+            query: AdrBaselineQuery,
+        ) -> Result<AdrBaselineQueryOutput, AdrBaselineQueryError> {
+            self.recorded.lock().unwrap().push(query);
+            Ok(AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Passed))
+        }
+    }
+
+    struct PassingQueryService;
+
+    impl AdrBaselineQueryService for PassingQueryService {
+        fn execute(
+            &self,
+            _: AdrBaselineQuery,
+        ) -> Result<AdrBaselineQueryOutput, AdrBaselineQueryError> {
+            Ok(AdrBaselineQueryOutput::Checked(AdrBaselineCheckOutcome::Passed))
         }
     }
 
@@ -358,40 +375,120 @@ mod tests {
         let outcome = driver.handle(AdrBaselineInput::Snapshot {
             track_id: "test-track".parse().unwrap(),
             source: "decision.md".parse().unwrap(),
-            kind: "new-adr".parse().unwrap(),
-            reason: Some("approved by user".parse().unwrap()),
-            timestamp: Timestamp::new("2026-07-16T00:00:00Z").unwrap(),
+            kind: AdrBaselineSnapshotInput::NewAdr(
+                NonEmptyString::try_new("approved by user".to_owned()).unwrap(),
+            ),
         });
 
         assert_eq!(outcome.exit_code, 1);
         let recorded = service.recorded.lock().unwrap();
         assert!(matches!(
             recorded.as_slice(),
-            [AdrBaselineCommand::Snapshot { track_id, source, kind: AdrBaselineKind::NewAdr, reason: Some(reason), timestamp }]
+            [AdrBaselineCommand::Snapshot { track_id, source, kind: AdrBaselineSnapshotKind::NewAdr(reason) }]
                 if track_id.as_ref() == "test-track"
                     && source.as_str() == "decision.md"
                     && reason.as_ref() == "approved by user"
-                    && timestamp.as_str() == "2026-07-16T00:00:00Z"
         ));
     }
 
     #[test]
-    fn test_adr_baseline_driver_defers_kind_reason_legality_to_service() {
-        let service = Arc::new(RecordingCommandService { recorded: Mutex::new(Vec::new()) });
-        let driver = AdrBaselineDriver::new(service.clone(), Arc::new(NoopQueryService));
-        let outcome = driver.handle(AdrBaselineInput::Snapshot {
+    fn test_adr_baseline_driver_query_variants_delegate_losslessly_to_injected_service() {
+        let command_service =
+            Arc::new(RecordingCommandService { recorded: Mutex::new(Vec::new()) });
+        let query_service = Arc::new(RecordingQueryService { recorded: Mutex::new(Vec::new()) });
+        let driver = AdrBaselineDriver::new(command_service.clone(), query_service.clone());
+
+        let review_outcome = driver.handle(AdrBaselineInput::CheckReview {
+            track_id: "review-track".parse().unwrap(),
+            primary_source: Some("primary.md".parse().unwrap()),
+        });
+        assert_eq!(review_outcome.stdout.as_deref(), Some("ADR baseline check: passed"));
+        assert_eq!(review_outcome.stderr, None);
+        assert_eq!(review_outcome.exit_code, 0);
+
+        let commit_outcome = driver
+            .handle(AdrBaselineInput::CheckCommit { track_id: "commit-track".parse().unwrap() });
+        assert_eq!(commit_outcome.stdout.as_deref(), Some("ADR baseline check: passed"));
+        assert_eq!(commit_outcome.stderr, None);
+        assert_eq!(commit_outcome.exit_code, 0);
+
+        assert!(command_service.recorded.lock().unwrap().is_empty());
+        assert!(matches!(
+            query_service.recorded.lock().unwrap().as_slice(),
+            [
+                AdrBaselineQuery::CheckReview { track_id: review_track, primary_source: Some(primary_source) },
+                AdrBaselineQuery::CheckCommit { track_id: commit_track },
+            ] if review_track.as_ref() == "review-track"
+                && primary_source.as_str() == "primary.md"
+                && commit_track.as_ref() == "commit-track"
+        ));
+    }
+
+    #[test]
+    fn test_adr_baseline_snapshot_input_rejects_illegal_kind_reason_combination() {
+        let result = AdrBaselineSnapshotInput::try_from((
+            AdrBaselineKindInput::Init,
+            Some("unexpected".parse().unwrap()),
+        ));
+
+        assert_eq!(result, Err(AdrBaselineValidationError::InvalidReason));
+    }
+
+    #[test]
+    fn test_adr_baseline_driver_new_handle_preserves_rendering() {
+        let command_service =
+            Arc::new(RecordingCommandService { recorded: Mutex::new(Vec::new()) });
+        let driver = AdrBaselineDriver::new(command_service.clone(), Arc::new(PassingQueryService));
+
+        let snapshot_outcome = driver.handle(AdrBaselineInput::Snapshot {
             track_id: "test-track".parse().unwrap(),
             source: "decision.md".parse().unwrap(),
-            kind: AdrBaselineKindInput::Init,
-            reason: Some("unexpected".parse().unwrap()),
-            timestamp: Timestamp::new("2026-07-16T00:00:00Z").unwrap(),
+            kind: AdrBaselineSnapshotInput::Init,
         });
-
-        assert_eq!(outcome.exit_code, 1);
+        assert_eq!(snapshot_outcome.stdout, None);
+        assert_eq!(
+            snapshot_outcome.stderr.as_deref(),
+            Some("ADR baseline source read failed: DiagnosticMessage(\"not used\")")
+        );
+        assert_eq!(snapshot_outcome.exit_code, 1);
         assert!(matches!(
-            service.recorded.lock().unwrap().as_slice(),
-            [AdrBaselineCommand::Snapshot { kind: AdrBaselineKind::Init, reason: Some(reason), .. }]
-                if reason.as_ref() == "unexpected"
+            command_service.recorded.lock().unwrap().as_slice(),
+            [AdrBaselineCommand::Snapshot { .. }]
         ));
+
+        let check_outcome = driver
+            .handle(AdrBaselineInput::CheckCommit { track_id: "test-track".parse().unwrap() });
+        assert_eq!(check_outcome.stdout.as_deref(), Some("ADR baseline check: passed"));
+        assert_eq!(check_outcome.stderr, None);
+        assert_eq!(check_outcome.exit_code, 0);
+    }
+
+    #[test]
+    fn test_adr_baseline_snapshot_input_converts_reason_aware_dto_losslessly() {
+        let cases = [
+            (AdrBaselineSnapshotInput::Init, AdrBaselineSnapshotKind::Init),
+            (AdrBaselineSnapshotInput::Cite, AdrBaselineSnapshotKind::Cite),
+            (
+                AdrBaselineSnapshotInput::NewAdr(
+                    NonEmptyString::try_new("approved by user".to_owned()).unwrap(),
+                ),
+                AdrBaselineSnapshotKind::NewAdr(
+                    NonEmptyString::try_new("approved by user".to_owned()).unwrap(),
+                ),
+            ),
+            (AdrBaselineSnapshotInput::NonSemanticFix, AdrBaselineSnapshotKind::NonSemanticFix),
+            (
+                AdrBaselineSnapshotInput::Escalation(
+                    NonEmptyString::try_new("decision needs review".to_owned()).unwrap(),
+                ),
+                AdrBaselineSnapshotKind::Escalation(
+                    NonEmptyString::try_new("decision needs review".to_owned()).unwrap(),
+                ),
+            ),
+        ];
+
+        for (input, expected) in cases {
+            assert_eq!(AdrBaselineSnapshotKind::from(input), expected);
+        }
     }
 }

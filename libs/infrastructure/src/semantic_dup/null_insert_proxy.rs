@@ -304,6 +304,17 @@ mod tests {
     }
 
     #[test]
+    fn test_persistent_index_lock_path_appends_lock_suffix() {
+        let db_path = Path::new("cache/semantic-index");
+
+        assert_eq!(
+            persistent_index_lock_path(db_path),
+            PathBuf::from("cache/semantic-index.lock"),
+            "the lock path must be the database path with exactly one .lock suffix"
+        );
+    }
+
+    #[test]
     fn test_acquire_persistent_index_lock_allows_absolute_temp_path() {
         let dir = tempfile::tempdir().unwrap();
         let db_path = dir.path().join("idx");

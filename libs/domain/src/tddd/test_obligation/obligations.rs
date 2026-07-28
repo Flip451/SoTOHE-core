@@ -10,6 +10,7 @@
 
 use crate::TrackId;
 use crate::tddd::semantic_verify::CatalogueEntryRef;
+use crate::tddd::test_obligation::errors::TestBindingConsistencyError;
 use crate::tddd::test_obligation::hashes::DeclarationHash;
 use crate::tddd::test_obligation::ids::{
     DiagnosticMessage, TestObligationAnchorId, TestObligationBrief, TestObligationEdgeId,
@@ -150,6 +151,24 @@ impl ObligationsDocument {
     #[must_use]
     pub fn owners_of_edge(&self, edge_id: &TestObligationEdgeId) -> Vec<&TestObligation> {
         self.obligations.iter().filter(|obligation| obligation.owns_edge(edge_id)).collect()
+    }
+
+    /// Rejects a voluntary binding recorded for an edge that owns a derived obligation.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation`]
+    /// when `edge_id` is owned by one or more derived obligations.
+    pub fn validate_voluntary_binding(
+        &self,
+        edge_id: &TestObligationEdgeId,
+    ) -> Result<(), TestBindingConsistencyError> {
+        if self.owners_of_edge(edge_id).is_empty() {
+            return Ok(());
+        }
+        Err(TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation {
+            edge_id: edge_id.clone(),
+        })
     }
 
     /// Diagnoses whether this persisted obligation document is stale against the
@@ -400,6 +419,31 @@ mod tests {
             "every obligation sharing the entry key and anchor owns the edge"
         );
         assert!(doc.owners_of_edge(&edge("domain::User", "IN-06")).is_empty());
+    }
+
+    #[test]
+    fn test_validate_voluntary_binding_with_derived_owner_returns_consistency_error() {
+        let document = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![sample_obligation()],
+        );
+        let edge_id = edge("domain::User", "IN-05");
+
+        assert!(matches!(
+            document.validate_voluntary_binding(&edge_id),
+            Err(TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id: actual })
+                if actual == edge_id
+        ));
+    }
+
+    #[test]
+    fn test_validate_voluntary_binding_without_derived_owner_succeeds() {
+        let document = ObligationsDocument::new(
+            TrackId::try_new("my-track").unwrap(),
+            vec![sample_obligation()],
+        );
+
+        assert!(document.validate_voluntary_binding(&edge("domain::User", "IN-06")).is_ok());
     }
 
     #[test]

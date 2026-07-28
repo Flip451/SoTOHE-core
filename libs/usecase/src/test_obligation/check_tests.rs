@@ -3,9 +3,13 @@
 #![allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
 
 use std::collections::{BTreeMap, HashMap};
+use std::future::Future;
 use std::path::{Path, PathBuf};
+use std::pin::pin;
 use std::sync::Arc;
+use std::sync::Mutex;
 use std::sync::atomic::{AtomicUsize, Ordering};
+use std::task::{Context, Poll, Waker};
 
 use domain::task_contract::{ContractedEntryRef, TaskContractDocument};
 use domain::tddd::LayerId;
@@ -18,7 +22,7 @@ use domain::tddd::catalogue_v2::{
     TraitImplDeclV2, TraitName, TypeEntry, TypeKindV2, TypeName, TypeRef,
 };
 use domain::tddd::semantic_verify::{
-    CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, SpecSectionKind,
+    CatalogueEntryKey, CatalogueEntryRef, CatalogueSectionKey, ModelTier, SpecSectionKind,
 };
 use domain::tddd::test_obligation::binding::{
     NonEmptyTestLocations, TestBindingRecord, TestBindingsDocument, TestLocation,
@@ -39,8 +43,8 @@ use domain::tddd::test_obligation::ids::{
 };
 use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
 use domain::tddd::test_obligation::ports::{
-    ObligationFulfillmentCachePort, ObligationsArtifactPort, TestBindingsArtifactPort,
-    TestObligationRulesLoaderPort, TestSourceScannerPort, WaiverCachePort,
+    ObligationsArtifactPort, TestBindingsArtifactPort, TestObligationRulesLoaderPort,
+    TestSourceScannerPort, WaiverCachePort,
 };
 use domain::tddd::test_obligation::projection::RoleObligationItemsProjector;
 use domain::tddd::test_obligation::rules::{
@@ -48,7 +52,8 @@ use domain::tddd::test_obligation::rules::{
 };
 use domain::tddd::test_obligation::scope::UncitedSpecElementFinding;
 use domain::tddd::test_obligation::verdict::{
-    ObligationFulfillmentCacheDocument, ObligationFulfillmentCacheEntry,
+    FulfillmentCacheLookupError, ObligationFulfillmentCacheDocument,
+    ObligationFulfillmentCacheEntry, ObligationFulfillmentCacheEntryState,
     ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict, WaiverCacheDocument,
     WaiverCacheEntry, WaiverCacheKey, WaiverVerdict,
 };
@@ -62,18 +67,30 @@ use domain::{
 
 use domain::SpecDocumentLoaderPort;
 
-use crate::pre_review_gate::{ImplPlanReaderPort, PreReviewGateError, TaskContractReaderPort};
+use crate::pre_review_gate::{
+    ImplPlanReadError, ImplPlanReaderPort, TaskContractReadError, TaskContractReaderPort,
+};
 
 use super::{
     CheckTestObligationsApplicationService, CheckTestObligationsCommand,
     CheckTestObligationsInteractor, CheckTestObligationsOutcome,
 };
+use crate::semantic_verdict_core::driver::{
+    SemanticEscalationDriverPort, SemanticEscalationFuture,
+};
 use crate::test_obligation::derive::derive_obligations_document;
+use crate::test_obligation::evaluate::{
+    EvaluateTestObligationsApplicationService, EvaluateTestObligationsCommand,
+    EvaluateTestObligationsInteractor, TestObligationEvaluateConfig,
+};
+use crate::test_obligation::hasher::ContentHasherPort;
+use crate::test_obligation::ports::ObligationFulfillmentCachePort;
 use crate::test_obligation::results::TestObligationStatusLaneSummary;
 use crate::test_obligation::{
     LoadedCatalogueDocument, TestObligationCatalogueCommandInput, obligation_declaration_text,
     obligation_declaration_text_from_loaded, sha256_content_hash,
 };
+use domain::tddd::test_obligation::pair::{ObligationFulfillmentPair, WaiverPair};
 
 const BODY: &str = "assert!(money.is_positive());";
 
@@ -190,15 +207,147 @@ impl TestSourceScannerPort for StubScanner {
 }
 
 struct StubFulfillmentCache(Option<ObligationFulfillmentCacheDocument>);
+
+fn cache_entry(
+    edge_id: TestObligationEdgeId,
+    obligation_id: TestObligationId,
+    key: ObligationFulfillmentCacheKey,
+    verdict: ObligationFulfillmentVerdict,
+    verifier_fingerprint: Option<VerifierPromptFingerprint>,
+) -> ObligationFulfillmentCacheEntry {
+    let location = TestLocation::new(
+        LayerId::try_new("usecase".to_owned()).unwrap(),
+        TestModulePath::try_new("fixture".to_owned()).unwrap(),
+        TestFunctionName::try_new("entry".to_owned()).unwrap(),
+    );
+    let state = match verifier_fingerprint {
+        Some(verifier_fingerprint) => ObligationFulfillmentCacheEntryState::Identified {
+            verifier_fingerprint,
+            bound_tests: Some(NonEmptyTestLocations::new(location, Vec::new())),
+        },
+        None => ObligationFulfillmentCacheEntryState::Legacy,
+    };
+    ObligationFulfillmentCacheEntry::new(edge_id, obligation_id, key, verdict, state)
+}
+
 impl ObligationFulfillmentCachePort for StubFulfillmentCache {
+    fn load(
+        &self,
+        track_id: &TrackId,
+    ) -> Result<Option<ObligationFulfillmentCacheDocument>, VerifyCacheError> {
+        Ok(Some(self.0.clone().unwrap_or_else(|| {
+            ObligationFulfillmentCacheDocument::new(track_id.clone(), Vec::new())
+        })))
+    }
+    fn save(&self, _d: &ObligationFulfillmentCacheDocument) -> Result<(), DiagnosticMessage> {
+        Ok(())
+    }
+}
+
+struct LegacyRowsFulfillmentCache;
+impl ObligationFulfillmentCachePort for LegacyRowsFulfillmentCache {
     fn load(
         &self,
         _t: &TrackId,
     ) -> Result<Option<ObligationFulfillmentCacheDocument>, VerifyCacheError> {
-        Ok(self.0.clone())
+        Ok(None)
     }
+
     fn save(&self, _d: &ObligationFulfillmentCacheDocument) -> Result<(), DiagnosticMessage> {
         Ok(())
+    }
+}
+
+struct RecoverableFulfillmentCache {
+    saved: Mutex<Option<ObligationFulfillmentCacheDocument>>,
+}
+
+impl RecoverableFulfillmentCache {
+    fn stale() -> Self {
+        Self {
+            saved: Mutex::new(Some(fresh_fulfillment_cache_for_fingerprint(
+                &obligation(),
+                Some(VerifierPromptFingerprint::new(ContentHash::from_bytes([7u8; 32]))),
+            ))),
+        }
+    }
+}
+
+impl ObligationFulfillmentCachePort for RecoverableFulfillmentCache {
+    fn load(
+        &self,
+        _t: &TrackId,
+    ) -> Result<Option<ObligationFulfillmentCacheDocument>, VerifyCacheError> {
+        Ok(self.saved.lock().unwrap().clone())
+    }
+
+    fn save(&self, document: &ObligationFulfillmentCacheDocument) -> Result<(), DiagnosticMessage> {
+        *self.saved.lock().unwrap() = Some(document.clone());
+        Ok(())
+    }
+}
+
+struct AlwaysFulfilledDriver;
+
+impl
+    SemanticEscalationDriverPort<
+        ObligationFulfillmentPair,
+        ObligationFulfillmentCacheKey,
+        ObligationFulfillmentVerdict,
+        domain::tddd::test_obligation::errors::SemanticVerifierError,
+    > for AlwaysFulfilledDriver
+{
+    fn evaluate_with_escalation<'a>(
+        &'a self,
+        _pair: &'a ObligationFulfillmentPair,
+        _key: &'a ObligationFulfillmentCacheKey,
+        _initial_tier: ModelTier,
+    ) -> SemanticEscalationFuture<
+        'a,
+        ObligationFulfillmentVerdict,
+        domain::tddd::test_obligation::errors::SemanticVerifierError,
+    > {
+        Box::pin(async {
+            Ok(ObligationFulfillmentVerdict::Fulfilled {
+                citation: EvidenceCitation::try_new("recovered by evaluator".to_owned()).unwrap(),
+            })
+        })
+    }
+}
+
+struct AlwaysWaivedDriver;
+
+impl
+    SemanticEscalationDriverPort<
+        WaiverPair,
+        WaiverCacheKey,
+        WaiverVerdict,
+        domain::tddd::test_obligation::errors::SemanticVerifierError,
+    > for AlwaysWaivedDriver
+{
+    fn evaluate_with_escalation<'a>(
+        &'a self,
+        _pair: &'a WaiverPair,
+        _key: &'a WaiverCacheKey,
+        _initial_tier: ModelTier,
+    ) -> SemanticEscalationFuture<
+        'a,
+        WaiverVerdict,
+        domain::tddd::test_obligation::errors::SemanticVerifierError,
+    > {
+        Box::pin(async {
+            Ok(WaiverVerdict::Waived {
+                citation: EvidenceCitation::try_new("not exercised".to_owned()).unwrap(),
+            })
+        })
+    }
+}
+
+struct Sha256Hasher;
+
+impl ContentHasherPort for Sha256Hasher {
+    fn sha256(&self, bytes: &[u8]) -> ContentHash {
+        sha256_content_hash(bytes)
     }
 }
 
@@ -253,7 +402,7 @@ impl CatalogueDocumentLoaderPort for FailingCatalogue {
 
 struct StubTaskContractReader(TaskContractDocument);
 impl TaskContractReaderPort for StubTaskContractReader {
-    fn read(&self, _track_id: &TrackId) -> Result<TaskContractDocument, PreReviewGateError> {
+    fn read(&self, _track_id: &TrackId) -> Result<TaskContractDocument, TaskContractReadError> {
         Ok(self.0.clone())
     }
 }
@@ -263,7 +412,7 @@ impl ImplPlanReaderPort for StubImplPlanReader {
     fn read_task_statuses(
         &self,
         _track_id: &TrackId,
-    ) -> Result<HashMap<TaskId, TaskStatusKind>, PreReviewGateError> {
+    ) -> Result<HashMap<TaskId, TaskStatusKind>, ImplPlanReadError> {
         Ok(self.0.clone())
     }
 }
@@ -461,6 +610,59 @@ fn interactor_with_scanner_and_task_statuses(
         ),
         impl_plan_reader_with(statuses),
     )
+}
+
+fn interactor_with_legacy_fulfillment_cache(
+    obligations: Option<ObligationsDocument>,
+    bindings: Option<TestBindingsDocument>,
+) -> CheckTestObligationsInteractor {
+    CheckTestObligationsInteractor::new(
+        Arc::new(StubRules::valid()),
+        Arc::new(StubObligations(obligations)),
+        Arc::new(StubBindings(bindings)),
+        Arc::new(StubScanner),
+        Arc::new(LegacyRowsFulfillmentCache),
+        Arc::new(StubWaiverCache(None)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+        task_contract_reader(),
+        impl_plan_reader(),
+    )
+}
+
+fn interactor_with_recoverable_fulfillment_cache(
+    cache: Arc<RecoverableFulfillmentCache>,
+) -> CheckTestObligationsInteractor {
+    CheckTestObligationsInteractor::new(
+        Arc::new(StubRules::valid()),
+        Arc::new(StubObligations(Some(ObligationsDocument::new(track(), vec![obligation()])))),
+        Arc::new(StubBindings(Some(TestBindingsDocument::new(
+            track(),
+            vec![fulfillment_binding()],
+        )))),
+        Arc::new(StubScanner),
+        cache as Arc<dyn ObligationFulfillmentCachePort + Send + Sync>,
+        Arc::new(StubWaiverCache(None)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+        task_contract_reader(),
+        impl_plan_reader(),
+    )
+}
+
+fn run<F: Future>(future: F) -> F::Output {
+    let mut future = pin!(future);
+    let mut cx = Context::from_waker(Waker::noop());
+    loop {
+        match future.as_mut().poll(&mut cx) {
+            Poll::Ready(output) => return output,
+            Poll::Pending => continue,
+        }
+    }
 }
 
 fn fulfillment_verifier_fingerprint() -> VerifierPromptFingerprint {
@@ -863,7 +1065,7 @@ fn fresh_voluntary_fulfillment_cache() -> ObligationFulfillmentCacheDocument {
             .as_bytes(),
     ));
     let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
-    let entry = ObligationFulfillmentCacheEntry::new(
+    let entry = cache_entry(
         edge(),
         TestObligationId::new(
             entry_key(),
@@ -898,7 +1100,7 @@ fn fresh_fulfillment_cache_for_catalogue(
             .as_bytes(),
     ));
     let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
-    let entry = ObligationFulfillmentCacheEntry::new(
+    let entry = cache_entry(
         edge(),
         obligation.id().clone(),
         ObligationFulfillmentCacheKey::new(bound, decl, anchor_hash),
@@ -2226,6 +2428,18 @@ fn test_mismatched_fulfillment_fingerprint_is_a_missing_stale_verdict() {
 }
 
 #[test]
+fn test_absent_fulfillment_fingerprint_is_a_missing_stale_verdict() {
+    let obligations = ObligationsDocument::new(track(), vec![obligation()]);
+    let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
+    let cache = fresh_fulfillment_cache_for_fingerprint(&obligation(), None);
+
+    let result =
+        interactor(Some(obligations), Some(bindings), Some(cache), None).execute(&command());
+
+    assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));
+}
+
+#[test]
 fn test_mismatched_waiver_fingerprint_is_a_missing_stale_verdict() {
     let obligations = ObligationsDocument::new(track(), vec![obligation()]);
     let bindings = TestBindingsDocument::new(track(), vec![waiver_binding()]);
@@ -2253,17 +2467,19 @@ fn test_absent_waiver_fingerprint_is_a_missing_stale_verdict() {
 }
 
 #[test]
-fn test_voluntary_binding_migrates_to_newly_derived_obligation() {
-    // AC-12: a prior edge-level binding becomes fulfillment for the derived
-    // obligation once the decision table starts producing one for that edge.
+fn test_voluntary_binding_for_derived_edge_returns_consistency_finding() {
     let obligations = ObligationsDocument::new(track(), vec![obligation()]);
     let bindings = TestBindingsDocument::new(track(), vec![voluntary_binding()]);
-    let outcome =
+    let result =
         interactor(Some(obligations), Some(bindings), Some(fresh_fulfillment_cache()), None)
-            .execute(&command())
-            .unwrap();
+            .execute(&command());
 
-    assert_eq!(outcome.resolved_edges(), &[edge()]);
+    assert!(matches!(
+        result,
+        Err(ObligationCheckError::BindingConsistency(
+            domain::tddd::test_obligation::errors::TestBindingConsistencyError::VoluntaryBindingOwnsDerivedObligation { edge_id }
+        )) if edge_id == edge()
+    ));
 }
 
 #[test]
@@ -2377,7 +2593,7 @@ fn test_declaration_change_stales_verdict_as_drift() {
     let bound = BoundTestsSetHash::new(sha256_content_hash(format!("{BODY}\n").as_bytes()));
     let stale_decl = DeclarationHash::new(sha256_content_hash(b"an older declaration"));
     let anchor_hash = AnchorTextHash::new(sha256_content_hash(b"Money positive"));
-    let entry = ObligationFulfillmentCacheEntry::new(
+    let entry = cache_entry(
         edge(),
         obligation().id().clone(),
         ObligationFulfillmentCacheKey::new(bound, stale_decl, anchor_hash),
@@ -2416,7 +2632,7 @@ fn test_check_reports_bound_test_or_anchor_hash_changes_as_freshness_drift() {
     ] {
         let cache = ObligationFulfillmentCacheDocument::new(
             track(),
-            vec![ObligationFulfillmentCacheEntry::new(
+            vec![cache_entry(
                 edge(),
                 obligation().id().clone(),
                 key,
@@ -2447,6 +2663,192 @@ fn test_bound_edge_without_verdict_is_stale() {
     let result =
         interactor(Some(obligations), Some(bindings), Some(empty_cache), None).execute(&command());
     assert!(matches!(result, Err(ObligationCheckError::StaleVerdicts { .. })));
+}
+
+#[test]
+fn test_check_absent_fulfillment_cache_requires_evaluation() {
+    let result = interactor_with_legacy_fulfillment_cache(
+        Some(ObligationsDocument::new(track(), vec![obligation()])),
+        Some(TestBindingsDocument::new(track(), vec![fulfillment_binding()])),
+    )
+    .execute(&command());
+
+    assert!(matches!(result, Err(ObligationCheckError::FulfillmentCacheRequiresEvaluation)));
+}
+
+#[test]
+fn test_stale_cache_check_evaluate_check_recovery_succeeds_without_manual_mutation() {
+    let cache = Arc::new(RecoverableFulfillmentCache::stale());
+    let initial_check =
+        interactor_with_recoverable_fulfillment_cache(Arc::clone(&cache)).execute(&command());
+    assert!(matches!(initial_check, Err(ObligationCheckError::StaleVerdicts { .. })));
+
+    let evaluator = EvaluateTestObligationsInteractor::new(
+        Arc::new(StubObligations(Some(ObligationsDocument::new(track(), vec![obligation()])))),
+        Arc::new(StubBindings(Some(TestBindingsDocument::new(
+            track(),
+            vec![fulfillment_binding()],
+        )))),
+        Arc::new(StubScanner),
+        Arc::new(AlwaysFulfilledDriver),
+        Arc::new(AlwaysWaivedDriver),
+        Arc::clone(&cache) as Arc<dyn ObligationFulfillmentCachePort + Send + Sync>,
+        Arc::new(StubWaiverCache(None)),
+        fulfillment_verifier_fingerprint(),
+        waiver_verifier_fingerprint(),
+        TestObligationEvaluateConfig::try_new(0, 90, 1).unwrap(),
+        Arc::new(StubSpec(spec_doc())),
+        Arc::new(StubCatalogue(money_catalogue())),
+        Arc::new(Sha256Hasher),
+    );
+    let evaluation = run(evaluator.execute(&EvaluateTestObligationsCommand::new(
+        track(),
+        "track/my-track".to_owned(),
+        vec![PathBuf::from("domain-types.json")],
+        PathBuf::from("track/items/my-track/spec.json"),
+    )))
+    .unwrap();
+    assert_eq!(evaluation.pass_count(), 1);
+    assert!(
+        cache.saved.lock().unwrap().is_some(),
+        "evaluate must persist a replacement fulfillment cache for the next check"
+    );
+
+    let recovered_check =
+        interactor_with_recoverable_fulfillment_cache(cache).execute(&command()).unwrap();
+    assert_eq!(recovered_check.resolved_edges(), &[edge()]);
+}
+
+#[test]
+fn test_check_with_historical_fulfillment_row_uses_current_full_key() {
+    let current = fresh_fulfillment_cache().entries()[0].clone();
+    let historical = cache_entry(
+        edge(),
+        obligation().id().clone(),
+        ObligationFulfillmentCacheKey::new(
+            BoundTestsSetHash::new(ContentHash::from_bytes([7u8; 32])),
+            current.key().declaration_hash().clone(),
+            current.key().anchor_text_hash().clone(),
+        ),
+        ObligationFulfillmentVerdict::Fulfilled {
+            citation: EvidenceCitation::try_new("historical cite".to_owned()).unwrap(),
+        },
+        Some(fulfillment_verifier_fingerprint()),
+    );
+    for entries in
+        [vec![historical.clone(), current.clone()], vec![current.clone(), historical.clone()]]
+    {
+        let cache = ObligationFulfillmentCacheDocument::new(track(), entries);
+        let obligations = ObligationsDocument::new(track(), vec![obligation()]);
+        let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
+
+        let outcome = interactor(Some(obligations), Some(bindings), Some(cache), None)
+            .execute(&command())
+            .unwrap();
+
+        assert_eq!(outcome.resolved_edges(), &[edge()]);
+    }
+}
+
+#[test]
+fn test_check_aggregates_historical_fulfillment_key_drifts_independent_of_row_order() {
+    let current = fresh_fulfillment_cache().entries()[0].clone();
+    let test_changed = cache_entry(
+        edge(),
+        obligation().id().clone(),
+        ObligationFulfillmentCacheKey::new(
+            BoundTestsSetHash::new(ContentHash::from_bytes([7u8; 32])),
+            current.key().declaration_hash().clone(),
+            current.key().anchor_text_hash().clone(),
+        ),
+        ObligationFulfillmentVerdict::Pending,
+        Some(fulfillment_verifier_fingerprint()),
+    );
+    let declaration_changed = cache_entry(
+        edge(),
+        obligation().id().clone(),
+        ObligationFulfillmentCacheKey::new(
+            current.key().bound_tests_set_hash().clone(),
+            DeclarationHash::new(ContentHash::from_bytes([7u8; 32])),
+            current.key().anchor_text_hash().clone(),
+        ),
+        ObligationFulfillmentVerdict::Pending,
+        Some(fulfillment_verifier_fingerprint()),
+    );
+    let expected = vec![
+        TestObligationDrift::test_changed_edge(
+            edge(),
+            DiagnosticMessage::try_new(
+                "bound test bodies changed since the verdict was frozen".to_owned(),
+            )
+            .unwrap(),
+        ),
+        TestObligationDrift::decl_changed_edge(
+            edge(),
+            DiagnosticMessage::try_new(
+                "entry declaration changed since the verdict was frozen".to_owned(),
+            )
+            .unwrap(),
+        ),
+    ];
+
+    for entries in [
+        vec![test_changed.clone(), declaration_changed.clone()],
+        vec![declaration_changed.clone(), test_changed.clone()],
+    ] {
+        let result = interactor(
+            Some(ObligationsDocument::new(track(), vec![obligation()])),
+            Some(TestBindingsDocument::new(track(), vec![fulfillment_binding()])),
+            Some(ObligationFulfillmentCacheDocument::new(track(), entries)),
+            None,
+        )
+        .execute(&command());
+
+        let Err(ObligationCheckError::DriftsDetected { drifts }) = result else {
+            panic!("expected deterministic freshness drifts");
+        };
+        assert_eq!(drifts.as_slice(), expected.as_slice());
+    }
+}
+
+#[test]
+fn test_check_with_duplicate_current_fulfillment_rows_returns_lookup_error() {
+    let fulfilled = fresh_fulfillment_cache().entries()[0].clone();
+    let expected_key = fulfilled.key().clone();
+    let pending = cache_entry(
+        edge(),
+        obligation().id().clone(),
+        expected_key.clone(),
+        ObligationFulfillmentVerdict::Pending,
+        Some(fulfillment_verifier_fingerprint()),
+    );
+
+    for entries in
+        [vec![fulfilled.clone(), pending.clone()], vec![pending.clone(), fulfilled.clone()]]
+    {
+        let cache = ObligationFulfillmentCacheDocument::new(track(), entries);
+        let obligations = ObligationsDocument::new(track(), vec![obligation()]);
+        let bindings = TestBindingsDocument::new(track(), vec![fulfillment_binding()]);
+        let result =
+            interactor(Some(obligations), Some(bindings), Some(cache), None).execute(&command());
+
+        match result {
+            Err(ObligationCheckError::FulfillmentCacheLookup(
+                FulfillmentCacheLookupError::AmbiguousCurrentEntries {
+                    edge_id: actual_edge_id,
+                    obligation_id: actual_obligation_id,
+                    key: actual_key,
+                },
+            )) => {
+                assert_eq!(actual_edge_id, edge());
+                assert_eq!(actual_obligation_id, obligation().id().clone());
+                assert_eq!(actual_key, expected_key);
+            }
+            other => {
+                panic!("expected ambiguity error with the complete cache identity, got {other:?}")
+            }
+        }
+    }
 }
 
 #[test]

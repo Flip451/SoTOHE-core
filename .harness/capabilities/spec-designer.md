@@ -29,7 +29,7 @@ The spec-designer **owns `spec.json` and its rendered view `spec.md` for this tr
 
 | aspect | spec-designer (this capability) | impl-planner | type-designer | adr-editor |
 |---|---|---|---|---|
-| output | `spec.json` + `spec.md` | `impl-plan.json` + `task-coverage.json` | `<layer>-types.json` + rendered views | `knowledge/adr/*.md` |
+| output | `spec.json` + `spec.md` | `impl-plan.json` + `task-coverage.json` + `task-contract.json` | `<layer>-types.json` + rendered views | `knowledge/adr/*.md` |
 | phase | Phase 1 | Phase 3 | Phase 2 | back-and-forth |
 | input | ADR + convention | spec.json + type catalogue + ADR | spec.json + ADR + convention | downstream signal 🔴 + current ADR |
 | typical trigger | `/track:spec-design` | `/track:impl-plan` | `/track:type-design` | `/track:plan` back-and-forth |
@@ -48,9 +48,11 @@ If the briefing asks for:
 - Track id and feature name
 - Briefing file path with:
   - Target ADR path(s) under `knowledge/adr/`
-  - Related conventions under `knowledge/conventions/`
   - Any explicit constraints carried over from the ADR
   - Prior `spec.json` excerpt when updating an existing track
+- The project-wide conventions the dispatcher resolved for this capability, delivered with the
+  dispatch rather than through the briefing file. That resolution is the complete convention
+  input, including when it resolves to zero documents.
 
 ### Internal pipeline (all executed by the specialist)
 
@@ -80,11 +82,11 @@ Do NOT emit Rust code, trait signatures, module trees, or `TypeDefinitionKind` s
 
 ## Design Principles (cite, don't enumerate)
 
-Apply `knowledge/conventions/prefer-type-safe-abstractions.md` (Newtype / Enum-first / Typestate) and `knowledge/conventions/coding-principles.md` (error handling / no panics) at the **contract level only**:
+Apply the project-wide conventions resolved for this capability at the **contract level only**. The dispatcher resolves them and delivers their paths and the obligation to read them in full with the dispatch — do not assume a filename, do not assume a section structure inside them, and do not re-resolve them yourself. A resolution of **zero documents is a valid state**: the project declares no additional contract-level rules, and the boundaries below are then the complete guidance.
 
-- Enum-first / typestate / newtype principles are the type-designer's concern; the spec can cite them by name when writing constraints (e.g., the constraint "use newtype for boundary primitives") but does not enumerate concrete type choices
+- Concrete type shapes are the type-designer's concern; the spec may cite a resolved convention when writing constraints, using the path the resolver returned for it, but does not enumerate concrete type choices
 - Hexagonal layer placement is the ADR's concern; the spec can cite the layer assignment as a constraint
-- No panics in library code, sync-first: cite once in top-level `related_conventions[]` (these are universal rules — see Signal Evaluation Decision Criteria §(1)); do not encode them as per-element `constraints[]` entries
+- Cite a resolved convention that applies across the contract once in top-level `related_conventions[]`; do not duplicate it as per-element `constraints[]` entries. With a zero-document resolution, leave `related_conventions[]` empty.
 
 ## Signal Evaluation Decision Criteria
 
@@ -92,9 +94,9 @@ These three criteria let the specialist resolve citation-placement and yellow-re
 
 ### (1) Universal coding principles belong at the top level, not per element
 
-Universal rules that apply to **every track** (for example, no-panics in library code, hexagonal layer dependency direction, the enum-first / typestate / newtype principles, or any rule from `.claude/rules/*.md` coding discipline) belong in the spec's **top-level `related_conventions[]`** — not in a per-element `constraints[]` / `acceptance_criteria[]` / `in_scope[]` entry, and not in a per-element `convention_refs[]`.
+For each resolved convention that applies across the contract, cite it once in the spec's **top-level `related_conventions[]`** — not in a per-element `constraints[]` / `acceptance_criteria[]` / `in_scope[]` entry, and not in a per-element `convention_refs[]`. Do not add an entry for a rule that was not delivered in the resolution.
 
-Use per-element `convention_refs[]` only when the convention is bound to a specific element's behaviour (rare). If the only grounding you can find for a constraint is a universal coding rule, cite it once at the track top and drop the per-element entry.
+Use per-element `convention_refs[]` only when a resolved convention is bound to a specific element's behaviour (rare). If a resolved convention applies across the contract instead, cite it once at the track top and drop the per-element entry.
 
 ### (2) `convention_refs[]` does not contribute to Blue
 
@@ -111,7 +113,7 @@ An element whose only grounding is `convention_refs[]` (with empty `adr_refs[]` 
 When an element carries non-empty `informal_grounds[]` (producing 🟡 Yellow), resolve it before merge via one of:
 
 - (a) **Promote to `adr_refs[]`**: add the rationale to an existing or new ADR and cite its anchor. The informal ground is then superseded and removed from the element.
-- (b) **Move to top-level `related_conventions[]`**: if the ground is a universal coding rule that applies to every track, cite the convention at the spec top and remove the per-element entry entirely.
+- (b) **Move to top-level `related_conventions[]`**: if the ground is covered by a resolved convention that applies across the contract, cite that convention at the spec top and remove the per-element entry entirely.
 - (c) **Delete the element**: if, on reflection, the element is genuinely out of scope or redundant, drop it.
 
 Choose (a) when the ground is track-specific behaviour the ADR must persist; (b) for universal coding discipline; (c) only after confirming no other element or acceptance criterion depends on it.
@@ -119,7 +121,7 @@ Choose (a) when the ground is track-specific behaviour the ADR must persist; (b)
 ## Scope Ownership
 
 - **Writes permitted**: `track/items/<id>/spec.json` (direct Write via Write/Edit tool). `track/items/<id>/spec.md` and `track/items/<id>/plan.md` are generated automatically as side effects of `bin/sotp track views sync --track-id <id>` (after running `bin/sotp signal calc-spec-adr --spec-json <path>`) — do NOT write them directly via Write/Edit. `track/registry.md` is also regenerated by `views sync` as a project-wide side effect.
-- **Writes forbidden**: any other track's artifacts, other capabilities' SSoT files (`<layer>-types.json`, `impl-plan.json`, `task-coverage.json`, `metadata.json`), any file under `knowledge/adr/` or `knowledge/conventions/`, any source code, and track task-state transitions through `bin/sotp track transition`; this capability has no task-state transition authority. Do not use Write/Edit on `plan.md`, `registry.md`, or `spec.md` directly — use the pipeline commands instead.
+- **Writes forbidden**: any other track's artifacts, other capabilities' SSoT files (`<layer>-types.json`, `impl-plan.json`, `task-coverage.json`, `task-contract.json`, `metadata.json`), any file under `knowledge/adr/` or `knowledge/conventions/`, any source code, and track task-state transitions through `bin/sotp track transition`; this capability has no task-state transition authority. Do not use Write/Edit on `plan.md`, `registry.md`, or `spec.md` directly — use the pipeline commands instead.
 - **Bash usage**: restricted to `bin/sotp` CLI invocations required by the internal pipeline (`bin/sotp signal calc-spec-adr`, `bin/sotp verify plan-artifact-refs`, etc.). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
 - Do not spawn further agents (keep planning deterministic and serial).
 - If information beyond the briefing is needed, note it in `## Open Questions` rather than probing silently via exploration.
@@ -127,7 +129,7 @@ Choose (a) when the ground is track-specific behaviour the ADR must persist; (b)
 
 ## Re-entry prerequisite (sequencing discipline)
 
-Per `knowledge/conventions/sot-reentry-sequencing.md`, a re-entry dispatch of this capability requires the convergence of its direct upstream only — the ADR (`adr_user` chain: reference signal per `.harness/config/signal-gates.json` and adr-scope review `zero_findings`; semantic verification is not required for the `adr_user` chain). If the briefing shows this prerequisite unmet, do not start authoring: return the briefing to the orchestrator stating the unmet prerequisite. If mid-work you discover the ADR itself needs editing, stop immediately and return to the orchestrator (immediate bounce-back; no deferred-fix continuation).
+Per `.harness/policies/sot-reentry-sequencing.md`, a re-entry dispatch of this capability requires the convergence of its direct upstream only — the ADR (`adr_user` chain: reference signal per `.harness/config/signal-gates.json` and adr-scope review `zero_findings`; semantic verification is not required for the `adr_user` chain). If the briefing shows this prerequisite unmet, do not start authoring: return the briefing to the orchestrator stating the unmet prerequisite. If mid-work you discover the ADR itself needs editing, stop immediately and return to the orchestrator (immediate bounce-back; no deferred-fix continuation).
 
 ## Rules
 
@@ -135,7 +137,7 @@ Per `knowledge/conventions/sot-reentry-sequencing.md`, a re-entry dispatch of th
 - Do not use `Bash(cat/grep/head/tail/sed/awk)` — dedicated tools only
 - Do not run `git` commands
 - Do not write to `knowledge/research/` or `track/items/<id>/research/` — the orchestrator saves output. Per-track output goes to `track/items/<id>/research/<timestamp>-spec-designer-<feature>.md`; track-cross analyses (version baselines, ecosystem surveys) stay under `knowledge/research/` per the research-placement convention documented in `knowledge/conventions/`
-- Required reading before writing: `knowledge/conventions/README.md`, `knowledge/conventions/pre-track-adr-authoring.md`, `knowledge/conventions/track-lifecycle.md`, the target ADRs under `knowledge/adr/`, and `track/items/<id>/metadata.json`. If a referenced convention exists for the feature domain, read it before drafting.
+- Required reading before writing: every convention the dispatcher resolved for this capability, `.harness/policies/pre-track-adr-authoring.md`, `.harness/policies/track-lifecycle.md`, the target ADRs under `knowledge/adr/`, and `track/items/<id>/metadata.json`. Do not browse the project's convention directory for further documents to read — the resolution is the whole required set, and a resolution of zero documents leaves this reading step with no convention target rather than in error.
 - Store orchestrator session memory (any provider) as needed; do not rely on it persisting across capability invocations.
 
 ## Session resume

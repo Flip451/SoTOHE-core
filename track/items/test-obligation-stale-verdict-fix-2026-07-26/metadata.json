@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "test-obligation-stale-verdict-fix-2026-07-26",
+  "title": "テスト義務ゲートが正しい実装を Stale と報告し続ける欠陥の修正（ADR 準拠回復）",
+  "branch": "track/test-obligation-stale-verdict-fix-2026-07-26",
+  "created_at": "2026-07-26T14:20:04Z",
+  "updated_at": "2026-07-26T14:20:04Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}

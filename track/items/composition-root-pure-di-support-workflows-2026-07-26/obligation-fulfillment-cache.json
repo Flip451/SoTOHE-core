@@ -1,0 +1,77 @@
+{
+  "track_id": "composition-root-pure-di-support-workflows-2026-07-26",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "SemanticDupDriverAdapter",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SemanticDupDriverAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::semantic_dup_driver::SemanticDupDriverPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "cf5527612da6e8afff0a6e6ce000e0db017358a7db2a5d663434b8289560355d",
+        "declaration_hash": "f49d6da84e45888c0a7586cabee0634a6c8b0750c8b2744b0e3ca2805dd2d681",
+        "anchor_text_hash": "c026e32fc3e48a65ea69a16f2960a0f1c571c08d7a3b70fb62b991b169c2e47c"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n                !production_source.contains(forbidden),\n                \"infrastructure port implementation must not refer to composition or compatibility path {forbidden}\"\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SemanticDupDriverAdapter",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SemanticDupDriverAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::semantic_dup_driver::SemanticDupDriverPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "cf5527612da6e8afff0a6e6ce000e0db017358a7db2a5d663434b8289560355d",
+        "declaration_hash": "f49d6da84e45888c0a7586cabee0634a6c8b0750c8b2744b0e3ca2805dd2d681",
+        "anchor_text_hash": "bdbddfa8edeef6853b2b3bca367c8fd369d6bcab3b7e1f99620dd6c38dcf2eed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for forbidden in [\n            \"SemanticDupCompositionRoot\",\n            \"cli_composition\",\n            \"semantic_dup_driver_adapter\",\n            \"ServiceImpl\",\n        ] {\n            assert!(\n                !production_source.contains(forbidden),"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SemanticDupDriverAdapter",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SemanticDupDriverAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::semantic_dup_driver::SemanticDupDriverPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "cf5527612da6e8afff0a6e6ce000e0db017358a7db2a5d663434b8289560355d",
+        "declaration_hash": "f49d6da84e45888c0a7586cabee0634a6c8b0750c8b2744b0e3ca2805dd2d681",
+        "anchor_text_hash": "74b4a02c6314ed12e694d672ab7c5a60ecfe8b106106b92d06b15f8a317cb2e3"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"infrastructure port implementation must not refer to composition or compatibility path {forbidden}\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ]
+}

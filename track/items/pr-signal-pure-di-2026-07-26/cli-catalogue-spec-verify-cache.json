@@ -1,0 +1,222 @@
+{
+  "schema_version": 1,
+  "layer": "cli",
+  "entries": [
+    {
+      "claim_hash": "75a0b4bda58a8c879cb68f450bf2fb823504fb6db53b68313c8c2eb86be7c399",
+      "evidence_hash": "fbf7a2dd2557d829077ce553c0fa6ef02688120acaf7a7fcadc7448cec5c1cef",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal gate 判定は単一の usecase 境界が所有し、4 chain の判定をそこで集約する。判定に必要な入力が欠ける、または判定不能な場合、同じ境界が fail-closed を保証して通過を許可しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::signal::run_aggregate_check"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-08",
+          "text_label": "Signal gate 判定は単一の usecase 境界が所有し、4 chain の判定をそこで集約する。判定に必要な入力が欠ける、または判定不能な場合、同じ境界が fail-closed を保証して通過を許可しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "bb00345074ddb77843a64cfa946e1692ffb714d82e62cd539ca667f9d8d5cc91",
+      "evidence_hash": "3913cb5de1ece43eefcb5572fb552804eab8236462db3dd7c24924b82f288d65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::signal::calc_adr_user::run"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ff32389f08cf12027f4da8001c0f649c374e757554870cd9f633e8ef3ff9d137",
+      "evidence_hash": "3913cb5de1ece43eefcb5572fb552804eab8236462db3dd7c24924b82f288d65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::signal::calc_catalog_spec::run"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7c39d850bad8f24edd97dd33d674fdd9030ae29c4228bd8d2ee0d22b4a3ca47c",
+      "evidence_hash": "3913cb5de1ece43eefcb5572fb552804eab8236462db3dd7c24924b82f288d65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::signal::calc_impl_catalog::run"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cd81ad4cef885485ca1e8b391ceb8e635bce241358755401f1f930693f19a63c",
+      "evidence_hash": "3913cb5de1ece43eefcb5572fb552804eab8236462db3dd7c24924b82f288d65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::signal::calc_spec_adr::run"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "7aea5ec3d00f3b82ce43c880f7caf1ab35293407c9d970e13dfafac0725012d8",
+      "evidence_hash": "3913cb5de1ece43eefcb5572fb552804eab8236462db3dd7c24924b82f288d65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::signal::check_adr_user::run"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b0c4e708ad5138d92767dd855e78ea273634d02cf82bea3753a4af00d9c7088b",
+      "evidence_hash": "3913cb5de1ece43eefcb5572fb552804eab8236462db3dd7c24924b82f288d65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::signal::check_catalog_spec::run"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "16c5b7a603c039cfca1005182850586cff0a644dd16ae2d98c4be2121087f9bd",
+      "evidence_hash": "3913cb5de1ece43eefcb5572fb552804eab8236462db3dd7c24924b82f288d65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::signal::check_impl_catalog::run"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "16b1da4d633fb2fff84de3d0d79d8fda26bc9f9f1a5b01b114da5a113f0b1188",
+      "evidence_hash": "3913cb5de1ece43eefcb5572fb552804eab8236462db3dd7c24924b82f288d65",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/cli-types.json",
+          "section_key": "functions",
+          "entry_key": "cli::commands::signal::check_spec_adr::run"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "Signal driver は各 Signal command を driver → usecase interactor → port の一方向・単一路で実行し、composition root または互換 facade を経由して実行しない。"
+        }
+      }
+    }
+  ]
+}

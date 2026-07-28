@@ -14,7 +14,11 @@ Write a briefing to `tmp/type-designer-briefing.md` containing:
 
 - Track id and `track/items/<track-id>/spec.json` path
 - `architecture-rules.json` path (source of truth for TDDD-enabled layers)
-- Paths to the related ADR(s) under `knowledge/adr/` and conventions under `knowledge/conventions/`
+- Paths to the related ADR(s) under `knowledge/adr/`
+
+Do not put convention paths in the briefing: the capability dispatcher resolves the
+`type-designer` convention set and delivers it with the dispatch, and that resolution is the
+complete convention input (workflow SSoT § Inputs).
 
 Then run `bin/sotp capability exec type-designer --host claude --briefing-file tmp/type-designer-briefing.md`.
 The dispatcher resolves `capabilities.type-designer` internally from

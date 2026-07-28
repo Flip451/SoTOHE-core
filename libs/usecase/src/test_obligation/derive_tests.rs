@@ -40,6 +40,7 @@ use super::{
     DeriveTestObligationsInteractor,
 };
 use crate::test_obligation::TestObligationCatalogueCommandInput;
+use crate::test_obligation::obligation_declaration_text;
 
 // ---------------------------------------------------------------------------
 // Test doubles
@@ -311,6 +312,40 @@ fn trait_entry(role: ContractRole, anchor: &str) -> TraitEntry {
         ModulePath::root(),
         None,
         vec![spec_ref(anchor)],
+        vec![],
+    )
+}
+
+fn fulfillment_cache_port_entry(docs: Option<DocString>) -> TraitEntry {
+    TraitEntry::new(
+        ItemAction::Add,
+        ContractRole::SecondaryPort,
+        vec![
+            MethodDeclaration::new(
+                MethodName::new("load").unwrap(),
+                Some(SelfReceiver::SharedRef),
+                vec![],
+                TypeRef::new("Result<ObligationFulfillmentCacheLoad, VerifyCacheError>").unwrap(),
+                false,
+                None,
+            ),
+            MethodDeclaration::new(
+                MethodName::new("save").unwrap(),
+                Some(SelfReceiver::SharedRef),
+                vec![],
+                TypeRef::new("Result<(), DiagnosticMessage>").unwrap(),
+                false,
+                None,
+            ),
+        ],
+        vec![],
+        vec![],
+        vec![],
+        vec![],
+        vec![],
+        ModulePath::root(),
+        docs,
+        vec![spec_ref("AC-06")],
         vec![],
     )
 }
@@ -782,6 +817,65 @@ fn test_fs_spec_document_loader_trait_impl_derives_its_secondary_port_obligation
         "trait_impl:domain::spec_document_loader_port::SpecDocumentLoaderPort"
     );
     assert_eq!(conformance[0].spec_refs()[0].element_id(), "IN-07");
+}
+
+#[test]
+fn test_trait_impl_declaration_hash_includes_resolved_port_contract() {
+    let usecase_path = PathBuf::from("usecase-types.json");
+    let infrastructure_path = PathBuf::from("infrastructure-types.json");
+    let mut usecase = empty_catalogue("usecase", "usecase");
+    usecase.insert_trait(
+        TraitName::new("ObligationFulfillmentCachePort").unwrap(),
+        fulfillment_cache_port_entry(None),
+    );
+    let mut infrastructure = empty_catalogue("infrastructure", "infrastructure");
+    infrastructure.push_trait_impl(TraitImplDeclV2::new(
+        TypeRef::new("usecase::ObligationFulfillmentCachePort").unwrap(),
+        TypeRef::new("JsonObligationFulfillmentCacheCodec").unwrap(),
+    ));
+
+    let (first_interactor, first_sink) = interactor_with_catalogues(
+        rules_doc(),
+        vec![
+            (usecase_path.clone(), usecase.clone()),
+            (infrastructure_path.clone(), infrastructure.clone()),
+        ],
+    );
+    first_interactor
+        .execute(&command(vec![usecase_path.clone(), infrastructure_path.clone()]))
+        .unwrap();
+    let first = first_sink.saved.lock().unwrap().clone().unwrap();
+    let first_obligation = first
+        .obligations()
+        .iter()
+        .find(|obligation| {
+            obligation.id().entry_key().as_str() == "JsonObligationFulfillmentCacheCodec"
+        })
+        .unwrap();
+    let declaration =
+        obligation_declaration_text(&[usecase.clone(), infrastructure.clone()], first_obligation)
+            .unwrap();
+    assert!(declaration.contains("load"));
+    assert!(declaration.contains("save"));
+
+    let mut changed_usecase = empty_catalogue("usecase", "usecase");
+    changed_usecase.insert_trait(
+        TraitName::new("ObligationFulfillmentCachePort").unwrap(),
+        fulfillment_cache_port_entry(Some(DocString::new("changed port contract".to_owned()))),
+    );
+    let (second_interactor, second_sink) = interactor_with_catalogues(
+        rules_doc(),
+        vec![
+            (usecase_path.clone(), changed_usecase),
+            (infrastructure_path.clone(), infrastructure),
+        ],
+    );
+    second_interactor.execute(&command(vec![usecase_path, infrastructure_path])).unwrap();
+    let second = second_sink.saved.lock().unwrap().clone().unwrap();
+    let second_obligation = second.obligations().first().unwrap();
+
+    assert_eq!(first_obligation.id(), second_obligation.id());
+    assert_ne!(first_obligation.declaration_hash(), second_obligation.declaration_hash());
 }
 
 #[test]

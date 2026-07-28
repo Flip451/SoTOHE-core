@@ -1,8 +1,8 @@
 //! Branch strategy resolution and switch-base operation for the `track` command
 //! family.
 //!
-//! Extracted from `mod.rs` to keep the module within the 700-line production
-//! code limit (see `knowledge/conventions/impl-delegation-arch-guard.md`).
+//! Extracted from `mod.rs` to keep the module within the production-code line
+//! limit declared by `architecture-rules.json` (`module_limits.max_lines`).
 
 use std::path::{Path, PathBuf};
 use std::sync::Arc;

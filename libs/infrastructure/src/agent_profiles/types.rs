@@ -260,10 +260,10 @@ pub enum ReasoningEffortDto {
     Medium,
     /// High reasoning effort.
     High,
-    /// Codex's maximum reasoning effort vocabulary.
+    /// Extra-high reasoning effort, above `High`.
     #[serde(rename = "xhigh")]
     XHigh,
-    /// Claude's maximum reasoning effort vocabulary.
+    /// Highest supported reasoning effort.
     Max,
 }
 

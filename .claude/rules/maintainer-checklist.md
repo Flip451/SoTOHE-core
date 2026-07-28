@@ -7,9 +7,9 @@ Always consider:
 - user-facing docs:
   - `README.md`
 - track docs:
-  - `knowledge/conventions/branch-strategy.md`
-  - `knowledge/conventions/track-lifecycle.md`
-  - `knowledge/conventions/git-notes.md`
+  - `.harness/policies/branch-strategy.md`
+  - `.harness/policies/track-lifecycle.md`
+  - `.harness/policies/git-notes.md`
   - `track/registry.md`
 - enforcement:
   - `Makefile.toml`
@@ -26,8 +26,11 @@ When changing workspace architecture, synchronize this same live architecture-do
 - `.harness/capabilities/{implementer,dry-fix-lead,review-fix-lead,rollback-diagnoser}.md`
 - `.harness/custom/review-prompts/{cli,cli_composition,cli_driver,domain,infrastructure,types,usecase}.md`
 - survey prompts: `.gemini/GEMINI.md`, `.claude/skills/{gemini-system,repomix-snapshot}/SKILL.md`
-- applicable `knowledge/conventions/` references, especially `coding-principles.md`,
-  `type-designer-kind-selection.md`, and `impl-delegation-arch-guard.md`
+- applicable `knowledge/conventions/` references, especially `coding-principles.md` and
+  `type-designer-kind-selection.md`
+- `.harness/catalogue-lint/config.json` and `.harness/catalogue-lint/presets/ddd-strict.json`
+  when layer ids change: every role's `KindLayerConstraint` matches layer ids literally, and
+  the two files must stay structurally equal
 
 Keep workflow SSoT, thin command adapters, maintainer guidance, user guidance, and the affected
 conventions synchronized. Do not change `.harness/config/signal-gates.json` or adr_user

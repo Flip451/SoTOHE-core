@@ -1,0 +1,507 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "impl-plan": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`regression-coverage` の section description は「allowed and rejected active-track role-layer declarations」を散文で再記述しており、上流 spec の挙動契約の restatement です。impl-plan の section description は target + operation + anchor cite に限定してください（`knowledge/conventions/no-upstream-restatement.md`）。",
+              "severity": "P1",
+              "file": "track/items/role-layer-matrix-enforcement-2026-07-25/impl-plan.json",
+              "line": 42,
+              "category": "upstream restatement"
+            }
+          ],
+          "hash": "rvw1:sha256:9047c92fbd5635da6c33b6b832dd18840c7a87291c0d4a2ef63572c268f8133e",
+          "at": "2026-07-25T07:39:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:b2847c31f19fd91ee5d8c8ed60dbed240adbd27d1664259374d78401f7b99bdb",
+          "at": "2026-07-25T07:41:24Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "T003 claims CN-02/AC-05 coverage but omits `libs/infrastructure/src/tddd/fs_lint_config_loader.rs`. Its existing shipped-config test still asserts that `DomainValueObjectInboundReferenceRequired` is absent and hard-codes the expected PrimaryAdapter rules, so completing the two named test files would leave the prohibited rule-specific regression contract intact. Add this test module to T003 and reduce its shipped-config assertions to production-loader decoding and config/preset equality.",
+              "severity": "P1",
+              "file": "track/items/role-layer-matrix-enforcement-2026-07-25/impl-plan.json",
+              "line": 18,
+              "category": "task-coverage gap"
+            }
+          ],
+          "hash": "rvw1:sha256:b2847c31f19fd91ee5d8c8ed60dbed240adbd27d1664259374d78401f7b99bdb",
+          "at": "2026-07-25T07:45:15Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d2888064bc5822eb6b750cb28d4f669e1a7609a765b8f69d96b79e7c77ee0f50",
+          "at": "2026-07-25T07:47:28Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18df082d5fd5945bae294f0c617d94f87ca8a43f1edac53b57b43dbc3b7260a0",
+          "at": "2026-07-25T08:10:20Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:18df082d5fd5945bae294f0c617d94f87ca8a43f1edac53b57b43dbc3b7260a0",
+          "at": "2026-07-25T08:15:06Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e10159d15c01c6df207e881f2c298e2e871a87adad95cbf1f46672920ee9cb50",
+          "at": "2026-07-25T08:30:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:e10159d15c01c6df207e881f2c298e2e871a87adad95cbf1f46672920ee9cb50",
+          "at": "2026-07-25T08:33:05Z"
+        }
+      ]
+    },
+    "other": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3fc55ffe221d9e516b7ae2dbb59ba2f5ef539801e74197e0a754fe14f860a73",
+          "at": "2026-07-25T07:39:47Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3fc55ffe221d9e516b7ae2dbb59ba2f5ef539801e74197e0a754fe14f860a73",
+          "at": "2026-07-25T07:42:35Z"
+        }
+      ]
+    },
+    "types": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a34b585d5dd8566e86df5af5febbcaf3bbfdf127957db6e4ea9670493a57e383",
+          "at": "2026-07-25T07:39:48Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:a34b585d5dd8566e86df5af5febbcaf3bbfdf127957db6e4ea9670493a57e383",
+          "at": "2026-07-25T07:43:39Z"
+        }
+      ]
+    },
+    "harness-policy": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c103d2e991715d59ea728f51052e78c0a52fe0ccaf01653bdfa27d7fa58e51b",
+          "at": "2026-07-25T06:10:28Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4c103d2e991715d59ea728f51052e78c0a52fe0ccaf01653bdfa27d7fa58e51b",
+          "at": "2026-07-25T06:18:30Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "Phase 0 gate text still requires a post-adjudication fresh review before staging, contradicting the updated Phase 0 procedure in the same workflow, which states that the boundary stamp is written only under `adr-baseline/`, does not change the scope hash, and requires only `review check-approved` confirmation. This stale gate can incorrectly force an unnecessary review round after approval.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 246,
+              "category": "convention contradiction"
+            },
+            {
+              "message": "The Codex adapter still describes Phase 0 approval as permitting a “post-approval stamp” but does not state the new invariant that approval leaves ADR text and front-matter untouched and that the ledger stamp is the sole approval record. Since this adapter is an operational entry point for the workflow SSoT, it leaves the old front-matter/post-approval-edit semantics available to Codex execution and is inconsistent with the updated convention and workflow.",
+              "severity": "P1",
+              "file": ".agents/skills/track-adr2pr/SKILL.md",
+              "line": 53,
+              "category": "adapter-SSoT synchronization"
+            }
+          ],
+          "hash": "rvw1:sha256:f9860e330bbe87bca21ec55eebb4a3c1bf5047d24f6994f51444f5efbf53b6e9",
+          "at": "2026-07-25T06:43:58Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:037edf57996ff38804ce847b110e0ec0fd43ee864a80efbacf6ea23ae4c18176",
+          "at": "2026-07-25T06:47:05Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "An `adjudication-ready` round intentionally retains ADR findings and is not `check-approved`; the review SSoT requires resuming the ordinary loop after adjudication. This gate instead skips a fresh round whenever the ruling leaves ADR bytes unchanged, then invokes a check guaranteed to fail. Keep the no-extra-round optimization only for the already-`zero_findings` path; `adjudication-ready` must re-review to final `zero_findings`.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/adr2pr.md",
+              "line": 246,
+              "category": "workflow-consistency"
+            },
+            {
+              "message": "Step 3 begins “After approval” and then edits or creates ADR text for a hearing decision. This violates the new prohibition on post-approval edits and bypasses review of the implemented text. Implement and re-audit the hearing decision before converged-text approval, resume review to final `zero_findings`, and only then close the boundary.",
+              "severity": "P1",
+              "file": ".harness/workflows/track/plan.md",
+              "line": 110,
+              "category": "workflow-consistency"
+            },
+            {
+              "message": "The Codex adapter only pauses when Phase 0 reaches `zero_findings`, omitting the workflow SSoT’s `adjudication-ready` terminal state. That is precisely where guardian-withheld and hearing-required proposals remain, so Codex can miss the mandatory user adjudication. Remove this duplicated workflow condition or synchronize it with both terminal states.",
+              "severity": "P1",
+              "file": ".agents/skills/track-adr2pr/SKILL.md",
+              "line": 51,
+              "category": "adapter-ssot"
+            },
+            {
+              "message": "Making the ledger stamp the sole approval record reverses merged ADR decisions without a superseding/refining ADR. `2026-07-16-2001-adr-decision-freeze.md` D6/D7 explicitly assign approval provenance to front-matter refs and exclude it from ledger reasons, and `2026-07-17-1203-...` D1 repeats that contract; D2 merely makes this convention the workflow SSoT. Record the new user ruling in a durable ADR before changing the convention and workflows, otherwise the live policy and decision history conflict.",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 52,
+              "category": "source-of-truth"
+            }
+          ],
+          "hash": "rvw1:sha256:037edf57996ff38804ce847b110e0ec0fd43ee864a80efbacf6ea23ae4c18176",
+          "at": "2026-07-25T06:53:16Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:9036e8d0844c3de3f44c0316863971dffc56970f536b0250fcf68e4c25ea738f",
+          "at": "2026-07-25T07:08:16Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "`obligations.json` を `Other` から `review_operational` へ移し、内容レビューと hash invalidation を恒久的に迂回させる新しい review policy に、対応する ADR decision がありません。既存の per-SoT review-scope ADR D2 は未割当 artifact を `Other` とし、新種 artifact の割当変更を再検討条件にしています。`test-bindings.json` との区別を含む判断を ADR に記録してから設定へ反映してください。",
+              "severity": "P1",
+              "file": ".harness/config/review-scope.json",
+              "line": 90,
+              "category": "decision-grounding"
+            },
+            {
+              "message": "承認後の fresh review で生じた意味的編集を通常の guardian lane で採用し、guardian と reviewer の対立時だけ user に戻す変更は、Phase 0 の裁定境界を変える workflow decision です。しかし根拠は一時 briefing 内の user 指示だけで、`knowledge/conventions/adr.md` が workflow 変更に要求する永続 ADR decision がありません。既存 ADR が記録する収束→user 承認→刻印の流れを amend/supersede する ADR を追加し、その後 convention と workflow SSoT を追随させてください。",
+              "severity": "P1",
+              "file": "knowledge/conventions/pre-track-adr-authoring.md",
+              "line": 51,
+              "category": "convention-contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:9036e8d0844c3de3f44c0316863971dffc56970f536b0250fcf68e4c25ea738f",
+          "at": "2026-07-25T07:13:35Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:40ea863f977533beb1e8d6d75eb40c8f4a29b7fbd4df40224e0a8cc0f629614d",
+          "at": "2026-07-25T08:10:39Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The capability claims that active-track lint mechanically rejects every forbidden role/layer pair, but its fixed pipeline never runs `bin/sotp catalogue-lint check-active-track`: step 7 runs only `catalog check`, signals run immediately afterward, and the step-12 receipts omit catalogue lint. A forbidden placement can therefore complete Phase 2 and produce signals despite R1 requiring rejection before `calc-impl-catalog`. Add the lint gate before signal evaluation and include it in the completion receipts and Bash allowlist.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 14,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "This paragraph duplicates R1 policy—the all-role constraint, `✓`/`△` semantics, exact `ValueObject` layer set, and evidence obligation—even though lines 12 and 38 declare the convention authoritative and explicitly prohibit mirroring its rules here. This creates a second policy source that can drift when R1 changes. Keep only the operational reference to R1 and the schema/linter documentation.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 14,
+              "category": "SSoT duplication"
+            },
+            {
+              "message": "R1 now declares catalogue-lint as the mechanical enforcement for all role/layer prohibitions, but the convention's `Enforcement` section still enumerates only agent self-check, reviewer review, and signal evaluation; catalogue lint is absent. This leaves contradictory guidance about which mechanism owns the gate. Add the active-track lint command to the enforcement chain and distinguish it from the optional future codec-level validation.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 69,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:40ea863f977533beb1e8d6d75eb40c8f4a29b7fbd4df40224e0a8cc0f629614d",
+          "at": "2026-07-25T08:15:42Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The 12c repair path edits the catalogue after 12a but instructs the designer to rerun only steps 8–11. Because the new `catalogue-lint check-active-track` gate and `catalog check` are both in step 7, a 12c role/layer correction can introduce a forbidden placement or invalid document and then regenerate signals/views without revalidating it. Rerun the step-7 pair—and its 12a receipt—after every 12c edit.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 246,
+              "category": "command wiring breakage"
+            },
+            {
+              "message": "The legend defines every `△` placement as requiring justification specifically in the entry `docs`, while the changed `ValueObject` rule permits the justification in either `docs` or a track review record. Since all three `ValueObject` placements are now `△`, a review-record-only justification is simultaneously allowed and forbidden. Align the legend with the ADR's `docs`-or-review-record rule or state an explicit `ValueObject` exception.",
+              "severity": "P1",
+              "file": "knowledge/conventions/type-designer-kind-selection.md",
+              "line": 71,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:4d17d0f721eda456231d8d9d5650d09cd409630c671a1f5233afa0157f160a75",
+          "at": "2026-07-25T08:22:01Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The `## Rules` Bash allowlist permits only catalogue verbs, `catalogue-lint`, `signal check-catalog-spec`, and `track views sync`, while the mandatory pipeline also requires `track baseline-capture`, `track baseline-graph`, `signal calc-catalog-spec`, `signal calc-impl-catalog`, and `track contract-map`. This contradicts the complete allowlist at line 467 and makes the fixed pipeline impossible under a literal reading. Replace this narrower duplicate with a reference to the complete pipeline allowlist or enumerate all required commands.",
+              "severity": "P1",
+              "file": ".harness/capabilities/type-designer.md",
+              "line": 477,
+              "category": "command wiring breakage"
+            }
+          ],
+          "hash": "rvw1:sha256:eef84ebdf0899b10a07438856dd143e3ce4442d0db0d4119d6b37be97a4c3e07",
+          "at": "2026-07-25T08:24:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:286f3142434d4c7c8768effe0f53db5e1d9ed191a019e54db78451a0ca966e6c",
+          "at": "2026-07-25T08:26:36Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new instruction claims `libs/infrastructure/tests/catalogue_lint_shipped_config.rs` fails when `config.json` and `ddd-strict.json` diverge, but the test only parses each file independently and never compares their structures. This gives maintainers false assurance about the stated synchronization invariant; add an explicit equality assertion or remove the claim.",
+              "severity": "P1",
+              "file": ".claude/skills/architecture-customizer/SKILL.md",
+              "line": 43,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:6a1524053e2827f011b600836b2eb515d45fd20aa72649cf4bfba8f0acdf9597",
+          "at": "2026-07-25T08:42:57Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "The new instruction claims the shipped-config regression test fails when `config.json` and `ddd-strict.json` diverge, but `libs/infrastructure/tests/catalogue_lint_shipped_config.rs` only loads each file independently and asserts each has rules; it never compares the two configurations. This creates a false synchronization guarantee. Add an explicit structural equality assertion or remove the claim.",
+              "severity": "P1",
+              "file": ".claude/skills/architecture-customizer/SKILL.md",
+              "line": 43,
+              "category": "convention contradiction"
+            }
+          ],
+          "hash": "rvw1:sha256:34e0260a1e66a140e6e515345f3b9819d82b24e3d44239d68d296e89d3a24536",
+          "at": "2026-07-25T08:44:33Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cb3e310c6b6f8b761e9990957d2f62a006027c63b49ac75979addb50b42cee12",
+          "at": "2026-07-25T08:45:41Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "追加した同期要件が、この skill の検証手順に接続されていません。Step 5 の `fmt`、`check-layers`、`verify-arch-docs`、`cargo deny` は catalogue-lint config を比較しないため、片方だけ更新しても workflow が成功します。構造的一致を検査するテストが実行されるよう、Step 5 に `cargo make ci` または対象テストを追加してください。",
+              "severity": "P1",
+              "file": ".claude/skills/architecture-customizer/SKILL.md",
+              "line": 38,
+              "category": "validation-gap"
+            }
+          ],
+          "hash": "rvw1:sha256:cb3e310c6b6f8b761e9990957d2f62a006027c63b49ac75979addb50b42cee12",
+          "at": "2026-07-25T08:50:36Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:743e218079c5e2796075041f1a455712bb52f408c880dfcb00b2ad090f041ddf",
+          "at": "2026-07-25T08:53:59Z"
+        }
+      ]
+    },
+    "spec": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e201a8a1783321e4a94600eee6c6e34b478b9af8f4852fc1a9bbc8af46f8516",
+          "at": "2026-07-25T07:39:37Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:4e201a8a1783321e4a94600eee6c6e34b478b9af8f4852fc1a9bbc8af46f8516",
+          "at": "2026-07-25T07:45:16Z"
+        }
+      ]
+    },
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:fe504c253e15cb8e5fdb0042003ec46657f271428a07d98e9ce4851b2da3b9c4",
+          "at": "2026-07-25T06:01:31Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "ADR 0045 limits its “no new mechanism” boundary to assertions over prose without a machine-readable contract, and explicitly preserves parsed structural checks of configuration keys and values. It therefore does not support rejecting a rule-presence contract for this machine-readable lint config. Remove this citation or ground Alternative H in an applicable decision; its current rejection rationale is unsupported.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+              "line": 120,
+              "category": "broken narrative reference"
+            }
+          ],
+          "hash": "rvw1:sha256:fe504c253e15cb8e5fdb0042003ec46657f271428a07d98e9ce4851b2da3b9c4",
+          "at": "2026-07-25T06:03:51Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:907aef4af8d3614920e91fb8169be584ce965327d6a35403eedc1e47f80e9e58",
+          "at": "2026-07-25T06:14:56Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D2 embeds downstream review procedure rather than only recording the architectural decision: requiring placement rationale in `docs` or a track review record and requiring the reviewer to reconcile it constrains review/documentation workflow. This is scope leakage into the ADR and should be delegated to the relevant convention or spec.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+              "line": 50,
+              "category": "scope leakage into ADR body"
+            },
+            {
+              "message": "D4 contains excessive implementation-level test and type details (`production adapter`, two-file structural matching, Rust literal assertions, and enum decode behavior). These operational verification mechanics obscure the decision about keeping config as the single source of truth and should be delegated to the relevant testing/convention artifact.",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-25-0538-role-layer-matrix-enforcement.md",
+              "line": 61,
+              "category": "decision obscured by excess detail"
+            }
+          ],
+          "hash": "rvw1:sha256:c60e402fd9b041ed3197bce7d3d2a48fb374105e5c8b58da9879af0805aa18bc",
+          "at": "2026-07-25T06:29:42Z"
+        }
+      ]
+    },
+    "cli": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "禁止層の検証が `cli` の1層だけで、ValueObject を許可していない `cli_composition` と `cli_driver` を実際には通過していません。3つの禁止層すべてを個別に fixture 化するか、同一テストで全層を検証してください。",
+              "severity": "P1",
+              "file": "apps/cli/tests/cli_catalogue_lint.rs",
+              "line": 759,
+              "category": "test coverage"
+            }
+          ],
+          "hash": "rvw1:sha256:ad76bcbbf15f47e0d89c9821b4bd6af048e8df539aaeb7fd6812cfe7ce081925",
+          "at": "2026-07-25T08:10:20Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3e4a626fbbd65e4eb3848b5bcdd930d8d6fad7ddfd0ad8c90c17d0ecbfbf814",
+          "at": "2026-07-25T08:13:21Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:c3e4a626fbbd65e4eb3848b5bcdd930d8d6fad7ddfd0ad8c90c17d0ecbfbf814",
+          "at": "2026-07-25T08:17:32Z"
+        }
+      ]
+    },
+    "infrastructure": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:cd89dd5e522be94a5b980c8245c4a5df40a9ddd07995c645829537084915d32b",
+          "at": "2026-07-25T08:10:23Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D4/CN-02 は出荷 config の回帰検査を production adapter でのデコードと、デコード後の規則集合の構造的一致に限定しています。このテストは raw bytes の一致まで要求するため、意味的に同一な JSON の整形やフィールド順変更でも CI を失敗させる第三の契約になっています。構造比較は fs_lint_config_loader.rs 側ですでに維持されているため、この byte-identical 検査は削除してください。",
+              "severity": "P1",
+              "file": "libs/infrastructure/tests/catalogue_lint_shipped_config.rs",
+              "line": 39,
+              "category": "contract_violation"
+            }
+          ],
+          "hash": "rvw1:sha256:cd89dd5e522be94a5b980c8245c4a5df40a9ddd07995c645829537084915d32b",
+          "at": "2026-07-25T08:14:17Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:edfcf43d0734f5f9d4b4c7b699899ac656c3a18da569623a540e55ee459f27f9",
+          "at": "2026-07-25T08:17:19Z"
+        }
+      ]
+    }
+  }
+}

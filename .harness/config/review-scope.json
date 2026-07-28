@@ -41,7 +41,8 @@
     },
     "types": {
       "patterns": [
-        "track/items/<track-id>/*-types.json"
+        "track/items/<track-id>/*-types.json",
+        "track/items/<track-id>/tddd-features.json"
       ],
       "briefing_file": ".harness/custom/review-prompts/types.md"
     },
@@ -87,6 +88,7 @@
     "track/items/<track-id>/*-catalogue-spec-verify-cache.json",
     "track/items/<track-id>/*-catalogue-spec-verify-cache.json.lock",
     "track/items/<track-id>/.provider-sessions/**",
+    "track/items/<track-id>/obligations.json",
     "track/items/<track-id>/obligation-fulfillment-cache.json",
     "track/items/<track-id>/waiver-cache.json",
     "track/items/<track-id>/adr-baseline/**"

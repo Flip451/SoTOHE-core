@@ -167,8 +167,11 @@ impl ClaudeReviewer {
             "{base}\n\n\
              ## Review scope: `{scope}`\n\n\
              Review ONLY the following files (this is the `{scope}` scope).\n\
-             Re-read the CURRENT file list and CURRENT diff, then fully re-adjudicate this entire scope.\n\
-             You have read-only access to the repo — use `git diff` to see changes.\n\n\
+             Re-read the CURRENT file list and CURRENT diff, then fully re-adjudicate this entire scope.\n\n\
+             You have read-only access to the working tree — use `git diff` to see changes.\n\
+             Read the listed files and the current diff before deciding. A verdict produced\n\
+             without reading them is invalid — in particular, returning `zero_findings` without\n\
+             having inspected the diff is not a pass.\n\n\
              Files:\n{file_list}",
             base = self.base_prompt,
             scope = scope_label,

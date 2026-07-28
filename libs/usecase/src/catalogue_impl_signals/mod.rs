@@ -39,7 +39,7 @@ pub use service::{
 pub(crate) fn validate_track_id(id: &str) -> Result<(), CatalogueImplSignalsError> {
     domain::TrackId::try_new(id)
         .map(|_| ())
-        .map_err(|e| CatalogueImplSignalsError::InvalidTrackId { reason: e.to_string() })
+        .map_err(|e| CatalogueImplSignalsError::InvalidTrackId(service::diagnostic(e.to_string())))
 }
 
 // ---------------------------------------------------------------------------
@@ -54,7 +54,7 @@ mod tests {
     #[test]
     fn test_validate_track_id_empty_returns_error() {
         let err = validate_track_id("").unwrap_err();
-        assert!(matches!(err, CatalogueImplSignalsError::InvalidTrackId { .. }));
+        assert!(matches!(err, CatalogueImplSignalsError::InvalidTrackId(_)));
     }
 
     #[test]
@@ -70,30 +70,30 @@ mod tests {
     #[test]
     fn test_validate_track_id_leading_hyphen_returns_error() {
         let err = validate_track_id("-my-track").unwrap_err();
-        assert!(matches!(err, CatalogueImplSignalsError::InvalidTrackId { .. }));
+        assert!(matches!(err, CatalogueImplSignalsError::InvalidTrackId(_)));
     }
 
     #[test]
     fn test_validate_track_id_double_hyphen_returns_error() {
         let err = validate_track_id("my--track").unwrap_err();
-        assert!(matches!(err, CatalogueImplSignalsError::InvalidTrackId { .. }));
+        assert!(matches!(err, CatalogueImplSignalsError::InvalidTrackId(_)));
     }
 
     #[test]
     fn test_validate_track_id_trailing_hyphen_returns_error() {
         let err = validate_track_id("my-track-").unwrap_err();
-        assert!(matches!(err, CatalogueImplSignalsError::InvalidTrackId { .. }));
+        assert!(matches!(err, CatalogueImplSignalsError::InvalidTrackId(_)));
     }
 
     #[test]
     fn test_validate_track_id_invalid_character_returns_error() {
         let err = validate_track_id("bad track id!!").unwrap_err();
-        assert!(matches!(err, CatalogueImplSignalsError::InvalidTrackId { .. }));
+        assert!(matches!(err, CatalogueImplSignalsError::InvalidTrackId(_)));
     }
 
     #[test]
     fn test_validate_track_id_uppercase_returns_error() {
         let err = validate_track_id("My-Track").unwrap_err();
-        assert!(matches!(err, CatalogueImplSignalsError::InvalidTrackId { .. }));
+        assert!(matches!(err, CatalogueImplSignalsError::InvalidTrackId(_)));
     }
 }

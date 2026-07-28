@@ -8,8 +8,7 @@
 //!   (IN-02 / IN-04 / AC-02).
 //! * [`ObligationsArtifactPort`] / [`TestBindingsArtifactPort`] — artifact
 //!   repositories (IN-05 / IN-06 / AC-03 / AC-04).
-//! * [`ObligationFulfillmentCachePort`] / [`WaiverCachePort`] — verdict-cache
-//!   persistence (IN-09 / CN-04 / AC-06).
+//! * [`WaiverCachePort`] — waiver verdict-cache persistence (IN-09 / CN-04 / AC-06).
 //! * [`ObligationFulfillmentVerifierPort`] / [`WaiverVerifierPort`] — semantic
 //!   judgement (IN-09 / IN-11 / CN-08 / AC-07).
 //! * [`TestSourceScannerPort`] — worktree test-body evidence (IN-06 / IN-09).
@@ -24,8 +23,7 @@ use crate::tddd::test_obligation::ids::DiagnosticMessage;
 use crate::tddd::test_obligation::obligations::ObligationsDocument;
 use crate::tddd::test_obligation::rules::TestObligationRulesDocument;
 use crate::tddd::test_obligation::verdict::{
-    ObligationFulfillmentCacheDocument, ObligationFulfillmentVerdict, WaiverCacheDocument,
-    WaiverVerdict,
+    ObligationFulfillmentVerdict, WaiverCacheDocument, WaiverVerdict,
 };
 use crate::{ModelTier, TrackId};
 
@@ -82,28 +80,6 @@ pub trait TestBindingsArtifactPort {
     /// Returns a [`DiagnosticMessage`] describing the failure when the artifact
     /// cannot be written.
     fn save(&self, doc: &TestBindingsDocument) -> Result<(), DiagnosticMessage>;
-}
-
-/// Loads and persists the obligation-fulfillment verdict cache for a track.
-pub trait ObligationFulfillmentCachePort {
-    /// Loads the fulfillment cache for `track_id`, if it exists.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`VerifyCacheError`] when the cache cannot be read or is
-    /// malformed.
-    fn load(
-        &self,
-        track_id: &TrackId,
-    ) -> Result<Option<ObligationFulfillmentCacheDocument>, VerifyCacheError>;
-
-    /// Persist an obligation-fulfillment cache document.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`DiagnosticMessage`] describing the failure when the cache
-    /// cannot be written.
-    fn save(&self, doc: &ObligationFulfillmentCacheDocument) -> Result<(), DiagnosticMessage>;
 }
 
 /// Loads and persists the waiver verdict cache for a track.

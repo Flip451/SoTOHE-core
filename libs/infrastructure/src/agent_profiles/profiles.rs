@@ -216,7 +216,7 @@ impl CapabilityConfigDto {
 fn supports_effort(provider: &ProviderName, effort: ReasoningEffort) -> bool {
     match provider.as_str() {
         "codex" => !matches!(effort, ReasoningEffort::Max),
-        "claude" => !matches!(effort, ReasoningEffort::XHigh),
+        "claude" => true,
         "gemini" => {
             matches!(effort, ReasoningEffort::Low | ReasoningEffort::Medium | ReasoningEffort::High)
         }

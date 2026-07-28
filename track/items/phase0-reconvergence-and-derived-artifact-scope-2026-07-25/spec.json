@@ -1,0 +1,232 @@
+{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Phase 0 再収束レーンと派生義務成果物のレビュー範囲",
+  "goal": [
+    {
+      "id": "GO-01",
+      "text": "Phase 0 で user 承認後の ADR 文面に修正が入った場合、承認前の収束段階へ戻して review loop と修正後全文の再承認を経ることで、修正前の承認を再利用せずに裁定境界を閉じる。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "GO-02",
+      "text": "型カタログから機械導出される obligations.json を review_operational として扱い、再導出だけで内容レビューを失効させない一方、書き手が明示的に作成する test-bindings.json はレビュー対象に維持する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-25-0715-derived-obligation-artifact-review-scope.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "scope": {
+    "in_scope": [
+      {
+        "id": "IN-01",
+        "text": "knowledge/conventions/pre-track-adr-authoring.md を、Phase 0 の user 承認後に修正が加わった ADR を承認前の収束 loop へ戻し、収束後に修正後全文への user 再承認を要求する規範の正として更新する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-02",
+        "text": "Phase 0 の再収束を案内する workflow SSoT と対応する command / skill adapter を、前記 convention を規範の正として参照する記述へ同期し、独自の手順再記述や承認済み状態のまま guardian lane を継続する経路を残さない。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "IN-03",
+        "text": ".harness/config/review-scope.json の review_operational に track ごとの obligations.json を加え、同成果物を内容レビューのスコープ分類から除外する。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-25-0715-derived-obligation-artifact-review-scope.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "OS-01",
+        "text": "test-bindings.json を review_operational へ加えること、または test-bindings.json の内容レビューを免除することは本 track の対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-25-0715-derived-obligation-artifact-review-scope.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-02",
+        "text": "commit gate の test-obligation check、.harness/config/signal-gates.json、または adr_user signal 評価を変更することは本 track の対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-25-0715-derived-obligation-artifact-review-scope.md",
+            "anchor": "D1"
+          }
+        ]
+      },
+      {
+        "id": "OS-03",
+        "text": "承認記録の ADR front-matter 所在、Phase 0 境界刻印、commit gate の ADR byte 照合、または adjudication-ready 経路を変更することは本 track の対象外とする。",
+        "adr_refs": [
+          {
+            "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+            "anchor": "D1"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "id": "CN-01",
+      "text": "修正が意味変更か、guardian が決定保存的と判定したかを問わず、承認後に変更された文面へ修正前の user 承認を流用してはならない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-02",
+      "text": "再収束の具体的手順と Phase 0 境界処理は pre-track-adr-authoring convention を唯一の規範の正とし、workflow SSoT と command / skill adapter はその規範を重複して定義しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "CN-03",
+      "text": "review_operational への分類基準は成果物の重要度ではなく、その内容が機械導出であることとし、明示的 authoring を含む test-bindings.json へ拡張してはならない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-25-0715-derived-obligation-artifact-review-scope.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "AC-01",
+      "text": "pre-track-adr-authoring convention は、user 承認後に ADR 文面が修正された場合に承認前の収束 loop を再開し、findings の収束後に修正後の全体を user へ再提示して再承認を得ることを定める。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-02",
+      "text": "Phase 0 の再収束を記述する workflow SSoT と対応する command / skill adapter は pre-track-adr-authoring convention を参照し、承認済みの状態を維持したまま通常の guardian lane を継続する手順を指示しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-03",
+      "text": "再収束した修正後の ADR 文面は、修正前の user 承認を流用せず、user の再承認を得るまで Phase 0 裁定境界を閉じない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-04",
+      "text": ".harness/config/review-scope.json の review_operational は track/items/<track-id>/obligations.json に対応する pattern を含み、obligations.json は内容レビューのスコープへ分類されない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-25-0715-derived-obligation-artifact-review-scope.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-05",
+      "text": "review_operational に test-bindings.json の pattern は追加されず、test-bindings.json は内容レビューの対象として残る。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-25-0715-derived-obligation-artifact-review-scope.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-06",
+      "text": "変更後も commit gate の test-obligation check は維持され、obligations.json の review_operational 分類は同 check の実行を変更しない。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-25-0715-derived-obligation-artifact-review-scope.md",
+          "anchor": "D1"
+        }
+      ]
+    },
+    {
+      "id": "AC-07",
+      "text": "変更後も承認記録は ADR front-matter にあり、境界刻印、commit gate の byte 照合、adjudication-ready 経路はいずれも従来の扱いを維持する。",
+      "adr_refs": [
+        {
+          "file": "knowledge/adr/2026-07-25-0716-phase0-post-approval-reconvergence-lane.md",
+          "anchor": "D1"
+        }
+      ]
+    }
+  ],
+  "related_conventions": [
+    {
+      "file": "knowledge/conventions/pre-track-adr-authoring.md",
+      "anchor": "Phase 0 — 裁定境界まで"
+    },
+    {
+      "file": "knowledge/conventions/adr.md",
+      "anchor": "Lifecycle: pre-merge draft vs post-merge record"
+    },
+    {
+      "file": "knowledge/conventions/no-upstream-restatement.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/enforce-by-mechanism.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/workflow-ceremony-minimization.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": "knowledge/conventions/responsibility-boundary.md",
+      "anchor": "Rules"
+    },
+    {
+      "file": ".claude/rules/maintainer-checklist.md",
+      "anchor": "Maintainer Checklist"
+    }
+  ],
+  "signals": {
+    "blue": 18,
+    "yellow": 0,
+    "red": 0
+  }
+}

@@ -920,7 +920,7 @@ mod tests {
             vec![],
             vec![],
             vec![],
-            vec![make_conv_ref("knowledge/conventions/source-attribution.md", "intro")],
+            vec![make_conv_ref("knowledge/conventions/x.md", "intro")],
             None,
         )
         .unwrap();

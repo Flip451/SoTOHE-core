@@ -47,6 +47,28 @@ fn test_resolve_execution_final_provider_cli_has_explicit_effort() {
 }
 
 #[test]
+fn test_resolve_execution_fast_round_selects_the_fast_model_and_effort() {
+    // `CODEX_PROFILE` gives the two round types distinct models and distinct
+    // efforts, so an implementation that requires `fast_reasoning_effort` to be
+    // present but then hands back the final round's `reasoning_effort` — or the
+    // final model — fails here. The absence test below cannot see that: it only
+    // establishes that a missing fast effort is refused, which such an
+    // implementation would still do.
+    let profiles = load_profiles(CODEX_PROFILE);
+    let execution = profiles
+        .resolve_execution(&capability("reviewer"), RoundType::Fast)
+        .expect("fast profile resolves");
+
+    assert!(matches!(
+        execution,
+        ResolvedExecution::ProviderCli { provider, model, effort }
+            if provider.as_str() == "codex"
+                && model.as_str() == "gpt-5.6-luna"
+                && effort == ReasoningEffort::Low
+    ));
+}
+
+#[test]
 fn test_resolve_execution_missing_fast_effort_returns_error() {
     let profiles = load_profiles(
         r#"{
@@ -99,11 +121,11 @@ fn test_resolve_execution_unsupported_provider_effort_returns_error() {
     let profiles = load_profiles(
         r#"{
             "schema_version": 1,
-            "providers": { "claude": { "label": "Claude Code" } },
+            "providers": { "gemini": { "label": "Gemini CLI" } },
             "capabilities": {
-                "implementer": {
-                    "provider": "claude",
-                    "model": "claude-opus-4-7",
+                "researcher": {
+                    "provider": "gemini",
+                    "model": "gemini-3-pro",
                     "reasoning_effort": "xhigh",
                     "execution_mode": "orchestrator-output"
                 }
@@ -112,10 +134,42 @@ fn test_resolve_execution_unsupported_provider_effort_returns_error() {
     );
 
     assert!(matches!(
-        profiles.resolve_execution(&capability("implementer"), RoundType::Final),
+        profiles.resolve_execution(&capability("researcher"), RoundType::Final),
         Err(AgentProfilesError::UnsupportedEffort(provider, ReasoningEffort::XHigh))
-            if provider.as_str() == "claude"
+            if provider.as_str() == "gemini"
     ));
+}
+
+#[test]
+fn test_resolve_execution_claude_accepts_every_effort_level() {
+    for (encoded, expected) in [
+        ("low", ReasoningEffort::Low),
+        ("medium", ReasoningEffort::Medium),
+        ("high", ReasoningEffort::High),
+        ("xhigh", ReasoningEffort::XHigh),
+        ("max", ReasoningEffort::Max),
+    ] {
+        let profiles = load_profiles(&format!(
+            r#"{{
+                "schema_version": 1,
+                "providers": {{ "claude": {{ "label": "Claude Code" }} }},
+                "capabilities": {{
+                    "implementer": {{
+                        "provider": "claude",
+                        "model": "claude-opus-5",
+                        "reasoning_effort": "{encoded}",
+                        "execution_mode": "orchestrator-output"
+                    }}
+                }}
+            }}"#
+        ));
+
+        assert!(matches!(
+            profiles.resolve_execution(&capability("implementer"), RoundType::Final),
+            Ok(ResolvedExecution::ProviderCli { provider, effort, .. })
+                if provider.as_str() == "claude" && effort == expected
+        ));
+    }
 }
 
 #[test]
@@ -196,14 +250,17 @@ fn test_committed_profiles_subprocess_entries_resolve_explicit_effort() {
             Ok(ResolvedExecution::ProviderCli { .. })
         ));
     }
-    assert!(matches!(
-        profiles.resolve_execution(&capability("reviewer"), RoundType::Fast),
-        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })
-    ));
-    assert!(matches!(
-        profiles.resolve_execution(&capability("reviewer"), RoundType::Final),
-        Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })
-    ));
+    // Both round types resolve an explicit effort. The values themselves are
+    // tunable configuration, so pinning them here would make every change to
+    // the committed profile a test edit; that the fast round reads the `fast_*`
+    // fields at all is established by the fixture tests above, which observe
+    // `EffortMissing(_, Fast)` when they are absent.
+    for round_type in [RoundType::Fast, RoundType::Final] {
+        assert!(matches!(
+            profiles.resolve_execution(&capability("reviewer"), round_type),
+            Ok(ResolvedExecution::ProviderCli { .. })
+        ));
+    }
     assert!(matches!(
         profiles.resolve_execution(&capability("pr-reviewer"), RoundType::Final),
         Ok(ResolvedExecution::HostedService { .. })
@@ -247,14 +304,14 @@ fn test_committed_and_default_profiles_resolve_full_cli_effort_contract() {
                 })
             ));
         }
-        assert!(matches!(
-            profiles.resolve_execution(&capability("reviewer"), RoundType::Fast),
-            Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::Low, .. })
-        ));
-        assert!(matches!(
-            profiles.resolve_execution(&capability("reviewer"), RoundType::Final),
-            Ok(ResolvedExecution::ProviderCli { effort: ReasoningEffort::XHigh, .. })
-        ));
+        // Contract only, not the tunable values — see the note on the same
+        // assertion in the committed-profiles test above.
+        for round_type in [RoundType::Fast, RoundType::Final] {
+            assert!(matches!(
+                profiles.resolve_execution(&capability("reviewer"), round_type),
+                Ok(ResolvedExecution::ProviderCli { .. })
+            ));
+        }
     }
 
     for capability_name in ["ref-verifier-chain1", "ref-verifier-chain2"] {

@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "c300fe70f1d2e798648158ca7f8486c4385bcbd9c0d2844d0aebe78f12e67cb1",
+  "signals": [
+    {
+      "type_name": "ConventionsCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "7e21abe3315c22ce1234fd6875e15c4b579c0af4b7342ab1330054cba66efb29"
+    },
+    {
+      "type_name": "TemplateCompositionRoot",
+      "signal": "blue",
+      "entry_hash": "29d6f2d217caa32a35762f47ffa46e6d685a184ecdcbb5c160af6ac847ff05cc"
+    }
+  ]
+}

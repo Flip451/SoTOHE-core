@@ -9,10 +9,14 @@ use infrastructure::capability_exec::{
     agent_profiles::AgentProfilesCapabilityAdapter, claude::ClaudeCapabilityAdapter,
     codex::CodexCapabilityAdapter, source::FsCapabilitySourceAdapter,
 };
+use infrastructure::conventions_resolve::FsConventionRequirementAdapter;
 use infrastructure::git_cli::SystemGitRepo;
 use infrastructure::provider_session::FsProviderSessionCacheAdapter;
 use usecase::capability_exec::{
     CapabilityExecInteractor, CapabilityProfilePort, CapabilityProviderPort, CapabilitySourcePort,
+};
+use usecase::conventions_resolve::{
+    ConventionRequirementPort, ConventionResolveInteractor, ConventionResolveService,
 };
 
 const CAPABILITY_RUNTIME_DIR: &str = "tmp/capability-runtime";
@@ -73,7 +77,28 @@ impl CapabilityCompositionRoot {
                 track_id,
             )),
         ];
-        let service = Arc::new(CapabilityExecInteractor::new(profile, source, providers));
+        // Convention resolution for the dispatch preflight, assembled from the
+        // same read-only scan the `conventions resolve` command uses. Both
+        // callers go through one service, so the documents a dispatched
+        // capability is told to read are the documents that command reports for
+        // it; the filesystem side is the requirement scan and nothing else, so
+        // this wiring gives the dispatcher no route to writing a convention
+        // document.
+        let conventions: Arc<dyn ConventionResolveService> = Arc::new(
+            ConventionResolveInteractor::new(Arc::new(FsConventionRequirementAdapter::new())
+                as Arc<dyn ConventionRequirementPort>),
+        );
+        // The preflight scans the discovered repository root, the same value the
+        // adapters above resolve their repository-relative inputs against, so a
+        // dispatch issued from a subdirectory reads the repository's conventions
+        // rather than whatever tree the process happens to sit in.
+        let service = Arc::new(CapabilityExecInteractor::new(
+            profile,
+            source,
+            conventions,
+            providers,
+            self.repo_root.clone(),
+        ));
 
         cli_driver::capability::CapabilityDriver::new(service)
     }
@@ -276,6 +301,40 @@ mod tests {
         assert!(output.contains("capability: implementer"));
         assert!(output.contains("briefing_file: tmp/briefing.md"));
         assert!(output.contains("Do not stage changes."));
+        Ok(())
+    }
+
+    #[test]
+    fn test_capability_composition_root_dispatch_names_the_repository_conventions()
+    -> Result<(), Box<dyn std::error::Error>> {
+        let directory = tempfile::tempdir()?;
+        write_dispatch_fixture(
+            directory.path(),
+            "---\nname: implementer\ndescription: Implements assigned tasks.\nmodel: claude-opus\ntools:\n  - Read\n---\nagent body\n",
+        )?;
+        // Declared for the dispatched capability, and named so that no document
+        // of this repository could be mistaken for it: a path reaching the
+        // delegation payload can only have come from the tree wired in as the
+        // repository root.
+        write_file(
+            directory.path(),
+            "knowledge/conventions/wiring-probe-capability-exec.md",
+            "---\nrequired_for:\n  - implementer\n---\n\n# Probe\n",
+        )?;
+        let root = CapabilityCompositionRoot::new(
+            directory.path().to_owned(),
+            directory.path().join("tmp/capability-runtime"),
+        );
+
+        let outcome = root.capability_driver().handle(input());
+        let output = outcome.stdout.expect("in-host instruction is rendered");
+
+        assert_eq!(outcome.exit_code, 0);
+        assert!(
+            output.contains("knowledge/conventions/wiring-probe-capability-exec.md"),
+            "the dispatch resolves conventions against the repository root this root was built \
+             with, and the delegation payload carries what it found: {output}"
+        );
         Ok(())
     }
 

@@ -1,0 +1,425 @@
+{
+  "track_id": "consumer-convention-ownership-and-harness-decoupling-2026-07-25",
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "CapabilityExecInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "CapabilityExecInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of CapabilityExecInteractor",
+      "declaration_hash": "427b4d75854e868dea37e391328c61d80edd9720f413863064ace03655c1c064",
+      "spec_refs": [
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-07"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-10"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-11"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-12"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ConventionResolveInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "ConventionResolveInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of ConventionResolveInteractor",
+      "declaration_hash": "5614ef129cb84ad8d9d97973cd6d60a7c1e1749ab5ece2dc3f379bd56474bdeb",
+      "spec_refs": [
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ConventionShippingCheckInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "ConventionShippingCheckInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of ConventionShippingCheckInteractor",
+      "declaration_hash": "05245ad436dc34b983abf71ea6e86eab1cfb3ee3d94f89a5893e909bf8b88a33",
+      "spec_refs": [
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "usecase::conventions_resolve::select_required_conventions",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+        "section_key": "functions",
+        "entry_key": "usecase::conventions_resolve::select_required_conventions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of usecase::conventions_resolve::select_required_conventions",
+      "declaration_hash": "12cdd5ac37e3f757c17f4abb5182b3bee1c60b747812d0340f3f40e9544d9c3e",
+      "spec_refs": [
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "usecase::template_conventions::select_unsupplied_conventions",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+        "section_key": "functions",
+        "entry_key": "usecase::template_conventions::select_unsupplied_conventions"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of usecase::template_conventions::select_unsupplied_conventions",
+      "declaration_hash": "51d35e3335125b49fcf4d91b94e0dc26329d3f198ac7b9c4a176891894d90255",
+      "spec_refs": [
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ConventionInventoryPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:list_conventions"
+      },
+      "target_entry": {
+        "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ConventionInventoryPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:list_conventions' of ConventionInventoryPort",
+      "declaration_hash": "b8be9962aba00206c94101a62375340a1d9c6e4b72163cbadfc5dfd99cfcdf03",
+      "spec_refs": [
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ConventionRequirementPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:scan_requirements"
+      },
+      "target_entry": {
+        "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ConventionRequirementPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:scan_requirements' of ConventionRequirementPort",
+      "declaration_hash": "34288b614a17b6a468af9b109bd2838a14ace7a85a93d7f977002d135910ceda",
+      "spec_refs": [
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ConventionResolveService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:resolve"
+      },
+      "target_entry": {
+        "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ConventionResolveService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:resolve' of ConventionResolveService",
+      "declaration_hash": "4d1a4f5492cb238b3d9407dc9e8f8e25ae90fb1932546d11c5bd8ab6553aa2d9",
+      "spec_refs": [
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "ConventionShippingCheckService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check"
+      },
+      "target_entry": {
+        "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "ConventionShippingCheckService"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "ApplicationService"
+      },
+      "brief": "Author a result test covering 'trait_method:check' of ConventionShippingCheckService",
+      "declaration_hash": "61076364ee93b426a6cc6346c00cb9b94f9677f8ad39b87cf944c73be7f1298a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "infrastructure::conventions_resolve::parse_convention_front_matter",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::conventions_resolve::parse_convention_front_matter"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::conventions_resolve::parse_convention_front_matter",
+      "declaration_hash": "ba4effd44d4c9d669010562de166e0d0fa7e1bcc8743fa8cf406c77fb2f949ef",
+      "spec_refs": [
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-08"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "infrastructure::conventions_resolve::scan_convention_requirements",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::conventions_resolve::scan_convention_requirements"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::conventions_resolve::scan_convention_requirements",
+      "declaration_hash": "0b6b6794541a76c741d0ece2044b168b4dced880b7ae65f150ff838c2803e01c",
+      "spec_refs": [
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "infrastructure::template_conventions::list_convention_documents",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::template_conventions::list_convention_documents"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::template_conventions::list_convention_documents",
+      "declaration_hash": "b66942a4da413425ff78d4901f91aba3f0b30ad53bc3ba04c417bd79c9537a70",
+      "spec_refs": [
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsConventionRequirementAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::conventions_resolve::requirement_port::ConventionRequirementPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsConventionRequirementAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::conventions_resolve::requirement_port::ConventionRequirementPort' of FsConventionRequirementAdapter",
+      "declaration_hash": "30202f165d0ed31d341c8de627ece2746c92468e99f08d21423bd25b0947cf00",
+      "spec_refs": [
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsConventionInventoryAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::template_conventions::ConventionInventoryPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsConventionInventoryAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::template_conventions::ConventionInventoryPort' of FsConventionInventoryAdapter",
+      "declaration_hash": "27c76fddfefa7ea561c19d9fb63dcae482581e60c9d8958211321a6bb9606fad",
+      "spec_refs": [
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        },
+        {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      ]
+    }
+  ]
+}

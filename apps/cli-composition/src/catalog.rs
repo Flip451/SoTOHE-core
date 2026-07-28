@@ -11,10 +11,7 @@
 
 use std::sync::Arc;
 
-use cli_driver::CommandOutcome;
-use cli_driver::catalog_gen::{CatalogDriver, CatalogInput};
-
-use crate::error::CompositionError;
+use cli_driver::catalog_gen::CatalogDriver;
 
 /// Composition root for the `catalog` command family.
 ///
@@ -35,23 +32,16 @@ impl CatalogCompositionRoot {
     #[must_use]
     pub fn catalog_driver(&self) -> CatalogDriver {
         use infrastructure::tddd::catalog_gen::FsCatalogAdapter;
-        use usecase::catalog_gen::{CatalogInteractor, CatalogPort, CatalogService};
+        use usecase::catalog_gen::{
+            CatalogInteractor, CatalogPort, CatalogQueryService, CatalogService,
+        };
 
         let adapter = Arc::new(FsCatalogAdapter::new());
-        let service: Arc<dyn CatalogService> =
-            Arc::new(CatalogInteractor::new(adapter as Arc<dyn CatalogPort>));
-        CatalogDriver::new(service)
-    }
-
-    /// Wire and dispatch a `catalog` command through the full stack.
-    ///
-    /// # Errors
-    ///
-    /// Returns [`CompositionError`] if composition fails. Wiring is currently
-    /// infallible; the signature preserves room for future wiring errors (e.g.
-    /// config loading), matching the sibling composition roots.
-    pub fn handle(&self, input: CatalogInput) -> Result<CommandOutcome, CompositionError> {
-        Ok(self.catalog_driver().handle(input))
+        let interactor = Arc::new(CatalogInteractor::new(adapter as Arc<dyn CatalogPort>));
+        CatalogDriver::new(
+            interactor.clone() as Arc<dyn CatalogService>,
+            interactor as Arc<dyn CatalogQueryService>,
+        )
     }
 }
 
@@ -133,23 +123,26 @@ mod tests {
         let (_ws, items_dir, track_id) = fixture();
         let root = CatalogCompositionRoot::new();
 
-        let init = root
-            .handle(CatalogInput::Init(CatalogInitInput {
-                track_id: track_id.clone(),
-                items_dir: items_dir.clone(),
-            }))
-            .unwrap();
+        let init = root.catalog_driver().handle(CatalogInput::Init(CatalogInitInput {
+            track_id: track_id.clone(),
+            items_dir: items_dir.clone(),
+        }));
         assert_eq!(init.exit_code, 0, "init: {init:?}");
 
-        let add =
-            root.handle(add_input(&items_dir, &track_id, vec!["count: u32".to_owned()])).unwrap();
+        let add = root.catalog_driver().handle(add_input(
+            &items_dir,
+            &track_id,
+            vec!["count: u32".to_owned()],
+        ));
         assert_eq!(add.exit_code, 0, "add: {add:?}");
         assert!(add.stdout.unwrap().contains("Foo"), "add stdout must name the entry");
 
         // Residual $todo holes block once catalogue generation has started.
-        let check = root
-            .handle(CatalogInput::Check(CatalogCheckInput { track_id, items_dir, layer: None }))
-            .unwrap();
+        let check = root.catalog_driver().handle(CatalogInput::Check(CatalogCheckInput {
+            track_id,
+            items_dir,
+            layer: None,
+        }));
         assert_eq!(check.exit_code, 1, "check blocks holes: {check:?}");
     }
 
@@ -158,17 +151,57 @@ mod tests {
         let (_ws, items_dir, track_id) = fixture();
         let root = CatalogCompositionRoot::new();
 
-        root.handle(CatalogInput::Init(CatalogInitInput {
+        root.catalog_driver().handle(CatalogInput::Init(CatalogInitInput {
             track_id: track_id.clone(),
             items_dir: items_dir.clone(),
-        }))
-        .unwrap();
-        root.handle(add_input(&items_dir, &track_id, vec![])).unwrap();
+        }));
+        root.catalog_driver().handle(add_input(&items_dir, &track_id, vec![]));
 
         // The check blocks while $todo holes remain (exit non-zero).
-        let check = root
-            .handle(CatalogInput::Check(CatalogCheckInput { track_id, items_dir, layer: None }))
-            .unwrap();
+        let check = root.catalog_driver().handle(CatalogInput::Check(CatalogCheckInput {
+            track_id,
+            items_dir,
+            layer: None,
+        }));
         assert_eq!(check.exit_code, 1, "check blocks on holes: {check:?}");
+    }
+
+    #[test]
+    fn catalog_composition_root_is_wiring_only() {
+        let source = include_str!("catalog.rs");
+        let production_source = source.split("#[cfg(test)]").next().unwrap();
+        assert!(production_source.contains("-> CatalogDriver"));
+        assert!(production_source.contains("CatalogDriver::new("));
+        assert!(production_source.contains("FsCatalogAdapter::new()"));
+        assert!(production_source.contains("Arc<dyn CatalogPort>"));
+        for wired_component in [
+            "let adapter = Arc::new(FsCatalogAdapter::new());",
+            "CatalogInteractor::new(adapter as Arc<dyn CatalogPort>)",
+            "interactor.clone() as Arc<dyn CatalogService>",
+            "interactor as Arc<dyn CatalogQueryService>",
+        ] {
+            assert!(
+                production_source.contains(wired_component),
+                "composition root must wire {wired_component} into the one-way driver path"
+            );
+        }
+        for forbidden in [
+            "CommandOutcome",
+            ".handle(",
+            "std::fs::",
+            "std::process::",
+            "std::net::",
+            "std::io::",
+            "println!",
+            "eprintln!",
+            "print!",
+            "eprint!",
+            "ServiceImpl",
+        ] {
+            assert!(
+                !production_source.contains(forbidden),
+                "composition root must not contain execution or compatibility path {forbidden}"
+            );
+        }
     }
 }

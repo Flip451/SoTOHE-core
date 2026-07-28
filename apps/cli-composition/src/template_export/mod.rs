@@ -13,10 +13,8 @@
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use cli_driver::CommandOutcome;
-use cli_driver::template_export::{TemplateDriver, TemplateInput};
-
-use crate::error::CompositionError;
+use cli_driver::template_conventions::ConventionShippingCheckDriver;
+use cli_driver::template_export::TemplateDriver;
 
 /// Resolves the work machine's home directory for export-output scanning.
 ///
@@ -71,15 +69,32 @@ impl TemplateCompositionRoot {
         TemplateDriver::new(service)
     }
 
-    /// Wire and dispatch a `template` command through the full stack.
+    /// Build a fully-wired [`ConventionShippingCheckDriver`] (spec IN-11,
+    /// AC-18).
     ///
-    /// # Errors
+    /// Wire chain: `FsConventionInventoryAdapter` →
+    /// `ConventionShippingCheckInteractor` → `ConventionShippingCheckDriver`.
     ///
-    /// Returns [`CompositionError`] if composition fails. Wiring is currently
-    /// infallible; the signature preserves room for future wiring errors (e.g.
-    /// config loading), matching the sibling composition roots.
-    pub fn handle(&self, input: TemplateInput) -> Result<CommandOutcome, CompositionError> {
-        Ok(self.template_driver().handle(input))
+    /// The adapter is constructed once and injected once. The interactor takes a
+    /// single `ConventionInventoryPort` so that both sides of the comparison are
+    /// walked by identical rules, and the adapter is a stateless unit struct so
+    /// that holds by construction; wiring a second instance, or handing the
+    /// interactor anything per-side, would satisfy the same signature and lose
+    /// it. A difference this check reports could then be an artefact of the walk
+    /// rather than of what ships.
+    #[must_use]
+    pub fn convention_shipping_check_driver(&self) -> ConventionShippingCheckDriver {
+        use infrastructure::template_conventions::FsConventionInventoryAdapter;
+        use usecase::template_conventions::{
+            ConventionInventoryPort, ConventionShippingCheckInteractor,
+            ConventionShippingCheckService,
+        };
+
+        let inventory_port: Arc<dyn ConventionInventoryPort> =
+            Arc::new(FsConventionInventoryAdapter::new());
+        let service: Arc<dyn ConventionShippingCheckService> =
+            Arc::new(ConventionShippingCheckInteractor::new(inventory_port));
+        ConventionShippingCheckDriver::new(service)
     }
 }
 
@@ -88,6 +103,7 @@ impl TemplateCompositionRoot {
 mod tests {
     use std::path::{Path, PathBuf};
 
+    use cli_driver::template_conventions::ConventionShippingCheckInput;
     use cli_driver::template_export::{TemplateExportInput, TemplateInput};
     use tempfile::TempDir;
 
@@ -160,7 +176,7 @@ mod tests {
             output_dir: PathBuf::from("/nonexistent/out"),
         });
 
-        let outcome = root.handle(input).unwrap();
+        let outcome = root.template_driver().handle(input);
 
         assert_eq!(outcome.exit_code, 1, "missing manifest must map to exit 1: {outcome:?}");
         assert_eq!(outcome.stdout, None, "failure path must not emit stdout");
@@ -168,6 +184,153 @@ mod tests {
             outcome.stderr.is_some(),
             "the underlying manifest-read error must be surfaced on stderr"
         );
+    }
+
+    #[test]
+    fn template_composition_root_is_wiring_only() {
+        let source = include_str!("mod.rs");
+        let production_source = source.split("#[cfg(test)]").next().unwrap();
+        assert!(production_source.contains("-> TemplateDriver"));
+        assert!(production_source.contains("TemplateDriver::new("));
+        assert!(production_source.contains("Arc<dyn TemplateExportService>"));
+        for wired_component in [
+            "Arc::new(FsTemplateBoundaryManifestAdapter::new())",
+            "Arc::new(FsTemplateExportAdapter::new(machine_home_directory()))",
+            "Arc::new(FsSelfBinaryTransplantAdapter::new())",
+            "TemplateExportInteractor::new(manifest_port, export_port, transplant_port)",
+            "TemplateDriver::new(service)",
+        ] {
+            assert!(
+                production_source.contains(wired_component),
+                "composition root must wire {wired_component} into the one-way driver path"
+            );
+        }
+        for forbidden in [
+            "CommandOutcome",
+            ".handle(",
+            "std::fs::",
+            "std::process::",
+            "std::net::",
+            "std::io::",
+            "println!",
+            "eprintln!",
+            "print!",
+            "eprint!",
+            "ServiceImpl",
+        ] {
+            assert!(
+                !production_source.contains(forbidden),
+                "composition root must not contain execution or compatibility path {forbidden}"
+            );
+        }
+    }
+
+    /// The shipping check's wire chain is `FsConventionInventoryAdapter` →
+    /// `ConventionShippingCheckInteractor` → `ConventionShippingCheckDriver`,
+    /// and the adapter is constructed exactly once (spec IN-11, AC-18).
+    #[test]
+    fn convention_shipping_check_wiring_injects_one_adapter_instance() {
+        let source = include_str!("mod.rs");
+        let production_source = source.split("#[cfg(test)]").next().unwrap();
+        for wired_component in [
+            "-> ConventionShippingCheckDriver",
+            "Arc<dyn ConventionInventoryPort>",
+            "Arc::new(FsConventionInventoryAdapter::new())",
+            "ConventionShippingCheckInteractor::new(inventory_port)",
+            "ConventionShippingCheckDriver::new(service)",
+        ] {
+            assert!(
+                production_source.contains(wired_component),
+                "composition root must wire {wired_component} into the check's one-way driver path"
+            );
+        }
+        // One construction site, and the interactor is handed that one binding.
+        // The interactor takes a single port so both trees are walked by
+        // identical rules; a second adapter here would satisfy the same
+        // signature and let a difference in the walk read as a difference in
+        // what ships.
+        assert_eq!(
+            production_source.matches("FsConventionInventoryAdapter::new()").count(),
+            1,
+            "exactly one inventory adapter is constructed for the check"
+        );
+        assert_eq!(
+            production_source.matches("ConventionShippingCheckInteractor::new(").count(),
+            1,
+            "the interactor is built once, from that one adapter binding"
+        );
+    }
+
+    fn write_convention(root: &Path, tree: &str, name: &str) {
+        write_file(root, &format!("{tree}/knowledge/conventions/{name}"), "# convention\n");
+    }
+
+    /// End-to-end wiring check over real trees (spec IN-11, AC-18): the wired
+    /// stack inventories both trees through the injected filesystem adapter and
+    /// answers the shipping question about the tree the caller named.
+    ///
+    /// Two trees rather than one, and real directories rather than a stand-in,
+    /// because what this asserts is that the composition root produced a driver
+    /// that actually reaches the filesystem walk on both sides.
+    #[test]
+    fn convention_shipping_check_passes_a_tree_shipping_only_the_overlays_supply() {
+        let dir = TempDir::new().unwrap();
+        let root_dir = dir.path();
+        for name in ["README.md", "coding-principles.md", "testing.md"] {
+            write_convention(root_dir, "export", name);
+            write_convention(root_dir, "overlay", name);
+        }
+
+        let outcome = TemplateCompositionRoot::new().convention_shipping_check_driver().handle(
+            ConventionShippingCheckInput {
+                exported_root: root_dir.join("export"),
+                overlay_dir: root_dir.join("overlay"),
+            },
+        );
+
+        assert_eq!(outcome.exit_code, 0, "an export shipping the overlay's supply passes");
+        assert_eq!(outcome.stderr, None, "a passing check reports no problem: {outcome:?}");
+    }
+
+    /// The same wired stack fails, naming every offending document, when the
+    /// exported tree ships a source convention the overlay does not supply
+    /// (spec IN-11, AC-18) — the shape a tree takes when `knowledge/conventions`
+    /// is classified anything other than `overlay`.
+    #[test]
+    fn convention_shipping_check_names_every_source_convention_the_overlay_does_not_supply() {
+        let dir = TempDir::new().unwrap();
+        let root_dir = dir.path();
+        for name in ["README.md", "coding-principles.md"] {
+            write_convention(root_dir, "export", name);
+            write_convention(root_dir, "overlay", name);
+        }
+        let unsupplied = ["dry-check-workflow.md", "language-policy.md", "shell-parsing.md"];
+        for name in unsupplied {
+            write_convention(root_dir, "export", name);
+        }
+
+        let outcome = TemplateCompositionRoot::new().convention_shipping_check_driver().handle(
+            ConventionShippingCheckInput {
+                exported_root: root_dir.join("export"),
+                overlay_dir: root_dir.join("overlay"),
+            },
+        );
+
+        assert_eq!(outcome.exit_code, 1, "an export shipping an unsupplied convention fails");
+        let reported = outcome.stderr.expect("the violation is reported");
+        for name in unsupplied {
+            assert!(
+                reported.contains(&format!("knowledge/conventions/{name}")),
+                "every offending document is named rather than counted; {name} is missing from: \
+                 {reported}"
+            );
+        }
+        for supplied in ["README.md", "coding-principles.md"] {
+            assert!(
+                !reported.contains(&format!("knowledge/conventions/{supplied}")),
+                "a document the overlay supplies is not an offender: {reported}"
+            );
+        }
     }
 
     fn write_file(root: &Path, rel: &str, content: &str) {
@@ -218,7 +381,7 @@ mod tests {
             output_dir: output_dir.clone(),
         });
 
-        let outcome = composition_root.handle(input).unwrap();
+        let outcome = composition_root.template_driver().handle(input);
         assert_eq!(outcome.exit_code, 0, "successful export must exit 0: {outcome:?}");
 
         // AC-01: `bin/sotp` exists and is byte-identical to the running binary.

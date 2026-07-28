@@ -14,6 +14,7 @@ globset = { workspace = true }
 rustdoc-types = "0.57"
 strum = { workspace = true }
 thiserror = { workspace = true }
+unicode-ident = { workspace = true }
 
 [dev-dependencies]
 rstest = { workspace = true }

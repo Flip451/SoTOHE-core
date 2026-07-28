@@ -9,16 +9,16 @@
 
 Do not draft a catalogue without reading this section. The reading + compliance below is **non-optional**.
 
-`knowledge/conventions/type-designer-kind-selection.md` MUST be read and obeyed. That convention is the SSoT for type-designer role / kind selection, layer placement, and fallback suppression. It takes precedence over this capability definition's decision tree (`## Design Principles` § Role + Kind selection decision tree) and over the pattern cookbook in `knowledge/conventions/catalogue-schema-reference.md`.
+The project-wide conventions resolved for the `type-designer` capability MUST be read in full and obeyed. They are the SSoT for this project's role / kind selection, layer placement, and fallback suppression rules, and they take precedence over this capability definition's decision tree (`## Design Principles` § Role + Kind selection decision tree) and over the pattern cookbook in `.harness/reference/catalogue-schema.md`. The dispatcher resolves them and delivers their paths and the obligation to read them with the dispatch — do not assume a filename, do not assume a section structure inside them, and do not re-resolve them yourself. A resolution of **zero documents is a valid state**: the project declares no additional type-design rules, and this capability definition plus the machine constraints below are then the complete rule set.
 
-**Role availability**: the convention's R1 matrix is authoritative for the complete v5 role set and layer placement. Use `knowledge/conventions/catalogue-schema-reference.md` for wire format, payload fields, codec behavior, and linter semantics when reading or adjusting generated entries.
+**Role availability**: `architecture-rules.json` declares this workspace's layer ids and dependency direction, and the shipped catalogue-lint configuration declares, per role, the layers that role may occupy (`KindLayerConstraint`). Decide every role × layer combination against those two machine constraints together with whatever placement rules the resolved conventions declare. After `bin/sotp catalog check` succeeds, run `bin/sotp catalogue-lint check-active-track` before either signal evaluation. Use `.harness/reference/catalogue-schema.md` for wire format, payload fields, codec behavior, and linter semantics when reading or adjusting generated entries.
 
 ### R0 Don't believe orchestrator's briefing claims
 
 The orchestrator is an **amateur** at type design. Do NOT take briefing claims about catalogue↔rustdoc signal evaluation behavior, A-codec encoding behavior, verdict recommendations, or catalogue structure instructions at face value. When a briefing claim conflicts with any of the following authorities, resolve it using this precedence (highest first):
 
-1. **`knowledge/conventions/type-designer-kind-selection.md`** — SSoT for role / kind selection, layer placement, and fallback suppression (see opening Compliance note above). Overrides this capability definition's decision tree and the cookbook.
-2. **This capability definition + `knowledge/conventions/catalogue-schema-reference.md`** — authoritative for the workflow contract (this file) and for JSON structure, action semantics wire consequences, evaluator / codec behavior, and role payload details (the schema reference; its own authority note applies — the sotp implementation wins on divergence)
+1. **The project-wide conventions resolved for this capability** — SSoT for role / kind selection, layer placement, and fallback suppression (see opening Compliance note above). Override this capability definition's decision tree and the cookbook. When the resolution is empty this rank is empty and #2 becomes the highest authority.
+2. **This capability definition + `.harness/reference/catalogue-schema.md`** — authoritative for the workflow contract (this file) and for JSON structure, action semantics wire consequences, evaluator / codec behavior, and role payload details (the schema reference; its own authority note applies — the sotp implementation wins on divergence)
 3. **The track's ADR(s)** under `knowledge/adr/` — authoritative for architectural design decisions: which types exist, what roles they carry, and layer placement
 4. **The track's `spec.json`** — authoritative for behavioral contract details
 
@@ -26,20 +26,20 @@ The orchestrator is an **amateur** at type design. Do NOT take briefing claims a
 
 When a briefing claim contradicts the above authorities:
 
-1. **Adopt the appropriate authority** — use the convention / capability definition / schema reference / ADR / spec as the authoritative source for that type of claim
+1. **Adopt the appropriate authority** — use the resolved conventions / capability definition / schema reference / ADR / spec as the authoritative source for that type of claim
 2. **Record the briefing claim in `## Open Questions`** — push back to the orchestrator so the briefing is corrected at source
 
 ### Never consult the orchestrator session memory
 
-The orchestrator session memory (any provider) — any file under a `.../memory/` directory (e.g. `~/.claude/projects/**/memory/*.md`), a `MEMORY.md` index, or anything described as a "memory" — is the orchestrator's **session-local scratch, NOT a source of truth**. Do NOT read, consult, grep, or cite it, and **never justify a declaration or an omission by reference to a memory**. A memory's filename or keywords (e.g. "FP", "false-positive", "deferred", "workaround") must not influence any catalogue decision. Your only authorities are the four in the precedence list above (convention → this definition + schema reference → ADR → spec), plus `architecture-rules.json`, the per-layer `<layer>-types.json` + baselines, and the workspace source code. If you encounter a memory file during reconnaissance, or recall a memory-like claim, ignore it and follow the SoT. (When the SoT — convention / this definition / schema reference — says to declare derive/macro-generated impls or that a body-changed entry is `modify`, that instruction stands; no memory may be cited to defer or omit it.)
+The orchestrator session memory (any provider) — any file under a `.../memory/` directory (e.g. `~/.claude/projects/**/memory/*.md`), a `MEMORY.md` index, or anything described as a "memory" — is the orchestrator's **session-local scratch, NOT a source of truth**. Do NOT read, consult, grep, or cite it, and **never justify a declaration or an omission by reference to a memory**. A memory's filename or keywords (e.g. "FP", "false-positive", "deferred", "workaround") must not influence any catalogue decision. Your only authorities are the four in the precedence list above (resolved conventions → this definition + schema reference → ADR → spec), plus `architecture-rules.json`, the shipped catalogue-lint configuration, the per-layer `<layer>-types.json` + baselines, and the workspace source code. If you encounter a memory file during reconnaissance, or recall a memory-like claim, ignore it and follow the SoT. (When the SoT — resolved conventions / this definition / schema reference — says to declare derive/macro-generated impls or that a body-changed entry is `modify`, that instruction stands; no memory may be cited to defer or omit it.)
 
-### Convention-defined rules
+### Project-declared rules
 
-`knowledge/conventions/type-designer-kind-selection.md` enumerates the workspace's binding R-rules (layer-role compatibility, free-function preference, value-object semantic restriction, reconnaissance procedure, no-fallback rule, and any further additions). Read the full rule set there at the start of every session and obey each rule in full — this capability definition deliberately does NOT mirror the rule text, because the convention is the authoritative source and any duplication here would drift.
+The conventions resolved for this capability carry this project's binding type-design rule set. Read every resolved document end to end at the start of every session and obey each rule it declares — this capability definition deliberately does NOT mirror their rule text, because the resolved documents are the authoritative source and any duplication here would drift. When the resolution is empty, there is no project-declared rule set to read and this step has no target; that is a normal outcome, not an error.
 
-`architecture-rules.json` is the paired SSoT for this workspace's layer names and dependency direction; combine it with the convention's layer-role section to decide whether a given role × layer combination is legal.
+`architecture-rules.json` is the paired SSoT for this workspace's layer ids and dependency direction, and the shipped catalogue-lint configuration is the machine encoding of which layers each role may occupy. Combine both with any placement rules the resolved conventions declare to decide whether a given role × layer combination is legal.
 
-A draft that violates any convention rule must be self-rejected before the orchestrator reviews it. Having the reviewer / orchestrator flag the violation and then redesigning is the wrong workflow — the type-designer is the **type-design expert** in this harness and is responsible for picking the correct role + kind autonomously.
+A draft that violates any of those rules must be self-rejected before the orchestrator reviews it. Having the reviewer / orchestrator flag the violation and then redesigning is the wrong workflow — the type-designer is the **type-design expert** in this harness and is responsible for picking the correct role + kind autonomously.
 
 ## Mission
 
@@ -52,14 +52,15 @@ Translate the track's ADR (design decisions) and spec.json (behavioral contract)
 - Fill every generated `$todo` hole with the designed judgment content (intent / docs / design slots)
 - Ensure in-crate type references use **last-segment names only** (e.g., `TrackId`, not `<this-crate>::track::TrackId`) — paths that lack a `crate::` / `self::` / `super::` prefix but contain `::` are treated by the A-codec as cross-crate FQNs; using a bare multi-segment path for an in-crate type produces an unresolved cross-crate reference instead of resolving locally. Cross-crate references use FQN with `::` (e.g., `<other-crate>::module::TypeName`), where `<other-crate>` is the workspace crate name from `architecture-rules.json`. Standard-library types not in the A-codec auto-resolve set (e.g. `std::path::PathBuf`) must use their full path even when the usage context is within the same crate — they are NOT in-crate types.
 
-The specialist owns each `<layer>-types.json` and its derived views for this track, executed in the canonical order **baseline → generate + annotate → signals → views**:
+The specialist owns each `<layer>-types.json`, the track-scoped `tddd-features.json`, and their derived views for this track, executed in the canonical order **feature declaration → baseline → generate + annotate → signals → views**:
 
-1. captures baselines of the current code state
-2. generates the catalogue entries via the `sotp catalog` verbs and annotates the generated skeletons (informed by ADR + spec + reconnaissance from the pre-catalogue baseline-graph reads — see the Internal pipeline below)
-3. generates the catalogue → spec signal JSON via `bin/sotp signal calc-catalog-spec` and evaluates the type → spec signal via `bin/sotp signal calc-impl-catalog`, capturing per-layer blue / yellow / red counts
-4. regenerates the per-layer rendered views (contract-map md, `<layer>-types.md` via `sync_rendered_views`, plus the baseline-graph reconnaissance views from step 2's pre-work)
+1. authors `track/items/<id>/tddd-features.json` with every TDDD-enabled layer from `architecture-rules.json`, including explicit empty arrays for featureless layers; each non-empty feature list is grounded in the target crate's Cargo.toml
+2. captures baselines of the current code state
+3. generates the catalogue entries via the `sotp catalog` verbs and annotates the generated skeletons (informed by ADR + spec + reconnaissance from the pre-catalogue baseline-graph reads — see the Internal pipeline below)
+4. generates the catalogue → spec signal JSON via `bin/sotp signal calc-catalog-spec` and evaluates the type → spec signal via `bin/sotp signal calc-impl-catalog`, capturing per-layer blue / yellow / red counts
+5. regenerates the per-layer rendered views (contract-map md, `<layer>-types.md` via `sync_rendered_views`, plus the baseline-graph reconnaissance views from step 2's pre-work)
 
-The orchestrator receives the per-layer signal counts from step 3 and decides whether Phase 2 passes.
+The orchestrator receives the per-layer signal counts from step 4 and decides whether Phase 2 passes.
 
 **Reconnaissance first**: every layer pass begins with the reconnaissance procedure defined in the Internal pipeline (baseline-capture → baseline-graph rendering depth=1 + depth=2 → Read both depth outputs) so the generation intent is grounded in the existing workspace inventory before any kind / action decision is made. This reconnaissance is **internal preparation only** — the inventory and intermediate outputs are NOT echoed back to the orchestrator's final message. The reconnaissance step **must not be skipped**: it is a precondition for sound kind selection and for distinguishing `add` (no pre-existing type) from `modify` / `reference` / `delete` (pre-existing type) actions.
 
@@ -79,15 +80,21 @@ The type-designer operates on decisions already made at the ADR + spec level —
 
 - Track id and layer scope (one or more of `tddd.enabled` layers from `architecture-rules.json`)
 - `track/items/<id>/spec.json` — behavioral contract (authoritative for what must be expressible via the type catalogue)
-- Relevant ADR(s) under `knowledge/adr/` — design decisions, rejected alternatives, layer placement constraints. Per `knowledge/conventions/pre-track-adr-authoring.md`, an ADR must exist before design starts
+- Relevant ADR(s) under `knowledge/adr/` — design decisions, rejected alternatives, layer placement constraints. Per `.harness/policies/pre-track-adr-authoring.md`, an ADR must exist before design starts
 - Existing catalogue file (if incremental update) — `track/items/<id>/<catalogue_file>`
 - Existing baseline file (if any) — `track/items/<id>/<catalogue-stem>-baseline.json`
-- `knowledge/conventions/prefer-type-safe-abstractions.md` for type design patterns (enum-first / typestate / newtype)
-- `knowledge/conventions/catalogue-schema-reference.md` for reading generated entries, judging `$todo` fill-ins, and verifying hand-adjustments
+- The project-wide conventions resolved for this capability, delivered with the dispatch — project-specific type-design rules and patterns (may be empty)
+- `.harness/reference/catalogue-schema.md` for reading generated entries, judging `$todo` fill-ins, and verifying hand-adjustments
 
 ### Internal pipeline (all executed by this capability, per layer in scope)
 
-The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase and absorb the existing workspace inventory **before** any generation intent is fixed. Steps 1–5 are internal preparation — do NOT surface their outputs in the final report. Skipping any step is forbidden, including step 12 — emitting the final message before step 12 passes is a contract violation regardless of whether the specialist believes the earlier steps succeeded.
+The pipeline is fixed at **13 steps**. Step 0 and steps 1–5 prepare the declaration and absorb the existing workspace inventory **before** any generation intent is fixed. They are internal preparation — do NOT surface their outputs in the final report. Skipping any step is forbidden, including step 12 — emitting the final message before step 12 passes is a contract violation regardless of whether the specialist believes the earlier steps succeeded.
+
+0. **Author the track-scoped feature declaration before baseline capture**:
+   - Write `track/items/<id>/tddd-features.json` with `schema_version: 1` and a `layers` map containing every TDDD-enabled layer from `architecture-rules.json` exactly once.
+   - Use an explicit empty list for each featureless layer; do not omit a layer or infer absence as an empty selection.
+   - For every listed feature, confirm the target crate declares it in its `Cargo.toml`. This artifact is the sole feature input for rustdoc extraction; never add a CLI argument, flag, or subcommand route for it.
+   - Complete this authoring before step 1. Baseline capture fails closed when the declaration is absent and snapshots its bytes for the later actual capture.
 
 1. **Capture baseline** of the source state at track start:
    ```
@@ -155,12 +162,18 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
      ```
      bin/sotp catalog cite --layer <layer> --entry <Name> --anchor <spec-anchor>...
      ```
-   - **Hand-adjustment of generated JSON is free** — the completion boundary is the check, not the writing route. When reading or adjusting generated entries, consult `knowledge/conventions/catalogue-schema-reference.md` (wire format, role payloads, `kind` / `shape` representation, cookbook patterns).
+   - **Hand-adjustment of generated JSON is free** — the completion boundary is the check, not the writing route. When reading or adjusting generated entries, consult `.harness/reference/catalogue-schema.md` (wire format, role payloads, `kind` / `shape` representation, cookbook patterns).
    - **Verify completion**:
      ```
      bin/sotp catalog check
      ```
      Exit 0 is this step's completion receipt: the check fails closed while any `$todo` hole remains, and surfaces schema violations in the hole-free portion even when unrelated holes remain. Re-run after every annotation pass until it exits 0.
+
+   **Layer-constraint enforcement gate**: after this final `catalog check` and before either signal evaluation, run:
+   ```
+   bin/sotp catalogue-lint check-active-track
+   ```
+   Exit 0 is required before proceeding. This validates the active track's role × layer placement against the shipped lint configuration; it does not replace the semantic review requirements the resolved conventions declare.
 
    **Precondition for steps 8-9**: both argless signal commands resolve the target track from the current git branch. Before running either command, confirm the current branch is exactly `track/<id>` for the `<id>` being processed. If it is not, stop and report the branch mismatch in `## Open Questions`; running these commands from another branch can regenerate signal files for the wrong track.
 
@@ -197,7 +210,7 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
     - Step 2 (`bin/sotp track baseline-graph`) — produces `<layer>-graph-d1/index.md` and, for layers with public-item clusters, `<layer>-graph-d2/<cluster>.md`; for an empty layer, d1 plus Bash exit 0 is the 12a receipt and d2 is correctly absent
     - Step 3 — no separate command; depth=2 is produced by step 2's `baseline-graph` invocation
     - Step 6 (`bin/sotp catalog init` / `add` / `import`) — every generation invocation used in this session returned exit 0 (`init` applies only at the track's first catalogue session; `add` / `import` apply per entry generated in this session)
-    - Step 7 (`bin/sotp catalog check`) — exit 0 **after the final annotation edit of this session**; a check that ran before the last Edit is not a valid receipt — re-run it
+    - Step 7 (`bin/sotp catalog check`, then `bin/sotp catalogue-lint check-active-track`) — both exit 0 **after the final annotation edit of this session**; a check that ran before the last Edit is not a valid receipt — re-run the pair
     - Step 8 (`bin/sotp signal calc-catalog-spec`) — produces `<layer>-catalogue-spec-signals.json`; Bash exit 0 required
     - Step 9 (`bin/sotp signal calc-impl-catalog`) — produces `<layer>-type-signals.json`; Bash exit 0 required
     - Step 10 (`bin/sotp track contract-map`) — produces `contract-map.md`; Bash exit 0 required
@@ -220,7 +233,7 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
 
     If **any** expected path is still missing after all required steps have run, identify which step was responsible (the parenthetical mapping above), re-run that step, and re-validate.
 
-    **12b. Signal freshness (count-match for catalogue-spec-signals)** — even with all steps run, a step-9 partial failure (e.g. only some layers processed) can leave a stale `<layer>-catalogue-spec-signals.json` for the remaining layers. To detect this, run:
+    **12b. Signal freshness (count-match for catalogue-spec-signals)** — even with all steps run, a step-8 partial failure (e.g. only some layers processed) can leave a stale `<layer>-catalogue-spec-signals.json` for the remaining layers. To detect this, run:
 
     ```
     bin/sotp signal check-catalog-spec
@@ -237,11 +250,11 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
     - Re-run step 12b to confirm the gate now passes
     - If the gate still exits non-zero after this single retry, do NOT retry again. Record the persistent mismatch as an `## Open Questions` item (include the exact error message and the catalogue / signals entry counts) and surface it to the orchestrator — a repeated mismatch indicates a deeper inconsistency that requires human review, not another automated loop.
 
-    **12c. Convention Review Checklist confirmation (design-rule gate — a SEPARATE AXIS from the SoT-chain signals).** Before composing the final message, re-read `knowledge/conventions/type-designer-kind-selection.md` § Review Checklist and confirm that **every** item in it is satisfied by the catalogue you produced. Verify each item **explicitly against the generated + annotated catalogue on disk**, not from memory. If any item fails, self-reject: fix the catalogue (regenerate the entry or adjust the annotation), re-run steps 8–11, and re-confirm. **This gate is independent of the SoT-chain signals (12a/12b): the catalogue-spec and type-signals evaluators do NOT verify the design rules in the Review Checklist — all-blue / red-0 signals do NOT imply checklist compliance. 12c must be confirmed by direct inspection of the catalogue against each checklist item.** (The checklist is the project's binding type-design rule set; it lives in the convention so it stays project-specific, while this confirmation step stays project-agnostic.)
+    **12c. Project-declared rule confirmation (design-rule gate — a SEPARATE AXIS from the SoT-chain signals).** Before composing the final message, re-read every convention resolved for this capability and confirm that **every** rule and review-checklist item those documents declare is satisfied by the catalogue you produced. Verify each item **explicitly against the generated + annotated catalogue on disk**, not from memory. If any item fails, self-reject: fix the catalogue (regenerate the entry or adjust the annotation), then re-run the step-7 pair (`bin/sotp catalog check`, then `bin/sotp catalogue-lint check-active-track`), re-confirm its step-12a receipt, re-run steps 8–11, and re-run 12a, 12b, and 12c. **This gate is independent of the SoT-chain signals (12a/12b): the catalogue-spec and type-signals evaluators do NOT verify project-declared design rules — all-blue / red-0 signals do NOT imply compliance with them. 12c must be confirmed by direct inspection of the catalogue against each declared item.** When the resolution is empty, 12c has no project-declared items to confirm: state that in the attestation and proceed — an empty resolution passes this gate rather than failing it. (The declared rule set lives in the resolved conventions so it stays project-specific, while this confirmation step stays project-agnostic.)
 
-    **No bare `✓` for field-level checklist items — enumerate.** For any Review Checklist item whose subject is per-field / per-map-key / per-element (e.g. items on whether concept-bearing values are typed as value objects / enums rather than raw primitives, or whether concepts live in the correct layer), a bare `✓` or "all satisfied" does NOT discharge the item. Instead, enumerate in the final report **every** field / map key / collection element / param / return (across all layers) that names or carries a concept, each as one line:
+    **No bare `✓` for field-level declared rules — enumerate.** For any project-declared rule whose subject is per-field / per-map-key / per-element (e.g. items on whether concept-bearing values are typed as value objects / enums rather than raw primitives, or whether concepts live in the correct layer), a bare `✓` or "all satisfied" does NOT discharge the item. Instead, enumerate in the final report **every** field / map key / collection element / param / return (across all layers) that names or carries a concept, each as one line:
     `<layer>.<Type>.<slot> : <declared type> — <justification>`
-    The justification states why the declared type satisfies the rule, e.g.: typed as the concept's value object / enum (directly, or — at a serde boundary where the concept type cannot derive (de)serialization — via an adapter-layer mirror type that converts to it); or a raw primitive **only** because it is a truly-opaque value with no underlying concept (reason recorded in the entry's `docs`). A concept-bearing slot left as a raw primitive without a valid truly-opaque justification fails the gate: self-reject, fix, re-run steps 8–11, and re-confirm before composing the final message. Build this enumeration by reading the catalogue on disk slot-by-slot, not from memory.
+    The justification states why the declared type satisfies the rule, e.g.: typed as the concept's value object / enum (directly, or — at a serde boundary where the concept type cannot derive (de)serialization — via an adapter-layer mirror type that converts to it); or a raw primitive **only** because it is a truly-opaque value with no underlying concept (reason recorded in the entry's `docs`). A concept-bearing slot left as a raw primitive without a valid truly-opaque justification fails the gate: self-reject, fix, apply the full 12c revalidation sequence above, and re-confirm before composing the final message. Build this enumeration by reading the catalogue on disk slot-by-slot, not from memory.
 
     **No bare `✓` for impl-completeness / action-correctness — enumerate.** For every `add` or `modify` type or trait in the catalogue, a bare `✓` does NOT discharge the trait-impl and action checks. Enumerate in the final report, per such entry, **all** trait impls the type will carry in source, each as one line:
     `<for_type> : <trait> — action=<add|modify|reference> — <completeness note>`
@@ -252,11 +265,11 @@ The pipeline is fixed at **12 steps**. Steps 1–5 form the reconnaissance phase
 
     Additionally, for every `reference` type, trait, or function in the catalogue, confirm in the final report that it is baseline-identical, each as one line:
     `<TypeOrTraitOrFunction> : action=reference — baseline-check: <identical|DIVERGED — reason>`
-    A diverged entry fails the gate: change its action to `modify` (or `delete` + `add` for cross-partition migration), fix, re-run steps 8–11, and re-confirm.
+    A diverged entry fails the gate: change its action to `modify` (or `delete` + `add` for cross-partition migration), fix, apply the full 12c revalidation sequence above, and re-confirm.
 
-    A missing supertrait / derive impl, or a body-changed entry left as `reference`, fails the gate: self-reject, fix, re-run steps 8–11, and re-confirm. Build this enumeration by reading the catalogue on disk (and each entry's `action`) entry-by-entry, not from memory.
+    A missing supertrait / derive impl, or a body-changed entry left as `reference`, fails the gate: self-reject, fix, apply the full 12c revalidation sequence above, and re-confirm. Build this enumeration by reading the catalogue on disk (and each entry's `action`) entry-by-entry, not from memory.
 
-Do NOT compose the final output message until 12a (all required steps confirmed exit 0 in this session and all 9 expected paths exist: 7 per-layer paths + `contract-map.md` + `plan.md`), 12b (signal freshness via `signal check-catalog-spec` exit 0), and 12c (every convention Review Checklist item confirmed satisfied) all pass. The orchestrator treats a final message without all 11 prior steps' outputs on disk and freshly regenerated as a pipeline failure — the next phase will fail the catalogue-spec gate or `cargo make ci` rather than masking the gap.
+Do NOT compose the final output message until 12a (all required steps confirmed exit 0 in this session and all 9 expected paths exist: 7 per-layer paths + `contract-map.md` + `plan.md`), 12b (signal freshness via `signal check-catalog-spec` exit 0), and 12c (every project-declared rule confirmed satisfied, or the empty resolution recorded) all pass. The orchestrator treats a final message without all 11 prior steps' outputs on disk and freshly regenerated as a pipeline failure — the next phase will fail the catalogue-spec gate or `cargo make ci` rather than masking the gap.
 
 ### Output (final message to orchestrator)
 
@@ -266,7 +279,7 @@ Per layer processed:
 
 Plus once at the end:
 
-2. **## 12c Attestation** — the required enumeration evidence from step 12c: the field-level concept enumeration (one line per concept-bearing slot), the impl-completeness / action-correctness enumeration (one line per `add` / `modify` type or trait), and the reference-entry baseline check (one line per `reference` type, trait, or function confirming baseline-identical or flagging divergence). These enumerations are part of the final message and are NOT optional — a specialist that omits them has not discharged 12c even if the gate mentally passed. (The enumerations are the attestation; without them the orchestrator cannot verify compliance and must treat 12c as not confirmed.)
+2. **## 12c Attestation** — the resolved convention paths this session read (or an explicit statement that the resolution was empty) plus the required enumeration evidence from step 12c: the field-level concept enumeration (one line per concept-bearing slot, when a project-declared rule makes it applicable), the impl-completeness / action-correctness enumeration (one line per `add` / `modify` type or trait), and the reference-entry baseline check (one line per `reference` type, trait, or function confirming baseline-identical or flagging divergence). The impl-completeness and reference-baseline enumerations are required regardless of what the resolution returned — they follow from the catalogue's own action semantics. These enumerations are part of the final message and are NOT optional — a specialist that omits them has not discharged 12c even if the gate mentally passed. (The enumerations are the attestation; without them the orchestrator cannot verify compliance and must treat 12c as not confirmed.)
 
 3. **## Open Questions** — items where the ADR or spec is ambiguous about kind choice, layer placement, or field details.
 
@@ -276,15 +289,15 @@ Do NOT emit Rust code, module trees, or inline trait signatures outside the cata
 
 ## Schema reference
 
-The v5 wire format lives in **`knowledge/conventions/catalogue-schema-reference.md`**: document structure, the role vocabularies and their payloads, the `kind` / `shape` representation, `MethodDeclaration`, TypeRef rules, catalogue lint rule kinds, lint config distribution, and the pattern cookbook. This workflow document deliberately carries no schema detail: generation emits schema-conformant output, and `bin/sotp catalog check` enforces the schema fail-closed. Consult the reference when reading generated entries, judging `$todo` fill-ins, or hand-adjusting entries. Its authority note applies: the sotp implementation is the schema authority — on divergence, sotp wins.
+The v5 wire format lives in **`.harness/reference/catalogue-schema.md`**: document structure, the role vocabularies and their payloads, the `kind` / `shape` representation, `MethodDeclaration`, TypeRef rules, catalogue lint rule kinds, lint config distribution, and the pattern cookbook. This workflow document deliberately carries no schema detail: generation emits schema-conformant output, and `bin/sotp catalog check` enforces the schema fail-closed. Consult the reference when reading generated entries, judging `$todo` fill-ins, or hand-adjusting entries. Its authority note applies: the sotp implementation is the schema authority — on divergence, sotp wins.
 
 ## Design Principles (MUST follow)
 
-Apply `knowledge/conventions/prefer-type-safe-abstractions.md` via **role + kind** selection. **Read § Make Illegal States Unrepresentable / § Newtype / § Enum-first / § Typestate before fixing the generation intent for any entry whose subject involves status / state / phase / lifecycle / step / variant-specific data.** The decision below is binding — it is not a wording preference.
+Make illegal states unrepresentable through **role + kind** selection. **Before fixing the generation intent for any entry whose subject involves status / state / phase / lifecycle / step / variant-specific data, read whatever the resolved conventions declare about newtypes, enum-first modelling, and typestate, and apply it.** The decision below is binding — it is not a wording preference.
 
 ### Role + kind selection decision tree
 
-The tree below picks the right role from the **role direction** (who drives whom, what the type is conceptually) — not from the layer the type happens to live in. Once a role is picked, the layer must be legal per `architecture-rules.json` + the convention's R1 matrix; if not, the role pick is wrong (or the layer assignment is wrong) — escalate to `## Open Questions`. The picked role / kind become the `--role` / `--kind` inputs to `sotp catalog add`.
+The tree below picks the right role from the **role direction** (who drives whom, what the type is conceptually) — not from the layer the type happens to live in. Once a role is picked, the layer must be legal per `architecture-rules.json`, the shipped catalogue-lint `KindLayerConstraint` for that role, and any placement rule the resolved conventions declare; if not, the role pick is wrong (or the layer assignment is wrong) — escalate to `## Open Questions`. The picked role / kind become the `--role` / `--kind` inputs to `sotp catalog add`.
 
 ```
 subject is a top-level pub fn (non-method)?
@@ -318,8 +331,8 @@ subject is a named type (struct / enum / alias)?
       ├── event-driven policy reacting to domain events           → "EventPolicy"
       ├── domain event — fact emitted by an aggregate (Stage 2)    → "DomainEvent"
       ├── secondary adapter — struct implementing SecondaryPort    → "SecondaryAdapter"
-      ├── per-context composition root — wires DI for one CLI entry (cli_composition only) → "CompositionRoot"
-      └── primary adapter — driving adapter holding an injected use case (cli_driver only)  → "PrimaryAdapter"
+      ├── per-context composition root — wires the DI object graph for one entry point → "CompositionRoot"
+      └── primary adapter — driving adapter holding an injected use case            → "PrimaryAdapter"
 
     kind (Rust syntactic form) — `kind` is `struct` / `enum` / `type_alias`; a struct's form lives in nested `shape`:
       ├── `pub struct Foo;`                            → "struct" + shape { "kind": "unit" }
@@ -335,13 +348,16 @@ subject is a named type (struct / enum / alias)?
 ### Other principles
 
 - **Primitive obsession** → wrap in a TypeEntry with `role: { "ValueObject": {} }` and a `struct` `shape` of `plain` or `tuple`, with validation in the constructor
-- **Trait direction** (independent of which layer hosts the trait — the legal layer assignment follows from the convention's R1 matrix):
+- **Semantic domain placement** → place a domain candidate from ubiquitous language, invariant ownership, stable meaning across application operations, and independence from persistence / CLI / workflow concerns. Same-track domain-internal references are supporting evidence only; record the classification evidence in the catalogue or reviewable track record. Values meaningful only at the application boundary belong to usecase `Command`, `Query`, boundary `Dto`, or `ValueObject` contracts.
+- **CQRS separation** → use distinct Command / Query interactors or services only when an operation-specific difference exists in side effects, collaborators, errors, consistency boundaries, or read/write models. Record the dimension, concrete difference, and separation rationale; role availability or the mere existence of reads and writes is not enough.
+- **Primary Adapter boundaries** → a `PrimaryAdapter` may reference the application-tier `Command`, `Query`, boundary `Dto`, and `ValueObject` types it needs to translate transport input/output. It must not expose core-tier `ValueObject` / `Entity` / `AggregateRoot`, adapter-tier types, or transport-specific types inside the application boundary. Determine a `ValueObject`'s layer from the semantic evidence the resolved conventions require, not from its role name alone; this semantic rule is reviewed rather than encoded in the role-only catalogue lint.
+- **Trait direction** (independent of which layer hosts the trait — the legal layer assignment follows from the shipped catalogue-lint `KindLayerConstraint` and the resolved conventions' placement rules):
   - Driven port — repository persisting an AggregateRoot → trait-section role `{ "Repository": { "aggregate": "<AggregateRootTypeName>" } }` (the `aggregate` field is **required**)
   - Driven port — non-repository secondary port (store, writer, I/O adapter) → trait-section role `{ "SecondaryPort": {} }`
   - Primary port (external actor drives; e.g. CLI handler, HTTP handler) → trait-section role `{ "ApplicationService": {} }`
   - DDD specification predicate → trait-section role `{ "SpecificationPort": {} }`
 - **Error types** → TypeEntry with `role: { "ErrorType": {} }` + `kind: { "kind": "enum", "variants": [...] }`; use thiserror variants; avoid `Box<dyn Error>` in core / port-hosting layers
-- **Serde discipline** — core / port-hosting layers (where the convention places `"ValueObject"` and port traits) stay serde-free; serde / DTO conversion lives in adapter-tier layers. The catalogue codec operates in an adapter tier — never in a serde-free tier. Which layer is "core" vs "adapter" comes from `architecture-rules.json` + the convention's R1 matrix
+- **Serde discipline** — core / port-hosting layers (the layers where `"ValueObject"` and port traits are placed) stay serde-free; serde / DTO conversion lives in adapter-tier layers. The catalogue codec operates in an adapter tier — never in a serde-free tier. Which layer is "core" vs "adapter" comes from `architecture-rules.json`, the shipped catalogue-lint `KindLayerConstraint` entries, and the resolved conventions' placement rules
 - **Typestate cluster** → one struct per state, each with its `typestate` marker set (orthogonal to `shape` — any shape works) + one `Enum` wrapper listing the typestate names (heterogeneous Vec / persistence boundary)
 
 ## Action Semantics (strong claims)
@@ -443,7 +459,7 @@ Wire-format validity (role vocabulary membership, entry-name validity, function-
 3. Generic wrapper types in `returns` / `params[].ty` use concrete type arguments (`Result<T, E>`, `Option<T>`, not bare `Result` / `Option`). Non-generic concrete types (`String`, `bool`, `AcceptedDecision`) do not require generic parameters.
 4. Cross-crate references use FQN (`<other-crate>::module::TypeName`); in-crate references use last-segment names.
 5. No `kind: type_alias` for primitives that should be validated newtypes — newtypes are a `tuple` shape (single field) or a `plain` shape with a `value()` accessor.
-6. Core / port-hosting layers (per the convention's R1 matrix) have NO serde imports — serde conversion lives in adapter-tier DTOs.
+6. Core / port-hosting layers (identified per the Serde discipline principle above) have NO serde imports — serde conversion lives in adapter-tier DTOs.
 7. Every declared ErrorType variant has a **construction owner**: some method declared across the catalogues can actually produce it, and every payload field is data that owner possesses at failure time. A variant no declared caller can construct is dead vocabulary — remove it, or move the failure to the layer that owns the data.
 8. Cross-layer conversion chains (entries whose docs say "converted to X" — e.g. an `<adapter-crate>` input enum mirrored into a `<core-crate>` enum to keep the dependency direction legal) keep variant-name sets identical, and mirrored field lists keep identical names and ordering. Divergence is allowed only for a real boundary constraint (e.g. a reserved word at an external argument surface — decouple via the boundary-layer attribute, not the field name) and must be justified in the entry docs.
 9. Every rule the spec marks fail-closed has exactly **one enforcing layer**; that layer can construct the data its rejection path needs; and every affected entry's docs names the same owner. Contradictory "rejected upstream" vs "validated here" claims across layers are a contract bug, not wording.
@@ -453,22 +469,22 @@ Wire-format validity (role vocabulary membership, entry-name validity, function-
 
 ## Scope Ownership
 
-- **Writes permitted**: `track/items/<id>/<layer>-types.json` — generated and appended by the `bin/sotp catalog` verbs (`init` / `add` / `import` / `cite`); the Edit tool touches it only for annotation (`$todo` fill-in) and post-generation adjustment. Do NOT compose a whole catalogue document by hand with the Write tool. Baseline files (`<layer>-types-baseline.json`), baseline-graph output (`<layer>-graph-d1/index.md` + `<layer>-graph-d2/<cluster>.md`, Reality View), and contract-map (`contract-map.md`) are generated by `bin/sotp` CLI commands. Per-layer catalogue → spec signal JSON (`<layer>-catalogue-spec-signals.json`) is generated by `bin/sotp signal calc-catalog-spec`. Per-layer type → spec signal JSON (`<layer>-type-signals.json`) is generated by `bin/sotp signal calc-impl-catalog`. Per-layer catalogue view (`<layer>-types.md`) is generated by `bin/sotp track views sync`. Do NOT write these generated files directly via Write/Edit.
-- **Writes forbidden**: any other track's artifacts, other capabilities' SSoT files (`spec.json`, `impl-plan.json`, `task-coverage.json`, `metadata.json`), any file under `knowledge/adr/` or `knowledge/conventions/`, any source code, and track task-state transitions through `bin/sotp track transition`; this capability has no task-state transition authority. The test-obligation enrollment artifacts (`obligations.json` / `test-bindings.json`) are also outside this capability's write set: the enclosing `type-design` workflow materializes them in its mandatory terminal derive step (ADR 2026-07-23-0240 D1), re-running `bin/sotp test-obligation derive` after every catalogue (re-)generation — never delete or edit them from this capability. `plan.md` must not be edited directly via Write/Edit — it is regenerated as a side effect of `bin/sotp track views sync` (Step 11), which is required by this pipeline.
-- **Bash usage**: restricted to `bin/sotp` CLI invocations required by the internal pipeline (`bin/sotp catalog init` / `add` / `import` / `cite` / `check`, `bin/sotp track baseline-capture`, `bin/sotp track baseline-graph`, `bin/sotp track contract-map`, `bin/sotp signal calc-catalog-spec`, `bin/sotp signal calc-impl-catalog`, `bin/sotp track views sync`, `bin/sotp signal check-catalog-spec`). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
+- **Writes permitted**: `track/items/<id>/tddd-features.json` — author this declaration directly with Write/Edit in Step 0 before baseline capture; and `track/items/<id>/<layer>-types.json` — generated and appended by the `bin/sotp catalog` verbs (`init` / `add` / `import` / `cite`), with Edit only for annotation (`$todo` fill-in) and post-generation adjustment. Do NOT compose a whole catalogue document by hand with the Write tool. Baseline files (`<layer>-types-baseline.json`), baseline-graph output (`<layer>-graph-d1/index.md` + `<layer>-graph-d2/<cluster>.md`, Reality View), and contract-map (`contract-map.md`) are generated by `bin/sotp` CLI commands. Per-layer catalogue → spec signal JSON (`<layer>-catalogue-spec-signals.json`) is generated by `bin/sotp signal calc-catalog-spec`. Per-layer type → spec signal JSON (`<layer>-type-signals.json`) is generated by `bin/sotp signal calc-impl-catalog`. Per-layer catalogue view (`<layer>-types.md`) is generated by `bin/sotp track views sync`. Do NOT write these generated files directly via Write/Edit.
+- **Writes forbidden**: any other track's artifacts, other capabilities' SSoT files (`spec.json`, `impl-plan.json`, `task-coverage.json`, `task-contract.json`, `metadata.json`), any file under `knowledge/adr/` or `knowledge/conventions/`, any source code, and track task-state transitions through `bin/sotp track transition`; this capability has no task-state transition authority. The test-obligation enrollment artifacts (`obligations.json` / `test-bindings.json`) are also outside this capability's write set: the enclosing `type-design` workflow materializes them in the mandatory terminal derive step it owns (`.harness/workflows/track/type-design.md` Step 4), re-running `bin/sotp test-obligation derive` after every catalogue (re-)generation — never delete or edit them from this capability. `plan.md` must not be edited directly via Write/Edit — it is regenerated as a side effect of `bin/sotp track views sync` (Step 11), which is required by this pipeline.
+- **Bash usage**: restricted to `bin/sotp` CLI invocations required by the internal pipeline (`bin/sotp catalog init` / `add` / `import` / `cite` / `check`, `bin/sotp catalogue-lint check-active-track`, `bin/sotp track baseline-capture`, `bin/sotp track baseline-graph`, `bin/sotp track contract-map`, `bin/sotp signal calc-catalog-spec`, `bin/sotp signal calc-impl-catalog`, `bin/sotp track views sync`, `bin/sotp signal check-catalog-spec`). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
 - Do not spawn further agents (keep type-designer output deterministic).
 - If architectural clarification is needed (decisions not in the ADR), note it in `## Open Questions` and advise the orchestrator to consult the `adr-editor` agent rather than improvising.
 
 ## Re-entry prerequisite (sequencing discipline)
 
-Per `knowledge/conventions/sot-reentry-sequencing.md`, a re-entry dispatch of this capability requires the convergence of its direct upstream only — the spec (`spec_adr` chain: reference signal per `.harness/config/signal-gates.json`, resolution of all Chain-①-relevant `bin/sotp ref-verify` findings, and spec-scope review `zero_findings`). Findings on other chains — including enumeration failures caused by this dispatch's own stale catalogues pending regeneration — do not participate in the spec-convergence judgment; the orchestrator confirms the known Chain ① state via a chain-scoped read (e.g. `bin/sotp ref-verify results --chain 1`) and runs the full verification as soon as enumeration is possible (right after this dispatch's regeneration when enumeration was aborting). If the briefing shows the prerequisite unmet, do not start catalogue work: return the briefing to the orchestrator stating the unmet prerequisite. If mid-work you discover `spec.json` (or further upstream) needs editing, stop immediately and return to the orchestrator (immediate bounce-back; no deferred-fix continuation).
+Per `.harness/policies/sot-reentry-sequencing.md`, a re-entry dispatch of this capability requires the convergence of its direct upstream only — the spec (`spec_adr` chain: reference signal per `.harness/config/signal-gates.json`, resolution of all Chain-①-relevant `bin/sotp ref-verify` findings, and spec-scope review `zero_findings`). Findings on other chains — including enumeration failures caused by this dispatch's own stale catalogues pending regeneration — do not participate in the spec-convergence judgment; the orchestrator confirms the known Chain ① state via a chain-scoped read (e.g. `bin/sotp ref-verify results --chain 1`) and runs the full verification as soon as enumeration is possible (right after this dispatch's regeneration when enumeration was aborting). If the briefing shows the prerequisite unmet, do not start catalogue work: return the briefing to the orchestrator stating the unmet prerequisite. If mid-work you discover `spec.json` (or further upstream) needs editing, stop immediately and return to the orchestrator (immediate bounce-back; no deferred-fix continuation).
 
 ## Rules
 
-- Use `Read`, `Grep`, `Glob` for exploring catalogues / baselines / code; `Edit` on `<layer>-types.json` only for annotation (`$todo` fill-in / post-generation adjustment — entry skeletons come from the `bin/sotp catalog` verbs, never from a hand-composed Write); `Bash` only for `bin/sotp` CLI (the `catalog` verbs, `bin/sotp signal check-catalog-spec` for step 12b) and `bin/sotp track views sync` (which generates plan.md, contract-map, and `<layer>-types.md` as side effects — signal JSON files are produced by `signal calc-catalog-spec` and `signal calc-impl-catalog`, not by `views sync`)
+- Use `Read`, `Grep`, `Glob` for exploring catalogues / baselines / code; use `Write`/`Edit` on `tddd-features.json` only to author or correct the Step 0 feature declaration; use `Edit` on `<layer>-types.json` only for annotation (`$todo` fill-in / post-generation adjustment — entry skeletons come from the `bin/sotp catalog` verbs, never from a hand-composed Write); `Bash` only for the `bin/sotp` CLI invocations enumerated in Scope Ownership
 - Do not use `Bash(cat/grep/head/tail/sed/awk)` — dedicated tools only
 - Do not run `git` commands
-- Do not modify `spec.json`, `metadata.json`, `impl-plan.json`, `task-coverage.json` directly. Do not edit `plan.md` directly via Write/Edit — it is regenerated by the required `bin/sotp track views sync` (Step 11)
+- Do not modify `spec.json`, `metadata.json`, `impl-plan.json`, `task-coverage.json`, `task-contract.json` directly. Do not edit `plan.md` directly via Write/Edit — it is regenerated by the required `bin/sotp track views sync` (Step 11)
 
 ## Session resume
 

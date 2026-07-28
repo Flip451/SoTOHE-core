@@ -333,7 +333,8 @@ fn execute_check(args: CatalogCheckArgs) -> ExitCode {
 
 /// Dispatch an assembled input through the composition root and map the outcome.
 fn dispatch(input: CatalogInput) -> ExitCode {
-    crate::commands::outcome_to_exit(CatalogCompositionRoot::new().handle(input))
+    let driver = CatalogCompositionRoot::new().catalog_driver();
+    crate::commands::driver_outcome_to_exit(driver.handle(input))
 }
 
 /// Resolve the track for a WRITE verb (fail-closed on branch/id mismatch, D8).

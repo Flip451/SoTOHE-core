@@ -1,0 +1,287 @@
+{
+  "crate_name": "cli_composition",
+  "functions": {},
+  "layer": "cli_composition",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "reference",
+      "for_type": "AdrBaselineCompositionRoot",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogCompositionRoot",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "CatalogCompositionRoot",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "TaskContractCompositionRoot",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateCompositionRoot",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "reference",
+      "for_type": "TemplateCompositionRoot",
+      "trait_ref": "core::default::Default"
+    },
+    {
+      "action": "delete",
+      "for_type": "AdrBaselineResolutionError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "delete",
+      "for_type": "AdrBaselineResolutionError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "delete",
+      "for_type": "AdrBaselineResolutionError",
+      "trait_ref": "core::error::Error"
+    }
+  ],
+  "traits": {},
+  "types": {
+    "AdrBaselineCompositionRoot": {
+      "action": "modify",
+      "docs": null,
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": false,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "adr_baseline_driver",
+          "params": [
+            {
+              "name": "project_root",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "cli_driver::adr_baseline::AdrBaselineDriver"
+        }
+      ],
+      "module_path": "adr_baseline",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "AdrBaselineResolutionError": {
+      "action": "delete",
+      "informal_grounds": [],
+      "module_path": "adr_baseline",
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "CatalogCompositionRoot": {
+      "action": "modify",
+      "docs": "Composition owner of the CatalogDriver dependency graph.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "catalog_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::catalog_gen::CatalogDriver"
+        }
+      ],
+      "module_path": "catalog",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "TaskContractCompositionRoot": {
+      "action": "modify",
+      "docs": "Composition owner of the TaskContractDriver dependency graph.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "task_contract_driver",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "std::path::PathBuf"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "cli_driver::task_contract::TaskContractDriver"
+        }
+      ],
+      "module_path": "task_contract",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    },
+    "TemplateCompositionRoot": {
+      "action": "modify",
+      "docs": "Composition owner of the TemplateDriver dependency graph.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "kind": "unit"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [],
+          "returns": "Self"
+        },
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "template_driver",
+          "params": [],
+          "receiver": "&self",
+          "returns": "cli_driver::template_export::TemplateDriver"
+        }
+      ],
+      "module_path": "template_export",
+      "role": {
+        "CompositionRoot": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "IN-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-01",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        },
+        {
+          "anchor": "AC-02",
+          "file": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json"
+        }
+      ]
+    }
+  }
+}

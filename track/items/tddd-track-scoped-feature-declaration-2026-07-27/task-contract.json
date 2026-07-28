@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "track_id": "tddd-track-scoped-feature-declaration-2026-07-27",
+  "entries": {
+    "T001": [
+      {"layer": "domain", "entry_key": "CargoFeatureName"},
+      {"layer": "domain", "entry_key": "CargoFeatureNameError"},
+      {"layer": "domain", "entry_key": "TdddFeatureDeclaration"},
+      {"layer": "domain", "entry_key": "TdddFeatureDeclarationError"},
+      {"layer": "domain", "entry_key": "TdddFeatureLookupError"}
+    ],
+    "T002": [
+      {"layer": "usecase", "entry_key": "TdddFeatureDeclarationReadError"},
+      {"layer": "usecase", "entry_key": "TdddBaselineFeatureDeclarationPort"},
+      {"layer": "usecase", "entry_key": "TdddBaselineFeatureDeclarationPortError"},
+      {"layer": "usecase", "entry_key": "TdddActualFeatureDeclarationPort"},
+      {"layer": "usecase", "entry_key": "TdddActualFeatureDeclarationPortError"},
+      {"layer": "infrastructure", "entry_key": "FsTdddFeatureDeclarationAdapter"}
+    ],
+    "T003": [
+      {"layer": "domain", "entry_key": "RustdocBaselineCapturePort"},
+      {"layer": "usecase", "entry_key": "BaselineCaptureError"},
+      {"layer": "usecase", "entry_key": "BaselineCaptureInteractor"},
+      {"layer": "infrastructure", "entry_key": "RustdocBaselineCaptureAdapter"},
+      {"layer": "infrastructure", "entry_key": "RustdocSchemaExporter"}
+    ],
+    "T004": [
+      {"layer": "domain", "entry_key": "SchemaExporter"},
+      {"layer": "domain", "entry_key": "RustdocCratePort"},
+      {"layer": "usecase", "entry_key": "SchemaExporterPort"},
+      {"layer": "usecase", "entry_key": "CatalogueImplSignalsError"},
+      {"layer": "usecase", "entry_key": "CatalogueImplSignalsInteractor"},
+      {"layer": "infrastructure", "entry_key": "RustdocCrateAdapter"},
+      {"layer": "infrastructure", "entry_key": "RustdocSchemaExporter"}
+    ],
+    "T006": [
+      {
+        "layer": "usecase",
+        "entry_key": "TypeSignalsInteractor"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "TypeSignalsError"
+      },
+      {
+        "layer": "usecase",
+        "entry_key": "TypeSignalsExecutorPort"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "TypeSignalsExecutorAdapter"
+      },
+      {
+        "layer": "infrastructure",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      }
+    ]
+  }
+}

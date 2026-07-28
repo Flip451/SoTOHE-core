@@ -1,0 +1,20 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-27T09:57:59Z",
+  "declaration_hash": "8685302dfadb86e94642e7e79cad927c11c5ccd6e12cd576a487dc17469eb3bb",
+  "implementation_input_hash": "fd9e01773c93d98295fc481d436f980154923652683a53480d33a8335d3e5fad",
+  "signals": [
+    {
+      "type_name": "PrDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "SignalDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

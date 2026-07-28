@@ -1,0 +1,8 @@
+{
+  "crate_name": "infrastructure",
+  "functions": {},
+  "layer": "infrastructure",
+  "schema_version": 5,
+  "traits": {},
+  "types": {}
+}

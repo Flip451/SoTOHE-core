@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "layer": "cli_driver",
+  "entries": [
+    {
+      "claim_hash": "2ea01e8fc418febbffe9dd2978e22d5220ed03e809707afff5fe48ce212ec424",
+      "evidence_hash": "f080ec78b99c5642c69600fc403d9fbccb7d0ba04c42f4fc183c6d13ea46b0ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TestObligationCompositionRoot::discover と TestObligationCompositionRoot::current_branch の worktree / branch I/O を composition boundary 外の port 経路へ移し、composition root に SystemGitRepo の discovery、branch を返す公開 query、または construction-time worktree discovery を残さない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestBindingsSkeletonHandler"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "TestObligationCompositionRoot::discover と TestObligationCompositionRoot::current_branch の worktree / branch I/O を composition boundary 外の port 経路へ移し、composition root に SystemGitRepo の discovery、branch を返す公開 query、または construction-time worktree discovery を残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2ea01e8fc418febbffe9dd2978e22d5220ed03e809707afff5fe48ce212ec424",
+      "evidence_hash": "6a1c7ebef15065b9d0352f83b8b6a7456f2db3740e69b8a0d9afe64e80d8de4e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestBindingsSkeletonHandler"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 execution path から、composition root 上の command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "22cfcd903572a7a719334e190ab55bf852ad37db59894bbbd2a9a443707b4ef4",
+      "evidence_hash": "f080ec78b99c5642c69600fc403d9fbccb7d0ba04c42f4fc183c6d13ea46b0ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TestObligationCompositionRoot::discover と TestObligationCompositionRoot::current_branch の worktree / branch I/O を composition boundary 外の port 経路へ移し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationCheckHandler"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "TestObligationCompositionRoot::discover と TestObligationCompositionRoot::current_branch の worktree / branch I/O を composition boundary 外の port 経路へ移し、composition root に SystemGitRepo の discovery、branch を返す公開 query、または construction-time worktree discovery を残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "22cfcd903572a7a719334e190ab55bf852ad37db59894bbbd2a9a443707b4ef4",
+      "evidence_hash": "6a1c7ebef15065b9d0352f83b8b6a7456f2db3740e69b8a0d9afe64e80d8de4e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path から、composition root 上の command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationCheckHandler"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 execution path から、composition root 上の command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5c6092321f8db52d6b52117f05ac5db3b1b3398de9458460e028257267ff2805",
+      "evidence_hash": "f080ec78b99c5642c69600fc403d9fbccb7d0ba04c42f4fc183c6d13ea46b0ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TestObligationCompositionRoot::discover と TestObligationCompositionRoot::current_branch の worktree / branch I/O を composition boundary 外の port 経路へ移し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationContextDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "TestObligationCompositionRoot::discover と TestObligationCompositionRoot::current_branch の worktree / branch I/O を composition boundary 外の port 経路へ移し、composition root に SystemGitRepo の discovery、branch を返す公開 query、または construction-time worktree discovery を残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5c6092321f8db52d6b52117f05ac5db3b1b3398de9458460e028257267ff2805",
+      "evidence_hash": "6a1c7ebef15065b9d0352f83b8b6a7456f2db3740e69b8a0d9afe64e80d8de4e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationContextDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 execution path から、composition root 上の command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0618e1dff6771ae2356842a277f7ddb003598dc6affb6c7563daa75ac47bb8a7",
+      "evidence_hash": "f080ec78b99c5642c69600fc403d9fbccb7d0ba04c42f4fc183c6d13ea46b0ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TestObligationCompositionRoot::discover と TestObligationCompositionRoot::current_branch の worktree / branch I/O を composition boundary 外の port 経路へ移し、composition root に SystemGitRepo の discovery、branch を返す公開 query、または construction-time worktree discovery を残さない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationDeriveHandler"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "TestObligationCompositionRoot::discover と TestObligationCompositionRoot::current_branch の worktree / branch I/O を composition boundary 外の port 経路へ移し、composition root に SystemGitRepo の discovery、branch を返す公開 query、または construction-time worktree discovery を残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0618e1dff6771ae2356842a277f7ddb003598dc6affb6c7563daa75ac47bb8a7",
+      "evidence_hash": "6a1c7ebef15065b9d0352f83b8b6a7456f2db3740e69b8a0d9afe64e80d8de4e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationDeriveHandler"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 execution path から、composition root 上の command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "904db669eac8998e2cd9bde0bedbf3c8b4606368de5b0c38ca85fed2b3cd88f7",
+      "evidence_hash": "f080ec78b99c5642c69600fc403d9fbccb7d0ba04c42f4fc183c6d13ea46b0ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "TestObligationCompositionRoot::discover と TestObligationCompositionRoot::current_branch の worktree / branch I/O を composition boundary 外の port 経路へ移し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationEvaluateHandler"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "TestObligationCompositionRoot::discover と TestObligationCompositionRoot::current_branch の worktree / branch I/O を composition boundary 外の port 経路へ移し、composition root に SystemGitRepo の discovery、branch を返す公開 query、または construction-time worktree discovery を残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "904db669eac8998e2cd9bde0bedbf3c8b4606368de5b0c38ca85fed2b3cd88f7",
+      "evidence_hash": "6a1c7ebef15065b9d0352f83b8b6a7456f2db3740e69b8a0d9afe64e80d8de4e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationEvaluateHandler"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 execution path から、composition root 上の command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9700038686869c1f31d2dc389494af1401a4333c7f93aaa7ab2ed600e71f1512",
+      "evidence_hash": "f080ec78b99c5642c69600fc403d9fbccb7d0ba04c42f4fc183c6d13ea46b0ed",
+      "verdict": {
+        "kind": "pass",
+        "citation": "worktree / branch I/O を composition boundary 外の port 経路へ移し"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationResultsHandler"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "TestObligationCompositionRoot::discover と TestObligationCompositionRoot::current_branch の worktree / branch I/O を composition boundary 外の port 経路へ移し、composition root に SystemGitRepo の discovery、branch を返す公開 query、または construction-time worktree discovery を残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "9700038686869c1f31d2dc389494af1401a4333c7f93aaa7ab2ed600e71f1512",
+      "evidence_hash": "6a1c7ebef15065b9d0352f83b8b6a7456f2db3740e69b8a0d9afe64e80d8de4e",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-support-workflows-2026-07-26/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "TestObligationResultsHandler"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 execution path から、composition root 上の command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    }
+  ]
+}

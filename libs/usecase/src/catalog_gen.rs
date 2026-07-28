@@ -12,7 +12,7 @@ use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
 use domain::plan_ref::SpecElementId;
-use domain::tddd::LayerId;
+use domain::{TrackId, tddd::LayerId};
 // Re-export the domain catalog types that appear in this module's public
 // command / report / error API so the `cli_driver` primary adapter can name
 // them without depending on `domain` directly (same boundary-re-export pattern
@@ -118,6 +118,15 @@ pub struct CatalogCheckQuery {
     pub layer: Option<LayerId>,
 }
 
+/// Catalogue location carried across the primary application boundary.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct CatalogTarget {
+    /// Validated track identity.
+    pub track_id: TrackId,
+    /// Root directory containing per-track artifacts.
+    pub items_dir: PathBuf,
+}
+
 // ── Report DTOs ────────────────────────────────────────────────────────────
 
 /// Report of the files created by `sotp catalog init`.
@@ -204,12 +213,6 @@ pub enum CatalogError {
         /// The schema-violation diagnostic.
         message: FreeText,
     },
-    /// The draft catalogue still has unfilled `$todo` holes.
-    #[error("draft catalogue has {} unfilled hole(s)", holes.len())]
-    DraftIncomplete {
-        /// The remaining holes.
-        holes: Vec<DraftHole>,
-    },
     /// A secondary-port (filesystem) operation failed.
     #[error("catalogue port failure: {detail}")]
     Port {
@@ -230,7 +233,7 @@ pub trait CatalogService: Send + Sync {
     ///
     /// Returns a [`CatalogError`] (`FileExists` / `FileMissing` / `Port`) on
     /// pre-existing files or filesystem failure.
-    fn init(&self, track_id: &str, items_dir: &Path) -> Result<CatalogInitReport, CatalogError>;
+    fn init(&self, target: CatalogTarget) -> Result<CatalogInitReport, CatalogError>;
 
     /// Add a new entry to a layer's catalogue.
     ///
@@ -240,8 +243,7 @@ pub trait CatalogService: Send + Sync {
     /// file, or filesystem failure.
     fn add(
         &self,
-        track_id: &str,
-        items_dir: &Path,
+        target: CatalogTarget,
         command: CatalogAddCommand,
     ) -> Result<CatalogWriteReport, CatalogError>;
 
@@ -253,8 +255,7 @@ pub trait CatalogService: Send + Sync {
     /// filesystem failure.
     fn import(
         &self,
-        track_id: &str,
-        items_dir: &Path,
+        target: CatalogTarget,
         command: CatalogImportCommand,
     ) -> Result<CatalogWriteReport, CatalogError>;
 
@@ -266,11 +267,13 @@ pub trait CatalogService: Send + Sync {
     /// filesystem failure.
     fn cite(
         &self,
-        track_id: &str,
-        items_dir: &Path,
+        target: CatalogTarget,
         command: CatalogCiteCommand,
     ) -> Result<CatalogWriteReport, CatalogError>;
+}
 
+/// Read-only primary application port for catalogue completion checks.
+pub trait CatalogQueryService: Send + Sync {
     /// Check catalogue completion.
     ///
     /// # Errors
@@ -279,8 +282,7 @@ pub trait CatalogService: Send + Sync {
     /// filesystem failure.
     fn check(
         &self,
-        track_id: &str,
-        items_dir: &Path,
+        target: CatalogTarget,
         query: CatalogCheckQuery,
     ) -> Result<CatalogCheckReport, CatalogError>;
 }
@@ -295,7 +297,8 @@ pub trait CatalogPort: Send + Sync {
     ///
     /// Returns a [`CatalogError`] (`FileExists` / `FileMissing` / `Port`) on
     /// pre-existing files or filesystem failure.
-    fn init(&self, track_id: &str, items_dir: &Path) -> Result<CatalogInitReport, CatalogError>;
+    fn init(&self, track_id: &TrackId, items_dir: &Path)
+    -> Result<CatalogInitReport, CatalogError>;
 
     /// Add a new entry to a layer's catalogue.
     ///
@@ -305,7 +308,7 @@ pub trait CatalogPort: Send + Sync {
     /// file, or filesystem failure.
     fn add(
         &self,
-        track_id: &str,
+        track_id: &TrackId,
         items_dir: &Path,
         command: CatalogAddCommand,
     ) -> Result<CatalogWriteReport, CatalogError>;
@@ -318,7 +321,7 @@ pub trait CatalogPort: Send + Sync {
     /// filesystem failure.
     fn import(
         &self,
-        track_id: &str,
+        track_id: &TrackId,
         items_dir: &Path,
         command: CatalogImportCommand,
     ) -> Result<CatalogWriteReport, CatalogError>;
@@ -331,7 +334,7 @@ pub trait CatalogPort: Send + Sync {
     /// filesystem failure.
     fn cite(
         &self,
-        track_id: &str,
+        track_id: &TrackId,
         items_dir: &Path,
         command: CatalogCiteCommand,
     ) -> Result<CatalogWriteReport, CatalogError>;
@@ -344,7 +347,7 @@ pub trait CatalogPort: Send + Sync {
     /// filesystem failure.
     fn check(
         &self,
-        track_id: &str,
+        track_id: &TrackId,
         items_dir: &Path,
         query: CatalogCheckQuery,
     ) -> Result<CatalogCheckReport, CatalogError>;
@@ -368,50 +371,50 @@ impl CatalogInteractor {
 }
 
 impl CatalogService for CatalogInteractor {
-    fn init(&self, track_id: &str, items_dir: &Path) -> Result<CatalogInitReport, CatalogError> {
-        self.port.init(track_id, items_dir)
+    fn init(&self, target: CatalogTarget) -> Result<CatalogInitReport, CatalogError> {
+        self.port.init(&target.track_id, &target.items_dir)
     }
 
     fn add(
         &self,
-        track_id: &str,
-        items_dir: &Path,
+        target: CatalogTarget,
         command: CatalogAddCommand,
     ) -> Result<CatalogWriteReport, CatalogError> {
-        self.port.add(track_id, items_dir, command)
+        self.port.add(&target.track_id, &target.items_dir, command)
     }
 
     fn import(
         &self,
-        track_id: &str,
-        items_dir: &Path,
+        target: CatalogTarget,
         command: CatalogImportCommand,
     ) -> Result<CatalogWriteReport, CatalogError> {
-        self.port.import(track_id, items_dir, command)
+        self.port.import(&target.track_id, &target.items_dir, command)
     }
 
     fn cite(
         &self,
-        track_id: &str,
-        items_dir: &Path,
+        target: CatalogTarget,
         command: CatalogCiteCommand,
     ) -> Result<CatalogWriteReport, CatalogError> {
-        self.port.cite(track_id, items_dir, command)
+        self.port.cite(&target.track_id, &target.items_dir, command)
     }
+}
 
+impl CatalogQueryService for CatalogInteractor {
     fn check(
         &self,
-        track_id: &str,
-        items_dir: &Path,
+        target: CatalogTarget,
         query: CatalogCheckQuery,
     ) -> Result<CatalogCheckReport, CatalogError> {
-        self.port.check(track_id, items_dir, query)
+        self.port.check(&target.track_id, &target.items_dir, query)
     }
 }
 
 #[cfg(test)]
 #[allow(clippy::unwrap_used, clippy::panic)]
 mod tests {
+    use std::sync::Mutex;
+
     use super::*;
 
     fn sample_add_command() -> CatalogAddCommand {
@@ -491,7 +494,6 @@ mod tests {
             CatalogError::InvalidRole { role: FreeText::new("Bogus") },
             CatalogError::ParseFragment { message: FreeText::new("bad fragment") },
             CatalogError::SchemaInvalid { message: FreeText::new("bad schema") },
-            CatalogError::DraftIncomplete { holes: vec![] },
             CatalogError::Port { detail: IoFailureDetail::new("io boom") },
         ];
         for err in &variants {
@@ -500,23 +502,27 @@ mod tests {
         }
     }
 
-    struct StubPort;
+    struct StubPort {
+        calls: Mutex<Vec<&'static str>>,
+    }
 
     impl CatalogPort for StubPort {
         fn init(
             &self,
-            _track_id: &str,
+            _track_id: &TrackId,
             _items_dir: &Path,
         ) -> Result<CatalogInitReport, CatalogError> {
+            self.calls.lock().unwrap().push("init");
             Ok(CatalogInitReport { created_files: vec!["init.json".to_owned()] })
         }
 
         fn add(
             &self,
-            _track_id: &str,
+            _track_id: &TrackId,
             _items_dir: &Path,
             _command: CatalogAddCommand,
         ) -> Result<CatalogWriteReport, CatalogError> {
+            self.calls.lock().unwrap().push("add");
             Ok(CatalogWriteReport {
                 file_path: "add.json".to_owned(),
                 entry_key: "added".to_owned(),
@@ -526,10 +532,11 @@ mod tests {
 
         fn import(
             &self,
-            _track_id: &str,
+            _track_id: &TrackId,
             _items_dir: &Path,
             _command: CatalogImportCommand,
         ) -> Result<CatalogWriteReport, CatalogError> {
+            self.calls.lock().unwrap().push("import");
             Ok(CatalogWriteReport {
                 file_path: "import.json".to_owned(),
                 entry_key: "imported".to_owned(),
@@ -539,10 +546,11 @@ mod tests {
 
         fn cite(
             &self,
-            _track_id: &str,
+            _track_id: &TrackId,
             _items_dir: &Path,
             _command: CatalogCiteCommand,
         ) -> Result<CatalogWriteReport, CatalogError> {
+            self.calls.lock().unwrap().push("cite");
             Ok(CatalogWriteReport {
                 file_path: "cite.json".to_owned(),
                 entry_key: "cited".to_owned(),
@@ -552,10 +560,11 @@ mod tests {
 
         fn check(
             &self,
-            _track_id: &str,
+            _track_id: &TrackId,
             _items_dir: &Path,
             _query: CatalogCheckQuery,
         ) -> Result<CatalogCheckReport, CatalogError> {
+            self.calls.lock().unwrap().push("check");
             Ok(CatalogCheckReport {
                 verdict: CatalogCheckVerdict::Blocked,
                 findings: vec!["stub".to_owned()],
@@ -564,13 +573,69 @@ mod tests {
         }
     }
 
+    struct FailingPort;
+
+    impl CatalogPort for FailingPort {
+        fn init(
+            &self,
+            _track_id: &TrackId,
+            _items_dir: &Path,
+        ) -> Result<CatalogInitReport, CatalogError> {
+            Err(CatalogError::FileExists { path: PathBuf::from("existing-types.json") })
+        }
+
+        fn add(
+            &self,
+            _track_id: &TrackId,
+            _items_dir: &Path,
+            _command: CatalogAddCommand,
+        ) -> Result<CatalogWriteReport, CatalogError> {
+            Err(CatalogError::DuplicateEntry {
+                entry_key: CatalogEntryName::try_new("Duplicate".to_owned()).unwrap(),
+            })
+        }
+
+        fn import(
+            &self,
+            _track_id: &TrackId,
+            _items_dir: &Path,
+            _command: CatalogImportCommand,
+        ) -> Result<CatalogWriteReport, CatalogError> {
+            Err(CatalogError::InvalidRole { role: FreeText::new("unsupported role") })
+        }
+
+        fn cite(
+            &self,
+            _track_id: &TrackId,
+            _items_dir: &Path,
+            _command: CatalogCiteCommand,
+        ) -> Result<CatalogWriteReport, CatalogError> {
+            Err(CatalogError::AnchorNotFound {
+                anchor: SpecElementId::try_new("AC-99".to_owned()).unwrap(),
+            })
+        }
+
+        fn check(
+            &self,
+            _track_id: &TrackId,
+            _items_dir: &Path,
+            _query: CatalogCheckQuery,
+        ) -> Result<CatalogCheckReport, CatalogError> {
+            Err(CatalogError::SchemaInvalid { message: FreeText::new("invalid catalogue") })
+        }
+    }
+
     #[test]
     fn test_interactor_delegates_to_port() {
-        let interactor = CatalogInteractor::new(Arc::new(StubPort));
-        let dir = Path::new("track/items");
+        let port = Arc::new(StubPort { calls: Mutex::new(Vec::new()) });
+        let interactor = CatalogInteractor::new(port.clone());
+        let target = || CatalogTarget {
+            track_id: TrackId::try_new("t".to_owned()).unwrap(),
+            items_dir: PathBuf::from("track/items"),
+        };
 
-        assert_eq!(interactor.init("t", dir).unwrap().created_files, vec!["init.json".to_owned()]);
-        assert_eq!(interactor.add("t", dir, sample_add_command()).unwrap().entry_key, "added");
+        assert_eq!(interactor.init(target()).unwrap().created_files, vec!["init.json".to_owned()]);
+        assert_eq!(interactor.add(target(), sample_add_command()).unwrap().entry_key, "added");
 
         let import = CatalogImportCommand {
             layer: LayerId::try_new("domain").unwrap(),
@@ -578,19 +643,104 @@ mod tests {
             action: CatalogImportAction::Modify,
             anchors: vec![],
         };
-        assert_eq!(interactor.import("t", dir, import).unwrap().entry_key, "imported");
+        assert_eq!(interactor.import(target(), import).unwrap().entry_key, "imported");
 
         let cite = CatalogCiteCommand {
             layer: LayerId::try_new("domain").unwrap(),
             entry: "Foo".to_owned(),
             anchors: vec![],
         };
-        assert_eq!(interactor.cite("t", dir, cite).unwrap().entry_key, "cited");
+        assert_eq!(interactor.cite(target(), cite).unwrap().entry_key, "cited");
 
         let query = CatalogCheckQuery { layer: None };
         assert_eq!(
-            interactor.check("t", dir, query).unwrap().verdict,
+            CatalogQueryService::check(&interactor, target(), query).unwrap().verdict,
             CatalogCheckVerdict::Blocked
         );
+
+        assert_eq!(
+            *port.calls.lock().unwrap(),
+            ["init", "add", "import", "cite", "check"],
+            "each CatalogInteractor operation must traverse the injected CatalogPort exactly once"
+        );
+
+        let source = include_str!("catalog_gen.rs");
+        let production_source = source.split("#[cfg(test)]").next().unwrap();
+        for delegated_call in [
+            "self.port.init(",
+            "self.port.add(",
+            "self.port.import(",
+            "self.port.cite(",
+            "self.port.check(",
+        ] {
+            assert!(
+                production_source.contains(delegated_call),
+                "interactor must delegate through {delegated_call}"
+            );
+        }
+        for forbidden_runtime_path in [
+            "ServiceImpl",
+            "CompositionRoot",
+            "std::fs::",
+            "std::process::",
+            "std::net::",
+            "std::io::",
+            "println!",
+            "eprintln!",
+            "print!",
+            "eprint!",
+        ] {
+            assert!(
+                !production_source.contains(forbidden_runtime_path),
+                "usecase execution path must not contain {forbidden_runtime_path}"
+            );
+        }
+    }
+
+    #[test]
+    fn test_interactor_propagates_named_port_errors() {
+        let interactor = CatalogInteractor::new(Arc::new(FailingPort));
+        let target = || CatalogTarget {
+            track_id: TrackId::try_new("t".to_owned()).unwrap(),
+            items_dir: PathBuf::from("track/items"),
+        };
+
+        assert!(matches!(
+            interactor.init(target()),
+            Err(CatalogError::FileExists { path })
+                if path.as_path() == Path::new("existing-types.json")
+        ));
+        assert!(matches!(
+            interactor.add(target(), sample_add_command()),
+            Err(CatalogError::DuplicateEntry { entry_key }) if entry_key.as_str() == "Duplicate"
+        ));
+        assert!(matches!(
+            interactor.import(
+                target(),
+                CatalogImportCommand {
+                    layer: LayerId::try_new("domain").unwrap(),
+                    type_path: "Foo".to_owned(),
+                    action: CatalogImportAction::Modify,
+                    anchors: vec![],
+                },
+            ),
+            Err(CatalogError::InvalidRole { role }) if role == FreeText::new("unsupported role")
+        ));
+        assert!(matches!(
+            interactor.cite(
+                target(),
+                CatalogCiteCommand {
+                    layer: LayerId::try_new("domain").unwrap(),
+                    entry: "Foo".to_owned(),
+                    anchors: vec![],
+                },
+            ),
+            Err(CatalogError::AnchorNotFound { anchor })
+                if anchor == SpecElementId::try_new("AC-99".to_owned()).unwrap()
+        ));
+        assert!(matches!(
+            CatalogQueryService::check(&interactor, target(), CatalogCheckQuery { layer: None }),
+            Err(CatalogError::SchemaInvalid { message }) if message == FreeText::new("invalid catalogue")
+        ));
     }
 }

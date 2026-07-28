@@ -1,0 +1,69 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-28T16:27:09Z",
+  "declaration_hash": "9869ef883a9ab5e60f8a8d91d90d3199f37ac84a676be6e87518477feabeb860",
+  "implementation_input_hash": "322aeece6b264c736dc8b3f201bfd90aab1649f6a99a6b729b13738cfabf0dbc",
+  "signals": [
+    {
+      "type_name": "ConventionCapabilityIdArg",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "FromStr",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ConventionResolveDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ConventionResolveInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ConventionShippingCheckDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ConventionShippingCheckInput",
+      "kind_tag": "dto",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Clone",
+        "Debug",
+        "Eq",
+        "PartialEq"
+      ]
+    },
+    {
+      "type_name": "ConventionsDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TemplateDriver",
+      "kind_tag": "primary_adapter",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

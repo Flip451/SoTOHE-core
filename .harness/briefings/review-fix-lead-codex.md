@@ -170,7 +170,7 @@ Go to step 2.
 
 Before modifying any file, verify it belongs to the correct architecture layer:
 ```sh
-cat knowledge/conventions/impl-delegation-arch-guard.md
+cat .harness/policies/implementation-delegation.md
 ```
 
 - Domain types stay in `libs/domain/`

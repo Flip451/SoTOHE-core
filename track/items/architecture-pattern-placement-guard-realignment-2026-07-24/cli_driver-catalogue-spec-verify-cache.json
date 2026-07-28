@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "layer": "cli_driver",
+  "entries": [
+    {
+      "claim_hash": "de16d8a0976763c59cb5c55902309d575a91c7b85fa0fa2b001eca914157173d",
+      "evidence_hash": "4515d76a5524fd8214afb99553204b50aefcff8edefe64db22ac8f7bd1e7bf41",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Primary Adapter が usecase の Command、Query、Response、および boundary DTO を公開シグネチャで参照して transport 入出力との変換を担えるようにし"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "Primary Adapter が usecase の Command、Query、Response、および boundary DTO を公開シグネチャで参照して transport 入出力との変換を担えるようにし、domain Entity・AggregateRoot の直接露出、公開シグネチャへの infrastructure 型露出、application boundary 内への transport 固有型漏出は引き続き禁止する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "de16d8a0976763c59cb5c55902309d575a91c7b85fa0fa2b001eca914157173d",
+      "evidence_hash": "571cece9adc81393f0671aaaf2d6939b04d257b9548eaa2292a233120a10a1c3",
+      "verdict": {
+        "kind": "pass",
+        "citation": "usecase の実行判断、永続化内容、整合性、または domain event に影響する時刻・乱数・ID 採番などの実行時値を、その取得能力を表す usecase Secondary Port と Interactor の必要時呼出しを通じて扱う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "usecase の実行判断、永続化内容、整合性、または domain event に影響する時刻・乱数・ID 採番などの実行時値を、その取得能力を表す usecase Secondary Port と Interactor の必要時呼出しを通じて扱う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "de16d8a0976763c59cb5c55902309d575a91c7b85fa0fa2b001eca914157173d",
+      "evidence_hash": "c2b47ee5c25362448693ee1b5186d785d764dfbf53c8b7675323361f7548a28f",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ADR baseline の snapshot 時刻取得を、usecase の ClockPort を Interactor が呼び出す形へ是正し、Primary Adapter から timestamp provider を除去し、infrastructure clock adapter と composition-only wiring で実行経路を成立させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-05",
+          "text_label": "ADR baseline の snapshot 時刻取得を、usecase の ClockPort を Interactor が呼び出す形へ是正し、Primary Adapter から timestamp provider を除去し、infrastructure clock adapter と composition-only wiring で実行経路を成立させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "de16d8a0976763c59cb5c55902309d575a91c7b85fa0fa2b001eca914157173d",
+      "evidence_hash": "dad71cd964a03ac26ad46ad3386868fefd6d3fd3de5f65d292c6fdfc7f1aa40a",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Primary Adapter の適合例は usecase Command、Query、Response、boundary DTO を参照して transport 変換と application service 呼出しを行え"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "Primary Adapter の適合例は usecase Command、Query、Response、boundary DTO を参照して transport 変換と application service 呼出しを行え、Entity・AggregateRoot・infrastructure 型の公開露出と application boundary 内への transport leakage は lint または review で拒否される。"
+        }
+      }
+    },
+    {
+      "claim_hash": "de16d8a0976763c59cb5c55902309d575a91c7b85fa0fa2b001eca914157173d",
+      "evidence_hash": "ab40a9c4dd8ed356f29b4d313a2af09bec3c5cbe7eecc8308ea6f5bbd1ca7933",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ADR baseline snapshot の時刻は Interactor が ClockPort から取得し、Primary Adapter は timestamp provider を保持せず、system clock adapter は infrastructure にあり、composition root だけがそれらを配線する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "ADR baseline snapshot の時刻は Interactor が ClockPort から取得し、Primary Adapter は timestamp provider を保持せず、system clock adapter は infrastructure にあり、composition root だけがそれらを配線する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "de16d8a0976763c59cb5c55902309d575a91c7b85fa0fa2b001eca914157173d",
+      "evidence_hash": "e368d7301642dba0780e1fb8f03ffb54361d68c1722bed3aac3cd63e328d2450",
+      "verdict": {
+        "kind": "pass",
+        "citation": "representative enforcement changes と ADR baseline の型配置・boundary・Clock correction は新規則に即時適合する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/architecture-pattern-placement-guard-realignment-2026-07-24/cli_driver-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineDriver"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-07",
+          "text_label": "representative enforcement changes と ADR baseline の型配置・boundary・Clock correction は新規則に即時適合する。"
+        }
+      }
+    }
+  ]
+}

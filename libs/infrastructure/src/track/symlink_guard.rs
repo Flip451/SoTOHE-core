@@ -25,10 +25,7 @@ pub(crate) fn reject_symlinks_up_to_root(path: &Path) -> Result<(), std::io::Err
         }
         match ancestor.symlink_metadata() {
             Ok(meta) if meta.file_type().is_symlink() => {
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::InvalidInput,
-                    format!("refusing to follow symlink: {}", ancestor.display()),
-                ));
+                return Err(symlink_rejection(ancestor));
             }
             Ok(_) => {}
             // Missing components are OK — the caller may create them later, and a
@@ -73,10 +70,7 @@ pub fn reject_symlinks_below(path: &Path, trusted_root: &Path) -> Result<bool, s
         }
         match component.symlink_metadata() {
             Ok(meta) if meta.file_type().is_symlink() => {
-                return Err(std::io::Error::new(
-                    std::io::ErrorKind::InvalidInput,
-                    format!("refusing to follow symlink: {}", component.display()),
-                ));
+                return Err(symlink_rejection(component));
             }
             Ok(_) => {}
             // Parent doesn't exist yet (e.g., track dir not created) — that's OK
@@ -92,16 +86,43 @@ pub fn reject_symlinks_below(path: &Path, trusted_root: &Path) -> Result<bool, s
 
     // Check the leaf itself
     match path.symlink_metadata() {
-        Ok(meta) if meta.file_type().is_symlink() => Err(std::io::Error::new(
-            std::io::ErrorKind::InvalidInput,
-            format!("refusing to follow symlink: {}", path.display()),
-        )),
+        Ok(meta) if meta.file_type().is_symlink() => Err(symlink_rejection(path)),
         Ok(_) => Ok(true),
         Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(false),
         Err(e) => {
             Err(std::io::Error::new(e.kind(), format!("failed to stat {}: {e}", path.display())))
         }
     }
+}
+
+/// This module's refusal to follow a symlink, carried inside the
+/// [`std::io::Error`] it raises.
+///
+/// A private type rather than a message or an error kind, because both of those
+/// can come from something other than this module: `InvalidInput` is what the
+/// filesystem returns for a malformed path, and an inspection failure renders
+/// the inspected path into its own message, so a caller matching on either
+/// could be handed a path that impersonates a refusal. Only this module can
+/// construct this type, so a downcast answers the question exactly.
+#[derive(Debug)]
+struct SymlinkRejected {
+    component: std::path::PathBuf,
+}
+
+impl std::fmt::Display for SymlinkRejected {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "refusing to follow symlink: {}", self.component.display())
+    }
+}
+
+impl std::error::Error for SymlinkRejected {}
+
+/// Builds this module's rejection for the symlink at `component`.
+fn symlink_rejection(component: &Path) -> std::io::Error {
+    std::io::Error::new(
+        std::io::ErrorKind::InvalidInput,
+        SymlinkRejected { component: component.to_path_buf() },
+    )
 }
 
 #[cfg(test)]

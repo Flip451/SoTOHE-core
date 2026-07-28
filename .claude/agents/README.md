@@ -1,34 +1,50 @@
 # Agent Definitions
 
-`.claude/agents/` holds the custom subagent definitions that Claude Code Orchestra invokes through `subagent_type`. Each agent pins Opus via `model: opus` frontmatter so that an unintended Sonnet fallback (driven by `CLAUDE_CODE_SUBAGENT_MODEL` in `.claude/settings.json`) never happens.
+`.claude/agents/` holds the custom subagent definitions that Claude Code invokes through `subagent_type`. Each file is a thin adapter that points back to a provider-agnostic capability contract under `.harness/capabilities/`; the contract owns the behaviour, the adapter owns only the Claude-side invocation surface.
 
-## Included Agents
+## Why the frontmatter carries `model` and `effort`
 
-- `spec-designer.md`: authors the behavioral contract (`spec.json`) (`/track:spec` = Phase 1)
-- `impl-planner.md`: authors the implementation plan (`impl-plan.json` + `task-coverage.json`) (`/track:impl-plan` = Phase 3)
-- `type-designer.md`: authors TDDD catalogue entries — picks `TypeDefinitionKind` variants and kind-specific fields (`/track:design` = Phase 2)
-- `adr-editor.md`: edits existing ADRs in the working tree when a downstream SoT Chain signal turns 🔴 (back-and-forth escalation invoked by `/track:plan`; write scope limited to `knowledge/adr/`)
-- `implementer.md`: implements assigned plan tasks, including source/tests and implementer-authored test-obligation bindings when applicable (`/track:implement`)
-- `review-fix-lead.md`: runs the autonomous fix+review loop owned by a single review scope (`/track:review`)
-- `dry-fix-lead.md`: runs the autonomous DFP (DRY fix phase) loop over the whole codebase — `sotp dry write` → fix DRY violations → `sotp dry check-approved` until the gate passes (`/track:dry-check`)
+`bin/sotp capability exec` returns one of two outcomes. When the resolved provider differs from the host it runs the provider subprocess itself and passes `--model` / `--effort` from `.harness/config/agent-profiles.json`. When the resolved provider **is** the host — a Claude orchestrator dispatching a `provider: claude` capability — it returns `delegate-in-host`, and that payload carries only `capability`, `briefing_file`, and `discipline`. It carries neither model nor effort.
 
-Provider-agnostic capability contracts live under `.harness/capabilities/`. Claude subagents,
-including `implementer`, are thin adapters that point back to those capability contracts.
+So on the `delegate-in-host` path the frontmatter in these files is the *only* surface that sets model and effort. A file whose `effort:` disagrees with its capability's `reasoning_effort` in `agent-profiles.json` produces different behaviour depending on which host runs it. Keep the two in sync.
 
-## Capability correspondence
+## Included agents
 
-Subagent files and routing correspondence:
+One file per `provider: claude` capability. `orchestrator` has no file — it is the main session itself.
 
-| capability | agent file | invocation |
+| agent file | capability | model | effort | invoked by |
+|---|---|---|---|---|
+| `spec-designer.md` | spec-designer | `claude-opus-5` | `high` | `/track:spec-design` (Phase 1) — authors `spec.json` |
+| `type-designer.md` | type-designer | `claude-opus-5` | `high` | `/track:type-design` (Phase 2) — authors `<layer>-types.json` |
+| `impl-planner.md` | impl-planner | `claude-opus-5` | `medium` | `/track:impl-plan` (Phase 3) — authors `impl-plan.json` + `task-coverage.json` + `task-contract.json` |
+| `adr-editor.md` | adr-editor | `claude-opus-5` | `high` | the sole in-track writer for `knowledge/adr/*.md` |
+| `adr-diagnoser.md` | adr-diagnoser | `claude-opus-5` | `xhigh` | guardian for recorded ADR decisions; read-only verdicts, no `Edit`/`Write` |
+| `rollback-diagnoser.md` | rollback-diagnoser | `claude-opus-5` | `xhigh` | `/track:diagnose` — routes a finding back to the phase owning its root cause |
+| `implementer.md` | implementer | `claude-opus-5` | `medium` | `/track:implement` — implements assigned plan tasks |
+| `review-fix-lead.md` | review-fix-lead | `claude-opus-5` | `medium` | `/track:review` — owns one scope's fix+review loop |
+| `researcher.md` | researcher | `claude-opus-5` | `medium` | crate research, codebase-wide analysis, external research |
+
+The two `xhigh` entries are the pure-judgment lanes: they run rarely, their verdicts have the highest leverage in the pipeline, and their outputs are small structured objects, so the cost of the top effective tier is bounded.
+
+`dry-fix-lead.md` is present but dormant: `capabilities.dry-fix-lead` routes to codex, and `cargo make track-local-dry-fix` implements only the codex provider path, so a Claude resolution fails closed rather than reaching the file. It declares no `effort:` for that reason. Unlike `review-fix-lead`, the dry wrapper has no subagent-dispatch sentinel; adding one spans usecase, infrastructure, cli-composition, and cli-driver, and is deliberately left as separate work.
+
+## Capabilities with no agent file
+
+These resolve to a non-Claude provider or to the host, and are never dispatched as Claude subagents.
+
+| capability | provider | how it runs |
 |---|---|---|
-| spec-designer | `spec-designer.md` | `subagent_type: "spec-designer"` |
-| impl-planner | `impl-planner.md` | `subagent_type: "impl-planner"` |
-| type-designer | `type-designer.md` | `subagent_type: "type-designer"` (available as a subagent; typically runs inline in the main session) |
-| adr-editor | `adr-editor.md` | `subagent_type: "adr-editor"` (auto-invoked by `/track:plan` on 🔴 escalation) |
-| orchestrator | — | handled directly by the Claude Code main session (no subagent needed) |
-| implementer | `implementer.md` | `subagent_type: "implementer"` |
-| reviewer | — (provider: codex) | dispatched internally by `review-fix-lead.md` via `bin/sotp review local`; not invoked directly as a subagent |
-| review-fix-lead | `review-fix-lead.md` | `review-fix-lead.md` owns the fix+review loop as a Claude subagent adapter (`subagent_type: "review-fix-lead"`) when routing dispatches the Claude path; invokes the reviewer via `bin/sotp review local` internally (`/track:review`) |
-| dry-fix-lead | `dry-fix-lead.md` | `dry-fix-lead.md` owns the DFP loop as a Claude subagent adapter (`subagent_type: "dry-fix-lead"`) when routing dispatches the Claude path; runs `sotp dry write` → fix → `cargo make ci-rust` → `sotp dry check-approved` internally (`/track:dry-check`) |
-| dry-checker | — (provider: codex) | invoked by the `sotp dry` CLI (CodexDryChecker adapter), not as a subagent |
-| researcher | — (provider: gemini) | Gemini CLI is invoked directly from the main session |
+| `orchestrator` | claude | the Claude Code main session itself |
+| `reviewer` | codex | dispatched internally by `bin/sotp review local` |
+| `dry-checker` | codex | invoked by the `sotp dry` CLI |
+| `pr-reviewer` | codex | fail-closes unless the provider supports structured PR review output |
+| `ref-verifier-chain1` / `ref-verifier-chain2` | codex | invoked by the reference-verification pipeline |
+| `obligation-fulfillment-verifier` / `waiver-verifier` | codex | invoked by the obligation pipeline |
+
+## Dispatch rule
+
+Never invoke these agents directly through the Agent tool. Direct invocation bypasses provider and model resolution. The canonical route is `bin/sotp capability exec <capability> --host <host> --briefing-file <path>`.
+
+`review-fix-lead` is the exception: dispatch it through `cargo make track-local-review-fix`, which resolves the profile and, on a Claude resolution, emits a subagent-dispatch sentinel for the caller to act on. `cargo make track-local-dry-fix` has no such sentinel — it executes the codex provider directly and fails closed on any other resolution, which is why `dry-fix-lead` stays on codex.
+
+`.harness/config/agent-profiles.json` is the routing SSoT. `.harness/config/samples/agent-profiles.*.json` hold alternative provider mixes.

@@ -19,7 +19,7 @@ use domain::schema::{
     FunctionInfo, ImplInfo, SchemaExport, SchemaExportError, SchemaExporter, TraitInfo, TypeInfo,
     TypeKind,
 };
-use domain::tddd::catalogue_v2::CrateName;
+use domain::tddd::{CargoFeatureName, catalogue_v2::CrateName};
 use rustdoc_types::{ItemEnum, Visibility};
 
 #[path = "schema_export/format_helpers.rs"]
@@ -80,6 +80,23 @@ impl RustdocSchemaExporter {
     ) -> Result<std::path::PathBuf, SchemaExportError> {
         check_nightly_available()?;
         bin_target::run_rustdoc(&self.workspace_root, crate_name)
+    }
+
+    /// Runs `cargo +nightly rustdoc --output-format json` with the validated
+    /// feature selection declared for a TDDD layer.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SchemaExportError`] when the nightly toolchain is unavailable,
+    /// Cargo cannot build the selected package and features, or the rustdoc JSON
+    /// output path cannot be resolved safely.
+    pub fn export_rustdoc_json_path_with_features(
+        &self,
+        crate_name: &CrateName,
+        features: &[CargoFeatureName],
+    ) -> Result<std::path::PathBuf, SchemaExportError> {
+        check_nightly_available()?;
+        bin_target::run_rustdoc_with_features(&self.workspace_root, crate_name, features)
     }
 
     /// Resolves a previously generated rustdoc JSON path without launching rustdoc.
@@ -838,6 +855,55 @@ mod tests {
         assert_eq!(params[0].ty.as_str(), "UserId");
         assert_eq!(params[1].name.as_str(), "name");
         assert_eq!(params[1].ty.as_str(), "String");
+    }
+
+    #[test]
+    fn test_extract_params_preserves_valid_identifier_names() {
+        let sig = rustdoc_types::FunctionSignature {
+            inputs: vec![("valid_name_7".to_string(), simple("Input"))],
+            output: None,
+            is_c_variadic: false,
+        };
+
+        let params = extract_params(&sig).unwrap();
+
+        assert_eq!(params[0].name.as_str(), "valid_name_7");
+        assert_eq!(params[0].ty.as_str(), "Input");
+    }
+
+    #[test]
+    fn test_extract_params_replaces_tuple_pattern_with_stable_positional_name() {
+        let sig = rustdoc_types::FunctionSignature {
+            inputs: vec![
+                ("(left, right)".to_string(), simple("Pair")),
+                ("tail".to_string(), simple("Tail")),
+            ],
+            output: None,
+            is_c_variadic: false,
+        };
+
+        let params = extract_params(&sig).unwrap();
+
+        assert_eq!(params[0].name.as_str(), "arg_0");
+        assert_eq!(params[0].ty.as_str(), "Pair");
+        assert_eq!(params[1].name.as_str(), "tail");
+    }
+
+    #[test]
+    fn test_extract_params_avoids_collision_with_valid_identifier() {
+        let sig = rustdoc_types::FunctionSignature {
+            inputs: vec![
+                ("(left, right)".to_string(), simple("Pair")),
+                ("arg_0".to_string(), simple("Tail")),
+            ],
+            output: None,
+            is_c_variadic: false,
+        };
+
+        let params = extract_params(&sig).unwrap();
+
+        assert_eq!(params[0].name.as_str(), "arg_0_1");
+        assert_eq!(params[1].name.as_str(), "arg_0");
     }
 
     // --- T006 (S4): build_trait_origins / resolve_trait_origin unit tests ---

@@ -42,6 +42,7 @@ use usecase::test_obligation::derive::DeriveTestObligationsInteractor;
 use usecase::test_obligation::evaluate::{
     EvaluateTestObligationsInteractor, TestObligationEvaluateConfig,
 };
+use usecase::test_obligation::ports::ObligationFulfillmentCachePort;
 use usecase::test_obligation::results::TestObligationResultsInteractor;
 
 const TEST_OBLIGATION_RULES_PATH: &str = ".harness/config/test-obligation-rules.json";
@@ -236,10 +237,7 @@ impl TestObligationCompositionRoot {
         Arc::new(FsImplPlanReader::new(self.items_dir()))
     }
 
-    fn fulfillment_cache(
-        &self,
-    ) -> Arc<dyn domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort + Send + Sync>
-    {
+    fn fulfillment_cache(&self) -> Arc<dyn ObligationFulfillmentCachePort + Send + Sync> {
         Arc::new(JsonObligationFulfillmentCacheCodec::new(self.items_dir()))
     }
 

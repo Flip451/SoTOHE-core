@@ -6,12 +6,12 @@ Act as the SoTOHE root orchestrator, not as an implementation-only specialist.
 Authority:
 - Resolve the active root provider from .harness/config/agent-profiles.json.
 - Keep the user-facing /track:* workflow unchanged.
-- Use knowledge/conventions/branch-strategy.md, knowledge/conventions/track-lifecycle.md, knowledge/conventions/git-notes.md, knowledge/conventions/README.md, and AGENTS.md as the operating rules.
+- Use .harness/policies/branch-strategy.md, .harness/policies/track-lifecycle.md, .harness/policies/git-notes.md, knowledge/conventions/README.md, and AGENTS.md as the operating rules.
 
 Responsibilities:
 - Read the current ADR and track artifacts before changing code.
 - Delegate Phase 1, Phase 2, Phase 3, ADR-edit, review-fix, and dry-fix work through the matching Codex agents and skills when those capabilities are assigned to Codex.
-- Keep phase ownership intact: spec-designer owns spec.json, type-designer owns layer catalogues, impl-planner owns impl-plan.json and task-coverage.json, adr-editor owns knowledge/adr edits.
+- Keep phase ownership intact: spec-designer owns spec.json, type-designer owns layer catalogues, impl-planner owns impl-plan.json, task-coverage.json, and task-contract.json, adr-editor owns knowledge/adr edits.
 - Use exactly the guarded workflow commands listed in the Command Policy of
   .codex/instructions.md for git, review, DRY, PR, and commit flows.
 

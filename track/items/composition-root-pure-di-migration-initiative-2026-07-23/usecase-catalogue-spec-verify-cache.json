@@ -1,0 +1,2646 @@
+{
+  "schema_version": 1,
+  "layer": "usecase",
+  "entries": [
+    {
+      "claim_hash": "92e5d29c70a2f65ac76767da77b2499f2f732aa2374c6c4c8228dafd2af6a40b",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "92e5d29c70a2f65ac76767da77b2499f2f732aa2374c6c4c8228dafd2af6a40b",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineCommand"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5a5b8cf1207b2dbaa3f5bf0a20284d3748e7019f8a9f8ecfca649922a367eac7",
+      "evidence_hash": "4f3ec37aa2c63716b17d2eb4dffcd4af6e30dde2e315beb76cee4590d912e190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ADR baseline command は CLI で track scope と snapshot input を検証・解決し、解決済みの typed AdrBaselineInput を直接構築する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "ADR baseline command は CLI で track scope と snapshot input を検証・解決し、解決済みの typed AdrBaselineInput を直接構築する。未解決の互換 DTO AdrBaselineRequest は composition boundary へ渡さず削除し、composition root はその request を変換・解決せず、既に解決済みの direct driver path を wiring する。Catalog、Template、TaskContract を含む各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5a5b8cf1207b2dbaa3f5bf0a20284d3748e7019f8a9f8ecfca649922a367eac7",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ca3b33236fef99cddaf86b10769fe435586d33e9de05a889071ca15ac5291aac",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ca3b33236fef99cddaf86b10769fe435586d33e9de05a889071ca15ac5291aac",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "ca3b33236fef99cddaf86b10769fe435586d33e9de05a889071ca15ac5291aac",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2d4b48a079b681615a28b5e89564cadd01e076fa374f5806a390fce31824bec4",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineQueryInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2d4b48a079b681615a28b5e89564cadd01e076fa374f5806a390fce31824bec4",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineQueryInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2d4b48a079b681615a28b5e89564cadd01e076fa374f5806a390fce31824bec4",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineQueryInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2d4b48a079b681615a28b5e89564cadd01e076fa374f5806a390fce31824bec4",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineQueryInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5f0d59a62d7562c3529d01eb408bda20d59e350e7574ed5d34dd48edefca159b",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineSnapshotKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5f0d59a62d7562c3529d01eb408bda20d59e350e7574ed5d34dd48edefca159b",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineSnapshotKind"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6704c4746a85329d3ba489a4a895f22413b9afbbe168d54613eef1ccce343718",
+      "evidence_hash": "4f3ec37aa2c63716b17d2eb4dffcd4af6e30dde2e315beb76cee4590d912e190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ADR baseline command は CLI で track scope と snapshot input を検証・解決し、解決済みの typed AdrBaselineInput を直接構築する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineTimestampError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "ADR baseline command は CLI で track scope と snapshot input を検証・解決し、解決済みの typed AdrBaselineInput を直接構築する。未解決の互換 DTO AdrBaselineRequest は composition boundary へ渡さず削除し、composition root はその request を変換・解決せず、既に解決済みの direct driver path を wiring する。Catalog、Template、TaskContract を含む各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "6704c4746a85329d3ba489a4a895f22413b9afbbe168d54613eef1ccce343718",
+      "evidence_hash": "097f090ca0a6e4e3045d8ffd0f3e9edd8e80d5104948ba60bea861f4a31c64c9",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineTimestampError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "Leaf commands の構造変更前後で、CLI 引数、stdout、stderr、exit code、および永続化結果を変更しない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "06f405db1d2d610435ea4a31cb7855341dcd4e6ec11eefffaf5d5d0c2c404b86",
+      "evidence_hash": "4f3ec37aa2c63716b17d2eb4dffcd4af6e30dde2e315beb76cee4590d912e190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "ADR baseline command は CLI で track scope と snapshot input を検証・解決し、解決済みの typed AdrBaselineInput を直接構築する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "AdrBaselineValidationError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "ADR baseline command は CLI で track scope と snapshot input を検証・解決し、解決済みの typed AdrBaselineInput を直接構築する。未解決の互換 DTO AdrBaselineRequest は composition boundary へ渡さず削除し、composition root はその request を変換・解決せず、既に解決済みの direct driver path を wiring する。Catalog、Template、TaskContract を含む各所有 execution path は、composition root に command 実行ロジック、CommandOutcome の生成、直接 I/O、または usecase から composition root への逆委譲を残さない。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4271f25851909c3b8de82ef5e3d6d5976d5eb2d44d3de40594953fd4d1dcb024",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4271f25851909c3b8de82ef5e3d6d5976d5eb2d44d3de40594953fd4d1dcb024",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4271f25851909c3b8de82ef5e3d6d5976d5eb2d44d3de40594953fd4d1dcb024",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "4271f25851909c3b8de82ef5e3d6d5976d5eb2d44d3de40594953fd4d1dcb024",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "82c4ae32805c116729be4d312964ba9b0d5b8a8dace6384b23ed1581a542ffcf",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "82c4ae32805c116729be4d312964ba9b0d5b8a8dace6384b23ed1581a542ffcf",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "82c4ae32805c116729be4d312964ba9b0d5b8a8dace6384b23ed1581a542ffcf",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "82c4ae32805c116729be4d312964ba9b0d5b8a8dace6384b23ed1581a542ffcf",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d75d1bcb7b3e3326501417f2abf3e5cd9b4dce281a927c339654238356d76706",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogTarget"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d75d1bcb7b3e3326501417f2abf3e5cd9b4dce281a927c339654238356d76706",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogTarget"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d75d1bcb7b3e3326501417f2abf3e5cd9b4dce281a927c339654238356d76706",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogTarget"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d75d1bcb7b3e3326501417f2abf3e5cd9b4dce281a927c339654238356d76706",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CatalogTarget"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "83f00190440d79b1e360e38e047707489b3d4710c971ae04bb725b439904f924",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "83f00190440d79b1e360e38e047707489b3d4710c971ae04bb725b439904f924",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "83f00190440d79b1e360e38e047707489b3d4710c971ae04bb725b439904f924",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "83f00190440d79b1e360e38e047707489b3d4710c971ae04bb725b439904f924",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "CoverageVerifyInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0f429ce146b45218742cce5b5c5fdb2388396c750b7aca30b10ce6807edff17a",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ImplCatalogSignalReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8e3305cea5c577cefd40bbad8bd845bfbe08b188d4240f5e5929362df3f9890b",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ImplPlanReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8e3305cea5c577cefd40bbad8bd845bfbe08b188d4240f5e5929362df3f9890b",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ImplPlanReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8e3305cea5c577cefd40bbad8bd845bfbe08b188d4240f5e5929362df3f9890b",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ImplPlanReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8e3305cea5c577cefd40bbad8bd845bfbe08b188d4240f5e5929362df3f9890b",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "ImplPlanReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1309ac374a1352ddbc5b465bf98380146d5427a8a64a0f09fcf7f02cefc51432",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1309ac374a1352ddbc5b465bf98380146d5427a8a64a0f09fcf7f02cefc51432",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "1309ac374a1352ddbc5b465bf98380146d5427a8a64a0f09fcf7f02cefc51432",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d56d7c494ae4f7b336878eae8d084df6fae83cf6d850a8680b643df689cf186b",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d56d7c494ae4f7b336878eae8d084df6fae83cf6d850a8680b643df689cf186b",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d56d7c494ae4f7b336878eae8d084df6fae83cf6d850a8680b643df689cf186b",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "d56d7c494ae4f7b336878eae8d084df6fae83cf6d850a8680b643df689cf186b",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "PreReviewGateInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b2a005f8a3e2240ebb86b9f820e831b9ac89a17e2cfc4d984d2f10d3000ca178",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TaskContractReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b2a005f8a3e2240ebb86b9f820e831b9ac89a17e2cfc4d984d2f10d3000ca178",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TaskContractReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b2a005f8a3e2240ebb86b9f820e831b9ac89a17e2cfc4d984d2f10d3000ca178",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TaskContractReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "b2a005f8a3e2240ebb86b9f820e831b9ac89a17e2cfc4d984d2f10d3000ca178",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TaskContractReadError"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0387b881877e83c543764d034f4fd83523c5f279283cebc8c15ae7c732d7ea6e",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0387b881877e83c543764d034f4fd83523c5f279283cebc8c15ae7c732d7ea6e",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0387b881877e83c543764d034f4fd83523c5f279283cebc8c15ae7c732d7ea6e",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "0387b881877e83c543764d034f4fd83523c5f279283cebc8c15ae7c732d7ea6e",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "types",
+          "entry_key": "TemplateExportInteractor"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c77fc62863fad2e4d9bcc07e023dca992966236d7a731d0b05e6ba217d9b97f0",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineQueryService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c77fc62863fad2e4d9bcc07e023dca992966236d7a731d0b05e6ba217d9b97f0",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineQueryService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c77fc62863fad2e4d9bcc07e023dca992966236d7a731d0b05e6ba217d9b97f0",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineQueryService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c77fc62863fad2e4d9bcc07e023dca992966236d7a731d0b05e6ba217d9b97f0",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineQueryService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "44696498cbfaeb0e541ac4e7e6ec6dbb7a84f41bb853ba54b19d6883b8a60227",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "44696498cbfaeb0e541ac4e7e6ec6dbb7a84f41bb853ba54b19d6883b8a60227",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "44696498cbfaeb0e541ac4e7e6ec6dbb7a84f41bb853ba54b19d6883b8a60227",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "44696498cbfaeb0e541ac4e7e6ec6dbb7a84f41bb853ba54b19d6883b8a60227",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cae8bcecea9c9031ab5282b3983e29c6ca3298087049b1d5f834292f6ac5121e",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineSourcePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cae8bcecea9c9031ab5282b3983e29c6ca3298087049b1d5f834292f6ac5121e",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineSourcePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "cae8bcecea9c9031ab5282b3983e29c6ca3298087049b1d5f834292f6ac5121e",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineSourcePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "badbf37bb52e52950a70e7efdcd6534f934ce84f5e6f2550027414c5134105ff",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineStorePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "badbf37bb52e52950a70e7efdcd6534f934ce84f5e6f2550027414c5134105ff",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineStorePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "badbf37bb52e52950a70e7efdcd6534f934ce84f5e6f2550027414c5134105ff",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineStorePort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "695de448dd38ff36887ab1452937c53f9e02a6a10466c3b014dd608416e127b0",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineStoreReadPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "695de448dd38ff36887ab1452937c53f9e02a6a10466c3b014dd608416e127b0",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineStoreReadPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "695de448dd38ff36887ab1452937c53f9e02a6a10466c3b014dd608416e127b0",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "AdrBaselineStoreReadPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "944f93a8b39e2d817cbd452cd0f8a50e14f6a03c8e562708883f27e72228f475",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CatalogPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "944f93a8b39e2d817cbd452cd0f8a50e14f6a03c8e562708883f27e72228f475",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CatalogPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "944f93a8b39e2d817cbd452cd0f8a50e14f6a03c8e562708883f27e72228f475",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CatalogPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f75f4509e6faf02e2ee9406fa57998df792159c4681f6e925b9931d89f40808f",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CatalogQueryService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f75f4509e6faf02e2ee9406fa57998df792159c4681f6e925b9931d89f40808f",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CatalogQueryService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f75f4509e6faf02e2ee9406fa57998df792159c4681f6e925b9931d89f40808f",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CatalogQueryService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "f75f4509e6faf02e2ee9406fa57998df792159c4681f6e925b9931d89f40808f",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CatalogQueryService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "302c255506cde0931576dc54f84ca26ba52d22fc09f0823d8bf7e750ca002cfb",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CatalogService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "302c255506cde0931576dc54f84ca26ba52d22fc09f0823d8bf7e750ca002cfb",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CatalogService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "302c255506cde0931576dc54f84ca26ba52d22fc09f0823d8bf7e750ca002cfb",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CatalogService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "302c255506cde0931576dc54f84ca26ba52d22fc09f0823d8bf7e750ca002cfb",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CatalogService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2c36c1688ba03e3ce06357dadd0cdd5baea173acf559072c17ea8b87a1799298",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CoverageVerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2c36c1688ba03e3ce06357dadd0cdd5baea173acf559072c17ea8b87a1799298",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CoverageVerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2c36c1688ba03e3ce06357dadd0cdd5baea173acf559072c17ea8b87a1799298",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CoverageVerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "2c36c1688ba03e3ce06357dadd0cdd5baea173acf559072c17ea8b87a1799298",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "CoverageVerifyService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "736c2a0813b53eb2b30bfe06ddd233749baa6c35572bcd83ee2cbe1c7d3da64b",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ImplCatalogSignalReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "736c2a0813b53eb2b30bfe06ddd233749baa6c35572bcd83ee2cbe1c7d3da64b",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ImplCatalogSignalReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "736c2a0813b53eb2b30bfe06ddd233749baa6c35572bcd83ee2cbe1c7d3da64b",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ImplCatalogSignalReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "68f07ff204ae76b4a115063a2e99402a2c601b0839bf94a61a45be7ba816b974",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ImplPlanReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "68f07ff204ae76b4a115063a2e99402a2c601b0839bf94a61a45be7ba816b974",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ImplPlanReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "68f07ff204ae76b4a115063a2e99402a2c601b0839bf94a61a45be7ba816b974",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "ImplPlanReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8fef4ae6404602cc0d1cbfedcd1fe60cf46a6f219fc239d727383df1d85f094e",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8fef4ae6404602cc0d1cbfedcd1fe60cf46a6f219fc239d727383df1d85f094e",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8fef4ae6404602cc0d1cbfedcd1fe60cf46a6f219fc239d727383df1d85f094e",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "8fef4ae6404602cc0d1cbfedcd1fe60cf46a6f219fc239d727383df1d85f094e",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "PreReviewGateService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5c3557668fb1a26ad91cce485351ff60ad19918d1e7691b5b605dadadc53c26b",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SelfBinaryTransplantPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5c3557668fb1a26ad91cce485351ff60ad19918d1e7691b5b605dadadc53c26b",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SelfBinaryTransplantPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "5c3557668fb1a26ad91cce485351ff60ad19918d1e7691b5b605dadadc53c26b",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "SelfBinaryTransplantPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "28c77571a70ec40549309a65b84dff2d1a16b69cd530cfe669427ba5581fba30",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TaskContractReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "28c77571a70ec40549309a65b84dff2d1a16b69cd530cfe669427ba5581fba30",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TaskContractReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "28c77571a70ec40549309a65b84dff2d1a16b69cd530cfe669427ba5581fba30",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TaskContractReaderPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "be02c70a3021dafcada95bbf4147c69d697a704c646b27aeca134ca1b3aa41d6",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateBoundaryManifestPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "be02c70a3021dafcada95bbf4147c69d697a704c646b27aeca134ca1b3aa41d6",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateBoundaryManifestPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "be02c70a3021dafcada95bbf4147c69d697a704c646b27aeca134ca1b3aa41d6",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateBoundaryManifestPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c6a01ec5114bb6a49e676047d693fbd05c433de1de43f809f0b4b65b5e3a52e0",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateExportPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c6a01ec5114bb6a49e676047d693fbd05c433de1de43f809f0b4b65b5e3a52e0",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateExportPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "c6a01ec5114bb6a49e676047d693fbd05c433de1de43f809f0b4b65b5e3a52e0",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateExportPort"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a9f2f2d4481f264ee26caa0080bf292961de9676f546544025ca5ed21c7b897f",
+      "evidence_hash": "c5fbe5106674b165021e3529ac316a3088b3184e36944f2676f0e140abc38554",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateExportService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "Leaf commands の ADR baseline、Catalog、Template、TaskContract の各 command 文脈を、この track が所有する純 DI 化の対象とする。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a9f2f2d4481f264ee26caa0080bf292961de9676f546544025ca5ed21c7b897f",
+      "evidence_hash": "67760255b67b6431dd9aac631feced3daaa4ea2ef4e7f9ccd76c407fbb29e4ca",
+      "verdict": {
+        "kind": "pass",
+        "citation": "driver → usecase interactor → port の一方向・単一路へ収束させる。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateExportService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "各所有 command 文脈の execution path から、composition root にある command 実行ロジック、CommandOutcome の生成、filesystem・process・network・terminal への直接 I/O、usecase から composition root への逆委譲、互換 shim と中間 *ServiceImpl への runtime 参照・呼出しを除去し、driver → usecase interactor → port の一方向・単一路へ収束させる。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a9f2f2d4481f264ee26caa0080bf292961de9676f546544025ca5ed21c7b897f",
+      "evidence_hash": "d2ef49c16edcf96cccdbd0ff1e3033b31ef11ac3956b15f4e6b9125534e4733d",
+      "verdict": {
+        "kind": "pass",
+        "citation": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateExportService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "各所有 execution path は、互換 shim または中間 *ServiceImpl への runtime 参照・呼出し・逆委譲を残さず、driver → usecase interactor → port の一方向・単一路に従う。"
+        }
+      }
+    },
+    {
+      "claim_hash": "a9f2f2d4481f264ee26caa0080bf292961de9676f546544025ca5ed21c7b897f",
+      "evidence_hash": "34daecacc846b9ad8a6a6e3b4075f73084338554728123949ca10fcfee5d5707",
+      "verdict": {
+        "kind": "pass",
+        "citation": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+      },
+      "claim_origin": {
+        "kind": "catalogue_entry",
+        "data": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/usecase-types.json",
+          "section_key": "traits",
+          "entry_key": "TemplateExportService"
+        }
+      },
+      "evidence_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "Leaf commands の純 DI 化は crate topology を変更せず、Interactor と Application Service の role separation を libs/usecase 内に維持する。"
+        }
+      }
+    }
+  ]
+}

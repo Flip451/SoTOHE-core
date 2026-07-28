@@ -1,0 +1,511 @@
+{
+  "schema_version": 1,
+  "entries": [
+    {
+      "claim_hash": "c91ad23fb4817bd693dd271464648cc5b54c1573dd10795172dc23ef4f4fa577",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scaffold に `cargo make init` を追加し、export 直後から初回ゲート通過までを 1 コマンドで到達可能にする。タスクは `git init -b main` ⇒ `cargo generate-lockfile` ⇒ `git add -A` ⇒ 初期コミット ⇒ `cargo make bootstrap` を順に実行する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-01",
+          "text_label": "export 直後の scaffold 利用者が、明示的に選んだ一つのタスクで初期 git repository、lockfile、初期 commit、および bootstrap 済みの状態へ到達できるようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "a1471c12fb2bf7eaee9a02552b143cd4a21323ea928e98bac2fe8765496213f5",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新規リポジトリの実在ブランチと出荷設定を一致させ、不一致プロンプト自体を消す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-02",
+          "text_label": "出荷 scaffold の branch strategy 既定を新規 repository の実在 branch と一致させ、初回 workflow の不一致 prompt をなくす。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "434bbdd95dd5a557e7d77d9eb13968ab58f48d7fd82e2cf67d5a78cd2a922c24",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「利用可能なら使う。無ければテキストの進捗報告で代替し、ワークフローは止めない」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "goal",
+          "element_id": "GO-03",
+          "text_label": "出荷 command adapter が host 固有の進捗トラッキング機能に依存して workflow を停止しないようにする。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "3f07bc0f0bc69a52a29483c87996fd74a299dae2048d9aed62b2dd2116a7ca3e",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "タスクは overlay の Makefile にのみ定義する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-01",
+          "text_label": "export された overlay Makefile に、初期化列を実行する明示 opt-in の `cargo make init` task を提供する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "a2a7fbee2889bf91569b542aa9cd16f17ab42e27aea0301e5b76b62fcdc2dd34",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "タスクは、すでにコミットを持つ git リポジトリで起動された場合、明示エラーで fail-closed に停止する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-02",
+          "text_label": "初期化 task の二回目以降の実行を、既に commit を持つ repository では利用者可読な明示エラーで fail-closed に停止させる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "a3a771652e52b100ce5ff20c55961d28d01c4907e4125d666118efbbf18fafa9",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出荷 `branch-strategy.json` を overlay へ移し、既定を base = main / merge target = main にする\n\nmaintainer 運用値（develop ベース）はソースリポジトリ側にのみ残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-03",
+          "text_label": "出荷 branch-strategy 設定を overlay へ置き、出荷既定を base branch と merge target ともに main にする一方、maintainer 運用値は source repository 側に残す。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "1838fda797b62f013d2369c4f746d026c9088a787d7bd5a9e83f063aa2b8c0e1",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「利用可能なら使う。無ければテキストの進捗報告で代替し、ワークフローは止めない」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "in_scope",
+          "element_id": "IN-04",
+          "text_label": "出荷 plan / adr2pr command adapter の進捗トラッキングを、TaskCreate が利用可能な場合だけ使用し、不在時にはテキスト進捗報告へ代替する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "bd6af8c757a77a75422cfa578e0eea7a66c227dac638fa9328b95b2220df3b19",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "タスクは overlay の Makefile にのみ定義する。ソースリポジトリは既に git リポジトリであり、本タスクを必要としない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-01",
+          "text_label": "source repository 側の Makefile へ初期化 task を追加すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "f8ddaa81ce77b019bf3bb4ed38e91a97980182822375210bb0b7ffcf7f1a2fe3",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "タスクは overlay の Makefile にのみ定義する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-02",
+          "text_label": "初期化列を sotp の新しい subcommand として実装すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "04c4df065781644ee4c52193760aa27708ae22151a74b38d58561a1b2bb1afce",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "`cargo generate-lockfile` を初期コミットより前に置くことで、bootstrap のゲート実行が生む lockfile が未コミット差分として残らない。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-03",
+          "text_label": "placeholder Cargo.lock を overlay に同梱すること、または Cargo.lock を gitignore に入れること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "4b07471f868faab2247e3933e516539f34245b507c2e5617f7d6c171d69422a5",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "タスクは、すでにコミットを持つ git リポジトリで起動された場合、明示エラーで fail-closed に停止する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-04",
+          "text_label": "bootstrap 自体へ git repository 前提チェックを追加すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "44f0b7919f1c925433e4ab99981970c500c7e364ea16bc349ae17d972e882bc9",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "maintainer 運用値（develop ベース）はソースリポジトリ側にのみ残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "out_of_scope",
+          "element_id": "OS-05",
+          "text_label": "source repository の maintainer 向け develop-base branch strategy を変更すること。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "5428d89c9b270331a45c63d8ec5ddf1c6889e6ab831e873f131f7dd6fcdca456",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "本タスクは利用者が明示的に選ぶ opt-in コマンドであり、かつ終端の bootstrap が hooks を設置するため、素の git が通る窓は同一コマンドの内側で閉じる。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-01",
+          "text_label": "初期化 task は利用者が明示的に選ぶ opt-in command であり、hooks 設置前に許される素の git 操作は同一 command 内の初回初期化列に閉じる。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "6838608dbcf03edb48b11e256c1c4998c6429288cb7fe6f37c4fb2fefddef1ff",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "タスクは、`git init -b main` ⇒ `cargo generate-lockfile` ⇒ `git add -A` ⇒ 初期コミット ⇒ `cargo make bootstrap` を順に実行する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-02",
+          "text_label": "初期化列は git init -b main、lockfile 生成、初期 commit、bootstrap の順で実行され、bootstrap により生じる lockfile 差分を残さない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "1c4d18fbe7e869b1f0edfc064c210c6b177118dea3707d6c99438e7ff6c0be28",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出荷面にだけ存在するタスクであるため、出荷 Makefile のタスク集合を検査する既存のスモーク検査の対象に含める。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-03",
+          "text_label": "出荷 Makefile の task 集合を検査する既存の smoke 検査は、初期化 task を出荷 task として検証する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "cbf6f74422dd3022c8a09108661389f88df671b2d04878be1962fb5842e5bb57",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "新規リポジトリの実在ブランチと出荷設定を一致させ、不一致プロンプト自体を消す。 maintainer 運用値（develop ベース）はソースリポジトリ側にのみ残す。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-04",
+          "text_label": "出荷 branch strategy は新規 repository の main branch と一致し、maintainer の branch strategy は出荷面へ輸出しない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "62e689d7e8a02b7224a3417e9d28f827d7d6fe8d94fe15af892c72d317f09eeb",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「利用可能なら使う。無ければテキストの進捗報告で代替し、ワークフローは止めない」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "constraint",
+          "element_id": "CN-05",
+          "text_label": "進捗トラッキングは host 提供機能の有無にかかわらず command adapter の完了を妨げない。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D3"
+        }
+      }
+    },
+    {
+      "claim_hash": "7102bf092837f13681985e1d4819216756aab53674b31d69509454b0919fa03c",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "scaffold に `cargo make init`を追加し、export 直後から初回ゲート通過までを 1 コマンドで到達可能にする。タスクは、`git init -b main` ⇒ `cargo generate-lockfile` ⇒ `git add -A` ⇒ 初期コミット ⇒ `cargo make bootstrap` を順に実行する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-01",
+          "text_label": "export 直後の未初期化 scaffold で cargo make init を実行すると、main branch の git repository、生成済み Cargo.lock を含む初期 commit、bootstrap 済みの hooks 設定に到達する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "6cf5df739169d9b5d3c2e773c8c12e05ff6a21845ea984b70c6f177238be68f3",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "タスクは、すでにコミットを持つ git リポジトリで起動された場合、明示エラーで fail-closed に停止する。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-02",
+          "text_label": "commit を持つ repository で cargo make init を再実行すると、ref-update guard の原因不明な停止ではなく、二回目以降を拒否する明示エラーで失敗する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "4559b5ecadd90d9981f6cb84af14337553f5161c74c7f7df85a79abcaee3ec07",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "タスクは overlay の Makefile にのみ定義する。ソースリポジトリは既に git リポジトリであり、本タスクを必要としない。本タスクを必要としない。本タスクは出荷面にだけ存在するタスクであるため、出荷 Makefile のタスク集合を検査する既存のスモーク検査の対象に含める。"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-03",
+          "text_label": "出荷 overlay は init task を提供し source repository の Makefile は提供せず、出荷 Makefile task 集合を検査する smoke 検査は task の欠落を検出する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D1"
+        }
+      }
+    },
+    {
+      "claim_hash": "f4f2484f711dc663f3a848964a4fee5f8e3ab6828631841019b054d58608cea5",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "出荷 `branch-strategy.json` を overlay へ移し、既定を base = main / merge target = main にする"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-04",
+          "text_label": "export 済み scaffold の branch-strategy.json は overlay から供給され、base branch と merge target は main である。source repository 側の maintainer 運用値は develop のまま保持される。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D2"
+        }
+      }
+    },
+    {
+      "claim_hash": "6748ac46c7569aea15987a12bea9eea8ea9164ce96aea7cecb4971b8a1cae910",
+      "evidence_hash": "73049d2591bb25cf5093051803b3a612074a50af88bf2ed37b64df72b0db8190",
+      "verdict": {
+        "kind": "pass",
+        "citation": "「利用可能なら使う。無ければテキストの進捗報告で代替し、ワークフローは止めない」"
+      },
+      "claim_origin": {
+        "kind": "spec_element",
+        "data": {
+          "section": "acceptance_criteria",
+          "element_id": "AC-05",
+          "text_label": "出荷 plan / adr2pr command adapter は TaskCreate が利用可能なら進捗トラッキングに使い、不在ならテキスト進捗報告に代替して workflow を停止せず完了する。"
+        }
+      },
+      "evidence_origin": {
+        "kind": "adr_decision",
+        "data": {
+          "file_path": "knowledge/adr/2026-07-23-0115-scaffold-first-run-experience.md",
+          "decision_id": "D3"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,509 @@
+{
+  "track_id": "consumer-convention-ownership-and-harness-decoupling-2026-07-25",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "ConventionRequirementPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionRequirementPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:scan_requirements"
+      },
+      "key": {
+        "waived_reason_hash": "3404d1d0b596be4d4e878c58f94b557e5534ba3784c7f96dc21e7c0c11df8459",
+        "declaration_hash": "34288b614a17b6a468af9b109bd2838a14ace7a85a93d7f977002d135910ceda",
+        "anchor_text_hash": "8fcacd3517663b65642147deac44f3bcb1b164d156190aeb2d42d310057f95f2"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "scan_requirements(&self, project_root: &Path) -> Result<Vec<ConventionRequirement>, ConventionResolveError>"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionRequirementPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionRequirementPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:scan_requirements"
+      },
+      "key": {
+        "waived_reason_hash": "7ed64412193322f128c96c34039c8dbe5c21ce8f8672a9533eebb0f1761399b3",
+        "declaration_hash": "34288b614a17b6a468af9b109bd2838a14ace7a85a93d7f977002d135910ceda",
+        "anchor_text_hash": "51b28f2ec9290b9ea2aff6e9e206e609664c90b60219ed5b54305415af475b37"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Read-only driven port producing one `ConventionRequirement` per scanned document"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionResolveService",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionResolveService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:resolve"
+      },
+      "key": {
+        "waived_reason_hash": "1229c41af1109602df65eb277527be64a36901f717dc72bb148888b2c24297d6",
+        "declaration_hash": "4d1a4f5492cb238b3d9407dc9e8f8e25ae90fb1932546d11c5bd8ab6553aa2d9",
+        "anchor_text_hash": "51b28f2ec9290b9ea2aff6e9e206e609664c90b60219ed5b54305415af475b37"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitEntry { action: Add, role: ApplicationService, methods: [MethodDeclaration { name: MethodName(Identifier(\"resolve\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"query\")), ty: TypeRef(\"ResolveConventionsQuery\") }], returns: TypeRef(\"Result<ConventionResolution, ConventionResolveError>\") }"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-07"
+      },
+      "key": {
+        "waived_reason_hash": "0ae1ef818e172f78f4cc779f3161566be385ab271870a9d6a023f015853ac94c",
+        "declaration_hash": "831abcc734f73d29fd67da731d798a4a2d38293e5cb089198573e19da87e779b",
+        "anchor_text_hash": "1b1ffbec0a695dd5ad0ef2aedf19b2203260b7cd306f9d0c5d44f2d3c1690f6b"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Reports fail-closed profile, source, preflight, or provider dispatch failures."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CapabilityExecError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CapabilityExecError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-11"
+      },
+      "key": {
+        "waived_reason_hash": "3a0f203385e314fdf5a0d75d45e2e9e6f91901ca5addd73393ee6921ce520ee9",
+        "declaration_hash": "831abcc734f73d29fd67da731d798a4a2d38293e5cb089198573e19da87e779b",
+        "anchor_text_hash": "ef1146cebde1234282359a696adfa10617e74044ed59045e5082ebfa2afb09a1"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "dispatch 一回あたり resolver の実行は一度だけであり、その実行は実行主体の決定より前に行われる。`typed-pipeline` capability の dispatch では resolver 注入が行われない。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionRequirementPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionRequirementPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:scan_requirements"
+      },
+      "key": {
+        "waived_reason_hash": "eb4b43b592bde0e0fe2aab1f9830ba6ea15aa1dcc3032ef265e4a2af9ff31be4",
+        "declaration_hash": "34288b614a17b6a468af9b109bd2838a14ace7a85a93d7f977002d135910ceda",
+        "anchor_text_hash": "2c8b009b849c82ccb1dbb756f2972cba4e650d06c7dbd798709555c40fe6efa4"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "TraitEntry { action: Add, role: SecondaryPort, methods: [MethodDeclaration { name: MethodName(Identifier(\"scan_requirements\")), receiver: Some(SharedRef), params: [ParamDeclaration { name: ParamName(Identifier(\"project_root\")), ty: TypeRef(\"&std::path::Path\") }], returns: TypeRef(\"Result<Vec<ConventionRequirement>, ConventionResolveError>\")"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionResolveError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionResolveError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "waived_reason_hash": "cf3ed2e2ae8d502a2327df88156041ef739ccfd95d2e71e06c9cb2d7af18aba1",
+        "declaration_hash": "37a227d0029aa787ad7c522cc852f5f2c1d7618cb3c9ace39e596b68ea50c31b",
+        "anchor_text_hash": "2c8b009b849c82ccb1dbb756f2972cba4e650d06c7dbd798709555c40fe6efa4"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CheckConventionShippingQuery",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CheckConventionShippingQuery",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-18"
+      },
+      "key": {
+        "waived_reason_hash": "105c765575fb570741a02719d9a7642379f3e94a3fdb76e88a830da72b393b1d",
+        "declaration_hash": "06df90f7df69b65c8d4524d3508c846fbfc2691c340242d226298a174dc029a5",
+        "anchor_text_hash": "905dd4700762cb87c5b0050cfa96cfb048942804e62b48c736a06958515ccf30"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Read-only request naming the two trees the check compares (IN-11, AC-18)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionShippingVerdict",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionShippingVerdict",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-18"
+      },
+      "key": {
+        "waived_reason_hash": "bd1a6b8a082623d7e8e62eb5f6a5a3b3d514f3d4f71a820b3e5f259390c18930",
+        "declaration_hash": "138d6dd0e4fb8eb1d4e748af7adb0cc4d75191c72b7a33a032e6b10cfb504ba7",
+        "anchor_text_hash": "905dd4700762cb87c5b0050cfa96cfb048942804e62b48c736a06958515ccf30"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionShippingCheckError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-11"
+      },
+      "key": {
+        "waived_reason_hash": "e94e56ecac6ec746553ea5a8b173f165ca9edc72278a572cff7f7416466a45fe",
+        "declaration_hash": "0dad6125d72ee417275583add65cc4b3190faf4490391aba1433d56260bb9d81",
+        "anchor_text_hash": "0d8bcb7b6139fbd92056795f9ccd8bb834d9efea32f8501529a2b539795d9e75"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckError",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionShippingCheckError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-18"
+      },
+      "key": {
+        "waived_reason_hash": "3ae871a79562ef31df531e588c19fe94d08be23bd1f5424b7654105490f98a6c",
+        "declaration_hash": "0dad6125d72ee417275583add65cc4b3190faf4490391aba1433d56260bb9d81",
+        "anchor_text_hash": "905dd4700762cb87c5b0050cfa96cfb048942804e62b48c736a06958515ccf30"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionInventoryPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionInventoryPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:list_conventions"
+      },
+      "key": {
+        "waived_reason_hash": "076fe2f6a68a7079b0d82bca5981852dcc0dd13ec51b266839aa126caf119494",
+        "declaration_hash": "b8be9962aba00206c94101a62375340a1d9c6e4b72163cbadfc5dfd99cfcdf03",
+        "anchor_text_hash": "905dd4700762cb87c5b0050cfa96cfb048942804e62b48c736a06958515ccf30"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Read-only driven port that lists the convention documents a given tree ships\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckService",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionShippingCheckService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check"
+      },
+      "key": {
+        "waived_reason_hash": "0ebe071e2bf3ee4bdd09099bc62472432614f38cb8457a4bc7fef91c23fe22fb",
+        "declaration_hash": "61076364ee93b426a6cc6346c00cb9b94f9677f8ad39b87cf944c73be7f1298a",
+        "anchor_text_hash": "905dd4700762cb87c5b0050cfa96cfb048942804e62b48c736a06958515ccf30"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Primary port for the read-only non-shipping check (IN-11, AC-18).\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckInteractor",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionShippingCheckInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "waived_reason_hash": "62e27c95abbc9c2b418d34498c51884570333c91324eab4e267e0c240bcd91f5",
+        "declaration_hash": "05245ad436dc34b983abf71ea6e86eab1cfb3ee3d94f89a5893e909bf8b88a33",
+        "anchor_text_hash": "905dd4700762cb87c5b0050cfa96cfb048942804e62b48c736a06958515ccf30"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Implements `ConventionShippingCheckService` by inventorying both trees through the one injected `ConventionInventoryPort` and delegating the comparison to `select_unsupplied_conventions` (IN-11, AC-18)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::template_conventions::list_convention_documents",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::template_conventions::list_convention_documents",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "waived_reason_hash": "884b7fbee40726c9eac6efdce9d87b1d579baa3a5ddbcc51296a69ca9e565933",
+        "declaration_hash": "b66942a4da413425ff78d4901f91aba3f0b30ad53bc3ba04c417bd79c9537a70",
+        "anchor_text_hash": "905dd4700762cb87c5b0050cfa96cfb048942804e62b48c736a06958515ccf30"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "template smoke が export 済み tree に対して overlay 以外の source convention の非出荷を検査し、変更後のリポジトリで成功する。"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsConventionInventoryAdapter",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsConventionInventoryAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::template_conventions::ConventionInventoryPort"
+      },
+      "key": {
+        "waived_reason_hash": "7f0b0e5eb41539e8eaca227693203fd24cbb4ca29afae101d054760f24bfd274",
+        "declaration_hash": "27c76fddfefa7ea561c19d9fb63dcae482581e60c9d8958211321a6bb9606fad",
+        "anchor_text_hash": "905dd4700762cb87c5b0050cfa96cfb048942804e62b48c736a06958515ccf30"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "params: [ParamDeclaration { name: ParamName(Identifier(\"tree_root\")), ty: TypeRef(\"&std::path::Path\") }], returns: TypeRef(\"Result<Vec<ConventionDocumentPath>, ConventionShippingCheckError>\")"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckInput",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionShippingCheckInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-18"
+      },
+      "key": {
+        "waived_reason_hash": "a6c61dc830918b30b57dd81572f745a270b36faf9d7698c95b8fa5980a0cc4f5",
+        "declaration_hash": "054b37d99a37af6a7e6cbd93a4dba7a1b2f97ce1fd4b444db11b870b705e7d06",
+        "anchor_text_hash": "905dd4700762cb87c5b0050cfa96cfb048942804e62b48c736a06958515ccf30"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Typed input for the read-only non-shipping check (IN-11, AC-18)."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionShippingCheckDriver",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionShippingCheckDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-18"
+      },
+      "key": {
+        "waived_reason_hash": "c33b33baf50a360013ba43df66904833ba120f2d884bd2f89e6989757e0560e6",
+        "declaration_hash": "03b4b2dab923b025e87fffc90162fe44bdfc1fc9ad53249c9f058437540bbc92",
+        "anchor_text_hash": "905dd4700762cb87c5b0050cfa96cfb048942804e62b48c736a06958515ccf30"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "It maps the two verdict variants and the error type onto the process outcome and adds no rule of its own"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TemplateConventionShippingArgs",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TemplateConventionShippingArgs",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-18"
+      },
+      "key": {
+        "waived_reason_hash": "0ac19257707fc9cf1728f0f9a4b6fb084d7f1dc39678bb5a140ecc3b4f6a90ba",
+        "declaration_hash": "e37089c8bdf3c9c3e9b2e7675d5331a02db7a443ee6391b366ddf5d502c99e5a",
+        "anchor_text_hash": "905dd4700762cb87c5b0050cfa96cfb048942804e62b48c736a06958515ccf30"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TemplateCommand",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TemplateCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-18"
+      },
+      "key": {
+        "waived_reason_hash": "a713ba10d3e6e903f869ab703c492a46b53b21b5fb91cd9d23b90213cf65c5ec",
+        "declaration_hash": "bd71e7c74223a1643c590971bf2264ccec1dcd573dfdafa1f831c066f046a8e4",
+        "anchor_text_hash": "905dd4700762cb87c5b0050cfa96cfb048942804e62b48c736a06958515ccf30"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "methods: []"
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TemplateCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TemplateCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-18"
+      },
+      "key": {
+        "waived_reason_hash": "f1a63c61ffa173fe2593ad197025355e186a7f236165f5373da41e48ea1affe8",
+        "declaration_hash": "2593e97ae9cb54a16a89d15234a55d0f203488829002bd50a15d5706cbc49bed",
+        "anchor_text_hash": "905dd4700762cb87c5b0050cfa96cfb048942804e62b48c736a06958515ccf30"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "Pure DI only — the check's tree walking and set comparison live in infrastructure and usecase respectively, never here."
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    }
+  ]
+}

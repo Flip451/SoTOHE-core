@@ -6,6 +6,7 @@ use std::collections::{BTreeMap, HashMap};
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
 
+use crate::test_obligation::ports::ObligationFulfillmentCachePort;
 use domain::SpecDocumentLoaderPort;
 use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::catalogue_impl_signals_ports::{
@@ -34,13 +35,13 @@ use domain::tddd::test_obligation::ids::{
 };
 use domain::tddd::test_obligation::obligations::{ObligationsDocument, TestObligation};
 use domain::tddd::test_obligation::ports::{
-    ObligationFulfillmentCachePort, ObligationsArtifactPort, TestBindingsArtifactPort,
-    TestSourceScannerPort, WaiverCachePort,
+    ObligationsArtifactPort, TestBindingsArtifactPort, TestSourceScannerPort, WaiverCachePort,
 };
 use domain::tddd::test_obligation::verdict::{
     ObligationFulfillmentCacheDocument, ObligationFulfillmentCacheEntry,
-    ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict, WaiverCacheDocument,
-    WaiverCacheEntry, WaiverCacheKey, WaiverVerdict,
+    ObligationFulfillmentCacheEntryState, ObligationFulfillmentCacheKey,
+    ObligationFulfillmentVerdict, WaiverCacheDocument, WaiverCacheEntry, WaiverCacheKey,
+    WaiverVerdict,
 };
 use domain::tddd::test_obligation::vocab::{
     FulfillmentFailCategory, TargetEntryRoleKind, TestObligationKind,
@@ -55,7 +56,9 @@ use super::{
     TestObligationResultsCommand, TestObligationResultsInteractor, TestObligationResultsOutput,
     TestObligationStatusLaneSummary,
 };
-use crate::pre_review_gate::{ImplPlanReaderPort, PreReviewGateError, TaskContractReaderPort};
+use crate::pre_review_gate::{
+    ImplPlanReadError, ImplPlanReaderPort, TaskContractReadError, TaskContractReaderPort,
+};
 use domain::task_contract::{ContractedEntryRef, TaskContractDocument};
 
 // ---------------------------------------------------------------------------
@@ -117,6 +120,46 @@ impl TestBindingsArtifactPort for FailingBindings {
 }
 
 struct StubFulfillmentCache(Option<ObligationFulfillmentCacheDocument>);
+
+struct FailingFulfillmentCache {
+    error: fn() -> VerifyCacheError,
+}
+
+impl ObligationFulfillmentCachePort for FailingFulfillmentCache {
+    fn load(
+        &self,
+        _track_id: &TrackId,
+    ) -> Result<Option<ObligationFulfillmentCacheDocument>, VerifyCacheError> {
+        Err((self.error)())
+    }
+
+    fn save(&self, _doc: &ObligationFulfillmentCacheDocument) -> Result<(), DiagnosticMessage> {
+        Ok(())
+    }
+}
+
+fn cache_entry(
+    edge_id: TestObligationEdgeId,
+    obligation_id: TestObligationId,
+    key: ObligationFulfillmentCacheKey,
+    verdict: ObligationFulfillmentVerdict,
+    verifier_fingerprint: Option<VerifierPromptFingerprint>,
+) -> ObligationFulfillmentCacheEntry {
+    let location = TestLocation::new(
+        LayerId::try_new("usecase".to_owned()).unwrap(),
+        TestModulePath::try_new("fixture".to_owned()).unwrap(),
+        TestFunctionName::try_new("entry".to_owned()).unwrap(),
+    );
+    let state = match verifier_fingerprint {
+        Some(verifier_fingerprint) => ObligationFulfillmentCacheEntryState::Identified {
+            verifier_fingerprint,
+            bound_tests: Some(NonEmptyTestLocations::new(location, Vec::new())),
+        },
+        None => ObligationFulfillmentCacheEntryState::Legacy,
+    };
+    ObligationFulfillmentCacheEntry::new(edge_id, obligation_id, key, verdict, state)
+}
+
 impl ObligationFulfillmentCachePort for StubFulfillmentCache {
     fn load(
         &self,
@@ -178,8 +221,8 @@ impl TaskContractReaderPort for UnusedTaskContractReader {
     fn read(
         &self,
         _track_id: &TrackId,
-    ) -> Result<domain::task_contract::TaskContractDocument, PreReviewGateError> {
-        Err(PreReviewGateError::TaskContractNotFound)
+    ) -> Result<domain::task_contract::TaskContractDocument, TaskContractReadError> {
+        Err(TaskContractReadError::NotFound)
     }
 }
 
@@ -188,8 +231,8 @@ impl ImplPlanReaderPort for UnusedImplPlanReader {
     fn read_task_statuses(
         &self,
         _track_id: &TrackId,
-    ) -> Result<HashMap<TaskId, TaskStatusKind>, PreReviewGateError> {
-        Err(PreReviewGateError::ImplPlanReadFailed { message: "unused".to_owned() })
+    ) -> Result<HashMap<TaskId, TaskStatusKind>, ImplPlanReadError> {
+        Err(ImplPlanReadError::ReadFailed { message: domain::FreeText::new("unused") })
     }
 }
 
@@ -226,7 +269,7 @@ impl CatalogueDocumentLoaderPort for StatusCatalogueReader {
 
 struct StatusTaskContractReader(TaskContractDocument);
 impl TaskContractReaderPort for StatusTaskContractReader {
-    fn read(&self, _track_id: &TrackId) -> Result<TaskContractDocument, PreReviewGateError> {
+    fn read(&self, _track_id: &TrackId) -> Result<TaskContractDocument, TaskContractReadError> {
         Ok(self.0.clone())
     }
 }
@@ -236,7 +279,7 @@ impl ImplPlanReaderPort for StatusImplPlanReader {
     fn read_task_statuses(
         &self,
         _track_id: &TrackId,
-    ) -> Result<HashMap<TaskId, TaskStatusKind>, PreReviewGateError> {
+    ) -> Result<HashMap<TaskId, TaskStatusKind>, ImplPlanReadError> {
         Ok(self.0.clone())
     }
 }
@@ -508,14 +551,14 @@ fn test_fulfillment_lane_counts_and_records() {
         ],
     );
     let entries = vec![
-        ObligationFulfillmentCacheEntry::new(
+        cache_entry(
             edge("Money", "IN-05"),
             fulfilled_id,
             fulfillment_key(),
             ObligationFulfillmentVerdict::Fulfilled { citation: citation() },
             None,
         ),
-        ObligationFulfillmentCacheEntry::new(
+        cache_entry(
             edge("Money", "IN-06"),
             failed_id.clone(),
             fulfillment_key(),
@@ -525,7 +568,7 @@ fn test_fulfillment_lane_counts_and_records() {
             },
             None,
         ),
-        ObligationFulfillmentCacheEntry::new(
+        cache_entry(
             edge("Money", "IN-07"),
             pending_id.clone(),
             fulfillment_key(),
@@ -552,8 +595,10 @@ fn test_fulfillment_lane_counts_and_records() {
         edge("Money", "IN-06"),
         Some(reason("fulfillment binding")),
         Some(reason("infrastructure::infrastructure::tests::test_case")),
-        EdgeResolutionOutcome::Fail(FulfillmentFailCategory::Contradiction),
-        Some(reason("asserts the opposite")),
+        EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Fail {
+            category: FulfillmentFailCategory::Contradiction,
+            reason: reason("asserts the opposite"),
+        }),
         None,
     )));
     assert!(output.records().contains(&EdgeVerdictRecord::new(
@@ -561,8 +606,7 @@ fn test_fulfillment_lane_counts_and_records() {
         edge("Money", "IN-07"),
         Some(reason("fulfillment binding")),
         Some(reason("infrastructure::infrastructure::tests::test_case")),
-        EdgeResolutionOutcome::Pending,
-        None,
+        EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Pending),
         None,
     )));
 }
@@ -578,7 +622,7 @@ fn test_layer_resolved_from_binding_test_location() {
     let bindings = TestBindingsDocument::new(track(), vec![binding]);
     let cache = ObligationFulfillmentCacheDocument::new(
         track(),
-        vec![ObligationFulfillmentCacheEntry::new(
+        vec![cache_entry(
             edge("Money", "IN-05"),
             obligation,
             fulfillment_key(),
@@ -601,7 +645,7 @@ fn test_layer_resolved_from_migrated_voluntary_binding() {
     let bindings = TestBindingsDocument::new(track(), vec![binding]);
     let cache = ObligationFulfillmentCacheDocument::new(
         track(),
-        vec![ObligationFulfillmentCacheEntry::new(
+        vec![cache_entry(
             bound_edge,
             obligation,
             fulfillment_key(),
@@ -675,8 +719,7 @@ fn test_waiver_lane_counts() {
         waived_edge,
         Some(reason("waiver")),
         Some(reason(waiver_reason)),
-        EdgeResolutionOutcome::Fail(FulfillmentFailCategory::CentralUnverified),
-        Some(reason("does not hold")),
+        EdgeResolutionOutcome::Waiver(WaiverVerdict::Fail { reason: reason("does not hold") }),
         None,
     )));
 }
@@ -690,8 +733,7 @@ fn test_waiver_record_without_exact_binding_has_no_provenance() {
         waived_edge.clone(),
         None,
         None,
-        EdgeResolutionOutcome::Fail(FulfillmentFailCategory::CentralUnverified),
-        Some(reason("does not hold")),
+        EdgeResolutionOutcome::Waiver(WaiverVerdict::Fail { reason: reason("does not hold") }),
         None,
     );
 
@@ -748,8 +790,7 @@ fn test_waiver_record_resolves_unique_owner_by_anchor() {
             waived_edge,
             Some(reason("waiver")),
             Some(reason("valid waiver")),
-            EdgeResolutionOutcome::Fail(FulfillmentFailCategory::CentralUnverified),
-            Some(reason("does not hold")),
+            EdgeResolutionOutcome::Waiver(WaiverVerdict::Fail { reason: reason("does not hold") }),
             None,
         )]
     );
@@ -784,8 +825,7 @@ fn test_waiver_record_with_ambiguous_anchor_owner_leaves_obligation_unresolved()
             waived_edge,
             Some(reason("waiver")),
             Some(reason("valid waiver")),
-            EdgeResolutionOutcome::Fail(FulfillmentFailCategory::CentralUnverified),
-            Some(reason("does not hold")),
+            EdgeResolutionOutcome::Waiver(WaiverVerdict::Fail { reason: reason("does not hold") }),
             None,
         )]
     );
@@ -866,7 +906,7 @@ fn test_results_interactor_aggregates_status_lanes_without_gate_failure() {
 
     let stale_cache = ObligationFulfillmentCacheDocument::new(
         track(),
-        vec![ObligationFulfillmentCacheEntry::new(
+        vec![cache_entry(
             edge("Money", "IN-05"),
             obligation.id().clone(),
             fulfillment_key(),
@@ -909,7 +949,7 @@ fn test_results_interactor_with_unresolved_or_status_read_error_returns_ok() {
         TestBindingsDocument::new(track(), vec![fulfillment_binding(obligation.id().clone())]);
     let failing_cache = ObligationFulfillmentCacheDocument::new(
         track(),
-        vec![ObligationFulfillmentCacheEntry::new(
+        vec![cache_entry(
             edge("Money", "IN-05"),
             obligation.id().clone(),
             fulfillment_key(),
@@ -1007,7 +1047,7 @@ fn test_results_interactor_with_absent_verifier_fingerprint_counts_verdict_absen
         TestBindingsDocument::new(track(), vec![fulfillment_binding(obligation.id().clone())]);
     let cache = ObligationFulfillmentCacheDocument::new(
         track(),
-        vec![ObligationFulfillmentCacheEntry::new(
+        vec![cache_entry(
             edge("Money", "IN-05"),
             obligation.id().clone(),
             fulfillment_key(),
@@ -1187,6 +1227,56 @@ fn test_bindings_malformed_error_maps_to_malformed_artifact() {
     match result {
         Err(ObligationResultsError::MalformedArtifact(message)) => {
             assert_eq!(message.as_str(), "bad json");
+        }
+        other => panic!("unexpected result: {other:?}"),
+    }
+}
+
+#[test]
+fn test_fulfillment_cache_source_scan_io_error_maps_to_io_error() {
+    let interactor = TestObligationResultsInteractor::new(
+        Arc::new(StubObligations(None)),
+        Arc::new(StubBindings(None)),
+        Arc::new(UnusedScanner),
+        Arc::new(FailingFulfillmentCache { error: || VerifyCacheError::Io(reason("scan failed")) }),
+        Arc::new(StubWaiverCache(None)),
+        VerifierPromptFingerprint::new(hash(9)),
+        VerifierPromptFingerprint::new(hash(10)),
+        Arc::new(UnusedSpecReader),
+        Arc::new(UnusedCatalogueReader),
+        Arc::new(UnusedTaskContractReader),
+        Arc::new(UnusedImplPlanReader),
+    );
+
+    match interactor.execute(&command()) {
+        Err(ObligationResultsError::IoError(message)) => {
+            assert_eq!(message.as_str(), "scan failed")
+        }
+        other => panic!("unexpected result: {other:?}"),
+    }
+}
+
+#[test]
+fn test_fulfillment_cache_source_scan_parse_error_maps_to_malformed_artifact() {
+    let interactor = TestObligationResultsInteractor::new(
+        Arc::new(StubObligations(None)),
+        Arc::new(StubBindings(None)),
+        Arc::new(UnusedScanner),
+        Arc::new(FailingFulfillmentCache {
+            error: || VerifyCacheError::MalformedJson(reason("bad syntax")),
+        }),
+        Arc::new(StubWaiverCache(None)),
+        VerifierPromptFingerprint::new(hash(9)),
+        VerifierPromptFingerprint::new(hash(10)),
+        Arc::new(UnusedSpecReader),
+        Arc::new(UnusedCatalogueReader),
+        Arc::new(UnusedTaskContractReader),
+        Arc::new(UnusedImplPlanReader),
+    );
+
+    match interactor.execute(&command()) {
+        Err(ObligationResultsError::MalformedArtifact(message)) => {
+            assert_eq!(message.as_str(), "bad syntax");
         }
         other => panic!("unexpected result: {other:?}"),
     }

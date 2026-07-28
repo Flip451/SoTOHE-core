@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "6dfa8a2c4f24ee92e46c159e3176f838a8c46e264778dcf3bff0ab6aca715eb7",
+  "signals": [
+    {
+      "type_name": "CapabilityIdField",
+      "signal": "blue",
+      "entry_hash": "83e15b5ed73728e8e2e96037e0ff2e9d99d67bace2d172fac1536e939e0394c1"
+    },
+    {
+      "type_name": "ConventionFrontMatterDto",
+      "signal": "blue",
+      "entry_hash": "f5470aa78caccacca22bfd202068243a07f3700621a5182162988e77ba74bad3"
+    },
+    {
+      "type_name": "FsConventionInventoryAdapter",
+      "signal": "blue",
+      "entry_hash": "517364d9dea5d43a231b3a10c8f358e9dead291faf9756dd3ccb42f8bad31767"
+    },
+    {
+      "type_name": "FsConventionRequirementAdapter",
+      "signal": "blue",
+      "entry_hash": "bafa61d4e29e069bbbc8c165b4cef942f80f92ebd5f03eb350bb79761fc81ae1"
+    },
+    {
+      "type_name": "infrastructure::conventions_resolve::parse_convention_front_matter",
+      "signal": "blue",
+      "entry_hash": "ad0ee3c00922bdabb508c9a5d459ebd36331dd4048c9c9c15d3c9dc280d2f5a8"
+    },
+    {
+      "type_name": "infrastructure::conventions_resolve::scan_convention_requirements",
+      "signal": "blue",
+      "entry_hash": "d82fa388f7bd8e17259e7a17ed39bcf0c63045d74b6b6828d0e622cda008a917"
+    },
+    {
+      "type_name": "infrastructure::template_conventions::list_convention_documents",
+      "signal": "blue",
+      "entry_hash": "f9931a780bf3bb2f4311eda0fd3745a7b066b2f2506bbb766fac20fed8436414"
+    }
+  ]
+}

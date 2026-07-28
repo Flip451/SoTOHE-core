@@ -125,7 +125,44 @@ impl TestObligationCheckHandler {
 mod tests {
     use std::sync::Mutex;
 
+    use domain::ContentHash;
+    use domain::tddd::semantic_verify::CatalogueEntryKey;
+    use domain::tddd::test_obligation::hashes::{
+        AnchorTextHash, BoundTestsSetHash, DeclarationHash,
+    };
+    use domain::tddd::test_obligation::ids::{
+        TestObligationAnchorId, TestObligationEdgeId, TestObligationId,
+        TestObligationItemIdentifier,
+    };
+    use domain::tddd::test_obligation::verdict::{
+        FulfillmentCacheLookupError, ObligationFulfillmentCacheKey,
+    };
+    use domain::tddd::test_obligation::vocab::TestObligationKind;
+
     use super::*;
+
+    fn ambiguous_current_cache_key_error() -> usecase::test_obligation::errors::ObligationCheckError
+    {
+        let entry_key = CatalogueEntryKey::try_new("domain::Money".to_owned()).unwrap();
+        let edge_id = TestObligationEdgeId::new(
+            entry_key.clone(),
+            TestObligationAnchorId::try_new("spec.json".to_owned(), "AC-02".to_owned()).unwrap(),
+        );
+        let obligation_id = TestObligationId::new(
+            entry_key,
+            TestObligationKind::Result,
+            TestObligationItemIdentifier::try_new("entry".to_owned()).unwrap(),
+        );
+        let key = ObligationFulfillmentCacheKey::new(
+            BoundTestsSetHash::new(ContentHash::from_bytes([1; 32])),
+            DeclarationHash::new(ContentHash::from_bytes([2; 32])),
+            AnchorTextHash::new(ContentHash::from_bytes([3; 32])),
+        );
+
+        usecase::test_obligation::errors::ObligationCheckError::FulfillmentCacheLookup(
+            FulfillmentCacheLookupError::AmbiguousCurrentEntries { edge_id, obligation_id, key },
+        )
+    }
 
     struct StubService;
 
@@ -257,6 +294,36 @@ mod tests {
 
         assert_ne!(outcome.exit_code, 0);
         assert!(outcome.stderr.unwrap().contains("BindingsAbsent"));
+    }
+
+    #[test]
+    fn test_check_handler_with_ambiguous_current_cache_key_returns_nonzero_failure() {
+        struct AmbiguousCurrentKeyService;
+
+        impl CheckTestObligationsApplicationService for AmbiguousCurrentKeyService {
+            fn execute(
+                &self,
+                _cmd: &CheckTestObligationsCommand,
+            ) -> Result<
+                usecase::test_obligation::check::CheckTestObligationsOutcome,
+                usecase::test_obligation::errors::ObligationCheckError,
+            > {
+                Err(ambiguous_current_cache_key_error())
+            }
+        }
+
+        let handler = TestObligationCheckHandler::new(
+            Arc::new(AmbiguousCurrentKeyService),
+            PathBuf::from("/repo"),
+        );
+        let branch = DiagnosticMessage::try_new("track/test-track".to_owned()).unwrap();
+
+        let outcome = handler.handle(TestObligationCheckInput::new(None, branch));
+
+        assert_ne!(outcome.exit_code, 0);
+        let stderr = outcome.stderr.unwrap();
+        assert!(stderr.contains("FulfillmentCacheLookup"));
+        assert!(stderr.contains("AmbiguousCurrentEntries"));
     }
 
     #[test]

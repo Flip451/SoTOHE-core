@@ -1,6 +1,8 @@
 #![forbid(unsafe_code)]
 //! Infrastructure layer for the SoTOHE-core track state machine.
 
+extern crate self as infrastructure;
+
 pub mod adr_baseline;
 pub mod adr_decision;
 pub mod agent_profiles;
@@ -14,6 +16,7 @@ pub mod code_profile_builder;
 pub mod codex_common;
 pub mod codex_runtime;
 pub mod conventions;
+pub mod conventions_resolve;
 pub mod demo;
 pub mod disk_maintenance;
 pub mod dry_check;
@@ -23,6 +26,7 @@ pub mod git_cli;
 pub mod impl_catalog_signal_reader;
 pub mod impl_plan_codec;
 pub mod impl_plan_reader;
+pub mod pr;
 pub mod pr_review;
 pub mod provider_session;
 pub mod ref_verify;
@@ -34,6 +38,7 @@ mod schema_export_tests;
 #[cfg(feature = "semantic-dup")]
 pub mod semantic_dup;
 pub mod shell;
+pub mod signal;
 pub mod signal_layer_reader;
 pub mod spec;
 pub mod task_contract_codec;
@@ -41,6 +46,7 @@ pub mod task_contract_reader;
 pub mod task_coverage_codec;
 pub mod tddd;
 pub mod telemetry;
+pub mod template_conventions;
 pub mod template_export;
 pub mod test_obligation;
 pub mod track;

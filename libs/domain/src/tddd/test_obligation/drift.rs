@@ -10,7 +10,8 @@ use crate::tddd::catalogue_v2::roles::ConstructionError;
 use crate::tddd::test_obligation::ids::{
     DiagnosticMessage, TestObligationEdgeId, TestObligationId,
 };
-use crate::tddd::test_obligation::vocab::{FulfillmentFailCategory, TestObligationDriftKind};
+use crate::tddd::test_obligation::verdict::{ObligationFulfillmentVerdict, WaiverVerdict};
+use crate::tddd::test_obligation::vocab::TestObligationDriftKind;
 
 /// A single detected drift against a test obligation or its binding edge.
 ///
@@ -102,14 +103,10 @@ impl TestObligationDrift {
 /// How a single obligation edge resolved during the `check` gate.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum EdgeResolutionOutcome {
-    /// A fresh fulfilled verdict resolves the edge.
-    Fulfilled,
-    /// A fresh waived verdict resolves the edge.
-    Waived,
-    /// The edge resolved to a failing fulfillment verdict of this category.
-    Fail(FulfillmentFailCategory),
-    /// The edge has no fresh verdict; treated as fail at the gate.
-    Pending,
+    /// A fulfillment verdict resolved the edge.
+    Fulfillment(ObligationFulfillmentVerdict),
+    /// A waiver verdict resolved the edge.
+    Waiver(WaiverVerdict),
     /// The edge has no binding at all.
     MissingBinding,
 }
@@ -130,7 +127,6 @@ pub struct EdgeVerdictRecord {
     #[allow(dead_code)]
     outcome: EdgeResolutionOutcome,
     #[allow(dead_code)]
-    verdict_reason: Option<DiagnosticMessage>,
     #[allow(dead_code)]
     drift: Option<TestObligationDrift>,
 }
@@ -144,18 +140,9 @@ impl EdgeVerdictRecord {
         claim_source: Option<DiagnosticMessage>,
         evidence_source: Option<DiagnosticMessage>,
         outcome: EdgeResolutionOutcome,
-        verdict_reason: Option<DiagnosticMessage>,
         drift: Option<TestObligationDrift>,
     ) -> Self {
-        Self {
-            obligation_id,
-            edge_id,
-            claim_source,
-            evidence_source,
-            outcome,
-            verdict_reason,
-            drift,
-        }
+        Self { obligation_id, edge_id, claim_source, evidence_source, outcome, drift }
     }
 }
 
@@ -273,7 +260,7 @@ mod tests {
     use super::*;
     use crate::tddd::semantic_verify::CatalogueEntryKey;
     use crate::tddd::test_obligation::ids::{TestObligationAnchorId, TestObligationItemIdentifier};
-    use crate::tddd::test_obligation::vocab::TestObligationKind;
+    use crate::tddd::test_obligation::vocab::{FulfillmentFailCategory, TestObligationKind};
 
     fn detail(text: &str) -> DiagnosticMessage {
         DiagnosticMessage::try_new(text.to_owned()).unwrap()
@@ -305,7 +292,6 @@ mod tests {
             None,
             None,
             EdgeResolutionOutcome::MissingBinding,
-            None,
             Some(drift()),
         )
     }
@@ -385,12 +371,24 @@ mod tests {
 
     #[test]
     fn test_edge_resolution_outcome_variants_are_distinct() {
-        assert_ne!(EdgeResolutionOutcome::Fulfilled, EdgeResolutionOutcome::Waived);
         assert_ne!(
-            EdgeResolutionOutcome::Fail(FulfillmentFailCategory::Contradiction),
-            EdgeResolutionOutcome::Fail(FulfillmentFailCategory::Substitution)
+            EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Pending),
+            EdgeResolutionOutcome::Waiver(WaiverVerdict::Pending)
         );
-        assert_ne!(EdgeResolutionOutcome::Pending, EdgeResolutionOutcome::MissingBinding);
+        assert_ne!(
+            EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Fail {
+                category: FulfillmentFailCategory::Contradiction,
+                reason: detail("contradiction"),
+            }),
+            EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Fail {
+                category: FulfillmentFailCategory::Substitution,
+                reason: detail("substitution"),
+            })
+        );
+        assert_ne!(
+            EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Pending),
+            EdgeResolutionOutcome::MissingBinding
+        );
     }
 
     #[test]
@@ -400,8 +398,9 @@ mod tests {
             edge_id(),
             Some(detail("fulfillment binding")),
             Some(detail("domain::user::tests::test_fulfilled")),
-            EdgeResolutionOutcome::Fulfilled,
-            None,
+            EdgeResolutionOutcome::Fulfillment(ObligationFulfillmentVerdict::Fulfilled {
+                citation: crate::EvidenceCitation::try_new("evidence".to_owned()).unwrap(),
+            }),
             None,
         );
         let missing = EdgeVerdictRecord::new(
@@ -410,7 +409,6 @@ mod tests {
             None,
             None,
             EdgeResolutionOutcome::MissingBinding,
-            Some(detail("binding is missing")),
             Some(TestObligationDrift::missing_obligation(obligation_id(), detail("no binding"))),
         );
         assert_ne!(fulfilled, missing);

@@ -132,7 +132,7 @@ fn tally(
     grandfathered: &mut usize,
 ) {
     match grounds {
-        // `knowledge/conventions/adr.md` §grandfathered (D4) excludes these
+        // `.harness/reference/adr-schema.md` §grandfathered (D4) excludes these
         // entries from signal evaluation. Counted in their own band — not
         // 🔵 — so back-fill debt remains observable for operators.
         DecisionGrounds::Grandfathered => *grandfathered += 1,

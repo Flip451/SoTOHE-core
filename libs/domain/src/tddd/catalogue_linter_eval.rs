@@ -9,6 +9,7 @@
 
 use std::collections::BTreeMap;
 
+use super::eval_layer_signature;
 use super::eval_primitives;
 use super::helpers::{
     bare_name_in_type_ref, collect_methods_for_type, contract_role_type_ref, entry_role_kind,
@@ -30,12 +31,9 @@ use crate::tddd::primitive_occurrence_scanner::PrimitiveOccurrenceScanner;
 // Cross-layer lookup helpers (strip_ref_sigils, resolve_type_role,
 // sig_type_contains_entry, find_in_catalogue, etc.)
 #[path = "catalogue_linter_eval_helpers.rs"]
-mod eval_helpers;
+pub(super) mod eval_helpers;
 
 use eval_helpers::{resolve_type_role, sig_type_contains_entry};
-
-#[path = "catalogue_linter_eval_inbound.rs"]
-mod eval_inbound;
 
 #[path = "catalogue_linter_eval_composition_root.rs"]
 mod eval_composition_root;
@@ -391,6 +389,18 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                 }
             }
 
+            CatalogueLinterRuleKind::NoLayerInMethodSignature { forbidden_layers } => {
+                ensure_layers_exist(forbidden_layers, all_catalogues)?;
+                violations.extend(eval_layer_signature::evaluate(
+                    rule.kind().discriminant_name(),
+                    rule.target(),
+                    forbidden_layers,
+                    catalogue,
+                    all_catalogues,
+                    target_layer_id,
+                )?);
+            }
+
             CatalogueLinterRuleKind::MethodReferenceSignature { target_field } => {
                 if *target_field != RolePayloadField::Invariants {
                     return Err(CatalogueLinterError::InvalidRuleConfig(FreeText::new(format!(
@@ -663,14 +673,6 @@ pub fn evaluate_catalogue_lint<S: PrimitiveOccurrenceScanner>(
                     scanner,
                 )?;
                 violations.extend(found);
-            }
-
-            CatalogueLinterRuleKind::DomainValueObjectInboundReferenceRequired => {
-                violations.extend(eval_inbound::evaluate_domain_value_object_inbound_references(
-                    rule,
-                    catalogue,
-                    all_catalogues,
-                )?);
             }
 
             CatalogueLinterRuleKind::CompositionRootPureDi => {

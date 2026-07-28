@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "106e9adf61de17b5d5df112a06d9a484b5a8ec656720864c736888c814c496ee",
+  "signals": [
+    {
+      "type_name": "ConventionsCommand",
+      "signal": "blue",
+      "entry_hash": "d99d6998a1f66fb369d6ea9fd34f9be7469c0d3520285e17be39e0f771080c10"
+    },
+    {
+      "type_name": "TemplateCommand",
+      "signal": "blue",
+      "entry_hash": "ed82b06a1342fc2c01f3a9da64c0856e7eae02aeef00f087d70482197b74b5c4"
+    },
+    {
+      "type_name": "TemplateConventionShippingArgs",
+      "signal": "blue",
+      "entry_hash": "52ac804a35e6959c2d9d01d1522f970e5900ee936b659f6c464df781eca9bc34"
+    },
+    {
+      "type_name": "TemplateExportArgs",
+      "signal": "blue",
+      "entry_hash": "bb0c44f1935f6ff2f1e50e9ba28fa94b0c7cc5f169496ce9ba4f5ffaeca1cbcd"
+    }
+  ]
+}

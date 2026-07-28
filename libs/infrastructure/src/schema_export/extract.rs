@@ -5,6 +5,8 @@
 //! and convert them into domain `MemberDeclaration` / `ParamDeclaration` / `FunctionInfo`
 //! values suitable for inclusion in a `SchemaExport`.
 
+use std::collections::HashSet;
+
 use domain::schema::{FunctionInfo, SchemaExportError, StructShapeKind};
 use domain::tddd::catalogue::{MemberDeclaration, ParamDeclaration};
 use domain::tddd::catalogue_v2::identifiers::{ParamName, TypeRef};
@@ -230,12 +232,21 @@ pub(super) fn has_self_param(sig: &rustdoc_types::FunctionSignature) -> bool {
 pub(super) fn extract_params(
     sig: &rustdoc_types::FunctionSignature,
 ) -> Result<Vec<ParamDeclaration>, SchemaExportError> {
+    let reserved_names: HashSet<&str> = sig
+        .inputs
+        .iter()
+        .map(|(name, _)| name.as_str())
+        .filter(|name| *name != "self" && is_valid_param_identifier(name))
+        .collect();
     let mut out = Vec::new();
-    for (name, ty) in sig.inputs.iter().filter(|(n, _)| n != "self") {
-        let param_name = ParamName::new(name.as_str()).map_err(|e| {
+    let mut synthesized_names = HashSet::new();
+    for (position, (name, ty)) in sig.inputs.iter().enumerate().filter(|(_, (n, _))| n != "self") {
+        let normalized_name =
+            normalize_param_name(name, position, &reserved_names, &mut synthesized_names);
+        let param_name = ParamName::new(&normalized_name).map_err(|e| {
             SchemaExportError::ParseFailed(format!(
                 "param name '{}' is not a valid identifier: {e}",
-                name
+                normalized_name
             ))
         })?;
         let ty_str = format_type(ty);
@@ -248,6 +259,39 @@ pub(super) fn extract_params(
         out.push(ParamDeclaration::new(param_name, ty_ref));
     }
     Ok(out)
+}
+
+/// Converts a rustdoc parameter pattern into a catalogue-safe name.
+///
+/// Rustdoc reports destructured bindings such as `(left, right)` as patterns,
+/// not identifiers. Catalogue parameter names must be identifiers, so retain
+/// valid source names and give every other pattern a stable, collision-free
+/// input-position name.
+fn normalize_param_name(
+    name: &str,
+    position: usize,
+    reserved_names: &HashSet<&str>,
+    synthesized_names: &mut HashSet<String>,
+) -> String {
+    if is_valid_param_identifier(name) {
+        return name.to_owned();
+    }
+
+    let base = format!("arg_{position}");
+    let mut candidate = base.clone();
+    let mut suffix = 1;
+    while reserved_names.contains(candidate.as_str()) || synthesized_names.contains(&candidate) {
+        candidate = format!("{base}_{suffix}");
+        suffix += 1;
+    }
+    synthesized_names.insert(candidate.clone());
+    candidate
+}
+
+fn is_valid_param_identifier(name: &str) -> bool {
+    let mut chars = name.chars();
+    matches!(chars.next(), Some(first) if first.is_ascii_alphabetic() || first == '_')
+        && chars.all(|character| character.is_ascii_alphanumeric() || character == '_')
 }
 
 /// Format the return type. `Option<Type>::None` is rendered as `"()"`.

@@ -24,8 +24,9 @@ transitions, review, then the `commit` workflow.
   If the branch does not match this pattern, stop immediately and report the situation.
 - **Track context** — `spec.md`, `plan.md`, `metadata.json`, and all conventions listed in
   `## Related Conventions (Required Reading)` in `spec.md` (or `plan.md` for legacy tracks).
-  For exact type signatures, trait definitions, module trees, and Mermaid diagrams, prefer
-  `## Canonical Blocks` in `plan.md` over surrounding prose.
+  Use the corresponding `<layer>-types.json` catalogue entries for exact type signatures,
+  trait definitions, and module trees; use `impl-plan.json` for task execution detail. Rendered
+  views provide context but do not replace those machine-readable sources.
 - **ADR pre-check** — if `spec.md` or `plan.md` references an ADR under `knowledge/adr/`,
   read the ADR and verify that the target task's description is consistent with the ADR's
   design (layer placement, error types, behavioral contracts). Fix `metadata.json` (then
@@ -62,6 +63,11 @@ directly — it is a read-only view rendered from the track artifacts.
 Implement the selected tasks in dependency order (lower-layer first, then upper layers that
 consume the new lower-layer surface). The order is encoded in the impl-plan sections.
 
+Every dispatch to a source-editing capability must carry the `## Architecture Constraints`
+section required by
+`.harness/policies/implementation-delegation.md#R1. 委譲時に architecture 制約を注入する`. That
+policy owns what the section must state; this workflow owns injecting it into each dispatch.
+
 Parallelism rules:
 
 - Tasks touching independent files may be implemented in parallel.
@@ -88,6 +94,11 @@ before implementation is reported complete.
 
 Before reporting completion, require `cargo make ci` equivalent validation.
 
+Before review is launched on this work, also perform the pre-review verification required by
+`.harness/policies/implementation-delegation.md#R2. review 起動前に配置を検証する`. The
+`cargo make ci` run above satisfies that rule's `cargo make check-layers` step; its remaining
+confirmations are the delegator's own and are covered by no gate.
+
 **Step 6: Record observations (conditional)**
 
 After CI passes, create or append to `track/items/<id>/observations.md` only when one of the
@@ -113,8 +124,10 @@ backfills the commit hash only after the batch commit. If work remains blocked, 
 | Step | Gate | Verdict |
 |------|------|---------|
 | 1 | Active `track/<id>` branch found | OK / stop |
+| 3 | Each source-editing dispatch carries `## Architecture Constraints` | pass / fail |
 | 4 | `bin/sotp test-obligation check` exits 0 | pass / fail |
 | 5 | `cargo make ci` exits 0 | pass / fail |
+| 5 | R2 pre-review placement verification performed | pass / fail |
 
 ## Failure / recovery
 

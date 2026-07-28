@@ -1,0 +1,1611 @@
+{
+  "track_id": "tddd-track-scoped-feature-declaration-2026-07-27",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "RustdocBaselineCapturePort",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RustdocBaselineCapturePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:capture"
+      },
+      "key": {
+        "bound_tests_set_hash": "04c1e309aa76a74521caaa0f0245e0b55e85d21024a4b45dd50b34f3d179fcd9",
+        "declaration_hash": "cba81fcdbfad3b9b71fa7f21056be82a914c61d88da85e736518d30e4158ff1d",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        observed.lock().unwrap().as_slice(),\n        [\n            (\"domain\".to_owned(), vec![]),\n            (\"infrastructure\".to_owned(), vec![\"semantic-dup\".to_owned()]),\n        ]\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_feature_declaration_forwards_layer_features_to_capture"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaselineCaptureError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaselineCaptureError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "c24534ea5a8e59ba73c260a41756d0e23d5f1007406037049664cf4c2f98405f",
+        "declaration_hash": "928ca4059e7d6c7c45839e02ef3f53b84d7a79df0c3300b3217d74625508847c",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "    assert!(matches!(error, BaselineCaptureError::FeatureDeclaration(_)));\n    assert_eq!(captures.load(Ordering::SeqCst), 0, \"rustdoc capture must not start\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_missing_feature_declaration_returns_error_before_capture"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaselineCaptureError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaselineCaptureError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "c24534ea5a8e59ba73c260a41756d0e23d5f1007406037049664cf4c2f98405f",
+        "declaration_hash": "928ca4059e7d6c7c45839e02ef3f53b84d7a79df0c3300b3217d74625508847c",
+        "anchor_text_hash": "a6f03d4d496a6520dfecd164f5d335765406389e2967c5dff57ef31c57d08b19"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(error, BaselineCaptureError::FeatureDeclaration(_))); assert_eq!(captures.load(Ordering::SeqCst), 0, \"rustdoc capture must not start\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_missing_feature_declaration_returns_error_before_capture"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "RustdocSchemaExporter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RustdocSchemaExporter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "4e5e36ed737c09d80ed1b64bc0f24e71b10b8a55108d2ba9a5d15a711724d42a",
+        "declaration_hash": "349111d9c8ed8dd54080b2138c87cfaad7038d8ac6e06fc606ffd904bca89528",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(features.first().unwrap().as_str(), \"semantic-dup\"); ... assert_eq!( declaration.features_for(&layer).unwrap().first().unwrap().as_str(), \"semantic-dup\" );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_valid_declaration_creates_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_with_matching_baseline_snapshot_returns_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_baseline_snapshot_mismatch_returns_feature_declaration_error_before_rustdoc_capture"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_with_declared_features_forwards_them_to_rustdoc"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaselineCaptureInteractor",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaselineCaptureInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "50ea2c8830c139f3b59f41fc2c78fcbb61c53b4ea9751ce282c7dc172e909a89",
+        "declaration_hash": "43909d2dae0f2db2ae93d71a1836a36918b378ee327b1dd4a7d65f202a3b421d",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        observed.lock().unwrap().as_slice(),\n        [\n            (\"domain\".to_owned(), vec![]),\n            (\"infrastructure\".to_owned(), vec![\"semantic-dup\".to_owned()]),\n        ]\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_feature_declaration_forwards_layer_features_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_missing_feature_declaration_returns_error_before_capture"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "BaselineCaptureInteractor",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "BaselineCaptureInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "50ea2c8830c139f3b59f41fc2c78fcbb61c53b4ea9751ce282c7dc172e909a89",
+        "declaration_hash": "43909d2dae0f2db2ae93d71a1836a36918b378ee327b1dd4a7d65f202a3b421d",
+        "anchor_text_hash": "52994ebd955ae0dfdb9f787beea721a43ffaa7b458488aa0cb0c77a12a756805"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "TdddFeatureDeclaration::try_new(\n                BTreeMap::from([(domain.clone(), vec![]), (infrastructure.clone(), vec![feature])]),\n                &[domain, infrastructure],\n            )\n\nassert_eq!(\n        observed.lock().unwrap().as_slice(),\n        [\n            (\"domain\".to_owned(), vec![]),\n            (\"infrastructure\".to_owned(), vec![\"semantic-dup\".to_owned()]),\n        ]\n    )\n\nassert!(matches!(error, BaselineCaptureError::FeatureDeclaration(_)));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_feature_declaration_forwards_layer_features_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_missing_feature_declaration_returns_error_before_capture"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPort",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_for_baseline"
+      },
+      "key": {
+        "bound_tests_set_hash": "80734ddb70ee6060c7f867439e56f0090b7edbcbada1d7bb74e4fccdd86828e3",
+        "declaration_hash": "2b6bf18a3fd6063f0062cc9a8036196ebb794afe107b6b22ab454972e0030dda",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::tddd_feature_declaration::TdddBaselineFeatureDeclarationPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "80734ddb70ee6060c7f867439e56f0090b7edbcbada1d7bb74e4fccdd86828e3",
+        "declaration_hash": "c126550d7e85863f2fd9bc63b6130eecf637188335bec8a40b744b7688ed3b4a",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddActualFeatureDeclarationPort",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddActualFeatureDeclarationPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_for_actual"
+      },
+      "key": {
+        "bound_tests_set_hash": "238ae4beddde8656339af30316a2d0251efd10ffb83f5ba6c0e7a133775d5ea6",
+        "declaration_hash": "e62a58cbafa332df962c79e4c842b7c9b0a571c57080e63231fcb6ce9867938e",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddActualFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "238ae4beddde8656339af30316a2d0251efd10ffb83f5ba6c0e7a133775d5ea6",
+        "declaration_hash": "a0b94d4ce7ae854320d956267c1b110aae89893ff684f2e78d84355f7060cba5",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddActualFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "RustdocBaselineCaptureAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RustdocBaselineCaptureAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocBaselineCapturePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "7bfab41eb1dbc58e9564a2c87674ff56c72b6477b93cded3a282ae8578f9e568",
+        "declaration_hash": "59a339d46b0fc1b9efadda514d7f19e702efdbf58de1181fcda37a0896decec2",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            std::fs::read_to_string(state.path().join(\"commands/rustdoc-args\")).unwrap().trim(),\n            \"+nightly rustdoc -p infrastructure --lib --no-default-features --features semantic-dup -- -Z unstable-options --output-format json --document-hidden-items\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_baseline_capture_adapter::tests",
+          "test_name": "test_capture_adapter_with_declared_features_writes_feature_gated_baseline"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CargoFeatureNameError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CargoFeatureNameError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "8aad1c3b251146e7ff6053a8b1e40871b628ef332f15590185081ae0cd8b16ab",
+        "declaration_hash": "0e5edbf18f8a3aeb9a76d982300960abfd1ecf7e6f5fd0fca65296e5abdcd520",
+        "anchor_text_hash": "3d140a8502ba2fc59e956d918239a0fcdced0fb09a01c5b260dec2c3152734f4"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "CargoFeatureName::try_new(\"not/a-feature\".to_owned()),\n            Err(CargoFeatureNameError::InvalidFeatureName(_))\n\nCargoFeatureName::try_new(\"-foo\".to_owned()),\n            Err(CargoFeatureNameError::InvalidFeatureName(_))\n\nCargoFeatureName::try_new(String::new()),\n            Err(CargoFeatureNameError::InvalidFeatureName(reason))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_invalid_token_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_leading_hyphen_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_empty_value_returns_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CargoFeatureName",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CargoFeatureName",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "8aad1c3b251146e7ff6053a8b1e40871b628ef332f15590185081ae0cd8b16ab",
+        "declaration_hash": "716ef3d3face0ccf29ba61e2617c09ea8bb6cfe15391fcfa00b0fe510fc3887a",
+        "anchor_text_hash": "3d140a8502ba2fc59e956d918239a0fcdced0fb09a01c5b260dec2c3152734f4"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "CargoFeatureName::try_new(\"not/a-feature\".to_owned()),\n            Err(CargoFeatureNameError::InvalidFeatureName(_))\n\nCargoFeatureName::try_new(\"-foo\".to_owned()),\n            Err(CargoFeatureNameError::InvalidFeatureName(_))\n\nCargoFeatureName::try_new(String::new()),\n            Err(CargoFeatureNameError::InvalidFeatureName(reason))\n                if reason.as_str() == \"feature name must not be empty\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_invalid_token_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_leading_hyphen_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_empty_value_returns_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:GO-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "fd09d211c87d7f59edcedb5fed5414efd5d1a5e373e3e995c605de08cd657881",
+        "declaration_hash": "5a25dce39433df63b76f59d21ceb9fb8f456bc0f948f710505a2d467bbb32f6d",
+        "anchor_text_hash": "1ec2142f4cac006b11e908702b5ea5a367c9edf170857016d6a46f72d6dda874"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            declaration.features_for(&layer(\"infrastructure\")).unwrap(),\n            &[feature(\"semantic-dup\")]\n        );\n        assert!(declaration.layers().contains_key(&layer(\"domain\")));\n        assert!(declaration.layers().get(&layer(\"domain\")).is_some_and(Vec::is_empty));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_total_layers_succeeds"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "fd09d211c87d7f59edcedb5fed5414efd5d1a5e373e3e995c605de08cd657881",
+        "declaration_hash": "5a25dce39433df63b76f59d21ceb9fb8f456bc0f948f710505a2d467bbb32f6d",
+        "anchor_text_hash": "849e354fdd1bf42568dab6b28d787e6154ec9a29413c4ef7476390082a4413b5"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            declaration.features_for(&layer(\"infrastructure\")).unwrap(),\n            &[feature(\"semantic-dup\")]\n        );\n        assert!(declaration.layers().contains_key(&layer(\"domain\")));\n        assert!(declaration.layers().get(&layer(\"domain\")).is_some_and(Vec::is_empty));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_total_layers_succeeds"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "fd09d211c87d7f59edcedb5fed5414efd5d1a5e373e3e995c605de08cd657881",
+        "declaration_hash": "5a25dce39433df63b76f59d21ceb9fb8f456bc0f948f710505a2d467bbb32f6d",
+        "anchor_text_hash": "1392fbe4aafabba21174d99184c8ee5c92fc9a7c42bdd3ebf7268021e7468b1e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            declaration.features_for(&layer(\"infrastructure\")).unwrap(),\n            &[feature(\"semantic-dup\")]\n        );\n        assert!(declaration.layers().contains_key(&layer(\"domain\")));\n        assert!(declaration.layers().get(&layer(\"domain\")).is_some_and(Vec::is_empty));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_total_layers_succeeds"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclarationError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddFeatureDeclarationError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "a3f0fdcf963a7811bf81a5ae3b5e4c097e8b69d690357db2a1d2d1bf3625ac4e",
+        "declaration_hash": "290b99faafc5eb11a943d207a8bf12b64aec3c3a68047ef2ce9079afd5cdea8d",
+        "anchor_text_hash": "1392fbe4aafabba21174d99184c8ee5c92fc9a7c42bdd3ebf7268021e7468b1e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "matches!(result, Err(TdddFeatureDeclarationError::MissingLayer(missing)) if missing == layer(\"usecase\"))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_missing_layer_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_unexpected_layer_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_duplicate_feature_returns_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddFeatureLookupError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddFeatureLookupError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "cb65a22c7a802b5d83344bc5b23e203ef46ed43b2ccd640e51e0c737739ba14f",
+        "declaration_hash": "7798a6613122195f8be166b8213186c90b1d3d0872812039bf853329e3ee9772",
+        "anchor_text_hash": "1392fbe4aafabba21174d99184c8ee5c92fc9a7c42bdd3ebf7268021e7468b1e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "matches!(declaration.features_for(&layer(\"usecase\")), Err(TdddFeatureLookupError::MissingLayer(missing)) if missing == layer(\"usecase\"))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_lookup_for_missing_layer_returns_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPortError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPortError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "80734ddb70ee6060c7f867439e56f0090b7edbcbada1d7bb74e4fccdd86828e3",
+        "declaration_hash": "157e138e93c85dedb0ceff6f9a4a36c5ea55400e03038f3f105ddd3568451882",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPortError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPortError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "af46828146a0f9bf6bd0bab073c36308211113a41f051196167af71a50a49707",
+        "declaration_hash": "157e138e93c85dedb0ceff6f9a4a36c5ea55400e03038f3f105ddd3568451882",
+        "anchor_text_hash": "a6f03d4d496a6520dfecd164f5d335765406389e2967c5dff57ef31c57d08b19"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            &result,\n            Err(\n                TdddBaselineFeatureDeclarationPortError::MissingDeclarationSnapshotWithExistingBaselines { .. }\n            )\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_existing_layer_baselines_and_no_snapshot_returns_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPortError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPortError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "a4654d8c6d2d0dfaf3c8a7c12c05e44630742c5be4da88691bed40fdc35f0dfb",
+        "declaration_hash": "157e138e93c85dedb0ceff6f9a4a36c5ea55400e03038f3f105ddd3568451882",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            declaration.features_for(&layer).unwrap().first().unwrap().as_str(),\n            \"semantic-dup\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_valid_declaration_creates_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_with_matching_baseline_snapshot_returns_declaration"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_with_changed_declaration_returns_snapshot_mismatch"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddActualFeatureDeclarationPortError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddActualFeatureDeclarationPortError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "238ae4beddde8656339af30316a2d0251efd10ffb83f5ba6c0e7a133775d5ea6",
+        "declaration_hash": "1c14f7cd66da0fb4e1b687ee8610468c2087f30a22e52512dc891dbcd44cd7ba",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddActualFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclarationReadError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddFeatureDeclarationReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "80734ddb70ee6060c7f867439e56f0090b7edbcbada1d7bb74e4fccdd86828e3",
+        "declaration_hash": "1533457c9880bf131ae0a4d06f37c6f2ac8136533da14d3d96263c43b9817187",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::MissingDeclaration { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclarationReadError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TdddFeatureDeclarationReadError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "47abe37514da53d2c7e789ce6ef2a70430bd9ea05e8cbf2481d860ab49ff1d7e",
+        "declaration_hash": "1533457c9880bf131ae0a4d06f37c6f2ac8136533da14d3d96263c43b9817187",
+        "anchor_text_hash": "6d4cbb78f28c7649c31707986155e9c48ae748dfbc7cb91aa58ba994f24be995"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }\n            ))\n        ))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_unknown_cargo_feature_returns_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "98da9691411352313e84154ec3b2d77ff39f2a3dd685a701342e540f8472363e",
+        "declaration_hash": "77a9e606f176b05d1c4986fe6d652cc3eb619bf5383af59ea445bc2535bf7230",
+        "anchor_text_hash": "1392fbe4aafabba21174d99184c8ee5c92fc9a7c42bdd3ebf7268021e7468b1e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"{\\\"schema_version\\\":1,\\\"layers\\\":{\\\"cli\\\":[],\\\"domain\\\":[\\\"semantic-dup\\\"]}}\" ... declaration.features_for(&domain) ... [\"semantic-dup\"] ... declaration.features_for(&cli).unwrap().is_empty()"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_featureless_layer_preserves_empty_feature_list"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "47abe37514da53d2c7e789ce6ef2a70430bd9ea05e8cbf2481d860ab49ff1d7e",
+        "declaration_hash": "77a9e606f176b05d1c4986fe6d652cc3eb619bf5383af59ea445bc2535bf7230",
+        "anchor_text_hash": "6d4cbb78f28c7649c31707986155e9c48ae748dfbc7cb91aa58ba994f24be995"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            result,\n            Err(TdddBaselineFeatureDeclarationPortError::Read(\n                TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }\n            ))\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_unknown_cargo_feature_returns_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "RustdocCratePort",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RustdocCratePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_from_path"
+      },
+      "key": {
+        "bound_tests_set_hash": "4b1bdfc87f9be6fa05d9c4cc09ff58e97518e40201fc7cf37a11333e4d490eea",
+        "declaration_hash": "af6e1e4088451544ab97cc68d32b64ee8d27de39e20b7e999c6455ade73a19df",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        observed_baseline_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n        \"baseline rustdoc acquisition must receive the frozen declaration's feature content\"\n    );\n    assert_eq!(\n        observed_actual_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n        \"actual rustdoc acquisition must receive the same frozen declaration content\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_nonexistent_file_returns_not_found"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "RustdocCratePort",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RustdocCratePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:capture_current"
+      },
+      "key": {
+        "bound_tests_set_hash": "d593acff3bea4ef1d976ca898cd9e934149db896cdcf9ed5816955a96a8a665d",
+        "declaration_hash": "af6e1e4088451544ab97cc68d32b64ee8d27de39e20b7e999c6455ade73a19df",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        observed_baseline_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n        \"baseline rustdoc acquisition must receive the frozen declaration's feature content\"\n    );\n    assert_eq!(\n        observed_actual_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n        \"actual rustdoc acquisition must receive the same frozen declaration content\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_with_exporter_forwards_declared_features"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogueImplSignalsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueImplSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "67bf3128e28ffdc700a779929cef2fd46dbffa7bd41ebeb862f827637d7d5bb1",
+        "declaration_hash": "c3fe69c6332fdf769b3ca13440432cd0bcf2f11d0e8237faa1058bf9bb9a313f",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        observed_baseline_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n        \"baseline rustdoc acquisition must receive the frozen declaration's feature content\"\n    );\n    assert_eq!(\n        observed_actual_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n        \"actual rustdoc acquisition must receive the same frozen declaration content\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_missing_frozen_declaration_stops_before_rustdoc_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_undeclared_gated_catalogue_item_returns_non_blue_chain_three_signal"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogueImplSignalsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueImplSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "67bf3128e28ffdc700a779929cef2fd46dbffa7bd41ebeb862f827637d7d5bb1",
+        "declaration_hash": "c3fe69c6332fdf769b3ca13440432cd0bcf2f11d0e8237faa1058bf9bb9a313f",
+        "anchor_text_hash": "1ab3371184df2686dbf8c21e6f5a9fb114b0e71b33ddadd5181ca429c616d9ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"the declared feature-gated item must be present in both baseline and actual surfaces\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_missing_frozen_declaration_stops_before_rustdoc_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_undeclared_gated_catalogue_item_returns_non_blue_chain_three_signal"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogueImplSignalsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueImplSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "67bf3128e28ffdc700a779929cef2fd46dbffa7bd41ebeb862f827637d7d5bb1",
+        "declaration_hash": "c3fe69c6332fdf769b3ca13440432cd0bcf2f11d0e8237faa1058bf9bb9a313f",
+        "anchor_text_hash": "e669dfd7cf98129cee3d6083ed28c4ec8e9b666588b4dba4848254d17df5f0a2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(report.any_red, \"a non-Blue chain ③ signal must fail closed\");\nassert!(report.text.contains(\"🔴 Red\"),"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_missing_frozen_declaration_stops_before_rustdoc_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_undeclared_gated_catalogue_item_returns_non_blue_chain_three_signal"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogueImplSignalsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueImplSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "67bf3128e28ffdc700a779929cef2fd46dbffa7bd41ebeb862f827637d7d5bb1",
+        "declaration_hash": "c3fe69c6332fdf769b3ca13440432cd0bcf2f11d0e8237faa1058bf9bb9a313f",
+        "anchor_text_hash": "b7d2b57517aab393d65b12b74c88f49bd2ec6a9de576b01e0e21e11f391d4a3a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        observed_baseline_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n    );\n    assert_eq!(\n        observed_actual_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n    );\n    assert_eq!(\n        observed_surfaces.lock().unwrap().as_slice(),\n        [(true, true)],\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_missing_frozen_declaration_stops_before_rustdoc_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_undeclared_gated_catalogue_item_returns_non_blue_chain_three_signal"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogueImplSignalsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-06"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueImplSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "67bf3128e28ffdc700a779929cef2fd46dbffa7bd41ebeb862f827637d7d5bb1",
+        "declaration_hash": "c3fe69c6332fdf769b3ca13440432cd0bcf2f11d0e8237faa1058bf9bb9a313f",
+        "anchor_text_hash": "1d40c160ebe77be98b54f02dd29e4c18da749d4a8266d9e9b491eda342dc5bfa"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"the undeclared feature must omit the catalogue item from both extracted surfaces\"; assert!(report.any_red, \"a non-Blue chain ③ signal must fail closed\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_missing_frozen_declaration_stops_before_rustdoc_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_undeclared_gated_catalogue_item_returns_non_blue_chain_three_signal"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "RustdocCrateAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "RustdocCrateAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "d85bdba35d94b250131b8ccd8d1efd36d858eaec9c6255637fdd583da785e7b8",
+        "declaration_hash": "14a662ed8e4e9f19817862fe821f8496e4c181f921e4eb72477c7ced5c6fd2b4",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*observed_features.lock().unwrap(), vec![\"semantic-dup\"]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_with_exporter_forwards_declared_features"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "eef67a9755217216576e187743c0db3ff6c8b81d2023ea43fb88ca111c1dd365",
+        "declaration_hash": "73f50f1055ccdb7b0113f72d353259bb60ec98ae648e6e3939a85c706a4d13cb",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        seen_features.lock().unwrap().as_slice(),\n        [vec![CargoFeatureName::try_new(\"semantic-dup\".to_owned()).unwrap()]],\n        \"the canonical executor must receive the layer's frozen feature declaration\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_forwards_declared_layer_features_to_executor"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "eef67a9755217216576e187743c0db3ff6c8b81d2023ea43fb88ca111c1dd365",
+        "declaration_hash": "73f50f1055ccdb7b0113f72d353259bb60ec98ae648e6e3939a85c706a4d13cb",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(outcome.exit_code, 0, \"an absent declaration must fail the canonical path\");\n    assert_eq!(observer.launches(), 0, \"the declaration failure must occur before rustdoc launch\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_forwards_declared_layer_features_to_executor"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "eef67a9755217216576e187743c0db3ff6c8b81d2023ea43fb88ca111c1dd365",
+        "declaration_hash": "73f50f1055ccdb7b0113f72d353259bb60ec98ae648e6e3939a85c706a4d13cb",
+        "anchor_text_hash": "a6f03d4d496a6520dfecd164f5d335765406389e2967c5dff57ef31c57d08b19"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(outcome.exit_code, 0, \"an absent declaration must fail the canonical path\");\n    assert_eq!(observer.launches(), 0, \"the declaration failure must occur before rustdoc launch\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_forwards_declared_layer_features_to_executor"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:evaluate_layer"
+      },
+      "key": {
+        "bound_tests_set_hash": "ec22e586e6f29355bce6264736a0498bfd6952f8979632e9b936496ab3aac4e7",
+        "declaration_hash": "aab4647e8f0e12891491f8b8f1a879b31eb36a71be2bcbf0b6d6a8d3046b1177",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        seen_features.lock().unwrap().as_slice(),\n        [vec![CargoFeatureName::try_new(\"semantic-dup\".to_owned()).unwrap()]],\n        \"the canonical executor must receive the layer's frozen feature declaration\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_forwards_declared_layer_features_to_executor"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "1ad4d720b63db968ff5ce8f7913605abc381a6a81d907223d60e44c05b8fc210",
+        "declaration_hash": "b92b7afdcdd0a86d1227e9ba7e22da6f726b4947634e3895b87ac1eb5581cf34",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(outcome.exit_code, 0, \"an absent declaration must fail the canonical path\");\n    assert_eq!(observer.launches(), 0, \"the declaration failure must occur before rustdoc launch\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "1ad4d720b63db968ff5ce8f7913605abc381a6a81d907223d60e44c05b8fc210",
+        "declaration_hash": "b92b7afdcdd0a86d1227e9ba7e22da6f726b4947634e3895b87ac1eb5581cf34",
+        "anchor_text_hash": "a6f03d4d496a6520dfecd164f5d335765406389e2967c5dff57ef31c57d08b19"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_ne!(outcome.exit_code, 0, \"an absent declaration must fail the canonical path\");\n    assert_eq!(observer.launches(), 0, \"the declaration failure must occur before rustdoc launch\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "35661455a7b37ed674c5cb4559c5cb64ba889711eb15cff322d293f42739d8e9",
+        "declaration_hash": "e84cf5c7e59c414c044a192a519a6a0889fdf33e2b53652e088229891e824dda",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            observer.feature_selections_for(\"infrastructure\"),\n            vec![vec![\"semantic-dup\".to_owned()], Vec::new()],\n            \"each measured rustdoc extraction must observe its declared feature selection\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_composition_freshness_skip_and_conservative_reextract_use_real_adapter"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_feature_selection_change_reextracts_and_reaches_rustdoc"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "0f7b312aa09e12111a9acb85efcc243183dccbb01582fb8ffc97b1027250b139",
+        "declaration_hash": "d7238671b4ec530ea096152c34ac7da8e10d3d02f7928eccfaaba4c54ca0f6a0",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            observer.feature_selections_for(\"infrastructure\"),\n            vec![vec![\"semantic-dup\".to_owned()]],\n            \"the executor adapter must pass the declaration-derived feature selection to rustdoc\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_absent_catalogue_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_with_declared_features_forwards_them_to_rustdoc"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueImplSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "71197b2947730a01c8ba9761bf00da3ee1dfb78db1700809f1997a04c6a6b744",
+        "declaration_hash": "794f865f827b9b3ae970e47a7547eb2b3c61a4c7e3d23b553daa8eefeec308fd",
+        "anchor_text_hash": "4418fb21867e63cc019c6ff9a16f674be660cbecfd56d8f37033a436bd432ac2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        observed_baseline_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n        \"baseline rustdoc acquisition must receive the frozen declaration's feature content\"\n    );\n    assert_eq!(\n        observed_actual_features.lock().unwrap().as_slice(),\n        [vec![\"semantic-dup\".to_owned()]],\n        \"actual rustdoc acquisition must receive the same frozen declaration content\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_baseline_snapshot_mismatch_returns_feature_declaration_error_before_rustdoc_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueImplSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-05"
+      },
+      "key": {
+        "bound_tests_set_hash": "bd38270595d9e7e15e40ac1fc27503bbcc23457e5155aa0f7bd92d2ca47f04aa",
+        "declaration_hash": "794f865f827b9b3ae970e47a7547eb2b3c61a4c7e3d23b553daa8eefeec308fd",
+        "anchor_text_hash": "1ab3371184df2686dbf8c21e6f5a9fb114b0e71b33ddadd5181ca429c616d9ed"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        error,\n        CatalogueImplSignalsError::FeatureDeclaration(TdddActualFeatureDeclarationPortError::Read(\n            crate::tddd_feature_declaration::TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }\n        ))\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueImplSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "f8e4557fc1f7bfe0c693d530655c33bac5582f8d0835cd5447598593e35c6e6d",
+        "declaration_hash": "794f865f827b9b3ae970e47a7547eb2b3c61a4c7e3d23b553daa8eefeec308fd",
+        "anchor_text_hash": "2271d4b956b76891a1837266c41dc6d7a081d4bfc7079e9c34803dace3f9fe24"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        error,\n        CatalogueImplSignalsError::FeatureDeclaration(\n            TdddActualFeatureDeclarationPortError::MissingBaselineSnapshot { .. }\n        )\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_missing_frozen_declaration_stops_before_rustdoc_capture"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogueImplSignalsError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "bd38270595d9e7e15e40ac1fc27503bbcc23457e5155aa0f7bd92d2ca47f04aa",
+        "declaration_hash": "794f865f827b9b3ae970e47a7547eb2b3c61a4c7e3d23b553daa8eefeec308fd",
+        "anchor_text_hash": "e669dfd7cf98129cee3d6083ed28c4ec8e9b666588b4dba4848254d17df5f0a2"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n        error,\n        CatalogueImplSignalsError::FeatureDeclaration(TdddActualFeatureDeclarationPortError::Read(\n            crate::tddd_feature_declaration::TdddFeatureDeclarationReadError::UnknownCargoFeature { .. }\n        ))\n    ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        }
+      ]
+    }
+  ]
+}

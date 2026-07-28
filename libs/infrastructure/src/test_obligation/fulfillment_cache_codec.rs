@@ -10,24 +10,28 @@
 //! Recovery is only via re-evaluation (CN-04). A passing verdict structurally
 //! carries its evidence citation, so "pass without citation" cannot be represented.
 
+use std::io::Write;
 use std::path::PathBuf;
 
+use domain::tddd::test_obligation::binding::NonEmptyTestLocations;
 use domain::tddd::test_obligation::errors::VerifyCacheError;
 use domain::tddd::test_obligation::hashes::{
     AnchorTextHash, BoundTestsSetHash, DeclarationHash, VerifierPromptFingerprint,
 };
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
-use domain::tddd::test_obligation::ports::ObligationFulfillmentCachePort;
 use domain::tddd::test_obligation::verdict::{
     ObligationFulfillmentCacheDocument, ObligationFulfillmentCacheEntry,
-    ObligationFulfillmentCacheKey, ObligationFulfillmentVerdict,
+    ObligationFulfillmentCacheEntryState, ObligationFulfillmentCacheKey,
+    ObligationFulfillmentVerdict,
 };
 use domain::tddd::test_obligation::vocab::FulfillmentFailCategory;
 use domain::{EvidenceCitation, TrackId};
 use serde::{Deserialize, Serialize};
+use usecase::test_obligation::ports::ObligationFulfillmentCachePort;
 
 use crate::test_obligation::bindings_codec::{
-    TestObligationEdgeIdDto, edge_id_from_dto, edge_id_to_dto,
+    TestLocationDto, TestObligationEdgeIdDto, edge_id_from_dto, edge_id_to_dto, location_from_dto,
+    location_to_dto,
 };
 use crate::test_obligation::obligations_codec::{
     TestObligationIdDto, obligation_id_from_dto, obligation_id_to_dto,
@@ -35,8 +39,17 @@ use crate::test_obligation::obligations_codec::{
 use crate::test_obligation::{diagnostic, reject_symlinked_items_root};
 use crate::track::symlink_guard::reject_symlinks_below;
 
+mod fulfillment_cache_io;
+
+use fulfillment_cache_io::{
+    open_fulfillment_cache_for_write_guarded, read_bounded_fulfillment_cache,
+    serialize_bounded_fulfillment_cache,
+};
+
 /// Artifact filename for the obligation-fulfillment verdict cache.
 const FULFILLMENT_CACHE_ARTIFACT: &str = "obligation-fulfillment-cache.json";
+const MAX_FULFILLMENT_CACHE_ENTRIES: usize = 1_024;
+const MAX_BOUND_TESTS_PER_ENTRY: usize = 64;
 
 // ---------------------------------------------------------------------------
 // DTOs
@@ -97,6 +110,8 @@ pub struct ObligationFulfillmentCacheEntryDto {
     verdict: ObligationFulfillmentVerdictDto,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     verifier_fingerprint: Option<String>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    bound_tests: Option<Vec<TestLocationDto>>,
 }
 
 /// Serde DTO for [`ObligationFulfillmentCacheDocument`] (IN-09).
@@ -112,9 +127,18 @@ pub struct ObligationFulfillmentCacheDocumentDto {
 // ---------------------------------------------------------------------------
 
 /// JSON codec adapter for [`ObligationFulfillmentCachePort`] (IN-09 / AC-06 / CN-04).
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct JsonObligationFulfillmentCacheCodec {
     items_dir: PathBuf,
+}
+
+impl std::fmt::Debug for JsonObligationFulfillmentCacheCodec {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter
+            .debug_struct("JsonObligationFulfillmentCacheCodec")
+            .field("items_dir", &self.items_dir)
+            .finish_non_exhaustive()
+    }
 }
 
 impl JsonObligationFulfillmentCacheCodec {
@@ -144,7 +168,9 @@ impl ObligationFulfillmentCachePort for JsonObligationFulfillmentCacheCodec {
         let path = self.artifact_path(track_id);
         match reject_symlinks_below(&path, &self.items_dir) {
             Ok(true) => {}
-            Ok(false) => return Ok(None),
+            Ok(false) => {
+                return Ok(None);
+            }
             Err(source) => {
                 return Err(VerifyCacheError::Io(diagnostic(&format!(
                     "refusing to read fulfillment cache {}: {source}",
@@ -152,15 +178,11 @@ impl ObligationFulfillmentCachePort for JsonObligationFulfillmentCacheCodec {
                 ))));
             }
         }
-        let content = std::fs::read_to_string(&path).map_err(|e| {
-            VerifyCacheError::Io(diagnostic(&format!(
-                "failed to read fulfillment cache {}: {e}",
-                path.display()
-            )))
-        })?;
+        let content = read_bounded_fulfillment_cache(&path, &self.items_dir)
+            .map_err(verify_cache_error_from_verify_cache)?;
         let dto: ObligationFulfillmentCacheDocumentDto = serde_json::from_str(&content)
             .map_err(|e| VerifyCacheError::MalformedJson(diagnostic(&e.to_string())))?;
-        let doc = document_from_dto(dto)?;
+        let doc = self.document_from_dto(dto)?;
         // Fail closed when the on-disk cache was copied from another track: a
         // matching filename is not proof of matching content, and the caller
         // trusts a `load(track_id)` result to describe exactly that track.
@@ -182,31 +204,23 @@ impl ObligationFulfillmentCachePort for JsonObligationFulfillmentCacheCodec {
             ))
         })?;
         let path = self.artifact_path(doc.track_id());
-        let Some(parent) = path.parent() else {
-            return Err(diagnostic(&format!(
-                "fulfillment cache path {} has no parent directory",
-                path.display()
-            )));
-        };
-        std::fs::create_dir_all(parent).map_err(|e| {
-            diagnostic(&format!("failed to create track directory {}: {e}", parent.display()))
+        validate_fulfillment_cache_structure(doc)?;
+        let dto = document_to_dto(doc);
+        let json = serialize_bounded_fulfillment_cache(&dto)?;
+        let mut file =
+            open_fulfillment_cache_for_write_guarded(&path, &self.items_dir).map_err(|e| {
+                diagnostic(&format!("failed to write fulfillment cache {}: {e}", path.display()))
+            })?;
+        let metadata = file.metadata().map_err(|e| {
+            diagnostic(&format!("failed to inspect fulfillment cache {}: {e}", path.display()))
         })?;
-        reject_symlinked_items_root(&self.items_dir).map_err(|source| {
-            diagnostic(&format!(
-                "refusing to write fulfillment cache under {}: {source}",
-                self.items_dir.display()
-            ))
-        })?;
-        if let Err(source) = reject_symlinks_below(&path, &self.items_dir) {
+        if !metadata.is_file() {
             return Err(diagnostic(&format!(
-                "refusing to write fulfillment cache {}: {source}",
+                "refusing to write non-regular fulfillment cache {}",
                 path.display()
             )));
         }
-        let dto = document_to_dto(doc);
-        let json = serde_json::to_string_pretty(&dto)
-            .map_err(|e| diagnostic(&format!("failed to encode fulfillment cache: {e}")))?;
-        std::fs::write(&path, json).map_err(|e| {
+        file.write_all(&json).map_err(|e| {
             diagnostic(&format!("failed to write fulfillment cache {}: {e}", path.display()))
         })
     }
@@ -225,20 +239,74 @@ fn document_to_dto(
     }
 }
 
-fn document_from_dto(
-    dto: ObligationFulfillmentCacheDocumentDto,
-) -> Result<ObligationFulfillmentCacheDocument, VerifyCacheError> {
-    let track_id = TrackId::try_new(dto.track_id.clone()).map_err(|e| {
-        VerifyCacheError::MalformedJson(diagnostic(&format!(
-            "invalid track id '{}': {e}",
-            dto.track_id
-        )))
-    })?;
-    let mut entries = Vec::with_capacity(dto.entries.len());
-    for entry in dto.entries {
-        entries.push(entry_from_dto(entry)?);
+fn validate_fulfillment_cache_structure(
+    doc: &ObligationFulfillmentCacheDocument,
+) -> Result<(), DiagnosticMessage> {
+    if doc.entries().len() > MAX_FULFILLMENT_CACHE_ENTRIES {
+        return Err(diagnostic(&format!(
+            "fulfillment cache has more than {MAX_FULFILLMENT_CACHE_ENTRIES} entries"
+        )));
     }
-    Ok(ObligationFulfillmentCacheDocument::new(track_id, entries))
+    if doc.entries().iter().any(|entry| {
+        entry.bound_tests().is_some_and(|tests| tests.as_slice().len() > MAX_BOUND_TESTS_PER_ENTRY)
+    }) {
+        return Err(diagnostic(&format!(
+            "fulfillment cache entry has more than {MAX_BOUND_TESTS_PER_ENTRY} bound tests"
+        )));
+    }
+    Ok(())
+}
+
+impl JsonObligationFulfillmentCacheCodec {
+    fn document_from_dto(
+        &self,
+        dto: ObligationFulfillmentCacheDocumentDto,
+    ) -> Result<ObligationFulfillmentCacheDocument, VerifyCacheError> {
+        let track_id = TrackId::try_new(dto.track_id.clone()).map_err(|e| {
+            VerifyCacheError::MalformedJson(diagnostic(&format!(
+                "invalid track id '{}': {e}",
+                dto.track_id
+            )))
+        })?;
+        if dto.entries.len() > MAX_FULFILLMENT_CACHE_ENTRIES {
+            return Err(VerifyCacheError::MalformedJson(diagnostic(&format!(
+                "fulfillment cache has more than {MAX_FULFILLMENT_CACHE_ENTRIES} entries"
+            ))));
+        }
+        let mut entries = Vec::with_capacity(dto.entries.len());
+        for entry in dto.entries {
+            entries.push(self.entry_from_dto(entry)?);
+        }
+        Ok(ObligationFulfillmentCacheDocument::new(track_id, entries))
+    }
+
+    fn entry_from_dto(
+        &self,
+        dto: ObligationFulfillmentCacheEntryDto,
+    ) -> Result<ObligationFulfillmentCacheEntry, VerifyCacheError> {
+        let edge_id = edge_id_from_dto(dto.edge_id).map_err(verify_cache_error_from_artifact)?;
+        let obligation_id =
+            obligation_id_from_dto(dto.obligation_id).map_err(verify_cache_error_from_artifact)?;
+        let key = key_from_wire(dto.key)?;
+        let verdict = verdict_from_dto(dto.verdict)?;
+        let verifier_fingerprint = dto
+            .verifier_fingerprint
+            .map(|fingerprint| {
+                parse_cache_hash(&fingerprint)
+                    .map(VerifierPromptFingerprint::new)
+                    .map_err(verify_cache_error_from_verify_cache)
+            })
+            .transpose()?;
+        let bound_tests = dto.bound_tests.map(parse_bound_tests).transpose()?;
+        let state = match verifier_fingerprint {
+            Some(verifier_fingerprint) => ObligationFulfillmentCacheEntryState::Identified {
+                verifier_fingerprint,
+                bound_tests,
+            },
+            None => ObligationFulfillmentCacheEntryState::Legacy,
+        };
+        Ok(ObligationFulfillmentCacheEntry::new(edge_id, obligation_id, key, verdict, state))
+    }
 }
 
 fn entry_to_dto(entry: &ObligationFulfillmentCacheEntry) -> ObligationFulfillmentCacheEntryDto {
@@ -250,28 +318,10 @@ fn entry_to_dto(entry: &ObligationFulfillmentCacheEntry) -> ObligationFulfillmen
         verifier_fingerprint: entry
             .verifier_fingerprint()
             .map(|fingerprint| fingerprint.as_hash().to_hex()),
+        bound_tests: entry
+            .bound_tests()
+            .map(|tests| tests.as_slice().iter().map(location_to_dto).collect()),
     }
-}
-
-fn entry_from_dto(
-    dto: ObligationFulfillmentCacheEntryDto,
-) -> Result<ObligationFulfillmentCacheEntry, VerifyCacheError> {
-    let edge_id = edge_id_from_dto(dto.edge_id).map_err(cache_error_from_artifact)?;
-    let obligation_id =
-        obligation_id_from_dto(dto.obligation_id).map_err(cache_error_from_artifact)?;
-    let key = key_from_wire(dto.key)?;
-    let verdict = verdict_from_dto(dto.verdict)?;
-    let verifier_fingerprint = dto
-        .verifier_fingerprint
-        .map(|fingerprint| parse_cache_hash(&fingerprint).map(VerifierPromptFingerprint::new))
-        .transpose()?;
-    Ok(ObligationFulfillmentCacheEntry::new(
-        edge_id,
-        obligation_id,
-        key,
-        verdict,
-        verifier_fingerprint,
-    ))
 }
 
 fn key_to_wire(key: &ObligationFulfillmentCacheKey) -> FulfillmentCacheKeyWire {
@@ -285,10 +335,16 @@ fn key_to_wire(key: &ObligationFulfillmentCacheKey) -> FulfillmentCacheKeyWire {
 fn key_from_wire(
     wire: FulfillmentCacheKeyWire,
 ) -> Result<ObligationFulfillmentCacheKey, VerifyCacheError> {
-    let bound_tests_set_hash =
-        BoundTestsSetHash::new(parse_cache_hash(&wire.bound_tests_set_hash)?);
-    let declaration_hash = DeclarationHash::new(parse_cache_hash(&wire.declaration_hash)?);
-    let anchor_text_hash = AnchorTextHash::new(parse_cache_hash(&wire.anchor_text_hash)?);
+    let bound_tests_set_hash = BoundTestsSetHash::new(
+        parse_cache_hash(&wire.bound_tests_set_hash)
+            .map_err(verify_cache_error_from_verify_cache)?,
+    );
+    let declaration_hash = DeclarationHash::new(
+        parse_cache_hash(&wire.declaration_hash).map_err(verify_cache_error_from_verify_cache)?,
+    );
+    let anchor_text_hash = AnchorTextHash::new(
+        parse_cache_hash(&wire.anchor_text_hash).map_err(verify_cache_error_from_verify_cache)?,
+    );
     Ok(ObligationFulfillmentCacheKey::new(bound_tests_set_hash, declaration_hash, anchor_text_hash))
 }
 
@@ -312,12 +368,15 @@ fn verdict_from_dto(
 ) -> Result<ObligationFulfillmentVerdict, VerifyCacheError> {
     let verdict = match dto {
         ObligationFulfillmentVerdictDto::Fulfilled { citation } => {
-            ObligationFulfillmentVerdict::Fulfilled { citation: parse_cache_citation(citation)? }
+            ObligationFulfillmentVerdict::Fulfilled {
+                citation: parse_cache_citation(citation)
+                    .map_err(verify_cache_error_from_verify_cache)?,
+            }
         }
         ObligationFulfillmentVerdictDto::Fail { category, reason } => {
             ObligationFulfillmentVerdict::Fail {
                 category: category_from_dto(category),
-                reason: parse_cache_reason(reason)?,
+                reason: parse_cache_reason(reason).map_err(verify_cache_error_from_verify_cache)?,
             }
         }
         ObligationFulfillmentVerdictDto::Pending => ObligationFulfillmentVerdict::Pending,
@@ -371,201 +430,35 @@ pub(crate) fn cache_error_from_artifact(
     VerifyCacheError::MalformedJson(diagnostic(&error.to_string()))
 }
 
-#[cfg(test)]
-#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
-mod tests {
-    use super::*;
-    use domain::ContentHash;
-    use domain::tddd::semantic_verify::CatalogueEntryKey;
-    use domain::tddd::test_obligation::ids::{
-        TestObligationAnchorId, TestObligationId, TestObligationItemIdentifier,
-    };
-    use domain::tddd::test_obligation::vocab::TestObligationKind;
-
-    fn edge_id() -> domain::tddd::test_obligation::ids::TestObligationEdgeId {
-        domain::tddd::test_obligation::ids::TestObligationEdgeId::new(
-            CatalogueEntryKey::try_new("domain::User".to_owned()).unwrap(),
-            TestObligationAnchorId::try_new("spec.json".to_owned(), "IN-09".to_owned()).unwrap(),
-        )
-    }
-
-    fn obligation_id() -> TestObligationId {
-        TestObligationId::new(
-            CatalogueEntryKey::try_new("domain::User".to_owned()).unwrap(),
-            TestObligationKind::Result,
-            TestObligationItemIdentifier::try_new("entry".to_owned()).unwrap(),
-        )
-    }
-
-    fn key() -> ObligationFulfillmentCacheKey {
-        ObligationFulfillmentCacheKey::new(
-            BoundTestsSetHash::new(ContentHash::from_bytes([1u8; 32])),
-            DeclarationHash::new(ContentHash::from_bytes([2u8; 32])),
-            AnchorTextHash::new(ContentHash::from_bytes([3u8; 32])),
-        )
-    }
-
-    fn verifier_fingerprint() -> VerifierPromptFingerprint {
-        VerifierPromptFingerprint::new(ContentHash::from_bytes([4u8; 32]))
-    }
-
-    fn document(verdict: ObligationFulfillmentVerdict) -> ObligationFulfillmentCacheDocument {
-        ObligationFulfillmentCacheDocument::new(
-            TrackId::try_new("my-track").unwrap(),
-            vec![ObligationFulfillmentCacheEntry::new(
-                edge_id(),
-                obligation_id(),
-                key(),
-                verdict,
-                Some(verifier_fingerprint()),
-            )],
-        )
-    }
-
-    fn round_trip(verdict: ObligationFulfillmentVerdict) {
-        let doc = document(verdict);
-        let dto = document_to_dto(&doc);
-        let json = serde_json::to_string_pretty(&dto).unwrap();
-        let decoded: ObligationFulfillmentCacheDocumentDto = serde_json::from_str(&json).unwrap();
-        assert_eq!(document_from_dto(decoded).unwrap(), doc);
-    }
-
-    // AC-06: the fulfilled verdict (with citation) round-trips, including the
-    // three-hash cache key.
-    #[test]
-    fn test_fulfilled_verdict_round_trips() {
-        round_trip(ObligationFulfillmentVerdict::Fulfilled {
-            citation: EvidenceCitation::try_new("asserts empty rejected".to_owned()).unwrap(),
-        });
-    }
-
-    // AC-08: each fail category round-trips.
-    #[test]
-    fn test_fail_verdict_round_trips_all_categories() {
-        for category in [
-            FulfillmentFailCategory::Contradiction,
-            FulfillmentFailCategory::Substitution,
-            FulfillmentFailCategory::CentralUnverified,
-        ] {
-            round_trip(ObligationFulfillmentVerdict::Fail {
-                category,
-                reason: DiagnosticMessage::try_new("asserts the opposite".to_owned()).unwrap(),
-            });
-        }
-    }
-
-    // AC-06: the pending verdict round-trips (treated as fail at the gate).
-    #[test]
-    fn test_pending_verdict_round_trips() {
-        round_trip(ObligationFulfillmentVerdict::Pending);
-    }
-
-    // CN-04: the three hex hashes survive serialization exactly.
-    #[test]
-    fn test_hash_triple_serializes_as_hex() {
-        let doc = document(ObligationFulfillmentVerdict::Pending);
-        let dto = document_to_dto(&doc);
-        let wire = &dto.entries[0].key;
-        assert_eq!(wire.bound_tests_set_hash, "01".repeat(32));
-        assert_eq!(wire.declaration_hash, "02".repeat(32));
-        assert_eq!(wire.anchor_text_hash, "03".repeat(32));
-        assert_eq!(dto.entries[0].verifier_fingerprint, Some("04".repeat(32)));
-    }
-
-    #[test]
-    fn test_legacy_entry_without_fingerprint_decodes_as_absent() {
-        let dto = document_to_dto(&document(ObligationFulfillmentVerdict::Pending));
-        let mut json = serde_json::to_value(dto).unwrap();
-        json["entries"][0].as_object_mut().unwrap().remove("verifier_fingerprint");
-
-        let legacy: ObligationFulfillmentCacheDocumentDto = serde_json::from_value(json).unwrap();
-        let decoded = document_from_dto(legacy).unwrap();
-
-        assert_eq!(decoded.entries()[0].verifier_fingerprint(), None);
-    }
-
-    // IN-09 fail-closed: a malformed cache-key hash is a malformed-cache error.
-    #[test]
-    fn test_malformed_hash_is_malformed_json() {
-        let doc = document(ObligationFulfillmentVerdict::Pending);
-        let mut dto = document_to_dto(&doc);
-        dto.entries[0].key.declaration_hash = "not-a-hash".to_owned();
-        assert!(matches!(document_from_dto(dto), Err(VerifyCacheError::MalformedJson(_))));
-    }
-
-    // IN-09 fail-closed: an unknown field is rejected by deny_unknown_fields.
-    #[test]
-    fn test_unknown_field_is_rejected() {
-        let json = r#"{ "track_id": "t", "entries": [], "extra": true }"#;
-        assert!(serde_json::from_str::<ObligationFulfillmentCacheDocumentDto>(json).is_err());
-    }
-
-    // IN-09 / AC-06: the codec persists and reloads a cache via the port.
-    #[test]
-    fn test_codec_save_then_load_round_trips() {
-        let dir = tempfile::tempdir().unwrap();
-        let codec = JsonObligationFulfillmentCacheCodec::new(dir.path().to_path_buf());
-        let doc = document(ObligationFulfillmentVerdict::Fulfilled {
-            citation: EvidenceCitation::try_new("cite".to_owned()).unwrap(),
-        });
-        codec.save(&doc).unwrap();
-        assert_eq!(codec.load(doc.track_id()).unwrap(), Some(doc));
-    }
-
-    // IN-09 / CN-04: the trusted items root itself must not be a symlink.
-    #[cfg(unix)]
-    #[test]
-    fn test_codec_symlinked_items_root_is_rejected() {
-        let dir = tempfile::tempdir().unwrap();
-        let real_items = dir.path().join("real-items");
-        let link_items = dir.path().join("items-link");
-        std::fs::create_dir_all(&real_items).unwrap();
-        std::os::unix::fs::symlink(&real_items, &link_items).unwrap();
-
-        let codec = JsonObligationFulfillmentCacheCodec::new(link_items);
-        let doc = document(ObligationFulfillmentVerdict::Pending);
-        match codec.load(doc.track_id()) {
-            Err(VerifyCacheError::Io(message)) => {
-                assert!(message.as_str().contains("symlinked track items root"));
-            }
-            other => panic!("expected symlinked items root load error, got {other:?}"),
-        }
-        let save_error = codec.save(&doc).unwrap_err();
-        assert!(save_error.as_str().contains("symlinked track items root"));
-    }
-
-    // IN-14 / AC-10: a missing cache loads as `None`.
-    #[test]
-    fn test_load_missing_cache_is_none() {
-        let dir = tempfile::tempdir().unwrap();
-        let codec = JsonObligationFulfillmentCacheCodec::new(dir.path().to_path_buf());
-        assert!(codec.load(&TrackId::try_new("absent-track").unwrap()).unwrap().is_none());
-    }
-
-    // CN-04: a fulfillment cache whose embedded `track_id` disagrees with the
-    // requested id must not be returned — a copy from another track would
-    // otherwise satisfy or block the gate on unrelated verdicts.
-    #[test]
-    fn test_codec_load_rejects_track_id_mismatch() {
-        let dir = tempfile::tempdir().unwrap();
-        let codec = JsonObligationFulfillmentCacheCodec::new(dir.path().to_path_buf());
-        let doc = document(ObligationFulfillmentVerdict::Pending);
-        codec.save(&doc).unwrap();
-
-        let other_track = TrackId::try_new("other-track").unwrap();
-        let source = dir.path().join(doc.track_id().as_ref()).join(FULFILLMENT_CACHE_ARTIFACT);
-        let target_dir = dir.path().join(other_track.as_ref());
-        std::fs::create_dir_all(&target_dir).unwrap();
-        std::fs::rename(&source, target_dir.join(FULFILLMENT_CACHE_ARTIFACT)).unwrap();
-
-        match codec.load(&other_track) {
-            Err(VerifyCacheError::MalformedJson(message)) => {
-                let text = message.as_str();
-                assert!(text.contains("fulfillment cache track id mismatch"), "got: {text}");
-                assert!(text.contains(other_track.as_ref()), "got: {text}");
-                assert!(text.contains(doc.track_id().as_ref()), "got: {text}");
-            }
-            other => panic!("expected MalformedJson track-id mismatch error, got {other:?}"),
-        }
-    }
+fn verify_cache_error_from_verify_cache(error: VerifyCacheError) -> VerifyCacheError {
+    error
 }
+
+fn verify_cache_error_from_artifact(
+    error: domain::tddd::test_obligation::errors::ArtifactCodecError,
+) -> VerifyCacheError {
+    cache_error_from_artifact(error)
+}
+
+fn parse_bound_tests(
+    bound_tests: Vec<TestLocationDto>,
+) -> Result<NonEmptyTestLocations, VerifyCacheError> {
+    if bound_tests.len() > MAX_BOUND_TESTS_PER_ENTRY {
+        return Err(VerifyCacheError::MalformedJson(diagnostic(&format!(
+            "fulfillment cache entry has more than {MAX_BOUND_TESTS_PER_ENTRY} bound tests"
+        ))));
+    }
+    let locations = bound_tests
+        .into_iter()
+        .map(location_from_dto)
+        .collect::<Result<Vec<_>, _>>()
+        .map_err(verify_cache_error_from_artifact)?;
+    NonEmptyTestLocations::try_new(locations).map_err(|error| {
+        VerifyCacheError::MalformedJson(diagnostic(&format!("invalid bound tests: {error}")))
+    })
+}
+
+#[cfg(all(test, unix))]
+#[allow(clippy::unwrap_used, clippy::expect_used, clippy::panic, clippy::indexing_slicing)]
+#[path = "fulfillment_cache_codec/tests.rs"]
+mod tests;

@@ -1,0 +1,56 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-25T03:04:28Z",
+  "declaration_hash": "3907a9cc575178cc98df1377cc2428ade089b145662973196ed69a97bde93cef",
+  "implementation_input_hash": "1e6db89b296b2e6a275de97756b23295cdd0b0bcae4a8bbb87686d8a6699be1f",
+  "signals": [
+    {
+      "type_name": "AdrBaselineCommand",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "ClockPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "LintRuleKind",
+      "kind_tag": "enum",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineService",
+      "kind_tag": "application_service",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineStorePort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "AdrBaselineTimestampError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

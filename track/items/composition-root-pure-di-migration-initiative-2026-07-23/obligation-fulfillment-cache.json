@@ -1,0 +1,2693 @@
+{
+  "track_id": "composition-root-pure-di-migration-initiative-2026-07-23",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "CatalogInteractor",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "cd58a75289571acc78968354435c18ba406314037761f03957131dff08de203e",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let port = Arc::new(StubPort { calls: Mutex::new(Vec::new()) });\n        let interactor = CatalogInteractor::new(port.clone());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogInteractor",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "cd58a75289571acc78968354435c18ba406314037761f03957131dff08de203e",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *port.calls.lock().unwrap(),\n            [\"init\", \"add\", \"import\", \"cite\", \"check\"],\n            \"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogInteractor",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "cd58a75289571acc78968354435c18ba406314037761f03957131dff08de203e",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\"; \"assert!(!production_source.contains(forbidden_runtime_path),\\n                \\\"usecase execution path must not contain {forbidden_runtime_path}\\\"\\n            );\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogInteractor",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "cd58a75289571acc78968354435c18ba406314037761f03957131dff08de203e",
+        "anchor_text_hash": "c8bbfbff360a7e362a409096da08f3d2bce35b5aecbe2b295a788b9ac9276557"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let interactor = CatalogInteractor::new(port.clone());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:init"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "c62ff8f878b577659db638c5b6ef20bcfd424405e84fe323dae5ec2f50032a5b",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:init"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "c62ff8f878b577659db638c5b6ef20bcfd424405e84fe323dae5ec2f50032a5b",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\"; \"interactor must delegate through {delegated_call}\"; \"usecase execution path must not contain {forbidden_runtime_path}\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:init"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "c62ff8f878b577659db638c5b6ef20bcfd424405e84fe323dae5ec2f50032a5b",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:add"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "c62ff8f878b577659db638c5b6ef20bcfd424405e84fe323dae5ec2f50032a5b",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:add"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "c62ff8f878b577659db638c5b6ef20bcfd424405e84fe323dae5ec2f50032a5b",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *port.calls.lock().unwrap(),\n            [\"init\", \"add\", \"import\", \"cite\", \"check\"],\n            \"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:add"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "c62ff8f878b577659db638c5b6ef20bcfd424405e84fe323dae5ec2f50032a5b",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:import"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "c62ff8f878b577659db638c5b6ef20bcfd424405e84fe323dae5ec2f50032a5b",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:import"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "c62ff8f878b577659db638c5b6ef20bcfd424405e84fe323dae5ec2f50032a5b",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:import"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "c62ff8f878b577659db638c5b6ef20bcfd424405e84fe323dae5ec2f50032a5b",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:cite"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "c62ff8f878b577659db638c5b6ef20bcfd424405e84fe323dae5ec2f50032a5b",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:cite"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "c62ff8f878b577659db638c5b6ef20bcfd424405e84fe323dae5ec2f50032a5b",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *port.calls.lock().unwrap(),\n            [\"init\", \"add\", \"import\", \"cite\", \"check\"],\n            \"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:cite"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "c62ff8f878b577659db638c5b6ef20bcfd424405e84fe323dae5ec2f50032a5b",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\" and \"usecase execution path must not contain {forbidden_runtime_path}\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:check"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "c62ff8f878b577659db638c5b6ef20bcfd424405e84fe323dae5ec2f50032a5b",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:check"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "c62ff8f878b577659db638c5b6ef20bcfd424405e84fe323dae5ec2f50032a5b",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:check"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "c62ff8f878b577659db638c5b6ef20bcfd424405e84fe323dae5ec2f50032a5b",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogQueryService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogQueryService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "81008b89cf1bd1f060feb80e791d2bc8585d4100f5144d7751a520e5e73ef893",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogQueryService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogQueryService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "81008b89cf1bd1f060feb80e791d2bc8585d4100f5144d7751a520e5e73ef893",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogQueryService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogQueryService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "81008b89cf1bd1f060feb80e791d2bc8585d4100f5144d7751a520e5e73ef893",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"CatalogQueryService::check(&interactor, target(), query).unwrap().verdict\"; \"[\\\"init\\\", \\\"add\\\", \\\"import\\\", \\\"cite\\\", \\\"check\\\"]\"; \"self.port.check(\"; \"usecase execution path must not contain {forbidden_runtime_path}\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogQueryService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogQueryService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:check"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "81008b89cf1bd1f060feb80e791d2bc8585d4100f5144d7751a520e5e73ef893",
+        "anchor_text_hash": "c8bbfbff360a7e362a409096da08f3d2bce35b5aecbe2b295a788b9ac9276557"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "CatalogQueryService::check(&interactor, target(), query).unwrap().verdict,\n            CatalogCheckVerdict::Blocked"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:init"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "4ac36389cdd4836b77ffd8551eed99a713512cc14ad979a43a28cde5017a8656",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *port.calls.lock().unwrap(),\n            [\"init\", \"add\", \"import\", \"cite\", \"check\"],\n            \"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:init"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "4ac36389cdd4836b77ffd8551eed99a713512cc14ad979a43a28cde5017a8656",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:init"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "4ac36389cdd4836b77ffd8551eed99a713512cc14ad979a43a28cde5017a8656",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:init"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "4ac36389cdd4836b77ffd8551eed99a713512cc14ad979a43a28cde5017a8656",
+        "anchor_text_hash": "c8bbfbff360a7e362a409096da08f3d2bce35b5aecbe2b295a788b9ac9276557"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let port = Arc::new(StubPort { calls: Mutex::new(Vec::new()) });\n        let interactor = CatalogInteractor::new(port.clone());\n...\n        assert_eq!(\n            *port.calls.lock().unwrap(),\n            [\"init\", \"add\", \"import\", \"cite\", \"check\"],\n            \"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:add"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "4ac36389cdd4836b77ffd8551eed99a713512cc14ad979a43a28cde5017a8656",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:add"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "4ac36389cdd4836b77ffd8551eed99a713512cc14ad979a43a28cde5017a8656",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *port.calls.lock().unwrap(),\n            [\"init\", \"add\", \"import\", \"cite\", \"check\"],\n            \"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:add"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "4ac36389cdd4836b77ffd8551eed99a713512cc14ad979a43a28cde5017a8656",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:add"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "4ac36389cdd4836b77ffd8551eed99a713512cc14ad979a43a28cde5017a8656",
+        "anchor_text_hash": "c8bbfbff360a7e362a409096da08f3d2bce35b5aecbe2b295a788b9ac9276557"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:import"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "4ac36389cdd4836b77ffd8551eed99a713512cc14ad979a43a28cde5017a8656",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:import"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "4ac36389cdd4836b77ffd8551eed99a713512cc14ad979a43a28cde5017a8656",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:import"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "4ac36389cdd4836b77ffd8551eed99a713512cc14ad979a43a28cde5017a8656",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:import"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "4ac36389cdd4836b77ffd8551eed99a713512cc14ad979a43a28cde5017a8656",
+        "anchor_text_hash": "c8bbfbff360a7e362a409096da08f3d2bce35b5aecbe2b295a788b9ac9276557"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *port.calls.lock().unwrap(),\n            [\"init\", \"add\", \"import\", \"cite\", \"check\"],\n            \"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:cite"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "4ac36389cdd4836b77ffd8551eed99a713512cc14ad979a43a28cde5017a8656",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:cite"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "4ac36389cdd4836b77ffd8551eed99a713512cc14ad979a43a28cde5017a8656",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:cite"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "4ac36389cdd4836b77ffd8551eed99a713512cc14ad979a43a28cde5017a8656",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogService",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogService",
+        "obligation_kind": "result",
+        "item_identifier": "trait_method:cite"
+      },
+      "key": {
+        "bound_tests_set_hash": "da8b0d1d92c8da3a35c0453f57e11f97bbc7e3498c14ddca4f4cd9c86accf71a",
+        "declaration_hash": "4ac36389cdd4836b77ffd8551eed99a713512cc14ad979a43a28cde5017a8656",
+        "anchor_text_hash": "c8bbfbff360a7e362a409096da08f3d2bce35b5aecbe2b295a788b9ac9276557"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"each CatalogInteractor operation must traverse the injected CatalogPort exactly once\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplCatalogSignalReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplCatalogSignalReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read_signals"
+      },
+      "key": {
+        "bound_tests_set_hash": "c0f047f6a09fbac32b3ad9d5671cf41d0428ced15a2dc028cfd9ac4d51dcb51b",
+        "declaration_hash": "3f7f93e566901a63055cdb17350f7c413e2271bc5761aad2f9462e175aafc048",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"signal_reader: Arc<dyn ImplCatalogSignalReaderPort>\",\n            \"read_optional_signals(&cmd.track_id, &layer)\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplCatalogSignalReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplCatalogSignalReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read_signals"
+      },
+      "key": {
+        "bound_tests_set_hash": "c0f047f6a09fbac32b3ad9d5671cf41d0428ced15a2dc028cfd9ac4d51dcb51b",
+        "declaration_hash": "3f7f93e566901a63055cdb17350f7c413e2271bc5761aad2f9462e175aafc048",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"signal_reader: Arc<dyn ImplCatalogSignalReaderPort>\", \"read_optional_signals(&cmd.track_id, &layer)\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplCatalogSignalReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplCatalogSignalReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read_signals"
+      },
+      "key": {
+        "bound_tests_set_hash": "c0f047f6a09fbac32b3ad9d5671cf41d0428ced15a2dc028cfd9ac4d51dcb51b",
+        "declaration_hash": "3f7f93e566901a63055cdb17350f7c413e2271bc5761aad2f9462e175aafc048",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n                !production_source.contains(forbidden_runtime_path),\n                \"signal-reader execution must not reference or reverse-delegate through {forbidden_runtime_path}\"\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplCatalogSignalReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplCatalogSignalReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read_optional_signals"
+      },
+      "key": {
+        "bound_tests_set_hash": "c0f047f6a09fbac32b3ad9d5671cf41d0428ced15a2dc028cfd9ac4d51dcb51b",
+        "declaration_hash": "3f7f93e566901a63055cdb17350f7c413e2271bc5761aad2f9462e175aafc048",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"signal_reader: Arc<dyn ImplCatalogSignalReaderPort>\",\n            \"read_optional_signals(&cmd.track_id, &layer)\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplCatalogSignalReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplCatalogSignalReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read_optional_signals"
+      },
+      "key": {
+        "bound_tests_set_hash": "c0f047f6a09fbac32b3ad9d5671cf41d0428ced15a2dc028cfd9ac4d51dcb51b",
+        "declaration_hash": "3f7f93e566901a63055cdb17350f7c413e2271bc5761aad2f9462e175aafc048",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"signal_reader: Arc<dyn ImplCatalogSignalReaderPort>\",\n            \"read_optional_signals(&cmd.track_id, &layer)\","
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplCatalogSignalReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplCatalogSignalReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read_optional_signals"
+      },
+      "key": {
+        "bound_tests_set_hash": "c0f047f6a09fbac32b3ad9d5671cf41d0428ced15a2dc028cfd9ac4d51dcb51b",
+        "declaration_hash": "3f7f93e566901a63055cdb17350f7c413e2271bc5761aad2f9462e175aafc048",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"read_optional_signals(&cmd.track_id, &layer)\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read_task_statuses"
+      },
+      "key": {
+        "bound_tests_set_hash": "c0f047f6a09fbac32b3ad9d5671cf41d0428ced15a2dc028cfd9ac4d51dcb51b",
+        "declaration_hash": "7cc941f5efbf44b7e7f442c0fbd986cb6932d29a04dcee18ca7e2305179af164",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"pub trait ImplPlanReaderPort: Send + Sync\", \"fn read_task_statuses(\", \"impl_plan_reader: Arc<dyn ImplPlanReaderPort>\", \"read_task_statuses(&cmd.track_id)\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read_task_statuses"
+      },
+      "key": {
+        "bound_tests_set_hash": "c0f047f6a09fbac32b3ad9d5671cf41d0428ced15a2dc028cfd9ac4d51dcb51b",
+        "declaration_hash": "7cc941f5efbf44b7e7f442c0fbd986cb6932d29a04dcee18ca7e2305179af164",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"pub trait ImplPlanReaderPort: Send + Sync\" ... \"fn read_task_statuses(\" ... \"impl_plan_reader: Arc<dyn ImplPlanReaderPort>\" ... \"read_task_statuses(&cmd.track_id)\" ... \"the injected reader ports must drive the pre-review result\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ImplPlanReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ImplPlanReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read_task_statuses"
+      },
+      "key": {
+        "bound_tests_set_hash": "c0f047f6a09fbac32b3ad9d5671cf41d0428ced15a2dc028cfd9ac4d51dcb51b",
+        "declaration_hash": "7cc941f5efbf44b7e7f442c0fbd986cb6932d29a04dcee18ca7e2305179af164",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"fn read_task_statuses(\", \"impl_plan_reader: Arc<dyn ImplPlanReaderPort>\", \"read_task_statuses(&cmd.track_id)\", \"the injected reader ports must drive the pre-review result\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskContractReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read"
+      },
+      "key": {
+        "bound_tests_set_hash": "dd566aa58c31ab0e9450bcb62a87a4c6bce460ef0821838f55842108b86f143c",
+        "declaration_hash": "edff9fcd403ce31afc23fe814fc42d4a8b651423da8b953c6fbd5892ea21cd09",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "production_source.contains(\"impl TaskContractReaderPort for FsTaskContractReader\")"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskContractReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read"
+      },
+      "key": {
+        "bound_tests_set_hash": "dd566aa58c31ab0e9450bcb62a87a4c6bce460ef0821838f55842108b86f143c",
+        "declaration_hash": "edff9fcd403ce31afc23fe814fc42d4a8b651423da8b953c6fbd5892ea21cd09",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(production_source.contains(\"impl TaskContractReaderPort for FsTaskContractReader\"),\n            \"reader must implement its declared secondary port\"\n        );\n        assert!(production_source.contains(\"fn read(\"), \"reader must implement port read\");\n        for forbidden_runtime_path in\n            [\"ServiceImpl\", \"CompositionRoot\", \"PreReviewGateInteractor\", \"TaskContractDriver\"]\n        {\n            assert!(\n                !production_source.contains(forbidden_runtime_path),\n                \"filesystem adapter must not reverse-delegate through {forbidden_runtime_path}\"\n            );\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskContractReaderPort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractReaderPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:read"
+      },
+      "key": {
+        "bound_tests_set_hash": "dd566aa58c31ab0e9450bcb62a87a4c6bce460ef0821838f55842108b86f143c",
+        "declaration_hash": "edff9fcd403ce31afc23fe814fc42d4a8b651423da8b953c6fbd5892ea21cd09",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for forbidden_runtime_path in\n            [\"ServiceImpl\", \"CompositionRoot\", \"PreReviewGateInteractor\", \"TaskContractDriver\"]\n        {\n            assert!(\n                !production_source.contains(forbidden_runtime_path),\n                \"filesystem adapter must not reverse-delegate through {forbidden_runtime_path}\"\n            );\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsCatalogAdapter",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsCatalogAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::catalog_gen::CatalogPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "aa738642d930843826432f1ab7fbeb261d162a533603948330402a4d496fcf5b",
+        "declaration_hash": "b37900a16d3c3946f75f12a7d2f70144f2bbe7a0d895de5df8c95c349e311258",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(production_source.contains(\"impl CatalogPort for FsCatalogAdapter\"));\n    for direct_port_operation in\n        [\"verb_init::run\", \"verb_add::run\", \"verb_import::run\", \"verb_cite::run\", \"verb_check::run\"]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsCatalogAdapter",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsCatalogAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::catalog_gen::CatalogPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "aa738642d930843826432f1ab7fbeb261d162a533603948330402a4d496fcf5b",
+        "declaration_hash": "b37900a16d3c3946f75f12a7d2f70144f2bbe7a0d895de5df8c95c349e311258",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(production_source.contains(\"impl CatalogPort for FsCatalogAdapter\")); ... assert!(production_source.contains(direct_port_operation), \"adapter must directly execute {direct_port_operation}\"); ... assert!(!production_source.contains(forbidden_runtime_path), \"filesystem adapter must not reverse-delegate through {forbidden_runtime_path}\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsCatalogAdapter",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsCatalogAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::catalog_gen::CatalogPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "aa738642d930843826432f1ab7fbeb261d162a533603948330402a4d496fcf5b",
+        "declaration_hash": "b37900a16d3c3946f75f12a7d2f70144f2bbe7a0d895de5df8c95c349e311258",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "forbidden_runtime_path in [\"ServiceImpl\", \"CompositionRoot\", \"CatalogInteractor\"] {\n        assert!(\n            !production_source.contains(forbidden_runtime_path),\n            \"filesystem adapter must not reverse-delegate through {forbidden_runtime_path}\"\n        );\n    }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsTaskContractReader",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsTaskContractReader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pre_review_gate::TaskContractReaderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "dd566aa58c31ab0e9450bcb62a87a4c6bce460ef0821838f55842108b86f143c",
+        "declaration_hash": "6640f7995f4f55f47fbcb2787eeed4c2c25645554af531d238a59d555aec4480",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "production_source.contains(\"impl TaskContractReaderPort for FsTaskContractReader\")"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsTaskContractReader",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsTaskContractReader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pre_review_gate::TaskContractReaderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "dd566aa58c31ab0e9450bcb62a87a4c6bce460ef0821838f55842108b86f143c",
+        "declaration_hash": "6640f7995f4f55f47fbcb2787eeed4c2c25645554af531d238a59d555aec4480",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            production_source.contains(\"impl TaskContractReaderPort for FsTaskContractReader\"),\n            \"reader must implement its declared secondary port\"\n        );\n        assert!(production_source.contains(\"fn read(\"), \"reader must implement port read\");\n        for forbidden_runtime_path in\n            [\"ServiceImpl\", \"CompositionRoot\", \"PreReviewGateInteractor\", \"TaskContractDriver\"]\n        {\n            assert!(\n                !production_source.contains(forbidden_runtime_path),\n                \"filesystem adapter must not reverse-delegate through {forbidden_runtime_path}\"\n            );\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsTaskContractReader",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsTaskContractReader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pre_review_gate::TaskContractReaderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "dd566aa58c31ab0e9450bcb62a87a4c6bce460ef0821838f55842108b86f143c",
+        "declaration_hash": "6640f7995f4f55f47fbcb2787eeed4c2c25645554af531d238a59d555aec4480",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            !production_source.contains(forbidden_runtime_path),\n            \"filesystem adapter must not reverse-delegate through {forbidden_runtime_path}\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsImplCatalogSignalReader",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsImplCatalogSignalReader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pre_review_gate::ImplCatalogSignalReaderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "bf1feec3c820a98f55248409577e99ea9ccf2323182eecb9020b496134afedea",
+        "declaration_hash": "1df7ae64d9fda81f438f72fc7191b70f686a4a6a4f5d22d6621969da59b111a8",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            production_source\n                .contains(\"impl ImplCatalogSignalReaderPort for FsImplCatalogSignalReader\"),\n            \"reader must implement its declared secondary port\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsImplCatalogSignalReader",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsImplCatalogSignalReader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pre_review_gate::ImplCatalogSignalReaderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "bf1feec3c820a98f55248409577e99ea9ccf2323182eecb9020b496134afedea",
+        "declaration_hash": "1df7ae64d9fda81f438f72fc7191b70f686a4a6a4f5d22d6621969da59b111a8",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "forbidden_runtime_path in [\"ServiceImpl\", \"CompositionRoot\", \"PreReviewGateInteractor\", \"TaskContractDriver\"] { assert!( !production_source.contains(forbidden_runtime_path), \"filesystem adapter must not reverse-delegate through {forbidden_runtime_path}\" ) }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsImplCatalogSignalReader",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsImplCatalogSignalReader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pre_review_gate::ImplCatalogSignalReaderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "bf1feec3c820a98f55248409577e99ea9ccf2323182eecb9020b496134afedea",
+        "declaration_hash": "1df7ae64d9fda81f438f72fc7191b70f686a4a6a4f5d22d6621969da59b111a8",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for forbidden_runtime_path in\n            [\"ServiceImpl\", \"CompositionRoot\", \"PreReviewGateInteractor\", \"TaskContractDriver\"]\n        {\n            assert!(\n                !production_source.contains(forbidden_runtime_path),\n                \"filesystem adapter must not reverse-delegate through {forbidden_runtime_path}\"\n            );\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsImplPlanReader",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsImplPlanReader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pre_review_gate::ImplPlanReaderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "e0c2672a59ce04af2cf367fcd89536a71eb982c95db8d2583f22d706c3be278b",
+        "declaration_hash": "b5c56d5d52340c389591686003497fa475574a4edc22f08edfa92ec00198e86c",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for forbidden_runtime_path in [\n            \"ServiceImpl\",\n            \"CompositionRoot\",\n            \"PreReviewGateInteractor::new\",\n            \"TaskContractDriver::new\",\n        ] {\n            assert!(\n                !production_source.contains(forbidden_runtime_path),\n                \"filesystem adapter must not reverse-delegate through {forbidden_runtime_path}\"\n            );\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsImplPlanReader",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsImplPlanReader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pre_review_gate::ImplPlanReaderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "e0c2672a59ce04af2cf367fcd89536a71eb982c95db8d2583f22d706c3be278b",
+        "declaration_hash": "b5c56d5d52340c389591686003497fa475574a4edc22f08edfa92ec00198e86c",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            production_source.contains(\"impl ImplPlanReaderPort for FsImplPlanReader\"),\n            \"reader must implement its declared secondary port\"\n        );\n        assert!(\n            production_source.contains(\"fn read_task_statuses(\"),\n            \"reader must implement the task-status operation\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsImplPlanReader",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsImplPlanReader",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pre_review_gate::ImplPlanReaderPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "e0c2672a59ce04af2cf367fcd89536a71eb982c95db8d2583f22d706c3be278b",
+        "declaration_hash": "b5c56d5d52340c389591686003497fa475574a4edc22f08edfa92ec00198e86c",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for forbidden_runtime_path in [\n            \"ServiceImpl\",\n            \"CompositionRoot\",\n            \"PreReviewGateInteractor::new\",\n            \"TaskContractDriver::new\",\n        ] {\n            assert!(\n                !production_source.contains(forbidden_runtime_path),\n                \"filesystem adapter must not reverse-delegate through {forbidden_runtime_path}\"\n            );\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineStorePort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineStorePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:snapshot"
+      },
+      "key": {
+        "bound_tests_set_hash": "c049fd4bcd41a94ed839d0cacf8d1444498b7ac4426888f2786e150d498f22a5",
+        "declaration_hash": "ff11418f7912ef89992a34a545398ada67dd0fc5c9ed48a35a9672fd552aeaa8",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(bytes, b\"current\");\n        assert_eq!(kind, expected_kind);\n        assert_eq!(timestamp, expected_timestamp);\n        assert!(store.restore_calls.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineStorePort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineStorePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:snapshot"
+      },
+      "key": {
+        "bound_tests_set_hash": "c049fd4bcd41a94ed839d0cacf8d1444498b7ac4426888f2786e150d498f22a5",
+        "declaration_hash": "ff11418f7912ef89992a34a545398ada67dd0fc5c9ed48a35a9672fd552aeaa8",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\".snapshot(&track_id, &source, bytes, kind, timestamp)\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineStorePort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineStorePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:snapshot"
+      },
+      "key": {
+        "bound_tests_set_hash": "c049fd4bcd41a94ed839d0cacf8d1444498b7ac4426888f2786e150d498f22a5",
+        "declaration_hash": "ff11418f7912ef89992a34a545398ada67dd0fc5c9ed48a35a9672fd552aeaa8",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\".snapshot(&track_id, &source, bytes, kind, timestamp)\", \"self.store.restore(&track_id, &source)\" ... \"ServiceImpl\", \"CompatibilityShim\", \"CompatService\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineStorePort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineStorePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:restore"
+      },
+      "key": {
+        "bound_tests_set_hash": "5372bb07d5c053fbdbb4c702a8166269b698441165cb89f8cc508a5a2d03a58c",
+        "declaration_hash": "ff11418f7912ef89992a34a545398ada67dd0fc5c9ed48a35a9672fd552aeaa8",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\".snapshot(&track_id, &source, bytes, kind, timestamp)\", \"self.store.restore(&track_id, &source)\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineStorePort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineStorePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:restore"
+      },
+      "key": {
+        "bound_tests_set_hash": "5372bb07d5c053fbdbb4c702a8166269b698441165cb89f8cc508a5a2d03a58c",
+        "declaration_hash": "ff11418f7912ef89992a34a545398ada67dd0fc5c9ed48a35a9672fd552aeaa8",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\".snapshot(&track_id, &source, bytes, kind, timestamp)\",\n            \"self.store.restore(&track_id, &source)\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineStorePort",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineStorePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:restore"
+      },
+      "key": {
+        "bound_tests_set_hash": "5372bb07d5c053fbdbb4c702a8166269b698441165cb89f8cc508a5a2d03a58c",
+        "declaration_hash": "ff11418f7912ef89992a34a545398ada67dd0fc5c9ed48a35a9672fd552aeaa8",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"ServiceImpl\",\n            \"CompatibilityShim\",\n            \"CompatService\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsAdrBaselineStore",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsAdrBaselineStore",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::adr_baseline::AdrBaselineStorePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "be875df3f12c818a81cda34d254249c7e737ef9c7341e9f6dbf384a77e434709",
+        "declaration_hash": "b4a7c530ad00511ade285e95d42d29a4f2edfa9a689a9f7ca299fb58043eb96c",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(production_source.contains(\"impl AdrBaselineStorePort for FsAdrBaselineStore\")); ... assert!(\n            !production_source.contains(forbidden_runtime_path),\n            \"filesystem store must not reverse-delegate through {forbidden_runtime_path}\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsAdrBaselineStore",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsAdrBaselineStore",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::adr_baseline::AdrBaselineStorePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "be875df3f12c818a81cda34d254249c7e737ef9c7341e9f6dbf384a77e434709",
+        "declaration_hash": "b4a7c530ad00511ade285e95d42d29a4f2edfa9a689a9f7ca299fb58043eb96c",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(production_source.contains(\"impl AdrBaselineStorePort for FsAdrBaselineStore\")); ... assert!(!production_source.contains(forbidden_runtime_path), \"filesystem store must not reverse-delegate through {forbidden_runtime_path}\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "FsAdrBaselineStore",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "FsAdrBaselineStore",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::adr_baseline::AdrBaselineStorePort"
+      },
+      "key": {
+        "bound_tests_set_hash": "be875df3f12c818a81cda34d254249c7e737ef9c7341e9f6dbf384a77e434709",
+        "declaration_hash": "b4a7c530ad00511ade285e95d42d29a4f2edfa9a689a9f7ca299fb58043eb96c",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "forbidden_runtime_path in [\"ServiceImpl\", \"CompositionRoot\", \"AdrBaselineInteractor::new\", \"AdrBaselineDriver::new\"] { assert!( !production_source.contains(forbidden_runtime_path), \"filesystem store must not reverse-delegate through {forbidden_runtime_path}\" ); }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::adr_baseline::timestamp_now",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::adr_baseline::timestamp_now",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1bc0442226c624dd34fca0396a083eb8e8cee6aca14f9a63765c3fa9fdc858c4",
+        "declaration_hash": "03100ee4b400e161757f8b78d971566552f50474238bcc24194b69c1e4f30e19",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "source.contains(\n            \"crate::timestamp_now().map_err(AdrBaselineTimestampError::InvalidTimestamp)\"\n        ); ... !provider_source.contains(forbidden_path)"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "infrastructure::adr_baseline::timestamp_now",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "infrastructure::adr_baseline::timestamp_now",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1bc0442226c624dd34fca0396a083eb8e8cee6aca14f9a63765c3fa9fdc858c4",
+        "declaration_hash": "03100ee4b400e161757f8b78d971566552f50474238bcc24194b69c1e4f30e19",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(source.contains(\n            \"crate::timestamp_now().map_err(AdrBaselineTimestampError::InvalidTimestamp)\"\n        ));\n    }\n    for forbidden_path in [\n        \"AdrBaselineCompositionRoot\",\n        \"AdrBaselineDriver\",\n        \"AdrBaselineInteractor\",\n        \"AdrBaselineService\",\n        \"AdrBaselineQueryService\",\n        \"ServiceImpl\",\n        \"CompatibilityShim\",\n        \"CompatService\","
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_read",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_read",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bef7aa7e638f5343252d878b7797c5c91f56ede04aa1a31cfa6839dc01c5602b",
+        "declaration_hash": "360557bcfd0b313c338b09e6f8a55c264ecba3ebf23135209dc96eee9445bb7d",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "AdrBaselineCompositionRoot::new().adr_baseline_driver(project_root).handle(input)"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_read",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_read",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bef7aa7e638f5343252d878b7797c5c91f56ede04aa1a31cfa6839dc01c5602b",
+        "declaration_hash": "360557bcfd0b313c338b09e6f8a55c264ecba3ebf23135209dc96eee9445bb7d",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!resolver_source.contains(forbidden_runtime_path), \"track resolution must not execute or delegate through {forbidden_runtime_path}\")"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_read",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_read",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bef7aa7e638f5343252d878b7797c5c91f56ede04aa1a31cfa6839dc01c5602b",
+        "declaration_hash": "360557bcfd0b313c338b09e6f8a55c264ecba3ebf23135209dc96eee9445bb7d",
+        "anchor_text_hash": "1164210c6b8a00aeefa165926ce2bbd2ec0a85c4195dce0b3c1efcad2c774aad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(dispatch_source.contains(\n            \"AdrBaselineCompositionRoot::new().adr_baseline_driver(project_root).handle(input)\"\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_read",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_read",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bef7aa7e638f5343252d878b7797c5c91f56ede04aa1a31cfa6839dc01c5602b",
+        "declaration_hash": "360557bcfd0b313c338b09e6f8a55c264ecba3ebf23135209dc96eee9445bb7d",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for forbidden_runtime_path in [\n                \"AdrBaselineCompositionRoot\",\n                \"CommandOutcome\",\n                \".handle(\",\n                \"std::fs::\",\n                \"std::process::\",\n                \"std::net::\",\n                \"std::io::\",\n                \"println!\",\n                \"eprintln!\",\n                \"print!\",\n                \"eprint!\",\n                \"ServiceImpl\",\n                \"CompatibilityShim\",\n                \"CompatService\",\n                \"usecase::\",\n            ] {\n                assert!(\n                    !resolver_source.contains(forbidden_runtime_path),\n                    \"track resolution must not execute or delegate through {forbidden_runtime_path}\"\n                );\n            }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_read",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_read",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bef7aa7e638f5343252d878b7797c5c91f56ede04aa1a31cfa6839dc01c5602b",
+        "declaration_hash": "360557bcfd0b313c338b09e6f8a55c264ecba3ebf23135209dc96eee9445bb7d",
+        "anchor_text_hash": "25d5f954a6da7614bf2bc0fc032465e4f4366197b081b6152df4b5a96465b0cd"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(resolved.as_ref(), \"fixture-track\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_write",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_write",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bef7aa7e638f5343252d878b7797c5c91f56ede04aa1a31cfa6839dc01c5602b",
+        "declaration_hash": "360557bcfd0b313c338b09e6f8a55c264ecba3ebf23135209dc96eee9445bb7d",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(dispatch_source.contains(\n            \"AdrBaselineCompositionRoot::new().adr_baseline_driver(project_root).handle(input)\"\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_write",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_write",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bef7aa7e638f5343252d878b7797c5c91f56ede04aa1a31cfa6839dc01c5602b",
+        "declaration_hash": "360557bcfd0b313c338b09e6f8a55c264ecba3ebf23135209dc96eee9445bb7d",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "forbidden_runtime_path in [\"AdrBaselineCompositionRoot\", \"CommandOutcome\", \".handle(\", \"std::fs::\", \"std::process::\", \"std::net::\", \"std::io::\", \"println!\", \"eprintln!\", \"print!\", \"eprint!\", \"ServiceImpl\", \"CompatibilityShim\", \"CompatService\", \"usecase::\"]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_write",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_write",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bef7aa7e638f5343252d878b7797c5c91f56ede04aa1a31cfa6839dc01c5602b",
+        "declaration_hash": "360557bcfd0b313c338b09e6f8a55c264ecba3ebf23135209dc96eee9445bb7d",
+        "anchor_text_hash": "1164210c6b8a00aeefa165926ce2bbd2ec0a85c4195dce0b3c1efcad2c774aad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(dispatch_source.contains(\n            \"AdrBaselineCompositionRoot::new().adr_baseline_driver(project_root).handle(input)\"\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_write",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_write",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bef7aa7e638f5343252d878b7797c5c91f56ede04aa1a31cfa6839dc01c5602b",
+        "declaration_hash": "360557bcfd0b313c338b09e6f8a55c264ecba3ebf23135209dc96eee9445bb7d",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for forbidden_runtime_path in [\"AdrBaselineCompositionRoot\", \"CommandOutcome\", \".handle(\", \"std::fs::\", \"std::process::\", \"std::net::\", \"std::io::\", \"println!\", \"eprintln!\", \"print!\", \"eprint!\", \"ServiceImpl\", \"CompatibilityShim\", \"CompatService\", \"usecase::\",] { assert!(!resolver_source.contains(forbidden_runtime_path)); } ... assert!(dispatch_source.contains(\"AdrBaselineCompositionRoot::new().adr_baseline_driver(project_root).handle(input)\")); ... assert!(!dispatch_source.contains(\"ServiceImpl\")); assert!(!dispatch_source.contains(\"CompatibilityShim\")); assert!(!dispatch_source.contains(\"CompatService\")); assert!(!dispatch_source.contains(\"usecase::\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_write",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::adr_baseline::resolve_for_write",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "bef7aa7e638f5343252d878b7797c5c91f56ede04aa1a31cfa6839dc01c5602b",
+        "declaration_hash": "360557bcfd0b313c338b09e6f8a55c264ecba3ebf23135209dc96eee9445bb7d",
+        "anchor_text_hash": "25d5f954a6da7614bf2bc0fc032465e4f4366197b081b6152df4b5a96465b0cd"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let write_default = resolve_for_write(&track_root, None, items_dir).unwrap();\nassert_eq!(read_default, write_default);\n\nlet explicit_write =\n    resolve_for_write(&track_root, Some(write_default.clone()), items_dir).unwrap();\nassert_eq!(explicit_write, write_default);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineTimestampError",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineTimestampError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "ae8d5d680b4a2fce9595e37f6ee2310649d867770dc53d252ef53864e83e7457",
+        "declaration_hash": "b644a1de0e5537da9d0f17ac955f7d78b900501bfb2545830609f5ce350c58b1",
+        "anchor_text_hash": "25d5f954a6da7614bf2bc0fc032465e4f4366197b081b6152df4b5a96465b0cd"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 1);\n        assert_eq!(outcome.stdout, None);\n        assert_eq!(outcome.stderr.as_deref(), Some(\"invalid timestamp: not-a-timestamp\"));\n        assert!(service.recorded.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogDriver",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "a62059e0c8a6be28a16038ebd64c61814273336f1a8824048259593069c54673",
+        "declaration_hash": "0a5b9bacb731b0d8a6e9d1d3f2bfd79d7d531a32b647cd60fdc6dbd8d99ce09d",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"the primary adapter must route every verb through its injected usecase services\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogDriver",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "a62059e0c8a6be28a16038ebd64c61814273336f1a8824048259593069c54673",
+        "declaration_hash": "0a5b9bacb731b0d8a6e9d1d3f2bfd79d7d531a32b647cd60fdc6dbd8d99ce09d",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *service.calls.lock().unwrap(),\n            [\"init\", \"add\", \"import\", \"cite\", \"check\"],\n            \"the primary adapter must route every verb through its injected usecase services\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogDriver",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "a62059e0c8a6be28a16038ebd64c61814273336f1a8824048259593069c54673",
+        "declaration_hash": "0a5b9bacb731b0d8a6e9d1d3f2bfd79d7d531a32b647cd60fdc6dbd8d99ce09d",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *service.calls.lock().unwrap(),\n            [\"init\", \"add\", \"import\", \"cite\", \"check\"],\n            \"the primary adapter must route every verb through its injected usecase services\"\n        );\n\n        let source = include_str!(\"catalog_gen.rs\");\n        let production_source = source.split(\"#[cfg(test)]\").next().unwrap();\n        for forbidden_runtime_path in\n            [\"ServiceImpl\", \"CompositionRoot\", \"std::fs::\", \"std::process::\"]\n        {\n            assert!(\n                !production_source.contains(forbidden_runtime_path),\n                \"CatalogDriver must not contain {forbidden_runtime_path}\"\n            );\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogDriver",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "a62059e0c8a6be28a16038ebd64c61814273336f1a8824048259593069c54673",
+        "declaration_hash": "0a5b9bacb731b0d8a6e9d1d3f2bfd79d7d531a32b647cd60fdc6dbd8d99ce09d",
+        "anchor_text_hash": "25d5f954a6da7614bf2bc0fc032465e4f4366197b081b6152df4b5a96465b0cd"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *service.calls.lock().unwrap(),\n            [\"init\", \"add\", \"import\", \"cite\", \"check\"],\n            \"the primary adapter must route every verb through its injected usecase services\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "2c48df327b3ca21bab50cd6726d37311c11b38dfadf7743551ad9eeaf3fed84a",
+        "declaration_hash": "988121c52967d7e280804ac57b174bcfb9778972129a85505a8aa3127942c302",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"FsAdrBaselineStore::from(project_root.clone())\", \"FsGitAdrBaselineSource::from(project_root)\", \"infrastructure::adr_baseline::timestamp_now\", \"AdrBaselineInteractor::new(\", \"AdrBaselineQueryInteractor::new(\", \"infrastructure::adr_baseline::timestamp_now,\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "2c48df327b3ca21bab50cd6726d37311c11b38dfadf7743551ad9eeaf3fed84a",
+        "declaration_hash": "988121c52967d7e280804ac57b174bcfb9778972129a85505a8aa3127942c302",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for wired_component in [\n            \"FsAdrBaselineStore::from(project_root.clone())\",\n            \"FsGitAdrBaselineSource::from(project_root)\",\n            \"infrastructure::adr_baseline::timestamp_now\",\n            \"AdrBaselineInteractor::new(\",\n            \"AdrBaselineQueryInteractor::new(\",\n            \"infrastructure::adr_baseline::timestamp_now,\"\n        ]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "2c48df327b3ca21bab50cd6726d37311c11b38dfadf7743551ad9eeaf3fed84a",
+        "declaration_hash": "988121c52967d7e280804ac57b174bcfb9778972129a85505a8aa3127942c302",
+        "anchor_text_hash": "1164210c6b8a00aeefa165926ce2bbd2ec0a85c4195dce0b3c1efcad2c774aad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"FsAdrBaselineStore::from(project_root.clone())\", \"FsGitAdrBaselineSource::from(project_root)\", \"infrastructure::adr_baseline::timestamp_now\", \"AdrBaselineInteractor::new(\", \"AdrBaselineQueryInteractor::new(\", \"infrastructure::adr_baseline::timestamp_now,\", \"!production_source.contains(\\\"AdrBaselineRequest\\\")\", \"!production_source.contains(forbidden)\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "2c48df327b3ca21bab50cd6726d37311c11b38dfadf7743551ad9eeaf3fed84a",
+        "declaration_hash": "988121c52967d7e280804ac57b174bcfb9778972129a85505a8aa3127942c302",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"ServiceImpl\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "73ee218353587845bff0cdfaad8aab62245cd4b2c8d393740121cd43b6cead03",
+        "declaration_hash": "71f8b2e5b5716842dde8cf2aa471ee9cfae0044b1bad091309ef37d9c6c5c87e",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(production_source.contains(\"-> CatalogDriver\"));\n        assert!(production_source.contains(\"CatalogDriver::new(\"));\n        assert!(production_source.contains(\"FsCatalogAdapter::new()\"));\n        assert!(production_source.contains(\"Arc<dyn CatalogPort>\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "73ee218353587845bff0cdfaad8aab62245cd4b2c8d393740121cd43b6cead03",
+        "declaration_hash": "71f8b2e5b5716842dde8cf2aa471ee9cfae0044b1bad091309ef37d9c6c5c87e",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for wired_component in [\n            \"let adapter = Arc::new(FsCatalogAdapter::new());\",\n            \"CatalogInteractor::new(adapter as Arc<dyn CatalogPort>)\",\n            \"interactor.clone() as Arc<dyn CatalogService>\",\n            \"interactor as Arc<dyn CatalogQueryService>\",\n        ]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "73ee218353587845bff0cdfaad8aab62245cd4b2c8d393740121cd43b6cead03",
+        "declaration_hash": "71f8b2e5b5716842dde8cf2aa471ee9cfae0044b1bad091309ef37d9c6c5c87e",
+        "anchor_text_hash": "1164210c6b8a00aeefa165926ce2bbd2ec0a85c4195dce0b3c1efcad2c774aad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"assert!(production_source.contains(\\\"-> CatalogDriver\\\"));\" ... \"assert!(production_source.contains(\\\"CatalogDriver::new(\\\"));\" ... \"assert!(production_source.contains(\\\"FsCatalogAdapter::new()\\\"));\" ... \"assert!(!production_source.contains(forbidden),\\n                \\\"composition root must not contain execution or compatibility path {forbidden}\\\"\\n            );\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "CatalogCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "CatalogCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "73ee218353587845bff0cdfaad8aab62245cd4b2c8d393740121cd43b6cead03",
+        "declaration_hash": "71f8b2e5b5716842dde8cf2aa471ee9cfae0044b1bad091309ef37d9c6c5c87e",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for wired_component in [\n            \"let adapter = Arc::new(FsCatalogAdapter::new());\",\n            \"CatalogInteractor::new(adapter as Arc<dyn CatalogPort>)\",\n            \"interactor.clone() as Arc<dyn CatalogService>\",\n            \"interactor as Arc<dyn CatalogQueryService>\",\n        ]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskContractCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "cd0a474d93bd18dbf7c3d51060b0735ce251a99dd175d99457b308a8748d0fea",
+        "declaration_hash": "23b23d64e6cfe5d5c5656d28f3d44d650ebaf511c476d4bc0228cf04160b525a",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(production_source.contains(\"-> TaskContractDriver\"));\nassert!(production_source.contains(\"TaskContractDriver::new(\"));\nassert!(production_source.contains(\"FsTaskContractReader::new(\"));\nassert!(production_source.contains(\"FsImplCatalogSignalReader::new(\"));\nassert!(production_source.contains(\"FsImplPlanReader::new(\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskContractCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "cd0a474d93bd18dbf7c3d51060b0735ce251a99dd175d99457b308a8748d0fea",
+        "declaration_hash": "23b23d64e6cfe5d5c5656d28f3d44d650ebaf511c476d4bc0228cf04160b525a",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"TaskContractDriver::new(check_service, coverage_service)\",\"PreReviewGateInteractor::new(\",\"CoverageVerifyInteractor::new(\",\"Arc::new(FsTaskContractReader::new(items_dir.clone()))\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskContractCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "cd0a474d93bd18dbf7c3d51060b0735ce251a99dd175d99457b308a8748d0fea",
+        "declaration_hash": "23b23d64e6cfe5d5c5656d28f3d44d650ebaf511c476d4bc0228cf04160b525a",
+        "anchor_text_hash": "1164210c6b8a00aeefa165926ce2bbd2ec0a85c4195dce0b3c1efcad2c774aad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "forbidden in [\n            \"CommandOutcome\",\n            \".handle(\",\n            \"std::fs::\",\n            \"std::process::\",\n            \"std::net::\",\n            \"std::io::\",\n            \"println!\",\n            \"eprintln!\",\n            \"print!\",\n            \"eprint!\",\n            \"ServiceImpl\",\n        ]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TaskContractCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TaskContractCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "cd0a474d93bd18dbf7c3d51060b0735ce251a99dd175d99457b308a8748d0fea",
+        "declaration_hash": "23b23d64e6cfe5d5c5656d28f3d44d650ebaf511c476d4bc0228cf04160b525a",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for wired_component in [\n            \"Arc::new(FsTaskContractReader::new(items_dir.clone()))\",\n            \"Arc::new(FsImplCatalogSignalReader::new(items_dir.clone()))\",\n            \"Arc::new(FsImplPlanReader::new(items_dir))\",\n            \"PreReviewGateInteractor::new(\",\n            \"CoverageVerifyInteractor::new(\",\n            \"TaskContractDriver::new(check_service, coverage_service)\",\n        ]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TemplateCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TemplateCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "ac6317df7049d4758e4dde7cebdb3dfa9c1c53a0fc743ee6a5d447f1c09ebf7d",
+        "declaration_hash": "0854a03469eef6c083965fd6e65a78ff6181230771872767a37d2444c6177a7e",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(production_source.contains(\"-> TemplateDriver\"));\nassert!(production_source.contains(\"TemplateDriver::new(\"));\nassert!(production_source.contains(\"Arc<dyn TemplateExportService>\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TemplateCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TemplateCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "ac6317df7049d4758e4dde7cebdb3dfa9c1c53a0fc743ee6a5d447f1c09ebf7d",
+        "declaration_hash": "0854a03469eef6c083965fd6e65a78ff6181230771872767a37d2444c6177a7e",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"for wired_component in [\\n            \\\"Arc::new(FsTemplateBoundaryManifestAdapter::new())\\\",\\n            \\\"Arc::new(FsTemplateExportAdapter::new(machine_home_directory()))\\\",\\n            \\\"Arc::new(FsSelfBinaryTransplantAdapter::new())\\\",\\n            \\\"TemplateExportInteractor::new(manifest_port, export_port, transplant_port)\\\",\\n            \\\"TemplateDriver::new(service)\\\",\\n        ]\" and \"for forbidden in [\\n            \\\"CommandOutcome\\\",\\n            \\\".handle(\\\",\\n            \\\"std::fs::\\\",\\n            \\\"std::process::\\\",\\n            \\\"std::net::\\\",\\n            \\\"std::io::\\\",\\n            \\\"println!\\\",\\n            \\\"eprintln!\\\",\\n            \\\"print!\\\",\\n            \\\"eprint!\\\",\\n            \\\"ServiceImpl\\\",\\n        ]\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TemplateCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TemplateCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "ac6317df7049d4758e4dde7cebdb3dfa9c1c53a0fc743ee6a5d447f1c09ebf7d",
+        "declaration_hash": "0854a03469eef6c083965fd6e65a78ff6181230771872767a37d2444c6177a7e",
+        "anchor_text_hash": "1164210c6b8a00aeefa165926ce2bbd2ec0a85c4195dce0b3c1efcad2c774aad"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "\"TemplateExportInteractor::new(manifest_port, export_port, transplant_port)\", \"TemplateDriver::new(service)\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "TemplateCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "TemplateCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "ac6317df7049d4758e4dde7cebdb3dfa9c1c53a0fc743ee6a5d447f1c09ebf7d",
+        "declaration_hash": "0854a03469eef6c083965fd6e65a78ff6181230771872767a37d2444c6177a7e",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "for wired_component in [\n            \"Arc::new(FsTemplateBoundaryManifestAdapter::new())\",\n            \"Arc::new(FsTemplateExportAdapter::new(machine_home_directory()))\",\n            \"Arc::new(FsSelfBinaryTransplantAdapter::new())\",\n            \"TemplateExportInteractor::new(manifest_port, export_port, transplant_port)\",\n            \"TemplateDriver::new(service)\",\n        ]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineSnapshotKind",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineSnapshotKind",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "0c673843feff7cf1bfe427d78634854e920878a329b07979ca8bf2b8ee86c5ae",
+        "declaration_hash": "e0f56b00162c91afde1c35a997622ea7a8c4a31088701de588dc6542e5d53051",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "matches!(result, AdrBaselineOutput::SnapshotRecorded(saved) if saved.hash() == &hash(b\"fork\") && saved.timestamp() == &timestamp)"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineDriver",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "81b34b4b560404937e7b4156b2e568de22080cc49bdd3a576c53bcec4351b3e6",
+        "declaration_hash": "659b77b06e2e1f5034e21ca4dc7d0e5eb76c1afad7ed55d3e6b219a5fe382988",
+        "anchor_text_hash": "0442c9e60c01d54b5f796781d4de112047aa7cced637ffd2a59e3ce6948e465b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let driver = AdrBaselineDriver::new(\n            service.clone(),\n            Arc::new(NoopQueryService),\n            fixed_timestamp_provider,\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineDriver",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "ecb35c2f074cda68601d79e5dfa0d6f2e8f09d3332a762ffa591fa99f8dd2df2",
+        "declaration_hash": "659b77b06e2e1f5034e21ca4dc7d0e5eb76c1afad7ed55d3e6b219a5fe382988",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(outcome.exit_code, 1); ... assert!(matches!(recorded.as_slice(), [AdrBaselineCommand::Snapshot { ... }] ... )); ... assert!(driver_source.contains(\"Arc<dyn AdrBaselineService>\")); ... assert!(driver_source.contains(\"Arc<dyn AdrBaselineQueryService>\")); ... assert!(!driver_source.contains(forbidden_runtime_path), \"primary adapter must not execute or reverse-delegate through {forbidden_runtime_path}\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineDriver",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "8661fc25cfc53f0f04d811ff045c894c72e716ac42bca370885a16569524db1b",
+        "declaration_hash": "659b77b06e2e1f5034e21ca4dc7d0e5eb76c1afad7ed55d3e6b219a5fe382988",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "forbidden_runtime_path in [\n            \"AdrBaselineCompositionRoot\",\n            \"adr_baseline_driver(\",\n            \"FsAdrBaseline\",\n            \"infrastructure::\",\n            \"AdrBaselineClockReading\",\n            \"ServiceImpl\",\n            \"CompatibilityShim\",\n            \"CompatService\",\n            \"std::fs::\",\n            \"std::process::\",\n            \"std::net::\",\n            \"std::io::\",\n            \"println!\",\n            \"eprintln!\",\n            \"print!\",\n            \"eprint!\",\n        ] {\n            assert!(\n                !driver_source.contains(forbidden_runtime_path),\n                \"primary adapter must not execute or reverse-delegate through {forbidden_runtime_path}\"\n            );\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineDriver",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineDriver",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "ea5c89b5e45f3c6132e8596941c3e99798c591e28aa7678b18a342aa30cefa15",
+        "declaration_hash": "659b77b06e2e1f5034e21ca4dc7d0e5eb76c1afad7ed55d3e6b219a5fe382988",
+        "anchor_text_hash": "25d5f954a6da7614bf2bc0fc032465e4f4366197b081b6152df4b5a96465b0cd"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(snapshot_outcome.stdout, None); assert_eq!(snapshot_outcome.stderr.as_deref(), Some(\"ADR baseline source read failed: DiagnosticMessage(\\\"not used\\\")\")); assert_eq!(snapshot_outcome.exit_code, 1); assert!(matches!(command_service.recorded.lock().unwrap().as_slice(), [AdrBaselineCommand::Snapshot { timestamp, .. }] if timestamp.as_str() == \"2026-07-16T00:00:00Z\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineSnapshotInput",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineSnapshotInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "9dd06e44155b2cf1bb270d7c11a899e14ef969a6fe6e561a69f7b5d444c3fb6a",
+        "declaration_hash": "32ddd953f7492c20e9356ea472e24c4b4d942b292b95e3b9bbf386f5ac78ba19",
+        "anchor_text_hash": "1084a4c9b9e0e512976b29e3fcd173064934602195da4b810776185586733865"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "forbidden_runtime_path in [\n            \"AdrBaselineDriver\",\n            \"AdrBaselineService\",\n            \"AdrBaselineQueryService\",\n            \"AdrBaselineCompositionRoot\",\n            \"ServiceImpl\",\n            \"CompatibilityShim\",\n            \"CompatService\",\n            \"std::fs::\",\n            \"std::process::\",\n            \"std::net::\",\n            \"std::io::\",\n        ] {\n            assert!(\n                !dto_source.contains(forbidden_runtime_path),\n                \"snapshot DTO must not retain or call runtime path {forbidden_runtime_path}\"\n            );\n        }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "AdrBaselineSnapshotInput",
+        "anchor_id": {
+          "file_path": "track/items/composition-root-pure-di-migration-initiative-2026-07-23/spec.json",
+          "element_id": "AC-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "AdrBaselineSnapshotInput",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "9dd06e44155b2cf1bb270d7c11a899e14ef969a6fe6e561a69f7b5d444c3fb6a",
+        "declaration_hash": "32ddd953f7492c20e9356ea472e24c4b4d942b292b95e3b9bbf386f5ac78ba19",
+        "anchor_text_hash": "fdb93cf236da1f671ad9bc35386ef18c873a6ae5bb9757b4c872c1e1f608534a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n                !dto_source.contains(forbidden_runtime_path),\n                \"snapshot DTO must not retain or call runtime path {forbidden_runtime_path}\"\n            );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ]
+}

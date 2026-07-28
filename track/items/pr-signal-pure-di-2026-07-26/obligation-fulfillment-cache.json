@@ -1,0 +1,1781 @@
+{
+  "track_id": "pr-signal-pure-di-2026-07-26",
+  "entries": [
+    {
+      "edge_id": {
+        "entry_key": "PrBaseOverride",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrBaseOverride",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:non_empty_pr_base_override"
+      },
+      "key": {
+        "bound_tests_set_hash": "e35986cbc54aa765cc04b116cef4baf831e0a58fd1f0f26ab296aea4954ca134",
+        "declaration_hash": "4fd32ab2a3e69f1d07a6293947e8cae1c9de129ab035f197e1259fd84e0ad6c2",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(PrBaseOverride::try_new(String::new()), None); ... base.as_str() == \" main \" && base.is_valid()"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrBaseOverride",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrBaseOverride",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:non_empty_pr_base_override"
+      },
+      "key": {
+        "bound_tests_set_hash": "e35986cbc54aa765cc04b116cef4baf831e0a58fd1f0f26ab296aea4954ca134",
+        "declaration_hash": "4fd32ab2a3e69f1d07a6293947e8cae1c9de129ab035f197e1259fd84e0ad6c2",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(PrBaseOverride::try_new(String::new()), None);\n\n        assert_eq!(output.exit_code, 0);\n        let commands = port.commands.lock().unwrap();\n        assert!(matches!(\n            commands.as_slice(),\n            [PrCommand::Ensure { base: Some(base), .. }] if base.as_str() == \" main \" && base.is_valid()\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1a3903c849e7804c009660331b33e8d401c294ac126787efbb11b1a7f91b5df8",
+        "declaration_hash": "d7313d327f9a8a1a5a037ab52af7260209e31e4d7c76de348fbb129b593aed07",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let interactor = PrCommandInteractor::new(port.clone());\n\n        let output = interactor.push(Some(\"valid-track\".to_owned()));\n\n        assert_eq!(output.stdout.as_deref(), Some(\"delegated\"));\n        let commands = port.commands.lock().unwrap();\n        assert!(\n            matches!(commands.as_slice(), [PrCommand::Push { track_id: Some(id) }] if id.as_str() == \"valid-track\")\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1a3903c849e7804c009660331b33e8d401c294ac126787efbb11b1a7f91b5df8",
+        "declaration_hash": "d7313d327f9a8a1a5a037ab52af7260209e31e4d7c76de348fbb129b593aed07",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let interactor = PrCommandInteractor::new(port.clone());\n\n        let outputs = [\n            interactor.push(Some(\"track-id\".to_owned())),\n            interactor.ensure(Some(\"track-id\".to_owned()), \"develop\".to_owned()),\n            interactor.status(\"123\".to_owned()),\n            interactor.wait_and_merge(\"123\".to_owned(), 2, 3, \"squash\".to_owned()),\n            interactor.trigger_review(\"123\".to_owned()),\n            interactor.poll_review(\"123\".to_owned(), \"2026-07-26T00:00:00Z\".to_owned(), 0, 1),\n            interactor.review_cycle(Some(\"track-id\".to_owned()), false),\n            interactor.review_cycle(Some(\"track-id\".to_owned()), true),\n        ];\n\n        assert!(matches!(\n            commands.as_slice(),\n            [\n                PrCommand::Push { .. },\n                PrCommand::Ensure { .. },\n                PrCommand::Status(_),\n                PrCommand::WaitAndMerge { .. },\n                PrCommand::TriggerReview(_),\n                PrCommand::PollReview { .. },\n                PrCommand::ReviewCycle { mode: PrReviewCycleMode::Start, .. },\n                PrCommand::ReviewCycle { mode: PrReviewCycleMode::Resume, .. },\n            ]\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1a3903c849e7804c009660331b33e8d401c294ac126787efbb11b1a7f91b5df8",
+        "declaration_hash": "d7313d327f9a8a1a5a037ab52af7260209e31e4d7c76de348fbb129b593aed07",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            commands.as_slice(),\n            [\n                PrCommand::Push { .. },\n                PrCommand::Ensure { .. },\n                PrCommand::Status(_),\n                PrCommand::WaitAndMerge { .. },\n                PrCommand::TriggerReview(_),\n                PrCommand::PollReview { .. },\n                PrCommand::ReviewCycle { mode: PrReviewCycleMode::Start, .. },\n                PrCommand::ReviewCycle { mode: PrReviewCycleMode::Resume, .. },\n            ]\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrIdentifier",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrIdentifier",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:non_empty_pr_identifier"
+      },
+      "key": {
+        "bound_tests_set_hash": "a2d7ea710188886b35f4d2cd33c29f275f222c9668812f4c39bdf4cf913bbb1a",
+        "declaration_hash": "45ff22aeefe386107c7c3ad3adb44939da0b7eb9a64d020d9f0bf9f38e163a5c",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let output = interactor.status(String::new());\n\n        assert_eq!(output.exit_code, 1);\n        assert_eq!(output.stderr.as_deref(), Some(\"PR identifier must not be empty\"));\n        assert!(port.commands.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrIdentifier",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrIdentifier",
+        "obligation_kind": "boundary",
+        "item_identifier": "invariant:non_empty_pr_identifier"
+      },
+      "key": {
+        "bound_tests_set_hash": "a2d7ea710188886b35f4d2cd33c29f275f222c9668812f4c39bdf4cf913bbb1a",
+        "declaration_hash": "45ff22aeefe386107c7c3ad3adb44939da0b7eb9a64d020d9f0bf9f38e163a5c",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(output.stderr.as_deref(), Some(\"PR identifier must not be empty\"));\n        assert!(port.commands.lock().unwrap().is_empty());"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommandPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommandPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "5cf4f77c529115f3635fb0fddb6fa6b2c9a29fd86af1bb438c18293e5ca509bf",
+        "declaration_hash": "790babd669b598fdbaea6958bcc41730273a1ca8520cf8a893dd94c7e021e50a",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            matches!(commands.as_slice(), [PrCommand::Push { track_id: Some(id) }] if id.as_str() == \"valid-track\")\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommandPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommandPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "5cf4f77c529115f3635fb0fddb6fa6b2c9a29fd86af1bb438c18293e5ca509bf",
+        "declaration_hash": "790babd669b598fdbaea6958bcc41730273a1ca8520cf8a893dd94c7e021e50a",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            matches!(commands.as_slice(), [PrCommand::Push { track_id: Some(id) }] if id.as_str() == \"valid-track\")\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommandPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommandPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "5cf4f77c529115f3635fb0fddb6fa6b2c9a29fd86af1bb438c18293e5ca509bf",
+        "declaration_hash": "790babd669b598fdbaea6958bcc41730273a1ca8520cf8a893dd94c7e021e50a",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n            matches!(commands.as_slice(), [PrCommand::Push { track_id: Some(id) }] if id.as_str() == \"valid-track\")\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommandPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommandPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "5cf4f77c529115f3635fb0fddb6fa6b2c9a29fd86af1bb438c18293e5ca509bf",
+        "declaration_hash": "790babd669b598fdbaea6958bcc41730273a1ca8520cf8a893dd94c7e021e50a",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(output.stdout.as_deref(), Some(\"persisted stdout\"));\n        assert_eq!(output.stderr.as_deref(), Some(\"persisted stderr\"));\n        assert_eq!(output.exit_code, 17);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pr::PrCommandPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5b7a4e19956614e2d03b54fc2adf13c24be21ea97aba88210e2044c54da54b0",
+        "declaration_hash": "2e70c060ac01e921a5be20756e6e79d8298d6419ca166ac3a61451c2313c5f86",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let driver = root.pr_driver_with_port(port.clone());\n\n        let outcome = driver.handle(PrInput::Push { track_id: Some(\"wired-track\".to_owned()) });\n\n        assert_eq!(outcome.stdout.as_deref(), Some(\"driver stdout\"));\n        assert_eq!(outcome.stderr.as_deref(), Some(\"driver stderr\"));\n        assert_eq!(outcome.exit_code, 23);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pr::PrCommandPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5b7a4e19956614e2d03b54fc2adf13c24be21ea97aba88210e2044c54da54b0",
+        "declaration_hash": "2e70c060ac01e921a5be20756e6e79d8298d6419ca166ac3a61451c2313c5f86",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let driver = root.pr_driver_with_port(port.clone());\n\n        let outcome = driver.handle(PrInput::Push { track_id: Some(\"wired-track\".to_owned()) });\n\n        assert_eq!(outcome.stdout.as_deref(), Some(\"driver stdout\"));\n        assert_eq!(outcome.stderr.as_deref(), Some(\"driver stderr\"));\n        assert_eq!(outcome.exit_code, 23);\n        let commands = port.commands.lock().unwrap();\n        assert!(\n            matches!(commands.as_slice(), [PrCommand::Push { track_id: Some(id) }] if id.as_str() == \"wired-track\")\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pr::PrCommandPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5b7a4e19956614e2d03b54fc2adf13c24be21ea97aba88210e2044c54da54b0",
+        "declaration_hash": "2e70c060ac01e921a5be20756e6e79d8298d6419ca166ac3a61451c2313c5f86",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            local_head.stdout, remote_head.stdout,\n            \"pure-DI push must persist the branch ref at origin\"\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::pr::PrCommandPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5b7a4e19956614e2d03b54fc2adf13c24be21ea97aba88210e2044c54da54b0",
+        "declaration_hash": "2e70c060ac01e921a5be20756e6e79d8298d6419ca166ac3a61451c2313c5f86",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "driver.handle(PrInput::Push { track_id: Some(track_id.to_owned()) })\nassert_eq!(outcome.stdout.as_deref(), Some(format!(\"[OK] Pushed {branch}\").as_str()));\nassert_eq!(outcome.stderr, None);\nassert_eq!(outcome.exit_code, 0);\nassert_eq!(local_head.stdout, remote_head.stdout, \"pure-DI push must persist the branch ref at origin\")"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemPrCommandAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "d5b7a4e19956614e2d03b54fc2adf13c24be21ea97aba88210e2044c54da54b0",
+        "declaration_hash": "a44888a7ba44481fee3a1d4884cae786013756af341b932f8160b3585d7e6bc9",
+        "anchor_text_hash": "2002daaeadc79b72748b7a8a3d7503e01c5f9eec6f4d5b7bee7037008ca48510"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let port = Arc::new(RecordingPort::new());\n        let driver = root.pr_driver_with_port(port.clone());\n\n        let outcome = driver.handle(PrInput::Push { track_id: Some(\"wired-track\".to_owned()) });\n\n        assert_eq!(outcome.stdout.as_deref(), Some(\"driver stdout\"));\n        assert_eq!(outcome.stderr.as_deref(), Some(\"driver stderr\"));\n        assert_eq!(outcome.exit_code, 23);\n        let commands = port.commands.lock().unwrap();\n        assert!(\n            matches!(commands.as_slice(), [PrCommand::Push { track_id: Some(id) }] if id.as_str() == \"wired-track\")\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "982433a0a2f872a5b37480c6aee4f61efec825547173f38cc4b6d0ad89e4bc08",
+        "declaration_hash": "db17152297722ff4a58355400123543b0877fb8416e87fea34c9aedf2c98bcbc",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            commands.as_slice(),\n            [\n                PrCommand::Push { track_id: Some(push_track_id) },\n                PrCommand::Ensure { track_id: Some(ensure_track_id), base: Some(base) },\n                PrCommand::Status(status_pr),\n                PrCommand::WaitAndMerge { pr: merge_pr, interval, timeout, method },\n                PrCommand::TriggerReview(trigger_pr),\n                PrCommand::PollReview { pr: poll_pr, trigger_timestamp, interval: poll_interval, timeout: poll_timeout },\n                PrCommand::ReviewCycle { track_id: Some(start_track_id), mode: PrReviewCycleMode::Start },\n                PrCommand::ReviewCycle { track_id: Some(resume_track_id), mode: PrReviewCycleMode::Resume, },\n            ]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "5ab61e744d89ebcb4603bccda92a41aa15ad357f900637afd8581de0940150f5",
+        "declaration_hash": "db17152297722ff4a58355400123543b0877fb8416e87fea34c9aedf2c98bcbc",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let driver = root.pr_driver_with_port(port.clone());\n\n        let outcomes = [\n            driver.handle(PrInput::Push { track_id: Some(\"INVALID\".to_owned()) }),\n            driver.handle(PrInput::Ensure {\n                track_id: Some(\"INVALID\".to_owned()),\n                base: Some(\" main \".to_owned()),\n            }),\n            driver.handle(PrInput::Status { pr: \"123\".to_owned() }),\n            driver.handle(PrInput::WaitAndMerge {\n                pr: \"123\".to_owned(),\n                interval: 0,\n                timeout: 0,\n                method: Some(\"squash\".to_owned()),\n            }),\n            driver.handle(PrInput::TriggerReview { pr: \"123\".to_owned() }),\n            driver.handle(PrInput::PollReview {\n                pr: \"123\".to_owned(),\n                trigger_timestamp: \"2026-07-26T00:00:00Z\".to_owned(),\n                interval: 0,\n                timeout: 0,\n            }),\n            driver.handle(PrInput::ReviewCycle {\n                track_id: Some(\"INVALID\".to_owned()),\n                resume: false,\n            }),\n            driver.handle(PrInput::ReviewCycle {\n                track_id: Some(\"INVALID\".to_owned()),\n                resume: true,\n            }),\n        ];\n\n        assert!(matches!(\n            commands.as_slice(),\n            [\n                PrCommand::Push { track_id: Some(push_track_id) },\n                PrCommand::Ensure { track_id: Some(ensure_track_id), base: Some(base) },\n                PrCommand::Status(status_pr),\n                PrCommand::WaitAndMerge { pr: merge_pr, interval: merge_interval, timeout: merge_timeout, method },\n                PrCommand::TriggerReview(trigger_pr),\n                PrCommand::PollReview { pr: poll_pr, trigger_timestamp, interval: poll_interval, timeout: poll_timeout },\n                PrCommand::ReviewCycle { track_id: Some(start_track_id), mode: usecase::pr::PrReviewCycleMode::Start },\n                PrCommand::ReviewCycle { track_id: Some(resume_track_id), mode: usecase::pr::PrReviewCycleMode::Resume },\n            ]\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "e7ce0bb9e4c6d1cf330ee6b67d137f723414cdd505e0a6b10ef1773cda27be2d",
+        "declaration_hash": "db17152297722ff4a58355400123543b0877fb8416e87fea34c9aedf2c98bcbc",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(outcomes.iter().all(|outcome| {\n            outcome.stdout.as_deref() == Some(\"driver stdout\")\n                && outcome.stderr.as_deref() == Some(\"driver stderr\")\n                && outcome.exit_code == 23\n        })); ... assert!(matches!(\n            commands.as_slice(),"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrPollIntervalSeconds",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrPollIntervalSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "67c53bca7a2af31e7d6a5fb9057c925ad6a7a4fa79c71d78a44c94285c7a679a",
+        "declaration_hash": "8433f7cffeff7426ec31491f06a2e8fc4672b681e877b625c115328e36166239",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "interactor.poll_review(\"123\".to_owned(), \"2026-07-26T00:00:00Z\".to_owned(), 0, 1),\n...\n&& poll_interval.as_secs() == 0"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrPollIntervalSeconds",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrPollIntervalSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "67c53bca7a2af31e7d6a5fb9057c925ad6a7a4fa79c71d78a44c94285c7a679a",
+        "declaration_hash": "8433f7cffeff7426ec31491f06a2e8fc4672b681e877b625c115328e36166239",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "&& poll_interval.as_secs() == 0"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrPollTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrPollTimeoutSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "67c53bca7a2af31e7d6a5fb9057c925ad6a7a4fa79c71d78a44c94285c7a679a",
+        "declaration_hash": "7c0920b3a79138fd73109204a496d379d0bd488c469021fb5f3e651ae2e584b6",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "&& timeout.as_secs() == 3\n                && matches!(method, Some(domain::MergeMethod::Squash))\n                && trigger_pr.as_str() == \"123\"\n                && poll_pr.as_str() == \"123\"\n                && trigger_timestamp.as_str() == \"2026-07-26T00:00:00Z\"\n                && poll_interval.as_secs() == 0\n                && poll_timeout.as_secs() == 1"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrPollTimeoutSeconds",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrPollTimeoutSeconds",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "67c53bca7a2af31e7d6a5fb9057c925ad6a7a4fa79c71d78a44c94285c7a679a",
+        "declaration_hash": "7c0920b3a79138fd73109204a496d379d0bd488c469021fb5f3e651ae2e584b6",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "PrCommand::PollReview { pr: poll_pr, trigger_timestamp, interval: poll_interval, timeout: poll_timeout },\n                && poll_timeout.as_secs() == 1"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrReviewCycleMode",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrReviewCycleMode",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "67c53bca7a2af31e7d6a5fb9057c925ad6a7a4fa79c71d78a44c94285c7a679a",
+        "declaration_hash": "4c001a69caa8e3d3918e66a1f4a49e714039db7026a8f0e436f1b39fce2f0422",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "PrCommand::ReviewCycle { track_id: Some(start_track_id), mode: PrReviewCycleMode::Start },\n                PrCommand::ReviewCycle { track_id: Some(resume_track_id), mode: PrReviewCycleMode::Resume },"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrReviewCycleMode",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrReviewCycleMode",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "67c53bca7a2af31e7d6a5fb9057c925ad6a7a4fa79c71d78a44c94285c7a679a",
+        "declaration_hash": "4c001a69caa8e3d3918e66a1f4a49e714039db7026a8f0e436f1b39fce2f0422",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let port = Arc::new(RecordingPort::new());\n        let interactor = PrCommandInteractor::new(port.clone());\n\n        let outputs = [\n            interactor.review_cycle(Some(\"track-id\".to_owned()), false),\n            interactor.review_cycle(Some(\"track-id\".to_owned()), true),\n        ];\n\n        assert!(outputs.iter().all(|output| output.exit_code == 0));\n        let commands = port.commands.lock().unwrap();\n        assert!(matches!(\n            commands.as_slice(),\n            [\n                PrCommand::Push { .. },\n                PrCommand::Ensure { .. },\n                PrCommand::Status(..),\n                PrCommand::WaitAndMerge { .. },\n                PrCommand::TriggerReview(..),\n                PrCommand::PollReview { .. },\n                PrCommand::ReviewCycle { track_id: Some(start_track_id), mode: PrReviewCycleMode::Start },\n                PrCommand::ReviewCycle { track_id: Some(resume_track_id), mode: PrReviewCycleMode::Resume },\n            ] if start_track_id.as_str() == \"track-id\"\n                && resume_track_id.as_str() == \"track-id\"\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "bfd58b85a22379ca12d85c232c543b28faa03e9b725df22d6b75f2f51586541f",
+        "declaration_hash": "0a90c7844af77af1a3d50467f65fad5759071343e307a82f4a7728c7659b3733",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let driver = PrCompositionRoot::new().pr_driver();"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-03"
+      },
+      "key": {
+        "bound_tests_set_hash": "bfd58b85a22379ca12d85c232c543b28faa03e9b725df22d6b75f2f51586541f",
+        "declaration_hash": "0a90c7844af77af1a3d50467f65fad5759071343e307a82f4a7728c7659b3733",
+        "anchor_text_hash": "4cbcdd32ce0a8bf946e5fe6400d57cd08205d8ed30661cc24521d18948810d78"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let driver = PrCompositionRoot::new().pr_driver();\nlet outcome = crate::test_support::run_in_dir(&workspace, || {\n    driver.handle(PrInput::Push { track_id: Some(track_id.to_owned()) })\n});\n\nassert_eq!(outcome.exit_code, 0);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrTrackIdOverride",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrTrackIdOverride",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "b964154d0ea5d36ccf910b9165970d8e8d36bc118f226550ac295caee289ef34",
+        "declaration_hash": "fcdeeed71f29510ebeae8e3c069e2be7cc7089a02161684384221b41fb3c4f35",
+        "anchor_text_hash": "02baa93f87ebe36a2da38b41af845df3b4527e91038f649c3e4fa20fd6f09927"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            commands.as_slice(),\n            [\n                PrCommand::Push { track_id: Some(push_track_id) },\n                PrCommand::Ensure { track_id: Some(ensure_track_id), base: None },\n                PrCommand::ReviewCycle { track_id: Some(review_track_id), mode: PrReviewCycleMode::Start },\n            ] if push_track_id.as_str() == \"INVALID\"\n                && ensure_track_id.as_str() == \"INVALID\"\n                && review_track_id.as_str() == \"INVALID\"\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "PrTrackIdOverride",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "PrTrackIdOverride",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "72459c6b744a240ca1ba5095f6597f137a03a0490681be53d06ce9e62ca11f9c",
+        "declaration_hash": "fcdeeed71f29510ebeae8e3c069e2be7cc7089a02161684384221b41fb3c4f35",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "&& push_track_id.as_str() == \"INVALID\"\n                && ensure_track_id.as_str() == \"INVALID\"\n                && review_track_id.as_str() == \"INVALID\""
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "3996ca54423e5a48885f994b45e6b0e0ebbe4540478c46136d902e7a9bf8fe80",
+        "declaration_hash": "3db2a3b102806c431b02712d90e0b08307749d1ca076aaf9516fc0d143ca9bc3",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(interactor_source.contains(\"impl SignalService for SignalCommandInteractor\"), \"the interactor must implement the driver's application-service boundary\");\nassert!(!interactor_source.contains(\"SystemSignalCommandAdapter\"), \"the interactor must not re-enter a concrete infrastructure adapter\");\nassert!(composition_source.contains(\"cli_driver::signal::SignalDriver::new(service)\"), \"the interactor must be the driver's sole execution dependency\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "3996ca54423e5a48885f994b45e6b0e0ebbe4540478c46136d902e7a9bf8fe80",
+        "declaration_hash": "3db2a3b102806c431b02712d90e0b08307749d1ca076aaf9516fc0d143ca9bc3",
+        "anchor_text_hash": "4888534bd2ae87f1a0401ba6f2dea9a33f16352c330db35724f4a9819ac36de8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!source.contains(\"SignalServiceImpl\"), \"{path} retains the legacy service\");\n        assert!(!source.contains(\"signal::shim\"), \"{path} retains the signal shim\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "3996ca54423e5a48885f994b45e6b0e0ebbe4540478c46136d902e7a9bf8fe80",
+        "declaration_hash": "3db2a3b102806c431b02712d90e0b08307749d1ca076aaf9516fc0d143ca9bc3",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(\n        composition_source.contains(\"cli_driver::signal::SignalDriver::new(service)\"),\n        \"the interactor must be the driver's sole execution dependency\"\n    );\n\n    assert!(\n        driver_source.contains(\"service: Arc<dyn SignalService>\"),\n        \"the driver must depend only on the usecase application service\"\n    );\n    assert!(\n        !driver_source.contains(\"SystemSignalCommandAdapter\"),\n        \"the driver must not construct or re-enter the infrastructure adapter\"\n    );\n    assert!(\n        !driver_source.contains(\"SignalCommandPort\"),\n        \"the driver must not bypass the interactor through the port\"\n    );\n\n    assert!(\n        interactor_source.contains(\"port: Arc<dyn SignalCommandPort>\"),\n        \"the interactor must own the typed execution port\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "3996ca54423e5a48885f994b45e6b0e0ebbe4540478c46136d902e7a9bf8fe80",
+        "declaration_hash": "3db2a3b102806c431b02712d90e0b08307749d1ca076aaf9516fc0d143ca9bc3",
+        "anchor_text_hash": "a56d5cadabfe199f3ca673a7ba369aa2ad26f0fe6a8d06844185774381716c0e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(commands.len(), 4);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "3996ca54423e5a48885f994b45e6b0e0ebbe4540478c46136d902e7a9bf8fe80",
+        "declaration_hash": "3db2a3b102806c431b02712d90e0b08307749d1ca076aaf9516fc0d143ca9bc3",
+        "anchor_text_hash": "0b714c87a9abc948effdac90df87045e9982cdef40f044b965737a0953d1a66a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(config.loads.load(Ordering::SeqCst), 1); ... ResolvedSignalChainCommand::CheckAdrUser { strictness: Strictness::Interim, .. }"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "3996ca54423e5a48885f994b45e6b0e0ebbe4540478c46136d902e7a9bf8fe80",
+        "declaration_hash": "3db2a3b102806c431b02712d90e0b08307749d1ca076aaf9516fc0d143ca9bc3",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(output.stdout.as_deref(), Some(\"port output\"));\n        assert_eq!(output.stderr, None);\n        assert_eq!(output.exit_code, 0);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandInteractor",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "3996ca54423e5a48885f994b45e6b0e0ebbe4540478c46136d902e7a9bf8fe80",
+        "declaration_hash": "3db2a3b102806c431b02712d90e0b08307749d1ca076aaf9516fc0d143ca9bc3",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(composition_source.contains(\"cli_driver::signal::SignalDriver::new(service)\")); ... assert!(!composition_public_api_source.contains(\"pub use infrastructure::signal::SystemSignalCommandAdapter\"));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalFailureReason",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalFailureReason",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "cd6fdede4c5db173db4084178e52dda31af25830a90d50d452e68f771f7a0004",
+        "declaration_hash": "522ddf87007ecba327226ee240300abb7bd0f7bac89aa0d0d7f68d48f9ca50fc",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(reason.as_str(), \"adapter diagnostic\");\n        assert_eq!(reason.to_string(), \"adapter diagnostic\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalActiveTrackResolverPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalActiveTrackResolverPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve_active_track"
+      },
+      "key": {
+        "bound_tests_set_hash": "6e3113ac51322e5087c8fb1125739edc80ba97483f6f245f96e0dc091588ad10",
+        "declaration_hash": "ee51506624a6ac94ff56e6337efef2937605439973c4443e0d2e7b4a78163dce",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            active_track_roots.lock().unwrap().as_slice(),\n            [Some(PathBuf::from(\"explicit/workspace\"))]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalActiveTrackResolverPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalActiveTrackResolverPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve_active_track"
+      },
+      "key": {
+        "bound_tests_set_hash": "6e3113ac51322e5087c8fb1125739edc80ba97483f6f245f96e0dc091588ad10",
+        "declaration_hash": "ee51506624a6ac94ff56e6337efef2937605439973c4443e0d2e7b4a78163dce",
+        "anchor_text_hash": "4888534bd2ae87f1a0401ba6f2dea9a33f16352c330db35724f4a9819ac36de8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "        assert!(!source.contains(\"SignalServiceImpl\"), \"{path} retains the legacy service\");\n        assert!(!source.contains(\"signal::shim\"), \"{path} retains the signal shim\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalSpecPathResolverPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalSpecPathResolverPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve_spec_path"
+      },
+      "key": {
+        "bound_tests_set_hash": "0b889d99918c2a3fb146f335408bba92e027fc603677e296ceb7d7613cef0ebd",
+        "declaration_hash": "c510bdc4a6b8b9cca228ab7ac51d339f9183de183e301d80667370024a1ca4eb",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(events.lock().unwrap().as_slice(), [\"spec-path\"]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalSpecPathResolverPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalSpecPathResolverPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:resolve_spec_path"
+      },
+      "key": {
+        "bound_tests_set_hash": "0b889d99918c2a3fb146f335408bba92e027fc603677e296ceb7d7613cef0ebd",
+        "declaration_hash": "c510bdc4a6b8b9cca228ab7ac51d339f9183de183e301d80667370024a1ca4eb",
+        "anchor_text_hash": "4888534bd2ae87f1a0401ba6f2dea9a33f16352c330db35724f4a9819ac36de8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!source.contains(\"SignalServiceImpl\"), \"{path} retains the legacy service\");\n        assert!(!source.contains(\"signal::shim\"), \"{path} retains the signal shim\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "cda6d8a6f9e500cd68548b2e1b375fb4f2a12da3a29a527c6455014bee101a60",
+        "declaration_hash": "287b66f17a3875010024f6b6bf457c9d3b614ec357b2ee0cdf36efd021b130dd",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(port.0.lock().unwrap().as_slice(), [ResolvedSignalChainCommand::CheckAdrUser { project_root: SignalRootSelection::Supplied(project_root), strictness: Strictness::Interim, }]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:execute"
+      },
+      "key": {
+        "bound_tests_set_hash": "cda6d8a6f9e500cd68548b2e1b375fb4f2a12da3a29a527c6455014bee101a60",
+        "declaration_hash": "287b66f17a3875010024f6b6bf457c9d3b614ec357b2ee0cdf36efd021b130dd",
+        "anchor_text_hash": "4888534bd2ae87f1a0401ba6f2dea9a33f16352c330db35724f4a9819ac36de8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!source.contains(\"SignalServiceImpl\"), \"{path} retains the legacy service\");\n        assert!(!source.contains(\"signal::shim\"), \"{path} retains the signal shim\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalGateConfigPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalGateConfigPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "key": {
+        "bound_tests_set_hash": "424bd742062947aec33cfe748097c2df0eb37609191321926a42c04ef88834ba",
+        "declaration_hash": "55e0896926da85e52bdfff960dc586a001ae4333e3064b473c166547a8d7fc78",
+        "anchor_text_hash": "a56d5cadabfe199f3ca673a7ba369aa2ad26f0fe6a8d06844185774381716c0e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(commands.len(), 4);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalGateConfigPort",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalGateConfigPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load"
+      },
+      "key": {
+        "bound_tests_set_hash": "424bd742062947aec33cfe748097c2df0eb37609191321926a42c04ef88834ba",
+        "declaration_hash": "55e0896926da85e52bdfff960dc586a001ae4333e3064b473c166547a8d7fc78",
+        "anchor_text_hash": "0b714c87a9abc948effdac90df87045e9982cdef40f044b965737a0953d1a66a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(config.loads.load(Ordering::SeqCst), 1); ... assert!(matches!(commands.as_slice(), [ ResolvedSignalChainCommand::CheckAdrUser { strictness: Strictness::Interim, .. }, ResolvedSignalChainCommand::CheckSpecAdr { .. }, ResolvedSignalChainCommand::CheckCatalogSpec { .. }, ResolvedSignalChainCommand::CheckImplCatalog { .. }, ]));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalCommandPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "5da3efca3cf65c60ac7598041239d452823a364a466817164af880b08c87c232",
+        "declaration_hash": "ae4369c153ce02cfc3762d2eac1738827189818544720e968649dd8440c60eee",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let _port: &dyn SignalCommandPort = &adapter;"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalActiveTrackResolverPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "b2c59de15cc02f33670a98c69b0a7004fbafe903ab40ce16cdf387182fbbf163",
+        "declaration_hash": "8817421b3f95fa3645838190acab19ad74b5a97fd6415ef1e1a81a03c4e9b4a8",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let _active_track_resolver: &dyn SignalActiveTrackResolverPort = &adapter;"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalSpecPathResolverPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "b2c59de15cc02f33670a98c69b0a7004fbafe903ab40ce16cdf387182fbbf163",
+        "declaration_hash": "e41a7759357eb9222598db5afa1e03853df81718077484fb2a97e6e979db15a3",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let _spec_path_resolver: &dyn SignalSpecPathResolverPort = &adapter;"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalGateConfigAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalGateConfigAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalGateConfigPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "f07dacf4f6a8cf660b56683f546957d765cd4084f510d928ddee82efc35ddcd5",
+        "declaration_hash": "b1261722f7cad79524058179c74bba5e00ab0ed175d7b66835d89a206d5dabec",
+        "anchor_text_hash": "a56d5cadabfe199f3ca673a7ba369aa2ad26f0fe6a8d06844185774381716c0e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let _port: &dyn SignalGateConfigPort = &adapter;"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalGateConfigAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalGateConfigAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::signal_service::SignalGateConfigPort"
+      },
+      "key": {
+        "bound_tests_set_hash": "f07dacf4f6a8cf660b56683f546957d765cd4084f510d928ddee82efc35ddcd5",
+        "declaration_hash": "b1261722f7cad79524058179c74bba5e00ab0ed175d7b66835d89a206d5dabec",
+        "anchor_text_hash": "0b714c87a9abc948effdac90df87045e9982cdef40f044b965737a0953d1a66a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(matrix.resolve(ChainId::AdrUser, GateKind::Commit), Strictness::Interim);\n        assert_eq!(matrix.resolve(ChainId::ImplCatalog, GateKind::Merge), Strictness::Strict);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedSignalChainCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedSignalChainCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "67405544d2ad0341d3d1d618c02008e1686c9178f63e4ec8d548c6044d279129",
+        "declaration_hash": "d2d3bd5911b703ee227968b1e8ebb5778d484e706b30ce964c3c52b18af0b197",
+        "anchor_text_hash": "0b714c87a9abc948effdac90df87045e9982cdef40f044b965737a0953d1a66a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "ResolvedSignalChainCommand::CheckAdrUser {\n    project_root: SignalRootSelection::Supplied(project_root),\n    strictness: Strictness::Strict,\n},\nResolvedSignalChainCommand::CheckSpecAdr {\n    spec_json_path: Some(spec_json_path),\n    strictness: Strictness::Strict,\n    workspace_root: Some(workspace_root.clone()),\n},\nResolvedSignalChainCommand::CheckCatalogSpec {\n    strictness: Strictness::Strict,\n    workspace_root: Some(workspace_root.clone()),\n},\nResolvedSignalChainCommand::CheckImplCatalog {\n    strictness: Strictness::Strict,\n    workspace_root: Some(workspace_root),\n}"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ResolvedSignalChainCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ResolvedSignalChainCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "67405544d2ad0341d3d1d618c02008e1686c9178f63e4ec8d548c6044d279129",
+        "declaration_hash": "d2d3bd5911b703ee227968b1e8ebb5778d484e706b30ce964c3c52b18af0b197",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            *port.0.lock().unwrap(),\n            vec![\n                ResolvedSignalChainCommand::CalcAdrUser { project_root: project_root.clone() },\n                ResolvedSignalChainCommand::CheckAdrUser {\n                    project_root: SignalRootSelection::Supplied(project_root.clone()),\n                    strictness: Strictness::Interim,\n                },"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalChainExecutionReport",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalChainExecutionReport",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "67405544d2ad0341d3d1d618c02008e1686c9178f63e4ec8d548c6044d279129",
+        "declaration_hash": "8c132424a746c737c3205389125932cdbfd0a470485804edf0bb13755f9a3e3b",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(gate_output.stderr, None);\n        assert_eq!(gate_output.exit_code, 0);\n        assert_eq!(\n            gate_output.stdout.as_deref(),"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommand",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommand",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "dd02b462d2fc2b154a906cd5df38467f7d72528c4b57f22b431a20632165ad7d",
+        "declaration_hash": "3ab37c23a729ab2cce1d84be98c3c261c27238360c787bfe669d94b1a05133dd",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(matches!(\n            &commands[0],\n            SignalCommand::CalcAdrUser { project_root: value } if value == &project_root\n        ));"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalGateConfigError",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalGateConfigError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-08"
+      },
+      "key": {
+        "bound_tests_set_hash": "ab9ebdc030edb37788b539ac85c27a75f8a76e35dbc9b1908ea9d36aeb8a763c",
+        "declaration_hash": "ed0f53eade67e15bf1fdf2716f3ca400c277e741e43dca96f2f4158009cea3aa",
+        "anchor_text_hash": "a56d5cadabfe199f3ca673a7ba369aa2ad26f0fe6a8d06844185774381716c0e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(gate_config_failure.exit_code, 1);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalStrictOverride",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-10"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalStrictOverride",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-10"
+      },
+      "key": {
+        "bound_tests_set_hash": "80a23518a6937c629da449ff35201c5c6c9f4ba904921c5f2a806442c364dc45",
+        "declaration_hash": "08ad1c71dd1576907d6722196263f198c3d249646ec13b0b2bc1075ccad2ffec",
+        "anchor_text_hash": "0b714c87a9abc948effdac90df87045e9982cdef40f044b965737a0953d1a66a"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            port.0.lock().unwrap().as_slice(),\n            [ResolvedSignalChainCommand::CheckAdrUser {\n                project_root: SignalRootSelection::Supplied(project_root),\n                strictness: Strictness::Interim,\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalStrictOverride",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalStrictOverride",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "80a23518a6937c629da449ff35201c5c6c9f4ba904921c5f2a806442c364dc45",
+        "declaration_hash": "08ad1c71dd1576907d6722196263f198c3d249646ec13b0b2bc1075ccad2ffec",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "strictness: Strictness::Interim,"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "IN-02"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:IN-02"
+      },
+      "key": {
+        "bound_tests_set_hash": "3f39deb631bce4491926120d792b0eb458a09b793cc61a378dd898c5b1f42f30",
+        "declaration_hash": "1a3a5b08d5831f5479b67ec596ee2165bd80b36a8d5932dab45b29af7eb4a0a8",
+        "anchor_text_hash": "be3d5c60d1e2f04aa49afe3b150b5a32c9729e59e4499e70f2ee4c5be08eceb1"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let root = SignalCompositionRoot::new();\n\nlet outcome = root\n    .signal_driver()\n    .handle(SignalInput::CalcAdrUser { project_root: workspace.path().to_path_buf() });\n\nassert_eq!(outcome.exit_code, 0);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "df6fb7625ce66838c8dfa5c2be89e964d590c1fa87416db84e7ed7a4e62049fb",
+        "declaration_hash": "1a3a5b08d5831f5479b67ec596ee2165bd80b36a8d5932dab45b29af7eb4a0a8",
+        "anchor_text_hash": "4888534bd2ae87f1a0401ba6f2dea9a33f16352c330db35724f4a9819ac36de8"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!source.contains(\"SignalServiceImpl\"), \"{path} retains the legacy service\");\n        assert!(!source.contains(\"signal::shim\"), \"{path} retains the signal shim\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-07"
+      },
+      "key": {
+        "bound_tests_set_hash": "c8ee17bdea842238b07264fd027c9507fdbbc6bf69e3262f8022266dd08e2e35",
+        "declaration_hash": "1a3a5b08d5831f5479b67ec596ee2165bd80b36a8d5932dab45b29af7eb4a0a8",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(*port.0.lock().unwrap(), vec![ ResolvedSignalChainCommand::CalcAdrUser { project_root: project_root.clone() }, ResolvedSignalChainCommand::CheckAdrUser { project_root: SignalRootSelection::Supplied(project_root.clone()), strictness: Strictness::Interim, }, ResolvedSignalChainCommand::CalcSpecAdr { spec_json_path: Some(spec_json_path.clone()), workspace_root: Some(workspace_root.clone()), }, ResolvedSignalChainCommand::CheckSpecAdr { spec_json_path: Some(spec_json_path.clone()), strictness: Strictness::Strict, workspace_root: Some(workspace_root.clone()), }, ResolvedSignalChainCommand::CalcCatalogSpec, ResolvedSignalChainCommand::CheckCatalogSpec { strictness: Strictness::Strict, workspace_root: Some(workspace_root.clone()), }, ResolvedSignalChainCommand::CalcImplCatalog, ResolvedSignalChainCommand::CheckImplCatalog { strictness: Strictness::Strict, workspace_root: Some(workspace_root.clone()), }, ResolvedSignalChainCommand::CheckAdrUser { project_root: SignalRootSelection::Supplied(project_root), strictness: Strictness::Strict, }, ResolvedSignalChainCommand::CheckSpecAdr { spec_json_path: Some(spec_json_path), strictness: Strictness::Strict, workspace_root: Some(workspace_root.clone()), }, ResolvedSignalChainCommand::CheckCatalogSpec { strictness: Strictness::Strict, workspace_root: Some(workspace_root.clone()), }, ResolvedSignalChainCommand::CheckImplCatalog { strictness: Strictness::Strict, workspace_root: Some(workspace_root), } ]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCompositionRoot",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCompositionRoot",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "c8ee17bdea842238b07264fd027c9507fdbbc6bf69e3262f8022266dd08e2e35",
+        "declaration_hash": "1a3a5b08d5831f5479b67ec596ee2165bd80b36a8d5932dab45b29af7eb4a0a8",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(!source.contains(\"SignalServiceImpl\"), \"{path} retains the legacy service\"); assert!(!source.contains(\"signal::shim\"), \"{path} retains the signal shim\");"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:AC-09"
+      },
+      "key": {
+        "bound_tests_set_hash": "d006ea3ad27bdc2cc077244b7239f754f744671d7174b145abf1d6be2ecab138",
+        "declaration_hash": "eb3c10ed7eca039c2f45bbf4980c9ff1bb264e81fd4df7b324d4122ae866300d",
+        "anchor_text_hash": "9b09a5d9f6a39b56453043d8ad00cbb017d26c88496c607e6456779389686596"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(std::fs::read_to_string(&spec_path).unwrap(), persisted_after_calc); ... assert_eq!(std::fs::read_to_string(adr_path).unwrap(), persisted_before_calc); ... assert_eq!(std::fs::read_to_string(signals_path).unwrap(), persisted_after_calc); ... assert_eq!(std::fs::read_to_string(signal_path).unwrap(), persisted_before_check);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-04"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SystemSignalCommandAdapter",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-04"
+      },
+      "key": {
+        "bound_tests_set_hash": "067813db30828a5b92c68e5f18baceee17f6915169e7763204f10eb24539b5e5",
+        "declaration_hash": "eb3c10ed7eca039c2f45bbf4980c9ff1bb264e81fd4df7b324d4122ae866300d",
+        "anchor_text_hash": "dbe04e9e31bc93ba75ae7df2d1fa0ac69fcf18414b71963bc4c71800d30f8b80"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert!(adapter_source.contains(\"impl SignalCommandPort for SystemSignalCommandAdapter\"), ...); assert!(!composition_public_api_source.contains(\"pub use infrastructure::signal::SystemSignalCommandAdapter\"), ...);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::calc_adr_user::run",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::calc_adr_user::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "1eaf4157172c12d455f02f0c9fbce3719e44d4d1840f415e9357dec89d806917",
+        "declaration_hash": "61c401ccda16ecdd9030aaf1bd4d260f3403570de6253f5cf6083bf901bfd9aa",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(service.calls(), vec![ServiceSignalCommand::CalcAdrUser { project_root }]); ... assert_eq!(port.calls(), vec![ResolvedSignalChainCommand::CalcAdrUser { project_root }]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::calc_catalog_spec::run",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::calc_catalog_spec::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "65352d668f196ed0404a2d2fc39e4a77b6c45d605c724a039e6ef4937f5a4cb3",
+        "declaration_hash": "f8eaa45ede8944430a76aa1a75bce822fd81884ea188aaa0573deabdccc5acd6",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let outcome = calc_catalog_spec::run(&driver, CalcCatalogSpecArgs {}).unwrap();\n\n        assert_recorded_outcome(&outcome);\n        assert_eq!(service.calls(), vec![ServiceSignalCommand::CalcCatalogSpec]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::calc_impl_catalog::run",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::calc_impl_catalog::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "be9045f0f674bd26dcd331d100d6ce6b628952f9c804ab16f014773590720f4b",
+        "declaration_hash": "ff68b3273dfb89370380acdd16b23cb2650cc69f4a645ad3a0d5e1a28f4fefcb",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(service.calls(), vec![ServiceSignalCommand::CalcImplCatalog]);"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::calc_spec_adr::run",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::calc_spec_adr::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "ab632f58e822fbdb1e59c9b32d28dfe04951c2dadd6ee7990b9f551e4e663b28",
+        "declaration_hash": "af84613920c52aad845d0afbe5df6a8fad379ae6f98c1eb8fb09efd87a08797f",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            service.calls(),\n            vec![ServiceSignalCommand::CalcSpecAdr {\n                spec_json_path: Some(spec_json_path),\n                workspace_root: Some(workspace_root),\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::check_adr_user::run",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::check_adr_user::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "c2ab290877127f29dd372d3c3632f6ed20d4c7e2ad0395cd8a5bb3aaef456923",
+        "declaration_hash": "2e29e4f95a244f1c216b2378651723af0e83db506783464cd33129757d306c60",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "service.calls(), vec![ServiceSignalCommand::CheckAdrUser { project_root, strict_override: usecase::signal_service::SignalStrictOverride::UseGateMatrix, gate: Some(ServiceSignalGateName::Merge), workspace_root: Some(workspace_root), }]"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::check_catalog_spec::run",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::check_catalog_spec::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "f999586cf3ccc1805da2998443a98c794299bc4c7ba030d03c3e859919e0411d",
+        "declaration_hash": "9680f2acc08db815d7f39972524d293fcdeb1defb51100ac0ce27904225ec393",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            service.calls(),\n            vec![ServiceSignalCommand::CheckCatalogSpec {\n                strict_override: usecase::signal_service::SignalStrictOverride::ForceStrict,\n                gate: None,\n                workspace_root: Some(workspace_root),\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::check_impl_catalog::run",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::check_impl_catalog::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "98887cf5f23b4513d6b3dc9b11f9e525a19036ff11ae56dd613a53d4b3aecead",
+        "declaration_hash": "f798cc44ffb36b734f78c71f63cdb5591bd507ccff018bbc6717717848b8fd58",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n            service.calls(),\n            vec![ServiceSignalCommand::CheckImplCatalog {\n                strict_override: usecase::signal_service::SignalStrictOverride::UseGateMatrix,\n                gate: Some(ServiceSignalGateName::Commit),\n                workspace_root: Some(workspace_root),\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::check_spec_adr::run",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-07"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::check_spec_adr::run",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "ce8862c66956324852774aaf64d16660932a0cf187d66c6a7d33e9a10c2b3399",
+        "declaration_hash": "bdb30c2e0b9682e8115693591902d68561c037d423853f15bc9e42db2c65eb39",
+        "anchor_text_hash": "ff931d6b7cbe5d26c9fd299ca018a6408871ef6cf80299959769a50acf82c989"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "service.calls(),\n            vec![ServiceSignalCommand::CheckSpecAdr {\n                spec_json_path: Some(spec_json_path),\n                strict_override: usecase::signal_service::SignalStrictOverride::UseGateMatrix,\n                gate: Some(ServiceSignalGateName::Merge),\n                workspace_root: Some(workspace_root),\n            }]\n        );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "cli::commands::signal::run_aggregate_check",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "AC-08"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "cli::commands::signal::run_aggregate_check",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "54a797a0138d7a1b8dfdb1338c36dc15f9465e6f7177bf1609f89d399f80997d",
+        "declaration_hash": "402f5b86d0fe9eeb5c4fc9d68ca0b29f799d8b6dbf2d6d9707dec23405352e69",
+        "anchor_text_hash": "a56d5cadabfe199f3ca673a7ba369aa2ad26f0fe6a8d06844185774381716c0e"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(output.exit_code, 1); ... assert_eq!(output.stdout.as_deref(), Some(\"--- signal check --gate commit ---\\nchain report\\nchain report\\nchain report\\nchain report\\n--- signal check --gate commit FAILED ---\"))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalCommandPortError",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalCommandPortError",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "ab9ebdc030edb37788b539ac85c27a75f8a76e35dbc9b1908ea9d36aeb8a763c",
+        "declaration_hash": "67eb24171bd44992cc087b0c93f22a5e74b38d7ecf68f7e98dad5bbdd53dfe0d",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(repository_failure.stderr.as_deref(), Some(\"[BLOCKED] cannot discover git repository: not a work tree; pass --workspace-root or --spec-json explicitly\")); ... assert_eq!(branch_failure.stderr.as_deref(), Some(\"[ERROR] signal calc-impl-catalog: cannot read current branch: detached HEAD\")); ... assert_eq!(missing_branch_failure.stderr.as_deref(), Some(\"[ERROR] signal calc-impl-catalog: cannot read current branch\")); ... assert_eq!(persistence_failure.stderr.as_deref(), Some(\"write denied\")); ... assert_eq!(execution_failure.stderr.as_deref(), Some(\"signal check-catalog-spec: cannot discover git repository: not a work tree\"))"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    },
+    {
+      "edge_id": {
+        "entry_key": "SignalRootSelection",
+        "anchor_id": {
+          "file_path": "track/items/pr-signal-pure-di-2026-07-26/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "SignalRootSelection",
+        "obligation_kind": "logic",
+        "item_identifier": "voluntary:CN-01"
+      },
+      "key": {
+        "bound_tests_set_hash": "2507329a7b68955d8c13243153fa325d32bcbf504aaa46fc0ee854b44d629b73",
+        "declaration_hash": "b9149ada617ca5eaa556e13f3408a0167f5485d568f1cf2aa767970a01eff879",
+        "anchor_text_hash": "6cc0112d190eff87077605c560dd72869c29e65b91924638bbb1f8df00924a2b"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "project_root: SignalRootSelection::Supplied(project_root),"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce"
+    }
+  ]
+}

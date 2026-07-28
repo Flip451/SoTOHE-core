@@ -25,6 +25,7 @@ pub mod catalogue_to_extended_crate_codec;
 pub mod catalogue_to_extended_crate_codec_error;
 pub mod contract_map_adapter;
 pub mod contract_map_renderer_adapter;
+pub mod feature_declaration_adapter;
 pub mod fs_catalogue_spec_signals_store;
 pub mod fs_lint_config_loader;
 pub(crate) mod mermaid_style;

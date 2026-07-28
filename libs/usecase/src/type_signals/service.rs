@@ -8,6 +8,7 @@ use domain::{TrackBranch, TrackId};
 use thiserror::Error;
 
 use crate::git_workflow::DiagnosticText;
+use crate::tddd_feature_declaration::TdddActualFeatureDeclarationPortError;
 
 /// Request DTO for [`TypeSignalsService::run`].
 pub struct TypeSignalsRequest {
@@ -58,6 +59,9 @@ pub enum TypeSignalsError {
          nothing to evaluate"
     )]
     NoLayers,
+    /// The frozen actual-capture feature declaration could not be loaded or verified.
+    #[error("feature declaration error: {0}")]
+    FeatureDeclaration(TdddActualFeatureDeclarationPortError),
     /// Signal evaluation failed for the given layer.
     #[error("type-signals evaluation failed for layer '{layer_id}': {reason}")]
     EvaluationFailed {

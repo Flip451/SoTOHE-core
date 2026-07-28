@@ -505,7 +505,7 @@ mod tests {
   ],
   "additional_sections": [{"title": "Custom Section", "content": ["Line 1"]}],
   "related_conventions": [
-    {"file": "knowledge/conventions/source-attribution.md", "anchor": "intro"}
+    {"file": "knowledge/conventions/x.md", "anchor": "intro"}
   ],
   "signals": { "blue": 3, "yellow": 1, "red": 0 }
 }"#;
@@ -940,10 +940,7 @@ mod tests {
     fn test_encode_related_conventions_as_struct() {
         use domain::{ConventionAnchor, ConventionRef};
         let anchor = ConventionAnchor::try_new("intro").unwrap();
-        let conv = ConventionRef::new(
-            PathBuf::from("knowledge/conventions/source-attribution.md"),
-            anchor,
-        );
+        let conv = ConventionRef::new(PathBuf::from("knowledge/conventions/x.md"), anchor);
         let doc = SpecDocument::new(
             "T",
             "1",
@@ -958,10 +955,7 @@ mod tests {
         .unwrap();
         let json = encode(&doc).unwrap();
         let parsed: serde_json::Value = serde_json::from_str(&json).unwrap();
-        assert_eq!(
-            parsed["related_conventions"][0]["file"],
-            "knowledge/conventions/source-attribution.md"
-        );
+        assert_eq!(parsed["related_conventions"][0]["file"], "knowledge/conventions/x.md");
         assert_eq!(parsed["related_conventions"][0]["anchor"], "intro");
     }
 

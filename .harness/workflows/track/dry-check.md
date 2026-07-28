@@ -61,6 +61,14 @@ invocation, the dfl loop that runs internally is `sotp dry write` → fix DRY vi
 `cargo make ci-rust` → `sotp dry write` → `sotp dry check-approved`, iterating until the
 gate passes or the loop is exhausted.
 
+`dry-fix-lead` edits source, so its briefing must carry the `## Architecture Constraints`
+section required by
+`.harness/policies/implementation-delegation.md#R1. 委譲時に architecture 制約を注入する`.
+Extract its placement decisions and call flow from the track ADR / plan artifacts and its
+crate, path, and dependency constraints from `architecture-rules.json`; the policy owns the
+required content and this workflow owns injecting it into the dfl dispatch. A DRY fix that
+lifts duplicated logic into a shared location is exactly the edit those constraints bound.
+
 **Step 2: Read the terminal state**
 
 The dfl reports exactly ONE of four mutually-exclusive terminal statuses. These statuses are
@@ -79,8 +87,12 @@ never collapsed into a single branch:
 - **`skipped`**: no further action. Recommend `review` workflow next. Do NOT probe the
   `sotp dry ...` CLI (the gate is disabled at the config level).
 - **`completed`**: verify by running `bin/sotp dry check-approved --track-id <id>` directly
-  and confirming exit 0. Report DFP passed and recommend `review` workflow for the RFP phase.
-  DFP does NOT invoke the `review` workflow itself.
+  and confirming exit 0. Before recommending `review`, repeat the pre-review verification
+  required by `.harness/policies/implementation-delegation.md#R2. review 起動前に配置を検証する`:
+  dfl may have changed source after the preceding implementation verification. The policy owns
+  the verification's steps; this workflow owns repeating it at the completed DFP boundary.
+  Report DFP passed and recommend `review` workflow for the RFP phase. DFP does NOT invoke the
+  `review` workflow itself.
 - **`blocked`**: surface the unresolved DRY violation pairs from
   `bin/sotp dry results --track-id <id> --filter violation`. Clearly state this is a DRY-gate
   block, NOT a tooling error. Do NOT proceed to review. Recommend manual resolution or escalation.
@@ -92,7 +104,9 @@ never collapsed into a single branch:
 |------|------|---------|
 | 0a | Branch matches `track/<id>` | OK / stop |
 | 0a | `dry-check.json.enabled` | `true`/absent → proceed; `false`/missing → skipped |
+| 1 | dfl briefing carries `## Architecture Constraints` | pass / fail |
 | 3 | `bin/sotp dry check-approved --track-id <id>` exits 0 (completed path only) | pass / fail |
+| 3 | R2 pre-review placement verification performed (completed path only) | pass / fail |
 
 ## Failure / recovery
 

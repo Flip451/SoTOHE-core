@@ -1,0 +1,13 @@
+{
+  "schema_version": 6,
+  "id": "consumer-convention-ownership-and-harness-decoupling-2026-07-25",
+  "title": "consumer 規約の所有権分離と harness 固定依存の撤去",
+  "branch": "track/consumer-convention-ownership-and-harness-decoupling-2026-07-25",
+  "created_at": "2026-07-25T18:16:04Z",
+  "updated_at": "2026-07-25T18:16:04Z",
+  "branch_strategy_snapshot": {
+    "base_branch": "develop",
+    "merge_target": "develop",
+    "merge_method": "merge"
+  }
+}
