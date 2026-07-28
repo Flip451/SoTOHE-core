@@ -50,7 +50,7 @@ If a genuine violation can only be resolved by editing an out-of-boundary file, 
 with the file list and rationale.
 
 Architecture-layer rules still apply. When refactoring across layers, ensure the edit respects
-`architecture-rules.json` and `knowledge/conventions/impl-delegation-arch-guard.md`.
+`architecture-rules.json` and `.harness/policies/implementation-delegation.md`.
 
 ## Internal pipeline
 
@@ -134,7 +134,7 @@ must escalate.
 ## Architecture guard
 
 Before modifying any file, verify it belongs to the correct architecture layer per
-`knowledge/conventions/impl-delegation-arch-guard.md`:
+`.harness/policies/implementation-delegation.md`:
 
 - Domain types and domain ports stay in `libs/domain/`
 - Usecase interactors and usecase ports stay in `libs/usecase/`

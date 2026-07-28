@@ -1,7 +1,7 @@
 //! Command dispatch for track subcommands.
 //!
-//! Extracted from `mod.rs` to keep the module within the 700-line production
-//! code limit (see `knowledge/conventions/impl-delegation-arch-guard.md`).
+//! Extracted from `mod.rs` to keep the module within the production-code line
+//! limit declared by `architecture-rules.json` (`module_limits.max_lines`).
 
 use std::path::PathBuf;
 use std::process::ExitCode;

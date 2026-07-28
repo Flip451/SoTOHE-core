@@ -60,7 +60,6 @@
 - `dry-check-workflow.md`: DRY Check Workflow Convention
 - `enforce-by-mechanism.md`: Enforce by Mechanism Convention
 - `filesystem-persistence-guard.md`: Filesystem Persistence Guard Convention
-- `impl-delegation-arch-guard.md`: Implementation Delegation Architecture Guard
 - `language-policy.md`: Language Policy Convention
 - `nightly-dev-tool.md`: Nightly Toolchain Dev-Tool Convention
 - `no-backward-compat.md`: No Backward Compatibility Convention

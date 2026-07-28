@@ -1,3 +1,9 @@
+---
+required_for:
+  - type-designer
+  - rollback-diagnoser
+---
+
 # Type-Designer Kind Selection Convention
 
 ## Purpose

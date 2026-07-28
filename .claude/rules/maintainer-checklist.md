@@ -26,8 +26,8 @@ When changing workspace architecture, synchronize this same live architecture-do
 - `.harness/capabilities/{implementer,dry-fix-lead,review-fix-lead,rollback-diagnoser}.md`
 - `.harness/custom/review-prompts/{cli,cli_composition,cli_driver,domain,infrastructure,types,usecase}.md`
 - survey prompts: `.gemini/GEMINI.md`, `.claude/skills/{gemini-system,repomix-snapshot}/SKILL.md`
-- applicable `knowledge/conventions/` references, especially `coding-principles.md`,
-  `type-designer-kind-selection.md`, and `impl-delegation-arch-guard.md`
+- applicable `knowledge/conventions/` references, especially `coding-principles.md` and
+  `type-designer-kind-selection.md`
 - `.harness/catalogue-lint/config.json` and `.harness/catalogue-lint/presets/ddd-strict.json`
   when layer ids change: every role's `KindLayerConstraint` matches layer ids literally, and
   the two files must stay structurally equal

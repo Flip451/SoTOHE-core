@@ -56,7 +56,6 @@
     { "pattern": "knowledge/conventions/dry-check-workflow.md", "classification": "exclude" },
     { "pattern": "knowledge/conventions/enforce-by-mechanism.md", "classification": "include" },
     { "pattern": "knowledge/conventions/filesystem-persistence-guard.md", "classification": "exclude" },
-    { "pattern": "knowledge/conventions/impl-delegation-arch-guard.md", "classification": "include" },
     { "pattern": "knowledge/conventions/language-policy.md", "classification": "include" },
     { "pattern": "knowledge/conventions/nightly-dev-tool.md", "classification": "exclude" },
     { "pattern": "knowledge/conventions/no-backward-compat.md", "classification": "include" },

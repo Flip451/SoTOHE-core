@@ -38,9 +38,12 @@ spec_refs/role/action mismatch.
   (`Entity` / `ValueObject` / `SpecificationPort` / `SecondaryPort` /
   `PrimaryAdapter` / `SecondaryAdapter` / etc.)
   does not match the `kind` discriminator or the layer the entry lives in
-	  (e.g., a review-execution `SecondaryPort` placed in domain instead of
-	  usecase). Cite
-  `knowledge/conventions/type-designer-kind-selection.md` R1.
+	  (e.g., a review-execution `SecondaryPort` placed in domain when the
+	  capability it names is an orchestration concern rather than one described
+	  in aggregate vocabulary). A placement the shipped catalogue-lint
+  `KindLayerConstraint` already rejects is a mechanical failure, not a review
+  finding — report the placements the lint permits but the entry's own
+  declared semantics contradict.
 - **action incoherent with the diff**: an entry declared `action: add` that
   references a type already present in the rustdoc baseline, or `action: modify`
   on a method whose signature is identical to baseline — the catalogue's action
@@ -66,8 +69,8 @@ spec_refs/role/action mismatch.
   ownership, stable meaning across application operations, and independence
   from persistence / CLI / workflow concerns as applicable. A reviewer must
   not treat absent same-track domain-internal inbound references as sufficient
-  rejection; they are supporting evidence only. Cite
-  `type-designer-kind-selection.md` R1.
+  rejection; they are supporting evidence only. Cite the entry key and name
+  which of those grounds the entry leaves unestablished.
 
 ### Cross-layer contract findings
 
@@ -155,8 +158,9 @@ spec_refs/role/action mismatch.
   reviewable record of an operation-specific asymmetry in side effects,
   collaborators, errors, consistency boundaries, or read/write models. A
   read/write label alone is not enough. Do not require a split merely because
-  an asymmetry exists; R1 makes that evidence necessary for a split, not
-  sufficient to mandate one. Cite `type-designer-kind-selection.md` R1.
+  an asymmetry exists: such evidence is necessary for a split, not sufficient
+  to mandate one. Cite both entry keys and the asymmetry the record fails to
+  establish.
 - **port whose name suggests one side but signature does the other**: e.g.,
   a port named `<Thing>Reader` whose declared methods mutate, or a `<Thing>Writer`
   that primarily reads. The catalogue is the contract; misleading names lock

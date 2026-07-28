@@ -25,8 +25,9 @@ briefing preparation, and capability dispatching.
   the branch does not match this pattern, stop and instruct the caller to switch first.
 - **Track context** — `spec.md`, `plan.md`, `metadata.json`, and all conventions listed in the
   `## Related Conventions (Required Reading)` section of `spec.md` (or `plan.md` for legacy
-  tracks). For exact type signatures / module trees / Mermaid diagrams, `## Canonical Blocks`
-  in `plan.md` is the source of truth.
+  tracks). Use the corresponding `<layer>-types.json` catalogue entries for exact type
+  signatures and module trees, and `impl-plan.json` for task execution detail. Rendered views
+  provide context but do not replace those machine-readable sources.
 - **Primary ADR sources** — Phase-0 init-kind ledger records are the orchestrator's primary-ADR
   designation records; no separate primary identity exists. The review prelude requires a
   nonempty init-record designation set and verifies every recorded ledger copy. It does not
@@ -99,9 +100,28 @@ For each scope reporting `required`, write `tmp/reviewer-runtime/briefing-{scope
 ## Review Checklist
 {scope-specific checklist items — keep this list short and observable}
 
+## Architecture Constraints
+{for a scope carrying source-editing artifacts, the R1 constraints below; otherwise omit this
+section}
+
+## Architecture Verification Checklist
+{the checks named by R3 below; omit this section only for a scope carrying no source-editing
+artifacts}
+
 ## Known Accepted Deviations
 {scope-specific notes for findings that should be dismissed}
 ```
+
+A scope whose file list carries source-editing artifacts must include the
+`## Architecture Constraints` section required by
+`.harness/policies/implementation-delegation.md#R1. 委譲時に architecture 制約を注入する`.
+Extract its placement decisions and call flow from the track ADR / plan artifacts and its
+crate, path, and dependency constraints from `architecture-rules.json`; the policy owns the
+required content and this workflow owns injecting it into the review-fixer dispatch.
+
+That same scope must include the `## Architecture Verification Checklist` section required by
+`.harness/policies/implementation-delegation.md#R3. review briefing に検査項目を渡す`. That
+policy owns the checks the section carries; this workflow owns emitting the section.
 
 Every briefing must include one sentence requiring that findings matching the severity policy
 be enumerated in full for the round — all matches reported, not truncated after the first
