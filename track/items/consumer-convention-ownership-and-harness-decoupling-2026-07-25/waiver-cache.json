@@ -264,6 +264,30 @@
         "citation": "methods: []"
       },
       "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionInventoryPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionInventoryPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:list_conventions"
+      },
+      "key": {
+        "waived_reason_hash": "076fe2f6a68a7079b0d82bca5981852dcc0dd13ec51b266839aa126caf119494",
+        "declaration_hash": "b8be9962aba00206c94101a62375340a1d9c6e4b72163cbadfc5dfd99cfcdf03",
+        "anchor_text_hash": "905dd4700762cb87c5b0050cfa96cfb048942804e62b48c736a06958515ccf30"
+      },
+      "verdict": {
+        "kind": "waived",
+        "citation": "\"Read-only driven port that lists the convention documents a given tree ships\""
+      },
+      "verifier_fingerprint": "ca5a11c64dff611fe679d3ed1a555adc5f435007a2ca5f1f94504538820990f5"
     }
   ]
 }

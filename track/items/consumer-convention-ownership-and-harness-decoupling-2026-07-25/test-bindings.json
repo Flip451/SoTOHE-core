@@ -1538,6 +1538,77 @@
         }
       },
       "reason": "ConventionShippingCheckError is declared as an enum of three variants — ConventionRootMissing { tree_root }, TreeUnreadable { path, reason }, and DocumentPathRejected { tree_root, source } — and declares no operation of its own. AC-18 promises three things: that template smoke checks the non-shipping of source conventions beyond the overlay against an exported tree, that this succeeds on the changed repository, and that no dead-reference check extracting convention paths from prose has been added. The first two are statements about a run and its outcome. This declaration admits no input and performs no step, so nothing here can show that a check ran; and the outcome clause is doubly out of reach, because by its own text this enum is reserved for states in which the question could not be answered at all, so a successful run has no representation among its variants to inspect. Its own text also places the production of every variant elsewhere: every variant of it is built by the infrastructure inventory, and every payload is data that walk possesses at failure time — a value existing here exists because a test constructed it, and reading its payload back exhibits that construction. The third clause is an absence in a repository, and no variant can spell an absence. The nearest thing this declaration states to it is that this check reads no document contents, so the content-parse conditions are unreachable on this path and must not be representable in this error type; that is a statement about what this vocabulary may name, and a vocabulary that cannot name a check is not evidence that no such check exists. What this declaration does establish is narrower than any of the three: that a non-answer has a representation distinct from the check's normal finding, that each variant names the tree or path its condition concerns, and that a constructor rejection arrives composed as a typed source rather than restated in this vocabulary."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "ConventionInventoryPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:list_conventions"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::inventory_port_tests",
+          "test_name": "test_list_conventions_inventories_the_tree_the_caller_named"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::inventory_port_tests",
+          "test_name": "test_list_conventions_identifies_documents_tree_relative_so_two_trees_compare"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::inventory_port_tests",
+          "test_name": "test_list_conventions_cannot_report_a_document_defect_as_a_shipping_finding"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::inventory_port_tests",
+          "test_name": "test_list_conventions_surfaces_every_condition_that_prevents_an_inventory"
+        }
+      ]
+    },
+    {
+      "kind": "waiver",
+      "edge_id": {
+        "entry_key": "ConventionInventoryPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "reason": "ConventionInventoryPort is declared as a read-only driven port with one synchronous method — list_conventions(&self, tree_root: &std::path::Path) -> Result<Vec<ConventionDocumentPath>, ConventionShippingCheckError> — that lists the convention documents a given tree ships, identified tree-relative so the exported tree and the overlay tree yield comparable values. What a test at this declaration can witness is how that listing behaves: that the tree listed is the one the caller named and never an ambient location, that a document found under either root arrives as one and the same value so two inventories are comparable at all, and that a condition preventing a listing reaches the caller as ConventionShippingCheckError rather than as a shorter list. Because the declaration is a trait, such a test drives some implementor and reads back what that implementor produced; when the implementor is a stand-in, what comes back is the listing the test itself arranged, so the reading exhibits the port's shape and the arrangement. AC-18 promises three things: that template smoke checks the non-shipping of source conventions beyond the overlay against an exported tree, that this succeeds on the changed repository, and that no dead-reference check extracting convention paths from prose has been added. None of the three is within reach at this declaration, and that holds even of an implementor which really walked a tree. The first clause asserts that a check ran: this method answers with the documents a tree holds, and a list of documents is neither a comparison nor a finding, so listing a tree — however genuinely — establishes at most that the tree was listed, never that the non-shipping question was put or answered. The second asserts that a run succeeded on the changed repository, and success is a property of that run's outcome; here Ok is a list and Err is a condition that prevented one, so nothing this method can return is the check's verdict, and the tree it reads is whichever location a caller names rather than any particular repository. The third clause is an absence in a repository, and a method that takes a tree root and hands back that tree's own documents says nothing about which checks a repository contains; the nearest the declaration comes to the subject is that this port names paths and is deliberately not the port whose contract is to decode required_for front matter, which states what this port reads and not what other checks exist. What this declaration does establish is narrower than any of the three and belongs to the listing step rather than to a run: that the tree is a parameter, so one port answers for the exported tree and for the overlay and the two sides cannot be walked by different rules; that identities are tree-relative, without which the two inventories could not be compared at all; and that a document defect cannot enter as a shipping finding, because this port never opens a document. None of that is any part of what AC-18 promises."
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "usecase::template_conventions::select_unsupplied_conventions",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::unsupplied_selection_tests",
+          "test_name": "test_select_unsupplied_conventions_names_the_shipped_documents_the_overlay_does_not_supply"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::unsupplied_selection_tests",
+          "test_name": "test_select_unsupplied_conventions_is_conforming_when_the_export_ships_only_supplied_documents"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::unsupplied_selection_tests",
+          "test_name": "test_select_unsupplied_conventions_deduplicates_and_stably_orders_the_offending_documents"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::unsupplied_selection_tests",
+          "test_name": "test_select_unsupplied_conventions_ignores_documents_the_overlay_supplies_but_the_export_lacks"
+        }
+      ]
     }
   ]
 }

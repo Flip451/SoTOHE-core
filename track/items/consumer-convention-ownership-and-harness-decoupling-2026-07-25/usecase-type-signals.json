@@ -1,8 +1,8 @@
 {
   "schema_version": 3,
-  "generated_at": "2026-07-28T13:25:41Z",
+  "generated_at": "2026-07-28T14:04:58Z",
   "declaration_hash": "894afddc4dc648cad1639fd5b44e91d94ed436dfa0a3f6b1270a7596c5827d19",
-  "implementation_input_hash": "3843c2fac4d5bc2113ce74d010350a445dc016a781d9ff76e04758c7b9f35ba6",
+  "implementation_input_hash": "641ee9242299578f0173ec49b7fd54f49cff62b94b677dc75be27cf19ebc2913",
   "signals": [
     {
       "type_name": "CapabilityExecError",
@@ -90,8 +90,8 @@
     {
       "type_name": "ConventionInventoryPort",
       "kind_tag": "secondary_port",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "ConventionRequirement",
@@ -221,8 +221,8 @@
     {
       "type_name": "usecase::template_conventions::select_unsupplied_conventions",
       "kind_tag": "free_function",
-      "signal": "yellow",
-      "found_type": false
+      "signal": "blue",
+      "found_type": true
     },
     {
       "type_name": "CapabilityFailureDetail",

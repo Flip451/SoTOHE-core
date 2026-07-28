@@ -3080,6 +3080,144 @@
           "test_name": "test_convention_shipping_verdict_violation_names_the_offending_documents"
         }
       ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "ConventionInventoryPort",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "ConventionInventoryPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:list_conventions"
+      },
+      "key": {
+        "bound_tests_set_hash": "0d9cbf2e3f600b11ddf418dec98cad812da5bfe5e3f57e1eba63b459e97e9d42",
+        "declaration_hash": "b8be9962aba00206c94101a62375340a1d9c6e4b72163cbadfc5dfd99cfcdf03",
+        "anchor_text_hash": "0d8bcb7b6139fbd92056795f9ccd8bb834d9efea32f8501529a2b539795d9e75"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let verdict = select_unsupplied_conventions(&shipped, &supplied); ... assert_eq!(\n        named,\n        [\"knowledge/conventions/workflow-ceremony-minimization.md\"],\n        \"only the document with no overlay counterpart is reported, which is the finding the \\\n         smoke item exists to make against an exported tree\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::inventory_port_tests",
+          "test_name": "test_list_conventions_inventories_the_tree_the_caller_named"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::inventory_port_tests",
+          "test_name": "test_list_conventions_identifies_documents_tree_relative_so_two_trees_compare"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::inventory_port_tests",
+          "test_name": "test_list_conventions_cannot_report_a_document_defect_as_a_shipping_finding"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::inventory_port_tests",
+          "test_name": "test_list_conventions_surfaces_every_condition_that_prevents_an_inventory"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "usecase::template_conventions::select_unsupplied_conventions",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "IN-11"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "usecase::template_conventions::select_unsupplied_conventions",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "e4de88526fbacac6f72f922b8b72ff3a96975ef12b9c646d713d4117b55896e5",
+        "declaration_hash": "51d35e3335125b49fcf4d91b94e0dc26329d3f198ac7b9c4a176891894d90255",
+        "anchor_text_hash": "0d8bcb7b6139fbd92056795f9ccd8bb834d9efea32f8501529a2b539795d9e75"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "let ConventionShippingVerdict::UnsuppliedDocumentsShipped { documents } = verdict else {\n        panic!(\"an export shipping a document the overlay does not supply is a violation\");\n    };"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::unsupplied_selection_tests",
+          "test_name": "test_select_unsupplied_conventions_names_the_shipped_documents_the_overlay_does_not_supply"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::unsupplied_selection_tests",
+          "test_name": "test_select_unsupplied_conventions_is_conforming_when_the_export_ships_only_supplied_documents"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::unsupplied_selection_tests",
+          "test_name": "test_select_unsupplied_conventions_deduplicates_and_stably_orders_the_offending_documents"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::unsupplied_selection_tests",
+          "test_name": "test_select_unsupplied_conventions_ignores_documents_the_overlay_supplies_but_the_export_lacks"
+        }
+      ]
+    },
+    {
+      "edge_id": {
+        "entry_key": "usecase::template_conventions::select_unsupplied_conventions",
+        "anchor_id": {
+          "file_path": "track/items/consumer-convention-ownership-and-harness-decoupling-2026-07-25/spec.json",
+          "element_id": "AC-18"
+        }
+      },
+      "obligation_id": {
+        "entry_key": "usecase::template_conventions::select_unsupplied_conventions",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "key": {
+        "bound_tests_set_hash": "e4de88526fbacac6f72f922b8b72ff3a96975ef12b9c646d713d4117b55896e5",
+        "declaration_hash": "51d35e3335125b49fcf4d91b94e0dc26329d3f198ac7b9c4a176891894d90255",
+        "anchor_text_hash": "905dd4700762cb87c5b0050cfa96cfb048942804e62b48c736a06958515ccf30"
+      },
+      "verdict": {
+        "kind": "fulfilled",
+        "citation": "assert_eq!(\n        select_unsupplied_conventions(&shipped, &supplied),\n        ConventionShippingVerdict::Conforming,\n        \"an export whose every document the overlay supplies ships nothing beyond that supply, \\\n         whatever order the walk found the documents in\"\n    );"
+      },
+      "verifier_fingerprint": "24ba81151c5d18c628a2933e263a2405d72f4989b908c10a606ebf08c29476ce",
+      "bound_tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::unsupplied_selection_tests",
+          "test_name": "test_select_unsupplied_conventions_names_the_shipped_documents_the_overlay_does_not_supply"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::unsupplied_selection_tests",
+          "test_name": "test_select_unsupplied_conventions_is_conforming_when_the_export_ships_only_supplied_documents"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::unsupplied_selection_tests",
+          "test_name": "test_select_unsupplied_conventions_deduplicates_and_stably_orders_the_offending_documents"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::template_conventions::unsupplied_selection_tests",
+          "test_name": "test_select_unsupplied_conventions_ignores_documents_the_overlay_supplies_but_the_export_lacks"
+        }
+      ]
     }
   ]
 }
