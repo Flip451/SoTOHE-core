@@ -1,0 +1,125 @@
+{
+  "schema_version": 3,
+  "generated_at": "2026-07-28T10:45:55Z",
+  "declaration_hash": "5aa7b67ea33061d108c778848ec4b3ece53c725df32b6cf6b4926cfb7f723578",
+  "implementation_input_hash": "07bd16f4a58a4ae3365da28bfca11e800f5d637cf93c359eb8e8b717a6e087c8",
+  "signals": [
+    {
+      "type_name": "BaselineCaptureError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "BaselineCaptureInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "BaselineCaptureService"
+      ]
+    },
+    {
+      "type_name": "CatalogueImplSignalsError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "CatalogueImplSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "CatalogueImplSignalsService"
+      ]
+    },
+    {
+      "type_name": "TdddActualFeatureDeclarationPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TdddActualFeatureDeclarationPortError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "TdddBaselineFeatureDeclarationPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TdddBaselineFeatureDeclarationPortError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "TdddFeatureDeclarationReadError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsError",
+      "kind_tag": "error_type",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "Debug",
+        "Display",
+        "Error"
+      ]
+    },
+    {
+      "type_name": "TypeSignalsExecutorPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    },
+    {
+      "type_name": "TypeSignalsInteractor",
+      "kind_tag": "interactor",
+      "signal": "blue",
+      "found_type": true,
+      "found_items": [
+        "TypeSignalsService"
+      ]
+    },
+    {
+      "type_name": "SchemaExporterPort",
+      "kind_tag": "secondary_port",
+      "signal": "blue",
+      "found_type": true
+    }
+  ]
+}

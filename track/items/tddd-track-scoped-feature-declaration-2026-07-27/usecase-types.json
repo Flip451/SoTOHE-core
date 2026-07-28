@@ -1,0 +1,1002 @@
+{
+  "crate_name": "usecase",
+  "functions": {},
+  "inherent_impls": [
+    {
+      "methods": [
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "symlink_guard",
+              "ty": "Arc<dyn domain::SymlinkGuardPort>"
+            },
+            {
+              "name": "layer_bindings",
+              "ty": "Arc<dyn domain::tddd::catalogue_v2::TdddLayerBindingsPort>"
+            },
+            {
+              "name": "capture",
+              "ty": "Arc<dyn domain::tddd::catalogue_v2::RustdocBaselineCapturePort>"
+            },
+            {
+              "name": "feature_declaration",
+              "ty": "Arc<dyn TdddBaselineFeatureDeclarationPort>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "type_name": "BaselineCaptureInteractor"
+    },
+    {
+      "methods": [
+        {
+          "generics": [],
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "catalogue_loader",
+              "ty": "Arc<dyn domain::tddd::catalogue_v2::CatalogueDocumentLoaderPort>"
+            },
+            {
+              "name": "ext_crate_codec",
+              "ty": "Arc<dyn domain::tddd::CatalogueToExtendedCratePort>"
+            },
+            {
+              "name": "evaluator",
+              "ty": "Arc<dyn domain::tddd::signal_evaluator::SignalEvaluatorPort>"
+            },
+            {
+              "name": "rustdoc_crate_port",
+              "ty": "Arc<dyn domain::tddd::catalogue_v2::RustdocCratePort>"
+            },
+            {
+              "name": "layer_bindings_port",
+              "ty": "Arc<dyn domain::tddd::catalogue_v2::TdddLayerBindingsPort>"
+            },
+            {
+              "name": "feature_declaration_port",
+              "ty": "Arc<dyn TdddActualFeatureDeclarationPort>"
+            },
+            {
+              "name": "symlink_guard",
+              "ty": "Arc<dyn domain::SymlinkGuardPort>"
+            }
+          ],
+          "receiver": null,
+          "returns": "Self",
+          "where_predicates": []
+        }
+      ],
+      "type_name": "CatalogueImplSignalsInteractor"
+    }
+  ],
+  "layer": "usecase",
+  "schema_version": 5,
+  "trait_impls": [
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsInteractor",
+      "trait_ref": "TypeSignalsService"
+    },
+    {
+      "action": "modify",
+      "for_type": "BaselineCaptureInteractor",
+      "trait_ref": "BaselineCaptureService"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueImplSignalsInteractor",
+      "trait_ref": "CatalogueImplSignalsService"
+    },
+    {
+      "action": "modify",
+      "for_type": "BaselineCaptureError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "BaselineCaptureError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "BaselineCaptureError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueImplSignalsError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueImplSignalsError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "CatalogueImplSignalsError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "TdddFeatureDeclarationReadError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TdddFeatureDeclarationReadError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "TdddFeatureDeclarationReadError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "TdddBaselineFeatureDeclarationPortError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TdddBaselineFeatureDeclarationPortError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "TdddBaselineFeatureDeclarationPortError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "for_type": "TdddActualFeatureDeclarationPortError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "for_type": "TdddActualFeatureDeclarationPortError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "for_type": "TdddActualFeatureDeclarationPortError",
+      "trait_ref": "core::error::Error"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsError",
+      "trait_ref": "core::fmt::Debug"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsError",
+      "trait_ref": "core::fmt::Display"
+    },
+    {
+      "action": "modify",
+      "for_type": "TypeSignalsError",
+      "trait_ref": "core::error::Error"
+    }
+  ],
+  "traits": {
+    "SchemaExporterPort": {
+      "action": "reference",
+      "docs": "Baseline schema-export port retained unchanged for the existing command surface; crate_name remains the baseline string boundary and the returned String is opaque serialized JSON.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "export_as_json",
+          "params": [
+            {
+              "name": "crate_name",
+              "ty": "&str"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<String, SchemaExporterError>"
+        }
+      ],
+      "module_path": "export_schema",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-05",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "AC-08",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "TdddActualFeatureDeclarationPort": {
+      "action": "add",
+      "docs": "Loads and verifies the actual-capture declaration against the frozen baseline bytes; synchronous by design because the existing command pipeline performs blocking filesystem, Cargo-manifest, and rustdoc work.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load_for_actual",
+          "params": [
+            {
+              "name": "track_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "layers",
+              "ty": "&[domain::tddd::catalogue_v2::TdddLayerBinding]"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::tddd::TdddFeatureDeclaration, TdddActualFeatureDeclarationPortError>"
+        }
+      ],
+      "module_path": "tddd_feature_declaration",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "TdddBaselineFeatureDeclarationPort": {
+      "action": "add",
+      "docs": "Loads and freezes the baseline-capture declaration bytes; synchronous by design because the existing command pipeline performs blocking filesystem, Cargo-manifest, and rustdoc work.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "load_for_baseline",
+          "params": [
+            {
+              "name": "track_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "layers",
+              "ty": "&[domain::tddd::catalogue_v2::TdddLayerBinding]"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<domain::tddd::TdddFeatureDeclaration, TdddBaselineFeatureDeclarationPortError>"
+        }
+      ],
+      "module_path": "tddd_feature_declaration",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    },
+    "TypeSignalsExecutorPort": {
+      "action": "modify",
+      "docs": "Synchronous secondary port for per-layer implementation-signal execution; blocking is deliberate because it drives cargo rustdoc subprocesses and filesystem reads from a CLI gate with no async runtime.",
+      "informal_grounds": [],
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "evaluate_layer",
+          "params": [
+            {
+              "name": "items_dir",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "track_id",
+              "ty": "&domain::TrackId"
+            },
+            {
+              "name": "workspace_root",
+              "ty": "&std::path::Path"
+            },
+            {
+              "name": "binding",
+              "ty": "&domain::tddd::catalogue_v2::TdddLayerBinding"
+            },
+            {
+              "name": "features",
+              "ty": "&[domain::tddd::CargoFeatureName]"
+            }
+          ],
+          "receiver": "&self",
+          "returns": "Result<(), TypeSignalsExecutionError>"
+        }
+      ],
+      "module_path": "type_signals::ports",
+      "role": {
+        "SecondaryPort": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ],
+      "supertrait_bounds": [
+        "Send",
+        "Sync"
+      ]
+    }
+  },
+  "types": {
+    "BaselineCaptureError": {
+      "action": "modify",
+      "docs": "Error enum for the baseline-capture application-service boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidTrackId",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SymlinkRejected",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SymlinkGuardIo",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf",
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "LayerBindingsLoad",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "NoLayers",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "CaptureFailed",
+            "payload": {
+              "fields": [
+                "domain::tddd::LayerId",
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "FeatureDeclaration",
+            "payload": {
+              "fields": [
+                "TdddBaselineFeatureDeclarationPortError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "baseline_capture::service",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "BaselineCaptureInteractor": {
+      "action": "modify",
+      "docs": "Coordinates symlink-safe baseline capture with one validated feature set per layer.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "baseline_capture::interactor",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "IN-04",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "CatalogueImplSignalsError": {
+      "action": "modify",
+      "docs": "Error enum for the catalogue implementation-signal application-service boundary.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "InvalidTrackId",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "LayerBindingsLoad",
+            "payload": {
+              "fields": [
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "CatalogueLoad",
+            "payload": {
+              "fields": [
+                "domain::tddd::LayerId",
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "BaselineLoad",
+            "payload": {
+              "fields": [
+                "domain::tddd::LayerId",
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "ExtendedCrateConversion",
+            "payload": {
+              "fields": [
+                "domain::tddd::LayerId",
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SchemaExport",
+            "payload": {
+              "fields": [
+                "domain::tddd::LayerId",
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "Evaluation",
+            "payload": {
+              "fields": [
+                "domain::tddd::LayerId",
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SymlinkRejected",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SymlinkGuardIo",
+            "payload": {
+              "fields": [
+                "std::path::PathBuf",
+                "domain::tddd::test_obligation::ids::DiagnosticMessage"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "NoLayers",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "FeatureDeclaration",
+            "payload": {
+              "fields": [
+                "TdddActualFeatureDeclarationPortError"
+              ],
+              "kind": "tuple"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "catalogue_impl_signals::service",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "CatalogueImplSignalsInteractor": {
+      "action": "modify",
+      "docs": "Evaluates catalogue implementation signals against rustdoc captured with the frozen per-layer features.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [],
+      "module_path": "catalogue_impl_signals::interactor",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "IN-05",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "CN-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "AC-04",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "AC-06",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "TdddActualFeatureDeclarationPortError": {
+      "action": "add",
+      "docs": "Actual-capture-only failures for declaration loading and frozen-byte verification.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Read",
+            "payload": {
+              "fields": [
+                "TdddFeatureDeclarationReadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "MissingBaselineSnapshot",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "BaselineSnapshotMismatch",
+            "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd_feature_declaration",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "TdddBaselineFeatureDeclarationPortError": {
+      "action": "add",
+      "docs": "Baseline-capture failure vocabulary for the declaration-snapshot path (CN-01, AC-03, IN-03).",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Read",
+            "payload": {
+              "fields": [
+                "TdddFeatureDeclarationReadError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "SnapshotWrite",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
+                }
+              ],
+          "kind": "struct"
+        }
+      },
+      {
+        "name": "MissingDeclarationSnapshotWithExistingBaselines",
+        "payload": {
+          "fields": [
+            {
+              "name": "baseline_paths",
+              "ty": "domain::tddd::catalogue_v2::NonEmptyVec<std::path::PathBuf>"
+            }
+          ],
+          "kind": "struct"
+        }
+      },
+      {
+        "name": "BaselineSnapshotMismatch",
+        "payload": {
+              "kind": "unit"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd_feature_declaration",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+      {
+        "anchor": "CN-01",
+        "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+      },
+      {
+        "anchor": "AC-03",
+        "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+      },
+      {
+        "anchor": "IN-03",
+        "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+      }
+    ]
+  },
+    "TdddFeatureDeclarationReadError": {
+      "action": "add",
+      "docs": "Shared declaration read and Cargo-manifest validation failures that either client-specific port can wrap.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "MissingDeclaration",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "ReadDeclaration",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "DecodeDeclaration",
+            "payload": {
+              "fields": [
+                {
+                  "name": "path",
+                  "ty": "std::path::PathBuf"
+                },
+                {
+                  "name": "reason",
+                  "ty": "domain::tddd::test_obligation::ids::DiagnosticMessage"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "UnknownCargoFeature",
+            "payload": {
+              "fields": [
+                {
+                  "name": "layer",
+                  "ty": "domain::tddd::LayerId"
+                },
+                {
+                  "name": "feature",
+                  "ty": "domain::tddd::CargoFeatureName"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "tddd_feature_declaration",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "AC-05",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsError": {
+      "action": "modify",
+      "docs": "Error boundary for the canonical per-layer implementation-signal application service.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "BranchTrackMismatch",
+            "payload": {
+              "fields": [
+                {
+                  "name": "branch",
+                  "ty": "domain::TrackBranch"
+                },
+                {
+                  "name": "track_id",
+                  "ty": "domain::TrackId"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "LayerBindingsLoad",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "NoLayers",
+            "payload": {
+              "kind": "unit"
+            }
+          },
+          {
+            "name": "FeatureDeclaration",
+            "payload": {
+              "fields": [
+                "TdddActualFeatureDeclarationPortError"
+              ],
+              "kind": "tuple"
+            }
+          },
+          {
+            "name": "EvaluationFailed",
+            "payload": {
+              "fields": [
+                {
+                  "name": "layer_id",
+                  "ty": "domain::tddd::LayerId"
+                },
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
+              ],
+              "kind": "struct"
+            }
+          },
+          {
+            "name": "InconsistentRequest",
+            "payload": {
+              "fields": [
+                {
+                  "name": "reason",
+                  "ty": "DiagnosticText"
+                }
+              ],
+              "kind": "struct"
+            }
+          }
+        ]
+      },
+      "methods": [],
+      "module_path": "type_signals::service",
+      "role": {
+        "ErrorType": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "CN-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    },
+    "TypeSignalsInteractor": {
+      "action": "modify",
+      "docs": "Interactor for the canonical per-layer implementation-signal application service.",
+      "informal_grounds": [],
+      "kind": {
+        "kind": "struct",
+        "shape": {
+          "fields": [],
+          "has_stripped_fields": true,
+          "kind": "plain"
+        }
+      },
+      "methods": [
+        {
+          "has_default_impl": false,
+          "is_async": false,
+          "name": "new",
+          "params": [
+            {
+              "name": "layer_bindings",
+              "ty": "Arc<dyn domain::tddd::catalogue_v2::TdddLayerBindingsPort>"
+            },
+            {
+              "name": "executor",
+              "ty": "Arc<dyn TypeSignalsExecutorPort>"
+            },
+            {
+              "name": "feature_declaration",
+              "ty": "Arc<dyn TdddActualFeatureDeclarationPort>"
+            }
+          ],
+          "returns": "Self"
+        }
+      ],
+      "module_path": "type_signals::interactor",
+      "role": {
+        "Interactor": {}
+      },
+      "spec_refs": [
+        {
+          "anchor": "IN-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "CN-01",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        },
+        {
+          "anchor": "AC-03",
+          "file": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json"
+        }
+      ]
+    }
+  }
+}

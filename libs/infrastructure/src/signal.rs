@@ -286,6 +286,7 @@ impl SystemSignalCommandAdapter {
         branch: String,
         executor: std::sync::Arc<dyn usecase::type_signals::TypeSignalsExecutorPort>,
     ) -> Result<VerifyOutcome, SignalCommandPortError> {
+        use crate::tddd::feature_declaration_adapter::FsTdddFeatureDeclarationAdapter;
         use crate::tddd::tddd_layer_bindings_adapter::FsTdddLayerBindingsAdapter;
         use crate::verify::tddd_layers::load_tddd_layers_from_workspace;
         use usecase::type_signals::{
@@ -297,6 +298,7 @@ impl SystemSignalCommandAdapter {
         let interactor = TypeSignalsInteractor::new(
             std::sync::Arc::new(FsTdddLayerBindingsAdapter::new()),
             executor,
+            std::sync::Arc::new(FsTdddFeatureDeclarationAdapter::new()),
         );
         Ok(usecase::signal::calc_impl_catalog(&reader, move |layer, _hash_hex, track_id| {
             let track_id = match domain::TrackId::try_new(track_id) {

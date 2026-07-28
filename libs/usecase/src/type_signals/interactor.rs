@@ -10,6 +10,7 @@ use domain::tddd::LayerId;
 use domain::tddd::catalogue_v2::{TdddLayerBindingsError, TdddLayerBindingsPort};
 
 use crate::git_workflow::DiagnosticText;
+use crate::tddd_feature_declaration::TdddActualFeatureDeclarationPort;
 
 use super::ports::TypeSignalsExecutorPort;
 use super::service::{TypeSignalsError, TypeSignalsRequest, TypeSignalsService};
@@ -35,6 +36,7 @@ use super::service::{TypeSignalsError, TypeSignalsRequest, TypeSignalsService};
 pub struct TypeSignalsInteractor {
     layer_bindings: Arc<dyn TdddLayerBindingsPort>,
     executor: Arc<dyn TypeSignalsExecutorPort>,
+    feature_declaration: Arc<dyn TdddActualFeatureDeclarationPort>,
 }
 
 impl TypeSignalsInteractor {
@@ -43,8 +45,9 @@ impl TypeSignalsInteractor {
     pub fn new(
         layer_bindings: Arc<dyn TdddLayerBindingsPort>,
         executor: Arc<dyn TypeSignalsExecutorPort>,
+        feature_declaration: Arc<dyn TdddActualFeatureDeclarationPort>,
     ) -> Self {
-        Self { layer_bindings, executor }
+        Self { layer_bindings, executor, feature_declaration }
     }
 }
 
@@ -61,7 +64,8 @@ impl TypeSignalsService for TypeSignalsInteractor {
     ///    and that the suffix matches `track_id`.
     /// 3. Derive `items_dir = workspace_root/track/items`.
     /// 4. Resolve layer bindings; fail-closed when no layers found.
-    /// 5. For each layer, call `TypeSignalsExecutorPort::evaluate_layer`, which
+    /// 5. Load and verify the frozen actual-capture feature declaration.
+    /// 6. For each layer, call `TypeSignalsExecutorPort::evaluate_layer`, which
     ///    verifies its persisted freshness inputs before any reuse.
     ///
     /// # Errors
@@ -112,23 +116,46 @@ impl TypeSignalsService for TypeSignalsInteractor {
             return Err(TypeSignalsError::NoLayers);
         }
 
-        // Step 4: per-layer signal evaluation.
+        let typed_bindings = bindings
+            .iter()
+            .map(|binding| {
+                LayerId::try_new(binding.layer_id.clone()).map(|layer_id| (binding, layer_id))
+            })
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|error| TypeSignalsError::InconsistentRequest {
+                reason: DiagnosticText::new(format!(
+                    "layer binding contains an invalid layer id: {error}"
+                )),
+            })?;
+
+        let declaration_bindings = if layer.is_some() {
+            self.layer_bindings.load(&workspace_root, None).map_err(|e| {
+                TypeSignalsError::LayerBindingsLoad { reason: DiagnosticText::new(e.to_string()) }
+            })?
+        } else {
+            bindings.clone()
+        };
+        let track_dir = items_dir.join(track_id.as_ref());
+        let declaration = self
+            .feature_declaration
+            .load_for_actual(&track_dir, &workspace_root, &declaration_bindings)
+            .map_err(TypeSignalsError::FeatureDeclaration)?;
+
+        // Step 5: per-layer signal evaluation.
         // Absent catalogue files are always skipped unconditionally (no gate-vs-direct
         // distinction). Present catalogues are always evaluated strictly.
-        for binding in &bindings {
-            let layer_id = LayerId::try_new(binding.layer_id.clone()).map_err(|error| {
+        for (binding, layer_id) in typed_bindings {
+            let features = declaration.features_for(&layer_id).map_err(|error| {
                 TypeSignalsError::InconsistentRequest {
-                    reason: DiagnosticText::new(format!(
-                        "layer binding contains an invalid layer id: {error}"
-                    )),
+                    reason: DiagnosticText::new(error.to_string()),
                 }
             })?;
-            self.executor.evaluate_layer(&items_dir, &track_id, &workspace_root, binding).map_err(
-                |e| TypeSignalsError::EvaluationFailed {
+            self.executor
+                .evaluate_layer(&items_dir, &track_id, &workspace_root, binding, features)
+                .map_err(|e| TypeSignalsError::EvaluationFailed {
                     layer_id,
                     reason: DiagnosticText::new(e.to_string()),
-                },
-            )?;
+                })?;
         }
 
         Ok(())

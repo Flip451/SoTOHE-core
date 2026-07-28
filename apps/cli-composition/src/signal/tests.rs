@@ -669,12 +669,38 @@ fn setup_type_signal_workspace()
     std::fs::write(&usecase_rustdoc_json_path, &rustdoc_json).unwrap();
     std::fs::write(track_dir.join("domain-types-baseline.json"), &rustdoc_json).unwrap();
     std::fs::write(track_dir.join("usecase-types-baseline.json"), rustdoc_json).unwrap();
+    let feature_declaration = r#"{
+  "schema_version": 1,
+  "layers": {
+    "domain": [],
+    "usecase": []
+  }
+}"#;
+    std::fs::write(track_dir.join("tddd-features.json"), feature_declaration).unwrap();
+    std::fs::write(track_dir.join("tddd-features-baseline.json"), feature_declaration).unwrap();
 
     let rustdoc_json_paths = std::collections::BTreeMap::from([
         ("domain".to_owned(), domain_rustdoc_json_path),
         ("usecase".to_owned(), usecase_rustdoc_json_path),
     ]);
     (workspace, TrackId::try_new(track_id).unwrap(), rustdoc_json_paths)
+}
+
+/// The actual-capture declaration must be verified before the canonical signal
+/// path reaches its rustdoc executor.
+#[cfg(feature = "test-support")]
+#[test]
+fn test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc() {
+    let (workspace, track_id, rustdoc_json_paths) = setup_type_signal_workspace();
+    let declaration_path =
+        workspace.path().join("track/items/freshness-composition/tddd-features.json");
+    std::fs::remove_file(declaration_path).unwrap();
+    let observer = RustdocLaunchObserver::using_json_paths(rustdoc_json_paths);
+
+    let outcome = calc_impl_catalog_with_observer(workspace.path(), track_id, observer.clone());
+
+    assert_ne!(outcome.exit_code, 0, "an absent declaration must fail the canonical path");
+    assert_eq!(observer.launches(), 0, "the declaration failure must occur before rustdoc launch");
 }
 
 #[cfg(feature = "test-support")]

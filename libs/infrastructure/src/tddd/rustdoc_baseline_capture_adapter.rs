@@ -8,10 +8,12 @@
 
 use std::path::Path;
 
+use domain::TrackId;
 use domain::schema::SchemaExportError;
 use domain::tddd::catalogue_v2::{
     BaselineCaptureIoError, RustdocBaselineCapturePort, TdddLayerBinding,
 };
+use domain::tddd::{CargoFeatureName, catalogue_v2::CrateName};
 
 use crate::schema_export::RustdocSchemaExporter;
 use crate::tddd::baseline_rustdoc_codec::BaselineRustdocCodec;
@@ -54,11 +56,12 @@ impl RustdocBaselineCapturePort for RustdocBaselineCaptureAdapter {
     fn capture(
         &self,
         items_dir: &Path,
-        track_id: &str,
+        track_id: &TrackId,
         rustdoc_workspace: &Path,
         binding: &TdddLayerBinding,
+        features: &[CargoFeatureName],
     ) -> Result<(), BaselineCaptureIoError> {
-        capture_baseline_inner(items_dir, track_id, rustdoc_workspace, binding)
+        capture_baseline_inner(items_dir, track_id, rustdoc_workspace, binding, features)
     }
 }
 
@@ -68,9 +71,10 @@ impl RustdocBaselineCapturePort for RustdocBaselineCaptureAdapter {
 
 fn capture_baseline_inner(
     items_dir: &Path,
-    track_id: &str,
+    track_id: &TrackId,
     workspace_root: &Path,
     binding: &TdddLayerBinding,
+    features: &[CargoFeatureName],
 ) -> Result<(), BaselineCaptureIoError> {
     let err = |s: String| BaselineCaptureIoError(s);
 
@@ -106,12 +110,8 @@ fn capture_baseline_inner(
         }
     }
 
-    // Security: validate track_id via domain newtype.
-    let valid_track_id =
-        domain::TrackId::try_new(track_id).map_err(|e| err(format!("invalid track_id: {e}")))?;
-
     let baseline_filename = &binding.baseline_file;
-    let track_dir = items_dir.join(valid_track_id.as_ref());
+    let track_dir = items_dir.join(track_id.as_ref());
     let baseline_path = track_dir.join(baseline_filename.as_str());
 
     // Security: reject symlinks in path components below items_dir.
@@ -165,15 +165,19 @@ fn capture_baseline_inner(
     };
 
     // Run cargo +nightly rustdoc and get the output JSON path.
-    let exporter = RustdocSchemaExporter::new(workspace_root.to_path_buf());
-    let json_path = exporter.export_rustdoc_json_path(target_crate).map_err(|e| {
-        let hint = if matches!(e, SchemaExportError::NightlyNotFound) {
-            " (install with: rustup toolchain install nightly)".to_owned()
-        } else {
-            String::new()
-        };
-        err(format!("failed to export rustdoc JSON: {e}{hint}"))
+    let target_crate = CrateName::new(target_crate.to_owned()).map_err(|error| {
+        err(format!("invalid schema-export target for layer '{layer_id}': {error}"))
     })?;
+    let exporter = RustdocSchemaExporter::new(workspace_root.to_path_buf());
+    let json_path =
+        exporter.export_rustdoc_json_path_with_features(&target_crate, features).map_err(|e| {
+            let hint = if matches!(e, SchemaExportError::NightlyNotFound) {
+                " (install with: rustup toolchain install nightly)".to_owned()
+            } else {
+                String::new()
+            };
+            err(format!("failed to export rustdoc JSON: {e}{hint}"))
+        })?;
 
     // Read and validate the rustdoc JSON before writing.
     let json_content = std::fs::read_to_string(&json_path)
@@ -210,6 +214,10 @@ mod tests {
         }
     }
 
+    fn track_id(value: &str) -> TrackId {
+        TrackId::try_new(value.to_owned()).unwrap()
+    }
+
     #[test]
     fn test_capture_adapter_fails_on_missing_track_dir() {
         let adapter = RustdocBaselineCaptureAdapter::new();
@@ -219,8 +227,13 @@ mod tests {
 
         let binding = domain_binding("domain");
 
-        let result =
-            adapter.capture(&items_dir, "test-track-2026-01-01", workspace.path(), &binding);
+        let result = adapter.capture(
+            &items_dir,
+            &track_id("test-track-2026-01-01"),
+            workspace.path(),
+            &binding,
+            &[],
+        );
 
         let err = result.unwrap_err();
         assert!(
@@ -231,7 +244,7 @@ mod tests {
     }
 
     #[test]
-    fn test_capture_adapter_skips_existing_valid_baseline() {
+    fn test_capture_adapter_with_declared_feature_skips_existing_valid_baseline() {
         let workspace = tempfile::tempdir().unwrap();
         let items_dir = workspace.path().join("track/items");
         let track_dir = items_dir.join("test-track-2026-01-01");
@@ -256,27 +269,108 @@ mod tests {
         let binding = domain_binding("domain");
 
         // existing baseline → idempotent skip → Ok(())
-        let result =
-            adapter.capture(&items_dir, "test-track-2026-01-01", workspace.path(), &binding);
+        let features = [CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap()];
+        let result = adapter.capture(
+            &items_dir,
+            &track_id("test-track-2026-01-01"),
+            workspace.path(),
+            &binding,
+            &features,
+        );
         assert!(result.is_ok(), "existing valid baseline must be skipped: {result:?}");
     }
 
     #[test]
-    fn test_capture_adapter_invalid_track_id_is_rejected() {
-        let adapter = RustdocBaselineCaptureAdapter::new();
-        let workspace = tempfile::tempdir().unwrap();
-        let items_dir = workspace.path().join("track/items");
-        std::fs::create_dir_all(&items_dir).unwrap();
-
-        let binding = domain_binding("domain");
-
-        let result = adapter.capture(&items_dir, "../evil", workspace.path(), &binding);
-
-        let err = result.unwrap_err();
-        assert!(
-            err.0.contains("invalid track_id") || err.0.contains("invalid track id"),
-            "expected invalid track_id error, got: {}",
-            err.0
+    fn test_capture_adapter_with_declared_features_writes_feature_gated_baseline() {
+        const CHILD_STATE_ENV: &str = "TDDD_CAPTURE_TEST_STATE";
+        const TEST_NAME: &str = concat!(
+            "tddd::rustdoc_baseline_capture_adapter::tests::",
+            "test_capture_adapter_with_declared_features_writes_feature_gated_baseline"
         );
+
+        if let Some(state_dir) = std::env::var_os(CHILD_STATE_ENV) {
+            let state_dir = Path::new(&state_dir);
+            let items_dir = state_dir.join("track/items");
+            let track = track_id("test-track-2026-01-01");
+            let binding = domain_binding("infrastructure");
+            let features = [CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap()];
+            let workspace_root =
+                Path::new(env!("CARGO_MANIFEST_DIR")).parent().and_then(Path::parent).unwrap();
+
+            RustdocBaselineCaptureAdapter::new()
+                .capture(&items_dir, &track, workspace_root, &binding, &features)
+                .unwrap();
+            return;
+        }
+
+        let state = tempfile::tempdir().unwrap();
+        let commands_dir = state.path().join("commands");
+        let items_dir = state.path().join("track/items");
+        let target_dir = state.path().join("target");
+        let track = track_id("test-track-2026-01-01");
+        std::fs::create_dir_all(&commands_dir).unwrap();
+        std::fs::create_dir_all(items_dir.join(track.as_ref())).unwrap();
+
+        let rustup = commands_dir.join("rustup");
+        std::fs::write(&rustup, "#!/bin/sh\nexit 0\n").unwrap();
+        let cargo = commands_dir.join("cargo");
+        std::fs::write(
+            &cargo,
+            format!(
+                r#"#!/bin/sh
+if [ "$1" = "metadata" ]; then
+    printf '{{"packages":[{{"name":"infrastructure","targets":[{{"kind":["lib"],"name":"infrastructure"}}]}}],"target_directory":"%s"}}\n' "$CARGO_TARGET_DIR"
+    exit 0
+fi
+printf '%s\n' "$*" > "$(dirname "$0")/rustdoc-args"
+if [ "$*" != "+nightly rustdoc -p infrastructure --lib --no-default-features --features semantic-dup -- -Z unstable-options --output-format json --document-hidden-items" ]; then
+    exit 1
+fi
+mkdir -p "$CARGO_TARGET_DIR/doc"
+printf '{{"root":0,"crate_version":null,"includes_private":false,"index":{{}},"paths":{{"0":{{"crate_id":0,"path":["infrastructure","semantic_dup","fragment_extractor_adapter","CodeFragmentExtractorAdapter"],"kind":"struct"}}}},"external_crates":{{}},"format_version":{FORMAT_VERSION},"target":{{"triple":"","target_features":[]}}}}' > "$CARGO_TARGET_DIR/doc/infrastructure.json"
+"#
+            ),
+        )
+        .unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt as _;
+
+            for command in [&rustup, &cargo] {
+                let mut permissions = std::fs::metadata(command).unwrap().permissions();
+                permissions.set_mode(0o755);
+                std::fs::set_permissions(command, permissions).unwrap();
+            }
+        }
+
+        let mut command = std::process::Command::new(std::env::current_exe().unwrap());
+        let mut path_entries = vec![commands_dir];
+        path_entries.extend(std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()));
+        command
+            .args(["--exact", TEST_NAME, "--nocapture"])
+            .env(CHILD_STATE_ENV, state.path())
+            .env("CARGO_TARGET_DIR", &target_dir)
+            .env("PATH", std::env::join_paths(path_entries).unwrap());
+        assert!(command.status().unwrap().success());
+
+        let baseline = std::fs::read_to_string(
+            items_dir.join(track.as_ref()).join("infrastructure-types-baseline.json"),
+        )
+        .unwrap();
+        let rustdoc = BaselineRustdocCodec::from_json(&baseline).unwrap();
+        assert_eq!(rustdoc.format_version, FORMAT_VERSION);
+        assert!(
+            baseline.contains("CodeFragmentExtractorAdapter"),
+            "the feature-gated public adapter must be present in the captured baseline"
+        );
+        assert_eq!(
+            std::fs::read_to_string(state.path().join("commands/rustdoc-args")).unwrap().trim(),
+            "+nightly rustdoc -p infrastructure --lib --no-default-features --features semantic-dup -- -Z unstable-options --output-format json --document-hidden-items"
+        );
+    }
+
+    #[test]
+    fn test_track_id_with_invalid_value_is_rejected_before_adapter_capture() {
+        assert!(TrackId::try_new("../evil".to_owned()).is_err());
     }
 }

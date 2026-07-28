@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "catalogue_declaration_hash": "890d87c60b6d68759ed369e62aa70465d8cd1f5884536ddd25153455d6b83833",
+  "signals": [
+    {
+      "type_name": "FsTdddFeatureDeclarationAdapter",
+      "signal": "blue",
+      "entry_hash": "bea678c596a40e27d6e23c6387adf6c80b0871d1f3d6a2c8d39fdc8566de6886"
+    },
+    {
+      "type_name": "RustdocBaselineCaptureAdapter",
+      "signal": "blue",
+      "entry_hash": "e11b81a0e243a02169ff82877bd5b9f8f6567e29434029ea02392d04399b56cf"
+    },
+    {
+      "type_name": "RustdocCrateAdapter",
+      "signal": "blue",
+      "entry_hash": "5abde4a83c117d95c555221da483d376a77c099cab0f6e6b80a425c9038eb0e0"
+    },
+    {
+      "type_name": "RustdocSchemaExporter",
+      "signal": "blue",
+      "entry_hash": "55bd1a84958c681f3154a0f042506755d403bad78d46b0a86313ba094ea022f0"
+    },
+    {
+      "type_name": "TypeSignalsExecutorAdapter",
+      "signal": "blue",
+      "entry_hash": "93ea1f4963d515901332bc3ff9fcea78128e5940a048ab7353bd0192d69c0595"
+    },
+    {
+      "type_name": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+      "signal": "blue",
+      "entry_hash": "81b3834d9af7b584bf75dc58ed45ded29dbcb2463d6c468f47b47ecd96ddec4c"
+    }
+  ]
+}

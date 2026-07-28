@@ -5,6 +5,38 @@
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
+const SIGNAL_AGGREGATE_SPEC_JSON: &str = r#"{
+  "schema_version": 2,
+  "version": "1.0",
+  "title": "Signal aggregate contract fixture",
+  "scope": {
+    "in_scope": [{
+      "id": "IN-01",
+      "text": "The aggregate fixture has a grounded requirement.",
+      "adr_refs": [{
+        "file": "knowledge/adr/signal-aggregate-contract.md",
+        "anchor": "D1"
+      }]
+    }],
+    "out_of_scope": []
+  },
+  "signals": { "blue": 1, "yellow": 0, "red": 0 }
+}"#;
+
+const SIGNAL_AGGREGATE_ADR: &str = r#"---
+adr_id: signal-aggregate-contract
+decisions:
+  - id: D1
+    status: accepted
+    user_decision_ref: chat:signal-aggregate-contract
+---
+# Signal aggregate contract fixture
+
+## Decision
+
+### D1: Ground the aggregate fixture
+"#;
+
 fn configure_git_environment(command: &mut Command, git_config: &Path) {
     for (key, _) in std::env::vars_os() {
         if key.to_string_lossy().starts_with("GIT_") {
@@ -135,6 +167,18 @@ fn initialize_signal_aggregate_workspace(
         String::from_utf8_lossy(&workspace_clone_output.stderr)
     );
     git(&workspace, &git_config, &["checkout", "-B", &branch]);
+
+    // The aggregate check resolves the active track from this branch, reads
+    // spec.json from the working tree, and skips absent per-layer catalogues.
+    // No fixture commit is needed for that read-only check path.
+    let track_dir = workspace.join("track/items").join(track_id);
+    std::fs::create_dir_all(&track_dir).unwrap();
+    std::fs::write(
+        workspace.join("knowledge/adr/signal-aggregate-contract.md"),
+        SIGNAL_AGGREGATE_ADR,
+    )
+    .unwrap();
+    std::fs::write(track_dir.join("spec.json"), SIGNAL_AGGREGATE_SPEC_JSON).unwrap();
 
     (sandbox, git_config, workspace, branch)
 }
@@ -343,8 +387,8 @@ fn test_signal_calc_then_check_spec_adr_preserves_isolated_persisted_artifact() 
 fn test_signal_check_aggregate_preserves_chain_order_and_repository_discovery_contract() {
     let root = workspace_root();
     let (_sandbox, _git_config, workspace, _branch) =
-        initialize_signal_aggregate_workspace(&root, "pr-signal-pure-di-2026-07-26");
-    let spec_json = workspace.join("track/items/pr-signal-pure-di-2026-07-26/spec.json");
+        initialize_signal_aggregate_workspace(&root, "signal-aggregate-contract");
+    let spec_json = workspace.join("track/items/signal-aggregate-contract/spec.json");
     let output = sotp_bin()
         .current_dir(&workspace)
         .args([

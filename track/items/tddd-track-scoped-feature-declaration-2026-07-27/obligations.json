@@ -1,0 +1,393 @@
+{
+  "track_id": "tddd-track-scoped-feature-declaration-2026-07-27",
+  "obligations": [
+    {
+      "id": {
+        "entry_key": "RustdocBaselineCapturePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:capture"
+      },
+      "target_entry": {
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "RustdocBaselineCapturePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:capture' of RustdocBaselineCapturePort",
+      "declaration_hash": "cba81fcdbfad3b9b71fa7f21056be82a914c61d88da85e736518d30e4158ff1d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "RustdocCratePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_from_path"
+      },
+      "target_entry": {
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "RustdocCratePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load_from_path' of RustdocCratePort",
+      "declaration_hash": "af6e1e4088451544ab97cc68d32b64ee8d27de39e20b7e999c6455ade73a19df",
+      "spec_refs": [
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "RustdocCratePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:capture_current"
+      },
+      "target_entry": {
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/domain-types.json",
+        "section_key": "traits",
+        "entry_key": "RustdocCratePort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:capture_current' of RustdocCratePort",
+      "declaration_hash": "af6e1e4088451544ab97cc68d32b64ee8d27de39e20b7e999c6455ade73a19df",
+      "spec_refs": [
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "BaselineCaptureInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "BaselineCaptureInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of BaselineCaptureInteractor",
+      "declaration_hash": "43909d2dae0f2db2ae93d71a1836a36918b378ee327b1dd4a7d65f202a3b421d",
+      "spec_refs": [
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-04"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "CatalogueImplSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "CatalogueImplSignalsInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of CatalogueImplSignalsInteractor",
+      "declaration_hash": "c3fe69c6332fdf769b3ca13440432cd0bcf2f11d0e8237faa1058bf9bb9a313f",
+      "spec_refs": [
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-05"
+        },
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-03"
+        },
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-04"
+        },
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-06"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TypeSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+        "section_key": "types",
+        "entry_key": "TypeSignalsInteractor"
+      },
+      "target_role": {
+        "kind": "data_role",
+        "role": "Interactor"
+      },
+      "brief": "Author a result test covering 'entry' of TypeSignalsInteractor",
+      "declaration_hash": "73f50f1055ccdb7b0113f72d353259bb60ec98ae648e6e3939a85c706a4d13cb",
+      "spec_refs": [
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        },
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        },
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TdddActualFeatureDeclarationPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_for_actual"
+      },
+      "target_entry": {
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "TdddActualFeatureDeclarationPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load_for_actual' of TdddActualFeatureDeclarationPort",
+      "declaration_hash": "e62a58cbafa332df962c79e4c842b7c9b0a571c57080e63231fcb6ce9867938e",
+      "spec_refs": [
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_for_baseline"
+      },
+      "target_entry": {
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "TdddBaselineFeatureDeclarationPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:load_for_baseline' of TdddBaselineFeatureDeclarationPort",
+      "declaration_hash": "2b6bf18a3fd6063f0062cc9a8036196ebb794afe107b6b22ab454972e0030dda",
+      "spec_refs": [
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:evaluate_layer"
+      },
+      "target_entry": {
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/usecase-types.json",
+        "section_key": "traits",
+        "entry_key": "TypeSignalsExecutorPort"
+      },
+      "target_role": {
+        "kind": "contract_role",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract test covering 'trait_method:evaluate_layer' of TypeSignalsExecutorPort",
+      "declaration_hash": "aab4647e8f0e12891491f8b8f1a879b31eb36a71be2bcbf0b6d6a8d3046b1177",
+      "spec_refs": [
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "obligation_kind": "logic",
+        "item_identifier": "entry"
+      },
+      "target_entry": {
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+        "section_key": "functions",
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer"
+      },
+      "target_role": {
+        "kind": "function_role",
+        "role": "FreeFunction"
+      },
+      "brief": "Author a logic test covering 'entry' of infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+      "declaration_hash": "e84cf5c7e59c414c044a192a519a6a0889fdf33e2b53652e088229891e824dda",
+      "spec_refs": [
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::tddd_feature_declaration::TdddBaselineFeatureDeclarationPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsTdddFeatureDeclarationAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::tddd_feature_declaration::TdddBaselineFeatureDeclarationPort' of FsTdddFeatureDeclarationAdapter",
+      "declaration_hash": "c126550d7e85863f2fd9bc63b6130eecf637188335bec8a40b744b7688ed3b4a",
+      "spec_refs": [
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "FsTdddFeatureDeclarationAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPort' of FsTdddFeatureDeclarationAdapter",
+      "declaration_hash": "a0b94d4ce7ae854320d956267c1b110aae89893ff684f2e78d84355f7060cba5",
+      "spec_refs": [
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "RustdocBaselineCaptureAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocBaselineCapturePort"
+      },
+      "target_entry": {
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "RustdocBaselineCaptureAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocBaselineCapturePort' of RustdocBaselineCaptureAdapter",
+      "declaration_hash": "59a339d46b0fc1b9efadda514d7f19e702efdbf58de1181fcda37a0896decec2",
+      "spec_refs": [
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "RustdocCrateAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort"
+      },
+      "target_entry": {
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "RustdocCrateAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort' of RustdocCrateAdapter",
+      "declaration_hash": "14a662ed8e4e9f19817862fe821f8496e4c181f921e4eb72477c7ced5c6fd2b4",
+      "spec_refs": [
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      ]
+    },
+    {
+      "id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort"
+      },
+      "target_entry": {
+        "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/infrastructure-types.json",
+        "section_key": "traits",
+        "entry_key": "TypeSignalsExecutorAdapter"
+      },
+      "target_role": {
+        "kind": "trait_impl",
+        "role": "SecondaryPort"
+      },
+      "brief": "Author a contract_conformance test covering 'trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort' of TypeSignalsExecutorAdapter",
+      "declaration_hash": "d7238671b4ec530ea096152c34ac7da8e10d3d02f7928eccfaaba4c54ca0f6a0",
+      "spec_refs": [
+        {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      ]
+    }
+  ]
+}

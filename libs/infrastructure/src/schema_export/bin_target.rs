@@ -10,8 +10,8 @@ use std::process::Command;
 use std::time::Duration;
 
 use domain::schema::SchemaExportError;
-use domain::tddd::catalogue_v2::CrateName;
 use domain::tddd::test_obligation::ids::DiagnosticMessage;
+use domain::tddd::{CargoFeatureName, catalogue_v2::CrateName};
 use thiserror::Error;
 
 use super::path_resolution::resolve_target_dir;
@@ -193,13 +193,38 @@ pub(super) fn run_rustdoc(
             "invalid catalogue crate name `{crate_name}`: {error}"
         ))
     })?;
+    run_rustdoc_for_package(workspace_root, &package_name, RustdocFeatureSelection::Legacy)
+}
+
+pub(super) fn run_rustdoc_with_features(
+    workspace_root: &Path,
+    crate_name: &CrateName,
+    features: &[CargoFeatureName],
+) -> Result<PathBuf, SchemaExportError> {
+    run_rustdoc_for_package(workspace_root, crate_name, RustdocFeatureSelection::Declared(features))
+}
+
+#[derive(Clone, Copy)]
+enum RustdocFeatureSelection<'a> {
+    Legacy,
+    Declared(&'a [CargoFeatureName]),
+}
+
+fn run_rustdoc_for_package(
+    workspace_root: &Path,
+    package_name: &CrateName,
+    feature_selection: RustdocFeatureSelection<'_>,
+) -> Result<PathBuf, SchemaExportError> {
+    let crate_name = package_name.as_str();
     let resolution =
-        resolve_rustdoc_root_name(workspace_root, &package_name).map_err(schema_export_error)?;
+        resolve_rustdoc_root_name(workspace_root, package_name).map_err(schema_export_error)?;
     let args = match resolution.target_kind() {
-        RustdocTargetKind::Library => build_rustdoc_args(crate_name, &["--lib"]),
-        RustdocTargetKind::Binary => {
-            build_rustdoc_args(crate_name, &["--bin", resolution.target_name().as_str()])
-        }
+        RustdocTargetKind::Library => build_rustdoc_args(crate_name, &["--lib"], feature_selection),
+        RustdocTargetKind::Binary => build_rustdoc_args(
+            crate_name,
+            &["--bin", resolution.target_name().as_str()],
+            feature_selection,
+        ),
     };
     let mut command = Command::new("cargo");
     command.args(args).current_dir(workspace_root);
@@ -233,9 +258,24 @@ pub(super) fn run_rustdoc(
     }
 }
 
-fn build_rustdoc_args(crate_name: &str, target: &[&str]) -> Vec<String> {
+fn build_rustdoc_args(
+    crate_name: &str,
+    target: &[&str],
+    feature_selection: RustdocFeatureSelection<'_>,
+) -> Vec<String> {
     let mut args = vec!["+nightly".into(), "rustdoc".into(), "-p".into(), crate_name.into()];
     args.extend(target.iter().map(|argument| (*argument).into()));
+    let features = match feature_selection {
+        RustdocFeatureSelection::Legacy => &[],
+        RustdocFeatureSelection::Declared(features) => {
+            args.push("--no-default-features".into());
+            features
+        }
+    };
+    if !features.is_empty() {
+        args.push("--features".into());
+        args.push(features.iter().map(CargoFeatureName::as_str).collect::<Vec<_>>().join(" "));
+    }
     args.extend(
         ["--", "-Z", "unstable-options", "--output-format", "json", "--document-hidden-items"]
             .map(Into::into),
@@ -389,10 +429,88 @@ mod tests {
     }
 
     #[test]
-    fn test_build_rustdoc_args_includes_document_hidden_items_flag() {
-        let args = build_rustdoc_args("catalogue_package", &["--lib"]);
+    fn test_build_rustdoc_args_legacy_selection_preserves_default_features() {
+        let args =
+            build_rustdoc_args("catalogue_package", &["--lib"], RustdocFeatureSelection::Legacy);
 
-        assert!(args.iter().any(|argument| argument == "--document-hidden-items"));
+        assert_eq!(
+            args,
+            vec![
+                "+nightly",
+                "rustdoc",
+                "-p",
+                "catalogue_package",
+                "--lib",
+                "--",
+                "-Z",
+                "unstable-options",
+                "--output-format",
+                "json",
+                "--document-hidden-items",
+            ]
+        );
+    }
+
+    #[test]
+    fn test_build_rustdoc_args_declared_empty_features_disables_default_features() {
+        let args = build_rustdoc_args(
+            "catalogue_package",
+            &["--lib"],
+            RustdocFeatureSelection::Declared(&[]),
+        );
+
+        assert_eq!(
+            args,
+            vec![
+                "+nightly",
+                "rustdoc",
+                "-p",
+                "catalogue_package",
+                "--lib",
+                "--no-default-features",
+                "--",
+                "-Z",
+                "unstable-options",
+                "--output-format",
+                "json",
+                "--document-hidden-items",
+            ]
+        );
+    }
+
+    #[test]
+    fn test_build_rustdoc_args_with_features_passes_space_separated_feature_list() {
+        let features = [
+            CargoFeatureName::try_new("semantic-dup".to_owned()).unwrap(),
+            CargoFeatureName::try_new("experimental".to_owned()).unwrap(),
+        ];
+
+        let args = build_rustdoc_args(
+            "catalogue_package",
+            &["--bin", "catalogue-bin"],
+            RustdocFeatureSelection::Declared(&features),
+        );
+
+        assert_eq!(
+            args,
+            vec![
+                "+nightly",
+                "rustdoc",
+                "-p",
+                "catalogue_package",
+                "--bin",
+                "catalogue-bin",
+                "--no-default-features",
+                "--features",
+                "semantic-dup experimental",
+                "--",
+                "-Z",
+                "unstable-options",
+                "--output-format",
+                "json",
+                "--document-hidden-items",
+            ]
+        );
     }
 
     #[test]

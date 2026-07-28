@@ -1,0 +1,386 @@
+<!-- Generated contract-map-renderer — DO NOT EDIT DIRECTLY -->
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart LR
+classDef aggregate_root fill:#ede9fe,stroke:#4c1d95,stroke-width:2px
+classDef app_service fill:#ecfdf5,stroke:#059669,stroke-width:2px
+classDef command fill:#fff7ed,stroke:#c2410c,stroke-width:1px
+classDef composition_root fill:#e0e7ff,stroke:#3730a3,stroke-width:2px
+classDef domain_event fill:#fce7f3,stroke:#9d174d,stroke-width:1px
+classDef domain_service fill:#fee2e2,stroke:#991b1b,stroke-width:1px
+classDef dto fill:#f8fafc,stroke:#64748b,stroke-width:1px
+classDef entity fill:#dbeafe,stroke:#1e40af,stroke-width:2px
+classDef error_type fill:#fef2f2,stroke:#b91c1c,stroke-width:1px,stroke-dasharray:4 2
+classDef event_policy fill:#fef3c7,stroke:#92400e,stroke-width:1px
+classDef factory fill:#e0f2fe,stroke:#0369a1,stroke-width:1px
+classDef free_function fill:#f5f3ff,stroke:#7c3aed,stroke-width:1px
+classDef function_node fill:#f5f3ff,stroke:#a78bfa,stroke-width:1px
+classDef interactor fill:#f0fdfa,stroke:#0d9488,stroke-width:1px
+classDef method_node fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+classDef primary_adapter fill:#ecfccb,stroke:#3f6212,stroke-width:1px
+classDef query fill:#f0f9ff,stroke:#0369a1,stroke-width:1px
+classDef repository fill:#f5f3ff,stroke:#6d28d9,stroke-width:1px
+classDef secondary_adapter fill:#fafaf9,stroke:#57534e,stroke-width:1px
+classDef secondary_port fill:#fafaf9,stroke:#78716c,stroke-width:1px,stroke-dasharray:4 2
+classDef specification fill:#fdf4ff,stroke:#6b21a8,stroke-width:1px
+classDef specification_port fill:#fdf4ff,stroke:#9333ea,stroke-width:1px,stroke-dasharray:4 2
+classDef typestate_overlay stroke:#dc2626,stroke-width:3px
+classDef use_case fill:#ecfeff,stroke:#0e7490,stroke-width:1px
+classDef use_case_function fill:#eef2ff,stroke:#4338ca,stroke-width:1px
+classDef value_object fill:#d1fae5,stroke:#065f46,stroke-width:1px
+classDef variant_node fill:#fafaf9,stroke:#d6d3d1,stroke-width:1px
+subgraph domain["domain"]
+  direction TB
+  subgraph domain_domain_module_schema["domain::schema"]
+    direction TB
+  subgraph R28_domain_domain_SchemaExporter["schema::SchemaExporter"]
+    direction TB
+    R28_domain_domain_SchemaExporter__self[SchemaExporter]
+    R28_domain_domain_SchemaExporter_export([export])
+  end
+  end
+  subgraph domain_domain_module_tddd["domain::tddd"]
+    direction TB
+  subgraph T30_domain_domain_CargoFeatureName["tddd::feature_declaration::CargoFeatureName"]
+    direction TB
+    T30_domain_domain_CargoFeatureName__self[CargoFeatureName]
+    T30_domain_domain_CargoFeatureName_try_new([try_new])
+    T30_domain_domain_CargoFeatureName_as_str([as_str])
+  end
+  subgraph T35_domain_domain_CargoFeatureNameError["tddd::feature_declaration::CargoFeatureNameError"]
+    direction TB
+    T35_domain_domain_CargoFeatureNameError__self[CargoFeatureNameError]
+    T35_domain_domain_CargoFeatureNameError_InvalidFeatureName[InvalidFeatureName]
+  end
+  subgraph T36_domain_domain_TdddFeatureDeclaration["tddd::feature_declaration::TdddFeatureDeclaration"]
+    direction TB
+    T36_domain_domain_TdddFeatureDeclaration__self[TdddFeatureDeclaration]
+    T36_domain_domain_TdddFeatureDeclaration_try_new([try_new])
+    T36_domain_domain_TdddFeatureDeclaration_features_for([features_for])
+    T36_domain_domain_TdddFeatureDeclaration_layers([layers])
+  end
+  subgraph T41_domain_domain_TdddFeatureDeclarationError["tddd::feature_declaration::TdddFeatureDeclarationError"]
+    direction TB
+    T41_domain_domain_TdddFeatureDeclarationError__self[TdddFeatureDeclarationError]
+    T41_domain_domain_TdddFeatureDeclarationError_MissingLayer[MissingLayer]
+    T41_domain_domain_TdddFeatureDeclarationError_UnexpectedLayer[UnexpectedLayer]
+    T41_domain_domain_TdddFeatureDeclarationError_DuplicateFeature[DuplicateFeature]
+  end
+  subgraph T36_domain_domain_TdddFeatureLookupError["tddd::feature_declaration::TdddFeatureLookupError"]
+    direction TB
+    T36_domain_domain_TdddFeatureLookupError__self[TdddFeatureLookupError]
+    T36_domain_domain_TdddFeatureLookupError_MissingLayer[MissingLayer]
+  end
+  subgraph R40_domain_domain_RustdocBaselineCapturePort["tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocBaselineCapturePort"]
+    direction TB
+    R40_domain_domain_RustdocBaselineCapturePort__self[RustdocBaselineCapturePort]
+    R40_domain_domain_RustdocBaselineCapturePort_capture([capture])
+  end
+  subgraph R30_domain_domain_RustdocCratePort["tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort"]
+    direction TB
+    R30_domain_domain_RustdocCratePort__self[RustdocCratePort]
+    R30_domain_domain_RustdocCratePort_load_from_path([load_from_path])
+    R30_domain_domain_RustdocCratePort_capture_current([capture_current])
+  end
+  end
+end
+subgraph usecase["usecase"]
+  direction TB
+  subgraph usecase_usecase_module_baseline_capture["usecase::baseline_capture"]
+    direction TB
+  subgraph T36_usecase_usecase_BaselineCaptureError["baseline_capture::service::BaselineCaptureError"]
+    direction TB
+    T36_usecase_usecase_BaselineCaptureError__self[BaselineCaptureError]
+    T36_usecase_usecase_BaselineCaptureError_InvalidTrackId[InvalidTrackId]
+    T36_usecase_usecase_BaselineCaptureError_SymlinkRejected[SymlinkRejected]
+    T36_usecase_usecase_BaselineCaptureError_SymlinkGuardIo[SymlinkGuardIo]
+    T36_usecase_usecase_BaselineCaptureError_LayerBindingsLoad[LayerBindingsLoad]
+    T36_usecase_usecase_BaselineCaptureError_NoLayers[NoLayers]
+    T36_usecase_usecase_BaselineCaptureError_CaptureFailed[CaptureFailed]
+    T36_usecase_usecase_BaselineCaptureError_FeatureDeclaration[FeatureDeclaration]
+  end
+  subgraph T41_usecase_usecase_BaselineCaptureInteractor["baseline_capture::interactor::BaselineCaptureInteractor"]
+    direction TB
+    T41_usecase_usecase_BaselineCaptureInteractor__self[BaselineCaptureInteractor]
+    T41_usecase_usecase_BaselineCaptureInteractor_new([new])
+  end
+  end
+  subgraph usecase_usecase_module_catalogue_impl_signals["usecase::catalogue_impl_signals"]
+    direction TB
+  subgraph T41_usecase_usecase_CatalogueImplSignalsError["catalogue_impl_signals::service::CatalogueImplSignalsError"]
+    direction TB
+    T41_usecase_usecase_CatalogueImplSignalsError__self[CatalogueImplSignalsError]
+    T41_usecase_usecase_CatalogueImplSignalsError_InvalidTrackId[InvalidTrackId]
+    T41_usecase_usecase_CatalogueImplSignalsError_LayerBindingsLoad[LayerBindingsLoad]
+    T41_usecase_usecase_CatalogueImplSignalsError_CatalogueLoad[CatalogueLoad]
+    T41_usecase_usecase_CatalogueImplSignalsError_BaselineLoad[BaselineLoad]
+    T41_usecase_usecase_CatalogueImplSignalsError_ExtendedCrateConversion[ExtendedCrateConversion]
+    T41_usecase_usecase_CatalogueImplSignalsError_SchemaExport[SchemaExport]
+    T41_usecase_usecase_CatalogueImplSignalsError_Evaluation[Evaluation]
+    T41_usecase_usecase_CatalogueImplSignalsError_SymlinkRejected[SymlinkRejected]
+    T41_usecase_usecase_CatalogueImplSignalsError_SymlinkGuardIo[SymlinkGuardIo]
+    T41_usecase_usecase_CatalogueImplSignalsError_NoLayers[NoLayers]
+    T41_usecase_usecase_CatalogueImplSignalsError_FeatureDeclaration[FeatureDeclaration]
+  end
+  subgraph T46_usecase_usecase_CatalogueImplSignalsInteractor["catalogue_impl_signals::interactor::CatalogueImplSignalsInteractor"]
+    direction TB
+    T46_usecase_usecase_CatalogueImplSignalsInteractor__self[CatalogueImplSignalsInteractor]
+    T46_usecase_usecase_CatalogueImplSignalsInteractor_new([new])
+  end
+  end
+  subgraph usecase_usecase_module_export_schema["usecase::export_schema"]
+    direction TB
+  subgraph R34_usecase_usecase_SchemaExporterPort["export_schema::SchemaExporterPort"]
+    direction TB
+    R34_usecase_usecase_SchemaExporterPort__self[SchemaExporterPort]
+    R34_usecase_usecase_SchemaExporterPort_export_as_json([export_as_json])
+  end
+  end
+  subgraph usecase_usecase_module_tddd_feature_declaration["usecase::tddd_feature_declaration"]
+    direction TB
+  subgraph T53_usecase_usecase_TdddActualFeatureDeclarationPortError["tddd_feature_declaration::TdddActualFeatureDeclarationPortError"]
+    direction TB
+    T53_usecase_usecase_TdddActualFeatureDeclarationPortError__self[TdddActualFeatureDeclarationPortError]
+    T53_usecase_usecase_TdddActualFeatureDeclarationPortError_Read[Read]
+    T53_usecase_usecase_TdddActualFeatureDeclarationPortError_MissingBaselineSnapshot[MissingBaselineSnapshot]
+    T53_usecase_usecase_TdddActualFeatureDeclarationPortError_BaselineSnapshotMismatch[BaselineSnapshotMismatch]
+  end
+  subgraph T55_usecase_usecase_TdddBaselineFeatureDeclarationPortError["tddd_feature_declaration::TdddBaselineFeatureDeclarationPortError"]
+    direction TB
+    T55_usecase_usecase_TdddBaselineFeatureDeclarationPortError__self[TdddBaselineFeatureDeclarationPortError]
+    T55_usecase_usecase_TdddBaselineFeatureDeclarationPortError_Read[Read]
+    T55_usecase_usecase_TdddBaselineFeatureDeclarationPortError_SnapshotWrite[SnapshotWrite]
+    T55_usecase_usecase_TdddBaselineFeatureDeclarationPortError_MissingDeclarationSnapshotWithExistingBaselines[MissingDeclarationSnapshotWithExistingBaselines]
+    T55_usecase_usecase_TdddBaselineFeatureDeclarationPortError_BaselineSnapshotMismatch[BaselineSnapshotMismatch]
+  end
+  subgraph T47_usecase_usecase_TdddFeatureDeclarationReadError["tddd_feature_declaration::TdddFeatureDeclarationReadError"]
+    direction TB
+    T47_usecase_usecase_TdddFeatureDeclarationReadError__self[TdddFeatureDeclarationReadError]
+    T47_usecase_usecase_TdddFeatureDeclarationReadError_MissingDeclaration[MissingDeclaration]
+    T47_usecase_usecase_TdddFeatureDeclarationReadError_ReadDeclaration[ReadDeclaration]
+    T47_usecase_usecase_TdddFeatureDeclarationReadError_DecodeDeclaration[DecodeDeclaration]
+    T47_usecase_usecase_TdddFeatureDeclarationReadError_UnknownCargoFeature[UnknownCargoFeature]
+  end
+  subgraph R48_usecase_usecase_TdddActualFeatureDeclarationPort["tddd_feature_declaration::TdddActualFeatureDeclarationPort"]
+    direction TB
+    R48_usecase_usecase_TdddActualFeatureDeclarationPort__self[TdddActualFeatureDeclarationPort]
+    R48_usecase_usecase_TdddActualFeatureDeclarationPort_load_for_actual([load_for_actual])
+  end
+  subgraph R50_usecase_usecase_TdddBaselineFeatureDeclarationPort["tddd_feature_declaration::TdddBaselineFeatureDeclarationPort"]
+    direction TB
+    R50_usecase_usecase_TdddBaselineFeatureDeclarationPort__self[TdddBaselineFeatureDeclarationPort]
+    R50_usecase_usecase_TdddBaselineFeatureDeclarationPort_load_for_baseline([load_for_baseline])
+  end
+  end
+  subgraph usecase_usecase_module_type_signals["usecase::type_signals"]
+    direction TB
+  subgraph T32_usecase_usecase_TypeSignalsError["type_signals::service::TypeSignalsError"]
+    direction TB
+    T32_usecase_usecase_TypeSignalsError__self[TypeSignalsError]
+    T32_usecase_usecase_TypeSignalsError_BranchTrackMismatch[BranchTrackMismatch]
+    T32_usecase_usecase_TypeSignalsError_LayerBindingsLoad[LayerBindingsLoad]
+    T32_usecase_usecase_TypeSignalsError_NoLayers[NoLayers]
+    T32_usecase_usecase_TypeSignalsError_FeatureDeclaration[FeatureDeclaration]
+    T32_usecase_usecase_TypeSignalsError_EvaluationFailed[EvaluationFailed]
+    T32_usecase_usecase_TypeSignalsError_InconsistentRequest[InconsistentRequest]
+  end
+  subgraph T37_usecase_usecase_TypeSignalsInteractor["type_signals::interactor::TypeSignalsInteractor"]
+    direction TB
+    T37_usecase_usecase_TypeSignalsInteractor__self[TypeSignalsInteractor]
+    T37_usecase_usecase_TypeSignalsInteractor_new([new])
+  end
+  subgraph R39_usecase_usecase_TypeSignalsExecutorPort["type_signals::ports::TypeSignalsExecutorPort"]
+    direction TB
+    R39_usecase_usecase_TypeSignalsExecutorPort__self[TypeSignalsExecutorPort]
+    R39_usecase_usecase_TypeSignalsExecutorPort_evaluate_layer([evaluate_layer])
+  end
+  end
+end
+subgraph infrastructure["infrastructure"]
+  direction TB
+  subgraph infrastructure_infrastructure_module_schema_export["infrastructure::schema_export"]
+    direction TB
+  subgraph T51_infrastructure_infrastructure_RustdocSchemaExporter["schema_export::RustdocSchemaExporter"]
+    direction TB
+    T51_infrastructure_infrastructure_RustdocSchemaExporter__self[RustdocSchemaExporter]
+    T51_infrastructure_infrastructure_RustdocSchemaExporter_new([new])
+    T51_infrastructure_infrastructure_RustdocSchemaExporter_export_rustdoc_json_path([export_rustdoc_json_path])
+    T51_infrastructure_infrastructure_RustdocSchemaExporter_export_rustdoc_json_path_with_features([export_rustdoc_json_path_with_features])
+    T51_infrastructure_infrastructure_RustdocSchemaExporter_existing_rustdoc_json_path([existing_rustdoc_json_path])
+  end
+  end
+  subgraph infrastructure_infrastructure_module_tddd["infrastructure::tddd"]
+    direction TB
+  subgraph T61_infrastructure_infrastructure_FsTdddFeatureDeclarationAdapter["tddd::feature_declaration_adapter::FsTdddFeatureDeclarationAdapter"]
+    direction TB
+    T61_infrastructure_infrastructure_FsTdddFeatureDeclarationAdapter__self[FsTdddFeatureDeclarationAdapter]
+    T61_infrastructure_infrastructure_FsTdddFeatureDeclarationAdapter_new([new])
+  end
+  subgraph T59_infrastructure_infrastructure_RustdocBaselineCaptureAdapter["tddd::rustdoc_baseline_capture_adapter::RustdocBaselineCaptureAdapter"]
+    direction TB
+    T59_infrastructure_infrastructure_RustdocBaselineCaptureAdapter__self[RustdocBaselineCaptureAdapter]
+    T59_infrastructure_infrastructure_RustdocBaselineCaptureAdapter_new([new])
+  end
+  subgraph T49_infrastructure_infrastructure_RustdocCrateAdapter["tddd::rustdoc_crate_adapter::RustdocCrateAdapter"]
+    direction TB
+    T49_infrastructure_infrastructure_RustdocCrateAdapter__self[RustdocCrateAdapter]
+    T49_infrastructure_infrastructure_RustdocCrateAdapter_new([new])
+  end
+  subgraph T56_infrastructure_infrastructure_TypeSignalsExecutorAdapter["tddd::type_signals_executor_adapter::TypeSignalsExecutorAdapter"]
+    direction TB
+    T56_infrastructure_infrastructure_TypeSignalsExecutorAdapter__self[TypeSignalsExecutorAdapter]
+    T56_infrastructure_infrastructure_TypeSignalsExecutorAdapter_new([new])
+  end
+  F106_infrastructure_infrastructure_infrastructure__tddd__type_signals_evaluator__execute_type_signals_for_layer[[execute_type_signals_for_layer]]
+  end
+end
+subgraph cli_driver["cli_driver"]
+  direction TB
+end
+subgraph cli_composition["cli_composition"]
+  direction TB
+end
+subgraph cli["cli"]
+  direction TB
+end
+T30_domain_domain_CargoFeatureName_try_new --> T35_domain_domain_CargoFeatureNameError__self
+T30_domain_domain_CargoFeatureName_try_new --> T30_domain_domain_CargoFeatureName__self
+T36_domain_domain_TdddFeatureDeclaration_try_new --o T30_domain_domain_CargoFeatureName__self
+T36_domain_domain_TdddFeatureDeclaration_try_new --> T36_domain_domain_TdddFeatureDeclaration__self
+T36_domain_domain_TdddFeatureDeclaration_try_new --> T41_domain_domain_TdddFeatureDeclarationError__self
+T36_domain_domain_TdddFeatureDeclaration_features_for --> T30_domain_domain_CargoFeatureName__self
+T36_domain_domain_TdddFeatureDeclaration_features_for --> T36_domain_domain_TdddFeatureLookupError__self
+T36_domain_domain_TdddFeatureDeclaration_layers --> T30_domain_domain_CargoFeatureName__self
+T41_domain_domain_TdddFeatureDeclarationError_DuplicateFeature --o|feature| T30_domain_domain_CargoFeatureName__self
+R40_domain_domain_RustdocBaselineCapturePort_capture --o T30_domain_domain_CargoFeatureName__self
+R30_domain_domain_RustdocCratePort_capture_current --o T30_domain_domain_CargoFeatureName__self
+T36_usecase_usecase_BaselineCaptureError_FeatureDeclaration --o T55_usecase_usecase_TdddBaselineFeatureDeclarationPortError__self
+T41_usecase_usecase_BaselineCaptureInteractor_new --o R40_domain_domain_RustdocBaselineCapturePort__self
+T41_usecase_usecase_BaselineCaptureInteractor_new --o R50_usecase_usecase_TdddBaselineFeatureDeclarationPort__self
+T41_usecase_usecase_BaselineCaptureInteractor_new --> T41_usecase_usecase_BaselineCaptureInteractor__self
+T41_usecase_usecase_CatalogueImplSignalsError_FeatureDeclaration --o T53_usecase_usecase_TdddActualFeatureDeclarationPortError__self
+T46_usecase_usecase_CatalogueImplSignalsInteractor_new --o R30_domain_domain_RustdocCratePort__self
+T46_usecase_usecase_CatalogueImplSignalsInteractor_new --o R48_usecase_usecase_TdddActualFeatureDeclarationPort__self
+T46_usecase_usecase_CatalogueImplSignalsInteractor_new --> T46_usecase_usecase_CatalogueImplSignalsInteractor__self
+T53_usecase_usecase_TdddActualFeatureDeclarationPortError_Read --o T47_usecase_usecase_TdddFeatureDeclarationReadError__self
+T55_usecase_usecase_TdddBaselineFeatureDeclarationPortError_Read --o T47_usecase_usecase_TdddFeatureDeclarationReadError__self
+T47_usecase_usecase_TdddFeatureDeclarationReadError_UnknownCargoFeature --o|feature| T30_domain_domain_CargoFeatureName__self
+R48_usecase_usecase_TdddActualFeatureDeclarationPort_load_for_actual --> T53_usecase_usecase_TdddActualFeatureDeclarationPortError__self
+R48_usecase_usecase_TdddActualFeatureDeclarationPort_load_for_actual --> T36_domain_domain_TdddFeatureDeclaration__self
+R50_usecase_usecase_TdddBaselineFeatureDeclarationPort_load_for_baseline --> T55_usecase_usecase_TdddBaselineFeatureDeclarationPortError__self
+R50_usecase_usecase_TdddBaselineFeatureDeclarationPort_load_for_baseline --> T36_domain_domain_TdddFeatureDeclaration__self
+T32_usecase_usecase_TypeSignalsError_FeatureDeclaration --o T53_usecase_usecase_TdddActualFeatureDeclarationPortError__self
+T37_usecase_usecase_TypeSignalsInteractor_new --o R39_usecase_usecase_TypeSignalsExecutorPort__self
+T37_usecase_usecase_TypeSignalsInteractor_new --o R48_usecase_usecase_TdddActualFeatureDeclarationPort__self
+T37_usecase_usecase_TypeSignalsInteractor_new --> T37_usecase_usecase_TypeSignalsInteractor__self
+R39_usecase_usecase_TypeSignalsExecutorPort_evaluate_layer --o T30_domain_domain_CargoFeatureName__self
+T51_infrastructure_infrastructure_RustdocSchemaExporter_new --> T51_infrastructure_infrastructure_RustdocSchemaExporter__self
+T51_infrastructure_infrastructure_RustdocSchemaExporter_export_rustdoc_json_path_with_features --o T30_domain_domain_CargoFeatureName__self
+T61_infrastructure_infrastructure_FsTdddFeatureDeclarationAdapter_new --> T61_infrastructure_infrastructure_FsTdddFeatureDeclarationAdapter__self
+T59_infrastructure_infrastructure_RustdocBaselineCaptureAdapter_new --> T59_infrastructure_infrastructure_RustdocBaselineCaptureAdapter__self
+T49_infrastructure_infrastructure_RustdocCrateAdapter_new --> T49_infrastructure_infrastructure_RustdocCrateAdapter__self
+T56_infrastructure_infrastructure_TypeSignalsExecutorAdapter_new --> T56_infrastructure_infrastructure_TypeSignalsExecutorAdapter__self
+F106_infrastructure_infrastructure_infrastructure__tddd__type_signals_evaluator__execute_type_signals_for_layer --o T30_domain_domain_CargoFeatureName__self
+T61_infrastructure_infrastructure_FsTdddFeatureDeclarationAdapter__self -.impl.-> R50_usecase_usecase_TdddBaselineFeatureDeclarationPort__self
+T61_infrastructure_infrastructure_FsTdddFeatureDeclarationAdapter__self -.impl.-> R48_usecase_usecase_TdddActualFeatureDeclarationPort__self
+T59_infrastructure_infrastructure_RustdocBaselineCaptureAdapter__self -.impl.-> R40_domain_domain_RustdocBaselineCapturePort__self
+T49_infrastructure_infrastructure_RustdocCrateAdapter__self -.impl.-> R30_domain_domain_RustdocCratePort__self
+T51_infrastructure_infrastructure_RustdocSchemaExporter__self -.impl.-> R28_domain_domain_SchemaExporter__self
+T51_infrastructure_infrastructure_RustdocSchemaExporter__self -.impl.-> R34_usecase_usecase_SchemaExporterPort__self
+T56_infrastructure_infrastructure_TypeSignalsExecutorAdapter__self -.impl.-> R39_usecase_usecase_TypeSignalsExecutorPort__self
+class R28_domain_domain_SchemaExporter_export method_node
+class R28_domain_domain_SchemaExporter__self secondary_port
+class T30_domain_domain_CargoFeatureName_try_new method_node
+class T30_domain_domain_CargoFeatureName_as_str method_node
+class T30_domain_domain_CargoFeatureName__self value_object
+class T35_domain_domain_CargoFeatureNameError_InvalidFeatureName variant_node
+class T35_domain_domain_CargoFeatureNameError__self error_type
+class T36_domain_domain_TdddFeatureDeclaration_try_new method_node
+class T36_domain_domain_TdddFeatureDeclaration_features_for method_node
+class T36_domain_domain_TdddFeatureDeclaration_layers method_node
+class T36_domain_domain_TdddFeatureDeclaration__self value_object
+class T41_domain_domain_TdddFeatureDeclarationError_MissingLayer variant_node
+class T41_domain_domain_TdddFeatureDeclarationError_UnexpectedLayer variant_node
+class T41_domain_domain_TdddFeatureDeclarationError_DuplicateFeature variant_node
+class T41_domain_domain_TdddFeatureDeclarationError__self error_type
+class T36_domain_domain_TdddFeatureLookupError_MissingLayer variant_node
+class T36_domain_domain_TdddFeatureLookupError__self error_type
+class R40_domain_domain_RustdocBaselineCapturePort_capture method_node
+class R40_domain_domain_RustdocBaselineCapturePort__self secondary_port
+class R30_domain_domain_RustdocCratePort_load_from_path method_node
+class R30_domain_domain_RustdocCratePort_capture_current method_node
+class R30_domain_domain_RustdocCratePort__self secondary_port
+class T36_usecase_usecase_BaselineCaptureError_InvalidTrackId variant_node
+class T36_usecase_usecase_BaselineCaptureError_SymlinkRejected variant_node
+class T36_usecase_usecase_BaselineCaptureError_SymlinkGuardIo variant_node
+class T36_usecase_usecase_BaselineCaptureError_LayerBindingsLoad variant_node
+class T36_usecase_usecase_BaselineCaptureError_NoLayers variant_node
+class T36_usecase_usecase_BaselineCaptureError_CaptureFailed variant_node
+class T36_usecase_usecase_BaselineCaptureError_FeatureDeclaration variant_node
+class T36_usecase_usecase_BaselineCaptureError__self error_type
+class T41_usecase_usecase_BaselineCaptureInteractor_new method_node
+class T41_usecase_usecase_BaselineCaptureInteractor__self interactor
+class T41_usecase_usecase_CatalogueImplSignalsError_InvalidTrackId variant_node
+class T41_usecase_usecase_CatalogueImplSignalsError_LayerBindingsLoad variant_node
+class T41_usecase_usecase_CatalogueImplSignalsError_CatalogueLoad variant_node
+class T41_usecase_usecase_CatalogueImplSignalsError_BaselineLoad variant_node
+class T41_usecase_usecase_CatalogueImplSignalsError_ExtendedCrateConversion variant_node
+class T41_usecase_usecase_CatalogueImplSignalsError_SchemaExport variant_node
+class T41_usecase_usecase_CatalogueImplSignalsError_Evaluation variant_node
+class T41_usecase_usecase_CatalogueImplSignalsError_SymlinkRejected variant_node
+class T41_usecase_usecase_CatalogueImplSignalsError_SymlinkGuardIo variant_node
+class T41_usecase_usecase_CatalogueImplSignalsError_NoLayers variant_node
+class T41_usecase_usecase_CatalogueImplSignalsError_FeatureDeclaration variant_node
+class T41_usecase_usecase_CatalogueImplSignalsError__self error_type
+class T46_usecase_usecase_CatalogueImplSignalsInteractor_new method_node
+class T46_usecase_usecase_CatalogueImplSignalsInteractor__self interactor
+class R34_usecase_usecase_SchemaExporterPort_export_as_json method_node
+class R34_usecase_usecase_SchemaExporterPort__self secondary_port
+class T53_usecase_usecase_TdddActualFeatureDeclarationPortError_Read variant_node
+class T53_usecase_usecase_TdddActualFeatureDeclarationPortError_MissingBaselineSnapshot variant_node
+class T53_usecase_usecase_TdddActualFeatureDeclarationPortError_BaselineSnapshotMismatch variant_node
+class T53_usecase_usecase_TdddActualFeatureDeclarationPortError__self error_type
+class T55_usecase_usecase_TdddBaselineFeatureDeclarationPortError_Read variant_node
+class T55_usecase_usecase_TdddBaselineFeatureDeclarationPortError_SnapshotWrite variant_node
+class T55_usecase_usecase_TdddBaselineFeatureDeclarationPortError_MissingDeclarationSnapshotWithExistingBaselines variant_node
+class T55_usecase_usecase_TdddBaselineFeatureDeclarationPortError_BaselineSnapshotMismatch variant_node
+class T55_usecase_usecase_TdddBaselineFeatureDeclarationPortError__self error_type
+class T47_usecase_usecase_TdddFeatureDeclarationReadError_MissingDeclaration variant_node
+class T47_usecase_usecase_TdddFeatureDeclarationReadError_ReadDeclaration variant_node
+class T47_usecase_usecase_TdddFeatureDeclarationReadError_DecodeDeclaration variant_node
+class T47_usecase_usecase_TdddFeatureDeclarationReadError_UnknownCargoFeature variant_node
+class T47_usecase_usecase_TdddFeatureDeclarationReadError__self error_type
+class R48_usecase_usecase_TdddActualFeatureDeclarationPort_load_for_actual method_node
+class R48_usecase_usecase_TdddActualFeatureDeclarationPort__self secondary_port
+class R50_usecase_usecase_TdddBaselineFeatureDeclarationPort_load_for_baseline method_node
+class R50_usecase_usecase_TdddBaselineFeatureDeclarationPort__self secondary_port
+class T32_usecase_usecase_TypeSignalsError_BranchTrackMismatch variant_node
+class T32_usecase_usecase_TypeSignalsError_LayerBindingsLoad variant_node
+class T32_usecase_usecase_TypeSignalsError_NoLayers variant_node
+class T32_usecase_usecase_TypeSignalsError_FeatureDeclaration variant_node
+class T32_usecase_usecase_TypeSignalsError_EvaluationFailed variant_node
+class T32_usecase_usecase_TypeSignalsError_InconsistentRequest variant_node
+class T32_usecase_usecase_TypeSignalsError__self error_type
+class T37_usecase_usecase_TypeSignalsInteractor_new method_node
+class T37_usecase_usecase_TypeSignalsInteractor__self interactor
+class R39_usecase_usecase_TypeSignalsExecutorPort_evaluate_layer method_node
+class R39_usecase_usecase_TypeSignalsExecutorPort__self secondary_port
+class T51_infrastructure_infrastructure_RustdocSchemaExporter_new method_node
+class T51_infrastructure_infrastructure_RustdocSchemaExporter_export_rustdoc_json_path method_node
+class T51_infrastructure_infrastructure_RustdocSchemaExporter_export_rustdoc_json_path_with_features method_node
+class T51_infrastructure_infrastructure_RustdocSchemaExporter_existing_rustdoc_json_path method_node
+class T51_infrastructure_infrastructure_RustdocSchemaExporter__self secondary_adapter
+class T61_infrastructure_infrastructure_FsTdddFeatureDeclarationAdapter_new method_node
+class T61_infrastructure_infrastructure_FsTdddFeatureDeclarationAdapter__self secondary_adapter
+class T59_infrastructure_infrastructure_RustdocBaselineCaptureAdapter_new method_node
+class T59_infrastructure_infrastructure_RustdocBaselineCaptureAdapter__self secondary_adapter
+class T49_infrastructure_infrastructure_RustdocCrateAdapter_new method_node
+class T49_infrastructure_infrastructure_RustdocCrateAdapter__self secondary_adapter
+class T56_infrastructure_infrastructure_TypeSignalsExecutorAdapter_new method_node
+class T56_infrastructure_infrastructure_TypeSignalsExecutorAdapter__self secondary_adapter
+class F106_infrastructure_infrastructure_infrastructure__tddd__type_signals_evaluator__execute_type_signals_for_layer free_function
+class F106_infrastructure_infrastructure_infrastructure__tddd__type_signals_evaluator__execute_type_signals_for_layer function_node
+```

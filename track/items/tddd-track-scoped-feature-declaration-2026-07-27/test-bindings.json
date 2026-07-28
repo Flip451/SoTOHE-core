@@ -1,0 +1,743 @@
+{
+  "track_id": "tddd-track-scoped-feature-declaration-2026-07-27",
+  "records": [
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "RustdocBaselineCapturePort",
+        "item_identifier": "trait_method:capture",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_feature_declaration_forwards_layer_features_to_capture"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BaselineCaptureError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_missing_feature_declaration_returns_error_before_capture"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "BaselineCaptureError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_missing_feature_declaration_returns_error_before_capture"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "RustdocSchemaExporter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_valid_declaration_creates_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_with_matching_baseline_snapshot_returns_declaration"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_baseline_snapshot_mismatch_returns_feature_declaration_error_before_rustdoc_capture"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_with_declared_features_forwards_them_to_rustdoc"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "BaselineCaptureInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_feature_declaration_forwards_layer_features_to_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::baseline_capture::interactor_tests",
+          "test_name": "test_run_with_missing_feature_declaration_returns_error_before_capture"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPort",
+        "item_identifier": "trait_method:load_for_baseline",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "item_identifier": "trait_impl:usecase::tddd_feature_declaration::TdddBaselineFeatureDeclarationPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "TdddActualFeatureDeclarationPort",
+        "item_identifier": "trait_method:load_for_actual",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "item_identifier": "trait_impl:usecase::tddd_feature_declaration::TdddActualFeatureDeclarationPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "RustdocBaselineCaptureAdapter",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocBaselineCapturePort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_baseline_capture_adapter::tests",
+          "test_name": "test_capture_adapter_with_declared_features_writes_feature_gated_baseline"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CargoFeatureNameError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_invalid_token_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_leading_hyphen_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_empty_value_returns_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CargoFeatureName",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-09"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_invalid_token_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_leading_hyphen_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_cargo_feature_name_with_empty_value_returns_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "GO-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_total_layers_succeeds"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_total_layers_succeeds"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclaration",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_total_layers_succeeds"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclarationError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_missing_layer_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_unexpected_layer_returns_error"
+        },
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_with_duplicate_feature_returns_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddFeatureLookupError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "domain",
+          "module_path": "domain::tddd::feature_declaration::tests",
+          "test_name": "test_tddd_feature_declaration_lookup_for_missing_layer_returns_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPortError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPortError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_existing_layer_baselines_and_no_snapshot_returns_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddBaselineFeatureDeclarationPortError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_valid_declaration_creates_snapshot"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_with_matching_baseline_snapshot_returns_declaration"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_with_changed_declaration_returns_snapshot_mismatch"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddActualFeatureDeclarationPortError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_actual_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclarationReadError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_without_declaration_returns_missing_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TdddFeatureDeclarationReadError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_unknown_cargo_feature_returns_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_featureless_layer_preserves_empty_feature_list"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "FsTdddFeatureDeclarationAdapter",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::feature_declaration_adapter::tests",
+          "test_name": "test_baseline_port_with_unknown_cargo_feature_returns_error"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "RustdocCratePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:load_from_path"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_load_from_path_nonexistent_file_returns_not_found"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "RustdocCratePort",
+        "obligation_kind": "contract",
+        "item_identifier": "trait_method:capture_current"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_with_exporter_forwards_declared_features"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "CatalogueImplSignalsInteractor",
+        "obligation_kind": "result",
+        "item_identifier": "entry"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_missing_frozen_declaration_stops_before_rustdoc_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_undeclared_gated_catalogue_item_returns_non_blue_chain_three_signal"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "RustdocCrateAdapter",
+        "obligation_kind": "contract_conformance",
+        "item_identifier": "trait_impl:domain::tddd::catalogue_v2::catalogue_impl_signals_ports::RustdocCratePort"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::rustdoc_crate_adapter::tests",
+          "test_name": "test_capture_current_with_exporter_forwards_declared_features"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "TypeSignalsInteractor",
+        "item_identifier": "entry",
+        "obligation_kind": "result"
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_forwards_declared_layer_features_to_executor"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorPort",
+        "item_identifier": "trait_method:evaluate_layer",
+        "obligation_kind": "contract"
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::type_signals::interactor::tests",
+          "test_name": "test_run_forwards_declared_layer_features_to_executor"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "TypeSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "AC-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_calc_impl_catalog_absent_feature_declaration_stops_before_rustdoc"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "infrastructure::tddd::type_signals_evaluator::execute_type_signals_for_layer",
+        "item_identifier": "entry",
+        "obligation_kind": "logic"
+      },
+      "tests": [
+        {
+          "layer": "cli_composition",
+          "module_path": "cli_composition::signal::tests",
+          "test_name": "test_signal_composition_freshness_skip_and_conservative_reextract_use_real_adapter"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_evaluator::tests",
+          "test_name": "test_execute_type_signals_feature_selection_change_reextracts_and_reaches_rustdoc"
+        }
+      ]
+    },
+    {
+      "kind": "fulfillment",
+      "obligation_id": {
+        "entry_key": "TypeSignalsExecutorAdapter",
+        "item_identifier": "trait_impl:usecase::type_signals::ports::TypeSignalsExecutorPort",
+        "obligation_kind": "contract_conformance"
+      },
+      "tests": [
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_absent_catalogue_returns_error"
+        },
+        {
+          "layer": "infrastructure",
+          "module_path": "infrastructure::tddd::type_signals_executor_adapter::tests",
+          "test_name": "test_evaluate_layer_with_declared_features_forwards_them_to_rustdoc"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_baseline_snapshot_mismatch_returns_feature_declaration_error_before_rustdoc_capture"
+        },
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_with_frozen_declaration_exposes_gated_public_item_in_both_captures"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "IN-05"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-01"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_missing_frozen_declaration_stops_before_rustdoc_capture"
+        }
+      ]
+    },
+    {
+      "kind": "voluntary_binding",
+      "edge_id": {
+        "entry_key": "CatalogueImplSignalsError",
+        "anchor_id": {
+          "file_path": "track/items/tddd-track-scoped-feature-declaration-2026-07-27/spec.json",
+          "element_id": "CN-03"
+        }
+      },
+      "tests": [
+        {
+          "layer": "usecase",
+          "module_path": "usecase::catalogue_impl_signals::interactor_tests",
+          "test_name": "test_run_invalid_feature_declaration_returns_feature_declaration_error"
+        }
+      ]
+    }
+  ]
+}
