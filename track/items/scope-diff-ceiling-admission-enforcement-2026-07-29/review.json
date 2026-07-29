@@ -1,0 +1,74 @@
+{
+  "schema_version": 2,
+  "scopes": {
+    "adr": {
+      "rounds": [
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:d3d9f2e438220c542f2b21650f0329a05fc4a25a5cc1f249d4046086a7953c7d",
+          "at": "2026-07-28T17:08:27Z"
+        },
+        {
+          "type": "final",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 は commit 後に baseline が 0 へ戻るため残り member を次 batch として続けられるとしていますが、Context 自身が review の hash / verdict は scope 全体を単位とすると記録しています。現行 review target も merge-base 以降の committed diff を含むため、先行 batch を commit してもその変更は後続の scope review から消えず、各 batch が個別に ceiling 以下でも reviewer が再審査する累積 scope は ceiling を超えます。これは D1/D2 の「batch = commit / review 単位」と主目的を崩す内部矛盾です。解消には review target または ceiling の対象について新たな決定が必要なため hearing-required です。",
+              "severity": "P0",
+              "file": "knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md",
+              "line": 160,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:d3d9f2e438220c542f2b21650f0329a05fc4a25a5cc1f249d4046086a7953c7d",
+          "at": "2026-07-28T17:16:04Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "findings_remain",
+          "findings": [
+            {
+              "message": "D3 unconditionally states that the next review excludes all prior batch commits (line 165), but the review implementation falls back to the base branch when `.commit_hash` is absent or invalid, causing those commits to re-enter the review diff. This contradicts the ADR’s baseline-reset narrative; clarify the fallback behavior (hearing-required ADR change).",
+              "severity": "P1",
+              "file": "knowledge/adr/2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md",
+              "line": 165,
+              "category": "inconsistent decisions within the same ADR"
+            }
+          ],
+          "hash": "rvw1:sha256:3c6ecb97188bb5addff1770f61139c7cd9509773cdcab213b5112e90ed37aee2",
+          "at": "2026-07-28T17:51:45Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b850454865bc11d6905f8b8d553b76726b6f8d2218087342484d781ce227395",
+          "at": "2026-07-28T17:58:10Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:7b850454865bc11d6905f8b8d553b76726b6f8d2218087342484d781ce227395",
+          "at": "2026-07-28T18:02:17Z"
+        },
+        {
+          "type": "fast",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa52287a0add1a09809ebee0335bf747ee0dc5fafe50ad51e1b1559b4ba0b8dc",
+          "at": "2026-07-29T00:03:50Z"
+        },
+        {
+          "type": "final",
+          "verdict": "zero_findings",
+          "findings": [],
+          "hash": "rvw1:sha256:aa52287a0add1a09809ebee0335bf747ee0dc5fafe50ad51e1b1559b4ba0b8dc",
+          "at": "2026-07-29T00:08:40Z"
+        }
+      ]
+    }
+  }
+}

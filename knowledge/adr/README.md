@@ -167,6 +167,7 @@ Convention に `## Decision Reference` セクションを追加し ADR にリン
 | [impl-plan task ステータス遷移後の review refresh](2026-07-22-0633-impl-plan-transition-review-refresh.md) | Proposed | 2026-07-22 |
 | [上流収束における意味論検証の chain scope 明確化](2026-07-22-0817-deferred-upstream-semantic-verification.md) | Proposed | 2026-07-22 |
 | [dry gate 評価点における設定無効と feature 無効の優先規則](2026-07-22-1541-dry-gate-evaluation-feature-off-precedence.md) | Proposed | 2026-07-22 |
+| [per-scope diff ceiling を実装開始前の admission で機構強制する](2026-07-28-1521-scope-diff-ceiling-admission-enforcement.md) | Proposed | 2026-07-28 |
 
 ### ADR 運用
 
