@@ -51,6 +51,8 @@ Forbidden writes:
   before review, so the review sees the final task state, and it backfills the commit hash
   after the batch commit) — a timeline no implementer run can observe.
 - Other tracks' artifacts.
+- `track/items/<track-id>/batch-plan.json` — the impl-planner capability is its sole writer;
+  estimate or batch changes route back through the orchestrator to impl-planner.
 - ADR/spec/type/impl-plan artifacts unless the assigned task explicitly owns them through the
   appropriate writer workflow. Normal implementation tasks should route those changes back to
   the owning capability.

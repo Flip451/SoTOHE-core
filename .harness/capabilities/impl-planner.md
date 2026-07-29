@@ -8,7 +8,9 @@
 ## Mission
 
 Author four Phase 3 artifacts, in dependency order — task decomposition → spec coverage →
-contract attribution → estimation → batch composition — completing each file in a single write:
+contract attribution → estimation → batch composition. Each authoring pass completes each file
+in a single write (no interleaved partial writes across artifacts); a failed gate afterwards
+starts a new revision pass, re-entering the order at the earliest affected artifact:
 
 - `track/items/<id>/impl-plan.json` — the implementation plan:
   - `schema_version`
@@ -59,7 +61,7 @@ If the briefing asks for:
 ### Internal pipeline (all executed by the specialist)
 
 Follow the authoring dependency order — task decomposition → spec coverage → contract
-attribution → estimation → batch composition — writing each file once:
+attribution → estimation → batch composition — writing each file once per pass:
 
 1. Draft and write `track/items/<id>/impl-plan.json` (`tasks[]` + `plan.sections[]`).
 2. Draft and write `track/items/<id>/task-coverage.json` (per-section `SpecElementId` → `Vec<TaskId>` map).
@@ -70,6 +72,13 @@ attribution → estimation → batch composition — writing each file once:
    bin/sotp verify plan-artifact-refs
    ```
    Capture the OK / ERROR verdict.
+6. Evaluate the batch-plan structural gate:
+   ```
+   bin/sotp batch-plan check
+   ```
+   Capture its verdict as well. Phase 3 is complete only when **both** gates pass; on a
+   batch-plan failure, run a new revision pass (per the Mission's pass rule) from the earliest
+   affected artifact and re-run both gates before reporting.
 
 ### Output (final message to orchestrator)
 
@@ -77,7 +86,7 @@ attribution → estimation → batch composition — writing each file once:
 2. **## Tasks summary** — bullet list of written tasks (`id` → one-line description) plus the plan sections grouping them
 3. **## Coverage summary** — per-section coverage status (all spec elements covered? any gaps?)
 4. **## Batch plan summary** — the declared batch order with member task ids, plus any task carrying an indivisibility justification (and why the boundary cannot be split further)
-5. **## Gate verdict** — OK / ERROR from `bin/sotp verify plan-artifact-refs`; include the error message if ERROR so the orchestrator can decide next steps
+5. **## Gate verdict** — OK / ERROR from both `bin/sotp verify plan-artifact-refs` and `bin/sotp batch-plan check`; include the error message(s) if ERROR so the orchestrator can decide next steps
 6. **## Open Questions** — anywhere the spec or type catalogue is ambiguous about task boundaries
 
 Do NOT emit Rust code, trait signatures, module trees, or `TypeDefinitionKind` selections.
@@ -96,7 +105,7 @@ Apply the project-wide conventions resolved for this capability at the **plan le
 
 - **Writes permitted**: `track/items/<id>/impl-plan.json` (direct), `track/items/<id>/task-coverage.json` (direct), `track/items/<id>/task-contract.json` (direct), `track/items/<id>/batch-plan.json` (direct; this capability is its sole writer).
 - **Writes forbidden**: any other track's artifacts, other capabilities' SSoT files (`spec.json`, `<layer>-types.json`, `metadata.json`), `plan.md`, any file under `knowledge/adr/` or `knowledge/conventions/`, any source code, and track task-state transitions through `bin/sotp track transition`; this capability has no task-state transition authority.
-- **Bash usage**: restricted to `bin/sotp` CLI invocations required by the internal pipeline (`bin/sotp verify plan-artifact-refs`). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
+- **Bash usage**: restricted to `bin/sotp` CLI invocations required by the internal pipeline (`bin/sotp verify plan-artifact-refs`, `bin/sotp batch-plan check`). No `git`, `cat`, `grep`, `head`, `tail`, `sed`, or `awk`.
 - Do not spawn further agents (keep planning deterministic and serial).
 - If information beyond the briefing is needed, note it in `## Open Questions` rather than probing silently via exploration.
 

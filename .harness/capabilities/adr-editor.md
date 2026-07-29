@@ -16,7 +16,7 @@ classified by `adr-diagnoser`; this capability edits, it never adjudicates.
 This capability is **write-only to `knowledge/adr/*.md`** (including the hand-maintained
 index rows in `knowledge/adr/README.md` for drafts it creates or deletes). It must not edit
 spec.json, type catalogues, metadata.json, impl-plan.json, task-coverage.json,
-task-contract.json, or any other artifact.
+task-contract.json, batch-plan.json, or any other artifact.
 
 ## Invocation contract
 
@@ -185,7 +185,7 @@ deleting a draft). Do NOT spawn further agents.
 - The single permitted git command is the read-only `git log <merge_target> -- <adr-file>`
   for pre-merge detection.
 - Do not modify spec.json, metadata.json, impl-plan.json, task-coverage.json,
-  task-contract.json, or any catalogue file.
+  task-contract.json, batch-plan.json, or any catalogue file.
 - Store reasoning in session memory, not on disk.
 
 ## Session resume

@@ -88,27 +88,30 @@
     {
       "id": "T013",
       "description": "`.harness/capabilities/impl-planner.md` の Phase 3 authoring と write ownership を batch-plan.json に対応させて更新する。IN-01、IN-02、IN-03、IN-04、IN-17、AC-01、AC-02、AC-03、AC-18、CN-07、CN-08。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "ab4eed67"
     },
     {
       "id": "T014",
       "description": "`.harness/custom/review-prompts/impl-plan.md` と `.harness/config/review-scope.json` を更新し、batch-plan review checks と artifact pattern を追加する。IN-08、AC-01、AC-09、CN-02。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "ab4eed67"
     },
     {
       "id": "T015",
       "description": "`.harness/capabilities/implementer.md` に task-state pre-work precondition を追加する。IN-13、AC-16、CN-10。",
-      "status": "done"
+      "status": "done",
+      "commit_hash": "ab4eed67"
     },
     {
       "id": "T016",
       "description": "`.harness/capabilities/{spec-designer,type-designer,adr-editor,implementer,researcher,review-fix-lead,dry-fix-lead,rollback-diagnoser}.md` の writes-forbidden 列に batch-plan.json を追加して impl-planner 専有を伝播し、`.harness/workflows/track/impl-plan.md`、`.claude/commands/track/impl-plan.md`（impl-planner 専有の forwarding）、`.agents/skills/track-impl-plan/SKILL.md`（同じ forwarding）、Makefile.toml を更新する。IN-01、IN-18、AC-01、AC-19、AC-20、CN-06。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T017",
       "description": "plan order 上で先行する全タスクの完了後に `.harness/workflows/track/full-cycle.md` の batch-consumption steps と scope-diff reference を更新する。IN-12、IN-15、IN-16、AC-15、AC-18、AC-19、CN-06、CN-09。",
-      "status": "todo"
+      "status": "done"
     },
     {
       "id": "T018",

@@ -7,7 +7,7 @@ GO-01 → T001–T012、T019、T020、T013、T016、T018: 宣言された batch 
 GO-02 → T003、T004、T006、T012、T018: Phase 3 終端と todo → in_progress 遷移の実装開始前 gate を配置する。
 GO-03 → T001、T002、T019、T020、T007、T008、T013、T014、T017: batch と依存宣言を Phase 3 宣言成果物へ移し、impl-plan review と full-cycle consumption の対象にする。
 
-## Tasks (17/20 resolved)
+## Tasks (19/20 resolved)
 
 ### S1 — ドメイン中核 — 見積り・batch 宣言と 2 つの純粋判定
 
@@ -34,11 +34,11 @@ GO-03 → T001、T002、T019、T020、T007、T008、T013、T014、T017: batch �
 
 ### S4 — 正本伝播 — capability 契約 / review 指示書 / workflow
 
-- [x] **T013**: `.harness/capabilities/impl-planner.md` の Phase 3 authoring と write ownership を batch-plan.json に対応させて更新する。IN-01、IN-02、IN-03、IN-04、IN-17、AC-01、AC-02、AC-03、AC-18、CN-07、CN-08。
-- [x] **T014**: `.harness/custom/review-prompts/impl-plan.md` と `.harness/config/review-scope.json` を更新し、batch-plan review checks と artifact pattern を追加する。IN-08、AC-01、AC-09、CN-02。
-- [x] **T015**: `.harness/capabilities/implementer.md` に task-state pre-work precondition を追加する。IN-13、AC-16、CN-10。
-- [ ] **T016**: `.harness/capabilities/{spec-designer,type-designer,adr-editor,implementer,researcher,review-fix-lead,dry-fix-lead,rollback-diagnoser}.md` の writes-forbidden 列に batch-plan.json を追加して impl-planner 専有を伝播し、`.harness/workflows/track/impl-plan.md`、`.claude/commands/track/impl-plan.md`（impl-planner 専有の forwarding）、`.agents/skills/track-impl-plan/SKILL.md`（同じ forwarding）、Makefile.toml を更新する。IN-01、IN-18、AC-01、AC-19、AC-20、CN-06。
-- [ ] **T017**: plan order 上で先行する全タスクの完了後に `.harness/workflows/track/full-cycle.md` の batch-consumption steps と scope-diff reference を更新する。IN-12、IN-15、IN-16、AC-15、AC-18、AC-19、CN-06、CN-09。
+- [x] **T013**: `.harness/capabilities/impl-planner.md` の Phase 3 authoring と write ownership を batch-plan.json に対応させて更新する。IN-01、IN-02、IN-03、IN-04、IN-17、AC-01、AC-02、AC-03、AC-18、CN-07、CN-08。 (`ab4eed67`)
+- [x] **T014**: `.harness/custom/review-prompts/impl-plan.md` と `.harness/config/review-scope.json` を更新し、batch-plan review checks と artifact pattern を追加する。IN-08、AC-01、AC-09、CN-02。 (`ab4eed67`)
+- [x] **T015**: `.harness/capabilities/implementer.md` に task-state pre-work precondition を追加する。IN-13、AC-16、CN-10。 (`ab4eed67`)
+- [x] **T016**: `.harness/capabilities/{spec-designer,type-designer,adr-editor,implementer,researcher,review-fix-lead,dry-fix-lead,rollback-diagnoser}.md` の writes-forbidden 列に batch-plan.json を追加して impl-planner 専有を伝播し、`.harness/workflows/track/impl-plan.md`、`.claude/commands/track/impl-plan.md`（impl-planner 専有の forwarding）、`.agents/skills/track-impl-plan/SKILL.md`（同じ forwarding）、Makefile.toml を更新する。IN-01、IN-18、AC-01、AC-19、AC-20、CN-06。
+- [x] **T017**: plan order 上で先行する全タスクの完了後に `.harness/workflows/track/full-cycle.md` の batch-consumption steps と scope-diff reference を更新する。IN-12、IN-15、IN-16、AC-15、AC-18、AC-19、CN-06、CN-09。
 
 ### S5 — 遷移経路への admission 内蔵（track 終端）
 
